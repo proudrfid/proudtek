@@ -1,0 +1,30 @@
+---
+import SnapshotLayout from "../layouts/SnapshotLayout.astro";
+import { getPageByRoute, getSiteData, routeToParam, type SnapshotPage } from "../lib/site-data";
+import { LOW_VALUE_ROUTE_PREFIXES } from "../lib/route-overrides";
+
+export async function getStaticPaths() {
+  const siteData = await getSiteData();
+
+  return siteData.pages
+    .filter(
+      (page) =>
+        page.route !== "/" &&
+        !LOW_VALUE_ROUTE_PREFIXES.some((prefix) => page.route.startsWith(prefix)) &&
+        !page.route.endsWith("/page/1/"),
+    )
+    .map((page) => ({
+      params: { slug: routeToParam(page.route) },
+    }));
+}
+
+const slug = Astro.params.slug;
+const route = slug ? `/${String(slug).replace(/^\/+|\/+$/g, "")}/` : "/";
+const page = (await getPageByRoute(route)) as SnapshotPage | undefined;
+
+if (!page) {
+  throw new Error(`Missing snapshot for route ${route}. Run \`npm run fetch\` first.`);
+}
+---
+
+<SnapshotLayout page={page} />
