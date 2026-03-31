@@ -1,37 +1,191 @@
 import { load } from "cheerio";
+import { getCollection } from "astro:content";
 
 import type { SiteData, SnapshotPage } from "./site-data";
+import { loadPageFromDisk } from "./site-data";
 import { html, raw } from "./html";
-import { PRODUCT_LANDING_DEFINITIONS } from "./product-landing-definitions";
-import { PRODUCT_LANDING_DEFINITIONS_BATCH2 } from "./product-landing-definitions-batch2";
-import { PRODUCT_LANDING_DEFINITIONS_BATCH3 } from "./product-landing-definitions-batch3";
-import { PRODUCT_LANDING_DEFINITIONS_BATCH4 } from "./product-landing-definitions-batch4";
-import { PRODUCT_LANDING_DEFINITIONS_BATCH5 } from "./product-landing-definitions-batch5";
-import { PRODUCT_LANDING_DEFINITIONS_BATCH6 } from "./product-landing-definitions-batch6";
-import { PRODUCT_LANDING_DEFINITIONS_BATCH7 } from "./product-landing-definitions-batch7";
-import { PRODUCT_LANDING_DEFINITIONS_BATCH8 } from "./product-landing-definitions-batch8";
-import { INDUSTRY_LANDING_DEFINITIONS } from "./industry-landing-definitions";
 
-const ALL_LANDING_DEFINITIONS = [
-  ...PRODUCT_LANDING_DEFINITIONS,
-  ...PRODUCT_LANDING_DEFINITIONS_BATCH2,
-  ...PRODUCT_LANDING_DEFINITIONS_BATCH3,
-  ...PRODUCT_LANDING_DEFINITIONS_BATCH4,
-  ...PRODUCT_LANDING_DEFINITIONS_BATCH5,
-  ...PRODUCT_LANDING_DEFINITIONS_BATCH6,
-  ...PRODUCT_LANDING_DEFINITIONS_BATCH7,
-  ...PRODUCT_LANDING_DEFINITIONS_BATCH8,
-  ...INDUSTRY_LANDING_DEFINITIONS,
-];
+/* ── Catalog hero-image overrides ──────────────────────────────────────
+ * Many WordPress product pages share the same generic banner image.
+ * This map assigns each product a unique hero image so the catalog grid
+ * does not look like it has duplicate products.
+ * Key = product route, Value = image path relative to site root.
+ */
+const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
+  // ── RFID Cards ──────────────────────────────────────────────────────
+  "/products/rfid-cards/em4100-rfid-card/":                      "/landing-images/em4100-rfid-card.jpg",
+  "/products/rfid-cards/icode-slix-card/":                       "/landing-images/icode-slix-card.jpg",
+  "/products/rfid-cards/mifare-classic-1k-card/":                "/landing-images/mifare-classic-1k-card.jpg",
+  "/products/rfid-cards/mifare-desfire-ev3-card/":               "/landing-images/mifare-desfire-ev3-card.jpg",
+  "/products/rfid-cards/mifare-desfire-ev3-cards/":              "/landing-images/mifare-desfire-ev3-card.jpg",
+  "/products/rfid-cards/mifare-plus-se-card/":                   "/landing-images/mifare-plus-se-card.png",
+  "/products/rfid-cards/nfc-card-custom-printing/":              "/landing-images/nfc-card-custom-printing.jpg",
+  "/products/rfid-cards/rfid-employee-badge/":                   "/landing-images/rfid-employee-badge.jpg",
+  "/products/rfid-cards/rfid-gift-card/":                        "/landing-images/rfid-gift-card.jpg",
+  "/products/rfid-cards/rfid-loyalty-card/":                     "/landing-images/rfid-loyalty-card.jpg",
+  "/products/rfid-cards/rfid-student-id-card/":                  "/landing-images/rfid-student-id-card.jpg",
+  "/products/rfid-cards/transparent-clear-nfc-card/":            "/landing-images/transparent-clear-nfc-card.jpg",
+  "/products/rfid-cards/transparent-nfc-card/":                  "/landing-images/transparent-nfc-card.jpg",
+  "/products/rfid-cards/uhf-rfid-card/":                         "/landing-images/uhf-rfid-card.jpg",
+  "/products/rfid-cards/rfid-card-magnetic-stripe-combo/":       "/landing-images/rfid-card-magnetic-stripe-combo.jpg",
+  "/products/rfid-cards/rfid-dual-frequency-card/":              "/landing-images/rfid-dual-frequency-card.jpg",
+  "/products/rfid-cards/rfid-bamboo-card/":                      "/landing-images/rfid-bamboo-card.jpg",
+  "/products/rfid-cards/rfid-wooden-card/":                      "/landing-images/rfid-wooden-card.jpg",
+  "/products/rfid-cards/wooden-nfc-business-card-engraved/":     "/landing-images/wooden-nfc-business-card-engraved.jpg",
+  "/products/rfid-cards/rfid-card-assa-abloy-compatible/":       "/landing-images/rfid-card-assa-abloy-compatible.jpg",
+  "/products/rfid-cards/ntag424-dna-tt-card/":                   "/landing-images/ntag424-dna-tamper-evident-tag.jpg",
+  // ── RFID Keyfobs ────────────────────────────────────────────────────
+  "/products/rfid-keyfobs/em4305-keyfob/":                       "/landing-images/em4305-keyfob.jpg",
+  "/products/rfid-keyfobs/mifare-desfire-keyfob/":               "/landing-images/mifare-desfire-keyfob.jpg",
+  "/products/rfid-keyfobs/t5577-keyfob/":                        "/landing-images/t5577-keyfob.jpg",
+  "/products/rfid-keyfobs/rfid-wristwatch-tag/":                 "/landing-images/rfid-wristwatch-tag.jpg",
+  "/products/rfid-keyfobs/rfid-leather-keyfob/":                 "/landing-images/rfid-leather-keyfob.jpg",
+  "/products/rfid-keyfobs/rfid-metal-keyfob/":                   "/landing-images/rfid-metal-keyfob.jpg",
+  "/products/rfid-keyfobs/rfid-silicone-keyfob/":                "/landing-images/rfid-silicone-keyfob.jpg",
+  "/products/rfid-keyfobs/rfid-epoxy-keyfob/":                   "/landing-images/rfid-epoxy-keyfob.jpg",
+  "/products/rfid-keyfobs/rfid-coin-keyfob/":                    "/landing-images/rfid-coin-keyfob.jpg",
+  // ── RFID Wristbands ─────────────────────────────────────────────────
+  "/products/rfid-wristbands/cashless-payment-rfid-wristband/":  "/landing-images/cashless-payment-rfid-wristband.jpg",
+  "/products/rfid-wristbands/elastic-rfid-wristband/":           "/landing-images/elastic-rfid-wristband.jpg",
+  "/products/rfid-wristbands/fabric-rfid-wristband/":            "/landing-images/fabric-rfid-wristband.jpg",
+  "/products/rfid-wristbands/nfc-fitness-wristband/":            "/landing-images/nfc-fitness-wristband.jpg",
+  "/products/rfid-wristbands/nfc-medical-alert-wristband/":      "/landing-images/nfc-medical-alert-wristband.jpg",
+  "/products/rfid-wristbands/paper-rfid-wristband/":             "/landing-images/paper-rfid-wristband.jpg",
+  "/products/rfid-wristbands/rfid-adjustable-silicone-wristband/": "/landing-images/rfid-adjustable-silicone-wristband.jpg",
+  "/products/rfid-wristbands/rfid-child-wristband/":             "/landing-images/rfid-child-wristband.jpg",
+  "/products/rfid-wristbands/rfid-prison-wristband/":            "/landing-images/rfid-prison-wristband.jpg",
+  "/products/rfid-wristbands/rfid-waterpark-wristband/":         "/landing-images/rfid-waterpark-wristband.jpg",
+  "/products/rfid-wristbands/rfid-wristband-qr-nfc/":           "/landing-images/rfid-wristband-qr-nfc.jpg",
+  "/products/rfid-wristbands/silicone-wristband-mifare-classic/": "/landing-images/silicone-wristband-mifare-classic.jpg",
+  "/products/rfid-wristbands/uhf-rfid-wristband/":              "/landing-images/uhf-rfid-wristband.jpg",
+  "/products/rfid-wristbands/rfid-nylon-wristband/":             "/landing-images/rfid-nylon-wristband.jpg",
+  "/products/rfid-wristbands/rfid-vinyl-wristband/":             "/landing-images/rfid-vinyl-wristband.jpg",
+  "/products/rfid-wristbands/rfid-tyvek-wristband/":             "/landing-images/rfid-tyvek-wristband-alt.jpg",
+  // ── RFID Labels / Stickers / Inlays ─────────────────────────────────
+  "/products/rfid-labels/alien-higgs-9-uhf-inlay/":              "/landing-images/alien-higgs-9-uhf-inlay.jpg",
+  "/products/rfid-labels/impinj-m700-uhf-inlay/":                "/landing-images/impinj-m700-uhf-inlay.jpg",
+  "/products/rfid-labels/impinj-m800-uhf-inlay/":                "/landing-images/impinj-m800-uhf-inlay.jpg",
+  "/products/rfid-labels/nfc-pharmaceutical-label/":             "/landing-images/nfc-pharmaceutical-label.jpg",
+  "/products/rfid-labels/rfid-asset-label/":                     "/landing-images/rfid-asset-label.jpg",
+  "/products/rfid-labels/rfid-book-spine-label/":                "/landing-images/rfid-book-spine-label.jpg",
+  "/products/rfid-labels/rfid-frozen-food-label/":               "/landing-images/rfid-frozen-food-label.jpg",
+  "/products/rfid-labels/rfid-plant-nursery-label/":             "/landing-images/rfid-plant-nursery-label.jpg",
+  "/products/rfid-labels/rfid-specimen-slide-label/":            "/landing-images/rfid-specimen-slide-label.jpg",
+  "/products/rfid-labels/uhf-rfid-apparel-hang-tag-retail/":     "/landing-images/uhf-rfid-apparel-hang-tag-retail.jpg",
+  "/products/rfid-labels/uhf-rfid-blood-bag-label/":             "/landing-images/uhf-rfid-blood-bag-label.jpg",
+  "/products/rfid-labels/uhf-rfid-jewelry-label/":               "/landing-images/uhf-rfid-jewelry-label.jpg",
+  "/products/rfid-labels/uhf-rfid-retail-price-label/":          "/landing-images/uhf-rfid-retail-price-label.jpg",
+  "/products/rfid-labels/uhf-rfid-tire-label/":                  "/landing-images/uhf-rfid-tire-label.jpg",
+  "/products/rfid-labels/rfid-dry-inlay/":                       "/landing-images/rfid-dry-inlay-alt.jpg",
+  "/products/rfid-labels/rfid-wet-inlay/":                       "/landing-images/rfid-wet-inlay-alt.jpg",
+  "/products/rfid-labels/nfc-art-provenance-tag/":               "/landing-images/nfc-art-provenance-tag.jpg",
+  "/products/rfid-labels/nfc-cannabis-tracking-label/":          "/landing-images/nfc-cannabis-tracking-label.jpg",
+  "/products/rfid-labels/nfc-electronics-warranty-label/":       "/landing-images/nfc-electronics-warranty-label.jpg",
+  "/products/rfid-labels/nfc-event-ticket-sticker/":             "/landing-images/nfc-event-ticket-sticker.jpg",
+  "/products/rfid-labels/nfc-food-traceability-label/":          "/landing-images/nfc-food-traceability-label.jpg",
+  "/products/rfid-labels/nfc-olive-oil-authentication-label/":   "/landing-images/nfc-olive-oil-authentication-label.jpg",
+  "/products/rfid-labels/nfc-spirits-authentication-label/":     "/landing-images/nfc-spirits-authentication-label.jpg",
+  "/products/rfid-labels/nfc-tap-to-pay-sticker/":               "/landing-images/nfc-tap-to-pay-sticker.jpg",
+  "/products/rfid-labels/long-range-uhf-windshield-sticker/":    "/landing-images/long-range-uhf-windshield-sticker.jpg",
+  "/products/rfid-labels/uhf-rfid-windshield-label/":            "/landing-images/uhf-rfid-windshield-label.jpg",
+  "/products/rfid-labels/rfid-tamper-evident-label/":            "/landing-images/rfid-tamper-evident-label.jpg",
+  "/products/rfid-labels/uhf-rfid-pallet-label/":                "/landing-images/uhf-rfid-pallet-label.jpg",
+  // ── RFID Tags ───────────────────────────────────────────────────────
+  "/products/rfid-tags/anti-metal-uhf-it-asset-tag/":            "/landing-images/anti-metal-uhf-it-asset-tag.jpg",
+  "/products/rfid-tags/rfid-magnet-mount-tag/":                  "/landing-images/rfid-magnet-mount-tag.jpg",
+  "/products/rfid-tags/rfid-utility-pole-tag/":                  "/landing-images/rfid-utility-pole-tag.jpg",
+  "/products/rfid-tags/rfid-nail-tag/":                          "/landing-images/rfid-nail-tag.jpg",
+  "/products/rfid-tags/rfid-pallet-runner-tag/":                 "/landing-images/rfid-pallet-runner-tag.jpg",
+  "/products/rfid-tags/rfid-parking-token/":                     "/landing-images/rfid-parking-token.jpg",
+  "/products/rfid-tags/rfid-wedge-tag/":                         "/landing-images/rfid-wedge-tag.jpg",
+  "/products/rfid-tags/rfid-silicone-flexible-tag/":             "/landing-images/rfid-silicone-flexible-tag.jpg",
+  "/products/rfid-tags/waterproof-uhf-rfid-outdoor-tag/":        "/landing-images/waterproof-uhf-rfid-outdoor-tag.jpg",
+  "/products/rfid-tags/rfid-coin-tag/":                          "/landing-images/rfid-coin-tag-alt.jpg",
+};
 
-/** Returns a map of sidebar label → correct product count, usable by render-snapshot.ts */
-export function getProductCategoryCounts(): Record<string, number> | null {
-  const totalProducts = PRODUCT_CATEGORIES.reduce((sum, cat) => sum + cat.routes.length, 0);
-  const result: Record<string, number> = { Products: totalProducts };
-  for (const cat of PRODUCT_CATEGORIES) {
-    result[cat.label] = cat.routes.length;
-  }
-  return result;
+/* ── WordPress product image overrides ──────────────────────────────────
+ * Many WP products share the same generic banner (ppc-custom-rfid-cards, ppc-rfid-wristbands).
+ * These overrides assign unique images so the catalog grid has visual variety.
+ */
+const WP_IMAGE_OVERRIDES: Record<string, string> = {
+  // RFID Cards (WP /product/ routes)
+  "/product/125-khz-rfid-card/":           "/landing-images/em4100-rfid-card.jpg",
+  "/product/blank-rfid-card/":             "/site-assets/wp-content/uploads/2023/12/RFID_blank_card.jpg",
+  "/product/clamshell-card/":              "/site-assets/wp-content/uploads/2023/12/clamshell_card.jpg",
+  "/product/combi-card/":                  "/site-assets/wp-content/uploads/2023/12/combi_card.jpg",
+  "/product/dual-interface-card/":         "/site-assets/wp-content/uploads/2023/12/dual_interface_card.jpg",
+  "/product/eco_rfid_card/":               "/site-assets/wp-content/uploads/2024/10/Eco_RFID_card.jpg",
+  "/product/em4200-card/":                 "/site-assets/wp-content/uploads/2023/12/EM4200_card.jpg",
+  "/product/em4305-card/":                 "/site-assets/wp-content/uploads/2023/12/EM4305_card.jpg",
+  "/product/felica-card/":                 "/site-assets/wp-content/uploads/2024/09/Felica_card_blank.jpg",
+  "/product/google-review-nfc-card/":      "/site-assets/wp-content/uploads/2024/09/Google_review_NFC_card.jpg",
+  "/product/hitag-2-card/":                "/site-assets/wp-content/uploads/2023/12/HITAG_2_Card.jpg",
+  "/product/hotel-key-cards/":             "/site-assets/wp-content/uploads/2023/12/rfid_hotel_key_card.jpg",
+  "/product/inkjet-pvc-id-card/":          "/site-assets/wp-content/uploads/2023/12/Inkjet_PVC_ID_card.jpg",
+  "/product/java-card/":                   "/site-assets/wp-content/uploads/2023/12/Java_card.jpg",
+  "/product/legic-card/":                  "/site-assets/wp-content/uploads/2023/12/legic_card.jpg",
+  "/product/metal-nfc-card/":              "/site-assets/wp-content/uploads/2024/09/Metal_NFC_card.jpg",
+  "/product/mifare-4k-card/":              "/site-assets/wp-content/uploads/2023/12/S70_card.jpg",
+  "/product/mifare-classic-card/":         "/site-assets/wp-content/uploads/2023/12/MIFARE_classic_card.jpg",
+  "/product/mifare-desfire-cards/":        "/site-assets/wp-content/uploads/2024/01/DESFire_card.jpg",
+  "/product/mifare-desfire-ev2-cards/":    "/site-assets/wp-content/uploads/2024/04/DESFire_EV2_Card.jpg",
+  "/product/mifare-plus-card/":           "/site-assets/wp-content/uploads/2024/04/MIFARE-Plus-EV2_card.png",
+  "/product/nfc-business-card/":           "/site-assets/wp-content/uploads/2024/09/NFC_business_card.jpg",
+  "/product/nfc-cards/":                   "/site-assets/wp-content/uploads/2024/09/NFC_card-1.jpg",
+  "/product/printed-rfid-cards/":          "/site-assets/wp-content/uploads/2023/12/printed_rfid_cards.jpg",
+  "/product/rfid-paper-card/":             "/site-assets/wp-content/uploads/2023/12/RFID_paper_card.jpg",
+  "/product/t5577-card/":                  "/site-assets/wp-content/uploads/2024/03/T5577_card.jpg",
+  "/product/wooden-rfid-card/":            "/site-assets/wp-content/uploads/2024/10/wood_RFID_card.jpg",
+  // RFID Keyfobs
+  "/product/desfire-tag/":                 "/site-assets/wp-content/uploads/2024/09/DESFire_tag.jpg",
+  "/product/nfc-ring/":                    "/site-assets/wp-content/uploads/2024/09/NFC_ring.jpg",
+  "/product/proximity-fobs/":             "/site-assets/wp-content/uploads/2024/07/rfid_key_fobs.jpg",
+  "/product/rfid-key-fob/":               "/site-assets/wp-content/uploads/2023/12/RFID_key_fob_collection.jpg",
+  // RFID Wristbands
+  "/product/coconut-shell-rfid-wristband/": "/site-assets/wp-content/uploads/2023/11/coconut-rfid-wristband.jpg",
+  "/product/rfid-event-wristband/":        "/site-assets/wp-content/uploads/2024/10/RFID_Event_wristband_with_RFID_reader.jpg",
+  "/product/rfid-silicone-wristbands/":    "/site-assets/wp-content/uploads/2024/09/rfid_silicone_wristband_group.jpg",
+  "/product/rfid-wristbands-for-events/":  "/site-assets/wp-content/uploads/2023/12/rfid_wristband_for_event.jpg",
+  "/product/rfid-wristbands-for-hotels/":  "/site-assets/wp-content/uploads/2024/11/RFID_wristbands_for_hotels.jpg",
+  "/product/uhf-wristband/":               "/site-assets/wp-content/uploads/2024/10/UHF_Wristband.jpg",
+  // RFID Labels/Stickers
+  "/product/125khz-rfid-sticker/":         "/site-assets/wp-content/uploads/2023/12/125khz_rfid_sticker.jpg",
+  "/product/mifare-stickers/":             "/site-assets/wp-content/uploads/2024/03/MIFARE_sticker.jpg",
+  "/product/nfc-sticker/":                 "/site-assets/wp-content/uploads/2024/09/NFC_sticker.jpg",
+  "/product/nfc-stickers/":                "/site-assets/wp-content/uploads/2024/03/NFC_stickers.jpg",
+  "/product/rfid-sticker-on-headlight/":   "/site-assets/wp-content/uploads/2024/09/headlight_rfid_sticker.jpg",
+  "/product/rfid-windshield-tag/":         "/site-assets/wp-content/uploads/2023/12/rfid_windshield_tag.jpg",
+  // RFID Tags
+  "/product/car-transponder-chip/":        "/site-assets/wp-content/uploads/2024/10/car_transponder_chip.jpg",
+  "/product/pps-rfid-laundry-tag/":        "/site-assets/wp-content/uploads/2024/09/PPS_laundry_tag.jpg",
+  "/product/rfid-laundry-tags/":           "/site-assets/wp-content/uploads/2023/12/rfid_laundry_tags.jpg",
+  "/product/rfid-silicone-laundry-tag/":   "/site-assets/wp-content/uploads/2024/09/RFID_silicone_laundry_tag.jpg",
+  "/product/rfid-tag-with-led-light/":     "/site-assets/wp-content/uploads/2023/12/rfid_tag_with_led.jpg",
+  // RFID Readers
+  "/product/nfc-reader-writer-with-free-sdks/": "/site-assets/wp-content/uploads/2024/06/nfc_reader_writer_uFR.jpg",
+};
+
+/* ── Load landing definitions from Content Collections ────────────────── */
+
+interface LandingDef {
+  route: string;
+  title: string;
+  summary: string;
+  heroImage?: string;
+  imageSourceRoutes: string[];
+  group: string;
+}
+
+let _landingDefsCache: LandingDef[] | null = null;
+
+async function loadLandingDefinitions(): Promise<LandingDef[]> {
+  if (_landingDefsCache) return _landingDefsCache;
+  const entries = await getCollection("editorial");
+  _landingDefsCache = entries
+    .filter((e) => !e.id.startsWith("_unused/"))
+    .filter((e) => e.data.group === "products")
+    .map((e) => e.data as unknown as LandingDef);
+  return _landingDefsCache;
 }
 
 /* Show ALL products on a single page — no pagination */
@@ -44,14 +198,15 @@ interface CatalogProduct {
   summary: string;
 }
 
-export function mergeCatalogPages(siteData: SiteData): SiteData {
-  const template = pickCatalogTemplate(siteData);
+export async function mergeCatalogPages(siteData: SiteData): Promise<SiteData> {
+  const template = await pickCatalogTemplate(siteData);
 
   if (!template) {
     return siteData;
   }
 
-  const products = collectCatalogProducts(siteData);
+  const products = await collectCatalogProducts(siteData);
+  await getProductCategories(); // populate _productCategoriesCache before sync usage
 
   if (products.length === 0) {
     return siteData;
@@ -69,7 +224,7 @@ export function mergeCatalogPages(siteData: SiteData): SiteData {
     buildCatalogRedirectPage(siteData, template, "/products/all/page/1/", "/products/all/", "Products"),
     buildCatalogRedirectPage(siteData, template, "/product-category/products/", "/products/all/", "Products"),
     buildCatalogRedirectPage(siteData, template, "/product-category/products/page/1/", "/products/all/", "Products"),
-    ...buildLegacyCollectionAliasPages(siteData),
+    ...(await buildLegacyCollectionAliasPages(siteData)),
     buildIndustriesPage(siteData, template, products),
   ];
 
@@ -112,55 +267,89 @@ export function mergeCatalogPages(siteData: SiteData): SiteData {
   };
 }
 
-function pickCatalogTemplate(siteData: SiteData): SnapshotPage | undefined {
-  return (
-    siteData.pages.find((page) => page.route === "/products/all/") ??
-    siteData.pages.find((page) => page.route === "/products/rfid-cards/") ??
-    siteData.pages.find((page) => page.route.startsWith("/products/"))
-  );
+async function pickCatalogTemplate(siteData: SiteData): Promise<SnapshotPage | undefined> {
+  const candidates = ["/products/all/", "/products/rfid-cards/"];
+  for (const route of candidates) {
+    if (siteData.pages.some((p) => p.route === route)) {
+      try { return await loadPageFromDisk(route); } catch { /* skip */ }
+    }
+  }
+  const fallback = siteData.pages.find((p) => p.route.startsWith("/products/"));
+  if (fallback) {
+    try { return await loadPageFromDisk(fallback.route); } catch { /* skip */ }
+  }
+  return undefined;
 }
 
-function collectCatalogProducts(siteData: SiteData): CatalogProduct[] {
-  const pageMap = new Map(siteData.pages.map((page) => [page.route, page]));
+async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduct[]> {
+  // Load WP product pages from disk for image/summary extraction
+  const wpProductStubs = siteData.pages.filter((page) => page.route.startsWith("/product/"));
+  const wpProducts: CatalogProduct[] = [];
+  for (const stub of wpProductStubs) {
+    try {
+      const page = await loadPageFromDisk(stub.route);
+      wpProducts.push({
+        route: page.route,
+        title: stripSiteSuffix(page.title) || slugToTitle(page.route.split("/").filter(Boolean).pop() ?? "Product"),
+        image: WP_IMAGE_OVERRIDES[page.route] ?? CATALOG_IMAGE_OVERRIDES[page.route] ?? extractFirstImage(page.bodyHtml),
+        summary: extractProductSummary(page.bodyHtml),
+      });
+    } catch {
+      wpProducts.push({
+        route: stub.route,
+        title: stripSiteSuffix(stub.title) || slugToTitle(stub.route.split("/").filter(Boolean).pop() ?? "Product"),
+        image: WP_IMAGE_OVERRIDES[stub.route] ?? CATALOG_IMAGE_OVERRIDES[stub.route] ?? "",
+        summary: "",
+      });
+    }
+  }
 
-  const wpProducts = siteData.pages
-    .filter((page) => page.route.startsWith("/product/"))
-    .map((page) => ({
-      route: page.route,
-      title: stripSiteSuffix(page.title) || slugToTitle(page.route.split("/").filter(Boolean).pop() ?? "Product"),
-      image: extractFirstImage(page.bodyHtml),
-      summary: extractProductSummary(page.bodyHtml),
-    }));
-
-  const landingProducts = ALL_LANDING_DEFINITIONS.map((def) => {
-    // Prefer heroImage if available, otherwise resolve from imageSourceRoutes
-    let image = def.heroImage ?? "";
+  // Load landing definitions from Content Collections
+  const allLandingDefs = await loadLandingDefinitions();
+  const landingProducts: CatalogProduct[] = [];
+  for (const def of allLandingDefs) {
+    // 1) Check override map first (ensures unique images in catalog grid)
+    let image = CATALOG_IMAGE_OVERRIDES[def.route] ?? "";
+    // 2) Then heroImage from the definition
+    if (!image) image = def.heroImage ?? "";
+    // 3) Fall back to extracting from source routes
     if (!image) {
       for (const sourceRoute of def.imageSourceRoutes) {
-        const sourcePage = pageMap.get(sourceRoute);
-        if (sourcePage) {
+        try {
+          const sourcePage = await loadPageFromDisk(sourceRoute);
           image = extractFirstImage(sourcePage.bodyHtml);
           if (image) break;
-        }
+        } catch { /* source page not on disk — skip */ }
       }
     }
 
-    return {
+    landingProducts.push({
       route: def.route,
       title: stripSiteSuffix(def.title) || slugToTitle(def.route.split("/").filter(Boolean).pop() ?? "Product"),
       image,
       summary: truncateText(def.summary, 160),
-    };
-  });
+    });
+  }
 
   return [...wpProducts, ...landingProducts].sort((left, right) => left.route.localeCompare(right.route));
 }
 
-function buildLegacyCollectionAliasPages(siteData: SiteData): SnapshotPage[] {
-  return siteData.pages
+async function buildLegacyCollectionAliasPages(siteData: SiteData): Promise<SnapshotPage[]> {
+  const stubs = siteData.pages
     .filter((page) => /^\/products\/[^/]+\/(?:page\/\d+\/)?$/.test(page.route))
-    .filter((page) => !page.route.startsWith("/products/all/"))
-    .map((page) => cloneSnapshotPage(siteData, page, page.route.replace(/^\/products\//, "/product-category/products/")));
+    .filter((page) => !page.route.startsWith("/products/all/"));
+
+  const results: SnapshotPage[] = [];
+  for (const stub of stubs) {
+    try {
+      const fullPage = await loadPageFromDisk(stub.route);
+      results.push(cloneSnapshotPage(siteData, fullPage, stub.route.replace(/^\/products\//, "/product-category/products/")));
+    } catch {
+      // Page doesn't exist on disk (synthetic) — clone stub as-is
+      results.push(cloneSnapshotPage(siteData, stub, stub.route.replace(/^\/products\//, "/product-category/products/")));
+    }
+  }
+  return results;
 }
 
 function buildCatalogArchivePage(
@@ -303,30 +492,25 @@ interface ProductCategory {
   routes: string[];
 }
 
-/* Landing page routes grouped by category prefix */
-const LANDING_CARD_ROUTES = ALL_LANDING_DEFINITIONS
-  .filter((d) => d.route.startsWith("/products/rfid-cards/"))
-  .map((d) => d.route);
-const LANDING_KEYFOB_ROUTES = ALL_LANDING_DEFINITIONS
-  .filter((d) => d.route.startsWith("/products/rfid-keyfobs/"))
-  .map((d) => d.route);
-const LANDING_WRISTBAND_ROUTES = ALL_LANDING_DEFINITIONS
-  .filter((d) => d.route.startsWith("/products/rfid-wristbands/"))
-  .map((d) => d.route);
-const LANDING_LABEL_ROUTES = ALL_LANDING_DEFINITIONS
-  .filter((d) => d.route.startsWith("/products/rfid-labels/"))
-  .map((d) => d.route);
-const LANDING_TAG_ROUTES = ALL_LANDING_DEFINITIONS
-  .filter((d) => d.route.startsWith("/products/rfid-tags/"))
-  .map((d) => d.route);
-const LANDING_INDUSTRY_ROUTES = ALL_LANDING_DEFINITIONS
-  .filter((d) => d.route.startsWith("/industries/"))
-  .map((d) => d.route);
+/* Landing page routes grouped by category prefix — computed lazily */
+let _productCategoriesCache: ProductCategory[] | null = null;
 
-/* Categories match the WordPress WooCommerce sidebar exactly.
- * Products not listed in any WordPress category page (due to WP pagination)
- * are appended to RFID Cards as the catch-all. */
-const PRODUCT_CATEGORIES: ProductCategory[] = [
+async function getProductCategories(): Promise<ProductCategory[]> {
+  if (_productCategoriesCache) return _productCategoriesCache;
+
+  const allLanding = await loadLandingDefinitions();
+  const landingRoutesByPrefix = (prefix: string) =>
+    allLanding.filter((d) => d.route.startsWith(prefix)).map((d) => d.route);
+
+  const LANDING_CARD_ROUTES = landingRoutesByPrefix("/products/rfid-cards/");
+  const LANDING_KEYFOB_ROUTES = landingRoutesByPrefix("/products/rfid-keyfobs/");
+  const LANDING_WRISTBAND_ROUTES = landingRoutesByPrefix("/products/rfid-wristbands/");
+  const LANDING_LABEL_ROUTES = landingRoutesByPrefix("/products/rfid-labels/");
+  const LANDING_TAG_ROUTES = landingRoutesByPrefix("/products/rfid-tags/");
+  const LANDING_INDUSTRY_ROUTES = landingRoutesByPrefix("/industries/");
+
+  /* Categories match the WordPress WooCommerce sidebar exactly. */
+  _productCategoriesCache = [
   {
     id: "rfid-cards",
     label: "RFID Cards",
@@ -440,13 +624,18 @@ const PRODUCT_CATEGORIES: ProductCategory[] = [
     description: "RFID and NFC solutions tailored for specific industries — hospitality, retail, healthcare, logistics and more.",
     routes: [...LANDING_INDUSTRY_ROUTES],
   },
-];
+  ];
 
-function categorizeProducts(products: CatalogProduct[]): { category: ProductCategory; items: CatalogProduct[] }[] {
+  return _productCategoriesCache;
+}
+
+/** Sync version — requires getProductCategories() to have been called first. */
+function categorizeProductsSync(products: CatalogProduct[]): { category: ProductCategory; items: CatalogProduct[] }[] {
+  const categories = _productCategoriesCache ?? [];
   const assignedRoutes = new Set<string>();
   const result: { category: ProductCategory; items: CatalogProduct[] }[] = [];
 
-  for (const category of PRODUCT_CATEGORIES) {
+  for (const category of categories) {
     const routeSet = new Set(category.routes);
     const items = products.filter((product) => routeSet.has(product.route));
     items.forEach((item) => assignedRoutes.add(item.route));
@@ -482,7 +671,7 @@ function renderCatalogMain({
   totalProducts: number;
   products: CatalogProduct[];
 }): string {
-  const categorized = categorizeProducts(products);
+  const categorized = categorizeProductsSync(products);
 
   const categoryNavHtml = categorized
     .map(({ category }) => `<a href="#${category.id}" class="codex-catalog-nav-chip">${category.icon} ${category.label}</a>`)
@@ -498,7 +687,7 @@ function renderCatalogMain({
             <span class="codex-catalog-count">${items.length} products</span>
           </div>
           <ul class="products columns-4">
-            ${items.map((product) => renderProductCard(product)).join("")}
+            ${items.map((product, i) => renderProductCard(product, i === 0 && items.length >= 4)).join("")}
           </ul>
         </section>`,
     )
@@ -508,7 +697,7 @@ function renderCatalogMain({
     <div class="woocommerce-notices-wrapper"></div>
     <header class="woocommerce-products-header">
       ${raw(renderBreadcrumbs(route, title))}
-      <h1 class="page-title archive-title">${title}</h1>
+      <h2 class="page-title archive-title">${title}</h2>
       <div class="term-description">
         <p>${description}</p>
       </div>
@@ -533,62 +722,70 @@ function renderCatalogMain({
         display: inline-flex;
         align-items: center;
         gap: 0.35rem;
+        min-height: 2.75rem;
         padding: 0.5rem 1rem;
         background: #fff;
         border: 1px solid #d4c9b8;
         border-radius: 999px;
         font-size: 0.9rem;
         font-weight: 500;
-        color: #4a3f35;
+        color: var(--codex-text);
         text-decoration: none;
         transition: all 0.2s ease;
         white-space: nowrap;
       }
       .codex-catalog-nav-chip:hover {
-        background: #7c6a4f;
+        background: var(--codex-dark-mid);
         color: #fff;
-        border-color: #7c6a4f;
+        border-color: var(--codex-dark-mid);
         transform: translateY(-1px);
         box-shadow: 0 3px 8px rgba(124, 106, 79, 0.25);
       }
       .codex-catalog-category {
-        margin: 2.5rem 0;
-        padding: 0;
+        margin: 0;
+        padding: 3rem 0;
+      }
+      .codex-catalog-category + .codex-catalog-category {
+        border-top: 1px solid #e8dfd3;
       }
       .codex-catalog-category-header {
-        margin-bottom: 1.25rem;
-        padding: 1.25rem 1.5rem;
-        background: linear-gradient(135deg, #faf6f0, #f0e9df);
-        border-radius: 12px;
-        border-left: 4px solid #7c6a4f;
+        margin-bottom: 1.5rem;
+        padding: 0;
+        background: none;
+        border-radius: 0;
+        border-left: none;
       }
       .codex-catalog-category-header h2 {
-        margin: 0 0 0.35rem;
-        font-size: 1.5rem;
-        color: #3d3425;
+        margin: 0 0 0.3rem;
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--codex-text);
         line-height: 1.3;
+        letter-spacing: -0.01em;
       }
       .codex-catalog-category-header p {
         margin: 0;
-        color: #6b5e50;
-        font-size: 0.95rem;
+        color: var(--codex-text-muted);
+        font-size: 0.92rem;
         line-height: 1.5;
+        max-width: 520px;
       }
       .codex-catalog-count {
         display: inline-block;
-        margin-top: 0.5rem;
-        padding: 0.15rem 0.6rem;
-        background: #7c6a4f;
-        color: #fff;
+        margin-top: 0.4rem;
+        padding: 0.15rem 0.55rem;
+        background: none;
+        border: 1px solid #c9b99a;
+        color: var(--codex-text-muted);
         border-radius: 999px;
-        font-size: 0.75rem;
+        font-size: 0.72rem;
         font-weight: 600;
         letter-spacing: 0.03em;
       }
       .codex-catalog-category .products {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.75rem;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
         list-style: none;
         padding: 0;
         margin: 0;
@@ -597,20 +794,19 @@ function renderCatalogMain({
         display: flex;
         flex-direction: column;
         background: #fff;
-        border: none;
-        border-radius: 14px;
+        border: 1px solid #ece6dc;
+        border-radius: 10px;
         padding: 0;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(41, 28, 14, 0.06);
-        transition: all 0.25s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
       }
       .codex-catalog-category .product:hover {
-        box-shadow: 0 12px 32px rgba(124, 106, 79, 0.15);
-        transform: translateY(-4px);
+        border-color: #c9b99a;
+        box-shadow: 0 8px 24px rgba(124, 106, 79, 0.12);
       }
       .codex-catalog-category .product img {
         width: 100%;
-        aspect-ratio: 4 / 3;
+        aspect-ratio: 1 / 1;
         object-fit: cover;
         background: #f8f6f2;
       }
@@ -619,23 +815,23 @@ function renderCatalogMain({
         color: inherit;
       }
       .codex-catalog-category .woocommerce-loop-product__title {
-        padding: 1rem 1.25rem 0.35rem;
-        font-size: 1rem;
-        font-weight: 700;
-        color: #3d3425;
-        line-height: 1.4;
+        padding: 0.75rem 1rem 0.25rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--codex-text);
+        line-height: 1.35;
         display: -webkit-box;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
       .codex-catalog-category .codex-catalog-summary {
-        padding: 0 1.25rem;
-        font-size: 0.88rem;
-        color: #7a6e60;
-        line-height: 1.55;
+        padding: 0 1rem;
+        font-size: 0.82rem;
+        color: var(--codex-text-muted);
+        line-height: 1.5;
         display: -webkit-box;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
         flex: 1;
@@ -644,32 +840,69 @@ function renderCatalogMain({
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        margin: auto 1.25rem 1.25rem;
-        padding: 0.55rem 1.25rem;
+        margin: auto 1rem 1rem;
+        padding: 0.5rem 1rem;
         text-align: center;
-        background: linear-gradient(135deg, #f5efe6, #ebe3d7);
-        border: none;
-        border-radius: 8px;
-        color: #5c4d3a;
-        font-size: 0.85rem;
+        background: none;
+        border: 1px solid #d4c9b8;
+        border-radius: 6px;
+        color: var(--codex-dark-mid);
+        font-size: 0.8rem;
         font-weight: 600;
         text-decoration: none;
         transition: all 0.2s ease;
       }
       .codex-catalog-category .button:hover {
-        background: #7c6a4f;
+        background: var(--codex-dark-mid);
         color: #fff;
+        border-color: var(--codex-dark-mid);
+      }
+      /* Featured product — first card in category */
+      .codex-catalog-featured {
+        grid-column: span 2;
+        grid-row: span 2;
+        border-color: #d4c9b8;
+      }
+      .codex-catalog-featured img {
+        aspect-ratio: 4 / 3 !important;
+      }
+      .codex-catalog-featured .woocommerce-loop-product__title {
+        font-size: 1.15rem !important;
+        font-weight: 700 !important;
+        padding: 1rem 1.25rem 0.35rem !important;
+        -webkit-line-clamp: 3 !important;
+      }
+      .codex-catalog-featured .codex-catalog-summary {
+        padding: 0 1.25rem !important;
+        font-size: 0.9rem !important;
+        -webkit-line-clamp: 4 !important;
+      }
+      .codex-catalog-featured .button {
+        margin: auto 1.25rem 1.25rem !important;
+        padding: 0.65rem 1.5rem !important;
+        font-size: 0.88rem !important;
+        background: var(--codex-dark-mid) !important;
+        color: #fff !important;
+        border-color: var(--codex-dark-mid) !important;
+      }
+      .codex-catalog-featured .button:hover {
+        background: var(--codex-dark) !important;
+        border-color: var(--codex-dark) !important;
       }
       @media (max-width: 1024px) {
-        .codex-catalog-category .products { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+        .codex-catalog-category .products { grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+        .codex-catalog-featured { grid-row: span 1; }
+        .codex-catalog-featured img { aspect-ratio: 3 / 2 !important; }
       }
       @media (max-width: 768px) {
-        .codex-catalog-category .products { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .codex-catalog-category .products { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
         .codex-catalog-nav { gap: 0.4rem; }
         .codex-catalog-nav-chip { font-size: 0.82rem; padding: 0.4rem 0.75rem; }
+        .codex-catalog-featured { grid-row: span 1; }
       }
       @media (max-width: 480px) {
         .codex-catalog-category .products { grid-template-columns: 1fr; }
+        .codex-catalog-featured { grid-column: span 1; }
       }
     </style>
   `;
@@ -704,24 +937,27 @@ function buildSrcset(_src: string): string {
   return "";
 }
 
-function renderProductCard(product: CatalogProduct): string {
+function renderProductCard(product: CatalogProduct, featured = false): string {
   const srcset = product.image ? buildSrcset(product.image) : "";
+  const loading = featured ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"';
+  const sizes = featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw";
   const imageHtml = product.image
     ? srcset
-      ? html`<img src="${product.image}" srcset="${srcset}" sizes="(max-width: 768px) 50vw, 25vw" alt="${product.title}" loading="lazy" decoding="async">`
-      : html`<img src="${product.image}" alt="${product.title}" loading="lazy" decoding="async">`
+      ? html`<img src="${product.image}" srcset="${srcset}" sizes="${raw(sizes)}" alt="${product.title}" ${raw(loading)} decoding="async">`
+      : html`<img src="${product.image}" alt="${product.title}" ${raw(loading)} decoding="async">`
     : "";
   const summaryHtml = product.summary
     ? html`<p class="codex-catalog-summary">${product.summary}</p>`
     : "";
+  const featuredClass = featured ? " codex-catalog-featured" : "";
 
-  return html`<li class="product type-product status-publish product-type-simple instock">
+  return html`<li class="product type-product status-publish product-type-simple instock${raw(featuredClass)}">
     <a href="${product.route}" class="woocommerce-LoopProduct-link woocommerce-loop-product__link">
       ${raw(imageHtml)}
       <h2 class="woocommerce-loop-product__title">${product.title}</h2>
     </a>
     ${raw(summaryHtml)}
-    <a href="${product.route}" class="button product_type_simple">Read more</a>
+    <a href="${product.route}" class="button product_type_simple">${raw(featured ? "View Details →" : "Read more")}</a>
   </li>`;
 }
 
@@ -782,7 +1018,7 @@ function updateSidebarCounts($: ReturnType<typeof load>, products: CatalogProduc
         const countEl = parent.find(".count, span");
         const actualCount = catId === null
           ? products.length
-          : (PRODUCT_CATEGORIES.find((c) => c.id === catId)?.routes ?? []).filter((r) => products.some((p) => p.route === r)).length;
+          : (_productCategoriesCache?.find((c) => c.id === catId)?.routes ?? []).filter((r) => products.some((p) => p.route === r)).length;
 
         countEl.each((_, ce) => {
           const countText = $(ce).text();
@@ -1147,7 +1383,8 @@ function buildIndustriesPage(
           else l.classList.remove('active');
         });
       }
-      window.addEventListener('scroll', update, {passive:true});
+      var ticking = false;
+      window.addEventListener('scroll', function(){ if (!ticking) { ticking = true; requestAnimationFrame(function(){ update(); ticking = false; }); } }, {passive:true});
       update();
       links.forEach(function(l){
         l.addEventListener('click', function(e){

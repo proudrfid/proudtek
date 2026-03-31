@@ -1,0 +1,190 @@
+{
+  "route": "/blog/hotel-key-card-encoding-explained/",
+  "group": "blog",
+  "title": "Hotel Key Card Encoding Explained",
+  "kicker": "Hotel Technology",
+  "summary": "A technical guide to hotel key card encoding covering PMS integration, encoder hardware types, sector data structure and the differences between magnetic-stripe and RFID chip encoding for hotel operations teams and IT procurement managers.",
+  "heroPoints": [
+    "Encoding links the Property Management System to the physical card through an encrypted data payload that the lock authenticates.",
+    "Encoder hardware selection must match both the PMS protocol and the target chip family on the card.",
+    "Understanding sector data layout prevents encoding conflicts when multiple applications share the same card."
+  ],
+  "imageAlt": "Hotel front desk RFID card encoder connected to PMS",
+  "imageSourceRoutes": [
+    "/product/hotel-key-cards/",
+    "/product/acr122u/"
+  ],
+  "sections": [
+    {
+      "title": "What hotel key card encoding does",
+      "intro": "Encoding is the process of writing guest-specific access data — room number, check-in and check-out timestamps, access zone permissions — onto a blank or recycled card so that the door lock can authenticate and grant entry.",
+      "image": {
+        "src": "/blog-images/encoding.jpg",
+        "alt": "RFID hotel key card being encoded at a front desk terminal"
+      },
+      "paragraphs": [
+        "When a guest checks in, the front-desk agent triggers an encoding command from the PMS. The PMS sends a data payload to the desktop encoder, which writes it to a specific memory location on the card. The door lock reads this payload, verifies the cryptographic authentication, checks the validity window and unlocks if all conditions pass.",
+        "Encoding quality directly affects guest experience. A poorly encoded card that fails at the lock forces the guest to return to the front desk, creating frustration and workload. Reliable encoding depends on correct encoder configuration, proper card positioning and valid encryption keys."
+      ]
+    },
+    {
+      "title": "Encoder hardware types",
+      "intro": "Hotel card encoders range from simple USB desktop units to integrated front-desk kiosk modules. The right choice depends on PMS compatibility, card volume and chip family.",
+      "image": {
+        "src": "/blog-images/hotel-reception.jpg",
+        "alt": "Hotel check-in desk with RFID key card encoder terminal"
+      },
+      "bullets": [
+        "USB desktop encoders (e.g., ACS ACR122U, HID OMNIKEY 5427) are the most common. They connect to the PMS workstation via USB and encode one card at a time in under 500 ms.",
+        "Serial-port encoders are found in older Saflok and Onity installations. They communicate via RS-232 and may require a USB-to-serial adapter on modern PCs.",
+        "Integrated kiosk encoders are built into self-check-in terminals. They accept cards from a hopper, encode and dispense automatically.",
+        "Network encoders connect via TCP/IP and can serve multiple PMS workstations. They are useful in lobby configurations where the encoder is mounted under the counter away from the workstation."
+      ],
+      "table": {
+        "columns": [
+          "Encoder Type",
+          "Connection",
+          "Typical Use Case",
+          "Card Throughput"
+        ],
+        "rows": [
+          [
+            "USB desktop",
+            "USB HID / PC/SC",
+            "Standard front-desk check-in",
+            "1 card / 0.3-0.5 s"
+          ],
+          [
+            "Serial RS-232",
+            "COM port / USB adapter",
+            "Legacy lock systems (Saflok, Onity)",
+            "1 card / 0.5-1.0 s"
+          ],
+          [
+            "Integrated kiosk",
+            "USB or serial to kiosk controller",
+            "Self-check-in terminals",
+            "1 card / 1.0-2.0 s (with dispensing)"
+          ],
+          [
+            "Network TCP/IP",
+            "Ethernet / Wi-Fi",
+            "Multi-station lobby setups",
+            "1 card / 0.3-0.5 s per station"
+          ]
+        ]
+      },
+      "callout": {
+        "label": "Compatibility tip",
+        "text": "Always confirm encoder firmware version matches your chip family. A Classic-only encoder cannot write DESFire credentials — verify before bulk ordering.",
+        "href": "/product/acr122u/"
+      }
+    },
+    {
+      "title": "PMS integration and encoding protocols",
+      "intro": "The PMS is the system of record for guest reservations and room assignments. It drives the encoding command that writes access credentials to the card.",
+      "bullets": [
+        "Most lock vendors provide a PMS integration SDK or DLL that the PMS calls to generate the encoding payload. Opera, Protel, Mews and other major PMS platforms have pre-built integrations for Saflok, ASSA ABLOY and SALTO lock systems.",
+        "The encoding payload typically includes: room number, check-in datetime, check-out datetime, common-door access flags (pool, gym, parking) and an encrypted authentication token.",
+        "Some PMS integrations support batch encoding for group check-ins, writing multiple cards in sequence from a pre-loaded guest list.",
+        "Cloud-based PMS platforms may use a local encoding agent that runs on the front-desk PC, bridging the cloud PMS to the USB encoder hardware."
+      ]
+    },
+    {
+      "title": "Magnetic stripe vs RFID chip encoding",
+      "intro": "Properties migrating from magstripe to RFID need to understand the fundamental differences in how data is written and secured on each card technology.",
+      "paragraphs": [
+        "Magnetic-stripe encoding writes data as a pattern of magnetic flux reversals on Track 2 or Track 3 of the card's iron-oxide stripe. The data is unencrypted and can be read by any standard magstripe reader, making cloning trivial. RFID chip encoding writes data to non-volatile EEPROM memory inside the chip, protected by cryptographic authentication keys."
+      ],
+      "bullets": [
+        "Magstripe data is written in a single linear pass through the encoder's write head. RFID data is written wirelessly via the encoder's contactless antenna.",
+        "Magstripe encoding is format-specific to the lock vendor — Saflok, Onity and VingCard each use proprietary track formats.",
+        "RFID encoding writes to specific sectors (Classic) or application files (DESFire), with each write operation authenticated by the sector or application key.",
+        "Dual-interface encoders can write both magstripe and RFID on the same card in a single pass, supporting migration-period operations."
+      ]
+    },
+    {
+      "title": "Sector data structure on RFID hotel cards",
+      "intro": "Understanding how data is organized on the RFID chip helps IT teams troubleshoot encoding failures and plan multi-application card deployments.",
+      "bullets": [
+        "On a Classic 1K card, the lock vendor typically reserves 1-2 of the 16 available sectors for door-access data. Sector 0 is usually reserved for the manufacturer block and card UID.",
+        "Each sector is protected by two keys (Key A and Key B) that control read and write permissions. The lock vendor provides the sector keys during system installation.",
+        "On DESFire cards, the lock vendor creates an application (identified by a 3-byte AID) with files for room data, access zones and validity timestamps. Other applications can coexist without interference.",
+        "Encoding conflicts occur when two systems attempt to use the same sector or when key configuration is incorrect — always document sector allocation in a card data map.",
+        "Card UID (unique identifier) is a 4-byte (Classic) or 7-byte (DESFire) serial number assigned at chip manufacture. Some lock systems use the UID as an additional authentication factor."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Hotel key cards",
+      "description": "Browse RFID card formats compatible with major hotel lock encoder systems.",
+      "links": [
+        {
+          "href": "/product/hotel-key-cards/",
+          "label": "Hotel key cards overview"
+        }
+      ]
+    },
+    {
+      "title": "RFID encoder hardware",
+      "description": "Desktop USB encoders for hotel front-desk and access control encoding.",
+      "links": [
+        {
+          "href": "/product/acr122u/",
+          "label": "ACR122U NFC encoder"
+        }
+      ]
+    },
+    {
+      "title": "Related guides",
+      "description": "Technical resources for hotel RFID procurement and chip selection.",
+      "links": [
+        {
+          "href": "/blog/how-hotel-rfid-key-cards-work/",
+          "label": "How hotel RFID key cards work"
+        },
+        {
+          "href": "/blog/mifare-classic-vs-desfire-hotel-chips/",
+          "label": "MIFARE Classic vs DESFire"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "How long does it take to encode a hotel key card?",
+      "answer": "RFID encoding typically completes in 300-500 milliseconds per card, fast enough for high-volume check-in queues. Magnetic-stripe encoding takes a similar time. Dual-interface encoding (magstripe + RFID on one card) adds approximately 200 ms for the second write operation."
+    },
+    {
+      "question": "Can I re-encode the same hotel card for a new guest?",
+      "answer": "Yes. RFID hotel cards support 100,000 write cycles (Classic) to 500,000 cycles (DESFire). A card issued daily would last over 270 years at Classic endurance. Cards are typically retired for physical wear or brand refresh long before write endurance is reached."
+    },
+    {
+      "question": "What causes encoding failures at the front desk?",
+      "answer": "Common causes include incorrect card placement on the encoder, wrong sector keys in the PMS configuration, encoder firmware mismatch with the chip family, damaged chip antenna from card bending, and USB connection issues between encoder and PMS workstation. Systematic troubleshooting starts with testing a known-good card on the encoder."
+    },
+    {
+      "question": "Do I need different encoders for Classic and DESFire cards?",
+      "answer": "Most modern contactless encoders (ACR122U, OMNIKEY 5427 CK) support both Classic and DESFire via the PC/SC interface. The PMS integration software determines which encoding protocol to use. However, some legacy lock-vendor encoders only support Classic and require replacement or firmware update for DESFire."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/hotel-rfid/",
+    "label": "Get encoding setup support"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/hotel-key-cards/",
+      "label": "Browse hotel key cards"
+    },
+    {
+      "href": "/product/acr122u/",
+      "label": "View ACR122U encoder"
+    },
+    {
+      "href": "/blog/how-hotel-rfid-key-cards-work/",
+      "label": "Read how hotel RFID cards work"
+    }
+  ]
+}

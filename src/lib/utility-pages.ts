@@ -1,11 +1,12 @@
 import { load } from "cheerio";
 
 import type { SiteData, SnapshotPage } from "./site-data";
+import { loadPageFromDisk } from "./site-data";
 import { ROUTE_CANONICAL_OVERRIDES } from "./route-overrides";
 import { html, raw } from "./html";
 
-export function mergeUtilityPages(siteData: SiteData): SiteData {
-  const utilityPages = buildUtilityPages(siteData);
+export async function mergeUtilityPages(siteData: SiteData): Promise<SiteData> {
+  const utilityPages = await buildUtilityPages(siteData);
   const pageMap = new Map(siteData.pages.map((page) => [page.route, page]));
 
   utilityPages.forEach((page) => {
@@ -21,28 +22,46 @@ export function mergeUtilityPages(siteData: SiteData): SiteData {
   };
 }
 
-function buildUtilityPages(siteData: SiteData): SnapshotPage[] {
-  const template =
-    siteData.pages.find((page) => page.route === "/blog/") ??
-    siteData.pages.find((page) => page.route === "/about/") ??
-    siteData.pages.find((page) => page.route === "/");
+async function buildUtilityPages(siteData: SiteData): Promise<SnapshotPage[]> {
+  const templateRoutes = ["/blog/", "/about/", "/"];
+  let template: SnapshotPage | undefined;
+  for (const route of templateRoutes) {
+    if (siteData.pages.some((p) => p.route === route)) {
+      try {
+        template = await loadPageFromDisk(route);
+        break;
+      } catch { /* skip */ }
+    }
+  }
 
   if (!template) {
     return [];
   }
 
-  return [buildCaseStudiesPage(siteData, template)];
+  return [await buildCaseStudiesPage(siteData, template)];
 }
 
-function buildCaseStudiesPage(siteData: SiteData, template: SnapshotPage): SnapshotPage {
-  const posts = siteData.pages
-    .filter((page) => /^\/20\d{2}\//.test(page.route))
-    .map((page) => ({
-      route: ROUTE_CANONICAL_OVERRIDES[page.route] ?? page.route,
-      title: stripSiteSuffix(page.title) || "Article",
-      image: extractFirstImage(page.bodyHtml),
-      summary: extractSummary(page.bodyHtml),
-    }));
+async function buildCaseStudiesPage(siteData: SiteData, template: SnapshotPage): Promise<SnapshotPage> {
+  const articleStubs = siteData.pages.filter((page) => /^\/20\d{2}\//.test(page.route));
+  const posts: Array<{ route: string; title: string; image: string; summary: string }> = [];
+  for (const stub of articleStubs) {
+    try {
+      const page = await loadPageFromDisk(stub.route);
+      posts.push({
+        route: ROUTE_CANONICAL_OVERRIDES[page.route] ?? page.route,
+        title: stripSiteSuffix(page.title) || "Article",
+        image: extractFirstImage(page.bodyHtml),
+        summary: extractSummary(page.bodyHtml),
+      });
+    } catch {
+      posts.push({
+        route: ROUTE_CANONICAL_OVERRIDES[stub.route] ?? stub.route,
+        title: stripSiteSuffix(stub.title) || "Article",
+        image: "",
+        summary: "",
+      });
+    }
+  }
 
   const bodyHtml = buildArchiveBodyHtml(
     template.bodyHtml,

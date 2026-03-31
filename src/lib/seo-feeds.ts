@@ -2,58 +2,68 @@ import type { SiteData, SnapshotPage } from "./site-data";
 import { SITE_ORIGIN } from "./seo-content";
 import { buildPageSeo, buildPageSummary, getIndexablePages } from "./seo";
 
-export function buildSitemapXml(siteData: SiteData): string {
-  const urls = getIndexablePages(siteData)
-    .map((page) => {
-      const seo = buildPageSeo(page);
-      const lastmod = getLastModified(page, siteData.generatedAt);
+export type PageLoader = (route: string) => Promise<SnapshotPage>;
 
-      return [
+export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader): Promise<string> {
+  const indexable = getIndexablePages(siteData);
+  const urlEntries: string[] = [];
+
+  for (const stub of indexable) {
+    const page = await loadPage(stub.route);
+    const seo = buildPageSeo(page);
+    const lastmod = getLastModified(page, siteData.generatedAt);
+
+    urlEntries.push(
+      [
         "  <url>",
         `    <loc>${escapeXml(seo.canonicalUrl)}</loc>`,
         `    <lastmod>${lastmod}</lastmod>`,
         "  </url>",
-      ].join("\n");
-    })
-    .join("\n");
+      ].join("\n"),
+    );
+  }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls}
+${urlEntries.join("\n")}
 </urlset>
 `;
 }
 
-export function buildImageSitemapXml(siteData: SiteData): string {
-  const urls = getIndexablePages(siteData)
-    .map((page) => {
-      const seo = buildPageSeo(page);
-      const images = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
-      const imageEntries = images
-        .map((image) =>
-          [
-            "    <image:image>",
-            `      <image:loc>${escapeXml(image.url)}</image:loc>`,
-            `      <image:title>${escapeXml(image.alt)}</image:title>`,
-            `      <image:caption>${escapeXml(seo.description)}</image:caption>`,
-            "    </image:image>",
-          ].join("\n"),
-        )
-        .join("\n");
+export async function buildImageSitemapXml(siteData: SiteData, loadPage: PageLoader): Promise<string> {
+  const indexable = getIndexablePages(siteData);
+  const urlEntries: string[] = [];
 
-      return [
+  for (const stub of indexable) {
+    const page = await loadPage(stub.route);
+    const seo = buildPageSeo(page);
+    const images = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
+    const imageEntries = images
+      .map((image) =>
+        [
+          "    <image:image>",
+          `      <image:loc>${escapeXml(image.url)}</image:loc>`,
+          `      <image:title>${escapeXml(image.alt)}</image:title>`,
+          `      <image:caption>${escapeXml(seo.description)}</image:caption>`,
+          "    </image:image>",
+        ].join("\n"),
+      )
+      .join("\n");
+
+    urlEntries.push(
+      [
         "  <url>",
         `    <loc>${escapeXml(seo.canonicalUrl)}</loc>`,
         imageEntries,
         "  </url>",
-      ].join("\n");
-    })
-    .join("\n");
+      ].join("\n"),
+    );
+  }
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-${urls}
+${urlEntries.join("\n")}
 </urlset>
 `;
 }
@@ -67,12 +77,28 @@ export function buildRobotsTxt(): string {
 Allow: /
 ${disallowedPrefixes}
 
+# AI search engine crawlers — allow full access
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
 Sitemap: ${SITE_ORIGIN}/sitemap.xml
 Sitemap: ${SITE_ORIGIN}/image-sitemap.xml
 `;
 }
 
-export function buildLlmsTxt(siteData: SiteData): string {
+export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Promise<string> {
   const mainRoutes = ["/", "/products/all/", "/about/", "/contact/", "/faq/", "/blog/", "/solutions/", "/compare/", "/compatibility/", "/guides/"];
   const collectionRoutes = [
     "/products/rfid-tags/",
@@ -105,15 +131,15 @@ export function buildLlmsTxt(siteData: SiteData): string {
     .filter((page) => page.route.startsWith("/contact/") && page.route !== "/contact/")
     .map((page) => page.route);
 
-  const mainSection = renderLlmsSection("Primary pages", pickRoutes(siteData, mainRoutes));
-  const collectionSection = renderLlmsSection("Product collections", pickRoutes(siteData, collectionRoutes));
-  const productSection = renderLlmsSection("Representative product pages", pickRoutes(siteData, productRoutes));
-  const articleSection = renderLlmsSection("Guides and articles", pickRoutes(siteData, articleRoutes));
-  const solutionSection = renderLlmsSection("Solutions by application", pickRoutes(siteData, solutionRoutes));
-  const comparisonSection = renderLlmsSection("Comparison pages", pickRoutes(siteData, comparisonRoutes));
-  const compatibilitySection = renderLlmsSection("Compatibility pages", pickRoutes(siteData, compatibilityRoutes));
-  const guideSection = renderLlmsSection("Buying guides", pickRoutes(siteData, guideRoutes));
-  const contactSection = renderLlmsSection("Contact paths", pickRoutes(siteData, contactRoutes));
+  const mainSection = await renderLlmsSection("Primary pages", await loadPages(siteData, mainRoutes, loadPage));
+  const collectionSection = await renderLlmsSection("Product collections", await loadPages(siteData, collectionRoutes, loadPage));
+  const productSection = await renderLlmsSection("Representative product pages", await loadPages(siteData, productRoutes, loadPage));
+  const articleSection = await renderLlmsSection("Guides and articles", await loadPages(siteData, articleRoutes, loadPage));
+  const solutionSection = await renderLlmsSection("Solutions by application", await loadPages(siteData, solutionRoutes, loadPage));
+  const comparisonSection = await renderLlmsSection("Comparison pages", await loadPages(siteData, comparisonRoutes, loadPage));
+  const compatibilitySection = await renderLlmsSection("Compatibility pages", await loadPages(siteData, compatibilityRoutes, loadPage));
+  const guideSection = await renderLlmsSection("Buying guides", await loadPages(siteData, guideRoutes, loadPage));
+  const contactSection = await renderLlmsSection("Contact paths", await loadPages(siteData, contactRoutes, loadPage));
 
   return [
     "# Proud Tek",
@@ -147,7 +173,7 @@ export function buildLlmsTxt(siteData: SiteData): string {
   ].join("\n");
 }
 
-export function buildLlmsFullTxt(siteData: SiteData): string {
+export async function buildLlmsFullTxt(siteData: SiteData, loadPage: PageLoader): Promise<string> {
   const pages = getIndexablePages(siteData);
   const groups = [
     {
@@ -188,10 +214,12 @@ export function buildLlmsFullTxt(siteData: SiteData): string {
     },
   ];
 
-  const sections = groups
-    .map((group) => renderLlmsSection(group.heading, pickRoutes(siteData, group.routes)))
-    .filter(Boolean)
-    .join("\n\n");
+  const sectionParts: string[] = [];
+  for (const group of groups) {
+    const loaded = await loadPages(siteData, group.routes, loadPage);
+    const section = await renderLlmsSection(group.heading, loaded);
+    if (section) sectionParts.push(section);
+  }
 
   return [
     "# Proud Tek",
@@ -204,18 +232,28 @@ export function buildLlmsFullTxt(siteData: SiteData): string {
     "- Use `https://proudtek.com/site-index.json` for a compact JSON inventory with titles and descriptions.",
     "- Use `https://proudtek.com/machine/...json` or `.txt` for page-level machine-readable mirrors of indexable pages.",
     "",
-    sections,
+    sectionParts.join("\n\n"),
     "",
   ].join("\n");
 }
 
-function pickRoutes(siteData: SiteData, routes: string[]): SnapshotPage[] {
+/** Load full pages for a list of routes, using the loadPage callback. */
+async function loadPages(siteData: SiteData, routes: string[], loadPage: PageLoader): Promise<SnapshotPage[]> {
   const routeSet = new Set(routes);
-
-  return siteData.pages.filter((page) => routeSet.has(page.route));
+  const matching = siteData.pages.filter((p) => routeSet.has(p.route));
+  const results: SnapshotPage[] = [];
+  for (const stub of matching) {
+    try {
+      results.push(await loadPage(stub.route));
+    } catch {
+      // If loading fails, use the stub (will produce minimal SEO data)
+      results.push(stub);
+    }
+  }
+  return results;
 }
 
-function renderLlmsSection(heading: string, pages: SnapshotPage[]): string {
+async function renderLlmsSection(heading: string, pages: SnapshotPage[]): Promise<string> {
   if (pages.length === 0) {
     return "";
   }

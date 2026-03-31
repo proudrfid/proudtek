@@ -1,0 +1,186 @@
+{
+  "route": "/blog/how-nfc-tags-work-smartphones/",
+  "group": "blog",
+  "title": "How NFC Tags Work with Smartphones",
+  "kicker": "NFC Technology",
+  "summary": "A technical explainer for product managers and procurement teams on how NFC tags communicate with smartphones — covering the RF protocol stack, NDEF message format, OS-level handling and compatibility across iOS and Android.",
+  "heroPoints": [
+    "NFC tags harvest power from the smartphone's electromagnetic field, requiring no battery and enabling a 10+ year operational lifespan.",
+    "The NDEF data format is an open standard that both iOS and Android parse natively, ensuring cross-platform compatibility without app installation.",
+    "Understanding the NFC communication sequence helps procurement teams write better specifications and avoid chip-selection mistakes."
+  ],
+  "imageAlt": "Smartphone reading an NFC tag with RF field visualization",
+  "imageSourceRoutes": [
+    "/product/nfc-stickers/",
+    "/product/acr122u/"
+  ],
+  "sections": [
+    {
+      "title": "The physics of NFC communication",
+      "intro": "Near Field Communication operates at 13.56 MHz using magnetic induction between two loop antennas — one in the smartphone and one in the NFC tag. The smartphone acts as the active device (reader), generating an alternating magnetic field that induces a current in the tag's antenna coil.",
+      "image": {
+        "src": "/blog-images/smartphone-nfc.jpg",
+        "alt": "Smartphone reading an NFC tag via electromagnetic induction"
+      },
+      "paragraphs": [
+        "This induced current powers the tag's integrated circuit, which then modulates the RF field to transmit its stored data back to the phone. The process is called load modulation: the tag switches a resistive load on and off across its antenna, creating small amplitude changes in the reader's field that the phone's NFC controller decodes as binary data."
+      ],
+      "bullets": [
+        "Operating frequency: 13.56 MHz ISM band, globally license-free for NFC applications.",
+        "Communication range: 0-10 cm, determined by antenna geometry and reader field strength. Typical smartphone-to-tag range is 1-5 cm.",
+        "Data rate: 106 kbit/s for standard NFC Forum tags (NTAG, MIFARE Ultralight). Higher rates (212/424 kbit/s) are used for card emulation mode.",
+        "Power transfer: 10-30 mW delivered to the tag from the phone's field — enough to operate the chip but not enough to power external sensors or LEDs without additional energy harvesting."
+      ],
+      "callout": {
+        "label": "Compatibility",
+        "text": "All iPhones from XS (2018) and virtually all Android phones since 2015 support background NFC tag reading without requiring any app installation.",
+        "href": "/product/nfc-stickers/"
+      }
+    },
+    {
+      "title": "NFC protocol stack: from RF to application",
+      "intro": "The communication between a smartphone and an NFC tag follows a layered protocol stack. Understanding each layer helps explain why certain tags work with certain phones and what can go wrong during a tap.",
+      "table": {
+        "columns": [
+          "Layer",
+          "Standard",
+          "Function",
+          "Failure mode"
+        ],
+        "rows": [
+          [
+            "Physical / RF",
+            "ISO 18092 / ISO 14443-3A",
+            "Magnetic coupling, power transfer, bit-level modulation",
+            "Out-of-range, metal interference, detuned antenna"
+          ],
+          [
+            "Anti-collision",
+            "ISO 14443-3A",
+            "Identifies and selects a single tag when multiple are in the field",
+            "Multiple overlapping tags cause read errors"
+          ],
+          [
+            "Data link",
+            "NFC Forum Type 2 Tag",
+            "Memory access commands (READ, WRITE, sector select)",
+            "Incompatible tag type, corrupted memory"
+          ],
+          [
+            "Application",
+            "NDEF (NFC Data Exchange Format)",
+            "Structured records: URI, text, vCard, MIME",
+            "Malformed NDEF message, unsupported record type"
+          ],
+          [
+            "OS handler",
+            "iOS Core NFC / Android NFC Dispatch",
+            "Routes NDEF record to app or browser",
+            "Background reading disabled, NFC off in settings"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "NDEF message format explained",
+      "intro": "NDEF is the standard data format stored on NFC tags. It defines how records (URLs, text strings, vCards, application launch commands) are structured so that any NFC-enabled device can parse them consistently.",
+      "paragraphs": [
+        "An NDEF message consists of one or more NDEF records, each containing a header (record type, payload length, ID) and a payload. The most common record types in B2B applications are URI (web link), Text (plain text with language code), vCard (contact information in MIME format) and Android Application Record (AAR) which forces a specific app to handle the tag."
+      ],
+      "bullets": [
+        "URI records use a prefix byte to compress common URL schemes (https://, tel:, mailto:), saving 5-10 bytes of tag memory.",
+        "Text records include a language code (e.g., 'en', 'de') enabling multi-language content on a single tag using multiple text records.",
+        "Smart Poster records combine a URI with a title and icon reference, allowing phones to display a preview before opening the link.",
+        "Custom MIME-type records can store application-specific binary data that only your app knows how to parse."
+      ]
+    },
+    {
+      "title": "iOS vs Android NFC behavior",
+      "intro": "iOS and Android handle NFC tag reads differently, and these differences affect how you design the user experience for a tap interaction.",
+      "bullets": [
+        "iOS (iPhone XS and later) reads NFC tags in the background without user action. A notification banner appears when a tag is detected, and tapping the banner opens the URL or action.",
+        "Android dispatches NFC tag reads through an intent system. If no app claims the intent, the default browser opens URL records. Apps can register intent filters to handle specific tag types.",
+        "iOS requires HTTPS URLs — HTTP links without TLS are not opened from NFC tag reads. Always use HTTPS for cross-platform compatibility.",
+        "Android supports a wider range of NDEF record types natively, including application launch via AAR, which is ignored by iOS.",
+        "Both platforms suppress repeated reads of the same tag within a short cooldown period (approximately 5-10 seconds) to prevent accidental duplicate actions."
+      ]
+    },
+    {
+      "title": "Troubleshooting common NFC read failures",
+      "intro": "When a smartphone fails to read an NFC tag, the issue is almost always physical positioning, environmental interference or a software configuration problem — not a defective tag.",
+      "bullets": [
+        "No read response: Ensure NFC is enabled in phone settings. On Android, check that the NFC toggle in quick settings is on. On iPhone, NFC is always on for background reading.",
+        "Intermittent reads: The tag antenna is not aligned with the phone's NFC coil. NFC coil position varies by phone model — on iPhones it is at the top; on many Android devices it is center-back.",
+        "Metal surface interference: Metal within 2 mm of the tag antenna detunes the resonant circuit. Use anti-metal (ferrite-backed) tags or add a 1 mm spacer between the tag and the metal surface.",
+        "Multiple tags in proximity: If two or more tags overlap in the phone's field, the anti-collision protocol may fail. Space tags at least 3 cm apart.",
+        "NDEF not recognized: The tag may contain raw data rather than a formatted NDEF message. Reformat the tag using an NFC writing app or desktop reader."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "NFC tag products",
+      "description": "Shop NFC stickers and cards with pre-formatted NDEF memory for smartphone compatibility.",
+      "links": [
+        {
+          "href": "/product/nfc-stickers/",
+          "label": "NFC stickers"
+        },
+        {
+          "href": "/product/nfc-cards/",
+          "label": "NFC cards"
+        }
+      ]
+    },
+    {
+      "title": "NFC development tools",
+      "description": "Desktop readers and SDKs for programming and testing NFC tags.",
+      "links": [
+        {
+          "href": "/product/acr122u/",
+          "label": "ACR122U NFC reader/writer"
+        },
+        {
+          "href": "/product/nfc-reader-writer-with-free-sdks/",
+          "label": "NFC reader with SDKs"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Do NFC tags need a battery?",
+      "answer": "No. Passive NFC tags harvest all their operating power from the smartphone's RF field. This is why they have no expiration date and can function for 10+ years without maintenance. Active NFC devices (like phones) do require a battery, but the tags themselves do not."
+    },
+    {
+      "question": "Can NFC tags be read through a phone case?",
+      "answer": "Yes, standard phone cases made of silicone, plastic, leather or TPU do not block NFC signals. Cases with metal plates, built-in magnets (MagSafe-style) or thick rugged armor may reduce read range by 1-2 cm. Remove the case to test if you experience read issues."
+    },
+    {
+      "question": "What is the maximum data an NFC tag can store?",
+      "answer": "Standard NFC Forum Type 2 Tags (NTAG series) store 144-888 bytes depending on the chip variant. For larger payloads, NFC Forum Type 4 Tags (like MIFARE DESFire) offer up to 8 KB. In practice, most NFC applications store a URL (50-150 bytes), making even the smallest chips sufficient."
+    },
+    {
+      "question": "Can a smartphone write data to an NFC tag?",
+      "answer": "Yes. Android phones can write NDEF records to writable NFC tags using built-in APIs or free apps like NFC TagWriter. iPhones gained NFC writing capability with iOS 13 (2019) via Core NFC APIs, though writing requires a dedicated app — Safari cannot write to tags."
+    },
+    {
+      "question": "Is NFC communication secure?",
+      "answer": "NFC's short range (under 10 cm) provides inherent physical security — an attacker must be within centimeters to intercept the signal. For additional security, NTAG chips support password-protected memory access, and advanced chips like NTAG424 DNA provide AES-128 encrypted communication and tamper detection."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/nfc-tags/",
+    "label": "Get NFC tag recommendations"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/nfc-stickers/",
+      "label": "Shop NFC stickers"
+    },
+    {
+      "href": "/product/acr122u/",
+      "label": "View ACR122U reader"
+    }
+  ]
+}

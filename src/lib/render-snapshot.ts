@@ -16,6 +16,23 @@ const TRANSLATE_SELECTORS = [
   "template#tp-language",
 ];
 
+// ── Performance: remove unused WordPress/WooCommerce assets ──
+// These are dead weight on a static site with no cart or WP admin.
+const UNUSED_HEAD_ASSET_PATTERNS: Array<string | RegExp> = [
+  // WooCommerce block styles — no cart/checkout on static site
+  'link[id*="wc-blocks"]',
+  'link[id*="wc-all-blocks"]',
+  // WooCommerce theme overrides
+  'link[id*="kadence-woocommerce"]',
+  // jQuery & WooCommerce scripts (fully unused — were only deferred before)
+  'script[src*="jquery"]',
+  'script[src*="jquery-migrate"]',
+  'script[src*="blockui"]',
+  'script[src*="add-to-cart"]',
+  'script[src*="woocommerce"]',
+  'script[src*="js.cookie"]',
+];
+
 const NOISY_EXTERNAL_HREF_PATTERNS = [
   /^https?:\/\/themes\.kadencethemes\.com\/ascend-5\//i,
 ];
@@ -47,6 +64,17 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
     $body(selector).remove();
   }
 
+  // Strip unused WP/WooCommerce assets from head and body
+  for (const selector of UNUSED_HEAD_ASSET_PATTERNS) {
+    if (typeof selector === "string") {
+      $head(selector).remove();
+      $body(selector).remove();
+    }
+  }
+
+  // Remove WP font preloads — we add our own preloads in the Astro layout
+  $head('link[rel="preload"][as="font"]').remove();
+
   $body("a[href]").each((_, element) => {
     const href = $body(element).attr("href") ?? "";
     const normalized = collapseFirstPagePagination(href);
@@ -61,6 +89,36 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   });
 
   removeEmptyContainers($body);
+
+  // ── Accessibility hardening ──
+  // Add aria-label to form inputs that use data-label but lack proper labelling
+  $body("input[data-label]").each((_, el) => {
+    const input = $body(el);
+    if (!input.attr("aria-label") && !input.attr("aria-labelledby")) {
+      input.attr("aria-label", input.attr("data-label") ?? "");
+    }
+  });
+
+  // Ensure <main> has id="main" for skip-link target
+  const mainEl = $body("main, [role='main']").first();
+  if (mainEl.length && !mainEl.attr("id")) {
+    mainEl.attr("id", "main");
+  }
+
+  // ── LCP optimization ──
+  // Upgrade the first product/hero image in main content to eager loading.
+  // Skip tiny badges/icons (width ≤ 100) — they're not LCP candidates.
+  const lcpCandidates = $body("main img, [role='main'] img, .entry-content img").toArray();
+  for (const candidate of lcpCandidates) {
+    const img = $body(candidate);
+    const width = parseInt(img.attr("width") ?? "999", 10);
+    if (width <= 100) continue; // Skip badges and icons
+    if (img.attr("loading") === "lazy") {
+      img.attr("loading", "eager");
+      img.attr("fetchpriority", "high");
+    }
+    break;
+  }
 
   return {
     htmlAttrs: {

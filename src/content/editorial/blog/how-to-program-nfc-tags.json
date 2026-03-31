@@ -1,0 +1,192 @@
+{
+  "route": "/blog/how-to-program-nfc-tags/",
+  "group": "blog",
+  "title": "How to Program NFC Tags and Stickers",
+  "kicker": "NFC Technology",
+  "summary": "A step-by-step technical guide for operations and IT teams on programming NFC tags — covering tool selection, NDEF record creation, batch encoding workflows and write-protection best practices.",
+  "heroPoints": [
+    "NFC tags ship blank and must be programmed with NDEF data before deployment — the programming step defines the entire user experience.",
+    "Smartphone apps handle single-tag programming, while desktop readers with SDK support enable batch encoding of hundreds of tags per hour.",
+    "Write-locking tags after programming prevents tampering but makes future URL updates impossible — choose the right protection strategy for your use case."
+  ],
+  "imageAlt": "Desktop NFC reader programming an NFC sticker with a laptop",
+  "imageSourceRoutes": [
+    "/product/nfc-stickers/",
+    "/product/acr122u/",
+    "/product/nfc-reader-writer-with-free-sdks/"
+  ],
+  "sections": [
+    {
+      "title": "Tools for NFC tag programming",
+      "intro": "NFC tags are programmed by writing NDEF-formatted data to the tag's EEPROM memory using an NFC reader/writer. The choice of tool depends on volume: smartphone apps for one-off programming, desktop readers for batch operations.",
+      "image": {
+        "src": "/blog-images/program-nfc.jpg",
+        "alt": "Programming an NFC tag using a smartphone NFC writer app"
+      },
+      "table": {
+        "columns": [
+          "Tool",
+          "Platform",
+          "Volume",
+          "Features",
+          "Best for"
+        ],
+        "rows": [
+          [
+            "NFC TagWriter (NXP)",
+            "Android",
+            "1 – 10 tags",
+            "GUI-based, URL/vCard/text templates",
+            "Quick single-tag programming"
+          ],
+          [
+            "NFC Tools",
+            "Android / iOS",
+            "1 – 10 tags",
+            "Read/write/copy, multiple record types",
+            "Cross-platform single-tag use"
+          ],
+          [
+            "ACR122U + NFC SDK",
+            "Windows / Mac / Linux",
+            "10 – 1,000 tags",
+            "Scriptable batch encoding, UID logging",
+            "Production-volume programming"
+          ],
+          [
+            "NFC reader with SDKs",
+            "Windows / Mac / Linux",
+            "100 – 10,000 tags",
+            "High-speed encoding, API integration",
+            "Factory and warehouse operations"
+          ],
+          [
+            "Web NFC API",
+            "Chrome on Android",
+            "1 – 50 tags",
+            "Browser-based, no app install",
+            "Field programming and demos"
+          ]
+        ]
+      },
+      "callout": {
+        "label": "Getting started",
+        "text": "Free apps like NFC Tools and NXP TagWriter let anyone program NFC tags in seconds using an iPhone or Android phone — no technical expertise required.",
+        "href": "/product/nfc-stickers/"
+      }
+    },
+    {
+      "title": "Programming a URL record step by step",
+      "intro": "The most common NFC programming task is writing a URL record that opens a web page when tapped. Here is the workflow using a desktop ACR122U reader, which applies to any reader with NDEF writing capability.",
+      "bullets": [
+        "Step 1 — Connect the ACR122U reader to your computer via USB. Install the driver if prompted (Windows may auto-detect; macOS and Linux require the ACR driver package).",
+        "Step 2 — Open your NFC writing software. For the ACR122U, NXP's TagXplorer or the open-source NDEF library with a Python/Java wrapper works well.",
+        "Step 3 — Place the NFC tag on the reader. The software should detect the tag and display its UID, chip type and available memory.",
+        "Step 4 — Create a new NDEF URI record. Enter the full URL including https:// prefix. The software will automatically select the URI prefix byte to optimize memory usage.",
+        "Step 5 — Write the record to the tag. A successful write is confirmed in under 500 milliseconds. Test the tag with a smartphone to verify the URL opens correctly."
+      ]
+    },
+    {
+      "title": "Batch encoding workflows",
+      "intro": "When programming hundreds or thousands of tags for a campaign or product line, manual one-by-one encoding is impractical. Batch workflows automate the process using scripted desktop reader sessions.",
+      "paragraphs": [
+        "A typical batch encoding script loops through a data source (CSV file, database query or API response), writes a unique URL to each tag, logs the tag UID alongside the written URL and sounds an audible confirmation. The operator places tags on the reader one at a time, and the script handles encoding and logging automatically."
+      ],
+      "bullets": [
+        "Use a CSV file with columns for tag sequence number, URL and any variable data. The script reads row N, writes to the current tag, increments N and waits for the next tag.",
+        "Log every write operation with timestamp, UID and write status. This audit trail is essential for quality control and troubleshooting.",
+        "Set up audio or visual feedback (beep or LED) on successful write so the operator knows when to swap tags without watching the screen.",
+        "Typical throughput with a trained operator is 200-400 tags per hour using a single desktop reader.",
+        "For higher volumes (1,000+ tags per day), consider a conveyor-fed inline encoder or outsource encoding to the tag supplier."
+      ]
+    },
+    {
+      "title": "Write protection and security options",
+      "intro": "After programming, you must decide whether to lock the tag against future writes. This is a critical decision that affects tag security, flexibility and operational recovery options.",
+      "bullets": [
+        "No protection: The tag remains fully writable. Anyone with an NFC phone can overwrite the content. Suitable for internal testing and personal tags only.",
+        "Password protection (NTAG21x): Set a 32-bit password that must be presented before writes are accepted. The tag remains updatable by authorized personnel but is protected against casual overwriting.",
+        "Permanent lock (OTP bits): The NTAG21x lock bits can be set to permanently prevent writes to specific memory pages. This is irreversible — the tag content is fixed forever.",
+        "Dynamic lock bits: Allow selective locking of individual memory pages while leaving others writable. Useful for tags that need a fixed URL but updatable metadata.",
+        "Recommendation for most B2B deployments: Use password protection rather than permanent lock. This prevents casual tampering while preserving the ability to update content for campaign changes or URL migrations."
+      ]
+    },
+    {
+      "title": "Common programming errors and how to avoid them",
+      "intro": "Programming errors during batch encoding are costly because they may not be discovered until tags are deployed in the field. These are the most frequent mistakes and their preventions.",
+      "bullets": [
+        "Wrong NDEF format: Writing raw bytes instead of formatted NDEF messages results in tags that desktop readers can parse but smartphones ignore. Always use NDEF library functions, not raw memory writes.",
+        "URL too long for chip memory: NTAG213 holds ~132 URL characters. URLs with long UTM parameters or encoded query strings may exceed this. Test the full production URL, not a shortened version.",
+        "Missing NDEF terminator TLV: Some low-level writing tools do not append the terminator (0xFE) after the last NDEF record. Without it, some phones read corrupted data.",
+        "Skipped verification read: Always read back the tag after writing to confirm the data was stored correctly. Memory errors during write are rare but not impossible.",
+        "Accidental lock: Setting lock bits when intending to set a password. Always double-check the lock configuration before writing — permanent locks cannot be reversed."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "NFC tags for programming",
+      "description": "Blank NFC stickers and cards ready for custom NDEF programming.",
+      "links": [
+        {
+          "href": "/product/nfc-stickers/",
+          "label": "NFC stickers"
+        },
+        {
+          "href": "/product/nfc-cards/",
+          "label": "NFC cards"
+        }
+      ]
+    },
+    {
+      "title": "NFC readers and development tools",
+      "description": "Desktop NFC readers with SDK support for batch programming workflows.",
+      "links": [
+        {
+          "href": "/product/acr122u/",
+          "label": "ACR122U reader/writer"
+        },
+        {
+          "href": "/product/nfc-reader-writer-with-free-sdks/",
+          "label": "NFC reader with free SDKs"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can I program NFC tags with an iPhone?",
+      "answer": "Yes, starting with iOS 13 (2019). You need a third-party app that uses Apple's Core NFC writing APIs, such as NFC Tools or NFC TagWriter. Note that iPhone NFC writing is slower and supports fewer tag types than Android, so desktop readers are preferred for batch operations."
+    },
+    {
+      "question": "How many times can I rewrite an NFC tag?",
+      "answer": "NTAG21x chips are rated for 100,000 write cycles. In practice, even if you reprogram a tag daily, it would last over 270 years. Write endurance is not a practical concern for any real-world application."
+    },
+    {
+      "question": "What happens if I write-lock a tag and need to change the URL later?",
+      "answer": "If you used permanent lock bits (OTP), the tag cannot be rewritten and must be physically replaced. If you used password protection, you can unlock and rewrite the tag using the password. This is why password protection is recommended over permanent locking for most applications."
+    },
+    {
+      "question": "Can I program different data on each tag in a batch?",
+      "answer": "Yes. Batch encoding scripts read unique data (URLs, serial numbers, vCard details) from a CSV or database and write different content to each tag. The ACR122U SDK and most NFC reader SDKs support this workflow natively through their programming APIs."
+    },
+    {
+      "question": "How do I verify that a tag was programmed correctly?",
+      "answer": "Perform a read-back verification immediately after writing by reading the tag's NDEF content and comparing it byte-for-byte against the intended data. Additionally, test a sample of tags with an actual smartphone to confirm the end-user experience matches expectations."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/nfc-programming/",
+    "label": "Get programming support"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/acr122u/",
+      "label": "View ACR122U reader"
+    },
+    {
+      "href": "/product/nfc-stickers/",
+      "label": "Shop NFC stickers"
+    }
+  ]
+}

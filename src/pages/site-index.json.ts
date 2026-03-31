@@ -1,24 +1,30 @@
 import type { APIRoute } from "astro";
 
-import { getSiteData } from "../lib/site-data";
+import { getSiteData, getPageByRoute } from "../lib/site-data";
 import { buildMachineRoute, buildPageSeo, buildPageSummary, getIndexablePages } from "../lib/seo";
 
 export const prerender = true;
 
 export const GET: APIRoute = async () => {
   const siteData = await getSiteData();
-  const pages = getIndexablePages(siteData).map((page) => {
+  const indexable = getIndexablePages(siteData);
+
+  const pages = [];
+  for (const stub of indexable) {
+    const page = await getPageByRoute(stub.route);
+    if (!page) continue;
+
     const seo = buildPageSeo(page);
     const summary = buildPageSummary(page);
 
-    return {
+    pages.push({
       ...summary,
       imageUrl: seo.imageUrl,
       imageAlt: seo.imageAlt,
       machineJson: `https://proudtek.com${buildMachineRoute(page.route, "json")}`,
       machineText: `https://proudtek.com${buildMachineRoute(page.route, "txt")}`,
-    };
-  });
+    });
+  }
 
   return new Response(
     JSON.stringify(

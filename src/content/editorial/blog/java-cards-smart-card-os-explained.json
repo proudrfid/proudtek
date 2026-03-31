@@ -1,0 +1,174 @@
+{
+  "route": "/blog/java-cards-smart-card-os-explained/",
+  "group": "blog",
+  "title": "Java Cards and Smart Card OS Explained",
+  "kicker": "Smart Cards",
+  "summary": "A comprehensive introduction to Java Card technology, the GlobalPlatform specification and smart-card operating systems — explaining how applets are developed, loaded and managed on secure multi-application cards for B2B identity, payment and access-control solutions.",
+  "heroPoints": [
+    "Java Card is a stripped-down Java platform that runs on secure microcontrollers, enabling multiple independent applets to coexist on a single smart card.",
+    "GlobalPlatform provides the security framework for applet lifecycle management — installation, personalization, locking and deletion — via standardized secure channels.",
+    "B2B buyers benefit from Java Card's vendor interoperability: applets developed for one manufacturer's chip can be deployed on another's with minimal porting effort."
+  ],
+  "imageAlt": "Java Card smart card with visible chip module and contactless antenna",
+  "imageSourceRoutes": [
+    "/product/java-card/",
+    "/product/dual-interface-card/"
+  ],
+  "sections": [
+    {
+      "title": "What is a smart card operating system?",
+      "intro": "A smart-card OS manages the card's secure storage, cryptographic coprocessor, communication interface and application lifecycle. Unlike a general-purpose OS, it is designed for resource-constrained environments with as little as 2 KB of RAM, 64 KB of ROM and 32 KB of EEPROM.",
+      "image": {
+        "src": "/blog-images/java-smartcard.jpg",
+        "alt": "Java Card smart card with visible chip contact pad"
+      },
+      "paragraphs": [
+        "Proprietary card OSes (JCOP, MULTOS, BasicCard) offer varying degrees of openness. Java Card Open Platform (JCOP), developed originally by IBM and now maintained by NXP, is the dominant commercial Java Card OS and runs on NXP's SmartMX and Infineon's SLE78 secure microcontrollers. MULTOS is a competing multi-application platform with strong presence in EMV payment cards."
+      ],
+      "bullets": [
+        "Java Card OS exposes a subset of the Java language — no floating-point, no multi-threading, no garbage collection on most implementations.",
+        "Applets communicate with the host via APDU (Application Protocol Data Unit) command-response pairs defined in ISO 7816-4.",
+        "The card's secure element provides hardware-enforced isolation between applets — one applet cannot access another's data without explicit sharing via shareable interfaces.",
+        "Card OSes implement on-card cryptographic services including AES, 3DES, RSA, ECC and SHA-family hashing."
+      ],
+      "callout": {
+        "label": "Enterprise scale",
+        "text": "Java Card technology powers over 20 billion secure smart cards worldwide, including SIM cards, government IDs, banking cards and enterprise access credentials."
+      }
+    },
+    {
+      "title": "Java Card platform editions",
+      "intro": "Oracle publishes the Java Card specification in multiple editions. B2B buyers and integrators should understand which edition their vendor supports, as it determines available API features.",
+      "table": {
+        "columns": [
+          "Edition",
+          "Key additions",
+          "Typical chip targets"
+        ],
+        "rows": [
+          [
+            "Java Card 2.2.x",
+            "Baseline — AID-based applet selection, basic crypto, T=0/T=1 contact",
+            "Legacy SIM cards, basic ID cards"
+          ],
+          [
+            "Java Card 3.0.1 Classic",
+            "Contactless (ISO 14443) support, extended APDU, biometric API",
+            "Dual-interface cards, ePassports, national ID"
+          ],
+          [
+            "Java Card 3.0.4 Classic",
+            "SCP03 secure channel, ECC support, key agreement",
+            "EMV payment, transit, high-security access"
+          ],
+          [
+            "Java Card 3.0.5 Classic",
+            "TLS 1.2 on-card, enhanced ECC curves, IoT profiles",
+            "IoT device identity, cloud-connected secure elements"
+          ],
+          [
+            "Java Card 3.1",
+            "Timers, monotonic counters, extended key management",
+            "Next-gen SIM (5G), automotive, eIDAS"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Applet development and deployment lifecycle",
+      "intro": "Developing for Java Card follows a distinct workflow compared to standard Java development. The compiled applet is converted to a CAP file, loaded onto the card via a secure channel and then installed and made selectable through GlobalPlatform commands.",
+      "paragraphs": [
+        "The development cycle begins with writing Java source code using the Java Card API subset. The standard javac compiler produces class files, which are then processed by the Java Card converter tool to generate a CAP (Converted Applet) file. The CAP file is loaded onto the card using a GlobalPlatform-compliant tool such as GPShell, GlobalPlatformPro or the vendor's personalization software."
+      ],
+      "bullets": [
+        "Each applet is identified by an AID (Application Identifier) — a 5–16 byte identifier registered with the ISO 7816-5 registry or using a proprietary prefix.",
+        "GlobalPlatform SCP02 and SCP03 secure channels encrypt and MAC-protect all card-management APDUs, preventing unauthorized applet installation.",
+        "On-card installation allocates EEPROM for the applet's persistent data and registers the applet's AID with the card manager.",
+        "Applet deletion frees the allocated EEPROM but may not zero-fill the memory — secure deletion requires explicit data-wiping logic in the applet.",
+        "Over-the-air (OTA) applet management is standard for SIM-based Java Cards in telecom, using SMS-PP or HTTPS bearer channels."
+      ]
+    },
+    {
+      "title": "Contact vs contactless vs dual-interface Java Cards",
+      "intro": "Java Cards are available in contact-only (ISO 7816), contactless-only (ISO 14443) and dual-interface form factors. Dual-interface cards are increasingly the default for B2B applications because they support both insertion-based and tap-based workflows from a single credential.",
+      "bullets": [
+        "Contact interface provides reliable, high-throughput communication (up to 921 kbps at T=1) and is preferred for initial card personalization and high-security key injection.",
+        "Contactless interface operates at 13.56 MHz with typical data rates of 106–848 kbps and supports the fast transaction times needed for transit and access-control tap-and-go.",
+        "Dual-interface cards share a single secure element between both interfaces — an applet installed via the contact interface is automatically available via contactless and vice versa.",
+        "Some Java Card implementations restrict certain cryptographic operations to the contact interface for security policy compliance."
+      ]
+    },
+    {
+      "title": "B2B use cases for Java Card technology",
+      "intro": "Java Card's multi-application architecture makes it the platform of choice for converged credential programs where a single card serves multiple functions.",
+      "bullets": [
+        "Corporate identity badges combining physical access (DESFire applet), logical access (PKI applet), cashless vending and secure print-release on one card.",
+        "Government national ID programs using Java Card for biometric storage, digital signature and ePassport ICAO MRTD compliance.",
+        "Transit fare-collection systems running a Calypso or CIPURSE applet alongside a general-purpose loyalty applet.",
+        "Healthcare professional credentials with on-card X.509 certificates for ePrescription signing and facility access."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Java Card products",
+      "description": "Java Card smart cards and dual-interface cards for multi-application identity and access-control deployments.",
+      "links": [
+        {
+          "href": "/product/java-card/",
+          "label": "Java Cards"
+        },
+        {
+          "href": "/product/dual-interface-card/",
+          "label": "Dual-interface cards"
+        }
+      ]
+    },
+    {
+      "title": "Smart card development tools",
+      "description": "Readers and SDKs for Java Card applet development, testing and personalization.",
+      "links": [
+        {
+          "href": "/product/acr122u/",
+          "label": "ACR122U USB reader"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Do I need to know Java to develop Java Card applets?",
+      "answer": "Basic Java knowledge is sufficient, but Java Card uses a heavily restricted subset of the language. There is no String class, no floating-point, no multi-threading and no standard Java collections. Most applet logic is low-level byte-array manipulation using APDU buffers."
+    },
+    {
+      "question": "Can I run multiple applets on a single Java Card?",
+      "answer": "Yes. Multi-application support is a core feature of the Java Card platform. Each applet is isolated in its own security context and is selected by the host using the applet's AID. The number of applets is limited only by available EEPROM and RAM."
+    },
+    {
+      "question": "What is the difference between JCOP and Java Card?",
+      "answer": "Java Card is the specification published by Oracle defining the API, runtime and virtual machine. JCOP (Java Card Open Platform) is NXP's commercial implementation of the Java Card specification on their SmartMX secure microcontrollers. JCOP cards are Java Cards, but not all Java Cards are JCOP."
+    },
+    {
+      "question": "How secure is a Java Card compared to MIFARE DESFire?",
+      "answer": "Java Cards with Common Criteria EAL5+ certified secure elements offer higher security than DESFire EV2/EV3. Java Card supports on-card RSA, ECC and AES with hardware-protected key storage. DESFire is a fixed-function product optimized for speed and simplicity, while Java Card is a programmable platform for custom security applications."
+    },
+    {
+      "question": "Can Java Card applets be updated after deployment?",
+      "answer": "Yes. GlobalPlatform defines a complete applet lifecycle management framework. Applets can be loaded, installed, updated and deleted via secure channels (SCP02/SCP03) using authenticated and encrypted APDU commands. Over-the-air (OTA) management is standard in telecom SIM deployments."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/java-cards/",
+    "label": "Discuss Java Card projects"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/java-card/",
+      "label": "View Java Cards"
+    },
+    {
+      "href": "/product/dual-interface-card/",
+      "label": "Browse dual-interface cards"
+    }
+  ]
+}

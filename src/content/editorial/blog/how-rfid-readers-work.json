@@ -1,0 +1,188 @@
+{
+  "route": "/blog/how-rfid-readers-work/",
+  "group": "blog",
+  "title": "How RFID Readers Work: USB, Bluetooth, and Fixed",
+  "kicker": "RFID Technology",
+  "summary": "A technical guide to RFID reader architectures — USB desktop, Bluetooth handheld and fixed-infrastructure readers — covering communication protocols, power delivery, read-range factors and integration considerations for system integrators and B2B buyers.",
+  "heroPoints": [
+    "USB desktop readers like the ACR122U provide plug-and-play NFC/HF card reading for enrollment, encoding and verification workstations.",
+    "Bluetooth RFID scanners enable mobile inventory and asset-tracking workflows without tethering operators to fixed workstations.",
+    "Fixed readers with external antenna ports deliver continuous, hands-free identification at chokepoints such as dock doors, conveyor lines and access gates."
+  ],
+  "imageAlt": "USB desktop RFID reader, Bluetooth handheld scanner and fixed RFID reader with antenna",
+  "imageSourceRoutes": [
+    "/product/acr122u/",
+    "/product/bluetooth-rfid-scanner/",
+    "/product/nfc-reader-writer-with-free-sdks/"
+  ],
+  "sections": [
+    {
+      "title": "Core components of an RFID reader",
+      "intro": "Every RFID reader — regardless of form factor — contains the same functional blocks: an RF transceiver, a control processor, a host interface and one or more antennas. Understanding these blocks helps system integrators select the right reader for their use case.",
+      "image": {
+        "src": "/blog-images/rfid-readers.jpg",
+        "alt": "Desktop RFID reader writing data to a contactless smart card"
+      },
+      "paragraphs": [
+        "The RF transceiver generates the carrier signal, modulates outbound commands and demodulates the tag's backscatter or load-modulated response. The control processor runs the air-interface protocol (ISO 14443, ISO 15693, ISO 18000-6C, etc.), manages anti-collision sequencing and handles cryptographic operations for secure chips like MIFARE DESFire or Java Cards."
+      ],
+      "bullets": [
+        "USB desktop readers draw power from the USB bus and communicate via virtual COM port, CCID (smart-card interface) or HID keyboard emulation.",
+        "Bluetooth readers contain an internal battery and pair with smartphones, tablets or laptops over BLE or Bluetooth Classic SPP profiles.",
+        "Fixed readers connect via Ethernet or RS-485 and support Power over Ethernet (PoE) to simplify cabling in large-scale deployments.",
+        "Reader sensitivity (minimum signal strength to decode a tag response) is the primary determinant of maximum read range for a given antenna and tag combination."
+      ],
+      "callout": {
+        "label": "Reader selection",
+        "text": "Desktop readers like the ACR122U handle single-card encoding for under $50. Fixed portal readers for warehouse scanning start at $500-$1,500 per antenna.",
+        "href": "/product/acr122u/"
+      }
+    },
+    {
+      "title": "USB desktop readers: enrollment and verification",
+      "intro": "USB readers are the workhorse of card enrollment stations, hotel front desks, membership kiosks and developer workbenches. Their low cost, compact footprint and driver-free operation on modern operating systems make them the default choice for single-card read/write tasks.",
+      "paragraphs": [
+        "The ACR122U from ACS is the most widely deployed USB NFC reader in the B2B channel. It supports ISO 14443 Type A/B and FeliCa, communicates via PC/SC (CCID) and includes a built-in SAM slot for secure applications. Read range is limited to approximately 5 cm due to the small integrated antenna, which is ideal for controlled enrollment workflows where only one card should be in the field at a time."
+      ],
+      "bullets": [
+        "CCID-class readers appear as smart-card readers to the OS, enabling integration with standard PC/SC middleware without custom drivers.",
+        "Keyboard-emulation readers output the card UID as keystrokes, allowing zero-code integration with any text-input application.",
+        "Read/write speed for MIFARE Classic 1K is typically under 200 ms for full-sector operations on USB readers.",
+        "Developers can use free SDKs and APDU command references to build custom encoding and verification software."
+      ]
+    },
+    {
+      "title": "Bluetooth handheld readers: mobile workflows",
+      "intro": "Bluetooth RFID scanners free operators from fixed workstations, enabling asset audits, inventory counts, laundry tracking and field-service verification from a smartphone or tablet. The key specification differentiators are battery life, operating frequency and pairing protocol.",
+      "bullets": [
+        "BLE (Bluetooth Low Energy) readers consume less power and pair faster than Classic Bluetooth SPP readers, but SPP provides higher sustained throughput for bulk-read scenarios.",
+        "Dual-frequency handheld readers that support both 125 kHz and 13.56 MHz cover legacy and modern card populations in migration scenarios.",
+        "Battery capacity of 1 000–2 500 mAh supports 4–12 hours of continuous scanning depending on read frequency and display usage.",
+        "Companion mobile apps typically expose a REST or WebSocket API, allowing integration with cloud-based asset-management platforms."
+      ]
+    },
+    {
+      "title": "Fixed readers: infrastructure-level identification",
+      "intro": "Fixed RFID readers are permanently installed at strategic chokepoints — loading docks, conveyor branches, access gates, toll plazas — to provide automatic, hands-free identification of tagged items, vehicles or personnel.",
+      "table": {
+        "columns": [
+          "Parameter",
+          "USB desktop",
+          "Bluetooth handheld",
+          "Fixed infrastructure"
+        ],
+        "rows": [
+          [
+            "Typical read range",
+            "2–5 cm",
+            "3–10 cm (HF) / 1–5 m (UHF)",
+            "1–12 m (UHF) / 5–30 cm (HF)"
+          ],
+          [
+            "Power source",
+            "USB bus (500 mA)",
+            "Internal battery",
+            "PoE / DC mains"
+          ],
+          [
+            "Antenna configuration",
+            "Built-in PCB antenna",
+            "Built-in or stubby external",
+            "1–8 external antenna ports"
+          ],
+          [
+            "Multi-tag capability",
+            "Single card",
+            "Single or low-count batch",
+            "Hundreds per second (UHF EPC Gen2)"
+          ],
+          [
+            "Host interface",
+            "USB (CCID / HID)",
+            "BLE / Bluetooth SPP",
+            "Ethernet / RS-485 / GPIO"
+          ],
+          [
+            "Typical unit cost",
+            "$30–$80",
+            "$150–$500",
+            "$500–$3 000+"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Selecting the right reader for your application",
+      "intro": "Reader selection should be driven by the use case, not by feature count. Over-specifying a reader adds unnecessary cost and integration complexity. The decision matrix below maps common B2B use cases to the appropriate reader category.",
+      "bullets": [
+        "Card enrollment and personalization stations: USB desktop reader with CCID interface and SDK support.",
+        "Hotel front-desk check-in: USB desktop reader with keyboard-emulation mode for PMS integration.",
+        "Warehouse inventory audit: Bluetooth UHF handheld reader paired with a rugged Android tablet.",
+        "Dock-door receiving: Fixed UHF reader with four antenna ports and LLRP or MQTT integration.",
+        "Access control turnstile: Fixed HF/NFC reader with Wiegand or OSDP output to the access-control panel."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Desktop and portable RFID readers",
+      "description": "USB and Bluetooth readers for card enrollment, verification and mobile scanning workflows.",
+      "links": [
+        {
+          "href": "/product/acr122u/",
+          "label": "ACR122U USB NFC reader"
+        },
+        {
+          "href": "/product/bluetooth-rfid-scanner/",
+          "label": "Bluetooth RFID scanner"
+        }
+      ]
+    },
+    {
+      "title": "Developer-friendly NFC readers",
+      "description": "NFC readers bundled with free SDKs and sample code for rapid application development.",
+      "links": [
+        {
+          "href": "/product/nfc-reader-writer-with-free-sdks/",
+          "label": "NFC reader/writer with free SDKs"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can a USB NFC reader write data to RFID cards as well as read them?",
+      "answer": "Yes. Most USB NFC readers including the ACR122U support both read and write operations. You can encode NDEF records, write custom data to MIFARE sectors or program DESFire applications using the appropriate APDU commands via the PC/SC interface."
+    },
+    {
+      "question": "What is the maximum read range of a Bluetooth RFID scanner?",
+      "answer": "For HF/NFC (13.56 MHz) Bluetooth scanners, typical read range is 3–10 cm. UHF Bluetooth handhelds operating at 860–960 MHz achieve 1–5 meters depending on tag type and antenna design. Bluetooth range to the paired host device is typically 10–30 meters."
+    },
+    {
+      "question": "Do fixed RFID readers require special network infrastructure?",
+      "answer": "Most fixed readers connect via standard Ethernet and support PoE (802.3af/at), so a single Ethernet cable provides both data and power. Some models also offer Wi-Fi or cellular connectivity for locations where cabling is impractical. RS-485 is used in legacy industrial installations."
+    },
+    {
+      "question": "Can one reader handle both 125 kHz and 13.56 MHz cards?",
+      "answer": "Dual-frequency readers exist and are common in access-control migration scenarios where a facility is transitioning from 125 kHz proximity cards to 13.56 MHz smart cards. These readers contain two separate RF front-ends and automatically detect the card frequency on presentation."
+    },
+    {
+      "question": "What software is needed to integrate a USB RFID reader?",
+      "answer": "On Windows, macOS and Linux, CCID-class readers are supported natively through the PC/SC framework. Free SDKs from reader manufacturers provide higher-level APIs for card detection, authentication and data read/write. No proprietary drivers are required for basic operation."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/rfid-readers/",
+    "label": "Get reader recommendations"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/acr122u/",
+      "label": "View ACR122U reader"
+    },
+    {
+      "href": "/product/bluetooth-rfid-scanner/",
+      "label": "Browse Bluetooth scanners"
+    }
+  ]
+}

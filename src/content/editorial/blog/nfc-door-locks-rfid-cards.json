@@ -1,0 +1,172 @@
+{
+  "route": "/blog/nfc-door-locks-rfid-cards/",
+  "group": "blog",
+  "title": "How NFC Door Locks Work with RFID Cards",
+  "kicker": "Access Control",
+  "summary": "A technical guide to NFC-based door-lock systems — covering lock architectures, card-authentication protocols, credential encoding, lock-management software and security best practices for B2B access-control buyers deploying smart locks in hotels, offices and multi-tenant buildings.",
+  "heroPoints": [
+    "NFC door locks authenticate RFID cards using cryptographic challenge-response protocols, preventing the replay and cloning attacks that compromise legacy magnetic-stripe and 125 kHz proximity systems.",
+    "Offline NFC locks store authorization data on the card itself, eliminating the need for real-time network connectivity at every door — critical for hotels and remote facilities.",
+    "Online NFC locks communicate with a central access-control server in real time, enabling instant credential revocation, audit logging and integration with building management systems."
+  ],
+  "imageAlt": "NFC-enabled door lock with an RFID card being presented for room access",
+  "imageSourceRoutes": [
+    "/product/hotel-key-cards/",
+    "/product/mifare-desfire-cards/"
+  ],
+  "sections": [
+    {
+      "title": "How NFC door locks authenticate an RFID card",
+      "intro": "When a guest or employee presents an RFID card to an NFC door lock, a multi-step authentication and authorization process occurs within milliseconds. Understanding this process helps B2B buyers evaluate lock-system security claims.",
+      "image": {
+        "src": "/blog-images/nfc-door-lock.jpg",
+        "alt": "NFC-enabled door lock reading an RFID access card"
+      },
+      "paragraphs": [
+        "The lock's NFC reader powers the card via the 13.56 MHz field and reads the card's UID (unique identifier). For basic systems, the UID alone may be checked against a whitelist. For secure systems using MIFARE DESFire or similar smart cards, the lock initiates a mutual-authentication handshake: both the lock and the card prove knowledge of a shared secret key using AES-128, without the key ever being transmitted over the air."
+      ],
+      "bullets": [
+        "UID-only authentication is insecure — UIDs can be cloned with inexpensive NFC tools. Never rely on UID alone for access control in production.",
+        "Mutual authentication (AES challenge-response) ensures both the lock and the card verify each other's identity before granting access.",
+        "After authentication, the lock reads authorization data from the card — room number, validity period, access-level flags — and makes a grant/deny decision locally.",
+        "The entire authentication and read process completes in 100–300 ms, perceived by the user as instantaneous."
+      ],
+      "callout": {
+        "label": "Smart lock growth",
+        "text": "The global smart door lock market is projected to exceed $8 billion by 2030, with NFC and RFID-based access driving adoption in residential and commercial buildings.",
+        "href": "/product/nfc-cards/"
+      }
+    },
+    {
+      "title": "Offline vs online lock architectures",
+      "intro": "NFC door locks are deployed in two primary architectures — offline (card-centric) and online (server-centric) — each with different infrastructure requirements, security properties and operational characteristics.",
+      "table": {
+        "columns": [
+          "Feature",
+          "Offline (card-centric)",
+          "Online (server-centric)"
+        ],
+        "rows": [
+          [
+            "Network requirement",
+            "None at the door",
+            "Wired or wireless to each lock"
+          ],
+          [
+            "Authorization data location",
+            "Encoded on the card",
+            "Server database, pushed to lock"
+          ],
+          [
+            "Credential revocation speed",
+            "Next card presentation at encoder",
+            "Immediate (server pushes to lock)"
+          ],
+          [
+            "Lock battery life",
+            "2–4 years (no network radio)",
+            "6–18 months (Wi-Fi/BLE radio active)"
+          ],
+          [
+            "Audit trail retrieval",
+            "Collected when card visits encoder or lock is read",
+            "Real-time via network"
+          ],
+          [
+            "Scalability",
+            "Unlimited doors without network infrastructure",
+            "Limited by network coverage and bandwidth"
+          ],
+          [
+            "Typical application",
+            "Hotels, dormitories, remote facilities",
+            "Corporate offices, data centers, government"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Card credential encoding and management",
+      "intro": "The data written to the RFID card determines which doors the cardholder can open and for how long. Credential encoding is performed at front desks, security offices or kiosks using USB NFC readers and lock-vendor software.",
+      "bullets": [
+        "Hotel key cards encode room number, arrival date, departure date, common-area access flags (pool, gym, parking) and a card-sequence counter for re-encoding detection.",
+        "Corporate access cards encode a cardholder ID that maps to access-level groups in the lock-management database.",
+        "Diversified keys ensure each lock uses a unique encryption key derived from a master key — compromising one lock does not expose the entire system.",
+        "Card blacklisting on offline systems is propagated via staff cards or mobile devices that carry blacklist updates and transmit them to locks during routine property walks.",
+        "Re-encoding a card invalidates the previous card automatically via a sequence counter — the lock rejects any card with a lower sequence number than the most recently presented card."
+      ]
+    },
+    {
+      "title": "Security best practices for NFC lock deployments",
+      "intro": "Deploying NFC locks securely requires attention to key management, card lifecycle, firmware maintenance and physical security of the lock hardware.",
+      "bullets": [
+        "Use MIFARE DESFire EV2 or EV3 for all new lock deployments — avoid MIFARE Classic (Crypto-1 is compromised) and UID-only authentication.",
+        "Implement diversified keys using AES CMAC key derivation — never use the same static key across multiple locks.",
+        "Rotate master keys annually and maintain offline backup copies in a physically secure location.",
+        "Enable lock-audit-trail collection and review access logs for anomalies — repeated denied accesses, off-hours entries, or cards used after checkout.",
+        "Keep lock firmware updated to patch known vulnerabilities — establish a maintenance schedule for firmware pushes via staff cards or BLE.",
+        "Physically secure the lock's interior components — tamper switches should trigger lockout mode if the lock housing is opened."
+      ]
+    },
+    {
+      "title": "Integration with building management systems",
+      "intro": "In corporate and multi-tenant buildings, NFC door locks are one component of a broader building-management ecosystem that includes elevators, HVAC, lighting and video surveillance.",
+      "bullets": [
+        "OSDP (Open Supervised Device Protocol) is replacing legacy Wiegand as the standard interface between NFC readers and access-control panels, providing encrypted bidirectional communication.",
+        "BACnet and Modbus integrations allow NFC card presentations to trigger HVAC set-point changes, lighting scenes and elevator dispatching.",
+        "Video-management system (VMS) integration correlates NFC access events with camera feeds for forensic review.",
+        "Visitor-management systems issue temporary NFC credentials with time-bound and area-restricted access — automatically expiring at the end of the scheduled visit."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Hotel key cards",
+      "description": "Pre-programmed and blank RFID key cards compatible with major hotel lock vendors.",
+      "links": [
+        {
+          "href": "/product/hotel-key-cards/",
+          "label": "Hotel key cards"
+        }
+      ]
+    },
+    {
+      "title": "High-security access cards",
+      "description": "MIFARE DESFire cards for corporate and government access-control deployments requiring AES-128 authentication.",
+      "links": [
+        {
+          "href": "/product/mifare-desfire-cards/",
+          "label": "MIFARE DESFire cards"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can NFC door locks work without internet connectivity?",
+      "answer": "Yes. Offline NFC locks are specifically designed for environments without network connectivity at the door. All authorization data is encoded on the card and validated locally by the lock. This architecture is standard in hotels, cruise ships and remote facilities."
+    },
+    {
+      "question": "What RFID chip should I specify for high-security door locks?",
+      "answer": "MIFARE DESFire EV2 or EV3 with AES-128 mutual authentication and diversified keys. Avoid MIFARE Classic (known vulnerabilities) and 125 kHz proximity cards (no authentication). For the highest security, consider Java Card-based credentials with PKI certificate authentication."
+    },
+    {
+      "question": "How long do batteries last in NFC door locks?",
+      "answer": "Offline NFC locks running on 4 AA batteries typically last 2–4 years or 30 000–50 000 openings. Online locks with Wi-Fi or BLE radios consume more power and last 6–18 months. Low-battery indicators warn maintenance staff 2–4 weeks before replacement is needed."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/nfc-locks/",
+    "label": "Get lock-system advice"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/hotel-key-cards/",
+      "label": "View hotel key cards"
+    },
+    {
+      "href": "/product/mifare-desfire-cards/",
+      "label": "Browse DESFire cards"
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+---
+/**
+ * BaseLayout — shared HTML skeleton for all pages.
+ *
+ * Provides:
+ *  - DOCTYPE, charset, viewport
+ *  - Resource hints (preconnect, font preloads)
+ *  - SEO meta tags (title, description, robots, OG, Twitter, JSON-LD)
+ *  - GA4 analytics
+ *  - Design tokens + global CSS (via codex.css import)
+ *  - WhatsApp FAB, sticky inquiry CTA bar
+ *  - Shared client-side JS (scroll reveal, FAB visibility, sticky CTA)
+ *
+ * Consumers (SnapshotLayout, EditorialLayout, etc.) pass a `seo` prop
+ * (PageSeoData) and inject page content via the default <slot />.
+ */
+import type { PageSeoData } from "../lib/seo";
+import "../styles/codex.css";
+
+interface Props {
+  seo: PageSeoData;
+  machineJsonPath?: string;
+  machineTextPath?: string;
+}
+
+const { seo, machineJsonPath, machineTextPath } = Astro.props;
+---
+
+<!doctype html>
+<html {...seo.htmlAttrs}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {/* ── Resource hints: speed up external connections ── */}
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+    {/* Preload critical fonts (Latin subsets for Inter body + Lora headings) */}
+    <link rel="preload" href="/site-assets/wp-content/fonts/inter/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/site-assets/wp-content/fonts/lora/0QIvMX1D_JOuMwr7Iw.woff2" as="font" type="font/woff2" crossorigin />
+
+    <Fragment set:html={seo.headHtml} />
+    <title>{seo.title}</title>
+    <meta name="description" content={seo.description} />
+    <meta name="robots" content={seo.robots} />
+    <link rel="canonical" href={seo.canonicalUrl} />
+
+    {/* GA4 */}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-30013548"></script>
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-30013548');
+    </script>
+
+    {seo.indexable && machineJsonPath ? <link rel="alternate" type="application/json" href={machineJsonPath} /> : null}
+    {seo.indexable && machineTextPath ? <link rel="alternate" type="text/plain" href={machineTextPath} /> : null}
+
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Proud Tek" />
+    <meta property="og:type" content={seo.ogType} />
+    <meta property="og:title" content={seo.title} />
+    <meta property="og:description" content={seo.description} />
+    <meta property="og:url" content={seo.canonicalUrl} />
+    <meta property="og:image" content={seo.imageUrl} />
+    <meta property="og:image:alt" content={seo.imageAlt} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={seo.title} />
+    <meta name="twitter:description" content={seo.description} />
+    <meta name="twitter:image" content={seo.imageUrl} />
+    <meta name="twitter:image:alt" content={seo.imageAlt} />
+
+    {seo.kind === "article" && seo.articleMeta ? <meta name="author" content={seo.articleMeta.authorName} /> : null}
+    {seo.kind === "article" && seo.articleMeta ? (
+      <meta property="article:published_time" content={seo.articleMeta.publishedAt} />
+    ) : null}
+    {seo.kind === "article" && seo.articleMeta ? (
+      <meta property="article:modified_time" content={seo.articleMeta.modifiedAt} />
+    ) : null}
+    {seo.kind === "article" && seo.articleMeta ? (
+      <meta property="article:author" content={seo.articleMeta.authorName} />
+    ) : null}
+
+    {seo.jsonLd.map((entry) => <script type="application/ld+json" set:html={entry} />)}
+
+    <slot name="head" />
+  </head>
+  <body {...seo.bodyAttrs}>
+    <slot />
+
+    <!-- WhatsApp floating button -->
+    <a class="codex-wa-fab"
+       href="https://wa.me/8618665820632?text=Hi%20Proud%20Tek%2C%20I%27m%20interested%20in%20your%20RFID%20products.%20Can%20you%20help%20with%20my%20project%3F"
+       target="_blank"
+       rel="noopener noreferrer"
+       aria-label="Chat on WhatsApp">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+
+    <!-- Sticky inquiry bar -->
+    <div class="codex-sticky-cta" role="complementary" aria-label="Quick inquiry">
+      <span>Ready to discuss your RFID project?</span>
+      <a class="codex-sticky-cta__btn" href="/contact/">Request Quote</a>
+      <button class="codex-sticky-cta__dismiss" aria-label="Dismiss" type="button">&times;</button>
+    </div>
+    <script is:inline>
+    (function() {
+      /* Jump-nav active state tracking */
+      var links = document.querySelectorAll('.codex-editorial-jump-link');
+      if (links.length) {
+        var sections = [];
+        links.forEach(function(link) {
+          var id = (link.getAttribute('href') || '').replace('#', '');
+          var el = id && document.getElementById(id);
+          if (el) sections.push({ link: link, el: el });
+        });
+        if (sections.length) {
+          var active = null;
+          var ticking = false;
+          function update() {
+            var scrollY = window.scrollY + 120;
+            var current = null;
+            for (var i = sections.length - 1; i >= 0; i--) {
+              if (sections[i].el.offsetTop <= scrollY) { current = sections[i]; break; }
+            }
+            if (current === active) return;
+            if (active) active.link.classList.remove('is-active');
+            if (current) current.link.classList.add('is-active');
+            active = current;
+          }
+          window.addEventListener('scroll', function() {
+            if (!ticking) { ticking = true; requestAnimationFrame(function() { update(); ticking = false; }); }
+          }, { passive: true });
+          update();
+        }
+      }
+
+      /* Scroll-triggered reveal: IntersectionObserver for section fade-in */
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var revealTargets = document.querySelectorAll(
+        '.codex-editorial-section, .codex-editorial-card, .codex-editorial-action-bar, .codex-editorial-jump-nav'
+      );
+
+      if (revealTargets.length && !prefersReducedMotion) {
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0.08,
+          rootMargin: '0px 0px -40px 0px'
+        });
+
+        revealTargets.forEach(function(el) { observer.observe(el); });
+      } else {
+        /* Reduced motion or no targets: show everything immediately */
+        revealTargets.forEach(function(el) { el.classList.add('is-visible'); });
+      }
+
+      /* WhatsApp FAB: show after scrolling 300px */
+      var waFab = document.querySelector('.codex-wa-fab');
+      if (waFab) {
+        var waShown = false;
+        function checkWaScroll() {
+          if (window.scrollY > 300 && !waShown) {
+            waFab.classList.add('is-visible');
+            waShown = true;
+            window.removeEventListener('scroll', checkWaScroll);
+          }
+        }
+        window.addEventListener('scroll', checkWaScroll, { passive: true });
+        checkWaScroll();
+      }
+
+      /* Sticky CTA bar: show after 3s delay, hide when action-bar is visible */
+      var stickyCta = document.querySelector('.codex-sticky-cta');
+      if (stickyCta) {
+        var stickyDismissed = false;
+        setTimeout(function() {
+          if (!stickyDismissed) stickyCta.classList.add('is-visible');
+        }, 3000);
+
+        var dismissBtn = stickyCta.querySelector('.codex-sticky-cta__dismiss');
+        if (dismissBtn) {
+          dismissBtn.addEventListener('click', function() {
+            stickyDismissed = true;
+            stickyCta.classList.remove('is-visible');
+          });
+        }
+
+        /* Hide sticky bar when action-bar or conversion shell is in view */
+        var actionBar = document.querySelector('.codex-editorial-action-bar, .codex-conversion-shell');
+        if (actionBar) {
+          var stickyObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                stickyCta.classList.remove('is-visible');
+              } else if (!stickyDismissed) {
+                stickyCta.classList.add('is-visible');
+              }
+            });
+          }, { threshold: 0.1 });
+          stickyObserver.observe(actionBar);
+        }
+      }
+    })();
+    </script>
+  </body>
+</html>

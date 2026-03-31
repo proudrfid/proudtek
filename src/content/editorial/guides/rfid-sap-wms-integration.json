@@ -1,0 +1,98 @@
+{
+  "route": "/guides/rfid-sap-wms-integration/",
+  "group": "products",
+  "title": "RFID Integration with SAP WMS — Architecture, Data Flow and Tag Requirements",
+  "kicker": "RFID SAP WMS Integration",
+  "summary": "Integrating RFID with SAP Warehouse Management (WMS) and SAP Extended Warehouse Management (EWM) enables automated goods receipt, real-time inventory updates, pick verification and shipping confirmation without manual barcode scanning. This technical guide covers the integration architecture between RFID infrastructure and SAP systems, the middleware layer required, data mapping between EPC tag data and SAP material masters, and the RFID tag specifications needed for reliable SAP integration.",
+  "heroPoints": [
+    "Automated goods receipt — RFID portal readers at dock doors capture incoming pallet and case EPCs, triggering automatic goods receipt postings in SAP without manual scanning or data entry.",
+    "Real-time inventory accuracy — continuous RFID scanning updates SAP stock quantities and locations in real time, maintaining 98-99% inventory accuracy compared to 85-90% with periodic manual counts.",
+    "Proud Tek supplies SAP-compatible tags — pre-encoded UHF RFID tags with EPC data structures that map directly to SAP material numbers, batch codes and handling unit hierarchies."
+  ],
+  "imageAlt": "RFID reader integrated with SAP WMS showing automated warehouse data flow",
+  "heroImage": "/landing-images/industrial.webp",
+  "imageSourceRoutes": [
+    "/product/uhf-rfid-tags/",
+    "/product/rfid-cards/"
+  ],
+  "sections": [
+    {
+      "title": "RFID-SAP integration architecture",
+      "bullets": [
+        "Physical layer — UHF RFID readers (fixed portals at dock doors, handheld readers for operators) capture EPC data from tagged items, cases and pallets as they move through warehouse processes.",
+        "RFID middleware — software such as SAP Auto-ID Infrastructure (AII), SAP Object Event Repository, or third-party RFID middleware (Zebra Savanna, RFID4U, Turck Vilant) filters raw tag reads, applies business logic and formats events for SAP consumption.",
+        "SAP integration interfaces — RFID events are transmitted to SAP via IDocs, RFC/BAPI calls, or SAP Integration Suite (formerly CPI). Standard SAP interfaces include MIGO for goods movements, HUMO for handling unit creation, and warehouse task confirmation in EWM.",
+        "Master data alignment — EPC data on RFID tags must map to SAP material master records. SGTIN-96 encodes the GTIN, which is linked to the SAP material number via Global Trade Item Number (GTIN) management in SAP.",
+        "Event-driven processing — each RFID scan event (receiving, put-away, pick, pack, ship) triggers a corresponding SAP transaction, maintaining synchronization between physical goods movement and SAP inventory records."
+      ]
+    },
+    {
+      "title": "Key SAP integration scenarios for RFID",
+      "bullets": [
+        "Inbound goods receipt — RFID portal at receiving dock reads all EPCs on an incoming pallet. Middleware aggregates reads, matches against the advance ship notice (ASN), and posts a goods receipt (MIGO 101) in SAP with quantity verification.",
+        "Warehouse put-away — handheld RFID reader confirms the storage bin when items are placed. SAP EWM warehouse task is confirmed automatically, updating the stock-on-hand at the bin level.",
+        "Outbound pick and pack — RFID verification at pick stations confirms the correct material and quantity are picked. SAP delivery documents are updated in real time, reducing shipping errors to near zero.",
+        "Stock transfers and replenishment — RFID readers at zone boundaries detect movement of tagged items between warehouse zones, triggering SAP stock transfer postings (301/311 movement types) without operator intervention.",
+        "Cycle counting — RFID handheld or overhead readers perform continuous cycle counts mapped to SAP physical inventory documents, posting count results (MI04/MI07) automatically for variance analysis."
+      ]
+    },
+    {
+      "title": "RFID tag requirements for SAP integration",
+      "bullets": [
+        "EPC encoding standard — tags must be encoded with GS1 EPC (SGTIN-96, SSCC-96, GRAI-96) to enable automated mapping to SAP material masters, handling units and returnable asset records.",
+        "Data quality — 100% encoding verification during tag manufacturing ensures every tag carries the correct EPC. A single misencoded tag can create a goods receipt discrepancy in SAP.",
+        "Read performance — tags must achieve reliable reads at the distances used by your RFID infrastructure (typically 1-3 meters for handheld, 3-8 meters for fixed portals). Proud Tek tests all tags for minimum read sensitivity.",
+        "Material compatibility — tag antenna design must match the surface material (corrugated, plastic, metal) to ensure consistent reads in the warehouse environment. Anti-metal tags are required for metal containers and shelving.",
+        "Serialization management — unique serial numbers per tag must be maintained across all orders and mapped to SAP batch or serial number records. Proud Tek provides serialization databases compatible with SAP upload formats."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "SAP-compatible RFID products",
+      "description": "Pre-encoded tags and labels for SAP warehouse integration.",
+      "links": [
+        {
+          "href": "/product/uhf-rfid-tags/",
+          "label": "UHF RFID warehouse tags"
+        },
+        {
+          "href": "/guides/gs1-epc-encoding-guide/",
+          "label": "GS1 EPC encoding guide"
+        },
+        {
+          "href": "/contact/",
+          "label": "Request SAP integration consultation"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Does SAP have built-in RFID support?",
+      "answer": "SAP provides RFID integration capabilities through SAP Auto-ID Infrastructure (AII) and the SAP Object Event Repository, which are part of SAP S/4HANA and SAP EWM. These components handle RFID event processing and master data mapping. However, you still need RFID middleware to manage the physical reader layer and filter raw tag data before it reaches SAP. Third-party middleware solutions from Zebra, Turck Vilant and others specialize in this RFID-to-SAP bridge."
+    },
+    {
+      "question": "How do I map RFID EPC data to SAP material numbers?",
+      "answer": "The connection point is the GTIN (Global Trade Item Number). SGTIN-96 encoded RFID tags contain the GTIN within the EPC. In SAP, GTINs are maintained in the material master (transaction ME01 or via Global Trade Item Number management). When RFID middleware reads an EPC, it extracts the GTIN and looks up the corresponding SAP material number. This mapping must be configured in the middleware or SAP AII before go-live."
+    },
+    {
+      "question": "What RFID middleware works best with SAP?",
+      "answer": "The most commonly deployed RFID middleware for SAP environments includes SAP's own Auto-ID Infrastructure, Zebra Savanna Data Services, Turck Vilant Engine, and RFID4U TagMatiks. The best choice depends on your RFID reader hardware, SAP version (ECC vs. S/4HANA), deployment complexity and whether you need edge processing capabilities. All of these can consume EPC data from Proud Tek pre-encoded tags."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/",
+    "label": "Discuss SAP RFID integration"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/uhf-rfid-tags/",
+      "label": "UHF RFID tags"
+    },
+    {
+      "href": "/guides/gs1-epc-encoding-guide/",
+      "label": "EPC encoding guide"
+    }
+  ]
+}

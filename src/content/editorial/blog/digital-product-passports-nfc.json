@@ -1,0 +1,182 @@
+{
+  "route": "/blog/digital-product-passports-nfc/",
+  "group": "blog",
+  "title": "Digital Product Passports and NFC Tags",
+  "kicker": "Industry Trends",
+  "summary": "How NFC tags enable EU-mandated Digital Product Passports (DPP) for textiles, batteries, electronics and construction materials — covering regulatory requirements, data architecture, tag selection and implementation timelines for B2B manufacturers and brand owners.",
+  "heroPoints": [
+    "The EU's Ecodesign for Sustainable Products Regulation (ESPR) mandates Digital Product Passports for multiple product categories starting in 2027, creating a massive B2B market for NFC-enabled product tagging.",
+    "NFC tags provide the consumer-accessible interface for DPP data — a smartphone tap retrieves product origin, material composition, repair guides and recycling instructions.",
+    "DPP implementation requires coordination between NFC hardware, cloud-hosted data repositories, GS1 identification standards and product-lifecycle management systems."
+  ],
+  "imageAlt": "NFC tag on a product label linking to a digital product passport on a smartphone",
+  "imageSourceRoutes": [
+    "/product/nfc-stickers/",
+    "/product/nfc-cards/"
+  ],
+  "sections": [
+    {
+      "title": "What is a Digital Product Passport?",
+      "intro": "A Digital Product Passport (DPP) is a structured digital record that accompanies a physical product throughout its lifecycle, providing standardized information on material composition, manufacturing origin, environmental footprint, repairability and end-of-life recycling pathways.",
+      "image": {
+        "src": "/blog-images/digital-passport.jpg",
+        "alt": "NFC tag enabling digital product passport scan on luxury goods"
+      },
+      "paragraphs": [
+        "The EU's ESPR framework mandates DPPs as a tool to advance circular-economy objectives. Each product category will have delegated acts specifying which data elements must be included in the passport. The data is hosted on a cloud platform and linked to the physical product via a unique identifier carried on an NFC tag, QR code or RFID label."
+      ],
+      "bullets": [
+        "Batteries: DPP requirements apply from February 2027, covering battery chemistry, capacity, carbon footprint, recycled content and collection instructions.",
+        "Textiles: DPP requirements expected from 2027–2028, covering fiber composition, country of manufacturing, care instructions and recyclability.",
+        "Electronics: DPP timelines vary by delegated act, targeting energy efficiency, repairability scores, hazardous substance declarations and spare-part availability.",
+        "Construction products: DPP requirements align with the revised Construction Products Regulation, covering environmental declarations and performance characteristics."
+      ],
+      "callout": {
+        "label": "EU regulation",
+        "text": "The EU Digital Product Passport regulation takes effect in phases from 2026, requiring brands to provide product lifecycle data via scannable identifiers like NFC tags.",
+        "href": "/product/nfc-stickers/"
+      }
+    },
+    {
+      "title": "Why NFC is the preferred DPP carrier",
+      "intro": "While QR codes can also link to DPP data, NFC tags offer several advantages for B2B product manufacturers concerned with authenticity, durability and consumer experience.",
+      "table": {
+        "columns": [
+          "Criterion",
+          "NFC tag",
+          "QR code",
+          "UHF RFID"
+        ],
+        "rows": [
+          [
+            "Consumer access",
+            "Smartphone tap — no app needed",
+            "Camera scan — requires focus/alignment",
+            "Requires dedicated reader — no consumer access"
+          ],
+          [
+            "Authentication",
+            "Chip UID + cryptographic signing (NTAG 424 DNA)",
+            "Visual code — easily duplicated",
+            "EPC — no consumer-facing authentication"
+          ],
+          [
+            "Durability",
+            "Embedded in product — survives washing, handling",
+            "Printed — fades, tears, abrades",
+            "Tag dependent — good for logistics, less for consumer"
+          ],
+          [
+            "Data capacity",
+            "URL link to cloud (unlimited data)",
+            "URL link to cloud (unlimited data)",
+            "On-tag EPC + user memory (limited)"
+          ],
+          [
+            "Cost per unit",
+            "$0.08 – $0.25",
+            "$0.01 – $0.03 (print cost)",
+            "$0.03 – $0.10"
+          ],
+          [
+            "Anti-counterfeit",
+            "Strong — cryptographic chip identity",
+            "Weak — code is easily reproduced",
+            "Moderate — EPC cloning is possible"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "NFC tag selection for DPP applications",
+      "intro": "The NFC tag embedded in a DPP-compliant product must survive the product's expected lifetime, resist tampering and provide cryptographic authentication to prevent counterfeit passports.",
+      "bullets": [
+        "NTAG 424 DNA (NXP) is purpose-built for DPP and authentication applications — it generates a unique, one-time authentication code (SUN message) on every tap, verifiable by the cloud backend.",
+        "NTAG 213/215/216 are suitable for basic DPP implementations where the tag serves as a simple URL carrier without on-tag cryptographic authentication.",
+        "Textile DPP tags must survive industrial washing (60 °C+), dry cleaning solvents and mechanical agitation — RFID laundry tags or sewn-in NFC labels are required.",
+        "For electronics and batteries, NFC tags can be embedded under the product label or in the packaging, where they are protected from mechanical damage."
+      ]
+    },
+    {
+      "title": "Data architecture and standards",
+      "intro": "A DPP is not a monolithic data file on the tag — it is a distributed data architecture with the NFC tag providing a resolvable link to a cloud-hosted data record.",
+      "paragraphs": [
+        "The GS1 Digital Link standard provides the URI structure for DPP identifiers: a product GTIN (Global Trade Item Number) combined with a serial number, encoded as a URL that resolves to the product's DPP data endpoint. The NFC tag stores this GS1 Digital Link URL as an NDEF URI record. When tapped, the smartphone browser resolves the URL to the manufacturer's DPP data repository or a neutral registry."
+      ],
+      "bullets": [
+        "GS1 Digital Link format: https://id.gs1.org/01/{GTIN}/21/{serial} — resolvable to product-specific data via GS1 Resolver infrastructure.",
+        "DPP data is typically served as a JSON-LD document conforming to schema.org Product and DigitalDocument types.",
+        "Decentralized identifiers (DIDs) and verifiable credentials (VCs) are being explored as trust layers to ensure DPP data integrity without relying on a single centralized registry.",
+        "Manufacturers must plan for 10–20 year data-hosting obligations matching product lifespans — cloud storage and URL persistence are critical architectural decisions."
+      ]
+    },
+    {
+      "title": "Implementation roadmap for B2B manufacturers",
+      "intro": "Manufacturers should begin DPP preparation now, even before delegated acts are finalized, to avoid last-minute compliance scrambles that increase cost and risk.",
+      "bullets": [
+        "Phase 1 (now): Audit product-data availability — identify gaps in material composition, supplier origin, carbon-footprint and recyclability data.",
+        "Phase 2 (6–12 months before mandate): Select NFC tag hardware, establish GS1 Digital Link identifiers and build or procure the cloud DPP data repository.",
+        "Phase 3 (3–6 months before mandate): Integrate NFC tag encoding into production lines, pilot with a single product category and validate consumer tap experience.",
+        "Phase 4 (go-live): Scale to all mandated product categories, train supply-chain partners on source-tagging requirements and establish ongoing data-maintenance workflows."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "NFC tags for Digital Product Passports",
+      "description": "NFC stickers and labels for embedding DPP links in products, packaging and labels.",
+      "links": [
+        {
+          "href": "/product/nfc-stickers/",
+          "label": "NFC stickers"
+        },
+        {
+          "href": "/product/nfc-cards/",
+          "label": "NFC cards"
+        }
+      ]
+    },
+    {
+      "title": "Authentication-grade NFC products",
+      "description": "NFC tags with cryptographic authentication for anti-counterfeit DPP implementations.",
+      "links": [
+        {
+          "href": "/product/nfc-stickers/",
+          "label": "NFC authentication stickers"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "When do Digital Product Passports become mandatory?",
+      "answer": "The EU battery DPP regulation applies from February 2027. Textile DPP requirements are expected in 2027–2028. Electronics and other product categories will follow via individual delegated acts under the ESPR framework. Non-EU manufacturers exporting to the EU must also comply."
+    },
+    {
+      "question": "Can a QR code replace an NFC tag for DPP compliance?",
+      "answer": "The ESPR regulation does not mandate a specific data carrier technology — QR codes are technically compliant. However, NFC tags offer significant advantages in durability, authentication and consumer experience. Many brands are adopting NFC as the primary carrier with a printed QR code as a fallback."
+    },
+    {
+      "question": "How much does NFC-based DPP tagging cost per product?",
+      "answer": "At scale (100 000+ units), NFC tag cost ranges from $0.08 to $0.25 per unit depending on chip type (NTAG 213 vs NTAG 424 DNA), form factor and application method. Cloud hosting, data management and integration add $0.01–$0.05 per product per year. Total DPP cost per unit is typically under $0.30."
+    },
+    {
+      "question": "What data must a Digital Product Passport contain?",
+      "answer": "Required data elements vary by product category and are defined in delegated acts. Common elements include: product identification (GTIN + serial), material composition, country of manufacturing, carbon footprint, repairability score, hazardous substance declarations, recycling instructions and warranty information."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/dpp-nfc/",
+    "label": "Plan your DPP implementation"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/nfc-stickers/",
+      "label": "View NFC stickers"
+    },
+    {
+      "href": "/product/nfc-cards/",
+      "label": "Browse NFC cards"
+    }
+  ]
+}

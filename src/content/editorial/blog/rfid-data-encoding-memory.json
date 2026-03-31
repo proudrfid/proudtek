@@ -1,0 +1,186 @@
+{
+  "route": "/blog/rfid-data-encoding-memory/",
+  "group": "blog",
+  "title": "RFID Data Encoding and Memory Structures",
+  "kicker": "RFID Technology",
+  "summary": "A technical primer on how data is organized, encoded and stored in RFID tag memory — covering NDEF formatting, MIFARE sector layouts, EPC memory banks and encoding best practices for B2B integrators building read/write RFID applications.",
+  "heroPoints": [
+    "Understanding RFID memory architecture prevents data corruption, improves read reliability and enables efficient utilization of limited tag memory.",
+    "NDEF (NFC Data Exchange Format) provides a standardized container for URLs, text, MIME records and smart-poster payloads across all NFC-compliant tags.",
+    "EPC Gen2 (UHF) tags use a four-bank memory model — Reserved, EPC, TID, User — each with different access permissions and use cases."
+  ],
+  "imageAlt": "Diagram of RFID tag memory structure showing NDEF records and sector layout",
+  "imageSourceRoutes": [
+    "/product/blank-rfid-card/",
+    "/product/acr122u/"
+  ],
+  "sections": [
+    {
+      "title": "HF tag memory: MIFARE and NTAG architectures",
+      "intro": "High-frequency (13.56 MHz) tags from the MIFARE and NTAG families organize memory into pages or sectors with byte-level addressing. Understanding the specific layout is essential for writing data without overwriting system areas or lock bits.",
+      "image": {
+        "src": "/blog-images/data-encoding.jpg",
+        "alt": "RFID chip memory structure diagram showing data blocks and sectors"
+      },
+      "paragraphs": [
+        "MIFARE Classic 1K divides its 1 024 bytes into 16 sectors, each containing 4 blocks of 16 bytes. The last block of each sector is the sector trailer, containing two authentication keys (Key A and Key B) and access condition bits. Writing to the sector trailer without understanding the access-bit format can permanently lock the sector.",
+        "NTAG213/215/216 use a page-based architecture with 4 bytes per page. User memory ranges from 144 bytes (NTAG213) to 888 bytes (NTAG216). Pages 0–1 contain the UID, page 2 holds lock bits and the capability container, and the remaining pages store user data. The last 5 pages hold dynamic lock bits, a mirror configuration, authentication settings and a password."
+      ],
+      "bullets": [
+        "Always read the capability container (CC) page before writing NDEF data — it defines the tag's memory size, read/write access and NDEF version.",
+        "MIFARE Classic Key A defaults to FF FF FF FF FF FF on blank cards — change both keys immediately in production to prevent unauthorized access.",
+        "NTAG password protection (32-bit password + 16-bit PACK) restricts write access but does not encrypt data at rest."
+      ],
+      "callout": {
+        "label": "Technical note",
+        "text": "MIFARE Classic organizes memory into 16 sectors of 4 blocks each. DESFire uses a flexible file system with application directories — plan your data model before encoding.",
+        "href": "/product/mifare-classic-card/"
+      }
+    },
+    {
+      "title": "NDEF record structure and encoding",
+      "intro": "NDEF is the NFC Forum's standard format for storing structured data on NFC tags. Every NFC-compliant tag — NTAG, MIFARE, DESFire, ST25 — uses NDEF as the interoperable data container.",
+      "table": {
+        "columns": [
+          "NDEF record type",
+          "TNF + Type",
+          "Typical payload",
+          "Memory usage"
+        ],
+        "rows": [
+          [
+            "URI",
+            "TNF=0x01, Type='U'",
+            "URL with protocol prefix code",
+            "5–100 bytes"
+          ],
+          [
+            "Text",
+            "TNF=0x01, Type='T'",
+            "UTF-8 or UTF-16 string with language code",
+            "10–200 bytes"
+          ],
+          [
+            "Smart Poster",
+            "TNF=0x01, Type='Sp'",
+            "Nested URI + Title + Action records",
+            "50–300 bytes"
+          ],
+          [
+            "MIME",
+            "TNF=0x02, Type='application/...'",
+            "vCard, JSON, binary blob",
+            "Variable"
+          ],
+          [
+            "External Type",
+            "TNF=0x04, Type='domain:type'",
+            "Application-specific payload",
+            "Variable"
+          ]
+        ]
+      },
+      "paragraphs": [
+        "The NDEF message begins with a TLV (Type-Length-Value) wrapper: type byte 0x03 identifies an NDEF message, followed by the length and the NDEF records. The message ends with a terminator TLV (type 0xFE). Writing NDEF data directly via APDU or page writes requires constructing the full TLV structure; using a library such as NDEF.js or ndeflib (Python) is strongly recommended."
+      ]
+    },
+    {
+      "title": "UHF EPC Gen2 memory model",
+      "intro": "UHF RFID tags conforming to ISO 18000-6C (EPC Gen2) organize memory into four banks, each serving a distinct purpose in supply-chain and asset-tracking applications.",
+      "paragraphs": [
+        "Bank 0 (Reserved) stores the kill password and access password — both 32 bits. Bank 1 (EPC) holds the Electronic Product Code, typically 96 bits but extendable to 496 bits. Bank 2 (TID) contains the tag manufacturer's chip identifier and model number — this bank is factory-programmed and read-only. Bank 3 (User) provides optional writable memory for application-specific data, ranging from 0 to 512 bits depending on the chip model."
+      ],
+      "bullets": [
+        "EPC Bank 1 structure: CRC-16 (16 bits) + PC (Protocol Control, 16 bits) + EPC (96–496 bits).",
+        "The kill password in Bank 0 should never be left at the default 0x00000000 in production — set and record it to enable permanent tag decommissioning.",
+        "User memory (Bank 3) availability varies widely — low-cost tags may have zero user memory. Verify datasheet specifications before designing applications that rely on User bank storage.",
+        "Access-password protection can lock individual memory banks to prevent unauthorized write or read operations."
+      ]
+    },
+    {
+      "title": "Encoding best practices for B2B applications",
+      "intro": "Data-encoding errors are among the most common causes of RFID project failures. Following established best practices during the encoding stage prevents costly rework and field recalls.",
+      "bullets": [
+        "Always write a verification read after every write operation — compare the written data byte-for-byte against the intended payload.",
+        "Use checksums or CRCs in user-data payloads to detect memory corruption from environmental RF interference or partial writes.",
+        "Implement encoding retry logic with a maximum attempt count — if a tag fails encoding after 3 attempts, divert it for quality inspection.",
+        "For multi-record NDEF messages, ensure total payload length does not exceed available user memory minus TLV overhead (typically 4–6 bytes).",
+        "Document the encoding schema version in the first bytes of user data so future readers can detect and handle format migrations."
+      ]
+    },
+    {
+      "title": "Memory capacity planning",
+      "intro": "Selecting the right tag chip depends on how much data the application needs to store. Over-provisioning wastes budget; under-provisioning requires mid-project chip changes.",
+      "bullets": [
+        "A standard URL (https://example.com/path?id=12345) encoded as NDEF URI uses 40–80 bytes — NTAG213 (144 bytes) is sufficient.",
+        "A vCard with name, company, phone, email and address encoded as NDEF MIME typically uses 200–400 bytes — NTAG216 (888 bytes) is appropriate.",
+        "MIFARE Classic 1K provides 752 bytes of usable data across 16 sectors after reserving sector trailers — suitable for transit or loyalty applications with structured records.",
+        "DESFire EV2/EV3 with 8 KB supports multi-application deployments with separate files for access control, transit, cashless payment and loyalty data."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Blank RFID cards for encoding",
+      "description": "Blank NFC and RFID cards ready for custom data encoding and NDEF formatting.",
+      "links": [
+        {
+          "href": "/product/blank-rfid-card/",
+          "label": "Blank RFID cards"
+        }
+      ]
+    },
+    {
+      "title": "RFID encoding hardware",
+      "description": "USB readers and writers for encoding NDEF data, MIFARE sectors and DESFire applications.",
+      "links": [
+        {
+          "href": "/product/acr122u/",
+          "label": "ACR122U USB reader/writer"
+        }
+      ]
+    },
+    {
+      "title": "NFC tags for NDEF encoding",
+      "description": "NTAG-based NFC stickers and cards with pre-formatted NDEF capability containers.",
+      "links": [
+        {
+          "href": "/product/nfc-stickers/",
+          "label": "NFC stickers"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "What happens if I write data beyond the tag's memory capacity?",
+      "answer": "The write command will fail and the reader will return an error code. On well-designed tags, the existing data is preserved. However, some tags may leave the memory in an inconsistent state if a multi-page write is interrupted — always verify data integrity after write operations."
+    },
+    {
+      "question": "Can I store encrypted data on an NFC tag?",
+      "answer": "Yes. You can encrypt your payload before writing it to the tag using any symmetric or asymmetric algorithm. The tag stores the ciphertext as raw bytes in an NDEF External Type or MIME record. The reading application decrypts the data using a shared key or PKI infrastructure."
+    },
+    {
+      "question": "How many times can I rewrite an NFC tag?",
+      "answer": "NTAG and MIFARE chips typically support 100 000 write/erase cycles per memory page or block. This is more than sufficient for most applications. If your use case requires millions of writes, consider FRAM-based tags or DESFire cards with wear-leveling."
+    },
+    {
+      "question": "What is the difference between NDEF and raw memory access?",
+      "answer": "NDEF is a standardized data format that all NFC-compliant devices can read. Raw memory access writes arbitrary bytes directly to tag pages or sectors, which requires a custom reader application to interpret. Use NDEF for interoperability and raw access for proprietary data structures that need maximum memory efficiency."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/rfid-encoding/",
+    "label": "Get encoding support"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/blank-rfid-card/",
+      "label": "Browse blank RFID cards"
+    },
+    {
+      "href": "/product/acr122u/",
+      "label": "View ACR122U reader"
+    }
+  ]
+}

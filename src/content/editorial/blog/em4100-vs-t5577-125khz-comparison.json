@@ -1,0 +1,185 @@
+{
+  "route": "/blog/em4100-vs-t5577-125khz-comparison/",
+  "group": "blog",
+  "title": "EM4100 vs T5577: 125 kHz Chip Comparison",
+  "kicker": "RFID Technology",
+  "summary": "A detailed technical comparison of the EM4100 read-only and T5577 read/write 125 kHz RFID chips — covering memory architecture, modulation schemes, security features, cloning risks and migration paths for B2B access-control and identification deployments.",
+  "heroPoints": [
+    "EM4100 is a read-only chip with a factory-programmed 40-bit ID — simple, inexpensive and widely deployed but offering zero security against cloning.",
+    "T5577 provides 330 bits of rewritable memory and can emulate EM4100, HID Prox and other 125 kHz formats, making it the standard for multi-format and cloneable card applications.",
+    "Understanding the security limitations of both chips is critical for B2B buyers evaluating whether to upgrade legacy 125 kHz systems to 13.56 MHz smart cards."
+  ],
+  "imageAlt": "EM4100 and T5577 125 kHz RFID cards side by side",
+  "imageSourceRoutes": [
+    "/product/125-khz-rfid-card/",
+    "/product/t5577-card/",
+    "/product/em4305-card/"
+  ],
+  "sections": [
+    {
+      "title": "125 kHz RFID chip landscape",
+      "intro": "The 125 kHz frequency band was the foundation of proximity-based identification from the 1990s through the early 2010s. Despite the security advantages of 13.56 MHz smart cards, 125 kHz systems remain in active production across access control, animal identification, industrial asset tracking and time-and-attendance applications due to installed-base inertia and lower per-tag cost.",
+      "image": {
+        "src": "/blog-images/chip-125khz.jpg",
+        "alt": "EM4100 and T5577 125 kHz RFID access control cards"
+      },
+      "paragraphs": [
+        "EM Microelectronic's EM4100 (also sold as EM4102) and Atmel's T5577 (now Microchip ATA5577) are the two most common 125 kHz chips in the B2B channel. They serve fundamentally different roles: EM4100 is a fixed-code transponder for simple identification, while T5577 is a programmable transponder that can store custom data and emulate multiple legacy chip formats."
+      ],
+      "callout": {
+        "label": "Migration path",
+        "text": "T5577 can emulate EM4100 and HID Prox formats, making it a versatile upgrade for legacy 125 kHz access control systems without replacing readers.",
+        "href": "/product/125-khz-rfid-card/"
+      }
+    },
+    {
+      "title": "Technical comparison: EM4100 vs T5577",
+      "intro": "The table below summarizes the key technical differences between the two chips across memory, modulation, security and application suitability.",
+      "table": {
+        "columns": [
+          "Feature",
+          "EM4100",
+          "T5577"
+        ],
+        "rows": [
+          [
+            "Memory type",
+            "Read-only (factory-programmed)",
+            "Read/write (330-bit EEPROM, 8 blocks × 33 bits)"
+          ],
+          [
+            "Unique ID length",
+            "40 bits (8 hex digits + row/column parity)",
+            "Configurable — can emulate 40-bit to 64-bit IDs"
+          ],
+          [
+            "Modulation",
+            "Manchester at 64 periods/bit (RF/64)",
+            "Configurable — Manchester, PSK1, FSK1, FSK2, Biphase"
+          ],
+          [
+            "Data rate",
+            "Fixed (RF/64 = ~2 kbps)",
+            "Configurable via block 0 configuration word"
+          ],
+          [
+            "Security / authentication",
+            "None — ID transmitted in the clear",
+            "Optional password protection (32-bit) for write operations"
+          ],
+          [
+            "Clone resistance",
+            "None — any reader can capture the ID",
+            "Minimal — password is transmitted unencrypted over the air"
+          ],
+          [
+            "Format emulation",
+            "EM4100 only",
+            "EM4100, HID Prox, Indala, AWID, FDX-B, and more"
+          ],
+          [
+            "Typical unit cost (card)",
+            "$0.08 – $0.15",
+            "$0.25 – $0.50"
+          ],
+          [
+            "Primary B2B use case",
+            "Low-security ID, time/attendance, animal tags",
+            "Multi-format access, card cloning services, testing/development"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Memory architecture and data format",
+      "intro": "Understanding the internal memory layout of each chip clarifies what data can be stored, modified and protected.",
+      "paragraphs": [
+        "EM4100 has a fixed 64-bit data stream transmitted continuously: 9 header bits (all ones), 40 data bits organized as 10 rows of 4 data bits plus 1 row-parity bit, 4 column-parity bits and 1 stop bit. There is no user-writable area. The ID is laser-programmed at the factory and cannot be changed.",
+        "T5577 organizes its 330-bit EEPROM into page 0 (blocks 0–7) and page 1 (blocks 0–3). Block 0 on page 0 is the configuration block that sets modulation, data rate, bit count and other RF parameters. Blocks 1–7 store user data or format-emulation payloads. Block 7 can optionally hold a 32-bit password to protect write operations."
+      ],
+      "bullets": [
+        "T5577 configuration block settings determine which legacy format the chip emulates — changing block 0 switches the chip's over-the-air behavior without replacing hardware.",
+        "EM4100 cards always transmit the same 64-bit frame on every interrogation — there is no session key, challenge-response or rolling code.",
+        "T5577 password protection prevents unauthorized writes but does not encrypt the read data — the emulated ID is still broadcast in the clear."
+      ]
+    },
+    {
+      "title": "Security analysis and cloning risks",
+      "intro": "Both EM4100 and T5577 are fundamentally insecure by modern standards. Any attacker with a $20 Proxmark or similar 125 kHz reader/writer can capture and duplicate the transmitted ID in seconds.",
+      "bullets": [
+        "EM4100 cloning requires only reading the 40-bit ID from the original card and writing it to a T5577 blank configured in EM4100 emulation mode.",
+        "T5577 password protection slows casual cloning but does not prevent it — the password is transmitted in plaintext during write operations and can be sniffed.",
+        "No 125 kHz chip supports mutual authentication, encrypted communication or cryptographic diversification.",
+        "B2B customers with any security requirement beyond basic identification should migrate to MIFARE DESFire, iCLASS SE or comparable 13.56 MHz platforms."
+      ]
+    },
+    {
+      "title": "Migration paths from 125 kHz to 13.56 MHz",
+      "intro": "For organizations with large 125 kHz installed bases, migration is typically phased. Dual-frequency readers and multi-technology cards ease the transition without a forklift replacement of all existing infrastructure.",
+      "bullets": [
+        "Dual-frequency cards embed both a 125 kHz chip (EM4100 or T5577) and a 13.56 MHz chip (MIFARE Classic, DESFire or iCLASS) in a single card body.",
+        "Dual-frequency readers detect and process both 125 kHz and 13.56 MHz cards, allowing old and new credentials to coexist during the migration window.",
+        "Migration timelines of 12–24 months are typical for mid-size enterprises with 500–5 000 cardholders.",
+        "T5577 cards can serve as interim credentials during migration because they can be reprogrammed to match multiple legacy reader formats across the facility."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "125 kHz RFID cards",
+      "description": "EM4100, T5577 and EM4305 cards for access control, identification and legacy system support.",
+      "links": [
+        {
+          "href": "/product/125-khz-rfid-card/",
+          "label": "125 kHz RFID cards (EM4100)"
+        },
+        {
+          "href": "/product/t5577-card/",
+          "label": "T5577 rewritable cards"
+        }
+      ]
+    },
+    {
+      "title": "Programmable 125 kHz chips",
+      "description": "EM4305 and T5577 cards with rewritable memory for multi-format emulation and development use.",
+      "links": [
+        {
+          "href": "/product/em4305-card/",
+          "label": "EM4305 cards"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can a T5577 card replace any EM4100 card?",
+      "answer": "Yes. T5577 can be configured to emulate EM4100's modulation, data rate and ID format. You program the desired 40-bit ID into the T5577's data blocks and set the configuration block to EM4100 mode. The reader cannot distinguish between a genuine EM4100 and a T5577 in emulation mode."
+    },
+    {
+      "question": "Is EM4100 still a good choice for new deployments?",
+      "answer": "Only for applications with no security requirement and maximum cost sensitivity, such as animal identification tags or basic time-clock badges. For any access-control application, EM4100's lack of authentication makes it unsuitable. Consider migrating to 13.56 MHz smart cards."
+    },
+    {
+      "question": "What is the read range of EM4100 and T5577 cards?",
+      "answer": "Both operate at 125 kHz and achieve similar read ranges of 5–15 cm with standard proximity readers. Read range depends primarily on the reader's antenna size and transmit power, not the chip type."
+    },
+    {
+      "question": "Can T5577 cards be locked to prevent reprogramming?",
+      "answer": "T5577 supports a 32-bit password that must be provided before write commands are accepted. However, this password is transmitted unencrypted over the air and can be captured with a sniffer. True tamper-proof locking is not possible with 125 kHz technology."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/125khz-cards/",
+    "label": "Order 125 kHz card samples"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/t5577-card/",
+      "label": "View T5577 cards"
+    },
+    {
+      "href": "/product/125-khz-rfid-card/",
+      "label": "Browse 125 kHz cards"
+    }
+  ]
+}

@@ -8,6 +8,8 @@ const SITE_ORIGIN = process.env.SITE_ORIGIN ?? "https://proudtek.com";
 const USER_AGENT = "Mozilla/5.0 (compatible; Codex Static Migration Bot/1.0)";
 const PROJECT_ROOT = process.cwd();
 const DATA_OUTPUT_PATH = path.join(PROJECT_ROOT, "src", "data", "site-data.json");
+const META_OUTPUT_PATH = path.join(PROJECT_ROOT, "src", "data", "site-meta.json");
+const PAGES_OUTPUT_DIR = path.join(PROJECT_ROOT, "src", "data", "pages");
 const ASSET_OUTPUT_ROOT = path.join(PROJECT_ROOT, "public", "site-assets");
 const XML = new XMLParser({ ignoreAttributes: false });
 const LOCALIZE_ASSETS = process.env.LOCALIZE_ASSETS === "1";
@@ -674,8 +676,35 @@ async function main() {
   const filteredPages = pages.filter(Boolean);
   filteredPages.sort((left, right) => left.route.localeCompare(right.route));
 
+  const generatedAt = new Date().toISOString();
+
+  // ── Write split format: site-meta.json + per-page files ──
+  const siteMeta = {
+    generatedAt,
+    siteOrigin: SITE_ORIGIN,
+    pageCount: filteredPages.length,
+    pages: filteredPages.map((p) => ({ route: p.route, title: p.title, sourceUrl: p.sourceUrl })),
+  };
+
+  await fs.mkdir(path.dirname(META_OUTPUT_PATH), { recursive: true });
+  await fs.writeFile(META_OUTPUT_PATH, JSON.stringify(siteMeta, null, 2));
+  console.log(`Wrote site meta index to ${META_OUTPUT_PATH}`);
+
+  // Clean and recreate pages directory
+  await fs.rm(PAGES_OUTPUT_DIR, { recursive: true, force: true });
+  await fs.mkdir(PAGES_OUTPUT_DIR, { recursive: true });
+
+  for (const page of filteredPages) {
+    const slug = page.route.replace(/^\/+|\/+$/g, "") || "index";
+    const outputPath = path.join(PAGES_OUTPUT_DIR, `${slug}.json`);
+    await fs.mkdir(path.dirname(outputPath), { recursive: true });
+    await fs.writeFile(outputPath, JSON.stringify(page));
+  }
+  console.log(`Wrote ${filteredPages.length} page files to ${PAGES_OUTPUT_DIR}/`);
+
+  // ── Legacy: also write monolithic site-data.json for backward compat ──
   const siteData = {
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     siteOrigin: SITE_ORIGIN,
     pageCount: filteredPages.length,
     pages: filteredPages,
@@ -683,7 +712,7 @@ async function main() {
 
   await fs.writeFile(DATA_OUTPUT_PATH, JSON.stringify(siteData, null, 2));
 
-  console.log(`Wrote site data to ${DATA_OUTPUT_PATH}`);
+  console.log(`Wrote legacy site data to ${DATA_OUTPUT_PATH}`);
   if (LOCALIZE_ASSETS) {
     console.log(`Downloaded ${assetTasks.size} assets to ${ASSET_OUTPUT_ROOT}`);
   } else {

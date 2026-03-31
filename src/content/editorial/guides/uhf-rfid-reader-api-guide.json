@@ -1,0 +1,88 @@
+{
+  "route": "/guides/uhf-rfid-reader-api-guide/",
+  "group": "products",
+  "title": "UHF RFID Reader API Guide — Protocols, SDKs and Integration Patterns",
+  "kicker": "UHF RFID Reader API",
+  "summary": "Integrating UHF RFID readers into software applications requires understanding the available APIs, communication protocols and SDK options for each reader platform. This technical guide covers the major UHF RFID reader API standards (LLRP, vendor-specific REST APIs, serial protocols), common integration patterns and the tag encoding standards your software needs to parse. Written for developers and system integrators building RFID-enabled applications.",
+  "heroPoints": [
+    "LLRP standard protocol — the Low Level Reader Protocol (LLRP) is the RAIN RFID standard for reader control and data exchange, supported by Impinj, Zebra and most major fixed reader manufacturers.",
+    "Vendor REST APIs — modern RFID readers from Impinj (IoT Interface), Zebra (DataCapture DNA) and others offer REST API interfaces for cloud-native and web application integration.",
+    "Proud Tek tags work with every reader API — our UHF RFID tags use standard Gen2 encoding readable by all LLRP and vendor API implementations."
+  ],
+  "imageAlt": "UHF RFID reader API integration architecture with software application data flow",
+  "heroImage": "/landing-images/industrial.webp",
+  "imageSourceRoutes": [
+    "/product/uhf-rfid-tags/",
+    "/product/rfid-cards/"
+  ],
+  "sections": [
+    {
+      "title": "UHF RFID reader communication protocols",
+      "bullets": [
+        "LLRP (Low Level Reader Protocol) — EPCglobal standard (ISO 24791-5) for controlling Gen2 RFID readers over TCP/IP. Provides commands for inventory, tag read/write, reader configuration, GPIO control and event subscription. Supported by Impinj Speedway/R-series, Zebra FX/ATR series, and most enterprise fixed readers.",
+        "Impinj Octane SDK — Impinj's proprietary SDK wrapping LLRP with high-level abstractions in Java, C# and Python. Simplifies tag inventory, filtered reads, direction detection and antenna management on Impinj readers.",
+        "Zebra DataCapture DNA — Zebra's reader management and data capture platform offering REST API and MQTT interfaces for Zebra fixed and handheld RFID readers. Enables cloud-based reader management and data routing.",
+        "Serial protocol (RS-232/USB) — budget and mid-range UHF readers use proprietary serial protocols for command/response communication. Each vendor defines its own command set, requiring vendor-specific libraries or documentation.",
+        "MQTT and WebSocket — modern reader firmware increasingly supports MQTT publishing of tag events to message brokers, and WebSocket streaming for real-time browser-based applications. Ideal for IoT and cloud architectures."
+      ]
+    },
+    {
+      "title": "Common API integration patterns",
+      "bullets": [
+        "Polling inventory — application periodically requests a tag inventory from the reader. Simplest pattern but introduces latency and may miss transient tag reads. Suitable for periodic counting workflows.",
+        "Event-driven streaming — reader continuously pushes tag read events to the application via callback, MQTT or WebSocket. Application processes each event in real time. Required for dock-door portals and real-time tracking.",
+        "Filtered reads — configure the reader to report only tags matching specific EPC patterns (GS1 filter values, company prefix ranges). Reduces application processing load in environments with many tags from multiple tenants.",
+        "Read/write operations — API calls to read from or write to specific tag memory banks (EPC, TID, User). Used for encoding, data update and commission/decommission workflows. Requires addressing individual tags by EPC or TID.",
+        "GPIO integration — API control of the reader's General Purpose Input/Output pins for triggering external devices (light stacks, conveyor gates, alarms) based on RFID events. Essential for automated material handling integration."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "UHF RFID tags for API development",
+      "description": "Standard Gen2 tags compatible with all reader APIs.",
+      "links": [
+        {
+          "href": "/product/uhf-rfid-tags/",
+          "label": "UHF RFID tags"
+        },
+        {
+          "href": "/guides/iso-18000-6c-uhf-rfid-standard/",
+          "label": "ISO 18000-6C standard guide"
+        },
+        {
+          "href": "/contact/",
+          "label": "Request developer tag samples"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "What is the best RFID reader API for beginners?",
+      "answer": "For developers new to RFID, Impinj's Octane SDK offers the best balance of documentation, abstraction and community support. It wraps the complexity of LLRP in high-level Java, C# and Python classes with clear examples. For a lower-cost entry point, budget USB serial readers from Chafon or Yanzeo with Python serial libraries provide a simpler but less feature-rich starting point."
+    },
+    {
+      "question": "Do I need different tags for different reader APIs?",
+      "answer": "No. All Gen2/ISO 18000-6C UHF RFID tags work with all compliant reader APIs. The tag communicates using the standard Gen2 air interface protocol regardless of whether the reader software uses LLRP, a vendor SDK, or a serial protocol. Proud Tek's UHF tags are tested for Gen2 compliance and work with Impinj, Zebra, ThingMagic, Alien and all other standard readers."
+    },
+    {
+      "question": "Can RFID reader APIs read multiple tags simultaneously?",
+      "answer": "Yes. UHF RFID readers use anti-collision algorithms defined in the Gen2 protocol to inventory hundreds of tags per second. The API returns a stream of individual tag reads (EPC, timestamp, antenna port, RSSI). Your application receives each unique tag identification and can aggregate them into inventory counts. Fixed readers with 4 antenna ports can process 500-1,000+ unique tags per second."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/",
+    "label": "Get UHF RFID developer samples"
+  },
+  "secondaryActions": [
+    {
+      "href": "/product/uhf-rfid-tags/",
+      "label": "UHF RFID tags"
+    },
+    {
+      "href": "/guides/python-rfid-reader-library/",
+      "label": "Python RFID library guide"
+    }
+  ]
+}

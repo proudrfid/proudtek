@@ -1,0 +1,100 @@
+{
+  "route": "/guides/nfc-ndef-format-explained/",
+  "group": "products",
+  "title": "NFC NDEF Format Explained — How NFC Tags Store and Share Data",
+  "kicker": "NDEF Data Format Guide",
+  "summary": "NDEF (NFC Data Exchange Format) is the standard data format that NFC tags use to store and share information with smartphones and other NFC readers. When you tap a phone on an NFC tag and a URL opens, a Wi-Fi network connects, or a contact card saves — that data was stored in NDEF format. This guide explains NDEF record types, message structure and how to use NDEF encoding for your NFC tag projects.",
+  "heroPoints": [
+    "Universal compatibility — NDEF is the standard data format recognized by all NFC-enabled smartphones (iOS and Android), ensuring tags work across all devices.",
+    "Multiple record types — NDEF supports URLs, text, vCards, Wi-Fi configurations, Bluetooth pairing, MIME types and custom application records.",
+    "Simple structure — NDEF messages contain one or more records, each with a type, ID and payload. The format is lightweight enough for NFC tags with as little as 144 bytes of memory."
+  ],
+  "imageAlt": "NFC NDEF data format structure showing records and message layout",
+  "heroImage": "/landing-images/ntag213-nfc-sticker.jpg",
+  "imageSourceRoutes": [
+    "/products/rfid-labels/ntag213-nfc-sticker/",
+    "/products/rfid-labels/ntag216-nfc-sticker/"
+  ],
+  "sections": [
+    {
+      "title": "NDEF message and record structure",
+      "bullets": [
+        "NDEF message — the top-level container stored on an NFC tag. A message contains one or more NDEF records. Each NFC tag stores exactly one NDEF message (though that message can contain multiple records).",
+        "NDEF record — individual data units within a message. Each record has a type (what kind of data), a payload (the actual data), and optional ID (for application-specific identification).",
+        "Record type indicator — specifies the data format of the payload: URI (U), text (T), MIME media type (M), NFC Forum external type (X), or application-specific (custom).",
+        "URI record — the most common NDEF record type. Stores a URL (web address) that the smartphone opens automatically when the tag is tapped. The URI type supports shorthand prefix codes (http://, https://, tel:, mailto:) to save tag memory.",
+        "Text record — stores plain text in a specified language encoding (UTF-8 or UTF-16). Used for labels, descriptions and messages that the reading application can display.",
+        "Smart poster record — a composite record type containing a URI, a title, an icon and an action indicator, designed for marketing and advertising use cases."
+      ]
+    },
+    {
+      "title": "Common NDEF record types for NFC tags",
+      "bullets": [
+        "URL record — tap to open a website, product page, review form, social media profile, or authentication page. The single most common use case for encoded NFC tags.",
+        "vCard record — tap to save a contact with name, phone, email, company and address. Used for NFC business cards and networking tags.",
+        "Wi-Fi configuration record — tap to connect to a Wi-Fi network with SSID and password automatically configured. Used in hotels, restaurants, offices and events.",
+        "Bluetooth pairing record — tap to initiate Bluetooth pairing with a speaker, headphone or other device. Eliminates manual Bluetooth search and pairing.",
+        "SMS record — tap to compose an SMS message to a predefined number with predefined text. Used for voting, feedback and opt-in marketing.",
+        "Application launch record — tap to open a specific app on the phone, or redirect to the app store if the app is not installed. Used for custom brand apps and loyalty programs."
+      ]
+    },
+    {
+      "title": "NDEF and NFC tag memory considerations",
+      "bullets": [
+        "NTAG 213 (144 bytes usable) — sufficient for short URLs (up to ~130 characters), single text records, and basic vCards. The most cost-effective tag for URL-based applications.",
+        "NTAG 215 (504 bytes usable) — enough for longer URLs, full vCards with multiple contact fields, Wi-Fi configurations, and small multi-record messages.",
+        "NTAG 216 (888 bytes usable) — the largest standard NFC tag, supporting complex vCards with photos, multiple NDEF records, and larger data payloads.",
+        "Memory optimization — NDEF URI records use prefix compression (e.g., 'https://www.' is stored as a single byte code), saving 10-20 bytes compared to storing the full URL string. Short URL services can further reduce memory usage.",
+        "Read-only lock — after encoding, the tag can be permanently locked to prevent data modification. This is recommended for production deployments to ensure consumers always see the intended content."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "NFC tag products for NDEF encoding",
+      "description": "Tags with various memory sizes for NDEF data storage.",
+      "links": [
+        {
+          "href": "/products/rfid-labels/ntag213-nfc-sticker/",
+          "label": "NTAG 213 stickers (144 bytes)"
+        },
+        {
+          "href": "/products/rfid-labels/ntag215-nfc-sticker/",
+          "label": "NTAG 215 stickers (504 bytes)"
+        },
+        {
+          "href": "/products/rfid-labels/ntag216-nfc-sticker/",
+          "label": "NTAG 216 stickers (888 bytes)"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can Proud Tek pre-encode NDEF data on NFC tags during production?",
+      "answer": "Yes. We encode NDEF records (URLs, vCards, Wi-Fi configs, custom records) during production on our automated encoding lines. Each tag can receive a unique NDEF record (unique URL with tag ID parameter, unique vCard) or the same static content across the entire batch. We also lock tags after encoding if requested to prevent end-user modification."
+    },
+    {
+      "question": "What is the maximum URL length that fits on an NTAG 213?",
+      "answer": "NTAG 213 has 144 bytes of usable memory. With NDEF URI record overhead (about 7-10 bytes) and the URI prefix compression, a typical URL of approximately 130 characters fits on an NTAG 213. For longer URLs, use NTAG 215 (504 bytes) or NTAG 216 (888 bytes), or shorten the URL with a URL shortener service."
+    },
+    {
+      "question": "Do iPhones and Android phones both read NDEF records?",
+      "answer": "Yes. iPhones (7 and later, iOS 13+) and Android phones (with NFC hardware) both read NDEF records automatically when tapped to a tag. For URI records, the phone opens the URL in the default browser without any app download required. For vCards, the phone offers to save the contact. This cross-platform compatibility is what makes NDEF the universal standard for consumer-facing NFC tags."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/",
+    "label": "Order pre-encoded NFC tags"
+  },
+  "secondaryActions": [
+    {
+      "href": "/blog/how-to-program-nfc-tags/",
+      "label": "How to program NFC tags"
+    },
+    {
+      "href": "/products/rfid-labels/ntag213-nfc-sticker/",
+      "label": "NTAG 213 NFC stickers"
+    }
+  ]
+}

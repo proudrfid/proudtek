@@ -1,10 +1,11 @@
 import { load, type CheerioAPI } from "cheerio";
 
 import type { SiteData, SnapshotPage } from "./site-data";
+import { getCollection } from "astro:content";
+
 import { ROUTE_CANONICAL_OVERRIDES } from "./route-overrides";
 import { injectConversionBlocks } from "./conversion";
 import { PRODUCT_SPEC_SHEETS } from "./product-specs";
-import { BLOG_DEFINITIONS } from "./blog-definitions";
 
 import {
   SITE_ORIGIN,
@@ -779,18 +780,14 @@ function sanitizeBody($body: CheerioAPI): void {
       return;
     }
 
-    // Defer non-critical render-blocking scripts for better LCP
+    // Defer remaining non-critical render-blocking scripts for better LCP
+    // (jQuery/WooCommerce/cookie scripts are already fully stripped in render-snapshot.ts)
     const src = ($body(element).attr("src") ?? "").toLowerCase();
     if (
       src &&
       !$body(element).attr("async") &&
       !$body(element).attr("defer") &&
-      (src.includes("jquery") ||
-        src.includes("blockui") ||
-        src.includes("add-to-cart") ||
-        src.includes("woocommerce") ||
-        src.includes("js.cookie") ||
-        src.includes("jarallax") ||
+      (src.includes("jarallax") ||
         src.includes("parallax") ||
         src.includes("kb-advanced"))
     ) {
@@ -1116,10 +1113,10 @@ function injectIndustriesMenu($body: CheerioAPI, page: SnapshotPage): void {
   ).join("");
 
   const industriesLi = `<li class="menu-item menu-item-has-children codex-industries-menu"
-    onmouseenter="this.querySelector('.codex-industries-drop').style.display='block'"
-    onmouseleave="this.querySelector('.codex-industries-drop').style.display='none'">
-    <a href="/industries/">Industries</a>
-    <ul class="sub-menu codex-industries-drop" style="display:none;position:absolute;top:100%;left:0;z-index:9999;background:#fff;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:8px;padding:8px 0;list-style:none;">${simpleItems}</ul>
+    onmouseenter="this.querySelector('.codex-industries-drop').style.display='block';this.querySelector('a').setAttribute('aria-expanded','true')"
+    onmouseleave="this.querySelector('.codex-industries-drop').style.display='none';this.querySelector('a').setAttribute('aria-expanded','false')">
+    <a href="/industries/" aria-haspopup="true" aria-expanded="false">Industries</a>
+    <ul class="sub-menu codex-industries-drop" role="menu" style="display:none;position:absolute;top:100%;left:0;z-index:9999;background:#fff;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:8px;padding:8px 0;list-style:none;">${simpleItems}</ul>
   </li>`;
 
   // Desktop: insert after PRODUCTS in the primary menu
@@ -1907,8 +1904,22 @@ function getBlogThumbnails(): Record<string, string> {
   return BLOG_THUMBNAIL_MAP;
 }
 
+/* ── Blog definitions from Content Collections (lazy cache) ──────────── */
+
+interface BlogDefEntry { route: string; title: string; summary: string; kicker: string }
+let _blogDefsCache: BlogDefEntry[] | null = null;
+
+/** Pre-load blog definitions into sync cache. Must be called once before buildPageSeo. */
+export async function initBlogDefinitions(): Promise<void> {
+  if (_blogDefsCache) return;
+  const entries = await getCollection("editorial");
+  _blogDefsCache = entries
+    .filter((e) => !e.id.startsWith("_unused/") && e.data.group === "blog")
+    .map((e) => ({ route: e.data.route, title: e.data.title, summary: e.data.summary, kicker: e.data.kicker }));
+}
+
 function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
-  if (!BLOG_DEFINITIONS || BLOG_DEFINITIONS.length === 0) {
+  if (!_blogDefsCache || _blogDefsCache.length === 0) {
     return;
   }
 
@@ -1916,7 +1927,7 @@ function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
   const thumbMap = getBlogThumbnails();
   const allPosts: Array<{ route: string; title: string; summary: string; kicker: string; thumb: string }> = [];
   const clusterSet = new Set<string>();
-  for (const blog of BLOG_DEFINITIONS) {
+  for (const blog of _blogDefsCache) {
     const kicker = blog.kicker || "RFID Technology";
     clusterSet.add(kicker);
     allPosts.push({ route: blog.route, title: blog.title, summary: blog.summary, kicker, thumb: thumbMap[blog.route] ?? "" });
