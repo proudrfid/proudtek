@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import { getCollection } from "astro:content";
 
 import { mergeCatalogPages } from "./catalog-pages";
 import { mergeEditorialPages } from "./editorial-pages";
@@ -23,26 +24,9 @@ export interface SiteData {
   pages: SnapshotPage[];
 }
 
-/** Lightweight metadata for a page — no HTML content. */
-export interface PageMeta {
-  route: string;
-  title: string;
-  sourceUrl: string;
-}
-
-/** Lightweight site index — loaded once, cached forever. */
-interface SiteMeta {
-  generatedAt: string;
-  siteOrigin: string;
-  pageCount: number;
-  pages: PageMeta[];
-}
-
 // ---------------------------------------------------------------------------
 // Caches
 // ---------------------------------------------------------------------------
-
-let metaCache: SiteMeta | null = null;
 
 /**
  * Merged SiteData containing stub pages (for WP snapshots) and full-content
@@ -77,15 +61,6 @@ function routeToFilePath(route: string): string {
 // Core loaders
 // ---------------------------------------------------------------------------
 
-async function readSiteMeta(): Promise<SiteMeta> {
-  if (!metaCache) {
-    const metaPath = path.join(process.cwd(), "src", "data", "site-meta.json");
-    const content = await fs.readFile(metaPath, "utf8");
-    metaCache = JSON.parse(content) as SiteMeta;
-  }
-  return metaCache;
-}
-
 /**
  * Load a single WP snapshot page from its on-disk JSON file.
  * This is the primary mechanism for obtaining full page HTML without loading
@@ -106,16 +81,21 @@ export async function loadPageFromDisk(route: string): Promise<SnapshotPage> {
  */
 export async function getSiteData(): Promise<SiteData> {
   if (!siteDataCache) {
-    const meta = await readSiteMeta();
+    // Load WP page metadata from Content Collections (type-safe, Zod-validated)
+    const wpEntries = await getCollection("wpPages");
 
     // Build a set of routes that live on disk
-    diskRouteSet = new Set(meta.pages.map((p) => p.route));
+    diskRouteSet = new Set(wpEntries.map((e) => e.data.route));
+
+    // Extract site-level metadata from the first entry
+    const siteOrigin = wpEntries[0]?.data.siteOrigin ?? "https://proudtek.com";
+    const generatedAt = wpEntries[0]?.data.generatedAt ?? new Date().toISOString();
 
     // Create lightweight stubs for all WP pages
-    const stubPages: SnapshotPage[] = meta.pages.map((p) => ({
-      route: p.route,
-      sourceUrl: p.sourceUrl,
-      title: p.title,
+    const stubPages: SnapshotPage[] = wpEntries.map((e) => ({
+      route: e.data.route,
+      sourceUrl: e.data.sourceUrl,
+      title: e.data.title,
       htmlAttrs: {},
       bodyAttrs: {},
       headHtml: "",
@@ -123,9 +103,9 @@ export async function getSiteData(): Promise<SiteData> {
     }));
 
     const stubData: SiteData = {
-      generatedAt: meta.generatedAt,
-      siteOrigin: meta.siteOrigin,
-      pageCount: meta.pageCount,
+      generatedAt,
+      siteOrigin,
+      pageCount: wpEntries.length,
       pages: stubPages,
     };
 

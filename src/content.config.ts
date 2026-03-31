@@ -1,5 +1,52 @@
+import fs from "node:fs/promises";
+import path from "node:path";
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
+
+/* ── WordPress snapshot page metadata ──────────────────────────────── */
+
+/**
+ * Custom loader that reads the lightweight site-meta.json index (~200KB)
+ * instead of globbing all 1,611 page JSON files (~200MB).
+ * Only metadata (route, title, sourceUrl) is loaded into the Content
+ * Collections store — full HTML stays on disk and is loaded on demand
+ * via loadPageFromDisk() in site-data.ts.
+ */
+const wpPagesLoader = {
+  name: "wp-pages",
+  load: async ({ store }: { store: { clear: () => void; set: (entry: { id: string; data: Record<string, unknown> }) => void } }) => {
+    const metaPath = path.join(process.cwd(), "src", "data", "site-meta.json");
+    const content = await fs.readFile(metaPath, "utf8");
+    const meta = JSON.parse(content) as {
+      generatedAt: string;
+      siteOrigin: string;
+      pageCount: number;
+      pages: Array<{ route: string; title: string; sourceUrl: string }>;
+    };
+
+    store.clear();
+    for (const page of meta.pages) {
+      store.set({
+        id: page.route,
+        data: {
+          route: page.route,
+          title: page.title,
+          sourceUrl: page.sourceUrl,
+          siteOrigin: meta.siteOrigin,
+          generatedAt: meta.generatedAt,
+        },
+      });
+    }
+  },
+};
+
+const wpPageSchema = z.object({
+  route: z.string(),
+  title: z.string(),
+  sourceUrl: z.string(),
+  siteOrigin: z.string(),
+  generatedAt: z.string(),
+});
 
 /* ── Shared sub-schemas ─────────────────────────────────────────────── */
 
@@ -95,11 +142,16 @@ const editorialSchema = z.object({
   secondaryActions: z.array(linkSchema),
 });
 
-/* ── Collection ─────────────────────────────────────────────────────── */
+/* ── Collections ────────────────────────────────────────────────────── */
+
+const wpPages = defineCollection({
+  loader: wpPagesLoader,
+  schema: wpPageSchema,
+});
 
 const editorial = defineCollection({
   loader: glob({ pattern: "**/*.json", base: "./src/content/editorial" }),
   schema: editorialSchema,
 });
 
-export const collections = { editorial };
+export const collections = { wpPages, editorial };
