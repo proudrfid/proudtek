@@ -656,7 +656,7 @@ function renderDecisionSnapshot(definition: EditorialDefinition, id: string): st
   // Include extra brief fields (beyond the first 2 already in cards) as supplementary items
   const extraBriefFields = (definition.brief ?? []).slice(2);
   const extraBriefHtml = extraBriefFields.length > 0
-    ? `<dl class="codex-editorial-brief-grid" style="margin-top: 1rem;">
+    ? `<dl class="codex-editorial-brief-grid codex-editorial-brief-grid--extra">
         ${extraBriefFields.map((field) => renderBriefField(field)).join("")}
       </dl>`
     : "";
