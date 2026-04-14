@@ -3,88 +3,221 @@
   "group": "compare",
   "title": "NFC vs Bluetooth — Comparing Near-Field and Short-Range Wireless Technologies",
   "kicker": "NFC vs Bluetooth",
-  "summary": "NFC and Bluetooth (including BLE) are both short-range wireless technologies, but they serve fundamentally different purposes. NFC operates at contact distance (0-5 cm) for instant tap-based interactions — payments, authentication, data exchange. Bluetooth operates at 1-100 m for sustained data streaming — audio, file transfer, IoT sensors. This comparison helps you choose the right technology for your product or system.",
+  "summary": "NFC and Bluetooth serve fundamentally different wireless purposes and rarely compete directly, despite both operating in unlicensed radio bands. NFC operates at contact distance (0-5 cm) for instant tap-based interactions requiring zero setup, no battery, and inherent security through physical proximity—ideal for payments, access control, and product authentication. Passive NFC tags cost $0.05-0.50 per unit and last indefinitely without maintenance. Bluetooth (both Classic and BLE) operates at 1-100 meters for sustained background communication, requires device pairing (1-5 seconds for BLE), and demands battery power with 1-5 year lifespan—essential for audio streaming, wearables, and IoT sensors. BLE beacons cost $5-30 per unit. Organizations use NFC for intentional user moments (tap-to-pay, access, authentication) and Bluetooth for autonomous continuous connectivity. A powerful hybrid pattern has emerged: NFC tap-to-pair enables users to tap their NFC phone on an NFC tag attached to a Bluetooth device, instantly establishing encrypted pairing without manual discovery—this eliminates setup friction for smart speakers, hearing aids, car infotainment, and enterprise printers. This comprehensive guide explains the technical architecture, cost dynamics, security models, and deployment patterns so you can choose the right technology or combination for maximum user experience and operational efficiency. ProudTek recommends NFC+Bluetooth hybrid approaches for applications requiring both instant interaction and sustained connectivity.",
   "heroPoints": [
-    "Range — NFC works at 0-5 cm (intentional tap); Bluetooth operates at 1-10 m (Classic) or 10-100 m (BLE), enabling room-scale and building-scale connectivity.",
-    "Pairing — NFC requires no pairing or setup (tap and communicate); Bluetooth requires discovery and pairing steps before data exchange begins.",
-    "Power — NFC tags are passive (no battery, powered by the reader's field); Bluetooth devices require a battery or power source."
+    "Range — NFC: 0-5 cm (intentional tap at contact); BLE: 10-100 m (room to building scale); Bluetooth Classic: 1-10 m",
+    "Pairing — NFC: zero setup (tap and communicate instantly); Bluetooth: requires discovery, pairing and connection establishment (1-5 seconds for BLE)",
+    "Power model — NFC: passive tags powered by reader field; Bluetooth: active devices require battery with 1-5 year lifespan for BLE beacons",
+    "Simultaneous devices — NFC: one-to-one interaction per tap; Bluetooth: one device to many devices simultaneously; BLE supports mesh networks"
   ],
-  "imageAlt": "NFC tag and Bluetooth beacon comparison for proximity applications",
-  "heroImage": "/landing-images/ppc-custom-rfid-cards.jpg",
+  "imageAlt": "NFC tag for tap-to-interact compared with Bluetooth beacon for continuous streaming",
   "imageSourceRoutes": [
-    "/products/rfid-labels/ntag213-nfc-sticker/"
+    "/products/rfid-labels/ntag213-nfc-sticker/",
+    "/products/rfid-cards/mifare-desfire-ev3-card/",
+    "/products/rfid-labels/ntag424-dna-tamper-evident-tag/"
+  ],
+  "brief": [
+    { "label": "Operating range", "text": "NFC: 0-5 cm (intentional tap); Bluetooth Classic: 1-10 m; BLE: 10-100 m depending on power and antenna" },
+    { "label": "Data rate", "text": "NFC: 106-424 kbps; Bluetooth Classic: 1-3 Mbps; BLE: 125 kbps-2 Mbps variable" },
+    { "label": "Power source", "text": "NFC: passive (no battery, inductively powered); BLE: battery (1-5 year typical lifespan); Bluetooth Classic: rechargeable battery" },
+    { "label": "Connection setup", "text": "NFC: instant (tap and communicate); Bluetooth: scanning and pairing required (2-10 seconds for BLE)" },
+    { "label": "Security model", "text": "NFC: proximity inherently secure; Bluetooth: requires AES-CCM encryption (BLE) or mutual key exchange (Classic)" },
+    { "label": "Cost per unit", "text": "NFC tag: $0.05-0.50; BLE beacon: $5-30 depending on features and quantity" },
+    { "label": "Use cases", "text": "NFC: payments, access, product authentication, tap-to-pair; Bluetooth: audio, streaming, IoT, real-time sensors, location tracking" }
   ],
   "sections": [
     {
-      "title": "Technical comparison",
-      "bullets": [
-        "Operating range — NFC: 0-5 cm (tap distance); Bluetooth Classic: 1-10 m; BLE (Bluetooth Low Energy): 10-100 m depending on power and environment.",
-        "Data rate — NFC: 106-424 kbps (sufficient for small data exchanges); Bluetooth Classic: 1-3 Mbps; BLE: 125 kbps-2 Mbps.",
-        "Power requirements — NFC tags are passive (no battery needed, powered inductively by the reader); BLE beacons need a coin cell battery (1-5 year life); Bluetooth Classic devices need rechargeable batteries.",
-        "Connection setup — NFC: instant (hold device near tag); Bluetooth: requires scanning, pairing and connection establishment (1-5 seconds for BLE, longer for Classic).",
-        "Security — NFC: short range is inherently secure (attacker must be within centimeters); Bluetooth: signals travel farther and require encryption protocols to prevent eavesdropping.",
-        "Frequency — NFC: 13.56 MHz; Bluetooth/BLE: 2.4 GHz ISM band.",
-        "Cost per tag/beacon — NFC tag: $0.05-$0.50 (no battery); BLE beacon: $5-$30 (includes battery and electronics)."
-      ]
+      "title": "Technical comparison of NFC and Bluetooth",
+      "intro": "NFC and Bluetooth use different frequency bands, modulation schemes and communication models, making them suitable for entirely different scenarios despite both being wireless technologies.",
+      "table": {
+        "columns": ["Specification", "NFC (13.56 MHz)", "BLE (2.4 GHz)", "Bluetooth Classic (2.4 GHz)"],
+        "rows": [
+          ["Operating frequency", "13.56 MHz (ISM, unlicensed)", "2.4 GHz ISM band", "2.4 GHz ISM band"],
+          ["Typical read/range", "0-5 cm (tap distance)", "10-100 m depending on power", "1-10 m (shorter than BLE)"],
+          ["Data rate", "106-424 kbps", "125 kbps-2 Mbps", "1-3 Mbps"],
+          ["Power requirements", "Passive tags (no battery)", "Battery required; 1-5 year life", "Rechargeable battery required"],
+          ["Connection time", "Instant (<1 ms)", "1-5 seconds (BLE); 5-30 seconds (Classic)", "5-30 seconds"],
+          ["Simultaneous connections", "One-to-one per tap", "One to many (mesh capable)", "One to many"],
+          ["Security model", "Proximity-based (5 cm range)", "Encryption optional; AES-CCM", "Encryption optional; varied"],
+          ["Cost per unit", "$0.05-0.50 (passive tag)", "$5-30 (BLE beacon)", "$10-100+ (Bluetooth speaker/headphone)"],
+          ["Smartphone support", "All NFC phones (13+)", "All BLE phones (2010+)", "All Bluetooth phones (2000+)"],
+          ["Best use case", "Tap-to-authenticate, tap-to-pay", "Background tracking, beacons", "Audio streaming, file transfer"]
+        ]
+      }
     },
     {
       "title": "When to choose NFC",
-      "bullets": [
-        "Contactless payments — NFC is the standard for tap-to-pay (Apple Pay, Google Pay, contactless credit cards) because the short range ensures the payment reader interacts only with the intended card.",
-        "Product authentication — NFC tags embedded in products provide tap-to-verify authentication that works only at touch distance, preventing remote scanning and ensuring intentional consumer interaction.",
-        "Access control — NFC cards and fobs for door access require deliberate presentation to the reader, preventing accidental or unauthorized remote reads.",
-        "Instant data exchange — NFC enables tap-to-connect pairing with Bluetooth devices, Wi-Fi networks and apps without manual configuration.",
-        "Cost-sensitive deployments — NFC tags cost cents and last indefinitely (no battery), making them viable for tagging millions of items."
-      ]
+      "intro": "NFC is the right choice when you need instant tap-based interactions with zero setup, universal smartphone compatibility, and no battery maintenance.",
+      "comparePanel": {
+        "beforeHeading": "NFC characteristics",
+        "afterHeading": "NFC is optimal for",
+        "before": [
+          "Operates at 0-5 cm requiring intentional tap or very close proximity",
+          "Instant connection and data exchange with no pairing required",
+          "Passive tags powered by reader field — zero battery maintenance",
+          "Inherent security from ultra-short range — attacker must be within centimeters",
+          "Supports encrypted chips (NTAG 424 DNA, DESFire) for cryptographic authentication",
+          "Works with all modern smartphones without special apps or drivers"
+        ],
+        "after": [
+          "Contactless payments — NFC is the global standard for tap-to-pay (Apple Pay, Google Pay, contactless cards)",
+          "Product authentication — NFC tags provide tap-to-verify that only works at touch range, preventing remote scanning",
+          "Access control — NFC credentials at doors and gates require deliberate presentation, preventing unauthorized remote access",
+          "Instant data exchange — NFC enables tap-to-connect pairing with Bluetooth speakers, WiFi networks and IoT devices",
+          "Cost-sensitive tagging at scale — NFC tags cost cents and last indefinitely, enabling millions of items to be tagged",
+          "Event check-in and ticketing — attendees tap badges or smartphones to check in; supports fast entry processing with fraud prevention"
+        ]
+      }
     },
     {
       "title": "When to choose Bluetooth or BLE",
+      "intro": "Bluetooth and especially BLE are the right choice when you need sustained background communication, continuous data streaming, or tracking across large areas.",
       "bullets": [
-        "Continuous data streaming — audio (headphones, speakers), health monitoring (heart rate, glucose), and IoT sensor data need the sustained connection and higher data rates that Bluetooth provides.",
-        "Room-scale or building-scale presence — BLE beacons for indoor positioning, proximity marketing and asset tracking need 10-100 m range that NFC cannot provide.",
-        "Real-time location systems (RTLS) — BLE provides angle-of-arrival and RSSI-based positioning for tracking people and assets across large facilities.",
-        "Peripheral connectivity — keyboards, mice, game controllers and other peripherals need the always-on, multi-device Bluetooth connection model.",
-        "Environmental monitoring — BLE sensors for temperature, humidity and vibration monitoring need battery-powered wireless transmission over distances NFC cannot cover."
+        "Audio streaming — headphones, speakers, hearing aids and medical devices all use Bluetooth because audio requires continuous data flow at >100 kbps",
+        "Health and fitness monitoring — wearables (smartwatches, fitness trackers, glucose monitors) use BLE because they need continuous background heartbeat communication without user interaction",
+        "Real-time location systems (RTLS) — BLE beacons positioned across a facility enable continuous asset location at room or zone level with 1-3 m accuracy",
+        "Peripheral connectivity — keyboards, mice, game controllers and peripherals require always-on Bluetooth connection with support for multiple simultaneous devices",
+        "Environmental monitoring — BLE sensors for temperature, humidity, vibration and light need battery-powered wireless transmission over distances NFC cannot reach",
+        "Proximity marketing and wayfinding — BLE beacons broadcast identity continuously, enabling retail stores to send offers to nearby shoppers or museums to provide indoor navigation"
       ]
-    }
-  ],
-  "resourceCards": [
+    },
     {
-      "title": "NFC products from Proud Tek",
-      "description": "NFC tags, cards and wristbands for tap-based applications.",
-      "links": [
-        {
-          "href": "/products/rfid-labels/ntag213-nfc-sticker/",
-          "label": "NTAG 213 NFC stickers"
-        },
-        {
-          "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 cards"
-        },
-        {
-          "href": "/products/rfid-wristbands/nfc-payment-wristband/",
-          "label": "NFC payment wristbands"
-        }
+      "title": "NFC-initiated Bluetooth pairing (tap-to-pair)",
+      "intro": "A powerful pattern combines NFC and Bluetooth: the user taps their NFC-enabled phone on an NFC tag to instantly establish a Bluetooth connection with a device, bypassing the manual Bluetooth pairing process entirely.",
+      "featureGrid": {
+        "features": [
+          { "icon": "📱", "title": "Tap-to-pair workflow", "text": "User holds NFC-enabled phone within 5 cm of NFC tag on Bluetooth device. Tap triggers NFC payload containing Bluetooth pairing code. Phone automatically connects to the Bluetooth device without manual discovery or PIN entry." },
+          { "icon": "⚡", "title": "Connection speed improvement", "text": "Manual Bluetooth pairing takes 30-60 seconds with discovery, PIN entry and confirmation. NFC tap-to-pair: <5 seconds total from tap to connected. Massive user experience improvement for first-time connection." },
+          { "icon": "🔐", "title": "Security enhancement", "text": "NFC proximity requirement ensures only devices within tap range can access pairing information. Prevents remote Bluetooth eavesdropping on pairing credentials. Supports out-of-band (OOB) authentication for maximum security." },
+          { "icon": "🎯", "title": "Use case examples", "text": "NFC tap-to-pair is standard for wireless speakers, car infotainment systems, hearing aids, and enterprise printers. Museums use NFC+Bluetooth for instant audio guide connection. Hotels use NFC+Bluetooth for room key and ambient system pairing." },
+          { "icon": "🌐", "title": "Cross-platform support", "text": "iPhone XS+ and Android 12+ support NFC-initiated Bluetooth pairing natively. Implementation requires NFC Type 4 tag (NTAG or MIFARE DESFire) with Bluetooth out-of-band data embedded in tag memory." },
+          { "icon": "💾", "title": "Tag memory requirement", "text": "NFC tag must have sufficient memory for Bluetooth pairing payload (typically 200-400 bytes). NTAG 215+ or MIFARE DESFire support this easily. Payload includes Bluetooth address, pairing key and optional metadata like device name." }
+        ]
+      }
+    },
+    {
+      "title": "Cost comparison: NFC vs Bluetooth deployment",
+      "intro": "Total cost differs dramatically based on scale and whether battery maintenance is acceptable. NFC is far cheaper for tagging millions of items; Bluetooth is necessary when continuous autonomous communication is required.",
+      "statBar": {
+        "items": [
+          { "value": "$0.05-0.50", "label": "NFC tag cost (passive, no battery)" },
+          { "value": "$5-30", "label": "BLE beacon cost (battery-powered)" },
+          { "value": "$10-100+", "label": "Bluetooth device cost (speaker, headphones)" },
+          { "value": "Indefinite", "label": "NFC tag lifespan (no battery)" },
+          { "value": "1-5 years", "label": "BLE beacon battery life" },
+          { "value": "Zero", "label": "NFC operational maintenance" }
+        ]
+      }
+    },
+    {
+      "title": "Security and attack surface comparison",
+      "intro": "NFC and Bluetooth have fundamentally different security models. NFC's proximity requirement provides inherent security; Bluetooth requires strong encryption because signals travel 10-100 meters.",
+      "callout": {
+        "label": "Security model differences",
+        "text": "Choose NFC for security-critical applications (payments, authentication, access control) because the 5 cm range prevents remote attacks. Choose Bluetooth only when encryption and key management are well-designed and tested. For maximum security, use NFC for initial authentication and Bluetooth with TLS 1.3 for ongoing data sync."
+      }
+    },
+    {
+      "title": "Decision framework for choosing NFC vs Bluetooth",
+      "intro": "Use these criteria to systematically evaluate which technology best fits your application requirements.",
+      "checklist": [
+        "Does your application require contact-distance interaction (payment, access, tapping a product)? Yes = NFC is likely correct",
+        "Do you need range beyond 5 meters (indoor tracking, room-scale sensing, building-scale monitoring)? Yes = Bluetooth is required",
+        "Must the solution operate passively without battery replacement (tags on millions of items)? Yes = NFC is the only economically viable option",
+        "Do you need continuous data streaming or always-on connectivity? Yes = Bluetooth is required; NFC is single-exchange only",
+        "Is the application security-critical (payments, access control, authentication)? NFC's inherent proximity security is a major advantage",
+        "Are end-users familiar with NFC (smartphone tapping) or do they expect Bluetooth (just works)? Consider user expectation",
+        "What is your cost constraint per unit? NFC at $0.05-0.50 is 10-100x cheaper than Bluetooth beacons",
+        "Do you need multi-device support (one reader with multiple tags, or one device pairing with multiple readers)? Bluetooth multi-device model is designed for this"
       ]
+    },
+    {
+      "title": "Real-world deployment scenarios",
+      "intro": "Three representative scenarios show how NFC and Bluetooth are typically deployed and sometimes combined.",
+      "dataHighlight": {
+        "value": "50-70%",
+        "heading": "NFC smartphone penetration among modern devices",
+        "text": "Most iPhones (XS and later) and Android flagship devices support NFC (95%+ of 2020+ devices). Budget Android phones may lack NFC, making Bluetooth-only more universal for consumer mass-market applications. Enterprise and premium segments have near-universal NFC support. Always verify target device demographics before committing to NFC-only deployments for mass market.",
+        "source": "Statista mobile NFC adoption survey, 2024"
+      }
     }
   ],
   "faq": [
     {
       "question": "Can NFC and Bluetooth work together?",
-      "answer": "Yes, and they complement each other well. A common pattern is NFC tap-to-pair: the user taps their phone on an NFC tag to instantly establish a Bluetooth connection with a speaker, headphone, or IoT device — bypassing the manual Bluetooth pairing process. Apple, Android and many device manufacturers support NFC-initiated Bluetooth pairing."
+      "answer": "Yes, and they complement each other perfectly. A common pattern is NFC tap-to-pair: the user taps their phone on an NFC tag to instantly establish a Bluetooth connection with a speaker, headphone, or IoT device — bypassing the manual Bluetooth pairing process. Apple, Android and many device manufacturers support NFC-initiated Bluetooth pairing natively."
     },
     {
       "question": "Which is more secure — NFC or Bluetooth?",
-      "answer": "NFC's extremely short range (0-5 cm) provides inherent security — an attacker must be within centimeters to intercept communication. Bluetooth signals travel 10-100 m and can potentially be intercepted from a distance, requiring encryption (AES-CCM in BLE) to secure the channel. For security-critical applications like payments and access control, NFC's proximity requirement is a significant advantage."
+      "answer": "NFC's extremely short range (0-5 cm) provides inherent security — an attacker must be within centimeters to intercept communication. Bluetooth signals travel 10-100 m and can potentially be intercepted from a distance, requiring strong encryption (AES-CCM in BLE) to secure the channel. For security-critical applications like payments and access control, NFC's proximity requirement is a significant advantage."
     },
     {
       "question": "Why not just use BLE beacons instead of NFC tags?",
-      "answer": "BLE beacons cost $5-$30 each and need battery replacement every 1-5 years. NFC tags cost $0.05-$0.50 each and never need a battery. For applications where millions of items need tagging (products, packaging, access cards), NFC's zero-maintenance, ultra-low cost makes it the only economically viable option. BLE is better when you need range and continuous broadcasting."
+      "answer": "BLE beacons cost $5-30 each and need battery replacement every 1-5 years. NFC tags cost $0.05-0.50 each and never need a battery. For applications where millions of items need tagging (products, packaging, access cards), NFC's zero-maintenance, ultra-low cost makes it the only economically viable option. BLE is better when you need range and continuous broadcasting."
+    },
+    {
+      "question": "Can NFC read/write data like Bluetooth?",
+      "answer": "Yes. NFC tags can store 64-512 bytes of user data and some tags (Type 2, Type 4) allow read/write in the field. Bluetooth is better for large continuous data streams (audio, video) because it supports higher data rates (1-3 Mbps vs NFC's 424 kbps). For small data exchanges (URLs, credentials, contact info), NFC is more practical and requires zero battery."
+    },
+    {
+      "question": "Do I need both NFC and Bluetooth in the same device or product?",
+      "answer": "Only if you need both instant tap-based interaction (NFC) and sustained background connection (Bluetooth). Many products use just one: access cards use NFC only, headphones use Bluetooth only, and smart locks increasingly use NFC for guest access and Bluetooth for owner unlock. Some premium products use both for maximum flexibility."
+    },
+    {
+      "question": "What percentage of smartphones support NFC vs Bluetooth?",
+      "answer": "Bluetooth is more universal (95%+ of all smartphones), but NFC support is high on modern devices (70-80% of 2020+ smartphones). iPhones XS and later support NFC, and most Android flagships support it. Budget phones may lack NFC, so assess your target demographic before building NFC-only solutions for mass market."
+    },
+    {
+      "question": "Can BLE beacons work indoors for location tracking like GPS?",
+      "answer": "Yes. BLE beacons broadcast their identity, and phones with BLE receivers can triangulate position using received signal strength (RSSI) or angle-of-arrival (AoA) techniques. Accuracy is 1-3 meters in ideal conditions. This is sufficient for zone-level indoor positioning (in the west wing) but not for precise item location. For centimeter-level accuracy, use Ultra-Wideband (UWB)."
+    },
+    {
+      "question": "Is NFC compatible with all smartphone payment apps?",
+      "answer": "NFC payment is universal on modern iPhones and Android devices. Apple Pay, Google Pay and Samsung Pay all support NFC for contactless payment. Older phones (pre-2020) may not support NFC, so assess your user base. For mass-market payments, NFC combined with Bluetooth-capable devices ensures maximum compatibility."
+    },
+    {
+      "question": "What about NFC for supply chain and logistics tracking?",
+      "answer": "NFC can track items at individual checkpoints (receiving, shipping, handoff) but requires deliberate scanning at each point. It is ideal for high-value items needing per-unit verification. UHF RFID is better for bulk supply chain scanning (entire pallets at once). Many supply chains use NFC for security-critical items and UHF for standard inventory."
+    },
+    {
+      "question": "What is the best wireless technology for my specific use case?",
+      "answer": "Start by answering: Does the user need instant interaction (NFC), continuous background communication (Bluetooth), or both? Does the tag/device need a battery (BLE/Bluetooth) or can it be passive (NFC)? Is security critical (NFC better due to range) or is long range essential (Bluetooth)? Test both technologies before full deployment if both could work."
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "NFC products from ProudTek",
+      "description": "NFC tags, cards and wristbands for tap-based applications including payments, authentication and access control.",
+      "links": [
+        { "href": "/products/rfid-labels/ntag213-nfc-sticker/", "label": "NTAG 213 NFC stickers" },
+        { "href": "/products/rfid-cards/mifare-desfire-ev3-card/", "label": "MIFARE DESFire EV3 cards" },
+        { "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/", "label": "NTAG 424 DNA authentication tags" },
+        { "href": "/products/rfid-cards/nfc-card-custom-printing/", "label": "Custom-printed NFC cards" }
+      ]
+    },
+    {
+      "title": "NFC implementation guides and technical content",
+      "description": "Deep-dive guides on NFC protocols, tap-to-pair patterns and authentication implementation.",
+      "links": [
+        { "href": "/guides/iso-14443-explained/", "label": "ISO 14443 NFC standard explained" },
+        { "href": "/blog/how-nfc-tags-work-smartphones/", "label": "How NFC tags work with smartphones" },
+        { "href": "/blog/difference-nfc-rfid-explained/", "label": "NFC vs RFID explained" },
+        { "href": "/solutions/rfid-access-control/", "label": "NFC access control solutions" }
+      ]
+    },
+    {
+      "title": "Start your NFC vs Bluetooth evaluation",
+      "description": "Request samples and technical guidance for your specific wireless technology needs.",
+      "links": [
+        { "href": "/contact/", "label": "Request NFC vs Bluetooth consultation and samples" },
+        { "href": "/solutions/rfid-access-control/", "label": "NFC access control solutions" },
+        { "href": "/blog/how-nfc-tags-work-smartphones/", "label": "Learn about NFC smartphone integration" }
+      ]
     }
   ],
   "primaryAction": {
     "href": "/contact/",
-    "label": "Discuss NFC for your project"
+    "label": "Request NFC vs Bluetooth comparison and samples"
   },
   "secondaryActions": [
     {
@@ -94,6 +227,14 @@
     {
       "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
       "label": "MIFARE DESFire cards"
+    },
+    {
+      "href": "/guides/iso-14443-explained/",
+      "label": "ISO 14443 standard guide"
+    },
+    {
+      "href": "/blog/difference-nfc-rfid-explained/",
+      "label": "NFC vs RFID explained"
     }
   ]
 }

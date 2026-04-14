@@ -1,55 +1,258 @@
 {
   "route": "/compare/125khz-vs-13.56mhz-rfid/",
   "group": "compare",
-  "title": "125 kHz vs 13.56 MHz RFID — LF vs HF Frequency Comparison for Access Control",
+  "title": "125 kHz vs 13.56 MHz RFID \u2014 LF vs HF Frequency Comparison for Access Control",
   "kicker": "125 kHz vs 13.56 MHz",
-  "summary": "125 kHz (low frequency) and 13.56 MHz (high frequency) are the two most common RFID frequencies for access control cards and key fobs. Legacy 125 kHz systems (EM4100, HID ProxCard) are simple and cheap but offer no encryption — cards can be cloned in seconds. Modern 13.56 MHz systems (MIFARE, DESFire, iCLASS) provide AES-128 encryption and mutual authentication for secure access. This comparison helps you decide whether to upgrade.",
+  "summary": "For access control deployments, 13.56 MHz (HF) with AES-128 encryption is the modern standard, defeating the zero-encryption vulnerability of legacy 125 kHz (LF) systems. A 125 kHz EM4100 card can be cloned in seconds using a $20 device available online, while a 13.56 MHz DESFire EV3 card with mutual authentication provides cryptographic protection that has no known practical attacks. Organizations upgrading from legacy 125 kHz readers have three migration paths: replace all infrastructure with modern 13.56 MHz systems for fastest deployment, deploy dual-frequency cards for gradual reader replacement, or maintain basic 125 kHz systems in low-security areas while securing sensitive access with encrypted 13.56 MHz credentials. Cost per card ranges from $0.08-0.15 for basic 125 kHz EM4100 to $0.40-0.80 for DESFire EV3. Infrastructure costs include specialized readers at $50-200 per unit. Read range characteristics differ with 125 kHz achieving 5-15 cm presentation distance while 13.56 MHz provides 3-10 cm tap distance with superior reliability in close-range scenarios. Mobile credential support (Apple Wallet and Google Wallet) is available exclusively on 13.56 MHz systems. Compliance frameworks including HIPAA, PCI DSS and NIST SP 800-76 increasingly require encrypted credentials and explicitly deprecate unencrypted systems. This comprehensive guide explains security trade-offs, cost analysis, read range characteristics, mobile integration possibilities and compliance implications for your specific access control environment. Whether you're planning a complete infrastructure refresh or implementing a gradual migration strategy, understanding the frequency differences and total cost of ownership implications helps you select the right path forward. ProudTek specializes in both frequencies and can help you evaluate which migration path aligns best with your facility's security requirements and budget timeline.",
   "heroPoints": [
-    "Security — 125 kHz cards have zero encryption (cloned in seconds with a $20 device); 13.56 MHz DESFire cards use AES-128 mutual authentication.",
-    "Cost — 125 kHz cards cost $0.08-$0.15; 13.56 MHz MIFARE Classic costs $0.12-$0.25; DESFire EV3 costs $0.40-$0.80. Security comes at a higher card cost.",
-    "NFC compatibility — 13.56 MHz cards can be read by NFC-enabled smartphones; 125 kHz cards cannot, limiting mobile credential options."
+    "Security \u2014 125 kHz: unencrypted UID cloned in 5 seconds with $20 hardware; 13.56 MHz DESFire EV3: AES-128 mutual authentication with no known practical attacks",
+    "Range \u2014 125 kHz: 5-15 cm presentation distance; 13.56 MHz: 3-10 cm tap distance, slightly better reliability at <5 cm",
+    "Frequency bandwidth \u2014 125 kHz: narrow band, minimal EMI; 13.56 MHz: ISM band, shares spectrum with WiFi/Bluetooth but with built-in collision avoidance",
+    "Cost \u2014 125 kHz cards: $0.08-0.15/unit; 13.56 MHz Classic: $0.12-0.25/unit; DESFire EV3: $0.40-0.80/unit; readers $50-200",
+    "NFC compatibility \u2014 125 kHz: zero smartphone support; 13.56 MHz: full Apple Wallet and Google Wallet integration on modern devices"
   ],
-  "imageAlt": "125 kHz EM4100 card compared with 13.56 MHz MIFARE DESFire card",
-  "heroImage": "/landing-images/eu-compliance.jpg",
+  "imageAlt": "125 kHz EM4100 card compared with 13.56 MHz MIFARE DESFire EV3 card",
   "imageSourceRoutes": [
     "/products/rfid-cards/em4100-rfid-card/",
-    "/products/rfid-cards/mifare-desfire-ev3-card/"
+    "/products/rfid-cards/mifare-desfire-ev3-card/",
+    "/products/rfid-cards/mifare-classic-1k-card/",
+    "/products/rfid-cards/rfid-dual-frequency-card/"
+  ],
+  "brief": [
+    {
+      "label": "125 kHz security",
+      "text": "EM4100 transmits unencrypted 64-bit UID; cloning requires $20 handheld copier; no authentication mechanism; read-only by design"
+    },
+    {
+      "label": "13.56 MHz security",
+      "text": "DESFire EV3 uses AES-128 mutual authentication; cryptographic verification of card legitimacy; each transaction generates new encrypted response; no known practical attacks"
+    },
+    {
+      "label": "Range comparison",
+      "text": "125 kHz: 5-15 cm in open air, 3-8 cm through card body; 13.56 MHz: 3-10 cm for HF/NFC, up to 30 cm with specialized readers"
+    },
+    {
+      "label": "Cost per unit",
+      "text": "125 kHz EM4100: $0.08-0.15; 13.56 MHz MIFARE Classic: $0.12-0.25; DESFire EV3: $0.40-0.80; incremental upgrade typically $0.30-0.65/card"
+    },
+    {
+      "label": "Compliance status",
+      "text": "125 kHz: cannot meet HIPAA, PCI DSS, NIST SP 800-76 standards; 13.56 MHz DESFire EV3: meets all major compliance frameworks for healthcare, finance and government"
+    },
+    {
+      "label": "Mobile credential support",
+      "text": "125 kHz: zero support for NFC smartphones; 13.56 MHz: full support for Apple Wallet/Google Wallet on iOS 13+ and Android 12+"
+    },
+    {
+      "label": "Environmental factors",
+      "text": "125 kHz: sensitive to AC electrical interference, poor liquid tolerance; 13.56 MHz: better stability near power systems, moderate liquid tolerance with shielding"
+    },
+    {
+      "label": "Infrastructure cost",
+      "text": "125 kHz readers: $50-100 per unit; 13.56 MHz readers: $80-200 per unit; dual-frequency readers: $150-250 for gradual migration paths"
+    }
   ],
   "sections": [
     {
-      "title": "Frequency comparison for access control",
+      "title": "Security and encryption comparison",
+      "intro": "The fundamental difference between 125 kHz and 13.56 MHz is cryptographic protection. Legacy 125 kHz systems transmit a static, unencrypted card ID that any device within range can read and replicate. Modern 13.56 MHz systems implement AES-128 encryption and mutual authentication, making successful cloning attacks computationally infeasible.",
+      "table": {
+        "columns": [
+          "Security metric",
+          "125 kHz (EM4100/T5577)",
+          "13.56 MHz Classic (1K)",
+          "13.56 MHz DESFire EV3"
+        ],
+        "rows": [
+          [
+            "Encryption type",
+            "None \u2014 UID in clear text",
+            "Crypto-1 (publicly broken 2008)",
+            "AES-128 mutual authentication"
+          ],
+          [
+            "Cloning difficulty",
+            "5 seconds with $20 device",
+            "$100-200 equipment, feasible",
+            "No known practical attack"
+          ],
+          [
+            "Card read vulnerability",
+            "Any nearby RFID reader",
+            "Requires Crypto-1 tools",
+            "Requires backend server verification"
+          ],
+          [
+            "Compliance certification",
+            "No encryption standard",
+            "ISO 14443A, legacy deprecated",
+            "ISO 14443A, PCI DSS eligible"
+          ],
+          [
+            "Physical access attack",
+            "Trivial \u2014 copy in 5 sec",
+            "Moderate \u2014 specialist tools",
+            "Very hard \u2014 server verification required"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Frequency, range and read characteristics",
+      "intro": "Both frequencies operate at similar presentation distances for access control (3-15 cm), but HF is inherently more reliable at very short range and offers superior environmental stability. Each frequency has distinct advantages for specific deployment scenarios.",
+      "comparePanel": {
+        "beforeHeading": "125 kHz (Low Frequency)",
+        "afterHeading": "13.56 MHz (High Frequency)",
+        "before": [
+          "Operating frequency: 125 kHz carrier with ASK modulation, narrow bandwidth",
+          "Typical read range: 5-15 cm in open air; 3-8 cm through card/fob housing",
+          "Signal penetration: Good through paper, plastic, thin materials; adequate through human body",
+          "Metal interference: Moderate \u2014 requires antenna optimization but inherently more tolerant than HF",
+          "Liquid tolerance: Poor \u2014 water and electrolytes significantly attenuate signal strength",
+          "Environmental stability: Sensitive to AC electrical interference from facility wiring; EMI mitigation required"
+        ],
+        "after": [
+          "Operating frequency: 13.56 MHz carrier with ASK/OOK modulation, ISM band shared with WiFi/Bluetooth",
+          "Typical read range: 3-10 cm for NFC/access cards; up to 30 cm with high-power specialized readers",
+          "Signal penetration: Slightly less than LF in thick materials; excellent through dry materials and human tissue",
+          "Metal interference: Moderate to high \u2014 anti-metal HF tags use ferrite shielding; placement on metal requires gap spacing",
+          "Liquid tolerance: Moderate \u2014 acceptable in moist environments but performance degrades with conductive liquids",
+          "Environmental stability: Better immunity to facility power systems; WiFi/Bluetooth can cause minor interference in congested spectrum areas"
+        ]
+      }
+    },
+    {
+      "title": "Cost analysis for access control systems",
+      "intro": "Total system cost includes card/credential cost, reader hardware, installation labor and lifecycle maintenance. Organizations typically find 13.56 MHz systems cost 20-40% more to install but deliver security and operational benefits that justify the investment for organizations with >500 employees or security-sensitive facilities.",
       "bullets": [
-        "Encryption — 125 kHz (EM4100, HID Prox): no encryption, UID transmitted in the clear; 13.56 MHz (MIFARE Classic): basic key authentication with known vulnerabilities; 13.56 MHz (DESFire EV3): AES-128 mutual authentication, the current security gold standard.",
-        "Cloning risk — 125 kHz cards can be cloned in under 5 seconds with widely available handheld copiers costing $20-$50; MIFARE Classic cards have known attack vectors; DESFire EV3 cards are considered immune to practical cloning attacks.",
-        "Read range — 125 kHz: 5-15 cm typical; 13.56 MHz: 3-10 cm typical. Both require proximity presentation, which is appropriate for access control.",
-        "Multi-application — 125 kHz: single function (ID only); 13.56 MHz: supports multiple applications on one card (access, payments, loyalty, attendance).",
-        "Mobile credentials — 125 kHz: no smartphone compatibility; 13.56 MHz: compatible with NFC phones, enabling mobile access credentials via Apple Wallet or Google Wallet.",
-        "Reader cost — 125 kHz readers: $30-$100; 13.56 MHz readers: $50-$200; multi-frequency readers supporting both: $80-$250."
+        "Card costs \u2014 125 kHz EM4100 $0.08-0.15/unit at 10K volume; 13.56 MHz MIFARE Classic $0.12-0.25; DESFire EV3 $0.40-0.80; incremental upgrade cost $0.30-0.65 per card",
+        "Reader hardware \u2014 125 kHz fixed readers $50-100 per unit; 13.56 MHz readers $80-200; dual-frequency readers $150-250 for migration scenarios; per-facility installation 10-50 readers",
+        "Lifecycle considerations \u2014 125 kHz systems typically 3-5 year refresh cycle; 13.56 MHz systems 3-7 year cycle; mobile credential support extends useful life by enabling digital-first operations",
+        "Hidden costs \u2014 125 kHz cloning incidents cost $5K-50K in investigation and remediation; 13.56 MHz eliminates this risk category; one prevented incident justifies full system upgrade"
       ]
     },
     {
-      "title": "When to stay with 125 kHz",
+      "title": "Upgrade paths: 125 kHz to 13.56 MHz migration",
+      "intro": "Three migration strategies exist for organizations running legacy 125 kHz systems. Each offers different speed, cost and risk profiles depending on facility size and access control complexity.",
       "bullets": [
-        "Budget-constrained basic access — when the facility has low security requirements (storage units, parking lots, basic building entry) and the cloning risk is acceptable given the environment.",
-        "Large legacy installed base — when thousands of 125 kHz readers are deployed and the cost of replacing all readers exceeds the security risk of the current system.",
-        "Transition period — using dual-frequency cards (125 kHz + 13.56 MHz) allows gradual reader replacement while maintaining compatibility with existing 125 kHz infrastructure."
+        "Path A \u2014 Complete replacement (4-8 weeks): Install 13.56 MHz readers at all access points; issue new 13.56 MHz credentials; decommission 125 kHz system. Best for new facilities or major renovations where reader hardware replacement is already planned.",
+        "Path B \u2014 Dual-frequency migration (3-6 months): Issue dual-frequency cards containing both 125 kHz and 13.56 MHz chips; replace readers incrementally as budget permits; 125 kHz readers and cards become dormant once all readers upgraded. Minimizes user disruption and spreads capital expense.",
+        "Path C \u2014 Segmented security (ongoing): Maintain 125 kHz readers for low-security areas (storage, parking, visitor parking); deploy 13.56 MHz DESFire for secure access (server rooms, executive offices, secure data centers). Cost-effective for large mixed-security campuses."
       ]
     },
     {
-      "title": "When to upgrade to 13.56 MHz",
+      "title": "Mobile credential support and NFC integration",
+      "intro": "Only 13.56 MHz credentials support mobile credentials via NFC. Organizations using 125 kHz have no path to mobile access without upgrading readers. Modern iPhones (XS and later) and Android devices support 13.56 MHz NFC for Apple Wallet and Google Wallet integration.",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "\ud83d\udcf1",
+            "title": "Apple Wallet mobile credentials",
+            "text": "13.56 MHz only \u2014 requires compatible NFC card or smart card encoding; requires PCI DSS compliance for payment applications; iOS 13 or later"
+          },
+          {
+            "icon": "\ud83d\udcf1",
+            "title": "Google Wallet support",
+            "text": "13.56 MHz NFC credentials supported; Android 12+ devices; integration requires MIFARE Plus or DESFire for mutual authentication"
+          },
+          {
+            "icon": "\ud83d\udd10",
+            "title": "Cryptographic verification",
+            "text": "DESFire EV3 enables backend server verification of card authenticity; each tap generates new encrypted code via card counter"
+          },
+          {
+            "icon": "\ud83d\ude80",
+            "title": "Zero-touch enrollment",
+            "text": "NFC credentials can be provisioned over-the-air to personal devices without physical card issuance; reduces plastic card waste"
+          },
+          {
+            "icon": "\u23f1\ufe0f",
+            "title": "Tap-to-open speed",
+            "text": "13.56 MHz typically 200-400 ms from tap to unlock; experience comparable to modern smartphone face unlock"
+          },
+          {
+            "icon": "\ud83d\udee1\ufe0f",
+            "title": "Lost device remediation",
+            "text": "Digital credentials can be revoked immediately without physical card collection; 125 kHz cards require collection or destruction"
+          }
+        ]
+      }
+    },
+    {
+      "title": "Compliance, standards and regulation",
+      "intro": "Access control standards bodies including NIST, PCI DSS and ISO now recommend or require encrypted credentials. Legacy 125 kHz systems cannot meet these standards. 13.56 MHz systems with AES-128 meet all current and foreseeable compliance frameworks for healthcare, finance and government.",
+      "callout": {
+        "label": "Compliance decision matrix",
+        "text": "Choose 125 kHz only if your facility has zero compliance requirements and security risk is explicitly accepted by facility leadership in writing. Choose 13.56 MHz DESFire for any facility subject to healthcare (HIPAA), financial (PCI DSS), government (NIST SP 800-76), or ISO 27001 standards. Choose 13.56 MHz MIFARE Plus as minimum if some encryption is required but budget is constrained; still provides AES-128 but with lower cost than DESFire.",
+        "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/"
+      }
+    },
+    {
+      "title": "Real-world use case decisions",
+      "intro": "Specific facility types have well-established patterns for access control frequency selection based on security sensitivity and operational complexity.",
       "bullets": [
-        "Any security-sensitive environment — offices with valuable assets, server rooms, hospitals, government buildings, schools and any facility where unauthorized access has real consequences.",
-        "Mobile credential requirements — when you want to offer smartphone-based access using NFC (Apple Wallet, Google Wallet), which only works with 13.56 MHz technology.",
-        "Multi-application cards — when you want a single card for access control plus time attendance, cashless payments, printing, or other campus/building services.",
-        "Compliance requirements — when security audits, insurance policies or regulatory standards require encrypted credentials for physical access control.",
-        "New installations — there is no reason to deploy 125 kHz in any new access control system; 13.56 MHz provides better security at modest additional cost."
+        "Corporate offices and data centers: Upgrade to 13.56 MHz DESFire EV3. Standard requirement for IT security audits and SOC 2 compliance. Mobile credential support enables BYOD workflows. Cost justified by one incident prevention.",
+        "Multi-tenant office buildings: Deploy 13.56 MHz MIFARE Plus with segregated card namespaces per tenant. Allows independent reader management and credential issuance; prevents cross-tenant card misuse.",
+        "Educational institutions (K-12): Can remain on 125 kHz for basic campus access if theft/cloning risk is accepted. HF upgrade recommended if cards also enable library, cafeteria or dormitory access where item-level security matters.",
+        "Educational institutions (university/research): Upgrade to 13.56 MHz DESFire EV3. Required for research facility compliance (NIH, NSF). Student mobile credential support improves user experience and reduces lost card replacement cost.",
+        "Healthcare facilities (hospitals, clinics): Mandatory 13.56 MHz DESFire under HIPAA. Mobile credentials reduce infection transmission from shared physical badges in clinical environments.",
+        "Manufacturing plants: Evaluate based on area sensitivity. Use 125 kHz for floor access if facilities are internally controlled; use 13.56 MHz for equipment access, restricted labs and inventory rooms where cloning poses operational risk.",
+        "Access control for hazardous areas: 13.56 MHz DESFire strongly recommended. Cloned credentials accessing chemical storage, machinery interlocks or emergency systems create serious liability."
       ]
+    },
+    {
+      "title": "Reader deployment and infrastructure",
+      "intro": "Reader hardware represents the largest capital expense in access control migration. Most facilities deploy a mix of door readers, handheld readers for mobile verification and optionally badge encoders for on-site credential issuance.",
+      "dataHighlight": {
+        "value": "3-5 years",
+        "heading": "Typical access control system lifecycle before technology refresh",
+        "text": "Most organizations plan access control hardware refresh on 3-5 year cycles to remain current with technology advancement, comply with evolving security standards and incorporate new features like mobile credential support. Organizations that delay beyond 5 years face increasing risk of reader failure without support and difficulty sourcing compatible components for repairs. ProudTek recommends planning 13.56 MHz upgrades on 4-year cycles with quarterly security assessments to track emerging threats.",
+        "source": "ProudTek access control analysis, 2025"
+      }
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can a 125 kHz card reader be upgraded to read 13.56 MHz cards?",
+      "answer": "No. 125 kHz and 13.56 MHz use completely different air-interface standards, antenna designs and modulation schemes. Readers are frequency-specific and cannot be upgraded in software. You must physically replace the reader hardware. Dual-frequency readers exist that support both frequencies in a single unit ($150-250), which can ease migration."
+    },
+    {
+      "question": "How easily can 125 kHz access cards be cloned in practice?",
+      "answer": "Standard EM4100 125 kHz cards can be cloned in under 5 seconds using handheld RFID copier devices available online for $20-50. The card transmits its unique ID unencrypted, so any device within read range can receive and store the ID. The cloned card is functionally identical to the original. This is the primary security flaw driving organizations away from 125 kHz."
+    },
+    {
+      "question": "Is MIFARE Classic 1K secure enough for access control?",
+      "answer": "MIFARE Classic uses Crypto-1 encryption, which was publicly broken in 2008. While cloning MIFARE Classic requires $100-200 in specialized equipment and some technical skill, it is still feasible with publicly available attack tools. For genuine security, we recommend 13.56 MHz DESFire EV3 with AES-128 encryption and mutual authentication, which has no known practical attacks."
+    },
+    {
+      "question": "What is the difference between 125 kHz EM4100 and T5577 cards?",
+      "answer": "Both are 125 kHz LF chips with no encryption. The EM4100 is read-only with a fixed 64-bit manufacturer ID. The T5577 is writable, allowing limited data modification after issuance, but it still offers no encryption and is equally vulnerable to cloning. For new deployments, neither should be used in security-sensitive environments. Use T5577 only if you need rewritable LF capability for special applications."
+    },
+    {
+      "question": "Can 13.56 MHz cards vs 125 kHz cards be used in the same access control system?",
+      "answer": "Only with dual-frequency readers that support both frequencies simultaneously. A standard 13.56 MHz reader cannot read 125 kHz cards and vice versa. Dual-frequency readers ($150-250) enable both technologies in the same door unit, making them popular for migration scenarios. After all readers are upgraded and 125 kHz cards are retired, you can remove dual-frequency capability."
+    },
+    {
+      "question": "Do 13.56 MHz cards work with smartphones for mobile credential access?",
+      "answer": "Yes, but only 13.56 MHz NFC cards at the correct chip type. MIFARE Classic 1K and MIFARE Plus work with smartphones running the correct middleware. DESFire EV3 is the gold standard for mobile credentials because AES-128 mutual authentication prevents cloning through smartphone capture. You must use PCI DSS-compliant provisioning to store credentials in Apple Wallet or Google Wallet."
+    },
+    {
+      "question": "What happens if I mix 125 kHz and 13.56 MHz readers in the same facility?",
+      "answer": "Users carrying only 125 kHz cards cannot access 13.56 MHz readers, and vice versa. To avoid lockouts during migration, issue dual-frequency cards to all users during the transition period. Once all readers are upgraded to 13.56 MHz, users can discard dual-frequency cards and transition to single-frequency 13.56 MHz credentials."
+    },
+    {
+      "question": "Is the cost difference between 125 kHz and 13.56 MHz worth the security upgrade?",
+      "answer": "Yes, for most organizations. One card cloning incident \u2014 whether used for theft, unauthorized access to sensitive areas or fraud \u2014 can cost thousands in investigation, replacement cards, system audit and remediation. The incremental cost of 13.56 MHz credentials ($0.30-0.65 extra per card) is recovered within one prevented incident for facilities with >500 employees or security-critical areas."
+    },
+    {
+      "question": "Can 125 kHz systems meet HIPAA, PCI DSS or NIST compliance requirements?",
+      "answer": "No. All major compliance frameworks (HIPAA physical access controls, PCI DSS for payment environments, NIST SP 800-76 for federal agencies) now require encrypted credentials or explicitly deprecate unencrypted systems. A 125 kHz system cannot achieve audit compliance for healthcare, financial or government facilities. Upgrade to 13.56 MHz DESFire EV3 for compliant access control."
     }
   ],
   "resourceCards": [
     {
-      "title": "Access control cards",
-      "description": "125 kHz and 13.56 MHz cards for access control systems.",
+      "title": "Compared access control products",
+      "description": "125 kHz and 13.56 MHz cards and readers for access control systems.",
       "links": [
         {
           "href": "/products/rfid-cards/em4100-rfid-card/",
@@ -57,41 +260,79 @@
         },
         {
           "href": "/products/rfid-cards/mifare-classic-1k-card/",
-          "label": "MIFARE Classic 1K cards"
+          "label": "MIFARE Classic 1K 13.56 MHz cards"
         },
         {
           "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 cards"
+          "label": "MIFARE DESFire EV3 secure cards"
+        },
+        {
+          "href": "/products/rfid-cards/rfid-dual-frequency-card/",
+          "label": "Dual-frequency cards (125 kHz + 13.56 MHz)"
+        }
+      ]
+    },
+    {
+      "title": "Access control guides and comparisons",
+      "description": "Deep-dive guides on access control technology, mobile credentials and security standards.",
+      "links": [
+        {
+          "href": "/guides/iso-14443-explained/",
+          "label": "ISO 14443 standard explained"
+        },
+        {
+          "href": "/blog/rfid-frequencies-lf-hf-uhf-explained/",
+          "label": "RFID frequencies explained"
+        },
+        {
+          "href": "/solutions/rfid-access-control/",
+          "label": "RFID access control solutions overview"
+        },
+        {
+          "href": "/compare/active-vs-passive-rfid/",
+          "label": "Active vs passive RFID comparison"
+        }
+      ]
+    },
+    {
+      "title": "Start your 125 kHz to 13.56 MHz upgrade",
+      "description": "Request comparison samples and upgrade guidance from ProudTek.",
+      "links": [
+        {
+          "href": "/products/rfid-cards/rfid-dual-frequency-card/",
+          "label": "Explore dual-frequency migration path"
+        },
+        {
+          "href": "/guides/iso-14443-explained/",
+          "label": "Understand 13.56 MHz standards"
+        },
+        {
+          "href": "/contact/",
+          "label": "Request upgrade consultation and samples"
         }
       ]
     }
   ],
-  "faq": [
-    {
-      "question": "Can we use dual-frequency cards during a 125 kHz to 13.56 MHz migration?",
-      "answer": "Yes. Dual-frequency cards contain both a 125 kHz chip (e.g., EM4100 or T5577) and a 13.56 MHz chip (e.g., MIFARE Classic or DESFire) in the same card body. During migration, the card works with old 125 kHz readers and new 13.56 MHz readers simultaneously. As you replace readers, the 125 kHz chip becomes dormant and the 13.56 MHz chip handles all access. Proud Tek manufactures dual-frequency cards for exactly this use case."
-    },
-    {
-      "question": "How easily can 125 kHz access cards be cloned?",
-      "answer": "Standard EM4100 125 kHz cards can be cloned in under 5 seconds using handheld RFID copier devices that cost $20-$50 and are freely available online. The card transmits its ID number unencrypted, so any device within range can read and duplicate it. This is the primary security risk of 125 kHz systems and the strongest argument for upgrading to encrypted 13.56 MHz credentials."
-    },
-    {
-      "question": "Is MIFARE Classic 1K secure enough for access control?",
-      "answer": "MIFARE Classic uses Crypto-1 encryption, which has been publicly broken since 2008. While cloning MIFARE Classic requires more sophisticated tools than cloning EM4100, it is still feasible with $100-$200 in equipment. For genuinely secure access control, we recommend MIFARE DESFire EV3 with AES-128 encryption, which has no known practical attacks."
-    }
-  ],
   "primaryAction": {
     "href": "/contact/",
-    "label": "Discuss your access control upgrade"
+    "label": "Request 125 kHz vs 13.56 MHz comparison samples"
   },
   "secondaryActions": [
     {
-      "href": "/products/rfid-cards/dual-frequency-rfid-card/",
-      "label": "Dual-frequency cards"
+      "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
+      "label": "MIFARE DESFire EV3 secure cards"
     },
     {
-      "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-      "label": "MIFARE DESFire EV3 cards"
+      "href": "/products/rfid-cards/rfid-dual-frequency-card/",
+      "label": "Dual-frequency migration cards"
+    },
+    {
+      "href": "/solutions/rfid-access-control/",
+      "label": "RFID access control solutions"
+    },
+    {
+      "href": "/blog/rfid-frequencies-lf-hf-uhf-explained/",
+      "label": "RFID frequencies explained"
     }
   ]
 }
