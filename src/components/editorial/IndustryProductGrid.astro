@@ -1,0 +1,55 @@
+---
+/**
+ * Product card grid for industry landing pages.
+ * Replaces renderIndustryProductGrid() from editorial-pages.ts.
+ */
+import type { EditorialDefinition } from "../../lib/editorial-types";
+import { INDUSTRY_CATEGORIES } from "../../lib/catalog-pages";
+
+interface Props {
+  definition: EditorialDefinition;
+  editorialImageMap: Map<string, { title: string; heroImage: string }>;
+  wpProductImageMap: Map<string, { title: string; image: string }>;
+}
+
+const { definition, editorialImageMap, wpProductImageMap } = Astro.props;
+
+const category = definition.route.startsWith("/industries/")
+  ? INDUSTRY_CATEGORIES.find((cat) => cat.href === definition.route)
+  : undefined;
+
+const cards = category && category.productRoutes.length > 0
+  ? category.productRoutes.map((route) => {
+      const editorial = editorialImageMap.get(route);
+      const wpProduct = wpProductImageMap.get(route);
+      const name = editorial?.title
+        ?? wpProduct?.title
+        ?? route.split("/").filter(Boolean).pop()?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+        ?? route;
+      const shortName = name.length > 50 ? name.slice(0, 47).trimEnd() + "..." : name;
+      const img = editorial?.heroImage ?? wpProduct?.image ?? "";
+      return { route, shortName, img };
+    })
+  : [];
+---
+
+{category && cards.length > 0 && (
+  <section class="ind-cat-products" aria-label={`Products for ${category.title}`}>
+    <h2 class="ind-cat-products__title">Featured {category.title} Products</h2>
+    <p class="ind-cat-products__sub">Explore our complete range of RFID solutions for {category.title.toLowerCase()}.</p>
+    <div class="ind-cat-products__grid">
+      {cards.map((card) => (
+        <a href={card.route} class="ind-cat-card">
+          {card.img
+            ? <img src={card.img} alt={card.shortName} loading="lazy" />
+            : <div class="ind-cat-card__placeholder"></div>
+          }
+          <div class="ind-cat-card__body">
+            <h3>{card.shortName}</h3>
+            <span class="ind-cat-card__arrow">&rarr;</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

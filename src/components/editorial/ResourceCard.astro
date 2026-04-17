@@ -1,0 +1,26 @@
+---
+/**
+ * Single resource link card.
+ * Replaces renderResourceCard() from editorial-pages.ts.
+ */
+import type { EditorialResourceCard } from "../../lib/editorial-types";
+
+interface Props {
+  card: EditorialResourceCard;
+}
+
+const { card } = Astro.props;
+---
+
+<section class="codex-editorial-card">
+  <h2>{card.title}</h2>
+  <p>{card.description}</p>
+  <div class="codex-editorial-link-list">
+    {card.links.map((link) => (
+      <a class="codex-editorial-link-card" href={link.href}>
+        <strong>{link.label}</strong>
+        {link.description && <span>{link.description}</span>}
+      </a>
+    ))}
+  </div>
+</section>

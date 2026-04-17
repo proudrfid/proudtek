@@ -1,0 +1,30 @@
+---
+/**
+ * "Get a Quick Quote" inline form.
+ * Replaces renderInlineRfqForm() from editorial-pages.ts.
+ */
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<section class="codex-inline-rfq">
+  <h2>Get a Quick Quote</h2>
+  <p>Tell us about your project and we'll respond within one business day.</p>
+  <form action="https://formspree.io/f/xlgorlog" method="POST" class="codex-inline-rfq-form">
+    <input type="hidden" name="_subject" value={`Inquiry: ${title}`} />
+    <input type="hidden" name="product" value={title} />
+    <div class="codex-inline-rfq-row">
+      <input type="email" name="email" aria-label="Your email address" placeholder="Your email *" required />
+      <input type="text" name="company" aria-label="Company name" placeholder="Company name" />
+    </div>
+    <div class="codex-inline-rfq-row">
+      <input type="text" name="quantity" aria-label="Quantity (e.g. 5,000 pcs)" placeholder="Quantity (e.g. 5,000 pcs)" />
+      <input type="text" name="application" aria-label="Application (e.g. hotel, event)" placeholder="Application (e.g. hotel, event)" />
+    </div>
+    <textarea name="message" rows="3" aria-label="Additional details about your inquiry" placeholder="Additional details (chip preference, timeline, special requirements...)"></textarea>
+    <button type="submit">Send Inquiry</button>
+  </form>
+</section>

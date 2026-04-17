@@ -1,0 +1,39 @@
+---
+/**
+ * "Next step" CTA bar with mailto and secondary links.
+ * Replaces renderActionBar() from editorial-pages.ts.
+ */
+import type { EditorialDefinition } from "../../lib/editorial-types";
+
+interface Props {
+  definition: EditorialDefinition;
+  id: string;
+}
+
+const { definition, id } = Astro.props;
+
+const heading = definition.group === "contact" ? "Send your project details" : "Ready to discuss your project?";
+const description =
+  definition.group === "contact"
+    ? "The main button opens a prefilled email for this route. Use it if the project already fits, or keep reviewing the linked product and reference pages first."
+    : "Use the contact route when you are ready for pricing, samples, or compatibility help, or continue into the linked product and comparison pages below.";
+
+const mailtoSubject = encodeURIComponent(`Inquiry: ${definition.title}`);
+const mailtoBody = encodeURIComponent(`Hi Proud Tek,\n\nI'm interested in: ${definition.title}\n\nProject details:\n- Application:\n- Chip / frequency requirement:\n- Quantity:\n- Target date:\n\nPlease advise on next steps.\n\nThanks`);
+const mailtoHref = `mailto:info@proudtek.com?subject=${mailtoSubject}&body=${mailtoBody}`;
+---
+
+<section class="codex-editorial-action-bar" id={id}>
+  <div>
+    <p class="codex-editorial-kicker">Next step</p>
+    <h2>{heading}</h2>
+    <p>{description}</p>
+  </div>
+  <div class="codex-editorial-action-links">
+    <a class="codex-editorial-primary" href={definition.primaryAction.href}>{definition.primaryAction.label}</a>
+    <a class="codex-editorial-secondary" href={mailtoHref}>&check; Email inquiry directly</a>
+    {definition.secondaryActions.map((link) => (
+      <a class="codex-editorial-secondary" href={link.href}>{link.label}</a>
+    ))}
+  </div>
+</section>

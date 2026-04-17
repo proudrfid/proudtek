@@ -1,0 +1,22 @@
+---
+/**
+ * On-page anchor navigation.
+ * Replaces renderJumpNav() from editorial-pages.ts.
+ */
+interface Props {
+  links: Array<{ id: string; label: string }>;
+}
+
+const { links } = Astro.props;
+---
+
+{links.length > 0 && (
+  <nav class="codex-editorial-jump-nav" aria-label="On this page">
+    <p class="codex-editorial-kicker">On this page</p>
+    <div class="codex-editorial-jump-links">
+      {links.map((link) => (
+        <a class="codex-editorial-jump-link" href={`#${link.id}`}>{link.label}</a>
+      ))}
+    </div>
+  </nav>
+)}

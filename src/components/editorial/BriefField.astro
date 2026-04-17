@@ -1,0 +1,32 @@
+---
+/**
+ * Single brief/checklist field (DT/DD pair).
+ * Replaces renderBriefField() from editorial-pages.ts.
+ */
+import type { EditorialBriefField } from "../../lib/editorial-types";
+
+interface Props {
+  field: EditorialBriefField;
+}
+
+const { field } = Astro.props;
+---
+
+<div class="codex-editorial-brief-card">
+  <dt>{field.label}</dt>
+  <dd>
+    {field.text && <p>{field.text}</p>}
+    {field.items && field.items.length > 0 && (
+      <ul class="codex-editorial-list">
+        {field.items.map((item) => <li>{item}</li>)}
+      </ul>
+    )}
+    {field.links && field.links.length > 0 && (
+      <div class="codex-editorial-brief-links">
+        {field.links.map((link) => (
+          <a class="codex-editorial-brief-link" href={link.href}>{link.label}</a>
+        ))}
+      </div>
+    )}
+  </dd>
+</div>

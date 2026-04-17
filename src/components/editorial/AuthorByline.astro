@@ -1,0 +1,147 @@
+---
+/**
+ * AuthorByline — renders author + reviewer attribution under the hero.
+ *
+ * Resolves authorSlug / reviewedBySlug against the `authors` collection.
+ * Falls back to free-text `author` / `reviewedBy` if a slug is absent.
+ * Renders nothing if neither slug nor free-text is present — so existing
+ * pages that have not yet adopted bylines are unaffected.
+ *
+ * This component is intentionally side-effect-free at build time; it only
+ * looks up entries from the already-loaded `authors` content collection.
+ */
+import { getCollection } from "astro:content";
+import type { EditorialDefinition, EditorialAuthor } from "../../lib/editorial-types";
+
+interface Props {
+  definition: EditorialDefinition;
+}
+
+const { definition } = Astro.props;
+
+// Short-circuit: no author metadata at all → render nothing.
+const hasAnyByline =
+  !!definition.authorSlug ||
+  !!definition.author ||
+  !!definition.reviewedBySlug ||
+  !!definition.reviewedBy;
+
+let authorEntry: EditorialAuthor | null = null;
+let reviewerEntry: EditorialAuthor | null = null;
+
+if (hasAnyByline) {
+  const authors = await getCollection("authors");
+  const byId = new Map<string, EditorialAuthor>(
+    authors.map((a) => [a.data.slug, a.data as EditorialAuthor]),
+  );
+  if (definition.authorSlug) authorEntry = byId.get(definition.authorSlug) ?? null;
+  if (definition.reviewedBySlug) reviewerEntry = byId.get(definition.reviewedBySlug) ?? null;
+}
+
+function formatDate(iso: string | undefined): string | null {
+  if (!iso) return null;
+  // Accept YYYY or YYYY-MM-DD; render month-day-year in long form.
+  try {
+    const d = new Date(iso.length === 4 ? `${iso}-01-01` : iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+  } catch {
+    return iso;
+  }
+}
+
+const authorName = authorEntry?.name ?? definition.author ?? null;
+const authorTitle = authorEntry?.jobTitle ?? null;
+const authorUrl = authorEntry?.url ?? null;
+const authorAvatar = authorEntry?.avatar ?? null;
+
+const reviewerName = reviewerEntry?.name ?? definition.reviewedBy ?? null;
+const reviewerTitle = reviewerEntry?.jobTitle ?? null;
+
+const modifiedLabel = formatDate(definition.modifiedAt);
+const reviewedLabel = formatDate(definition.reviewedAt);
+---
+
+{hasAnyByline && (authorName || reviewerName) && (
+  <aside class="codex-byline" aria-label="Article byline">
+    {authorName && (
+      <div class="codex-byline-author">
+        {authorAvatar && (
+          <img class="codex-byline-avatar" src={authorAvatar} alt="" loading="lazy" decoding="async" width="40" height="40" />
+        )}
+        <div class="codex-byline-text">
+          <p class="codex-byline-line">
+            <span class="codex-byline-label">By</span>
+            {authorUrl ? (
+              <a class="codex-byline-name" href={authorUrl} rel="author">{authorName}</a>
+            ) : (
+              <span class="codex-byline-name">{authorName}</span>
+            )}
+            {authorTitle && <span class="codex-byline-title">, {authorTitle}</span>}
+          </p>
+          {(reviewerName || modifiedLabel) && (
+            <p class="codex-byline-meta">
+              {reviewerName && (
+                <span class="codex-byline-reviewer">
+                  Technically reviewed by <strong>{reviewerName}</strong>
+                  {reviewerTitle && <span>, {reviewerTitle}</span>}
+                  {reviewedLabel && <span> · {reviewedLabel}</span>}
+                </span>
+              )}
+              {modifiedLabel && (
+                <span class="codex-byline-updated">Last updated {modifiedLabel}</span>
+              )}
+            </p>
+          )}
+        </div>
+      </div>
+    )}
+    {!authorName && reviewerName && (
+      <p class="codex-byline-meta">
+        <span class="codex-byline-reviewer">
+          Technically reviewed by <strong>{reviewerName}</strong>
+          {reviewerTitle && <span>, {reviewerTitle}</span>}
+          {reviewedLabel && <span> · {reviewedLabel}</span>}
+        </span>
+        {modifiedLabel && <span class="codex-byline-updated"> · Last updated {modifiedLabel}</span>}
+      </p>
+    )}
+  </aside>
+)}
+
+<style>
+  .codex-byline {
+    margin: 1.25rem 0 1.75rem;
+    padding: 0.9rem 1rem;
+    background: var(--codex-byline-bg, #f6f8fa);
+    border-left: 3px solid var(--codex-accent, #3fc0c4);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #1f2d3a;
+  }
+  .codex-byline-author {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .codex-byline-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 auto;
+  }
+  .codex-byline-text { flex: 1 1 auto; min-width: 0; }
+  .codex-byline-line { margin: 0; line-height: 1.4; }
+  .codex-byline-label { color: #55687a; margin-right: 0.25rem; }
+  .codex-byline-name { font-weight: 600; color: #0f2333; text-decoration: none; }
+  .codex-byline-name:hover { text-decoration: underline; }
+  .codex-byline-title { color: #55687a; }
+  .codex-byline-meta {
+    margin: 0.25rem 0 0;
+    color: #55687a;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+  .codex-byline-reviewer strong { color: #0f2333; }
+</style>
