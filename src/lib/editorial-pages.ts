@@ -62,6 +62,25 @@ export interface EditorialDefinition {
   faq: EditorialFaq[];
   primaryAction: EditorialLink;
   secondaryActions: EditorialLink[];
+  /** Optional ISO-8601 content freshness dates; injected into bodyHtml as <time.entry-date.published> and <time.updated> so resolveArticleMeta picks them up for JSON-LD. */
+  publishedAt?: string;
+  modifiedAt?: string;
+  /** Optional keyword phrases for Article/Product JSON-LD; preferred over tokenized title. */
+  keywords?: string[];
+  /** Authority / EEAT signals — see src/content.config.ts for field contract. */
+  authorSlug?: string;
+  author?: string;
+  reviewedBySlug?: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  sources?: Array<{
+    label: string;
+    url: string;
+    publisher?: string;
+    publishedAt?: string;
+    accessedAt?: string;
+    note?: string;
+  }>;
 }
 
 const EDITORIAL_LINK_REWRITES: Record<string, EditorialLink> = {
@@ -371,6 +390,15 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
     }
   }
 
+  // Populate keyword map so seo.ts buildSchemaKeywords can prefer
+  // editorial-authored keyword phrases over title tokenization.
+  EDITORIAL_KEYWORDS_MAP.clear();
+  for (const def of EDITORIAL_DEFINITIONS) {
+    if (def.keywords && def.keywords.length > 0) {
+      EDITORIAL_KEYWORDS_MAP.set(def.route, def.keywords);
+    }
+  }
+
   const pages: SnapshotPage[] = [];
   for (const definition of EDITORIAL_DEFINITIONS) {
     pages.push({
@@ -441,6 +469,14 @@ function buildBodyHtml(templateBodyHtml: string, definition: EditorialDefinition
 const _editorialImageMap: Map<string, { title: string; heroImage: string }> = new Map();
 const _wpProductImageMap: Map<string, { title: string; image: string }> = new Map();
 
+/**
+ * Route → keyword-phrase lookup for JSON-LD `keywords` field.
+ * Populated from editorial JSON's optional `keywords` array.
+ * Consumed by seo.ts buildSchemaKeywords() to prefer authored phrases over
+ * naive title tokenization. Exported so other modules can read it.
+ */
+export const EDITORIAL_KEYWORDS_MAP: Map<string, string[]> = new Map();
+
 /** Render a product card grid for industry landing pages */
 function renderIndustryProductGrid(definition: EditorialDefinition): string {
   if (!definition.route.startsWith("/industries/")) return "";
@@ -480,12 +516,23 @@ function renderIndustryProductGrid(definition: EditorialDefinition): string {
 function renderEditorialMain(definition: EditorialDefinition, illustration: { src: string; alt: string } | null): string {
   const outline = buildEditorialOutline(definition);
 
+  // Freshness signal — resolveArticleMeta in seo.ts scrapes these <time> tags
+  // to populate JSON-LD datePublished / dateModified. Fallback to build-time if missing.
+  const published = definition.publishedAt || new Date().toISOString();
+  const modified = definition.modifiedAt || published;
+  const publishedLabel = new Date(published).toISOString().slice(0, 10);
+  const modifiedLabel = new Date(modified).toISOString().slice(0, 10);
+
   return `
     <div class="woocommerce kadence-woo-messages-none-woo-pages woocommerce-notices-wrapper"></div>
     <div class="content-wrap">
       <article class="entry content-bg single-entry page type-page status-publish hentry codex-editorial-page">
         <div class="entry-content-wrap">
           <div class="entry-content single-content">
+            <div class="codex-editorial-dates" hidden aria-hidden="true">
+              <time class="entry-date published" datetime="${escapeAttribute(published)}">${escapeHtml(publishedLabel)}</time>
+              <time class="updated" datetime="${escapeAttribute(modified)}">${escapeHtml(modifiedLabel)}</time>
+            </div>
             ${renderTrail(definition)}
             <section class="codex-editorial-hero" data-page-type="${escapeAttribute(resolvePageType(definition.group))}">
               <div class="codex-editorial-hero-copy">

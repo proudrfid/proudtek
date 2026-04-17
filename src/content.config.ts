@@ -122,11 +122,33 @@ const faqSchema = z.object({
   answer: z.string(),
 });
 
+/* ── Authority layer sub-schemas (added 2026-04) ───────────────────── */
+
+/**
+ * A single cited source that appears inline on an editorial page.
+ * Rendered by EditorialPage.astro into a uniform citations block and
+ * emitted into Article.citation[] JSON-LD for machine-readability.
+ */
+const sourceSchema = z.object({
+  /** Short human label shown in the rendered citation — e.g. "ISO/IEC 14443-3:2018" */
+  label: z.string(),
+  /** Canonical URL — must be the primary/authoritative host (iso.org, gs1.org, nxp.com, fcc.gov, europa.eu, etc.) */
+  url: z.string(),
+  /** Issuing organisation — "ISO", "GS1", "NXP", "FCC". Optional but recommended. */
+  publisher: z.string().optional(),
+  /** Document/standard publication date in YYYY or YYYY-MM-DD. */
+  publishedAt: z.string().optional(),
+  /** Date we last verified the cited URL resolves and the claim matches — ISO-8601. */
+  accessedAt: z.string().optional(),
+  /** Free-text note, e.g. "§8.2, table 4". */
+  note: z.string().optional(),
+});
+
 /* ── Editorial definition schema ────────────────────────────────────── */
 
 const editorialSchema = z.object({
   route: z.string(),
-  group: z.enum(["solutions", "compare", "contact", "compatibility", "guides", "blog", "products", "lp", "markets"]),
+  group: z.enum(["solutions", "compare", "contact", "compatibility", "guides", "blog", "products", "lp", "markets", "about"]),
   title: z.string(),
   kicker: z.string(),
   summary: z.string(),
@@ -140,6 +162,52 @@ const editorialSchema = z.object({
   faq: z.array(faqSchema),
   primaryAction: linkSchema,
   secondaryActions: z.array(linkSchema),
+  /** Optional ISO-8601 content freshness dates; preferred over build-time fallback for JSON-LD Article datePublished / dateModified. */
+  publishedAt: z.string().optional(),
+  modifiedAt: z.string().optional(),
+  /** Optional keyword phrases for Article/Product JSON-LD; preferred over tokenized title. 2-6 short phrases. */
+  keywords: z.array(z.string()).optional(),
+  /** Primary author slug (key into the `authors` collection). Drives byline + Article.author JSON-LD. */
+  authorSlug: z.string().optional(),
+  /** Free-text author name fallback if no author entry exists yet. Prefer authorSlug for EEAT signals. */
+  author: z.string().optional(),
+  /** Optional reviewer slug (key into `authors`) for technical/fact review. Drives Article.reviewedBy JSON-LD. */
+  reviewedBySlug: z.string().optional(),
+  /** Free-text reviewer name fallback. */
+  reviewedBy: z.string().optional(),
+  /** ISO-8601 date the reviewer last signed off on the content. */
+  reviewedAt: z.string().optional(),
+  /** Authoritative sources cited by this page. Rendered as a uniform citations block + Article.citation JSON-LD. */
+  sources: z.array(sourceSchema).optional(),
+});
+
+/* ── Authors collection schema (added 2026-04) ─────────────────────── */
+
+const authorSchema = z.object({
+  /** Slug used as the `authorSlug` / `reviewedBySlug` foreign key from editorial pages. */
+  slug: z.string(),
+  /** Full display name, e.g. "Peter Zhang". */
+  name: z.string(),
+  /** One-line role / title shown under the byline. */
+  jobTitle: z.string(),
+  /** Longer bio, 80-200 words, real experience + credentials. Rendered on the author detail page. */
+  bio: z.string(),
+  /** Short one-sentence blurb for cross-page bylines. */
+  shortBio: z.string().optional(),
+  /** 1-3 primary expertise tags, e.g. ["MIFARE DESFire security", "RAIN RFID retail", "EU DPP"]. */
+  expertise: z.array(z.string()),
+  /** Years of industry experience. Integer. */
+  yearsExperience: z.number().int().nonnegative().optional(),
+  /** Credentials / certifications, e.g. ["GS1 Digital Link certified integrator"]. */
+  credentials: z.array(z.string()).optional(),
+  /** Portrait path under /public. */
+  avatar: z.string().optional(),
+  /** Canonical URL (the author detail page). Usually /about/authors/{slug}/. */
+  url: z.string().optional(),
+  /** External profiles that prove identity for EEAT — LinkedIn, ORCID, GitHub, company-about. */
+  sameAs: z.array(z.string()).optional(),
+  /** Email (optional, for editors@ alias or sameAs mailto). */
+  email: z.string().optional(),
 });
 
 /* ── Collections ────────────────────────────────────────────────────── */
@@ -154,4 +222,9 @@ const editorial = defineCollection({
   schema: editorialSchema,
 });
 
-export const collections = { wpPages, editorial };
+const authors = defineCollection({
+  loader: glob({ pattern: "**/*.json", base: "./src/content/authors" }),
+  schema: authorSchema,
+});
+
+export const collections = { wpPages, editorial, authors };

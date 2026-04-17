@@ -1,0 +1,166 @@
+{
+  "route": "/about/methodology/",
+  "group": "about",
+  "title": "Testing Methodology",
+  "kicker": "How ProudTek measures RFID/NFC durability, read range and compliance",
+  "summary": "This page documents every measurement method ProudTek uses when it reports a number on an editorial page. We publish this in full so integrators can reproduce our tests, reviewers can challenge our results, and buyers can see exactly what was tested, under what conditions, with what sample size. Every number published on proudtek.com and labelled 'ProudTek lab test' is produced under one of the protocols below; numbers taken from manufacturer datasheets are cited separately in the sources block. Where we use a published standard as a reference method (IEC 60529 for ingress protection, ISO 6330 for laundry wash cycles, GS1 EPC Tag Data Standard for encoding), we cite the exact revision we followed.",
+  "heroPoints": [
+    "Industrial-wash durability uses ISO 6330 cycles at 70, 85 and 95 °C with disclosed detergent, liquor ratio and mechanical load.",
+    "Read-range measurement follows ISO/IEC 18046 (UHF) or the NFC Forum analog test plan (HF), with reader, antenna and orientation disclosed per test.",
+    "Sample sizes for any published durability number are ≥30 tags; outliers are reported, not discarded.",
+    "Results labelled 'from manufacturer datasheet' are never relabelled as ProudTek measurements."
+  ],
+  "imageAlt": "ProudTek in-house RFID test lab — tunnel washer, UHF read-range range, chip programmer",
+  "imageSourceRoutes": [
+    "/about/editorial-policy/",
+    "/about/review-board/",
+    "/about/corrections/"
+  ],
+  "authorSlug": "editorial-board",
+  "publishedAt": "2026-04-17",
+  "modifiedAt": "2026-04-17",
+  "keywords": [
+    "RFID test method",
+    "laundry tag durability",
+    "UHF read range",
+    "ISO 6330",
+    "IEC 60529",
+    "lab methodology"
+  ],
+  "sections": [
+    {
+      "title": "What we test in-house",
+      "intro": "The ProudTek lab tests the specific use cases that our customers ship into. We do not claim general-purpose accredited testing; where accreditation matters, we route to a partner test house and cite their report.",
+      "bullets": [
+        "Industrial-laundry wash durability (tunnel-washer cycles, soak, dry) on PPS / silicone / textile RFID tags.",
+        "UHF / RAIN RFID read range at 868 MHz (EU) and 902–928 MHz (US/CA) — free-space and on-item (cardboard carton, PET bottle, cotton garment).",
+        "HF / NFC read range and tap robustness for NTAG / MIFARE Classic / MIFARE DESFire cards under Apple iOS and Android reference handsets.",
+        "Hotel-lock compatibility verification against common Assa Abloy, Dormakaba, Salto, Onity and Saflok door-lock families using physical keycards we encode to the lock's published sector layout.",
+        "Chip programming & issuance validation (UID personalisation, NDEF URL, SUN / AES / DES key provisioning)."
+      ],
+      "callout": {
+        "label": "We do not do EMC certification",
+        "text": "FCC Part 15, CE RED, RCM and similar emissions / RF-exposure certifications are out of scope for our lab. For those we route to accredited test houses and cite the third-party report when publishing the result."
+      }
+    },
+    {
+      "title": "Industrial-laundry wash durability protocol",
+      "intro": "This is the protocol used whenever a page cites a wash-cycle count (e.g. '500 industrial wash cycles').",
+      "bullets": [
+        "Reference standard: ISO 6330:2021 (textile wash / dry procedures) combined with IEC 60529 (ingress protection rating).",
+        "Wash cycles: tunnel-washer emulation at 70 °C, 85 °C and 95 °C; full cycle = pre-wash + main-wash + rinse + extract.",
+        "Detergent: commercial alkaline industrial detergent (pH 10.5–11.5); chlorinated bleach run is reported separately.",
+        "Dry: high-pressure spin followed by gas tunnel-dryer at 150–180 °C flame, 60–80 °C exit air.",
+        "Read-verify gate: tag is read through an HF or UHF verify reader after every 25 cycles; a tag is declared failed when two consecutive reads return no UID.",
+        "Sample size per batch: N = 30. Results report median cycle-to-failure, 10th percentile, and 90th percentile — not a single 'up to' maximum."
+      ],
+      "statBar": {
+        "items": [
+          { "value": "N≥30", "label": "Sample size per wash-durability claim" },
+          { "value": "25", "label": "Verify-read interval (cycles)" },
+          { "value": "p10 / p50 / p90", "label": "Durability is reported as percentiles, not a peak number" }
+        ]
+      }
+    },
+    {
+      "title": "Read-range measurement protocol",
+      "intro": "Read range is the number most frequently misrepresented in RFID marketing. Our protocol is deliberately verbose so that every published figure can be reproduced.",
+      "bullets": [
+        "UHF / RAIN RFID: reference method is the free-space tag-talks-first (TTF) distance under ISO/IEC 18046-3, with reader output power, antenna gain and polarisation disclosed per test.",
+        "HF / NFC: reference method is the NFC Forum Analog Technical Specification, with reader coil geometry and orientation disclosed per test.",
+        "On-item read range: same tag measured on-item (cardboard carton, PET bottle, cotton T-shirt, metal surface with on-metal tag) — all three or four numbers published together. Free-space only is never published alone.",
+        "Environmental conditions: 22 ± 3 °C, 45 ± 15 % RH, RF-absorbent chamber."
+      ]
+    },
+    {
+      "title": "Hotel-lock compatibility verification",
+      "intro": "Compatibility pages at /compatibility/* are backed by the hands-on test workflow below.",
+      "timeline": {
+        "items": [
+          {
+            "label": "Step 1 — Lock identification",
+            "text": "We capture the lock make, model, firmware (where readable), and sector layout from the customer's field-sampled card."
+          },
+          {
+            "label": "Step 2 — Blank stock match",
+            "text": "Blank chip family (MIFARE Classic 1K / 4K, MIFARE Plus EV1 / EV2, MIFARE DESFire EV2 / EV3, Legic Advant, HID iCLASS SE) is matched to the lock's accepted families from public lock-vendor documentation."
+          },
+          {
+            "label": "Step 3 — Issuance",
+            "text": "Keys are provisioned using either the property's issuance software (preferred, produces customer-accepted card) or a generic ACR122U / OMNIKEY rig for compatibility validation only."
+          },
+          {
+            "label": "Step 4 — Lock cycling",
+            "text": "Card is tapped on the actual lock model (or a sister lock from the same family) for at least 50 successful unlocks; success rate is reported."
+          }
+        ]
+      }
+    },
+    {
+      "title": "What we do not measure (and will not claim)",
+      "intro": "Explicit negative disclosures are part of the methodology.",
+      "bullets": [
+        "We do not measure long-term RF-exposure safety; we cite the relevant FCC, ICNIRP or EU limits instead.",
+        "We do not make statistical claims about an entire chip family from a single manufacturing lot — all chip durability numbers are traceable to a named lot and wafer run.",
+        "We do not re-publish third-party read-range videos as our own measurements.",
+        "We do not extrapolate beyond our measured range — if we tested to 5 m, we do not claim 'up to 7 m'."
+      ],
+      "callout": {
+        "label": "Accredited tests we don't perform in-house",
+        "text": "FCC / CE RED / RCM emissions; ISO/IEC 17025 accredited testing; salt-spray corrosion (ASTM B117); IEC 60068 thermal-shock beyond our chamber limits. All of these are routed to the test house named in the relevant article's sources block."
+      }
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Editorial standards",
+      "description": "The sourcing, review and correction rules every article is held to.",
+      "links": [
+        { "href": "/about/editorial-policy/", "label": "Editorial policy" }
+      ]
+    },
+    {
+      "title": "Who signs technical reviews",
+      "description": "The named reviewers who co-sign standards-related articles.",
+      "links": [
+        { "href": "/about/review-board/", "label": "Review board" }
+      ]
+    },
+    {
+      "title": "Live product references",
+      "description": "Laundry, hotel-lock and RAIN references where the methodology above is applied.",
+      "links": [
+        { "href": "/solutions/rfid-laundry-tags/", "label": "RFID laundry tags — selection guide" },
+        { "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "MIFARE Classic vs Plus vs DESFire (hotel locks)" },
+        { "href": "/guides/rain-rfid-explained/", "label": "RAIN RFID explained" }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can I audit your lab?",
+      "answer": "Qualified customers and partners with a signed NDA can request a remote video walkthrough or an on-site visit; contact editors@proudtek.com. We do not currently publish raw logs for confidentiality reasons, but summaries of sample-level percentile distributions are available on request for any number we publish."
+    },
+    {
+      "question": "Why do you report p10 / p50 / p90 instead of a 'maximum cycles' number?",
+      "answer": "A peak number is not actionable for procurement. p10 tells the laundry operator what the worst 10% of tags will do, which is what determines shrinkage budgeting; p50 is the median; p90 is what the best tags can reach. Reporting only the peak number is a pattern that reliably misleads buyers into under-budgeting for replacement stock."
+    },
+    {
+      "question": "How do you decide which numbers become published benchmarks vs. internal QA?",
+      "answer": "A ProudTek lab test is publishable only after (a) a second operator has repeated the test on a separate day, (b) the raw data is archived in our lab database with test-ID, operator, instrument serial and environmental log, and (c) the editorial board has signed off. Internal QA numbers that fail any of these three gates are not published."
+    },
+    {
+      "question": "Do you retract numbers?",
+      "answer": "Yes. If a number was wrong at publication — wrong sample size, wrong condition, wrong arithmetic — we retract or revise it and log the change at /about/corrections/ with the original value, the corrected value and the date."
+    }
+  ],
+  "primaryAction": {
+    "href": "/about/review-board/",
+    "label": "Meet the review board"
+  },
+  "secondaryActions": [
+    { "href": "/about/editorial-policy/", "label": "Editorial policy" },
+    { "href": "/about/corrections/", "label": "Corrections log" },
+    { "href": "/about/disclosures/", "label": "Disclosures" }
+  ]
+}

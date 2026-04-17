@@ -45,7 +45,87 @@ export const ORGANIZATION_CONTACT = {
   whatsapp: "+86 18665820632",
   streetAddress: "A2110, Zhantao Building, #1079 Minzhi Rd, Longhua",
   addressLocality: "Shenzhen",
+  addressRegion: "Guangdong",
+  postalCode: "518131",
   addressCountry: "CN",
+};
+
+/** Expert author profiles for E-E-A-T authority signals */
+export interface ExpertAuthor {
+  name: string;
+  title: string;
+  expertise: string[];
+  url: string;
+}
+
+export const EXPERT_AUTHORS: Record<string, ExpertAuthor> = {
+  default: {
+    name: EDITORIAL_TEAM_NAME,
+    title: "RFID & NFC Technical Content Team",
+    expertise: ["RFID manufacturing", "NFC technology", "Access control systems", "Smart card engineering"],
+    url: "/about/",
+  },
+  "peter-zhang": {
+    name: "Peter Zhang",
+    title: "Founder & CEO",
+    expertise: ["RFID/NFC industry strategy", "Technology standards (ISO 14443, ISO 18000-63)", "Market trends", "System architecture"],
+    url: "/about/#peter-zhang",
+  },
+  "nancy-wu": {
+    name: "Nancy Wu",
+    title: "NFC Product Specialist",
+    expertise: ["NFC business cards", "Google Review NFC cards", "NFC tag programming", "Digital product authentication"],
+    url: "/about/#nancy-wu",
+  },
+  "sam-yao": {
+    name: "Sam Yao",
+    title: "RFID Solutions Architect",
+    expertise: ["UHF RFID systems", "Inventory & warehouse management", "Supply chain RFID", "Event access control"],
+    url: "/about/#sam-yao",
+  },
+  "mia-li": {
+    name: "Mia Li",
+    title: "Quality & Manufacturing Engineer",
+    expertise: ["RFID card materials", "Hotel key card manufacturing", "Compliance (ISO, CE, RoHS)", "Laundry tag durability"],
+    url: "/about/#mia-li",
+  },
+};
+
+/** Article author assignment — maps routes to expert authors */
+export { ARTICLE_AUTHOR_MAP } from "../data/article-author-map";
+
+/** Organization credentials & certifications */
+export const ORGANIZATION_CREDENTIALS = {
+  certifications: [
+    { name: "ISO 9001:2015", issuer: "SGS", description: "Quality Management System Certification" },
+    { name: "ISO 14001:2015", issuer: "SGS", description: "Environmental Management System" },
+    { name: "RoHS Compliant", issuer: "EU Directive 2011/65/EU", description: "Restriction of Hazardous Substances" },
+    { name: "CE Marking", issuer: "EU", description: "European Conformity" },
+    { name: "REACH Compliant", issuer: "ECHA", description: "Registration, Evaluation, Authorisation and Restriction of Chemicals" },
+  ],
+  memberships: [
+    { name: "RAIN RFID Alliance", role: "Member", url: "https://rainrfid.org/" },
+    { name: "NFC Forum", role: "Implementer Member", url: "https://nfc-forum.org/" },
+  ],
+  founded: "2008",
+  employeeCount: "100+",
+  clientCount: "500+",
+  countriesServed: "50+",
+  yearExperience: "17+",
+};
+
+/** Geo targeting constants for global SEO */
+export const GEO_CONFIG = {
+  latitude: 22.6312,
+  longitude: 114.0579,
+  region: "CN-44",
+  placename: "Shenzhen",
+  /** Primary target markets (ISO 3166-1 alpha-2) */
+  targetMarkets: ["US", "GB", "DE", "JP", "AU", "IN", "CA", "BR", "FR", "KR", "AE", "SG", "MY", "TH", "VN"],
+  /** Languages supported by the team */
+  supportedLanguages: ["en", "zh"],
+  /** Primary content language */
+  primaryLanguage: "en",
 };
 
 export const HOME_GROWTH_GROUPS: GrowthGroup[] = [

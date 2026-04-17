@@ -30,7 +30,12 @@ import {
   ARTICLE_SUPPORT_PROFILES,
   COLLECTION_SUPPORT_PROFILES,
   CORE_SUPPORT_PROFILES,
+  EXPERT_AUTHORS,
+  ARTICLE_AUTHOR_MAP,
+  ORGANIZATION_CREDENTIALS,
 } from "./seo-content";
+
+import { EDITORIAL_KEYWORDS_MAP } from "./editorial-pages";
 
 export {
   SITE_ORIGIN,
@@ -134,6 +139,11 @@ export type ProductSourceProfile = Record<string, BreadcrumbItem[]>;
 interface ArticleMeta {
   authorName: string;
   authorUrl: string;
+  authorTitle?: string;
+  authorExpertise?: string[];
+  reviewedBy?: string;
+  reviewedByTitle?: string;
+  lastReviewedDate?: string;
   publishedAt: string;
   modifiedAt: string;
   publishedLabel: string;
@@ -241,6 +251,14 @@ export interface MachinePageData {
   productSpecs: ProductSpec[];
   machineJsonUrl: string;
   machineTextUrl: string;
+  /** Citation-friendly metadata */
+  author?: { name: string; title?: string; expertise?: string[] };
+  publisher: string;
+  datePublished?: string;
+  dateModified?: string;
+  reviewedBy?: string;
+  lastReviewedDate?: string;
+  credentials?: string[];
 }
 
 
@@ -378,6 +396,19 @@ export function buildMachinePageData(page: SnapshotPage): MachinePageData {
     productSpecs,
     machineJsonUrl,
     machineTextUrl,
+    author: seo.articleMeta
+      ? {
+          name: seo.articleMeta.authorName,
+          title: seo.articleMeta.authorTitle,
+          expertise: seo.articleMeta.authorExpertise,
+        }
+      : { name: ORGANIZATION_NAME },
+    publisher: ORGANIZATION_NAME,
+    datePublished: seo.articleMeta?.publishedAt,
+    dateModified: seo.articleMeta?.modifiedAt,
+    reviewedBy: seo.articleMeta?.reviewedBy,
+    lastReviewedDate: seo.articleMeta?.lastReviewedDate,
+    credentials: ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name),
   };
 }
 
@@ -390,6 +421,13 @@ export function buildMachinePageText(page: SnapshotPage): string {
     `URL: ${data.url}`,
     `Source URL: ${data.sourceUrl}`,
     `Kind: ${data.kind}`,
+    `Publisher: ${data.publisher}`,
+    ...(data.author ? [`Author: ${data.author.name}${data.author.title ? ` (${data.author.title})` : ""}`] : []),
+    ...(data.datePublished ? [`Published: ${data.datePublished}`] : []),
+    ...(data.dateModified ? [`Last Modified: ${data.dateModified}`] : []),
+    ...(data.reviewedBy ? [`Reviewed By: ${data.reviewedBy}`] : []),
+    ...(data.lastReviewedDate ? [`Last Reviewed: ${data.lastReviewedDate}`] : []),
+    ...(data.credentials && data.credentials.length > 0 ? [`Credentials: ${data.credentials.join(", ")}`] : []),
     `Image: ${data.imageUrl}`,
     `Image Alt: ${data.imageAlt}`,
     "",
@@ -2364,6 +2402,17 @@ function inferPageKind(route: string): PageKind {
     return "article";
   }
 
+  // Editorial content routes (blog articles, solutions, comparisons, guides, compatibility)
+  if (
+    (route.startsWith("/blog/") && route !== "/blog/") ||
+    (route.startsWith("/solutions/") && route !== "/solutions/") ||
+    (route.startsWith("/compare/") && route !== "/compare/") ||
+    (route.startsWith("/guides/") && route !== "/guides/") ||
+    (route.startsWith("/compatibility/") && route !== "/compatibility/")
+  ) {
+    return "article";
+  }
+
   if (route.startsWith("/industries/")) {
     return "product";
   }
@@ -2695,9 +2744,17 @@ function resolveArticleMeta($body: CheerioAPI, route: string): ArticleMeta {
   const publishedAt = normalizeDateTime(cleanText($body("time.entry-date.published, time.published").first().attr("datetime") ?? ""), fallback);
   const modifiedAt = normalizeDateTime(cleanText($body("time.updated").first().attr("datetime") ?? ""), publishedAt);
 
+  const authorKey = ARTICLE_AUTHOR_MAP[route] ?? "default";
+  const author = EXPERT_AUTHORS[authorKey] ?? EXPERT_AUTHORS["default"];
+
   return {
-    authorName: EDITORIAL_TEAM_NAME,
-    authorUrl: absoluteUrl("/about/"),
+    authorName: author.name,
+    authorUrl: absoluteUrl(author.url),
+    authorTitle: author.title,
+    authorExpertise: author.expertise,
+    reviewedBy: authorKey !== "default" ? EDITORIAL_TEAM_NAME : undefined,
+    reviewedByTitle: authorKey !== "default" ? "RFID & NFC Technical Content Team" : undefined,
+    lastReviewedDate: modifiedAt,
     publishedAt,
     modifiedAt,
     publishedLabel: formatDisplayDate(publishedAt),
@@ -4250,11 +4307,19 @@ function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Record<str
       datePublished: context.articleMeta.publishedAt,
       dateModified: context.articleMeta.modifiedAt,
       mainEntityOfPage: context.canonicalUrl,
-      author: {
-        "@type": "Organization",
-        name: context.articleMeta.authorName,
-        url: context.articleMeta.authorUrl,
-      },
+      author: authorSchema,
+      ...(context.articleMeta.reviewedBy
+        ? {
+            reviewedBy: {
+              "@type": "Organization",
+              name: context.articleMeta.reviewedBy,
+              url: absoluteUrl("/about/"),
+            },
+          }
+        : {}),
+      ...(context.articleMeta.lastReviewedDate
+        ? { lastReviewed: context.articleMeta.lastReviewedDate }
+        : {}),
       articleSection: "RFID & NFC Guides",
       keywords: buildSchemaKeywords(context.contentTitle, canonicalPath),
       publisher: { "@id": organizationId },
@@ -4941,6 +5006,12 @@ function applyImageAccessibility($body: CheerioAPI, context: PageContext): void 
 }
 
 function buildSchemaKeywords(contentTitle: string, route: string): string {
+  // Prefer editorial-authored keyword phrases (set in editorial JSON's `keywords` field)
+  // over naive title tokenization; avoids garbage like "how, far, can, be" in JSON-LD keywords.
+  const authored = EDITORIAL_KEYWORDS_MAP.get(route);
+  if (authored && authored.length > 0) {
+    return authored.join(", ");
+  }
   return Array.from(buildImageKeywordSet(contentTitle, route)).slice(0, 8).join(", ");
 }
 
