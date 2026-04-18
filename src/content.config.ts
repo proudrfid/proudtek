@@ -183,6 +183,8 @@ const editorialSchema = z.object({
   relatedIndustries: z.array(z.string()).optional(),
   /** Explicit chip-family facet values for the catalog filter on /products/all/. Takes precedence over the regex scan of title+summary+route — use when the SKU supports multiple chips in a compatibility matrix and the filter should surface it for every chip. Valid values match FACET_RULES.chip values in catalog-pages.ts: ntag21x, ntag424, mifare-classic, mifare-desfire, mifare-ultralight, mifare-plus, icode, em-tk5, impinj-m7, alien-higgs, ucode. */
   chipFamilies: z.array(z.string()).optional(),
+  /** Explicit environment-tag facet values for the catalog filter on /products/all/. Takes precedence over the regex scan of title+summary+route — use when the SKU's environmental specs (IP rating, temperature range, mount type, tamper behaviour) live deep in spec tables. Valid values match FACET_RULES.env values in catalog-pages.ts: anti-metal, high-temp, outdoor, embed, tamper, sensor. */
+  envFamilies: z.array(z.string()).optional(),
 });
 
 /* ── Authors collection schema (added 2026-04) ─────────────────────── */

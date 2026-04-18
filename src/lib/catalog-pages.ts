@@ -256,6 +256,8 @@ interface LandingDef {
   group: string;
   /** Explicit chip-family facet values — takes precedence over regex scan for the chip group. See FACET_RULES.chip below for the vocabulary. */
   chipFamilies?: string[];
+  /** Explicit environment-tag facet values — takes precedence over regex scan for the env group. See FACET_RULES.env below for the vocabulary. */
+  envFamilies?: string[];
 }
 
 let _landingDefsCache: LandingDef[] | null = null;
@@ -332,29 +334,34 @@ function deriveFacets(...textParts: (string | undefined)[]): Facets {
 }
 
 /**
- * Variant of deriveFacets that lets a SKU explicitly declare its chip-family
- * facet values (for SKUs whose chip compatibility matrix lives deep in section
- * tables rather than in title/summary, e.g. keyfobs and wristbands that ship
- * with 10+ chip options). Values are validated against FACET_RULES.chip and
- * unknown values are dropped silently. If `chipFamilies` is omitted or empty,
- * falls back to regex-scan of title+summary+route like deriveFacets.
+ * Variant of deriveFacets that lets a SKU explicitly declare chip-family
+ * and/or environment-tag facet values (for SKUs whose chip compatibility
+ * matrix or environmental specs live deep in section tables rather than
+ * in title/summary — e.g. keyfobs that ship with 10+ chip options, or
+ * tags whose IP68 / 200 °C claims live in a spec-sheet row).
+ *
+ * Values are validated against the relevant FACET_RULES group and unknown
+ * values are dropped silently. Unions the explicit list with whatever the
+ * regex scan already found (so an editor's explicit list plus a regex hit
+ * in the summary both land in the final set). If an override array is
+ * omitted or empty, the corresponding group falls back to regex-scan.
  */
-function deriveFacetsWithChipOverride(
-  chipFamilies: string[] | undefined,
+function deriveFacetsWithOverrides(
+  overrides: { chip?: string[]; env?: string[] },
   ...textParts: (string | undefined)[]
 ): Facets {
   const facets = deriveFacets(...textParts);
-  if (chipFamilies && chipFamilies.length > 0) {
-    const validChipValues = new Set(FACET_RULES.chip.map((spec) => spec.value));
-    const explicit = chipFamilies.filter((v) => validChipValues.has(v));
-    // Union with whatever the regex scan already found (regex may catch aliases
-    // the author didn't list, e.g. a tangential NTAG21x reference in the
-    // summary). Dedupe while preserving FACET_RULES order.
-    const merged = Array.from(new Set([...facets.chip, ...explicit]));
-    facets.chip = FACET_RULES.chip
+  const applyOverride = (group: "chip" | "env", explicit: string[] | undefined) => {
+    if (!explicit || explicit.length === 0) return;
+    const validValues = new Set(FACET_RULES[group].map((spec) => spec.value));
+    const filtered = explicit.filter((v) => validValues.has(v));
+    const merged = Array.from(new Set([...facets[group], ...filtered]));
+    facets[group] = FACET_RULES[group]
       .map((spec) => spec.value)
       .filter((v) => merged.includes(v));
-  }
+  };
+  applyOverride("chip", overrides.chip);
+  applyOverride("env", overrides.env);
   return facets;
 }
 
@@ -511,10 +518,16 @@ async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduc
       // Include the route slug so mount-type words like "anti-metal" or
       // "on-metal" embedded in URLs (e.g. /products/rfid-tags/anti-metal-…)
       // are picked up even when the marketing summary is short.
-      // Explicit chipFamilies takes precedence for SKUs whose chip matrix
-      // lives in section tables rather than title/summary (keyfobs,
-      // wristbands, multi-chip cards).
-      facets: deriveFacetsWithChipOverride(def.chipFamilies, title, summary, def.route),
+      // Explicit chipFamilies / envFamilies take precedence for SKUs whose
+      // chip matrix or env specs live in section tables rather than
+      // title/summary (keyfobs with 10-chip matrices, on-metal UHF tags
+      // with IP68 spec rows, etc.).
+      facets: deriveFacetsWithOverrides(
+        { chip: def.chipFamilies, env: def.envFamilies },
+        title,
+        summary,
+        def.route,
+      ),
     });
   }
 
