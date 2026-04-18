@@ -1,0 +1,215 @@
+{
+  "route": "/guides/ntag424-dna-sun-cmac-authentication/",
+  "group": "guides",
+  "title": "NTAG424 DNA SUN + CMAC Authentication — The Complete Technical Encyclopedia",
+  "kicker": "NTAG424 DNA Authentication Guide",
+  "summary": "NTAG424 DNA (NT4H2421Gx / NT4H2421Tx) is NXP's flagship authentication NFC chip, combining ISO/IEC 14443-4 compliance, AES-128 cryptography and the Secure Unique NFC (SUN) message feature that generates a different, cryptographically signed URL on every single tap. Combined with CMAC (Cipher-based Message Authentication Code) verification, NTAG424 DNA is the technology that powers anti-counterfeit tags for luxury goods, EU Digital Product Passport implementations, tamper-evident seals and cryptographic brand-authentication campaigns. This encyclopedia documents the chip's architecture, memory layout, SUN/CMAC message format, key management, backend verification flow, and the specific commercial deployments where it is the correct engineering choice.",
+  "heroPoints": [
+    "Secure Unique NFC (SUN) — every tap generates a different URL containing the tag's UID, a monotonically incrementing read counter and a CMAC signature over both, making replay attacks mathematically infeasible even if a counterfeiter photographs or clones the printed QR/URL.",
+    "AES-128 cryptography — the chip ships with three independent 128-bit AES keys (Application Master, Data Encryption, MAC) used to derive session keys per read, enabling authenticated encryption and integrity verification without exposing the master key to the NFC interface.",
+    "ISO/IEC 14443-4 + Type-4 NDEF — full compliance means any standards-compliant smartphone (iOS 11+ with background NDEF tag reading, Android 4.4+) reads the SUN URL automatically via the operating system's native NFC handler, with no app install required for the end user."
+  ],
+  "imageAlt": "NTAG424 DNA chip with SUN + CMAC authentication flow diagram",
+  "heroImage": "/landing-images/ntag424-dna-tamper-evident-tag.jpg",
+  "imageSourceRoutes": [
+    "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
+    "/products/rfid-cards/ntag424-dna-tt-card/"
+  ],
+  "keywords": [
+    "NTAG424 DNA",
+    "SUN message",
+    "CMAC authentication",
+    "AES-128 NFC",
+    "NFC brand protection",
+    "NXP NT4H2421",
+    "tamper-evident NFC",
+    "EU Digital Product Passport NFC"
+  ],
+  "publishedAt": "2026-04-18",
+  "modifiedAt": "2026-04-18",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedAt": "2026-04-18",
+  "sections": [
+    {
+      "title": "Chip family and part numbers",
+      "bullets": [
+        "NTAG424 DNA — the baseline authentication chip. Part number NT4H2421Gx (13.56 MHz ISO/IEC 14443-4 Type A, 416 bytes user memory, AES-128, three application keys).",
+        "NTAG424 DNA TT (Tag Tamper) — variant adding a hardware tamper-detection loop on the chip substrate; when the antenna trace or tamper wire is cut, a dedicated memory bit flips permanently and is reflected in the SUN message, enabling tamper-evident seals that still function after tampering but signal the event cryptographically. Part number NT4H2421Tx.",
+        "NTAG413 DNA — the predecessor generation. Smaller memory (144 bytes), SUN message support but without the full AES key hierarchy of NTAG424. Being phased out for new designs in favor of NTAG424.",
+        "NTAG424 DNA is sold by NXP as wafer, chip on tape (COT), or in finished inlays through licensed antenna designers (Smartrac/Avery Dennison, Alien, Arizon RFID, HID, Proud Tek). Minimum realistic MOQ through inlay distributors is typically 10,000 pieces.",
+        "Chip markings — look for the NXP mint logo plus the silicon mark 'NT4H2421'. Third-party chips that advertise 'NTAG424-compatible' are almost always MIFARE Ultralight EV1 or NTAG213 silicon running a partial command set; they do not implement AES and cannot produce a valid SUN message."
+      ]
+    },
+    {
+      "title": "Memory architecture",
+      "bullets": [
+        "Total user memory — 416 bytes organized as three files: File 01 (static 32-byte CC file, defines NDEF capability container and maximum NDEF size), File 02 (NDEF message file, 256 bytes — holds the URL template with placeholders for UID, read counter and CMAC), File 03 (proprietary file, 128 bytes — used for application-specific encrypted data).",
+        "Access rights per file — each file has read/write access rules tied to any of the three application keys (AppKey0 / AppKey1 / AppKey2) or a fourth 'free access' mode. Typical deployment: File 02 NDEF = plain read + MAC-on-read; File 03 = encrypted read using AES session keys.",
+        "SUN configuration — the NDEF URL template in File 02 uses tag-parameter placeholders: '${UID}' is replaced with the 7-byte manufacturer UID, '${CTR}' with the 3-byte read counter (big-endian), '${MAC}' with the 8-byte truncated AES-CMAC signature. Example: 'https://brand.com/verify?uid=${UID}&ctr=${CTR}&mac=${MAC}'.",
+        "Read counter — a 24-bit monotonically incrementing counter on-chip, incremented atomically before every NDEF read when SUN is enabled. Counter wraps only after 16,777,215 reads per tag; once wrapped the chip still functions but the server must tolerate counter reset during replay detection.",
+        "Config byte — a settings byte that turns SUN mirroring on/off for each field. SUN can be configured to include just the UID, UID + CTR, or UID + CTR + MAC depending on the brand's security/privacy trade-off.",
+        "UID — 7 bytes, factory-programmed, read-only. The UID is globally unique and NXP tracks issuance lots so duplicate UIDs cannot exist in the field."
+      ]
+    },
+    {
+      "title": "SUN + CMAC authentication flow",
+      "bullets": [
+        "Step 1 — smartphone taps tag. iOS/Android Type-4 NDEF handler issues an ISO 7816-4 SELECT AID command for the NDEF application (A0000002471001), then SELECT FILE 02, then READ BINARY.",
+        "Step 2 — chip increments the 24-bit read counter in non-volatile memory atomically (before returning data), then computes session keys from the SDMMACKey (the CMAC application key) using AES-128 CMAC over the context bytes 'C3 3C' || UID || CTR (per AN12196 Section 7.2).",
+        "Step 3 — chip computes the SUN MAC as AES-CMAC over the concatenation of UID and CTR using the derived session MAC key, then truncates to 8 bytes (16 hex chars) per AN12196 Section 7.3.3.",
+        "Step 4 — chip substitutes the '${UID}', '${CTR}' and '${MAC}' placeholders in the URL template and returns the resulting URL as a Type-4 NDEF URI record.",
+        "Step 5 — smartphone launches the URL in the browser. Brand verification backend extracts UID, CTR and MAC, retrieves the SDMMACKey for this tag's UID from the key management system, recomputes the CMAC locally and compares it bit-for-bit with the submitted MAC.",
+        "Step 6 — backend also verifies that the submitted CTR is strictly greater than the last-seen CTR for this UID (rejecting replays) and that the CTR is not wildly in the future (rejecting out-of-range attacks). A valid tap returns an authenticated HTTPS response; a MAC mismatch or stale CTR returns a counterfeit/replay warning.",
+        "The entire cryptographic verification takes place server-side against a key custody system (HSM, AWS KMS, or an on-premise key vault). The customer's smartphone sees only a URL; they never need an app and never perform crypto locally."
+      ]
+    },
+    {
+      "title": "Key management and personalization",
+      "bullets": [
+        "Three AES-128 application keys per tag — AppKey0 (master, can rewrite keys), AppKey1 (AES-128 SDMMACKey for CMAC), AppKey2 (AES-128 SDMEncKey for payload encryption when File 03 encryption is enabled). A fourth 'null' key for public read access.",
+        "Diversified keys — production deployments do NOT use the same three keys across all tags. Instead, a Master Key (MK) held by the brand's HSM is combined with the tag UID via AES-128 ECB to derive per-tag SDMMACKey and SDMEncKey. NXP's AN12196 Section 10 defines the standard diversification function; Proud Tek uses this as the default personalization scheme.",
+        "Key rotation — AppKey0 can change AppKey1 and AppKey2 post-issuance via authenticated commands. In regulated deployments (EU DPP, pharmaceutical track-and-trace), keys are rotated annually and all prior keys archived for forensic re-verification.",
+        "Personalization workstation — a desktop NFC reader with a secure element (SAM, Secure Access Module) holds the MK and writes per-tag keys during manufacturing, typically on a PC/SC-compliant encoder running PC/SC 2.0 drivers. Proud Tek factory personalization runs on HID Omnikey 5427 CK SAM-equipped encoders.",
+        "NXP TagWriter / NXP TapLinx — NXP's official SDKs provide reference implementations for personalization, SUN configuration and CMAC verification in Android, iOS and server-side Java. Proud Tek ships tested integration samples alongside order-specific key delivery."
+      ]
+    },
+    {
+      "title": "Commercial applications by industry",
+      "bullets": [
+        "Luxury goods authentication — designer apparel, handbags, sneakers, watches and accessories. The SUN MAC proves the tap is to a genuine, un-cloned tag; the customer experience is a simple smartphone tap that lands on an authenticated product page.",
+        "EU Digital Product Passport (ESPR 2023/2102) — textiles and electronics in-scope from 2027 require a persistent, machine-readable data carrier linked to the product record. NTAG424 DNA satisfies the authentication and tamper-evidence recommendations of the ESPR implementing acts.",
+        "EU Battery Regulation 2023/1542 — industrial and EV batteries >2 kWh require a Battery Passport from February 2027. NTAG424 DNA TT variants provide both the unique ID linkage and tamper-detection needed for the anti-circumvention provisions.",
+        "Pharmaceutical track-and-trace — US DSCSA and EU FMD both allow (but do not require) NFC data carriers for unit-of-sale authentication. NTAG424 DNA is the choice for high-value oncology and biologics packaging where counterfeit risk is severe.",
+        "Industrial asset and tool tracking — where the combination of tamper detection (TT variant) and cryptographic identity matters, for example for calibration-controlled tooling in aerospace MRO.",
+        "Wine, spirits and olive oil authentication — tamper-evident neck-seal deployments where the tag is destroyed on bottle opening, and the last successful authentication establishes chain of custody up to the point of sale.",
+        "Cosmetic refill programs — refill-program retailers use NTAG424 DNA to bind refill packs to original containers; the brand app verifies the pack's SUN URL before dispensing points or loyalty credit."
+      ]
+    },
+    {
+      "title": "When NTAG424 DNA is overkill",
+      "bullets": [
+        "Simple tap-to-URL redirects — NTAG213 (144 bytes, no crypto) is 5-8× cheaper and sufficient when the brand does not need authentication (e.g. marketing landing pages, Google review cards, event check-ins).",
+        "Closed-loop access control — MIFARE DESFire EV3 is the correct chip for enterprise access control systems using readers from HID, Suprema, Axis and similar. EV3 offers ISO 14443-4, AES, and supports a richer multi-application file structure than NTAG424 DNA.",
+        "Memory-heavy payloads — NTAG216 (888 bytes user) is the right choice when the application needs to store larger NDEF payloads on-tag without crypto, such as vCards or extended URLs with query strings.",
+        "Extreme price sensitivity at massive volume — NTAG213 or MIFARE Ultralight EV1 should be specified for promotional campaigns with 100 K+ unit runs where counterfeit risk is low and per-unit cost dominates."
+      ]
+    },
+    {
+      "title": "NXP reference documents",
+      "bullets": [
+        "AN12196 — NTAG424 DNA NTAG424 DNA TagTamper Features and Hints. The canonical reference for SUN, CMAC and tamper configuration. Covers the mirroring modes, key diversification function and server-side verification algorithm in full.",
+        "AN12343 — NTAG424 DNA Android/iOS application hints. Describes Type-4 NDEF handler interoperability with iOS Core NFC, Android NFC Foreground Dispatch, and browser URL redirection semantics.",
+        "AN11765 — NTAG424 DNA (baseline chip) features and product data sheet equivalent.",
+        "ISO/IEC 14443-4:2018 — contactless transmission protocol layer. Defines the APDU exchange NTAG424 DNA uses for all read/write commands.",
+        "ISO/IEC 7816-4 — file selection and READ BINARY semantics inherited from smartcard standards."
+      ]
+    },
+    {
+      "title": "Specifications at a glance",
+      "table": {
+        "columns": [
+          "Parameter",
+          "NTAG424 DNA (NT4H2421Gx)",
+          "NTAG424 DNA TT (NT4H2421Tx)"
+        ],
+        "rows": [
+          ["Operating frequency", "13.56 MHz", "13.56 MHz"],
+          ["Air-interface standard", "ISO/IEC 14443-4 Type A", "ISO/IEC 14443-4 Type A"],
+          ["User memory", "416 bytes (3 files)", "416 bytes (3 files) + tamper flag"],
+          ["Cryptography", "AES-128", "AES-128"],
+          ["Application keys", "3 × 128-bit AES", "3 × 128-bit AES"],
+          ["UID", "7 bytes, unique", "7 bytes, unique"],
+          ["Read counter", "24-bit monotonic", "24-bit monotonic"],
+          ["Tamper detection", "No", "Hardware loop + persistent flag"],
+          ["Operating temperature", "-25 °C to +70 °C", "-25 °C to +70 °C"],
+          ["Data retention", "≥ 50 years", "≥ 50 years"],
+          ["Endurance (writes)", "500,000 cycles", "500,000 cycles"],
+          ["Typical use case", "Brand authentication, DPP", "Tamper-evident seals, closures"]
+        ]
+      }
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "NTAG424 DNA product pages",
+      "description": "Proud Tek SKUs built on the NTAG424 DNA silicon.",
+      "links": [
+        { "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/", "label": "NTAG424 DNA tamper-evident tag" },
+        { "href": "/products/rfid-cards/ntag424-dna-tt-card/", "label": "NTAG424 DNA TT card" },
+        { "href": "/products/rfid-labels/nfc-sneaker-authentication-tag/", "label": "NFC sneaker authentication tag" },
+        { "href": "/products/rfid-labels/nfc-luxury-handbag-tag/", "label": "NFC luxury handbag tag" },
+        { "href": "/products/rfid-labels/nfc-digital-product-passport-tag/", "label": "NFC DPP tag" },
+        { "href": "/products/rfid-labels/nfc-battery-passport-tag/", "label": "NFC battery passport tag" }
+      ]
+    },
+    {
+      "title": "Related comparisons and guides",
+      "description": "Pages that expand on chips, standards and deployment decisions around NTAG424 DNA.",
+      "links": [
+        { "href": "/compare/ntag213-vs-ntag215-vs-ntag216/", "label": "NTAG213 vs NTAG215 vs NTAG216" },
+        { "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "MIFARE Plus EV2 vs DESFire EV3" },
+        { "href": "/guides/eu-digital-product-passport-2027/", "label": "EU Digital Product Passport guide" },
+        { "href": "/solutions/nfc-brand-authentication/", "label": "NFC brand authentication solution" },
+        { "href": "/solutions/nfc-luxury-authentication/", "label": "NFC luxury authentication" },
+        { "href": "/solutions/digital-product-passport/", "label": "Digital Product Passport solution" }
+      ]
+    },
+    {
+      "title": "Authoritative external references",
+      "description": "NXP and ISO specifications that define the NTAG424 DNA standard.",
+      "links": [
+        { "href": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-labels/ntag-424-dna-secure-unique-nfc-tag-with-message-protection:NTAG424DNA", "label": "NXP NTAG424 DNA product page" },
+        { "href": "https://www.nxp.com/docs/en/application-note/AN12196.pdf", "label": "NXP AN12196 — SUN / CMAC application note" }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can I verify the SUN MAC without a server?",
+      "answer": "Technically yes — a mobile app can embed the diversification master key and verify locally — but this defeats the security model because the master key is now on thousands of user devices. Production deployments always verify server-side against a key management system (HSM, AWS KMS, HashiCorp Vault). The tag's URL lands on your verification endpoint, which returns authenticated (200) or counterfeit (403) as an HTTP response."
+    },
+    {
+      "question": "Does NTAG424 DNA work on iPhones without an app?",
+      "answer": "Yes. iOS 11+ supports background NDEF tag reading in the Core NFC framework — tapping an NTAG424 DNA tag with a valid URL opens that URL in Safari automatically, no app install needed. The only requirement is that the URL uses HTTPS (which your verification endpoint should be doing anyway). Android 4.4+ has the same behavior via the NFC Foreground Dispatch system."
+    },
+    {
+      "question": "What prevents a counterfeiter from cloning the tag UID?",
+      "answer": "The UID alone is not sensitive — it's public. What prevents cloning is the CMAC signature. Without the per-tag SDMMACKey (derived from the brand's master key and held only in the HSM), an attacker cannot compute a valid MAC for any given UID+CTR pair. Even if an attacker reads a legitimate tag's current URL and tries to replay it, the server rejects any CTR less than or equal to the last-seen value for that UID."
+    },
+    {
+      "question": "What happens when the 24-bit read counter wraps?",
+      "answer": "After 16,777,215 reads the counter wraps to zero. This only matters in automation scenarios — consumer-facing authentication tags will never reach this limit in their lifetime. For high-read-volume deployments (ticketing, industrial), the server can detect wrap and reset its per-UID last-seen CTR, or the deployment can use NTAG424 DNA in a mode where counter wrap triggers tag re-issuance."
+    },
+    {
+      "question": "Can NTAG424 DNA be pre-encoded at the factory?",
+      "answer": "Yes. Proud Tek pre-encodes per-customer. We need your master key (delivered via encrypted channel or generated inside our Thales/Utimaco HSM with shared custody), the URL template and the per-tag UID/CTR mirroring configuration. Every shipment includes a CSV manifest mapping UID to per-tag SDMMACKey and SDMEncKey (when File 03 encryption is enabled)."
+    },
+    {
+      "question": "Is NTAG424 DNA the right choice for EU Digital Product Passport?",
+      "answer": "For high-value textiles and electronics where counterfeit risk or tamper risk is material — yes. The ESPR implementing acts recommend but do not mandate cryptographic authentication; NTAG213 or NTAG216 can satisfy the data-carrier requirement at lower cost for categories where authentication is not required. For batteries under Regulation 2023/1542 the tamper-evidence clause makes NTAG424 DNA TT the natural choice."
+    },
+    {
+      "question": "Why choose NTAG424 DNA over MIFARE DESFire EV3?",
+      "answer": "Different problems. NTAG424 DNA is designed for public, consumer-smartphone authentication — one URL per tap, no app, AES-protected. MIFARE DESFire EV3 is designed for enterprise multi-application smart cards (access control, cashless payment, transit) where a proprietary reader with a SAM performs authenticated transactions. Use NTAG424 DNA for brand-facing tags that consumers tap with their phone; use DESFire EV3 for employee badges, transit cards and physical access."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/",
+    "label": "Request NTAG424 DNA pre-encoded samples"
+  },
+  "secondaryActions": [
+    {
+      "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
+      "label": "NTAG424 DNA tamper-evident tag"
+    },
+    {
+      "href": "/solutions/nfc-brand-authentication/",
+      "label": "NFC brand authentication"
+    },
+    {
+      "href": "/solutions/digital-product-passport/",
+      "label": "Digital Product Passport"
+    }
+  ]
+}
