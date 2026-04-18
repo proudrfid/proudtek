@@ -83,7 +83,24 @@ function injectArticleBlock($body: CheerioAPI, page: SnapshotPage, context: Conv
     return;
   }
 
-  const anchor = content.find("article").last();
+  // Preferred anchors, in order:
+  //  1. The action bar (insert BEFORE so Project Planning sits above the final Next Step CTA).
+  //  2. The last top-level <article> that is NOT a snapshot card / conversion card (legacy WP content).
+  // Avoid matching `.codex-editorial-snapshot-card` elements — they are <article> tags
+  // rendered inside `.codex-editorial-snapshot-grid`; inserting after one nests the
+  // conversion shell INSIDE the grid and squeezes the At-A-Glance layout.
+  const actionBar = content.children(".codex-editorial-action-bar").last();
+  const legacyArticles = content.find("article").filter((_, el) => {
+    const $el = $body(el);
+    return (
+      !$el.hasClass("codex-editorial-snapshot-card") &&
+      !$el.hasClass("codex-conversion-card") &&
+      $el.closest(".codex-editorial-snapshot-grid").length === 0 &&
+      $el.closest(".codex-conversion-grid").length === 0
+    );
+  });
+  const anchor = actionBar.length > 0 ? actionBar : legacyArticles.last();
+  const insertBefore = actionBar.length > 0;
   const profile = resolveArticleProfile(page.route, context.contentTitle);
   const html = renderConversionSection({
     kicker: profile.kicker,
@@ -119,7 +136,11 @@ function injectArticleBlock($body: CheerioAPI, page: SnapshotPage, context: Conv
   });
 
   if (anchor.length) {
-    anchor.after(html);
+    if (insertBefore) {
+      anchor.before(html);
+    } else {
+      anchor.after(html);
+    }
     return;
   }
 

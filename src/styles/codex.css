@@ -80,41 +80,18 @@ body {
 }
 
 /* ═══════════════════════════════════════════
-   Kadence Row/Column Layout (missing from static export)
-   The original kadence-blocks-rowlayout and kadence-blocks-column
-   CSS files were not included in the WP static export. This
-   provides the essential flex layout that those files supply.
+   Kadence Row/Column Layout — rely on original Kadence CSS.
+   Kadence's own stylesheets (loaded from /site-assets/) set:
+     .kt-row-column-wrap { display: grid; grid-template-columns: minmax(0,1fr) }
+   and per-row inline <style> blocks emit desktop/tablet breakpoints:
+     @media (min-width: 1025px) { .kb-row-layout-id_XXX > .kt-row-column-wrap {
+       grid-template-columns: repeat(N, 1fr) } }
+   We intentionally DO NOT override these — earlier attempts to "polyfill"
+   with display:flex broke every multi-column row on the site. The only
+   additions we keep here are visual spacing between rows and a padding
+   reset for nested theme-content-width containers.
    ═══════════════════════════════════════════ */
 .kb-row-layout-wrap { margin-bottom: 20px; }
-.kt-row-column-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-.kt-row-column-wrap > .wp-block-kadence-column {
-  flex: 1 1 0%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-.kt-inside-inner-col { padding: 0 10px; }
-
-/* Single-column rows don't need flex */
-.kt-has-1-columns { display: block; }
-.kt-has-1-columns > .wp-block-kadence-column { width: 100%; }
-
-/* Auto-stacking: min-width forces wrapping when container is too narrow. */
-.kt-has-2-columns > .wp-block-kadence-column { min-width: min(100%, 200px); }
-.kt-has-3-columns > .wp-block-kadence-column { min-width: min(100%, 120px); }
-.kt-has-4-columns > .wp-block-kadence-column { min-width: min(100%, 60px); }
-.kt-has-5-columns > .wp-block-kadence-column { min-width: min(100%, 50px); }
-
-/* Golden ratio layouts (Kadence ~33/66 split) */
-.kt-row-layout-right-golden { gap: 20px; }
-.kt-row-layout-right-golden > .wp-block-kadence-column:first-child { flex: 1 0 30%; min-width: min(100%, 180px); }
-.kt-row-layout-right-golden > .wp-block-kadence-column:last-child  { flex: 2 0 60%; min-width: min(100%, 200px); }
-.kt-row-layout-left-golden { gap: 20px; }
-.kt-row-layout-left-golden > .wp-block-kadence-column:first-child { flex: 2 0 60%; min-width: min(100%, 200px); }
-.kt-row-layout-left-golden > .wp-block-kadence-column:last-child  { flex: 1 0 30%; min-width: min(100%, 180px); }
 
 /* Nested kb-theme-content-width: remove padding that only makes sense at page level */
 .wp-block-kadence-column .kb-theme-content-width {
@@ -123,38 +100,331 @@ body {
   max-width: none;
 }
 
-/* ── Homepage section overrides (original per-column widths lost in export) ── */
-/* "WHAT MAKE US DIFFERENT" — heading | text | 4 features */
-.kb-row-layout-id_774394-c4 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(1) { flex: 0 0 18%; }
-.kb-row-layout-id_774394-c4 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(2) { flex: 0 0 22%; }
-.kb-row-layout-id_774394-c4 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(3) { flex: 1 0 55%; }
-/* "CERTIFICATIONS" — heading | cert logos | stats */
-.kb-row-layout-id_8bdf38-ac > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(1) { flex: 0 0 18%; }
-.kb-row-layout-id_8bdf38-ac > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(2) { flex: 0 0 24%; }
-.kb-row-layout-id_8bdf38-ac > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(3) { flex: 1 0 53%; }
-/* "VALUABLE PARTNERS" — heading | partner logos | testimonials */
-.kb-row-layout-id_3a1960-e8 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(1) { flex: 0 0 18%; }
-.kb-row-layout-id_3a1960-e8 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(2) { flex: 0 0 24%; }
-.kb-row-layout-id_3a1960-e8 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(3) { flex: 1 0 53%; }
-/* Override excessive padding on partner logos column */
-.kadence-column_dde58a-ba > .kt-inside-inner-col { padding-left: 10px !important; padding-right: 10px !important; }
-/* Shrink section headings in narrow first columns so words don't break */
-.kb-row-layout-id_774394-c4 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(1) h2,
-.kb-row-layout-id_3a1960-e8 > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(1) h2 {
-  font-size: 28px;
-  line-height: 1.2;
-}
-.kb-row-layout-id_8bdf38-ac > .kt-row-column-wrap > .wp-block-kadence-column:nth-child(1) h2 {
-  font-size: 24px;
-  line-height: 1.2;
+/* ═══════════════════════════════════════════
+   Home — "Our Capabilities" stats grid (3×2 card grid)
+   ───────────────────────────────────────────
+   Scope: the Kadence row that wraps the six stat cards (f2a65f-e2) and
+   the 3-col row that lays them out (a63b0a-6e). Each stat card is itself a
+   nested 2-col row whose inline Kadence CSS sets
+   `grid-template-columns: repeat(2, 1fr)` (image | number+label). Without
+   intervention the text side is too narrow, `kb-section-dir-horizontal`
+   flex-rows h2 + p, and "305+" / "Automated Production Lines" end up
+   wrapping letter-by-letter. We keep the Kadence DOM intact and flip
+   each card's 2-col grid into a stacked layout (icon → number → label),
+   centered, with light card styling.
+   ═══════════════════════════════════════════ */
+
+/* Flip each stat card from 2-col (image | text) to stacked (image / text) */
+.kb-row-layout-id_717fc7-48 > .kt-row-column-wrap,
+.kb-row-layout-id_7fea3b-fc > .kt-row-column-wrap,
+.kb-row-layout-id_999b4d-77 > .kt-row-column-wrap,
+.kb-row-layout-id_a51fc7-b7 > .kt-row-column-wrap,
+.kb-row-layout-id_9476db-93 > .kt-row-column-wrap,
+.kb-row-layout-id_09ebce-d2 > .kt-row-column-wrap {
+  grid-template-columns: 1fr !important;
+  justify-items: center !important;
+  row-gap: 6px !important;
+  column-gap: 0 !important;
+  padding: 24px 16px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  height: 100%;
 }
 
-/* Mobile: stack columns vertically */
-@media (max-width: 767px) {
-  .kt-row-column-wrap:not(.kt-mobile-layout-row) { flex-direction: column; }
-  .kt-row-column-wrap:not(.kt-mobile-layout-row) > .wp-block-kadence-column {
-    flex-basis: 100% !important;
-    min-width: 100% !important;
+/* Card container visual treatment */
+.kb-row-layout-id_a63b0a-6e .kb-row-layout-wrap {
+  border-radius: 12px;
+  background: #fafaf6;
+  border: 1px solid #e8e5dc;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  height: 100%;
+  margin-bottom: 0;
+}
+.kb-row-layout-id_a63b0a-6e .kb-row-layout-wrap:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -16px rgba(20, 20, 20, 0.22);
+  border-color: #d9d4c2;
+}
+
+/* Icon: fixed-size square, centered, contained */
+.kb-row-layout-id_f2a65f-e2 figure.wp-block-image {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.kb-row-layout-id_f2a65f-e2 figure.wp-block-image img {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  max-width: none;
+  border-radius: 8px;
+}
+
+/* Override kb-section-dir-horizontal on the text-side column (first 2 cards)
+   so h2 + p stack instead of flex-rowing */
+.kb-row-layout-id_f2a65f-e2 .kb-section-dir-horizontal > .kt-inside-inner-col,
+.kb-row-layout-id_f2a65f-e2 .kb-section-dir-horizontal {
+  display: block;
+  text-align: center;
+}
+
+/* Number: prominent, single-line */
+.kb-row-layout-id_f2a65f-e2 h2.wp-block-heading {
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 2.75vw, 2.75rem);
+  line-height: 1;
+  margin: 4px 0 2px 0;
+  font-weight: 700;
+  text-align: center !important;
+  color: #141414;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+.kb-row-layout-id_f2a65f-e2 h2.wp-block-heading strong {
+  font-weight: inherit;
+}
+
+/* Label: small, secondary, center-aligned, no forced left */
+.kb-row-layout-id_f2a65f-e2 p {
+  font-size: 0.9rem;
+  line-height: 1.35;
+  margin: 0;
+  color: #5a5a5a;
+  text-align: center !important;
+  max-width: 22ch;
+}
+.kb-row-layout-id_f2a65f-e2 p strong {
+  color: #141414;
+  font-weight: 600;
+}
+
+/* Tighten the outer 3-col grid's gap for a nicer card rhythm */
+.kb-row-layout-id_a63b0a-6e > .kt-row-column-wrap {
+  column-gap: 20px !important;
+  row-gap: 20px !important;
+}
+
+/* Responsive: 3 → 2 → 1 columns */
+@media (max-width: 900px) {
+  .kb-row-layout-id_a63b0a-6e > .kt-row-column-wrap {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 480px) {
+  .kb-row-layout-id_a63b0a-6e > .kt-row-column-wrap {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Home — section header decoration icon (rfid_blue.jpg)
+   ───────────────────────────────────────────
+   Decorative 55×55 accent used next to section headings
+   (NEW IN, BEST COLLECTION, MORE SKUs, CERTIFICATIONS,
+   VALUABLE PARTNERS, EASY PROCESS). Without a width cap,
+   the global `img { max-width: 100% }` stretches it to the
+   full column width — that's the giant cyan square.
+   ═══════════════════════════════════════════ */
+img[src*="rfid_blue"] {
+  width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  object-fit: contain !important;
+  border-radius: 4px;
+  display: inline-block;
+}
+/* Keep the figure wrapper from adding extra gutter */
+figure.wp-block-image:has(img[src*="rfid_blue"]) {
+  margin: 0 !important;
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Header row layouts (icon|heading at 1fr|2fr): tighten to a
+   centered [icon ⟶ heading] pair so the 48px accent sits next
+   to its title instead of floating in a 400px empty column. */
+.kb-row-layout-id_76dae6-de > .kt-row-column-wrap,
+.kb-row-layout-id_ae5786-81 > .kt-row-column-wrap,
+.kb-row-layout-id_33738b-52 > .kt-row-column-wrap {
+  grid-template-columns: auto auto !important;
+  justify-content: center !important;
+  align-items: center !important;
+  column-gap: 20px !important;
+  padding: 40px 0 16px !important;
+}
+.kb-row-layout-id_76dae6-de .kb-section-dir-horizontal > .kt-inside-inner-col,
+.kb-row-layout-id_ae5786-81 .kb-section-dir-horizontal > .kt-inside-inner-col,
+.kb-row-layout-id_33738b-52 .kb-section-dir-horizontal > .kt-inside-inner-col {
+  display: flex !important;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 !important;
+}
+.kb-row-layout-id_76dae6-de h2.wp-block-heading,
+.kb-row-layout-id_ae5786-81 h2.wp-block-heading,
+.kb-row-layout-id_33738b-52 h2.wp-block-heading {
+  margin: 0;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+/* ═══════════════════════════════════════════
+   Home — "Trusted by Clients Worldwide" + testimonials
+   ───────────────────────────────────────────
+   The wrapping column `kadence-column_1cf711-b4` has
+   `kb-section-dir-horizontal`, which places the heading AND
+   the 3-testimonial carousel on the same flex row. That
+   crushes the carousel to ~300px — cards become ~90px wide
+   and quote text wraps letter-by-letter. Force vertical stack
+   so the carousel can use the full row width, then turn the
+   carousel into a clean static 3-col grid (the snapshot's
+   Splide JS may or may not run; either way we look correct).
+   ═══════════════════════════════════════════ */
+.kadence-column_1cf711-b4.kb-section-dir-horizontal > .kt-inside-inner-col,
+.kadence-column_1cf711-b4 > .kt-inside-inner-col {
+  display: block !important;
+  width: 100%;
+}
+
+/* Section heading — center + airy spacing */
+.kadence-column_f9c71e-2f h3.wp-block-heading {
+  text-align: center;
+  font-family: "Lora", Georgia, "Times New Roman", serif;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 600;
+  color: #141414;
+  margin: 0 auto 32px;
+  max-width: 720px;
+}
+
+/* Static 3-col grid of testimonials.
+   `render-snapshot.ts` strips the `kt-blocks-carousel-init` class so
+   Kadence's Splide JS never bootstraps this wrapper and the default
+   `:not(.splide-initialized) .kt-blocks-testimonial-carousel-item { display: none }`
+   rule no longer applies (items 2 & 3 stay visible). The former carousel
+   container survives as the single direct <div> child of
+   `.kt-blocks-testimonials-inner-wrap` — we grid-ify that. */
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonials-inner-wrap > div {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 24px !important;
+  padding: 0 !important;
+  width: 100%;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonial-carousel-item {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0;
+}
+
+/* Testimonial card polish */
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-item-wrap {
+  background: #ffffff !important;
+  border: 1px solid #e8e5dc !important;
+  border-radius: 12px !important;
+  padding: 32px 24px !important;
+  text-align: center;
+  min-height: auto !important;
+  max-width: 100% !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  height: 100%;
+  box-shadow: 0 1px 2px rgba(20, 20, 20, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-item-wrap:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -16px rgba(20, 20, 20, 0.22);
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Avatar — circular, 80×80 */
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-media-wrap,
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-media-inner-wrap,
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kadence-testimonial-image-intrisic {
+  width: 80px !important;
+  height: 80px !important;
+  flex: 0 0 80px;
+  margin: 0 auto 4px;
+  padding: 0 !important;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-image {
+  width: 80px !important;
+  height: 80px !important;
+  border-radius: 50% !important;
+}
+
+/* Title */
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-title-wrap {
+  width: 100%;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-title {
+  font-family: "Lora", Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 4px 0 6px !important;
+  color: #141414;
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* Quote body */
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-content-wrap {
+  width: 100%;
+  flex-grow: 1;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-content {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #4a4a4a;
+  text-align: center;
+  margin: 0;
+}
+
+/* Author name + location */
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-meta-wrap {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #efece3;
+  width: 100%;
+  text-align: center;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-name-wrap,
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-occupation-wrap {
+  text-align: center;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-name {
+  font-family: "Lora", Georgia, serif;
+  font-weight: 600;
+  color: #141414;
+  font-size: 1rem;
+}
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-occupation {
+  font-size: 0.8rem;
+  color: #888;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Responsive: 3 → 2 → 1 */
+@media (max-width: 900px) {
+  .kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonials-inner-wrap > div {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 600px) {
+  .kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonials-inner-wrap > div {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -1647,6 +1917,169 @@ a[href="#main"]:focus {
   .ind-hero-grid { grid-template-columns: 1fr; }
   .ind-header h1 { font-size: 1.6rem; }
   .ind-product-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Catalog page (/products/all/) — floating left rail, full-width content ── */
+/* The category navigator is a fixed rail pinned to the viewport's left edge.
+   All other page content (header, result count, product sections, support CTA)
+   stretches to the full width of the page — the rail does NOT pull the content
+   into a narrower flex column. The rail is hidden below 1280px because there
+   isn't enough horizontal room for an overlay without colliding with content. */
+.codex-catalog-rail {
+  position: fixed;
+  top: 120px;
+  left: 1rem;
+  width: 220px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  z-index: 30;
+}
+.codex-catalog-rail .ind-sidebar__nav {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--codex-border-light);
+  padding: 0.75rem 0;
+  box-shadow: 0 2px 12px rgba(41, 28, 14, 0.04);
+}
+.codex-catalog-rail .ind-sidebar__title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--codex-text-subtle);
+  padding: 0.5rem 1.1rem 0.6rem;
+  border-bottom: 1px solid var(--codex-border-light);
+}
+.codex-catalog-rail .ind-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  text-decoration: none;
+  color: var(--codex-text);
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.15s;
+  border-left: 3px solid transparent;
+}
+.codex-catalog-rail .ind-sidebar__link:hover {
+  background: var(--codex-bg-warm);
+  border-left-color: var(--codex-gold);
+}
+.codex-catalog-rail .ind-sidebar__link.active {
+  background: var(--codex-bg-warm);
+  border-left-color: var(--codex-gold);
+  color: var(--codex-gold);
+  font-weight: 600;
+}
+.codex-catalog-rail .ind-sidebar__emoji { font-size: 1rem; flex-shrink: 0; }
+.codex-catalog-rail .ind-sidebar__label { flex: 1; line-height: 1.3; }
+.codex-catalog-rail .ind-sidebar__count {
+  font-size: 0.72rem;
+  color: var(--codex-text-subtle);
+  background: var(--codex-bg-warm);
+  border-radius: 99px;
+  padding: 0.15rem 0.5rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* Product-family sections stretch full width; separate with subtle rule. */
+.codex-catalog-content .codex-catalog-category {
+  margin-bottom: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--codex-border-light);
+}
+.codex-catalog-content .codex-catalog-category:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Floating toggle button + close button — hidden at wide viewports, where
+   the rail is always visible. At ≤1279px the rail collapses and the button
+   appears. Clicking either toggles the rail as an overlay. */
+.codex-catalog-rail-toggle {
+  display: none;
+  position: fixed;
+  top: 100px;
+  left: 1rem;
+  z-index: 40;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.95rem;
+  background: var(--codex-gold, #c89d2d);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(41, 28, 14, 0.18);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.codex-catalog-rail-toggle:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(41, 28, 14, 0.24); }
+.codex-catalog-rail-toggle__icon { font-size: 1.05rem; line-height: 1; }
+.codex-catalog-rail-toggle__label { line-height: 1; }
+
+.codex-catalog-rail-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(41, 28, 14, 0.35);
+  z-index: 35;
+  animation: codex-rail-fade-in 0.15s ease;
+}
+@keyframes codex-rail-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.codex-catalog-rail__close {
+  display: none;
+  position: absolute;
+  top: 0.35rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  color: var(--codex-text-subtle, #7a6a55);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+}
+.codex-catalog-rail__close:hover { color: var(--codex-text, #291c0e); }
+
+body.codex-catalog-rail-locked { overflow: hidden; }
+
+/* Narrow viewports: hide the fixed rail by default, show the toggle button.
+   When .is-open is added by JS, the rail slides in as an overlay panel. */
+@media (max-width: 1279px) {
+  .codex-catalog-rail {
+    display: none;
+    top: 0;
+    left: 0;
+    width: 280px;
+    max-width: 82vw;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    padding-top: 2.5rem;
+    box-shadow: 8px 0 32px rgba(41, 28, 14, 0.18);
+    z-index: 36;
+    animation: codex-rail-slide-in 0.22s ease;
+  }
+  .codex-catalog-rail.is-open { display: block; }
+  .codex-catalog-rail .ind-sidebar__nav {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding: 0.5rem 0 1rem;
+  }
+  .codex-catalog-rail__close { display: block; }
+  .codex-catalog-rail-toggle { display: inline-flex; }
+  .codex-catalog-rail-backdrop:not([hidden]) { display: block; }
+}
+@keyframes codex-rail-slide-in {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
 }
 
 /* Keep old classes for backward compat */
@@ -3662,4 +4095,248 @@ a[href="#main"]:focus {
 @media (max-width: 480px) {
   .codex-catalog-category .products { grid-template-columns: 1fr; }
   .codex-catalog-featured { grid-column: span 1; }
+}
+
+/* ═══════════════════════════════════════════
+   Codex Mega-Menu — Industries / Solutions / Resources dropdowns
+   Injected by render-snapshot.ts into #primary-menu + #mobile-menu.
+   ═══════════════════════════════════════════ */
+
+/* ── Desktop: show sub-menu on hover / focus-within ── */
+@media (min-width: 768px) {
+  #primary-menu > li.codex-mega-item {
+    position: relative;
+  }
+
+  /* Override the blanket ".sub-menu { display: none }" for our items */
+  #primary-menu > li.codex-mega-item > .codex-mega-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    z-index: 99999;
+    margin: 0;
+    padding: 1.25rem 1.5rem;
+    list-style: none;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(41, 28, 14, 0.16);
+  }
+
+  /* Simple (single column) dropdown: Resources */
+  #primary-menu > li.codex-mega-item--simple > .codex-mega-dropdown {
+    left: 0;
+    min-width: 260px;
+    padding: 0.5rem 0;
+  }
+
+  /* Mega dropdown: Industries, Solutions */
+  #primary-menu > li.codex-mega-item--mega > .codex-mega-dropdown {
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(90vw, 760px);
+  }
+
+  #primary-menu > li.codex-mega-item--solutions > .codex-mega-dropdown {
+    width: min(94vw, 980px);
+  }
+
+  /* Products mega: 6 family columns → 3×2 grid by default, needs extra width. */
+  #primary-menu > li.codex-mega-item--products > .codex-mega-dropdown {
+    width: min(94vw, 880px);
+  }
+
+  /* Show on hover + focus-within */
+  #primary-menu > li.codex-mega-item:hover > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item:focus-within > .codex-mega-dropdown {
+    display: block;
+  }
+
+  /* Dropdown arrow — override "display: none" from line 1377 */
+  #primary-menu > li.codex-mega-item .dropdown-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.25rem;
+    transition: transform 160ms ease;
+  }
+  #primary-menu > li.codex-mega-item:hover .dropdown-nav-toggle {
+    transform: rotate(180deg);
+  }
+  #primary-menu > li.codex-mega-item .dropdown-nav-toggle .kadence-svg-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ── Mega layout: groups as columns (only when open; default is display:none) ── */
+  #primary-menu > li.codex-mega-item--mega:hover > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item--mega:focus-within > .codex-mega-dropdown {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.25rem 2rem;
+  }
+  #primary-menu > li.codex-mega-item--solutions:hover > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item--solutions:focus-within > .codex-mega-dropdown {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .codex-mega-group {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .codex-mega-heading {
+    display: block;
+    margin: 0 0 0.5rem;
+    padding-bottom: 0.4rem;
+    font-family: var(--codex-font-heading, "Lora", serif);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--codex-gold, #b08d57);
+    border-bottom: 1px solid rgba(176, 141, 87, 0.2);
+  }
+
+  .codex-mega-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .codex-mega-list > li {
+    list-style: none;
+    margin: 0;
+  }
+
+  .codex-mega-list > li > a {
+    display: block;
+    padding: 0.35rem 0;
+    font-size: 0.86rem;
+    line-height: 1.35;
+    color: var(--codex-text, #1a1a1a) !important;
+    text-decoration: none !important;
+    transition: color 160ms ease;
+  }
+
+  .codex-mega-list > li > a:hover,
+  .codex-mega-list > li > a:focus {
+    color: var(--codex-gold, #b08d57) !important;
+  }
+
+  /* Simple dropdown (Resources) link styling */
+  .codex-mega-item--simple .codex-mega-dropdown .codex-mega-list > li > a {
+    padding: 0.6rem 1.1rem;
+    font-size: 0.9rem;
+  }
+  .codex-mega-item--simple .codex-mega-dropdown .codex-mega-list > li > a:hover {
+    background: rgba(176, 141, 87, 0.08);
+  }
+}
+
+/* ── Narrower desktop: shrink solutions mega to 3 cols ── */
+@media (min-width: 768px) and (max-width: 1100px) {
+  #primary-menu > li.codex-mega-item--solutions:hover > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item--solutions:focus-within > .codex-mega-dropdown {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    width: min(94vw, 820px);
+  }
+}
+
+/* ── Mobile: flatten into accordion using Kadence's existing toggle ── */
+@media (max-width: 767px) {
+  #mobile-menu .codex-mega-item .sub-menu .codex-mobile-heading {
+    padding: 0.9rem 1rem 0.3rem;
+    font-family: var(--codex-font-heading, "Lora", serif);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--codex-gold, #b08d57);
+    pointer-events: none;
+  }
+  #mobile-menu .codex-mega-item .codex-mobile-overview a {
+    font-weight: 600;
+    color: var(--codex-gold, #b08d57) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Codex Footer Nav — 5-column link directory above bottom strip
+   ═══════════════════════════════════════════ */
+
+.codex-footer-nav {
+  background: var(--codex-dark, #1a1a1a);
+  color: rgba(255, 255, 255, 0.88);
+  padding: 3rem 1.25rem 2.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.codex-footer-nav__inner {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2rem 2.25rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.codex-footer-nav__col {
+  min-width: 0;
+}
+
+.codex-footer-nav__heading {
+  margin: 0 0 0.9rem;
+  font-family: var(--codex-font-heading, "Lora", serif);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--codex-gold, #d4a755);
+}
+
+.codex-footer-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.codex-footer-nav__list > li {
+  list-style: none;
+  margin: 0 0 0.5rem;
+}
+
+.codex-footer-nav__list > li > a {
+  display: inline-block;
+  padding: 0.15rem 0;
+  font-size: 0.87rem;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.78) !important;
+  text-decoration: none !important;
+  transition: color 160ms ease;
+}
+
+.codex-footer-nav__list > li > a:hover,
+.codex-footer-nav__list > li > a:focus {
+  color: var(--codex-gold, #d4a755) !important;
+}
+
+@media (max-width: 1100px) {
+  .codex-footer-nav__inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .codex-footer-nav {
+    padding: 2rem 1.25rem 1.25rem;
+  }
+  .codex-footer-nav__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+  .codex-footer-nav__heading {
+    font-size: 0.78rem;
+    margin-bottom: 0.6rem;
+  }
 }

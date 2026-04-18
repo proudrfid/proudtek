@@ -897,7 +897,10 @@ function normalizePageBody($body: CheerioAPI, page: SnapshotPage, context: PageC
 
   clarifyBuyerFacingCopy($body);
   normalizeGlobalInquiryEntry($body, page);
-  injectIndustriesMenu($body, page);
+  // Legacy injectIndustriesMenu() removed — primary-menu Industries/Solutions/Resources
+  // dropdowns are now fully provided by injectCustomNav() in render-snapshot.ts
+  // (driven by menu-structure.ts). Re-enabling this here produced a DUPLICATE
+  // "Industries" item beside the new mega-menu.
   refreshNormalizedImageContext($body, page.route, context);
   applyImageAccessibility($body, context);
 }
@@ -1057,153 +1060,14 @@ function rewriteFooterInquirySection($body: CheerioAPI): void {
   footerInfo.prepend(rfqHtml);
 }
 
-/* ── Industries mega-menu injection ──────────────────────────────────── */
-const INDUSTRIES_MENU_GROUPS: Array<{ title: string; href: string; items: Array<{ href: string; label: string }> }> = [
-  {
-    title: "Hospitality",
-    href: "/industries/hospitality/",
-    items: [
-      { href: "/products/rfid-cards/mifare-desfire-ev3-cards/", label: "Hotel Key Cards" },
-      { href: "/product/hotel-key-cards/", label: "Hotel RFID Cards" },
-      { href: "/product/rfid-wristbands-for-hotels/", label: "Hotel Wristbands" },
-      { href: "/product/rfid-laundry-tags/", label: "Linen Tracking Tags" },
-    ],
-  },
-  {
-    title: "Retail & Apparel",
-    href: "/industries/retail-apparel/",
-    items: [
-      { href: "/products/rfid-labels/rfid-garment-source-tag/", label: "Garment Source Tags" },
-      { href: "/products/rfid-tags/uhf-rfid-apparel-hang-tag/", label: "Apparel Hang Tags" },
-      { href: "/products/rfid-tags/uhf-rfid-woven-care-label/", label: "Woven Care Labels" },
-      { href: "/products/rfid-tags/uhf-rfid-hard-tag/", label: "Anti-Theft Hard Tags" },
-      { href: "/products/rfid-tags/rfid-jewelry-tag/", label: "Jewelry Tags" },
-    ],
-  },
-  {
-    title: "Brand Protection",
-    href: "/industries/brand-protection/",
-    items: [
-      { href: "/products/rfid-labels/nfc-sneaker-authentication-tag/", label: "Sneaker Authentication" },
-      { href: "/products/rfid-labels/nfc-luxury-handbag-tag/", label: "Luxury Bag Authentication" },
-      { href: "/products/rfid-labels/nfc-cosmetics-authentication-label/", label: "Cosmetics Authentication" },
-      { href: "/products/rfid-labels/nfc-wine-bottle-tag/", label: "Wine & Spirits Tags" },
-      { href: "/products/rfid-labels/nfc-warranty-seal-tag/", label: "Warranty Seal Tags" },
-    ],
-  },
-  {
-    title: "Events & Venues",
-    href: "/industries/events-venues/",
-    items: [
-      { href: "/product/rfid-wristbands-for-events/", label: "Event Wristbands" },
-      { href: "/products/rfid-wristbands/pvc-rfid-wristband/", label: "Water Park Wristbands" },
-      { href: "/products/rfid-wristbands/nfc-payment-wristband/", label: "Cashless Payment Bands" },
-      { href: "/products/rfid-tags/rfid-race-timing-tag/", label: "Race Timing Tags" },
-    ],
-  },
-  {
-    title: "Healthcare",
-    href: "/industries/healthcare/",
-    items: [
-      { href: "/products/rfid-wristbands/hospital-patient-id-wristband/", label: "Patient ID Wristbands" },
-      { href: "/products/rfid-tags/rfid-surgical-instrument-tag/", label: "Surgical Instrument Tags" },
-      { href: "/products/rfid-tags/rfid-blood-bag-tag/", label: "Blood Bag Tags" },
-      { href: "/products/rfid-labels/rfid-medication-vial-label/", label: "Medication Vial Labels" },
-      { href: "/products/rfid-labels/rfid-cryogenic-specimen-label/", label: "Cryogenic Specimen Labels" },
-    ],
-  },
-  {
-    title: "Logistics & Supply Chain",
-    href: "/industries/logistics/",
-    items: [
-      { href: "/products/rfid-labels/uhf-rfid-paper-label/", label: "RFID Shipping Labels" },
-      { href: "/products/rfid-tags/rfid-pallet-tag/", label: "Pallet Tags" },
-      { href: "/products/rfid-tags/rfid-returnable-container-tag/", label: "Returnable Container Tags" },
-      { href: "/products/rfid-tags/rfid-bolt-seal/", label: "Container Bolt Seals" },
-    ],
-  },
-  {
-    title: "Industrial & Manufacturing",
-    href: "/industries/industrial/",
-    items: [
-      { href: "/products/rfid-tags/rfid-pcb-screw-mount-tag/", label: "PCB Screw-Mount Tags" },
-      { href: "/products/rfid-tags/rfid-high-temperature-ceramic-tag/", label: "High-Temp Ceramic Tags" },
-      { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-Metal Tags" },
-      { href: "/products/rfid-tags/rfid-gas-cylinder-tag/", label: "Gas Cylinder Tags" },
-      { href: "/products/rfid-tags/rfid-tool-tracking-tag/", label: "Tool Tracking Tags" },
-    ],
-  },
-  {
-    title: "EU Compliance",
-    href: "/industries/eu-compliance/",
-    items: [
-      { href: "/products/rfid-labels/nfc-digital-product-passport-tag/", label: "Digital Product Passport" },
-      { href: "/products/rfid-labels/nfc-battery-passport-tag/", label: "Battery Passport Tags" },
-      { href: "/products/rfid-labels/ntag424-dna-tamper-evident-tag/", label: "NTAG424 DNA Tags" },
-    ],
-  },
-];
-
-function injectIndustriesMenu($body: CheerioAPI, page: SnapshotPage): void {
-  // Build a clean, simple dropdown — just 8 industry links, no nested products
-  const simpleItems = INDUSTRIES_MENU_GROUPS.map((group) =>
-    `<li class="menu-item"><a href="${group.href}">${group.title}</a></li>`
-  ).join("");
-
-  const industriesLi = `<li class="menu-item menu-item-has-children codex-industries-menu"
-    onmouseenter="this.querySelector('.codex-industries-drop').style.display='block';this.querySelector('a').setAttribute('aria-expanded','true')"
-    onmouseleave="this.querySelector('.codex-industries-drop').style.display='none';this.querySelector('a').setAttribute('aria-expanded','false')">
-    <a href="/industries/" aria-haspopup="true" aria-expanded="false">Industries</a>
-    <ul class="sub-menu codex-industries-drop" role="menu" style="display:none;position:absolute;top:100%;left:0;z-index:9999;background:#fff;min-width:240px;box-shadow:0 8px 24px rgba(0,0,0,.12);border-radius:8px;padding:8px 0;list-style:none;">${simpleItems}</ul>
-  </li>`;
-
-  // Desktop: insert after PRODUCTS in the primary menu
-  const desktopMenus = $body("#primary-menu, #header-menu");
-  desktopMenus.each((_, menu) => {
-    const $menu = $body(menu);
-    // Skip if already injected
-    if ($menu.find(".codex-industries-menu").length) return;
-    // Find the PRODUCTS menu item (first item or one linking to /products/)
-    const productsItem = $menu.children('li').filter((_, li) => {
-      const link = $body(li).children("a").first();
-      const href = link.attr("href") || "";
-      const text = (link.text() || "").trim().toUpperCase();
-      return text === "PRODUCTS" || href.includes("/products/");
-    }).first();
-    if (productsItem.length) {
-      productsItem.after(industriesLi);
-    }
-  });
-
-  // Mobile: insert after PRODUCTS in mobile menu
-  const mobileMenu = $body("#mobile-menu");
-  if (mobileMenu.length && !mobileMenu.find(".codex-industries-menu").length) {
-    // Build simplified mobile version (flat list of groups)
-    const mobileSubItems = INDUSTRIES_MENU_GROUPS.map((group) => {
-      const links = group.items
-        .map((item) => `<li class="menu-item"><a href="${item.href}">${item.label}</a></li>`)
-        .join("");
-      return `<li class="menu-item menu-item-has-children">
-        <a href="#">${group.title}</a>
-        <ul class="sub-menu">${links}</ul>
-      </li>`;
-    }).join("");
-
-    const mobileLi = `<li class="menu-item menu-item-has-children codex-industries-menu">
-      <a href="/industries/">Industries</a>
-      <ul class="sub-menu">${mobileSubItems}</ul>
-    </li>`;
-
-    const mobileProductsItem = mobileMenu.children('li').filter((_, li) => {
-      const link = $body(li).children("a").first();
-      const text = (link.text() || "").trim().toUpperCase();
-      return text === "PRODUCTS";
-    }).first();
-    if (mobileProductsItem.length) {
-      mobileProductsItem.after(mobileLi);
-    }
-  }
-}
+/* ── Industries mega-menu injection (REMOVED) ──────────────────────────
+ * This legacy injection path has been replaced by injectCustomNav() in
+ * render-snapshot.ts, which is driven by menu-structure.ts and handles
+ * Industries/Solutions/Resources as a unified mega-menu. Keeping the old
+ * injector here caused a DUPLICATE "Industries" top-level item on every
+ * page (the legacy simple dropdown plus the new mega-menu item).
+ * INDUSTRIES_MENU_GROUPS + injectIndustriesMenu() were removed intentionally.
+ * ──────────────────────────────────────────────────────────────────── */
 
 function normalizeHomeHeroInquiryButtons($body: CheerioAPI): void {
   $body('.wp-block-kadence-advancedbtn a[href="/contact/"], .wp-block-kadence-advancedbtn a[href="https://proudtek.com/contact/"]')
@@ -1679,19 +1543,27 @@ function normalizeCollectionBody($body: CheerioAPI, context: PageContext): void 
     return;
   }
 
+  // Inject the "Need help choosing?" CTA + "How to navigate" guidance at the
+  // BOTTOM of the page, after all product category sections — so shoppers
+  // browse the catalog first and fall into the help block only if they scroll
+  // past without finding what they need.
+  const mainEl = $body("main#main, main.site-main, main").first();
+  if (mainEl.length) {
+    mainEl.append(supportHtml);
+    return;
+  }
+
+  // Fallbacks — try to place after the last product list, else after header.
+  const productLists = $body("ul.products, .products");
+  if (productLists.length) {
+    productLists.last().after(supportHtml);
+    return;
+  }
+
   const header = $body(".woocommerce-products-header").first();
   if (header.length) {
     header.after(supportHtml);
-    return;
   }
-
-  const products = $body("ul.products, .products").first();
-  if (products.length) {
-    products.before(supportHtml);
-    return;
-  }
-
-  $body("main").first().prepend(supportHtml);
 }
 
 function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context: PageContext): void {
@@ -4298,6 +4170,17 @@ function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Record<str
   }
 
   if (context.kind === "article" && context.articleMeta) {
+    const authorSchema: Record<string, unknown> = {
+      "@type": "Person",
+      name: context.articleMeta.authorName,
+      url: context.articleMeta.authorUrl,
+      ...(context.articleMeta.authorTitle ? { jobTitle: context.articleMeta.authorTitle } : {}),
+      ...(context.articleMeta.authorExpertise && context.articleMeta.authorExpertise.length > 0
+        ? { knowsAbout: context.articleMeta.authorExpertise }
+        : {}),
+      worksFor: { "@id": organizationId },
+    };
+
     entries.push({
       "@context": "https://schema.org",
       "@type": "Article",
