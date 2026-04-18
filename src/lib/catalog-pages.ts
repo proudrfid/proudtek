@@ -4,6 +4,7 @@ import { getCollection } from "astro:content";
 import type { SiteData, SnapshotPage } from "./site-data";
 import { loadPageFromDisk } from "./site-data";
 import { html, raw } from "./html";
+import { ROUTE_CANONICAL_OVERRIDES } from "./route-overrides";
 
 /* ── Catalog hero-image overrides ──────────────────────────────────────
  * Many WordPress product pages share the same generic banner image.
@@ -457,8 +458,14 @@ async function pickCatalogTemplate(siteData: SiteData): Promise<SnapshotPage | u
 }
 
 async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduct[]> {
-  // Load WP product pages from disk for image/summary extraction
-  const wpProductStubs = siteData.pages.filter((page) => page.route.startsWith("/product/"));
+  // Load WP product pages from disk for image/summary extraction.
+  // WP stubs that have a canonical override (see ROUTE_CANONICAL_OVERRIDES in
+  // route-overrides.ts) are dropped from the filter grid on W3-4d⁵ — the
+  // richer content-collection landing takes their slot. The stub page itself
+  // stays reachable as a soft-landing so existing inbound links don't 404.
+  const wpProductStubs = siteData.pages.filter(
+    (page) => page.route.startsWith("/product/") && !ROUTE_CANONICAL_OVERRIDES[page.route],
+  );
   const wpProducts: CatalogProduct[] = [];
   for (const stub of wpProductStubs) {
     try {
