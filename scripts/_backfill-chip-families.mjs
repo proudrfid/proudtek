@@ -49,6 +49,9 @@ const CHIP_RULES = [
 const TARGET_DIRS = [
   "src/content/editorial/products/rfid-keyfobs",
   "src/content/editorial/products/rfid-wristbands",
+  "src/content/editorial/products/rfid-cards",
+  "src/content/editorial/products/rfid-labels",
+  "src/content/editorial/products/rfid-tags",
 ];
 
 function detectChipFamilies(doc) {
