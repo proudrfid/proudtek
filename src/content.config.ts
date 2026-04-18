@@ -179,6 +179,8 @@ const editorialSchema = z.object({
   reviewedAt: z.string().optional(),
   /** Authoritative sources cited by this page. Rendered as a uniform citations block + Article.citation JSON-LD. */
   sources: z.array(sourceSchema).optional(),
+  /** Industry slugs (matching `src/content/editorial/industries/<slug>.json`) where this SKU is deployed. Renders a "Used in these industries" card grid on SKU pages. */
+  relatedIndustries: z.array(z.string()).optional(),
 });
 
 /* ── Authors collection schema (added 2026-04) ─────────────────────── */

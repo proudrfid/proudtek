@@ -81,6 +81,8 @@ export interface EditorialDefinition {
     accessedAt?: string;
     note?: string;
   }>;
+  /** Industry slugs where this SKU is deployed (e.g. ["retail-apparel", "hospitality"]). */
+  relatedIndustries?: string[];
 }
 
 const EDITORIAL_LINK_REWRITES: Record<string, EditorialLink> = {
@@ -501,6 +503,71 @@ const _wpProductImageMap: Map<string, { title: string; image: string }> = new Ma
  */
 export const EDITORIAL_KEYWORDS_MAP: Map<string, string[]> = new Map();
 
+/**
+ * Render a "Used in these industries" card grid for SKU pages that declare
+ * `relatedIndustries` in their editorial JSON. Slugs map to INDUSTRY_CATEGORIES
+ * entries for title / hero / description; unknown slugs are silently dropped.
+ */
+function renderRelatedIndustriesGrid(definition: EditorialDefinition): string {
+  const slugs = definition.relatedIndustries ?? [];
+  if (slugs.length === 0) return "";
+  // Scope: SKU pages only (inside a product cluster, excluding the cluster roots themselves).
+  if (!/^\/products\/rfid-[a-z]+\/[a-z0-9\-]+\/$/.test(definition.route)) return "";
+
+  type IndustryCard = { href: string; title: string; description: string; heroImage: string; emoji: string };
+  const entries: IndustryCard[] = slugs
+    .map((slug): IndustryCard | null => {
+      const known = INDUSTRY_CATEGORIES.find((c) => c.id === slug);
+      if (known) {
+        return {
+          href: known.href,
+          title: known.title,
+          description: known.description,
+          heroImage: known.heroImage,
+          emoji: known.emoji,
+        };
+      }
+      // Fallback for industries not in the homepage rail (education, fitness,
+      // agriculture, libraries, laundry-services, luxury-brands, pharmaceutical, …).
+      // Pull title + hero from the industry editorial JSON via _editorialImageMap.
+      const route = `/industries/${slug}/`;
+      const editorial = _editorialImageMap.get(route);
+      if (!editorial) return null;
+      const title = editorial.title.split(/—|–|-|\|/, 1)[0]?.trim() || slug;
+      return {
+        href: route,
+        title,
+        description: "Real-world deployments, compliance notes and product picks for this vertical.",
+        heroImage: editorial.heroImage,
+        emoji: "→",
+      };
+    })
+    .filter((c): c is IndustryCard => Boolean(c));
+  if (entries.length === 0) return "";
+
+  const cards = entries
+    .map(
+      (cat) => `
+        <a href="${escapeAttribute(cat.href)}" class="codex-related-industry-card">
+          ${cat.heroImage ? `<img src="${escapeAttribute(cat.heroImage)}" alt="${escapeAttribute(cat.title)}" loading="lazy" decoding="async">` : ""}
+          <div class="codex-related-industry-card__body">
+            <span class="codex-related-industry-card__emoji" aria-hidden="true">${escapeHtml(cat.emoji)}</span>
+            <strong>${escapeHtml(cat.title)}</strong>
+            <p>${escapeHtml(cat.description)}</p>
+          </div>
+        </a>`,
+    )
+    .join("");
+
+  return `<section class="codex-editorial-section codex-related-industries" id="used-in-industries">
+    <h2>Used in these industries</h2>
+    <p class="codex-editorial-section-intro">Deployments where this product is referenced on our industry landing pages.</p>
+    <div class="codex-related-industries-grid">
+      ${cards}
+    </div>
+  </section>`;
+}
+
 /** Render a product card grid for industry landing pages */
 function renderIndustryProductGrid(definition: EditorialDefinition): string {
   if (!definition.route.startsWith("/industries/")) return "";
@@ -588,6 +655,7 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
               }
             </section>
             ${renderIndustryProductGrid(definition)}
+            ${renderRelatedIndustriesGrid(definition)}
             ${renderDecisionSnapshot(definition, outline.snapshotId)}
             ${renderJumpNav(outline.jumpLinks)}
             ${outline.filteredSections.map((section, index) => renderSection(section, outline.sectionLinks[index]?.id ?? "section")).join("")}
