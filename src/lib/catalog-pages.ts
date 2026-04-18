@@ -271,11 +271,70 @@ async function loadLandingDefinitions(): Promise<LandingDef[]> {
 /* Show ALL products on a single page — no pagination */
 const CATALOG_PAGE_SIZE = 999;
 
+/* ── Faceted-filter spec (W3-4d) ────────────────────────────────────────── */
+/* Three facet groups — frequency / chip family / environment — derived from
+   each product's title + summary at build time. Emitted as data-* attributes
+   on every <li.product> card so client-side JS can hide/show without a round
+   trip. Multi-select within a group is OR; AND across groups. */
+type FacetGroup = "freq" | "chip" | "env";
+type Facets = Record<FacetGroup, string[]>;
+
+interface FacetSpec { value: string; label: string; rx: RegExp; }
+const FACET_RULES: Record<FacetGroup, FacetSpec[]> = {
+  freq: [
+    { value: "lf",  label: "LF (125 kHz)",
+      rx: /\b(125\s?kHz|\bLF\s?RFID|low[\s-]?frequency|EM41[02]0|EM4305|T5577|TK4100|HID\s?Prox)\b/i },
+    { value: "hf",  label: "HF / NFC (13.56 MHz)",
+      rx: /\b(13\.56\s?MHz|\bHF\s?RFID|\bNFC\b|MIFARE|NTAG|DESFire|Ultralight|ICODE|ISO[\s-]?14443|ISO[\s-]?15693)\b/i },
+    { value: "uhf", label: "UHF / RAIN (860–960 MHz)",
+      rx: /\b(\bUHF\b|RAIN[\s-]?RFID|860[\s\-–]?960|EPC[\s-]?Gen\s?2?|Higgs|Monza|UCODE|Impinj\s?M(?:700|730|750|800)|M(?:700|730|750|800)\s?(?:UHF|inlay|chip))\b/i },
+  ],
+  chip: [
+    { value: "ntag21x",          label: "NTAG21x",            rx: /\bNTAG\s?21[3567]\b/i },
+    { value: "ntag424",          label: "NTAG424 DNA",        rx: /\bNTAG\s?424\b/i },
+    { value: "mifare-classic",   label: "MIFARE Classic",     rx: /\bMIFARE\s?Classic\b/i },
+    { value: "mifare-desfire",   label: "MIFARE DESFire",     rx: /\bDESFire\b/i },
+    { value: "mifare-ultralight",label: "MIFARE Ultralight",  rx: /\b(MIFARE\s?)?Ultralight\b/i },
+    { value: "mifare-plus",      label: "MIFARE Plus",        rx: /\bMIFARE\s?Plus\b/i },
+    { value: "icode",            label: "ICODE SLIX",         rx: /\bICODE\b/i },
+    { value: "em-tk5",           label: "EM / T5577 (LF)",    rx: /\b(EM41[02]0|EM4305|T5577|TK4100|HID\s?Prox)\b/i },
+    { value: "impinj-m7",        label: "Impinj M7xx / M8xx", rx: /\b(Impinj\s?M(?:700|730|750|800)|Monza\s?R6(?:-?P)?|Monza\s?X)\b/i },
+    { value: "alien-higgs",      label: "Alien Higgs",        rx: /\bAlien\s?Higgs(?:[\s-]?\d)?\b/i },
+    { value: "ucode",            label: "NXP UCODE 8/9",      rx: /\bUCODE(?:\s?[89])?\b/i },
+  ],
+  env: [
+    { value: "anti-metal", label: "On-metal / anti-metal",
+      rx: /\b(anti[\s-]?metal|on[\s-]?metal|metal[\s-]?surface|metal[\s-]?asset|on[\s-]?metal\s?UHF)\b/i },
+    { value: "high-temp",  label: "High-temp (≥150 °C)",
+      rx: /\b(high[\s-]?temp(?:erature)?|200\s?°?\s?C|180\s?°?\s?C|150\s?°?\s?C|cure[\s-]?press|autoclave|pasteuriz|thermal[\s-]?cycling|heat[\s-]?resistant)\b/i },
+    { value: "outdoor",    label: "Outdoor / IP67+",
+      rx: /\b(IP6[7-9]|IP7\d|outdoor|UV[\s-]?(?:resistant|stable|stabili[sz]ed)|weather[\s-]?proof|waterproof|submersible)\b/i },
+    { value: "embed",      label: "Embed / cast-in",
+      rx: /\b(concrete[\s-]?embed|cast[\s-]?in|epoxy[\s-]?embed|insert[\s-]?mold|in[\s-]?mould|embedded\s?in)\b/i },
+    { value: "tamper",     label: "Tamper-evident",
+      rx: /\b(tamper[\s-]?(?:evident|proof|detection)|frangible|destructible|breakaway|tear[\s-]?off|TT\s?card)\b/i },
+    { value: "sensor",     label: "Sensor / temp logger",
+      rx: /\b(sensor[\s-]?(?:tag|enabled)|temp(?:erature)?[\s-]?logger|moisture\s?sensor|pressure\s?sensor|EM4325)\b/i },
+  ],
+};
+
+function deriveFacets(...textParts: (string | undefined)[]): Facets {
+  const text = textParts.filter(Boolean).join(" \n ");
+  const out: Facets = { freq: [], chip: [], env: [] };
+  for (const group of Object.keys(FACET_RULES) as FacetGroup[]) {
+    for (const spec of FACET_RULES[group]) {
+      if (spec.rx.test(text)) out[group].push(spec.value);
+    }
+  }
+  return out;
+}
+
 interface CatalogProduct {
   route: string;
   title: string;
   image: string;
   summary: string;
+  facets: Facets;
 }
 
 export async function mergeCatalogPages(siteData: SiteData): Promise<SiteData> {
@@ -368,18 +427,23 @@ async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduc
   for (const stub of wpProductStubs) {
     try {
       const page = await loadPageFromDisk(stub.route);
+      const title = stripSiteSuffix(page.title) || slugToTitle(page.route.split("/").filter(Boolean).pop() ?? "Product");
+      const summary = extractProductSummary(page.bodyHtml);
       wpProducts.push({
         route: page.route,
-        title: stripSiteSuffix(page.title) || slugToTitle(page.route.split("/").filter(Boolean).pop() ?? "Product"),
+        title,
         image: WP_IMAGE_OVERRIDES[page.route] ?? CATALOG_IMAGE_OVERRIDES[page.route] ?? extractFirstImage(page.bodyHtml),
-        summary: extractProductSummary(page.bodyHtml),
+        summary,
+        facets: deriveFacets(title, summary, page.route),
       });
     } catch {
+      const title = stripSiteSuffix(stub.title) || slugToTitle(stub.route.split("/").filter(Boolean).pop() ?? "Product");
       wpProducts.push({
         route: stub.route,
-        title: stripSiteSuffix(stub.title) || slugToTitle(stub.route.split("/").filter(Boolean).pop() ?? "Product"),
+        title,
         image: WP_IMAGE_OVERRIDES[stub.route] ?? CATALOG_IMAGE_OVERRIDES[stub.route] ?? "",
         summary: "",
+        facets: deriveFacets(title, stub.route),
       });
     }
   }
@@ -408,11 +472,17 @@ async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduc
       }
     }
 
+    const title = stripSiteSuffix(def.title) || slugToTitle(def.route.split("/").filter(Boolean).pop() ?? "Product");
+    const summary = truncateText(def.summary, 160);
     landingProducts.push({
       route: def.route,
-      title: stripSiteSuffix(def.title) || slugToTitle(def.route.split("/").filter(Boolean).pop() ?? "Product"),
+      title,
       image,
-      summary: truncateText(def.summary, 160),
+      summary,
+      // Include the route slug so mount-type words like "anti-metal" or
+      // "on-metal" embedded in URLs (e.g. /products/rfid-tags/anti-metal-…)
+      // are picked up even when the marketing summary is short.
+      facets: deriveFacets(title, summary, def.route),
     });
   }
 
@@ -771,10 +841,54 @@ function renderCatalogMain({
       ({ category, items }) => `<a href="#${category.id}" class="ind-sidebar__link" data-target="${category.id}">
         <span class="ind-sidebar__emoji">${category.icon}</span>
         <span class="ind-sidebar__label">${category.label}</span>
-        <span class="ind-sidebar__count">${items.length}</span>
+        <span class="ind-sidebar__count" data-cat-count="${category.id}">${items.length}</span>
       </a>`,
     )
     .join("");
+
+  // Tally how many products carry each facet value so the filter panel can
+  // display "(N)" next to each checkbox. Skips facet values with zero hits
+  // (e.g. when no SKU mentions Alien Higgs at all there's no checkbox for it).
+  const facetCounts: Record<FacetGroup, Record<string, number>> = {
+    freq: {}, chip: {}, env: {},
+  };
+  for (const p of products) {
+    for (const group of Object.keys(FACET_RULES) as FacetGroup[]) {
+      for (const v of p.facets[group]) {
+        facetCounts[group][v] = (facetCounts[group][v] ?? 0) + 1;
+      }
+    }
+  }
+
+  const FACET_GROUP_LABELS: Record<FacetGroup, { label: string; icon: string }> = {
+    freq: { label: "Frequency",       icon: "📡" },
+    chip: { label: "Chip family",     icon: "🔌" },
+    env:  { label: "Environment",     icon: "🛡️" },
+  };
+
+  const filterPanelHtml = (Object.keys(FACET_RULES) as FacetGroup[])
+    .map((group) => {
+      const rows = FACET_RULES[group]
+        .filter((spec) => (facetCounts[group][spec.value] ?? 0) > 0)
+        .map(
+          (spec) => `<label class="codex-facet-option">
+            <input type="checkbox" data-facet-group="${group}" value="${spec.value}">
+            <span class="codex-facet-option__label">${spec.label}</span>
+            <span class="codex-facet-option__count">${facetCounts[group][spec.value]}</span>
+          </label>`,
+        )
+        .join("");
+      if (!rows) return "";
+      return `<div class="codex-facet-group" data-facet-group-wrap="${group}">
+        <div class="codex-facet-group__title">
+          <span class="codex-facet-group__icon" aria-hidden="true">${FACET_GROUP_LABELS[group].icon}</span>
+          ${FACET_GROUP_LABELS[group].label}
+        </div>
+        ${rows}
+      </div>`;
+    })
+    .join("");
+  const hasFilters = filterPanelHtml.length > 0;
 
   const categorySectionsHtml = categorized
     .map(
@@ -809,6 +923,13 @@ function renderCatalogMain({
         <div class="ind-sidebar__title">Product Families</div>
         ${raw(sidebarLinksHtml)}
       </nav>
+      ${raw(hasFilters ? `<div class="codex-catalog-filter" data-total-products="${totalProducts}">
+        <div class="codex-catalog-filter__header">
+          <div class="ind-sidebar__title">Filter by spec</div>
+          <button type="button" class="codex-catalog-filter__clear" hidden>Clear</button>
+        </div>
+        ${filterPanelHtml}
+      </div>` : "")}
     </aside>
     <header class="woocommerce-products-header">
       ${raw(renderBreadcrumbs(route, title))}
@@ -817,9 +938,15 @@ function renderCatalogMain({
         <p>${description}</p>
       </div>
     </header>
-    <p class="woocommerce-result-count">${raw(`Showing all ${totalProducts} products`)}</p>
+    <p class="woocommerce-result-count" data-default-count="${totalProducts}">${raw(`Showing all ${totalProducts} products`)}</p>
     <div class="codex-catalog-content">
       ${raw(categorySectionsHtml)}
+    </div>
+    <div class="codex-catalog-empty" hidden>
+      <div class="codex-catalog-empty__icon" aria-hidden="true">🔍</div>
+      <h3 class="codex-catalog-empty__title">No products match these filters</h3>
+      <p class="codex-catalog-empty__desc">Try unselecting one or two criteria, or clear all filters to see the full catalog.</p>
+      <button type="button" class="codex-catalog-empty__clear">Clear filters</button>
     </div>
     <script>
     (function(){
@@ -880,6 +1007,123 @@ function renderCatalogMain({
           if (window.matchMedia('(max-width: 1279px)').matches) closeRail();
         });
       });
+
+      // ---------------------------------------------------------------
+      // Faceted filter: AND across groups (freq AND chip AND env),
+      //                 OR  within  a group (freq == lf OR hf).
+      // Products carry space-separated data-facet-<group>=".." tokens;
+      // an empty token string means "card doesn't match any value in
+      // that group", so it's hidden when the group has any checkbox
+      // ticked.
+      // ---------------------------------------------------------------
+      var filterPanel = document.querySelector('.codex-catalog-filter');
+      var cards = document.querySelectorAll('.codex-catalog-content li.product');
+      var categoryBlocks = document.querySelectorAll('.codex-catalog-content .codex-catalog-category');
+      var countPills = document.querySelectorAll('.ind-sidebar__count[data-cat-count]');
+      var resultCount = document.querySelector('.woocommerce-result-count');
+      var emptyState = document.querySelector('.codex-catalog-empty');
+      var clearBtn = filterPanel ? filterPanel.querySelector('.codex-catalog-filter__clear') : null;
+      var clearBtnEmpty = emptyState ? emptyState.querySelector('.codex-catalog-empty__clear') : null;
+
+      if (!filterPanel || !cards.length) return;
+
+      var totalProducts = parseInt(filterPanel.getAttribute('data-total-products') || '0', 10) || cards.length;
+
+      function readSelectedFacets(){
+        var out = { freq: [], chip: [], env: [] };
+        var boxes = filterPanel.querySelectorAll('input[type="checkbox"][data-facet-group]:checked');
+        boxes.forEach(function(b){
+          var g = b.getAttribute('data-facet-group');
+          var v = b.value;
+          if (out[g]) out[g].push(v);
+        });
+        return out;
+      }
+
+      function cardMatches(card, sel){
+        var groups = ['freq', 'chip', 'env'];
+        for (var i = 0; i < groups.length; i++){
+          var g = groups[i];
+          if (!sel[g].length) continue;
+          var attr = card.getAttribute('data-facet-' + g) || '';
+          var tokens = attr.split(/\s+/).filter(Boolean);
+          var ok = false;
+          for (var j = 0; j < sel[g].length; j++){
+            if (tokens.indexOf(sel[g][j]) !== -1) { ok = true; break; }
+          }
+          if (!ok) return false;
+        }
+        return true;
+      }
+
+      function applyFilters(){
+        var sel = readSelectedFacets();
+        var anyActive = sel.freq.length + sel.chip.length + sel.env.length > 0;
+        var visible = 0;
+        var perCategory = {};
+
+        cards.forEach(function(card){
+          var match = !anyActive || cardMatches(card, sel);
+          card.hidden = !match;
+          if (match){
+            visible += 1;
+            var section = card.closest('.codex-catalog-category');
+            if (section) {
+              var id = section.id;
+              perCategory[id] = (perCategory[id] || 0) + 1;
+            }
+          }
+        });
+
+        // Hide empty category sections while filters are active.
+        categoryBlocks.forEach(function(section){
+          var n = perCategory[section.id] || 0;
+          section.hidden = anyActive && n === 0;
+          var hdrCount = section.querySelector('.codex-catalog-count');
+          if (hdrCount) {
+            if (anyActive) hdrCount.textContent = n + ' product' + (n === 1 ? '' : 's');
+            else hdrCount.textContent = section.querySelectorAll('li.product').length + ' products';
+          }
+        });
+
+        // Rail count pills stay in sync with what's actually visible.
+        countPills.forEach(function(pill){
+          var id = pill.getAttribute('data-cat-count');
+          var n = anyActive ? (perCategory[id] || 0) : null;
+          if (n === null) {
+            // Restore original full count.
+            var section = document.getElementById(id);
+            if (section) pill.textContent = String(section.querySelectorAll('li.product').length);
+          } else {
+            pill.textContent = String(n);
+          }
+          if (anyActive && n === 0) pill.classList.add('is-empty');
+          else pill.classList.remove('is-empty');
+        });
+
+        // "Showing N of M" / "Showing all M" line up top.
+        if (resultCount) {
+          if (anyActive) resultCount.textContent = 'Showing ' + visible + ' of ' + totalProducts + ' products';
+          else resultCount.textContent = 'Showing all ' + totalProducts + ' products';
+        }
+
+        // Empty state + clear-button visibility.
+        if (emptyState) emptyState.hidden = !(anyActive && visible === 0);
+        if (clearBtn) clearBtn.hidden = !anyActive;
+        filterPanel.classList.toggle('has-active-filters', anyActive);
+      }
+
+      function clearAll(){
+        var boxes = filterPanel.querySelectorAll('input[type="checkbox"][data-facet-group]:checked');
+        boxes.forEach(function(b){ b.checked = false; });
+        applyFilters();
+      }
+
+      filterPanel.addEventListener('change', function(e){
+        if (e.target && e.target.matches('input[type="checkbox"][data-facet-group]')) applyFilters();
+      });
+      if (clearBtn) clearBtn.addEventListener('click', clearAll);
+      if (clearBtnEmpty) clearBtnEmpty.addEventListener('click', clearAll);
     })();
     </script>
   `;
@@ -928,7 +1172,18 @@ function renderProductCard(product: CatalogProduct, featured = false): string {
     : "";
   const featuredClass = featured ? " codex-catalog-featured" : "";
 
-  return html`<li class="product type-product status-publish product-type-simple instock${raw(featuredClass)}">
+  // Emit derived facets as space-separated data-* attributes so the
+  // client-side filter can hide/show without reading any DOM beyond the
+  // <li>. Empty groups fall back to "" — the JS treats that as "matches no
+  // selected filter for that group" (i.e. the card is hidden if the user
+  // has any filter ticked in that group).
+  const facetAttrs = raw(
+    `data-facet-freq="${product.facets.freq.join(" ")}" ` +
+    `data-facet-chip="${product.facets.chip.join(" ")}" ` +
+    `data-facet-env="${product.facets.env.join(" ")}"`,
+  );
+
+  return html`<li class="product type-product status-publish product-type-simple instock${raw(featuredClass)}" ${facetAttrs}>
     <a href="${product.route}" class="woocommerce-LoopProduct-link woocommerce-loop-product__link">
       ${raw(imageHtml)}
       <h2 class="woocommerce-loop-product__title">${product.title}</h2>
