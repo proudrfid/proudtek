@@ -33,7 +33,7 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-cards/rfid-wooden-card/":                      "/landing-images/rfid-wooden-card.jpg",
   "/products/rfid-cards/wooden-nfc-business-card-engraved/":     "/landing-images/wooden-nfc-business-card-engraved.jpg",
   "/products/rfid-cards/rfid-card-assa-abloy-compatible/":       "/landing-images/rfid-card-assa-abloy-compatible.jpg",
-  "/products/rfid-cards/ntag424-dna-tt-card/":                   "/landing-images/ntag424-dna-tamper-evident-tag.jpg",
+  "/products/rfid-cards/ntag424-dna-tt-card/":                   "/landing-images/ntag424-dna-tt-card.png",
   // ── RFID Keyfobs ────────────────────────────────────────────────────
   "/products/rfid-keyfobs/em4305-keyfob/":                       "/landing-images/em4305-keyfob.jpg",
   "/products/rfid-keyfobs/mifare-desfire-keyfob/":               "/landing-images/mifare-desfire-keyfob.jpg",
@@ -49,17 +49,26 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-wristbands/elastic-rfid-wristband/":           "/landing-images/elastic-rfid-wristband.jpg",
   "/products/rfid-wristbands/fabric-rfid-wristband/":            "/landing-images/fabric-rfid-wristband.jpg",
   "/products/rfid-wristbands/nfc-fitness-wristband/":            "/landing-images/nfc-fitness-wristband.jpg",
-  "/products/rfid-wristbands/nfc-medical-alert-wristband/":      "/landing-images/nfc-medical-alert-wristband.jpg",
+  // Hero/title mismatch round 2 2026-04-18: original landing image was an AI-generated
+  // photo showing an Ouster-branded CARD being tapped on a reader (wrong form factor
+  // + competitor logo). Point at an on-disk unbranded wristband-on-wrist shot.
+  "/products/rfid-wristbands/nfc-medical-alert-wristband/":      "/site-assets/wp-content/uploads/2024/09/RFID_silicone_wristband_application.jpg",
   "/products/rfid-wristbands/paper-rfid-wristband/":             "/landing-images/paper-rfid-wristband.jpg",
   "/products/rfid-wristbands/rfid-adjustable-silicone-wristband/": "/landing-images/rfid-adjustable-silicone-wristband.jpg",
-  "/products/rfid-wristbands/rfid-child-wristband/":             "/landing-images/rfid-child-wristband.jpg",
+  // Hero/title mismatch round 2 2026-04-18: original landing image was an adult
+  // ASSA ABLOY / Proudtek-branded silicone wristband (wrong size + competitor logo).
+  // Point at a child-scale pink elastic RFID wristband photo.
+  "/products/rfid-wristbands/rfid-child-wristband/":             "/site-assets/wp-content/uploads/2024/11/RFID_wristband_for_hotel_swiming_pool.jpg",
   "/products/rfid-wristbands/rfid-prison-wristband/":            "/landing-images/rfid-prison-wristband.jpg",
   "/products/rfid-wristbands/rfid-waterpark-wristband/":         "/landing-images/rfid-waterpark-wristband.jpg",
   "/products/rfid-wristbands/rfid-wristband-qr-nfc/":           "/landing-images/rfid-wristband-qr-nfc.jpg",
   "/products/rfid-wristbands/silicone-wristband-mifare-classic/": "/landing-images/silicone-wristband-mifare-classic.jpg",
   "/products/rfid-wristbands/uhf-rfid-wristband/":              "/landing-images/uhf-rfid-wristband.jpg",
   "/products/rfid-wristbands/rfid-nylon-wristband/":             "/landing-images/rfid-nylon-wristband.jpg",
-  "/products/rfid-wristbands/rfid-vinyl-wristband/":             "/landing-images/rfid-vinyl-wristband.jpg",
+  // Hero/title mismatch round 2 2026-04-18: original landing image was a concert-crowd
+  // placeholder. Point at an on-disk adult multi-day RFID wristband trio (pink + black
+  // fabric strap w/ disc holder — suits "multi-day resort / cruise" framing).
+  "/products/rfid-wristbands/rfid-vinyl-wristband/":             "/site-assets/wp-content/uploads/2024/04/DESFire_EV2_Wristband.jpg",
   "/products/rfid-wristbands/rfid-tyvek-wristband/":             "/landing-images/rfid-tyvek-wristband-alt.jpg",
   // ── RFID Labels / Stickers / Inlays ─────────────────────────────────
   "/products/rfid-labels/alien-higgs-9-uhf-inlay/":              "/landing-images/alien-higgs-9-uhf-inlay.jpg",
@@ -77,7 +86,14 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-labels/uhf-rfid-retail-price-label/":          "/landing-images/uhf-rfid-retail-price-label.jpg",
   "/products/rfid-labels/uhf-rfid-tire-label/":                  "/landing-images/uhf-rfid-tire-label.jpg",
   "/products/rfid-labels/rfid-dry-inlay/":                       "/landing-images/rfid-dry-inlay-alt.jpg",
-  "/products/rfid-labels/rfid-wet-inlay/":                       "/landing-images/rfid-wet-inlay-alt.jpg",
+  // Title/hero mismatch 2026-04-18: rfid-wet-inlay-alt.jpg showed bare antennas
+  // with no adhesive/liner context; a first swap to printed_NFC_sticker was
+  // actually a finished wet LABEL, not a wet inlay. Now points at a real wet
+  // inlay (translucent PET + etched spiral antenna + chip visible, partially
+  // peeled off a transit ticket to show the adhesive characteristic).
+  // Source: Wikimedia Commons "IC_Inlay_of_Standard_Ticket_Transit_Card.jpg",
+  // CC BY-SA 4.0 — attribution in public/landing-images/CREDITS.md.
+  "/products/rfid-labels/rfid-wet-inlay/":                       "/landing-images/rfid-wet-inlay.jpg",
   "/products/rfid-labels/nfc-art-provenance-tag/":               "/landing-images/nfc-art-provenance-tag.jpg",
   "/products/rfid-labels/nfc-cannabis-tracking-label/":          "/landing-images/nfc-cannabis-tracking-label.jpg",
   "/products/rfid-labels/nfc-electronics-warranty-label/":       "/landing-images/nfc-electronics-warranty-label.jpg",
@@ -101,6 +117,64 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-tags/rfid-silicone-flexible-tag/":             "/landing-images/rfid-silicone-flexible-tag.jpg",
   "/products/rfid-tags/waterproof-uhf-rfid-outdoor-tag/":        "/landing-images/waterproof-uhf-rfid-outdoor-tag.jpg",
   "/products/rfid-tags/rfid-coin-tag/":                          "/landing-images/rfid-coin-tag-alt.jpg",
+  // ── Deduplication pass 2026-04-18 ───────────────────────────────────
+  // Each entry replaces a shared placeholder hero image with the product's
+  // own dedicated photo (already on disk in /public/landing-images/).
+  // rfid-cable-tie-tag.jpg group
+  "/products/rfid-tags/rfid-cable-seal-tag/":                    "/landing-images/rfid-cable-seal-tag.png",
+  "/products/rfid-tags/rfid-eyelet-tag/":                        "/landing-images/rfid-eyelet-tag.jpg",
+  "/products/rfid-tags/rfid-hose-tag/":                          "/landing-images/rfid-hose-tag.jpg",
+  "/products/rfid-tags/rfid-zip-tie-tag/":                       "/landing-images/rfid-zip-tie-tag.png",
+  // rfid-high-temperature-ceramic-tag.jpg group
+  "/products/rfid-tags/high-temperature-rfid-tag-200c/":         "/landing-images/high-temperature-rfid-tag-200c.jpg",
+  "/products/rfid-tags/rfid-ceramic-tag/":                       "/landing-images/rfid-ceramic-tag.png",
+  "/products/rfid-tags/rfid-high-temp-silicone-tag/":            "/landing-images/rfid-high-temp-silicone-tag.jpg",
+  // rfid-pcb-screw-mount-tag.png group
+  "/products/rfid-tags/rfid-concrete-embed-tag/":                "/landing-images/rfid-concrete-embed-tag.jpg",
+  "/products/rfid-tags/rfid-pcb-tag/":                           "/landing-images/rfid-pcb-tag.jpg",
+  "/products/rfid-tags/rfid-screw-tag/":                         "/landing-images/rfid-screw-tag.png",
+  // rfid-bolt-seal.jpg group
+  "/products/rfid-tags/rfid-anchor-bolt-tag/":                   "/landing-images/rfid-anchor-bolt-tag.png",
+  "/products/rfid-tags/rfid-bolt-tag/":                          "/landing-images/rfid-bolt-tag.jpg",
+  // rfid-animal-ear-tag.png group
+  "/products/rfid-tags/rfid-ear-tag-livestock/":                 "/landing-images/rfid-ear-tag-livestock.jpg",
+  "/products/rfid-tags/rfid-livestock-leg-band/":                "/landing-images/rfid-livestock-leg-band.jpg",
+  // rfid-anti-metal-tag.jpg group
+  "/products/rfid-tags/rfid-flag-tag/":                          "/landing-images/rfid-flag-tag.webp",
+  "/products/rfid-tags/rfid-mining-asset-tag/":                  "/landing-images/rfid-mining-asset-tag.jpg",
+  // rfid-gas-cylinder-tag.webp group
+  "/products/rfid-tags/rfid-oil-gas-pipe-tag/":                  "/landing-images/rfid-oil-gas-pipe-tag.jpg",
+  "/products/rfid-tags/rfid-valve-tag/":                         "/landing-images/rfid-valve-tag.png",
+  // rfid-tool-tracking-tag.webp group
+  "/products/rfid-tags/rfid-tool-tag/":                          "/landing-images/rfid-tool-tag.jpg",
+  "/products/rfid-tags/rfid-weapon-tracking-tag/":               "/landing-images/rfid-weapon-tracking-tag.jpg",
+  // nfc-epoxy-key-tag.jpg group
+  "/products/rfid-tags/rfid-epoxy-tag/":                         "/landing-images/rfid-epoxy-tag.jpg",
+  // rfid-coin-tag.jpg group
+  "/products/rfid-tags/rfid-manhole-cover-tag/":                 "/landing-images/rfid-manhole-cover-tag.jpg",
+  // nfc-anti-metal-sticker.png group
+  "/products/rfid-tags/rfid-on-metal-uhf-tag/":                  "/landing-images/rfid-on-metal-uhf-tag.jpg",
+  // rfid-ibc-chemical-drum-tag.jpg group
+  "/products/rfid-tags/rfid-drum-tag/":                          "/landing-images/rfid-drum-tag.jpg",
+  // rfid-guard-tour-tag.jpg group
+  "/products/rfid-tags/rfid-fire-extinguisher-tag/":             "/landing-images/rfid-fire-extinguisher-tag.jpg",
+  // rfid-glass-capsule-tag.webp group
+  "/products/rfid-tags/rfid-fish-tag/":                          "/landing-images/rfid-fish-tag.jpg",
+  // uhf-rfid-apparel-hang-tag.jpg group
+  "/products/rfid-tags/rfid-hang-tag/":                          "/landing-images/rfid-hang-tag.jpg",
+  // rfid-nail-tag.jpg group
+  "/products/rfid-tags/rfid-tree-tag/":                          "/landing-images/rfid-tree-tag.jpg",
+  // rfid-textile-laundry-tag.jpg group
+  "/products/rfid-tags/rfid-pps-laundry-chip/":                  "/landing-images/rfid-pps-laundry-chip.png",
+  // ppc-nfc-business-cards.jpg group — point metal business card at a
+  // different NFC business card shot (reading scene) so it no longer
+  // collides with the PPC landing page hero.
+  "/products/rfid-cards/rfid-metal-business-card/":              "/site-assets/wp-content/uploads/2024/09/NFC_business_card_reading.jpg",
+  // ── Logo scrub 2026-04-18 ────────────────────────────────────────────
+  // Original /landing-images/rfid-textile-laundry-tag.jpg was a third-party
+  // supplier catalog sheet ("JYL-Tech" watermark). Swap to our own textile
+  // UHF laundry tag photo (unbranded hands-holding-tags shot).
+  "/products/rfid-tags/rfid-textile-laundry-tag/":               "/site-assets/wp-content/uploads/2024/04/textile_uhf_laundry_tag.jpg",
 };
 
 /* ── WordPress product image overrides ──────────────────────────────────
@@ -109,7 +183,10 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
  */
 const WP_IMAGE_OVERRIDES: Record<string, string> = {
   // RFID Cards (WP /product/ routes)
-  "/product/125-khz-rfid-card/":           "/landing-images/em4100-rfid-card.jpg",
+  // Dedup 2026-04-18: was em4100-rfid-card.jpg (collided with editorial
+  // /products/rfid-cards/em4100-rfid-card/). Pointed at a dedicated on-disk
+  // 125kHz product photo instead.
+  "/product/125-khz-rfid-card/":           "/site-assets/wp-content/uploads/2024/10/125khz_RFID_card_for_access_control.jpg",
   "/product/blank-rfid-card/":             "/site-assets/wp-content/uploads/2023/12/RFID_blank_card.jpg",
   "/product/clamshell-card/":              "/site-assets/wp-content/uploads/2023/12/clamshell_card.jpg",
   "/product/combi-card/":                  "/site-assets/wp-content/uploads/2023/12/combi_card.jpg",
@@ -304,8 +381,13 @@ async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduc
     }
   }
 
-  // Load landing definitions from Content Collections
-  const allLandingDefs = await loadLandingDefinitions();
+  // Load landing definitions from Content Collections. Industry Solutions
+  // landing pages (/industries/*) live in the main-nav "Industries" mega-menu
+  // instead of the product catalog — skip them here so they don't show up as
+  // products and so the catalog rail has no "Industry Solutions" entry.
+  const allLandingDefs = (await loadLandingDefinitions()).filter(
+    (d) => !d.route.startsWith("/industries/"),
+  );
   const landingProducts: CatalogProduct[] = [];
   for (const def of allLandingDefs) {
     // 1) Check override map first (ensures unique images in catalog grid)
@@ -453,8 +535,16 @@ function buildArchiveBodyHtml(
 
   main.html(renderCatalogMain({ route, title, description, pageNumber, totalPages, totalProducts, products }));
 
-  // Update sidebar category counts to match actual product totals
-  updateSidebarCounts($, products);
+  // The /products/all/ catalog has its own in-page sticky navigator
+  // (`.codex-catalog-sidebar`) so the legacy WooCommerce sidebar widgets
+  // (RFID Labels / RFID Readers / Tag Cloud ...) are removed and the content
+  // column stretches full-width, matching the /industries/ page layout.
+  const wpSidebar = $("aside.primary-sidebar, .widget-area").first();
+  if (wpSidebar.length) wpSidebar.remove();
+  const contentCol = $(".content-area, .site-content > .ast-container > div").first();
+  if (contentCol.length) {
+    contentCol.css("width", "100%").css("max-width", "100%").css("float", "none");
+  }
 
   return $("body").html() ?? templateBodyHtml;
 }
@@ -507,7 +597,8 @@ async function getProductCategories(): Promise<ProductCategory[]> {
   const LANDING_WRISTBAND_ROUTES = landingRoutesByPrefix("/products/rfid-wristbands/");
   const LANDING_LABEL_ROUTES = landingRoutesByPrefix("/products/rfid-labels/");
   const LANDING_TAG_ROUTES = landingRoutesByPrefix("/products/rfid-tags/");
-  const LANDING_INDUSTRY_ROUTES = landingRoutesByPrefix("/industries/");
+  // Industry Solutions (/industries/*) are NOT listed in the product catalog.
+  // They live in the main-nav Industries mega-menu exclusively.
 
   /* Categories match the WordPress WooCommerce sidebar exactly. */
   _productCategoriesCache = [
@@ -617,13 +708,9 @@ async function getProductCategories(): Promise<ProductCategory[]> {
       ...LANDING_TAG_ROUTES,
     ],
   },
-  {
-    id: "industries",
-    label: "Industry Solutions",
-    icon: "🏭",
-    description: "RFID and NFC solutions tailored for specific industries — hospitality, retail, healthcare, logistics and more.",
-    routes: [...LANDING_INDUSTRY_ROUTES],
-  },
+  /* NOTE: Industry Solutions deliberately NOT included as a catalog category.
+     The 15 /industries/* landing pages are accessed via the main-nav
+     "Industries" mega-menu only — they're verticals/use-cases, not products. */
   ];
 
   return _productCategoriesCache;
@@ -673,8 +760,17 @@ function renderCatalogMain({
 }): string {
   const categorized = categorizeProductsSync(products);
 
-  const categoryNavHtml = categorized
-    .map(({ category }) => `<a href="#${category.id}" class="codex-catalog-nav-chip">${category.icon} ${category.label}</a>`)
+  // Sticky left-side navigator — borrowed styling from the /industries/ page
+  // (`.ind-sidebar` class family). One row per category with icon + label +
+  // product-count pill. Clicking a row smooth-scrolls the matching section.
+  const sidebarLinksHtml = categorized
+    .map(
+      ({ category, items }) => `<a href="#${category.id}" class="ind-sidebar__link" data-target="${category.id}">
+        <span class="ind-sidebar__emoji">${category.icon}</span>
+        <span class="ind-sidebar__label">${category.label}</span>
+        <span class="ind-sidebar__count">${items.length}</span>
+      </a>`,
+    )
     .join("");
 
   const categorySectionsHtml = categorized
@@ -695,6 +791,22 @@ function renderCatalogMain({
 
   return html`
     <div class="woocommerce-notices-wrapper"></div>
+    <button type="button"
+            class="codex-catalog-rail-toggle"
+            aria-expanded="false"
+            aria-controls="codex-catalog-rail-panel"
+            aria-label="Show product categories">
+      <span class="codex-catalog-rail-toggle__icon" aria-hidden="true">🗂️</span>
+      <span class="codex-catalog-rail-toggle__label">Categories</span>
+    </button>
+    <div class="codex-catalog-rail-backdrop" hidden></div>
+    <aside id="codex-catalog-rail-panel" class="codex-catalog-rail" aria-label="Product categories">
+      <button type="button" class="codex-catalog-rail__close" aria-label="Close categories">✕</button>
+      <nav class="ind-sidebar__nav">
+        <div class="ind-sidebar__title">Product Families</div>
+        ${raw(sidebarLinksHtml)}
+      </nav>
+    </aside>
     <header class="woocommerce-products-header">
       ${raw(renderBreadcrumbs(route, title))}
       <h2 class="page-title archive-title">${title}</h2>
@@ -703,10 +815,70 @@ function renderCatalogMain({
       </div>
     </header>
     <p class="woocommerce-result-count">${raw(`Showing all ${totalProducts} products`)}</p>
-    <nav class="codex-catalog-nav" aria-label="Product categories">
-      ${raw(categoryNavHtml)}
-    </nav>
-    ${raw(categorySectionsHtml)}
+    <div class="codex-catalog-content">
+      ${raw(categorySectionsHtml)}
+    </div>
+    <script>
+    (function(){
+      var rail = document.getElementById('codex-catalog-rail-panel');
+      var toggle = document.querySelector('.codex-catalog-rail-toggle');
+      var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
+      var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
+      var links = document.querySelectorAll('.codex-catalog-rail .ind-sidebar__link');
+      var sections = document.querySelectorAll('.codex-catalog-content .codex-catalog-category');
+      if (!links.length || !sections.length) return;
+
+      // Scroll-spy: highlight the rail entry for the section currently in view.
+      function update(){
+        var scrollY = window.scrollY + 120;
+        var active = null;
+        sections.forEach(function(s){ if (s.offsetTop <= scrollY) active = s.id; });
+        links.forEach(function(l){
+          if (l.getAttribute('data-target') === active) l.classList.add('active');
+          else l.classList.remove('active');
+        });
+      }
+      var ticking = false;
+      window.addEventListener('scroll', function(){
+        if (!ticking) { ticking = true; requestAnimationFrame(function(){ update(); ticking = false; }); }
+      }, {passive:true});
+      update();
+
+      // Collapse / expand behaviour (only active at narrow viewports via CSS).
+      function openRail(){
+        if (!rail) return;
+        rail.classList.add('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+        if (backdrop) backdrop.hidden = false;
+        document.body.classList.add('codex-catalog-rail-locked');
+      }
+      function closeRail(){
+        if (!rail) return;
+        rail.classList.remove('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        if (backdrop) backdrop.hidden = true;
+        document.body.classList.remove('codex-catalog-rail-locked');
+      }
+      if (toggle) toggle.addEventListener('click', function(){
+        if (rail && rail.classList.contains('is-open')) closeRail(); else openRail();
+      });
+      if (closeBtn) closeBtn.addEventListener('click', closeRail);
+      if (backdrop) backdrop.addEventListener('click', closeRail);
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && rail && rail.classList.contains('is-open')) closeRail();
+      });
+
+      // Smooth-scroll on link click, and auto-close the overlay on narrow viewports.
+      links.forEach(function(l){
+        l.addEventListener('click', function(e){
+          e.preventDefault();
+          var target = document.getElementById(l.getAttribute('data-target'));
+          if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+          if (window.matchMedia('(max-width: 1279px)').matches) closeRail();
+        });
+      });
+    })();
+    </script>
   `;
 }
 
