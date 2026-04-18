@@ -85,6 +85,14 @@ COMPOSITIONS = {
         "rfid-epoxy-keyfob.jpg",
         "nfc-epoxy-key-tag.jpg",
     ],
+    "industries-pillar.jpg": [
+        "retail-apparel.jpg",
+        "hospital-patient-id-wristband.jpg",
+        "logistics.jpg",
+        "events-venues.jpg",
+        "eu-compliance.jpg",
+        "rfid-library-book-tag.jpg",
+    ],
 }
 
 if __name__ == "__main__":
