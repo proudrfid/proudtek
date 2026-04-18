@@ -1,0 +1,238 @@
+{
+  "route": "/guides/mifare-desfire-ev3-commands-reference/",
+  "group": "guides",
+  "title": "MIFARE DESFire EV3 — Command Set and Cryptographic Protocol Reference",
+  "kicker": "DESFire EV3 / MF3ICDx81 Command Encyclopedia",
+  "summary": "MIFARE DESFire EV3 (NXP MF3D(H)x2) is the current flagship enterprise smart-card chip — the silicon behind corporate access control, transit ticketing, closed-loop cashless payment, and multi-application campus credentials. This encyclopedia documents the full DESFire EV3 command set, the three-key AES authentication flow, the application and file-based access model, the MIFARE 2GO / transaction MAC / proximity-check features that EV3 introduced, and the migration path from DESFire EV1 and EV2. Intended as the day-to-day reference for reader firmware developers, SAM integrators, and access-control architects.",
+  "heroPoints": [
+    "Multi-application smart card — up to 32 concurrent applications per card (EV1) / 28 in EV3 with the reserved PICC-level application, each application with up to 32 files, each file with independent access rights. A single EV3 card can carry employee badge, gym access, building vending payment, and transit pass simultaneously.",
+    "AES-128 everywhere — three full application keys per application (plus optional originality key), all AES-128. Three-pass mutual authentication using random challenges and session-key derivation. No DES or Triple-DES fallback in the default EV3 configuration.",
+    "Transaction MAC and proximity check — EV3-specific features. Transaction MAC chains a cryptographic MAC across a sequence of commands within a single authenticated session, preventing mid-transaction tampering. Proximity check measures the RF round-trip time to detect relay attacks (where an attacker uses two phones to bridge a card to a distant reader)."
+  ],
+  "imageAlt": "MIFARE DESFire EV3 card with command protocol diagram",
+  "heroImage": "/landing-images/mifare-desfire-ev3-card.jpg",
+  "imageSourceRoutes": [
+    "/products/rfid-cards/mifare-desfire-ev3-card/",
+    "/products/rfid-keyfobs/mifare-desfire-keyfob/"
+  ],
+  "keywords": [
+    "MIFARE DESFire EV3",
+    "DESFire commands",
+    "DESFire AES authentication",
+    "Transaction MAC",
+    "DESFire proximity check",
+    "MF3D H x2",
+    "ISO 14443-4 APDU",
+    "DESFire access rights"
+  ],
+  "publishedAt": "2026-04-18",
+  "modifiedAt": "2026-04-18",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedAt": "2026-04-18",
+  "sections": [
+    {
+      "title": "Family and part numbers",
+      "bullets": [
+        "MIFARE DESFire EV3 — NXP part family MF3D(H)x2. Three memory variants: 2 KB (MF3DHx2), 4 KB (MF3DHx4), and 8 KB (MF3DHx8). Same command set across all three; only user file capacity differs.",
+        "ISO/IEC 14443-4 Type A compliant — seven-byte UID, full APDU exchange, 106-848 kbps data rate negotiable. Bit-for-bit protocol-compatible with any ISO 14443-4 reader, including HID, Suprema, Idesco, Nedap, and transit-authority readers from Cubic and Thales.",
+        "Operating temperature — -25 °C to +85 °C. Data retention ≥ 25 years at 55 °C. Endurance ≥ 500,000 write cycles per file.",
+        "Generational lineage — DESFire EV1 (2008, launched the 3DES→AES migration), EV2 (2016, added MIFARE 2GO and transaction MAC), EV3 (2020, added proximity check and enhanced transaction integrity). EV3 is fully backwards-compatible with EV1 and EV2 readers.",
+        "Complementary variants — DESFire Light (MF2DL_H10, cost-optimized single-application subset of DESFire for public transit ticketing) and DESFire EV3 EP (with 8 KB + extended performance).",
+        "Silicon authenticity — the first two bytes of the UID are 0x04 (NXP manufacturer code); Get Version command returns hardware type 0x01, software type 0x01, and major.minor version indicating EV3 silicon. Counterfeit 'DESFire-compatible' chips often return mismatched version bytes."
+      ]
+    },
+    {
+      "title": "Memory model — application, file, access rights",
+      "bullets": [
+        "PICC-level — the root layer. Contains a 7-byte UID, a PICC Master Key, configuration bytes, and up to 28 applications (identified by 3-byte AID, Application ID).",
+        "Application level — each application has its own keys (up to 14 keys per application for EV3, vs. up to 14 for EV2). The PICC Master Key can create/delete applications; each application's Application Master Key (key 0) can manage keys within it.",
+        "File level — each application holds up to 32 files (file IDs 0x00-0x1F). File types: Standard Data File (fixed-length binary), Backup Data File (with commit/abort), Value File (32-bit signed integer with credit/debit semantics), Linear Record File (fixed-length records), Cyclic Record File (circular buffer).",
+        "Access rights per file — four fields: Read Access, Write Access, Read & Write Access, Change Access Rights. Each can be set to one of the 14 application keys, or to 'free' (no authentication required), or to 'deny' (no access at all).",
+        "Backup vs. standard files — standard files commit writes immediately; backup files maintain a shadow copy and commit atomically on CommitTransaction, allowing rollback on AbortTransaction. Critical for transit applications where a partially-written fare balance must never leave the card in an inconsistent state.",
+        "Value files — native credit/debit semantics with configurable limits and a 'limited credit' mode where an unauthenticated writer can credit up to a pre-configured maximum without authentication, useful for top-up kiosks.",
+        "Free memory tracking — GetFreeMemory returns remaining bytes in the PICC, a useful sanity check during provisioning of multi-application cards."
+      ]
+    },
+    {
+      "title": "Command set — organized by authentication level",
+      "bullets": [
+        "Unauthenticated (PICC level) — GetVersion (0x60, returns 28 bytes of version info), GetCardUID (0x51, returns 7-byte UID), GetApplicationIDs (0x6A, returns list of 3-byte AIDs on the PICC), SelectApplication (0x5A AID), FreeMem (0x6E), GetKeySettings (0x45), GetKeyVersion (0x64).",
+        "Authentication — AuthenticateEV2First (0x71) for fresh mutual auth with forward-secure session keys, AuthenticateEV2NonFirst (0x77) to authenticate additional keys without repeating the first-pass RndA exchange, AuthenticateAES (0xAA) for legacy three-pass AES (EV1-compatible mode), AuthenticateLRP (0x71 with LRP flag) for Leakage-Resilient Primitive mode (side-channel hardened).",
+        "Application management — CreateApplication (0xCA AID, keySettings, numberOfKeys), DeleteApplication (0xDA AID), ChangeKeySettings (0x54), ChangeKey (0xC4 keyNumber, newKey, keyVersion).",
+        "File management — CreateStdDataFile (0xCD), CreateBackupDataFile (0xCB), CreateValueFile (0xCC), CreateLinearRecordFile (0xC1), CreateCyclicRecordFile (0xC0), DeleteFile (0xDF), GetFileSettings (0xF5), ChangeFileSettings (0x5F), GetFileIDs (0x6F).",
+        "Data operations — ReadData (0xAD file, offset, length), WriteData (0x3D file, offset, length, data), GetValue (0x6C), Credit (0x0C value), Debit (0xDC value), LimitedCredit (0x1C value), ReadRecords (0xBB), WriteRecord (0x3B), ClearRecordFile (0xEB).",
+        "Transaction integrity — CommitTransaction (0xC7), AbortTransaction (0xA7), CommitReaderID (0xC8 for reader-binding in session), ReadSig (0x3C for the card's ECDSA originality signature).",
+        "EV3-specific — ProximityCheck (0xFD pre-check, 0xFC main check, 0xFF verification), Transaction MAC support via the TMCounter file (0x0F) and the associated ChangeTransactionMACKey flow.",
+        "ISO 7816-4 SELECT — the standard smartcard SELECT command (00 A4 …) is supported in parallel for reader stacks that prefer ISO APDU framing over native DESFire APDUs."
+      ]
+    },
+    {
+      "title": "Authentication — the three-pass mutual AES flow",
+      "bullets": [
+        "Step 1 — Reader issues AuthenticateEV2First with the target key number (e.g. 0x00 for app master key). Card returns 16-byte encrypted RndB (random challenge B) using the pre-shared AES-128 key.",
+        "Step 2 — Reader decrypts RndB using the key, generates its own 16-byte RndA, computes RndA'||RndB' (where B' is RndB rotated left one byte), encrypts the concatenation, and sends 32 bytes back to the card.",
+        "Step 3 — Card decrypts, verifies that the received RndB' matches RndB rotated, extracts RndA, rotates it one byte left, encrypts, and returns 16 bytes. Reader decrypts and verifies.",
+        "Session keys — post-authentication, both sides compute session encryption key (SessEncKey) and session MAC key (SessMACKey) from RndA and RndB using the standard DESFire key derivation function. All subsequent commands in the session are either plain, MAC'd, or fully encrypted depending on file communication settings.",
+        "Communication modes — Plain (no crypto, still requires session to be authenticated for access-controlled files), MACed (CMAC appended to every command/response), Fully Enciphered (entire command + response encrypted with SessEncKey and signed with SessMACKey). File creation specifies which mode the file uses for each operation.",
+        "AuthenticateEV2First vs AuthenticateEV2NonFirst — EV2First clears any prior session and establishes a fresh one with new random challenges. EV2NonFirst lets the reader authenticate a second or third key within the same session without repeating RndA; useful when a single transaction uses multiple keys (e.g. one for reading balance, another for decrementing).",
+        "Key versions — each key slot has a 1-byte version number. ChangeKey requires knowing the current version. Rotating keys in a deployed fleet is coordinated by version numbers; a card may reject a ChangeKey if the provided version is stale."
+      ]
+    },
+    {
+      "title": "Transaction MAC and proximity check — EV3 signature features",
+      "bullets": [
+        "Transaction MAC (TMAC) — a cryptographic counter stored on-card that chains a MAC across all commands within an authenticated session. The reader can include 'transaction reader ID' + TMAC value in the session, and the card verifies the TMAC at CommitTransaction. Prevents mid-transaction tampering where an attacker intercepts a partial transaction and tries to splice in a modified command.",
+        "TMCounter file (0x0F) — a special file type that EV3 introduces for TMAC. Holds a 4-byte transaction counter and a 16-byte TMAC value, both cryptographically bound. Reading this file returns the counter to the reader, which uses it as part of the session integrity checks.",
+        "Proximity check — a challenge-response round-trip time measurement that detects NFC relay attacks. Reader issues PreparePC, then a sequence of 1-7 PC challenges, each measured for round-trip latency. If the latency exceeds a configurable threshold (typically 1-3 ms), the proximity check fails — indicating the card might be behind a relay attacker instead of physically present.",
+        "Proximity check integration — the reader firmware must support PC because the feature is activated by the reader. Building access controllers from HID Signo series, Suprema Bioentry W2, and similar recent systems do support PC on EV3 cards. Older reader firmware simply skips PC, degrading to EV2-level transaction integrity.",
+        "Originality signature — DESFire EV3 carries an ECDSA signature over its UID, signed by NXP's production key. ReadSig (0x3C) returns the signature; the reader can verify against NXP's published public key to prove the card is authentic NXP silicon. Used in high-value deployments to reject counterfeit cards before they enter the access-control issuance workflow."
+      ]
+    },
+    {
+      "title": "Application deployment scenarios",
+      "bullets": [
+        "Corporate access control — primary DESFire EV3 use case. Single application on the card holds a 16-byte credential number protected by an AES key shared between the card and the reader network. HID Signo, Suprema, Nedap AEOS and every modern enterprise access system support DESFire EV3 natively.",
+        "University / campus credential — multi-application: door access (one AID), library checkout (another AID), meal plan value file (third AID), printing/copying vending (fourth AID). Each application's master key is held by the issuing department, and a central IT team holds the PICC Master Key.",
+        "Transit ticketing — DESFire EV3 or DESFire Light. Value files with credit/debit semantics and backup/commit/abort for atomic fare deductions. TransBay TransLink, SEPTA Key, Ventra (Chicago), and Clipper II (Bay Area) are all DESFire or DESFire-variant deployments.",
+        "Closed-loop cashless payment — stadium vendor systems, resort plastic cards, gym chain member cards. Value file plus credit/limited-credit for kiosks plus debit for vendor terminals. Transaction MAC is the security advantage over older MIFARE Plus deployments.",
+        "Event multi-day wristbands (VIP tiers, all-access badges) — DESFire EV3 on an epoxy key tag or wristband insert, one application for entry control and one for cashless beverage vending. Proximity check catches ticket-reseller relay attacks at gate entry.",
+        "Industrial access (controlled-rated areas in pharma, aerospace MRO) — DESFire EV3 for dual-factor badge-plus-PIN flows. The PIN is not on the card; DESFire carries only the cryptographic credential and the reader combines it with a PIN entered at the keypad.",
+        "When DESFire EV3 is not the right choice — single-application consumer authentication (use NTAG424 DNA for smartphone tap-to-verify), cost-sensitive loyalty cards (use MIFARE Classic or Ultralight EV1 for closed-loop, non-secure applications), ultra-low-cost transit disposables (use DESFire Light rather than full EV3)."
+      ]
+    },
+    {
+      "title": "Migration from DESFire EV1 / EV2 to EV3",
+      "bullets": [
+        "Reader firmware — EV3 is fully backwards-compatible with EV1 and EV2 command sets. A reader that works with EV2 cards works with EV3 cards unchanged, treating them as EV2 cards. To exploit EV3 features (proximity check, enhanced transaction MAC) the reader firmware needs updating.",
+        "Card personalization workflow — EV3 silicon accepts the same application and file creation commands as EV2. Existing personalization scripts work without changes. To enable EV3 features (e.g. ProximityCheck) the script must create a TMCounter file (0x0F) with appropriate access rights.",
+        "Key migration — existing EV1 / EV2 AES keys can be transferred to EV3 without change. Card issuance stays the same.",
+        "PICC-level configuration byte — EV3 introduces additional configuration bits in the PICC settings; set ISO_DF_NAMES_SUPPORT, RANDOM_UID, and MIRROR_UID as needed for the deployment. Legacy scripts that don't set these continue to work; the EV3 card uses sane defaults.",
+        "Coexistence — EV1, EV2, and EV3 cards can coexist in the same deployment. Readers implement a fallback chain (try EV3 first, then EV2, then EV1) so a single reader network can handle a mixed fleet. Most enterprises migrate by attrition: new issuance is EV3, old cards continue to work until they're replaced on natural expiry."
+      ]
+    },
+    {
+      "title": "NXP reference documents",
+      "bullets": [
+        "MIFARE DESFire EV3 MF3D(H)x2 Product Data Sheet (NDA-wrapped via NXP's DocStore) — the canonical chip reference.",
+        "AN12752 — DESFire EV3 features and application hints. Transaction MAC, proximity check, and communication-mode implementation details.",
+        "AN10787 — DESFire protocol reference (applies to EV1/EV2/EV3). The command-set opcodes and APDU layouts.",
+        "AN11004 — DESFire authentication and session key derivation reference. Pseudocode for the three-pass AES authentication and SessEncKey / SessMACKey computation.",
+        "MIFARE SDK / TapLinx — NXP's Android and iOS SDKs that abstract the DESFire command set into higher-level Java/Swift APIs. Reference implementations for reader integration.",
+        "ISO/IEC 14443 Parts 1-4 — the air-interface and transport-protocol standards. DESFire EV3 implements Parts 1, 2, 3 and 4 in full.",
+        "ISO/IEC 7816-4 — the smartcard command framework. DESFire EV3 accepts ISO 7816-4 APDUs in parallel to the native DESFire APDUs."
+      ]
+    },
+    {
+      "title": "Specifications at a glance",
+      "table": {
+        "columns": [
+          "Parameter",
+          "DESFire EV3 (2 KB)",
+          "DESFire EV3 (4 KB)",
+          "DESFire EV3 (8 KB)"
+        ],
+        "rows": [
+          ["NXP part number", "MF3DHx2", "MF3DHx4", "MF3DHx8"],
+          ["Operating frequency", "13.56 MHz", "13.56 MHz", "13.56 MHz"],
+          ["Air-interface standard", "ISO/IEC 14443-4 Type A", "ISO/IEC 14443-4 Type A", "ISO/IEC 14443-4 Type A"],
+          ["User memory", "2 KB", "4 KB", "8 KB"],
+          ["Max applications", "28", "28", "28"],
+          ["Max files per application", "32", "32", "32"],
+          ["Max keys per application", "14", "14", "14"],
+          ["Cryptography", "AES-128, 3DES legacy", "AES-128, 3DES legacy", "AES-128, 3DES legacy"],
+          ["Authentication", "EV2 3-pass + LRP", "EV2 3-pass + LRP", "EV2 3-pass + LRP"],
+          ["Transaction MAC", "Yes", "Yes", "Yes"],
+          ["Proximity check", "Yes", "Yes", "Yes"],
+          ["Originality signature", "ECDSA over UID", "ECDSA over UID", "ECDSA over UID"],
+          ["UID length", "7 bytes", "7 bytes", "7 bytes"],
+          ["Operating temperature", "-25 °C to +85 °C", "-25 °C to +85 °C", "-25 °C to +85 °C"],
+          ["Data retention", "≥ 25 years", "≥ 25 years", "≥ 25 years"],
+          ["Endurance (writes)", "500,000 cycles", "500,000 cycles", "500,000 cycles"]
+        ]
+      }
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "MIFARE DESFire EV3 product pages",
+      "description": "Proud Tek SKUs built on DESFire EV3 silicon.",
+      "links": [
+        { "href": "/products/rfid-cards/mifare-desfire-ev3-card/", "label": "MIFARE DESFire EV3 card" },
+        { "href": "/products/rfid-keyfobs/mifare-desfire-keyfob/", "label": "MIFARE DESFire keyfob" },
+        { "href": "/products/rfid-cards/mifare-ultralight-c-card/", "label": "MIFARE Ultralight C card" },
+        { "href": "/products/rfid-keyfobs/rfid-metal-keyfob/", "label": "RFID metal keyfob" },
+        { "href": "/products/rfid-keyfobs/nfc-epoxy-key-tag/", "label": "NFC epoxy key tag" },
+        { "href": "/products/rfid-keyfobs/rfid-abs-keyfob/", "label": "RFID ABS keyfob" }
+      ]
+    },
+    {
+      "title": "Related comparisons and guides",
+      "description": "DESFire family context, alternatives and integration guides.",
+      "links": [
+        { "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "MIFARE Plus EV2 vs DESFire EV3" },
+        { "href": "/compare/mifare-plus-vs-desfire/", "label": "MIFARE Plus vs DESFire" },
+        { "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "MIFARE Classic vs Plus vs DESFire for hotel locks" },
+        { "href": "/guides/ntag424-dna-sun-cmac-authentication/", "label": "NTAG424 DNA SUN + CMAC guide" },
+        { "href": "/guides/iso-14443-explained/", "label": "ISO/IEC 14443 explained" },
+        { "href": "/solutions/rfid-access-control/", "label": "RFID access-control solution" }
+      ]
+    },
+    {
+      "title": "Authoritative external references",
+      "description": "NXP and ISO documents that define DESFire EV3.",
+      "links": [
+        { "href": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-desfire/mifare-desfire-ev3-contactless-multi-application-ic:MIFARE-DESFIRE-EV3", "label": "NXP DESFire EV3 product page" },
+        { "href": "https://www.iso.org/standard/73599.html", "label": "ISO/IEC 14443-4:2018 specification" }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "How many applications and files can a DESFire EV3 card hold?",
+      "answer": "Up to 28 applications per PICC, each with up to 32 files and up to 14 AES application keys. Total memory is the limit: a 2 KB card cannot hold 28 × 32 files at meaningful size, so in practice deployments plan around the memory budget rather than the maximum counts. Typical multi-application campus cards use 3-5 applications with 2-4 files each, leaving significant headroom on a 4 KB or 8 KB chip."
+    },
+    {
+      "question": "What is the difference between AuthenticateEV2First and AuthenticateAES?",
+      "answer": "AuthenticateAES (0xAA) is the legacy EV1/EV2 AES authentication — three-pass mutual auth, session keys derived from RndA and RndB, no forward secrecy across multiple authentications. AuthenticateEV2First (0x71) is the EV2-introduced mode that adds forward-secure session keys and a transaction counter, making it harder for an attacker who compromises one session to retroactively decrypt earlier sessions. For new deployments, always use AuthenticateEV2First. AuthenticateAES is retained for backwards compatibility with EV1-era reader firmware."
+    },
+    {
+      "question": "Do I need proximity check for typical access control?",
+      "answer": "For most corporate door access — no. Proximity check defeats NFC relay attacks where an attacker uses two phones (one near the victim's card, one near the reader) to extend the card's effective reach by tens of meters. Relay attacks are realistic against high-value transit and contactless-payment targets but rare against corporate access control. Enterprises with executive-protection requirements or high-secrecy deployments (classified, pharma high-value storage, etc.) do enable PC; mainstream corporate deployments leave it off and rely on physical security + video verification instead."
+    },
+    {
+      "question": "Can DESFire EV3 be used for transit ticketing alongside existing Calypso cards?",
+      "answer": "Yes. DESFire EV3 is the native choice for new transit deployments in the EU and North America; ISO/IEC 14443-4 Type A makes it interoperable with existing fare-collection reader networks. Coexistence with Calypso (ISO 14443 Type B, different command set) requires the reader to probe both protocols, which is standard in multi-card transit networks. DESFire Light is the cost-optimized variant specifically for single-application transit ticketing."
+    },
+    {
+      "question": "How does Transaction MAC protect a cashless-payment flow?",
+      "answer": "Transaction MAC chains a cryptographic MAC across a sequence of commands within an authenticated session. A typical cashless-payment flow is: (1) Authenticate, (2) ReadBalance, (3) Debit(amount), (4) CommitTransaction. Without TMAC, an attacker intercepting between step 3 and step 4 could splice a different Debit command. With TMAC, the MAC is computed over the ordered sequence of commands and values; any mid-transaction tampering makes the CommitTransaction MAC verification fail. The card rejects the commit and the transaction is rolled back."
+    },
+    {
+      "question": "Can I read DESFire EV3 from an Android phone without special hardware?",
+      "answer": "Yes for unencrypted file reads and for public information (UID, application list via GetApplicationIDs). ISO 14443-4 Type A is native to Android's NFC stack. However, to perform authenticated operations (ReadData on protected files, Credit/Debit, ChangeKey) the phone needs the per-application AES key — which is a secret shared with the card's issuing authority. Typical consumer-facing flows don't give phones this key; they instead make network API calls where the server holds the keys and verifies or returns authentication data."
+    },
+    {
+      "question": "Is MIFARE DESFire EV3 the right choice for EU Digital Product Passport (DPP)?",
+      "answer": "Usually no. DPP regulation (ESPR 2023/2102) specifies a persistent, machine-readable data carrier that consumers can scan with a smartphone. DESFire EV3 requires per-application AES keys for authenticated access, which does not fit the 'any smartphone can read it' model DPP assumes. NTAG424 DNA is the NXP-recommended chip for DPP (smartphone-friendly, URL-based, cryptographic authenticity via SUN + CMAC). DESFire EV3 is the right choice for closed-loop enterprise access control, transit, and cashless payment — applications with dedicated reader infrastructure and proprietary keys."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/",
+    "label": "Request DESFire EV3 card samples"
+  },
+  "secondaryActions": [
+    {
+      "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
+      "label": "MIFARE DESFire EV3 card"
+    },
+    {
+      "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
+      "label": "MIFARE Plus EV2 vs DESFire EV3"
+    },
+    {
+      "href": "/solutions/rfid-access-control/",
+      "label": "RFID access-control solution"
+    }
+  ]
+}
