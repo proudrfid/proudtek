@@ -254,6 +254,8 @@ interface LandingDef {
   heroImage?: string;
   imageSourceRoutes: string[];
   group: string;
+  /** Explicit chip-family facet values — takes precedence over regex scan for the chip group. See FACET_RULES.chip below for the vocabulary. */
+  chipFamilies?: string[];
 }
 
 let _landingDefsCache: LandingDef[] | null = null;
@@ -327,6 +329,33 @@ function deriveFacets(...textParts: (string | undefined)[]): Facets {
     }
   }
   return out;
+}
+
+/**
+ * Variant of deriveFacets that lets a SKU explicitly declare its chip-family
+ * facet values (for SKUs whose chip compatibility matrix lives deep in section
+ * tables rather than in title/summary, e.g. keyfobs and wristbands that ship
+ * with 10+ chip options). Values are validated against FACET_RULES.chip and
+ * unknown values are dropped silently. If `chipFamilies` is omitted or empty,
+ * falls back to regex-scan of title+summary+route like deriveFacets.
+ */
+function deriveFacetsWithChipOverride(
+  chipFamilies: string[] | undefined,
+  ...textParts: (string | undefined)[]
+): Facets {
+  const facets = deriveFacets(...textParts);
+  if (chipFamilies && chipFamilies.length > 0) {
+    const validChipValues = new Set(FACET_RULES.chip.map((spec) => spec.value));
+    const explicit = chipFamilies.filter((v) => validChipValues.has(v));
+    // Union with whatever the regex scan already found (regex may catch aliases
+    // the author didn't list, e.g. a tangential NTAG21x reference in the
+    // summary). Dedupe while preserving FACET_RULES order.
+    const merged = Array.from(new Set([...facets.chip, ...explicit]));
+    facets.chip = FACET_RULES.chip
+      .map((spec) => spec.value)
+      .filter((v) => merged.includes(v));
+  }
+  return facets;
 }
 
 interface CatalogProduct {
@@ -482,7 +511,10 @@ async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduc
       // Include the route slug so mount-type words like "anti-metal" or
       // "on-metal" embedded in URLs (e.g. /products/rfid-tags/anti-metal-…)
       // are picked up even when the marketing summary is short.
-      facets: deriveFacets(title, summary, def.route),
+      // Explicit chipFamilies takes precedence for SKUs whose chip matrix
+      // lives in section tables rather than title/summary (keyfobs,
+      // wristbands, multi-chip cards).
+      facets: deriveFacetsWithChipOverride(def.chipFamilies, title, summary, def.route),
     });
   }
 

@@ -181,6 +181,8 @@ const editorialSchema = z.object({
   sources: z.array(sourceSchema).optional(),
   /** Industry slugs (matching `src/content/editorial/industries/<slug>.json`) where this SKU is deployed. Renders a "Used in these industries" card grid on SKU pages. */
   relatedIndustries: z.array(z.string()).optional(),
+  /** Explicit chip-family facet values for the catalog filter on /products/all/. Takes precedence over the regex scan of title+summary+route — use when the SKU supports multiple chips in a compatibility matrix and the filter should surface it for every chip. Valid values match FACET_RULES.chip values in catalog-pages.ts: ntag21x, ntag424, mifare-classic, mifare-desfire, mifare-ultralight, mifare-plus, icode, em-tk5, impinj-m7, alien-higgs, ucode. */
+  chipFamilies: z.array(z.string()).optional(),
 });
 
 /* ── Authors collection schema (added 2026-04) ─────────────────────── */
