@@ -269,15 +269,38 @@ async function loadEditorialDefinitions(): Promise<EditorialDefinition[]> {
   return _editorialDefsCache;
 }
 
+/**
+ * Routes where an editorial JSON is authoritative and MUST replace any
+ * existing WooCommerce stub or snapshot at the same route.
+ *
+ * These are the product-cluster pillar pages ("Complete guide to ...") that
+ * supersede the imported WooCommerce category listings. Without this override
+ * list `mergeEditorialPages` would silently skip the pillar because the
+ * legacy /products/<cluster>/ stub is already present in siteData.pages.
+ */
+const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
+  "/products/rfid-labels/",
+  "/products/rfid-tags/",
+  "/products/rfid-cards/",
+  "/products/rfid-wristbands/",
+  "/products/rfid-keyfobs/",
+]);
+
 export async function mergeEditorialPages(siteData: SiteData): Promise<SiteData> {
   const extraPages = await buildEditorialPages(siteData);
-  const existingRoutes = new Set(siteData.pages.map((page) => page.route));
+  const existingIndex = new Map<string, number>();
+  siteData.pages.forEach((page, index) => existingIndex.set(page.route, index));
   const pages = [...siteData.pages];
 
   extraPages.forEach((page) => {
-    if (!existingRoutes.has(page.route)) {
+    const existingAt = existingIndex.get(page.route);
+    if (existingAt === undefined) {
       pages.push(page);
+    } else if (EDITORIAL_OVERRIDE_ROUTES.has(page.route)) {
+      // Pillar editorial page replaces the WP snapshot at the cluster root.
+      pages[existingAt] = page;
     }
+    // Otherwise: keep the existing page (SKU pages already map 1:1 to JSON).
   });
 
   return {
@@ -1121,7 +1144,14 @@ function findMeaningfulImage(bodyHtml: string): string | null {
 }
 
 function isSectionRoot(route: string): boolean {
-  return route === "/solutions/" || route === "/compare/" || route === "/compatibility/" || route === "/guides/" || route === "/contact/";
+  return (
+    route === "/solutions/" ||
+    route === "/compare/" ||
+    route === "/compatibility/" ||
+    route === "/guides/" ||
+    route === "/contact/" ||
+    EDITORIAL_OVERRIDE_ROUTES.has(route)
+  );
 }
 
 function resolvePageType(group: EditorialGroup): string {
