@@ -3,7 +3,7 @@
   "group": "guides",
   "title": "Google Review Cards For Auto Dealerships",
   "kicker": "Dealership Guide",
-  "summary": "A multi-rooftop playbook for auto dealer groups deploying Google review cards — splitting sales delivery from service pickup and cashier moments, per-rooftop URL routing, F&I and service-advisor handoff mechanics, post-delivery digital supplements, and the dealer-management-system data hooks that turn the programme into a measurement layer.",
+  "summary": "A multi-rooftop playbook for auto dealer groups deploying Google review cards — splitting sales delivery from service pickup and cashier moments, per-rooftop URL routing, F&I and service-advisor handoff mechanics, post-delivery digital supplements, CSI/SSI alignment with OEM manufacturer scoring, and the dealer-management-system data hooks that turn the programme into a measurement layer.",
   "publishedAt": "2026-04-19",
   "modifiedAt": "2026-04-19",
   "reviewedAt": "2026-04-19",
@@ -18,9 +18,9 @@
     "dealership rooftop routing"
   ],
   "heroPoints": [
-    "Dealership review prompts split between sales delivery and service pickup — running one generic card for both consistently underperforms two tailored prompts.",
-    "Per-rooftop URL routing has to be stable before a group starts printing several store batches; cross-rooftop routing errors are common and hurt local SEO.",
-    "The strongest pilot tests one sales-side workflow and one service-side workflow in parallel at the same rooftop before scaling the network."
+    "Dealership review prompts split between sales delivery and service pickup — running one generic card for both consistently underperforms two tailored prompts, and the two moments converge only on the shared rooftop profile.",
+    "Per-rooftop URL routing has to be stable before a group starts printing several store batches; cross-rooftop routing errors are common and hurt local SEO, OEM scoring, and the group's local-pack position simultaneously.",
+    "The strongest pilot tests one sales-side workflow and one service-side workflow in parallel at the same rooftop before scaling the network — and the six-week duration has to span at least one service-month closeout to capture real variance."
   ],
   "imageAlt": "Google review card handoff at an auto dealership delivery bay",
   "imageSourceRoutes": [
@@ -31,82 +31,99 @@
   "sections": [
     {
       "title": "Why dealerships are a distinct review-programme case",
-      "intro": "Auto dealerships look like premium retail from the outside, but the business runs two completely different customer flows under one roof — sales delivery and service pickup — with separate staff, workflows and handoff moments.",
+      "intro": "Auto dealerships look like premium retail from the outside, but the business runs two completely different customer flows under one roof — sales delivery and service pickup — with separate staff, workflows and handoff moments. A generic retail review-card plan fits neither, and the dealership also layers OEM manufacturer scoring on top, which changes both the stakes and the compliance lines.",
       "bullets": [
-        "Sales delivery: a high-stakes, once-a-decade transaction. The customer has spent hours at the dealership, signed paperwork, and is picking up a car they feel emotionally invested in. The review moment is very strong if it lands well.",
-        "Service pickup: a frequent, lower-stakes transaction. The customer drops off, the car is fixed, the customer pays at the cashier and drives away. The review moment is shorter but repeats every visit.",
-        "The two flows share a Google Business Profile in most rooftops, which means both sales and service reviews land on the same rooftop profile. This is a feature (consolidated review count) but creates measurement complications (no clean separation of sales vs service review velocity)."
+        "Sales delivery: a high-stakes, once-a-decade transaction. The customer has spent hours at the dealership, signed paperwork, and is picking up a car they feel emotionally invested in. The review moment is very strong if it lands well, and sales reviews tend to be long, substantive and heavily influential for other new-car shoppers comparing dealers.",
+        "Service pickup: a frequent, lower-stakes transaction. The customer drops off, the car is fixed, the customer pays at the cashier and drives away. The review moment is shorter but repeats every visit. Service generates the bulk of total review volume across the year because the customer base cycles through service two to six times for every one sales interaction.",
+        "The two flows share a Google Business Profile in most rooftops, which means both sales and service reviews land on the same rooftop profile. This is a feature (consolidated review count that strengthens local-pack ranking) but creates measurement complications (no clean separation of sales vs service review velocity without URL-level tagging).",
+        "OEM scoring overlay: most manufacturers run CSI (Customer Satisfaction Index) for service and SSI (Sales Satisfaction Index) for sales, fed partly by post-visit surveys. These scores tie to dealer bonuses, allocation and stair-step programmes. Dealer principals often treat the Google review programme as complementary — the surveys drive OEM bonuses, the reviews drive local visibility — but the two systems cannot contradict each other publicly.",
+        "Dealer-group structure: multi-rooftop groups often hold several OEM franchises under one parent. Each rooftop has its own Business Profile, its own general manager, and often its own internal culture. The group-level template and admin layer has to accommodate variation between rooftops, not force an identical workflow onto every one.",
+        "EV and hybrid transitions: as dealerships shift toward battery-electric inventory, the delivery moment is longer (charging setup, range education, mobile-app pairing) and the service moment is different (fewer routine service visits, more infrequent high-stakes battery-related visits). The prompt timing has to shift with the vehicle mix.",
+        "Recall and warranty dynamics: recall repairs and warranty-claim visits are often emotionally negative. The customer is inconvenienced, and a review ask in that context reads tone-deaf. The programme's default should bias toward skipping prompts during recall visits and warranty disputes, catching those customers only at their next clean interaction."
       ]
     },
     {
       "title": "Per-rooftop URL routing and dealer-group admin",
-      "intro": "Dealer groups with multiple rooftops follow the same multi-location URL discipline as other verticals. The specific addition is that many dealerships want the URL to log whether the tap came from sales or service, even if it lands on the same profile.",
+      "intro": "Dealer groups with multiple rooftops follow the same multi-location URL discipline as other verticals. The specific addition is that many dealerships want the URL to log whether the tap came from sales or service, even if it lands on the same profile. This dual-path routing is what makes per-department measurement possible without splitting the underlying Google profile.",
       "bullets": [
-        "Subdomain pattern: review.dealergroup.com/rooftop-northside-sales, review.dealergroup.com/rooftop-northside-service, etc. The redirect logs the source path and then 301s to the rooftop's single Google review URL.",
-        "Central admin: one admin panel mapping rooftop and department to Place ID. Growing dealer groups often acquire rooftops; this admin is also the migration workflow.",
-        "OEM franchise agreements: some OEMs specify how the Business Profile is named and categorised. Work within OEM rules; do not invent parallel profiles that confuse the customer.",
-        "Rooftop closure and consolidation: when two rooftops merge, decommission the losing rooftop's redirect so old cards do not drive traffic to a stale profile.",
-        "Fixed operations vs variable operations: service and parts (fixed ops) and sales (variable ops) may belong to different general managers. Align the URL strategy with the GM structure so attribution lands in the right place."
+        "Subdomain pattern: review.dealergroup.com/rooftop-northside-sales, review.dealergroup.com/rooftop-northside-service, etc. The redirect logs the source path and then 301s to the rooftop's single Google review URL. The chain-owned subdomain survives profile URL changes and OEM-mandated profile renames without card reprints.",
+        "Central admin: one admin panel mapping rooftop and department to Place ID. Growing dealer groups often acquire rooftops; this admin is also the migration workflow for new-acquisition rooftops entering the group.",
+        "OEM franchise agreements: some OEMs specify how the Business Profile is named and categorised. Work within OEM rules; do not invent parallel profiles that confuse the customer or create OEM-compliance exposure. Profile ownership is a frequent pre-sale negotiation point in dealer acquisitions, and the purchase agreement should explicitly cover review-asset transfer.",
+        "Rooftop closure and consolidation: when two rooftops merge, decommission the losing rooftop's redirect so old cards do not drive traffic to a stale profile. Residual cards circulate in customer glove boxes for years; a live redirect to a deprecated profile is worse than a clean 404.",
+        "Fixed operations vs variable operations: service and parts (fixed ops) and sales (variable ops) may belong to different general managers. Align the URL strategy with the GM structure so attribution lands in the right place and neither GM can dispute the other's numbers.",
+        "Multi-brand holdings: groups holding multiple franchises (Toyota, Honda, Ford at a campus) may have three profiles at the same physical address. Each profile needs its own subdomain row and its own redirect; mixing cards between brands at a shared service drive is a common mistake on campuses with shared quick-service lanes.",
+        "Used-car-only stores: some groups operate used-vehicle-only satellite stores under the parent group umbrella. These usually have their own Business Profile and their own routing path, distinct from the flagship new-car rooftop.",
+        "Routing audit: quarterly, tap each rooftop's cards from a distant IP and confirm the destination profile is live, owned by the group, and shows the correct rooftop. DNS and Place ID drift silently breaks 1–2% of cards per year in groups over ten rooftops."
       ]
     },
     {
       "title": "Sales delivery: the high-stakes review moment",
-      "intro": "The new-car or used-car delivery moment is the strongest review-card opportunity in the entire vertical. It earns a dedicated workflow.",
+      "intro": "The new-car or used-car delivery moment is the strongest review-card opportunity in the entire vertical. It earns a dedicated workflow, premium materials and a carefully sequenced handoff that involves the salesperson, the F&I manager and often a delivery specialist. Most dealers under-invest in this moment because service volume feels more urgent; the dealers who get it right see sales-side reviews that heavily influence local-pack conversion.",
       "bullets": [
-        "Delivery bay handoff: the salesperson walks the customer through the new car's features and hands over the keys. The review card is part of the key handoff kit along with the owner's manual pocket and registration paperwork.",
-        "F&I exit moment: after the finance and insurance paperwork is signed, the F&I manager hands over the folio plus the review card. Conversion is high because the customer has just made a large commitment.",
-        "Post-delivery SMS: 24–48 hours after delivery, a short text with the review URL. Supplements the physical card; captures customers who walked away without tapping.",
-        "Photograph moment: some dealerships take a photo of the customer with the new car and text it with the review prompt. Higher conversion, more production overhead.",
-        "Substrate choice: premium. A plastic reception-style card undermines the six-figure transaction. Metal-look or premium PVC with heavy soft-touch laminate is appropriate.",
-        "Script: 'If your buying experience went well, a Google review helps the next customer find us.' Delivered by the salesperson at key handoff and by F&I at folio handoff. Mentions 'buying experience', not 'service'."
+        "Delivery bay handoff: the salesperson walks the customer through the new car's features and hands over the keys. The review card is part of the key handoff kit along with the owner's manual pocket and registration paperwork. Dedicated delivery specialists (a role growing at larger dealer groups) handle this moment specifically and convert noticeably better than multitasking salespeople.",
+        "F&I exit moment: after the finance and insurance paperwork is signed, the F&I manager hands over the folio plus the review card. Conversion is high because the customer has just made a large commitment and the relief-point emotion is strong. The F&I prompt is also a natural compliance-safe moment because there are no incentives or discounts being traded.",
+        "EV-specific delivery: electric-vehicle deliveries take longer (charging app pairing, home-charger discussion, range education). The review prompt fits at the end of the EV walkthrough, after the customer has just been educated for 30–45 minutes. Conversion is disproportionately strong because the customer feels looked-after.",
+        "Post-delivery SMS: 24–48 hours after delivery, a short text with the review URL. Supplements the physical card; captures customers who walked away without tapping. The BDC (Business Development Center) usually owns this motion at group scale.",
+        "Photograph moment: some dealerships take a photo of the customer with the new car and text it with the review prompt. Higher conversion (often 20–30% of deliveries), more production overhead, and the photo itself becomes content the customer shares, creating organic social lift alongside the review.",
+        "Trade-in emotional layer: the sale often involves trading in the customer's previous car, which carries emotional weight. A delivery handoff that acknowledges the trade-in (not just the new car) generates warmer reviews. Train sales staff to mention the trade-in explicitly in the delivery conversation.",
+        "Substrate choice: premium. A plastic reception-style card undermines the six-figure transaction. Metal-look or premium PVC with heavy soft-touch laminate is appropriate. The folio the card sits inside matters almost as much as the card itself — a branded folio lifts perceived quality of the entire delivery experience.",
+        "Script: 'If your buying experience went well, a Google review helps the next customer find us.' Delivered by the salesperson at key handoff and by F&I at folio handoff. Mentions 'buying experience', not 'service', which keeps the sales review separate from service reviews the customer may write later."
       ]
     },
     {
       "title": "Service pickup: the high-volume review moment",
-      "intro": "Service pickup is where most of the review volume comes from because the interaction repeats several times a year per customer. Getting the prompt right at scale matters.",
+      "intro": "Service pickup is where most of the review volume comes from because the interaction repeats several times a year per customer. Getting the prompt right at scale matters. The service-advisor handoff is the single highest-leverage moment, and the dealers who treat it as a trained workflow (rather than an afterthought on a busy Friday) see 3–5× the review velocity of dealers who print cards and hope.",
       "bullets": [
-        "Service advisor handoff: the advisor walks the customer through the service ticket, takes payment (or routes to cashier), and returns the keys. The review card is part of the key handoff. This is the highest-converting service moment.",
-        "Cashier counter: if the dealership has a separate cashier, a small card or sticker at the counter supplements the advisor handoff.",
-        "Courtesy shuttle / loaner return: the customer returns a loaner, waits briefly for their car, and is a captive audience. A tabletop stand in this area converts steadily without staff effort.",
-        "Post-service text: a short text 2–4 hours after pickup asking for the review. Most effective when the service advisor's photo is in the message.",
-        "Substrate choice: mid-range. Service pickup runs higher volume than sales delivery, so the cost has to support the refresh cadence. Standard PVC with a durable laminate is the workhorse.",
-        "Script: 'If service went well today, a Google review helps us out.' Shorter than the sales script because the interaction is shorter."
+        "Service advisor handoff: the advisor walks the customer through the service ticket, takes payment (or routes to cashier), and returns the keys. The review card is part of the key handoff. This is the highest-converting service moment because the advisor is the relationship anchor and the customer is about to drive away satisfied.",
+        "Cashier counter: if the dealership has a separate cashier, a small card or sticker at the counter supplements the advisor handoff. The cashier moment is shorter and less relational, so conversion is lower, but it catches customers whose advisor forgot to mention the card.",
+        "Courtesy shuttle / loaner return: the customer returns a loaner, waits briefly for their car, and is a captive audience. A tabletop stand in this area converts steadily without staff effort. Loaner-return placement is one of the few 'set-and-forget' placements that works reliably.",
+        "Quick-service lane (oil change, tire rotation): many dealers run express lanes separate from the main service drive. These customers have shorter interactions (45 minutes) and do not meet a service advisor. A stand at the quick-service checkout plus a sticker at the express-lane exit catches these visits.",
+        "Post-service text: a short text 2–4 hours after pickup asking for the review. Most effective when the service advisor's photo is in the message. Open rates for service-advisor-named texts run 50–70% versus 25–40% for generic texts.",
+        "Mobile service visits: dealers offering mobile service (technician visits the customer's home or office) have a different prompt architecture. The technician hands over a card at the end of the visit along with the paperwork. Conversion is very strong because the customer just received white-glove service at home.",
+        "Substrate choice: mid-range. Service pickup runs higher volume than sales delivery, so the cost has to support the refresh cadence. Standard PVC with a durable laminate is the workhorse; upgrade the advisor-handed card, keep the waiting-lounge and cashier placements at baseline spec.",
+        "Script: 'If service went well today, a Google review helps us out.' Shorter than the sales script because the interaction is shorter. Avoid prompts during warranty-claim disputes or recall repairs where the customer is inconvenienced; those are not review moments."
       ]
     },
     {
       "title": "Separating sales and service in the measurement layer",
-      "intro": "Sales and service reviews land on the same Google Business Profile, but a dealer group needs to know whether sales or service is driving volume. The routing layer is what makes this possible.",
+      "intro": "Sales and service reviews land on the same Google Business Profile, but a dealer group needs to know whether sales or service is driving volume. The routing layer is what makes this possible, and the reporting infrastructure built on top of it is what turns the review programme from a marketing expense into a measurable operations layer.",
       "bullets": [
-        "Source tagging in the redirect: the sales URL and the service URL hit the same redirect endpoint, which logs which path triggered the tap before forwarding to Google.",
-        "Dealer management system (DMS) integration: match review taps against the DMS customer record so the group knows whether the reviewer just bought a car, just had service, or both.",
-        "Reporting: weekly report per rooftop showing review velocity by source. Use this to coach sales teams or fixed-ops teams separately.",
-        "Google review copy analysis: most reviews mention either the salesperson's name or the service advisor's name. A simple NLP scan of review text classifies reviews even without the URL routing.",
-        "OEM reporting: many manufacturers now require dealers to report customer experience metrics tied to reviews. The per-source routing makes this reporting cleaner."
+        "Source tagging in the redirect: the sales URL and the service URL hit the same redirect endpoint, which logs which path triggered the tap before forwarding to Google. The log captures rooftop, department, timestamp, and optionally which staff member's card was tapped (if the card carries a staff parameter).",
+        "Dealer management system (DMS) integration: match review taps against the DMS customer record so the group knows whether the reviewer just bought a car, just had service, or both. CDK, Reynolds and Reynolds, Dealertrack and Auto/Mate all expose APIs that support this matching if the group's IT team prioritises the integration.",
+        "Reporting: weekly report per rooftop showing review velocity by source. Use this to coach sales teams or fixed-ops teams separately. Monthly roll-up at group level for the dealer principal; quarterly review against OEM CSI/SSI trends.",
+        "Google review copy analysis: most reviews mention either the salesperson's name or the service advisor's name. A simple NLP scan of review text classifies reviews even without the URL routing, and dealers who run this analysis catch naming patterns that the redirect data cannot show (most-named advisor, most-praised sales specialty).",
+        "OEM reporting: many manufacturers now require dealers to report customer experience metrics tied to reviews. The per-source routing makes this reporting cleaner and defensible; dealers who rely on guesswork tend to under-report sales-driven reviews (which are often longer and harder to classify with simple rules).",
+        "Advisor-level leaderboards: with staff-parameter routing, the group can maintain per-advisor tap leaderboards. Publish monthly at each rooftop; pair with non-cash recognition. Trailing advisors often benefit more from coaching on the handoff moment than from motivation alone — the leaderboard identifies who needs help.",
+        "Review-volume-to-CSI correlation: over time, pair the group's Google review velocity with OEM CSI scores. Rooftops where the two diverge (high CSI, low review velocity) are under-prompting; rooftops where they converge are running the programme correctly. The divergence analysis is one of the most useful KPIs a dealer principal can add.",
+        "Response-time metric: track how quickly the group responds to each review (goal: under 24 hours). Fast, thoughtful responses lift the profile's perceived attentiveness and correlate with future review volume. Centralise responses to a small team trained in both the sales and service voice."
       ]
     },
     {
       "title": "Format choice by department and surface",
-      "intro": "Each dealership department needs a format tailored to its physical layout and customer flow. A single universal card almost always underserves at least one department.",
+      "intro": "Each dealership department needs a format tailored to its physical layout and customer flow. A single universal card almost always underserves at least one department. The cost of running five different formats across a rooftop is tiny compared with the review volume the right placement unlocks.",
       "bullets": [
-        "Sales showroom: premium handheld card, held by sales and F&I. Not placed on showroom furniture — it gets lost in the showroom's visual noise.",
-        "Delivery bay: a branded folio with the review card included. The folio dignifies the card and keeps it with the paperwork the customer takes home.",
-        "Service drive-through: small NFC sticker on the service advisor's desk or a stand at waiting-area eye-level. Customers may drop off and rush; the prompt has to catch them on return.",
-        "Service waiting lounge: tabletop card or stand. The customer is a captive audience for 30–60 minutes; the prompt competes with WiFi, coffee and phone use.",
-        "Loaner return area: tabletop stand. The customer waits briefly; the placement converts steadily.",
-        "Cashier counter: small stand or sticker. Transactional moment, short dwell, works as supplement to the advisor handoff."
+        "Sales showroom: premium handheld card, held by sales and F&I. Not placed on showroom furniture — it gets lost in the showroom's visual noise and competes with OEM brochures, brand displays and colour-swatch kits. Keep it in the salesperson's hand or in the delivery folio.",
+        "Delivery bay: a branded folio with the review card included. The folio dignifies the card and keeps it with the paperwork the customer takes home. A folio costs 3–5× a standalone card but keeps the card in rotation as the customer refers to the paperwork weeks later.",
+        "F&I office: desk card or small stand at the F&I manager's desk. The F&I conversation is the last room before delivery; a card on the desk that the manager reaches for at folio handoff fits naturally.",
+        "Service drive-through: small NFC sticker on the service advisor's desk or a stand at waiting-area eye-level. Customers may drop off and rush; the prompt has to catch them on return. Desk-level placement converts better than wall-mounted signage because the advisor can gesture to it during the handoff.",
+        "Service waiting lounge: tabletop card or stand. The customer is a captive audience for 30–60 minutes; the prompt competes with WiFi, coffee and phone use. Placement near the coffee station works well because the customer physically approaches that area.",
+        "Loaner return area: tabletop stand. The customer waits briefly; the placement converts steadily without any staff involvement.",
+        "Cashier counter: small stand or sticker. Transactional moment, short dwell, works as supplement to the advisor handoff. The cashier should not deliver a verbal prompt — that is the service advisor's job — but the sticker catches customers whose advisor handoff was rushed.",
+        "Quick-service exit: sticker on the payment kiosk or tabletop card at the service-writer stand for express-lane customers. These customers do not meet a traditional service advisor, so self-serve placement is the only prompt they will see."
       ]
     },
     {
       "title": "Pilot, measurement and refresh rhythm",
-      "intro": "Dealership pilots need to test sales and service in parallel at the same rooftop, then scale across the network with a consistent data model.",
+      "intro": "Dealership pilots need to test sales and service in parallel at the same rooftop, then scale across the network with a consistent data model. Six-week duration is the minimum because service month-end cycles create operational swings that shorter pilots miss, and model-year-end sales cycles create similar distortions on the sales side.",
       "bullets": [
-        "Pilot selection: one representative rooftop (mid-volume is ideal). Test sales delivery and service pickup in parallel for six weeks.",
-        "Metrics: reviews per 100 deliveries (sales), reviews per 100 service ROs (service), and reviews per 100 service visits. Segment by source via the URL routing.",
-        "Exit criteria: sales delivery review velocity lifts to at least 4× baseline; service review velocity lifts to at least 3× baseline; no complaints from staff about the prompt cadence.",
-        "Replacement cadence: showroom and F&I cards every 6 months because dwell is short and cards stay in the folio. Service department cards every 3 months because service staff handle them dozens of times a day.",
-        "Seasonal variation: model-year end (August/September) spikes sales volume. Print sales folios ahead of this window.",
-        "Rooftop rollout: after the pilot, roll out one rooftop per month. Faster rollouts lose training consistency; slower rollouts lose momentum.",
-        "Audit: quarterly per-rooftop audit of review velocity by source and stock levels. Laggard rooftops get coaching before replacement cards."
+        "Pilot selection: one representative rooftop (mid-volume is ideal, not the group's flagship). Test sales delivery and service pickup in parallel for six weeks. The flagship rooftop often has non-representative staffing and disproportionately senior teams, which makes its pilot results hard to scale to smaller rooftops.",
+        "Metrics: reviews per 100 deliveries (sales), reviews per 100 service ROs (service), and reviews per 100 service visits (for quick-service lanes). Segment by source via the URL routing. Track per-advisor and per-salesperson attribution where possible.",
+        "Exit criteria: sales delivery review velocity lifts to at least 4× baseline; service review velocity lifts to at least 3× baseline; OEM CSI/SSI trajectories hold or improve; no complaints from staff about the prompt cadence. A pilot that meets volume targets but damages CSI is not a successful pilot.",
+        "Replacement cadence: showroom and F&I cards every 6 months because dwell is short and cards stay in the folio. Service department cards every 3 months because service staff handle them dozens of times a day. Loaner-return stands last a year; quick-service-lane stickers need 90-day replacement because of heavy hand traffic.",
+        "Seasonal variation: model-year end (August/September for most OEMs) spikes sales volume, quarter-end sales pushes spike deliveries, and winterisation service volume spikes in October. Print sales folios ahead of the August/September window and service stock ahead of October.",
+        "Rooftop rollout: after the pilot, roll out one rooftop per month. Faster rollouts lose training consistency; slower rollouts lose momentum. Pair each rooftop rollout with a dedicated launch week where a group-level trainer visits and coaches sales and service staff on the handoff.",
+        "Audit: quarterly per-rooftop audit of review velocity by source, card wear and stock levels. Laggard rooftops get coaching before replacement cards. A rooftop whose service velocity trails the group average by more than 30% almost always has a service-advisor handoff problem, not a card problem.",
+        "BDC integration: once rooftops are running, fold the post-delivery SMS and post-service SMS into the BDC's existing call-and-text scripts. Consistent follow-up from the BDC across sales and service adds 20–35% to review volume versus physical cards alone."
       ]
     }
   ],
@@ -169,31 +186,31 @@
   "faq": [
     {
       "question": "Should dealerships use one review-card setup for sales and service?",
-      "answer": "No. The sales delivery moment and the service pickup moment are different workflows with different staff, different customer emotions and different dwell times. One generic card will always underperform in at least one of the two. Run two tailored formats — a premium folio card for sales, a mid-range reception card or stand for service — and measure them separately through URL-tagged routing."
+      "answer": "No. The sales delivery moment and the service pickup moment are different workflows with different staff, different customer emotions and different dwell times. One generic card will always underperform in at least one of the two. Run two tailored formats — a premium folio card for sales, a mid-range reception card or stand for service — and measure them separately through URL-tagged routing. The cost of running two formats is trivial next to the review volume the differentiated workflow unlocks."
     },
     {
       "question": "What should a dealership pilot prove first?",
-      "answer": "Per-rooftop URL routing, sales delivery handoff adoption by both sales and F&I, service advisor handoff adoption at service pickup, and the replacement cadence under service-department handling. Pilot at one mid-volume rooftop for six weeks; measure sales and service separately. Exit criteria are a 4× lift for sales delivery and a 3× lift for service."
+      "answer": "Per-rooftop URL routing works reliably in both sales and service paths, sales delivery handoff adoption by both sales and F&I is above 70%, service advisor handoff adoption at service pickup is above 80%, and the replacement cadence holds under service-department handling. Pilot at one mid-volume rooftop for six weeks; measure sales and service separately. Exit criteria are a 4× lift for sales delivery and a 3× lift for service, without damage to OEM CSI/SSI trajectories."
     },
     {
       "question": "Should sales and service have separate Google Business Profiles?",
-      "answer": "No, in almost all cases. OEM franchise agreements and local SEO best practice favour a single rooftop profile that aggregates sales and service reviews. Split the measurement through URL routing, not through separate profiles. Multiple profiles at one address usually violate Google's guidelines and hurt local rankings."
+      "answer": "No, in almost all cases. OEM franchise agreements and local SEO best practice favour a single rooftop profile that aggregates sales and service reviews, which is what strengthens the rooftop's local-pack position. Split the measurement through URL routing, not through separate profiles. Multiple profiles at one address usually violate Google's guidelines and hurt local rankings; the group's dealer-marketing team should push back on any vendor proposing a split-profile structure."
     },
     {
       "question": "Who delivers the card at sales delivery?",
-      "answer": "Both the salesperson and the F&I manager. The salesperson mentions the card at key handoff in the delivery bay ('if your buying experience went well…'); the F&I manager includes it in the folio at paperwork handoff. Combined delivery earns more total sales reviews than either alone. A 24–48 hour post-delivery SMS with the same URL catches the customers who walked away without tapping."
+      "answer": "Both the salesperson and the F&I manager, with optional reinforcement from a delivery specialist at larger dealerships. The salesperson mentions the card at key handoff in the delivery bay ('if your buying experience went well…'); the F&I manager includes it in the folio at paperwork handoff; the delivery specialist (where one exists) covers the full walkthrough. Combined delivery earns more total sales reviews than any single deliverer alone. A 24–48 hour post-delivery SMS from the BDC with the same URL catches the customers who walked away without tapping."
     },
     {
       "question": "What placement works best in the service department?",
-      "answer": "Service advisor handoff at key return is the highest-converting moment. Waiting-lounge tabletop cards and loaner-return-area stands are useful secondary placements because customers are captive. Cashier-counter stickers work if the dealership has a separate cashier. Stickers on the service-bay door itself rarely convert — the customer is focused on the mechanic, not on reviewing."
+      "answer": "Service advisor handoff at key return is the highest-converting moment and produces 60–75% of total service-department reviews. Waiting-lounge tabletop cards and loaner-return-area stands are useful secondary placements because customers are captive and low-effort taps add up. Cashier-counter stickers work if the dealership has a separate cashier. Quick-service-lane placement (stand or sticker at the express checkout) catches express-lane customers who never meet a traditional service advisor. Stickers on the service-bay door itself rarely convert because the customer is focused on the mechanic's conversation, not on reviewing."
     },
     {
       "question": "How do dealer groups track whether sales or service is driving reviews?",
-      "answer": "URL-tagged routing through a chain-controlled redirect, combined with DMS-level matching. The sales URL and the service URL both forward to the same Google profile, but the redirect logs which path triggered the tap. Matching the tap timestamp against the DMS customer record tells the group whether the reviewer just bought, just serviced, or both. Weekly reporting by source gives the fixed-ops and variable-ops GMs their own coaching data."
+      "answer": "URL-tagged routing through a chain-controlled redirect, combined with DMS-level matching. The sales URL and the service URL both forward to the same Google profile, but the redirect logs which path triggered the tap. Matching the tap timestamp against the DMS customer record tells the group whether the reviewer just bought, just serviced, or both. Weekly reporting by source gives the fixed-ops and variable-ops GMs their own coaching data, and monthly roll-ups feed the dealer principal's view of the group's review health versus OEM CSI/SSI trajectories."
     },
     {
       "question": "What is the single biggest avoidable mistake in dealer programmes?",
-      "answer": "Using one generic rollout plan for both sales delivery and service pickup. The two departments have different staff cultures, different customer flows and different handoff moments. A universal programme produces mediocre conversion in both; tailored programmes in parallel produce strong conversion in both and let the group measure each department's performance separately."
+      "answer": "Using one generic rollout plan for both sales delivery and service pickup. The two departments have different staff cultures, different customer flows and different handoff moments. A universal programme produces mediocre conversion in both; tailored programmes in parallel produce strong conversion in both and let the group measure each department's performance separately. The second most common mistake is prompting during recall repairs and warranty disputes, which reads tone-deaf and damages the customer relationship for future interactions."
     }
   ],
   "primaryAction": {
