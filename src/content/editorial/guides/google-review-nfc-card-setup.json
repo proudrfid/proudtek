@@ -3,13 +3,26 @@
   "group": "guides",
   "title": "Google Review NFC Card Setup Guide",
   "kicker": "Review Card Guide",
-  "summary": "This guide helps businesses set up Google review NFC cards with fewer avoidable failures by focusing on the live review link, redirect control, phone testing and a reliable QR fallback.",
-  "heroPoints": [
-    "A simple review-link workflow usually works better than a complicated NFC payload.",
-    "The live tap experience should be tested on the real phones customers use, not only on one internal device.",
-    "Placement and staff prompting matter almost as much as the encoded link itself."
+  "summary": "A step-by-step setup guide for Google review NFC cards that covers the review-link source, redirect ownership, NFC payload choice, QR fallback, multi-device testing, multi-location URL strategy and the live checks that turn a good sample into a reliable rollout.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "Google review NFC card setup",
+    "place ID review link",
+    "NFC review card encoding",
+    "QR fallback review",
+    "NFC review card testing",
+    "multi-location review URL"
   ],
-  "imageAlt": "Google review NFC card setup workflow",
+  "heroPoints": [
+    "A simple web-link payload almost always works better than a complicated NFC action — simplicity is the feature.",
+    "The live tap experience has to be tested on the real phones customers actually use, not on one internal iPhone at the design desk.",
+    "Placement and staff prompting drive most of the conversion lift; the encoded link only matters when the link itself fails."
+  ],
+  "imageAlt": "Google review NFC card setup on an iPhone and Android device",
   "imageSourceRoutes": [
     "/product/google-review-nfc-card/",
     "/product/nfc-stickers/",
@@ -17,38 +30,93 @@
   ],
   "sections": [
     {
-      "title": "What this guide covers",
-      "intro": "Use this guide when the project already knows the use case, but still needs a tighter implementation or validation workflow before requesting samples or pricing.",
+      "title": "Get the right review destination before anything else",
+      "intro": "The single biggest setup mistake is encoding a review URL the business does not control or that points somewhere slightly wrong. Spend the first hour getting this right; everything else becomes easier.",
       "bullets": [
-        "How to choose the right live review link and keep redirect ownership under control.",
-        "How to structure the encoded action, QR fallback and on-card design for real-world use.",
-        "What to test before ordering a wider branded batch for several locations or teams."
+        "The canonical destination is a Google Business Profile review URL generated from the Profile's unique Place ID. It takes the form https://search.google.com/local/writereview?placeid=XXXX or the newer g.page/r/ shortlink.",
+        "Do not use a Google Maps listing URL, a search result URL, or a business's homepage. Those paths add friction, cost conversions, and change behaviour across iOS and Android.",
+        "Verify ownership of the Business Profile before setup. A card pointing to a profile someone else controls (a former agency, a parent company) will break the moment ownership changes.",
+        "For new locations, create the Business Profile and let it index for at least 48 hours before generating the review link. Fresh listings occasionally redirect unpredictably.",
+        "Document the exact URL used for each location. Six months from now, someone will ask 'which URL is on the cards' — have the answer ready."
       ]
     },
     {
-      "title": "Recommended workflow",
-      "intro": "These steps keep the first sample or deployment round focused on the questions that change the buying decision most.",
+      "title": "Redirect ownership and why it matters",
+      "intro": "Most multi-location or growing brands end up routing the review URL through a short domain they control — review.brand.com/shop1. The reason: NFC chips are a fixed payload, so the URL on the card has to stay stable for years.",
       "bullets": [
-        "Confirm the correct Google review destination and who controls the live URL first.",
-        "Encode a simple web-link action and pair it with a visible QR fallback for edge cases.",
-        "Test the card on representative iPhone and Android devices in the real customer interaction moment.",
-        "Roll out wider only after the team has proved the placement, phone behavior and response rate are stable enough."
+        "Direct link: encode the raw Google review URL on the chip. Simplest, no infrastructure, no tracking. Breaks if the Google URL format changes or if the business moves to a new Profile.",
+        "Self-hosted redirect: encode review.brand.com/shop1 on the chip; the short domain 301-redirects to the Google review URL. Slightly more complex to set up, but gives the business control.",
+        "Analytics layer: the self-hosted redirect can log taps per location before redirecting. Useful for conversion attribution in multi-location programmes.",
+        "Third-party shortener: avoid bit.ly, tinyurl and other consumer shorteners on printed cards. They change behaviour, add friction, and can expire. Paid enterprise shorteners are fine but more expensive than a self-hosted redirect.",
+        "Best practice for brands with more than one location: self-hosted redirect under a review subdomain. The infrastructure is under a dozen lines of Nginx or Cloudflare Workers and pays for itself the first time a Google URL format changes."
       ]
     },
     {
-      "title": "Common mistakes to avoid",
-      "intro": "These are the patterns that often slow down projects because the team moves into samples or pricing before the core workflow is clear enough.",
+      "title": "NFC payload choice: keep it simple",
+      "intro": "NFC chips support several payload types. For a review card, exactly one payload makes sense. Complexity costs reliability.",
       "bullets": [
-        "Using the wrong review link or a redirect path the business cannot control later.",
-        "Skipping QR fallback and assuming every customer will tap the card correctly on the first try.",
-        "Printing a large branded batch before validating phone behavior and the live customer handoff."
+        "URI record (web link): this is the correct choice. Encoded as a plain https URL, works on every modern iPhone and Android without any setup.",
+        "NDEF App record: avoid. Attempts to launch a specific app; breaks when the app is not installed or the OS blocks the behaviour.",
+        "Custom MIME record: avoid. Requires a reader app; kills the experience for 95% of customers.",
+        "Text record: avoid. Displays the URL as text instead of opening it; customers have to copy-paste.",
+        "Smart Poster record: redundant for review cards; adds complexity without adding reliability.",
+        "Lock the tag after encoding. Unlocked NTAG chips can be rewritten by any phone with an NFC writer app, and some customers do this accidentally. A locked chip cannot be changed after setup — which is a feature, not a bug, for branded cards."
+      ]
+    },
+    {
+      "title": "Multi-device testing: the real phones customers carry",
+      "intro": "A setup that passes on the team's latest iPhone may fail on an older Android or a phone with NFC disabled. Test across the devices customers actually use, not just the devices the team prefers.",
+      "bullets": [
+        "Minimum test set: current-generation iPhone, current-generation Android flagship, mid-range Android from three years ago, and a mid-tier Android with NFC disabled by default (some markets still ship these).",
+        "Test motion: tap the card to the back of the phone at the typical NFC hot-spot location. iPhones have the antenna near the top of the back; many Androids have it in the middle or near the camera.",
+        "Test state: phone locked (should still work on most modern devices), phone unlocked on home screen, phone in-app. Some apps intercept NFC; check the most common ones (banking, transport).",
+        "Test fallback: turn NFC off on one test device and confirm the QR code scans reliably from 40 cm. QR has to be a genuine fallback, not a theoretical one.",
+        "Test geography: if the brand operates internationally, test with a phone on a foreign carrier SIM or international data roaming. Some mobile redirects behave differently based on region.",
+        "Edge case: customers with phone cases covering the NFC antenna. The card should still tap reliably; if it does not, the customer blames the card, not the case."
+      ]
+    },
+    {
+      "title": "Multi-location URL strategy",
+      "intro": "Single-location brands encode one URL. Multi-location brands need a strategy that scales without creating a per-location manual step for every new card batch.",
+      "bullets": [
+        "Per-location URL: each location has its own redirect (review.brand.com/shop1, review.brand.com/shop2, etc.) pointing to the location's Google Business Profile review URL.",
+        "Print batch per location: card artwork stays identical, but the NFC payload and the printed QR code both carry the per-location URL. Printing is straightforward with modern variable-data presses.",
+        "Central admin: one web app or spreadsheet mapping location ID to Place ID to redirect URL. Source of truth for card printing, onboarding of new locations, and migrations.",
+        "New location onboarding: create the Google Business Profile, capture the Place ID, add a redirect row, print the card batch. Written SOP prevents mistakes.",
+        "Location closures: decommission the redirect URL (404 the short URL) so residual cards do not drive traffic to a wrong profile. Log the decommission for audit.",
+        "Brand-wide URL: never encode a brand homepage or a generic 'find a store' URL. The customer is holding a card at a specific location and expects to review that specific location."
+      ]
+    },
+    {
+      "title": "QR fallback design",
+      "intro": "QR has to work when NFC fails. Treat it as a first-class part of the setup, not an afterthought.",
+      "bullets": [
+        "Source URL: the QR encodes the same per-location URL as the NFC chip. Both paths lead to the same destination.",
+        "Size: minimum 2 cm square on the printed card. Smaller QR codes fail scans from natural reading distance and hurt the fallback.",
+        "Contrast: dark QR on a light background is most reliable. Reverse-contrast (light QR on dark background) works but needs 20% larger sizing.",
+        "Quiet zone: at least 4 mm of uninterrupted background around the code. Decorative elements that bleed into the quiet zone break scans.",
+        "Gloss interaction: gloss lamination creates glare under overhead lighting. Spot-matte over the QR area helps, or use a matte substrate.",
+        "Version choice: QR code version 2 or 3 is plenty for a URL under 60 characters. Higher versions add density that reduces scan reliability at small sizes."
+      ]
+    },
+    {
+      "title": "Go-live checklist before the first branded print run",
+      "intro": "A pilot sample is the right place to catch setup mistakes. Running the full go-live checklist on 50 pilot cards prevents printing 5,000 cards with a broken URL.",
+      "bullets": [
+        "URL validation: every URL (NFC payload and QR) resolves to the correct Google review profile on at least three test devices.",
+        "Redirect chain audit: if using a self-hosted redirect, confirm there is exactly one 301 redirect, not a chain. Chains slow the hop and sometimes break on cellular networks.",
+        "HTTPS: every URL in the chain uses HTTPS. Mixed-content redirects break silently on modern iOS.",
+        "Lock status: NFC tag lock bit is set, so the payload cannot be accidentally rewritten.",
+        "Print proof review: artwork is correct, QR size and contrast meet specification, action copy is readable.",
+        "Staff rehearsal: at least two staff members tap and scan a pilot card and demonstrate the flow from end to end.",
+        "Decision: if any check fails, do not place the full print order. The cost of re-printing is much higher than the cost of fixing the setup before scale."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "Related pages",
-      "description": "Use these solution, comparison and product pages to move from the guide into a sharper shortlist.",
+      "title": "Review card pillars",
+      "description": "Solution pages that frame the Google review card programme.",
       "links": [
         {
           "href": "/solutions/google-review-nfc-card/",
@@ -61,10 +129,42 @@
         {
           "href": "/solutions/google-review-cards-for-hotels/",
           "label": "Google review cards for hotels"
+        }
+      ]
+    },
+    {
+      "title": "Paired playbooks",
+      "description": "Design, placement and staff prompt guides that pair with the setup decision.",
+      "links": [
+        {
+          "href": "/guides/google-review-card-design-and-copy/",
+          "label": "Google review card design and copy"
         },
         {
+          "href": "/guides/google-review-card-placement-guide/",
+          "label": "Google review card placement guide"
+        },
+        {
+          "href": "/guides/google-review-card-staff-prompt-playbook/",
+          "label": "Google review card staff prompt playbook"
+        }
+      ]
+    },
+    {
+      "title": "Compare and format context",
+      "description": "Compare pages that frame the card vs sticker vs stand decision.",
+      "links": [
+        {
           "href": "/compare/google-review-nfc-card-vs-nfc-sticker/",
-          "label": "Google review NFC card vs NFC sticker"
+          "label": "Google review card vs NFC sticker"
+        },
+        {
+          "href": "/compare/nfc-review-card-vs-qr-review-stand/",
+          "label": "NFC review card vs QR review stand"
+        },
+        {
+          "href": "/guides/nfc-business-card-iphone-android-compatibility/",
+          "label": "NFC business card iPhone and Android compatibility"
         }
       ]
     }
@@ -72,11 +172,31 @@
   "faq": [
     {
       "question": "What should be set up first on a Google review NFC card?",
-      "answer": "The first setup priority is the live review destination and who controls it, because every later design, encoding and rollout choice depends on that link working reliably."
+      "answer": "The live review destination and who controls it. The correct destination is a Google Business Profile review URL generated from the location's Place ID — not a Maps listing, not a search result, not the homepage. Verify ownership of the Business Profile before encoding anything, because a card pointing to a profile someone else controls will break the moment ownership changes."
     },
     {
       "question": "Why is QR fallback still important on an NFC review card?",
-      "answer": "QR fallback keeps the review prompt usable when a customer does not tap correctly, NFC is disabled or the phone behavior is inconsistent enough to need another path."
+      "answer": "Because NFC does not work every time. Some customers miss the tap location, some phones have NFC disabled, some phone cases block the antenna, and some customers are more comfortable scanning a QR. QR keeps the prompt usable in every one of these cases. Any card that relies on NFC alone underperforms a card that offers both."
+    },
+    {
+      "question": "Should the NFC payload be a web link, an app link, or something else?",
+      "answer": "A plain https web link (URI record). It works on every modern iPhone and Android without any app installed. App links and custom MIME payloads break when the target app is missing or when the OS blocks the behaviour. Simplicity is the feature for a review card."
+    },
+    {
+      "question": "Is a self-hosted redirect worth the infrastructure?",
+      "answer": "For a single location, usually not. For multiple locations, yes. A review.brand.com/shop1 redirect gives the business control over the URL when Google changes its review URL format (which has happened before), lets the team log taps per location for attribution, and makes location closures and moves straightforward to manage."
+    },
+    {
+      "question": "How many devices should setup testing cover?",
+      "answer": "At least four: a current iPhone, a current Android flagship, a mid-range Android from three years ago, and one device with NFC disabled to confirm the QR fallback works. More is better for multi-location rollouts; less is risky because a setup that passes on one iPhone can fail on an old Android and produce a quiet conversion leak."
+    },
+    {
+      "question": "Should the NFC tag be locked after encoding?",
+      "answer": "Yes. A locked NTAG chip cannot be rewritten by any phone with an NFC writer app, which prevents both accidental corruption by curious customers and malicious rewriting by bad actors. Locking is a one-time write and is irreversible for NTAG21x series chips. Lock after the final URL is confirmed, not during setup."
+    },
+    {
+      "question": "What is the single biggest avoidable mistake in review card setup?",
+      "answer": "Encoding the wrong URL and only noticing after the full print run. A pilot sample of 50 cards, tapped and scanned across multiple devices, catches bad URLs, wrong Place IDs, redirect chain problems and HTTPS issues before they become a 5,000-card print rework. Run the go-live checklist on pilot cards; do not skip straight to scale."
     }
   ],
   "primaryAction": {
