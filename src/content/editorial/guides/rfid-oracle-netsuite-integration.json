@@ -1,58 +1,171 @@
 {
   "route": "/guides/rfid-oracle-netsuite-integration/",
   "group": "guides",
-  "title": "RFID Integration with Oracle NetSuite — Inventory Sync, WMS and Fulfillment Automation",
-  "kicker": "RFID NetSuite Integration",
-  "summary": "Oracle NetSuite's cloud ERP platform manages inventory, warehouse operations and fulfillment for thousands of mid-market businesses. Integrating RFID with NetSuite automates inventory counting, goods receipt, pick verification and shipping confirmation, replacing manual processes and barcode-dependent workflows. This guide covers the integration architecture, SuiteScript and REST API approaches, and the RFID tag specifications for NetSuite environments.",
-  "heroPoints": [
-    "Real-time inventory sync — RFID counts update NetSuite inventory quantities via REST API or SuiteScript, maintaining accurate available-to-promise and available-to-sell figures across all sales channels.",
-    "Automated warehouse workflows — RFID events trigger NetSuite inventory adjustments, transfer orders, fulfillment confirmations and receiving transactions without manual data entry.",
-    "Pre-encoded tags for NetSuite — Proud Tek supplies RFID tags encoded with identifiers that map to NetSuite item records and inventory lot/serial numbers."
+  "title": "RFID Integration with Oracle NetSuite — Mid-Market Cloud ERP Architecture, SuiteTalk REST/GraphQL, SuiteScript 2.x, RESTlets, SuiteFlow and RF-SMART WMS Connectors",
+  "kicker": "NetSuite RFID Integration",
+  "summary": "A mid-market cloud-ERP practitioner's guide to integrating RFID with Oracle NetSuite for inventory counting, goods receipt, pick verification and omnichannel fulfillment. This page covers NetSuite's inventory and warehouse data model (items, inventory items, lot-numbered, serialized, bins, subsidiaries, locations), the SuiteTalk REST and GraphQL APIs, SuiteScript 2.1 server-side automation, RESTlet custom endpoints, SuiteFlow workflow triggers, the RF-SMART WMS SuiteApp partnership (the most common NetSuite-native WMS with RFID readiness), tag encoding patterns that match NetSuite's GTIN and custom-record fields, and the Proud Tek tag and encoding services sized for mid-market NetSuite customers.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "RFID NetSuite integration",
+    "SuiteTalk REST API RFID",
+    "SuiteScript 2.1 RFID",
+    "RF-SMART WMS SuiteApp",
+    "NetSuite inventory adjustment RFID",
+    "NetSuite multi-location RFID"
   ],
-  "imageAlt": "RFID warehouse reader integrated with Oracle NetSuite ERP inventory dashboard",
+  "heroPoints": [
+    "NetSuite is the cloud ERP of choice for mid-market operations — fast-growing apparel, cosmetics, consumer electronics, healthcare and industrial-supply organizations run on NetSuite's unified platform (ERP + inventory + WMS + financials + e-commerce). RFID integration follows NetSuite's cloud-first and API-first conventions, with SuiteTalk REST and GraphQL APIs, SuiteScript server-side automation and SuiteApp partners (RF-SMART being the dominant NetSuite-native WMS).",
+    "Inventory-first data model aligns with RFID use cases — NetSuite's item master distinguishes inventory items (counted by quantity), lot-numbered (counted by lot), serialized (counted by individual serial) and kit/assembly items; inventory is tracked per location (warehouse) and optionally per bin. RFID tag encoding naturally maps to the (item + location + serial/lot) tuple that NetSuite expects, enabling clean automation without custom data structures.",
+    "Proud Tek supplies tags and encoding services tuned for mid-market NetSuite programmes — smaller volume per SKU than enterprise retail, more frequent SKU turnover, lot/serial mixes depending on regulated-product requirements. Our per-tag TID-to-EPC mapping file imports directly into NetSuite as an inventory adjustment, inventory item receipt or CSV-bulk upload, letting customers go live within weeks rather than months."
+  ],
+  "imageAlt": "RFID integration with Oracle NetSuite cloud ERP showing inventory sync warehouse receipt and fulfillment workflows",
   "heroImage": "/landing-images/retail-apparel.jpg",
   "imageSourceRoutes": [
-    "/product/uhf-rfid-tags/",
-    "/product/rfid-cards/"
+    "/products/rfid-labels/uhf-rfid-inlay/",
+    "/products/rfid-labels/impinj-m700-uhf-inlay/"
   ],
   "sections": [
     {
-      "title": "NetSuite RFID integration architecture",
+      "title": "NetSuite's inventory and warehouse data model — what RFID data needs to align with",
+      "intro": "To design a clean RFID integration with NetSuite, the first step is understanding NetSuite's inventory and warehouse data model: the item taxonomy, the location structure, bin-level tracking, lot and serial numbering, and how transaction records (inventory adjustments, item receipts, inventory transfers, fulfillments) flow through the system. The RFID integration layer maps tag reads into transactions that NetSuite already understands.",
       "bullets": [
-        "RFID hardware layer — UHF RFID handheld readers for manual counts and fixed readers at dock doors for automated scanning. Readers connect to middleware via Bluetooth, Wi-Fi or ethernet.",
-        "RFID middleware — cloud-based or on-premise software that processes raw tag reads, applies business rules (deduplication, tag-to-SKU mapping, location assignment) and formats data for NetSuite consumption.",
-        "NetSuite REST API — middleware pushes inventory adjustments, item receipts and fulfillment confirmations to NetSuite using the SuiteTalk REST API. RESTlet endpoints provide custom transaction processing for RFID-specific workflows.",
-        "SuiteScript automation — SuiteScript 2.0 scripts within NetSuite process incoming RFID data, create inventory adjustment records, update item quantities and trigger downstream workflows (reorder notifications, allocation adjustments).",
-        "SuiteFlow integration — RFID events can trigger SuiteFlow workflow actions such as approval routing, notification emails and status updates on inventory records."
+        "Item taxonomy — inventory items (counted by quantity, lowest-complexity integration), lot-numbered inventory items (track by lot number per quantity unit, common for cosmetics, food, pharmaceuticals), serialized inventory items (unique serial number per physical unit, common for electronics, medical devices, high-value assets), assembly/BOM items (parent items composed of component inventory items), and kits (group of items sold together). RFID integration pattern differs by item type: quantity-based tags can aggregate reads into adjustment quantities; serialized items require 1:1 tag-to-unit correspondence.",
+        "Location structure — each warehouse, store, 3PL or drop-ship partner is a NetSuite 'location'. Inventory is tracked per location, and NetSuite's multi-location inventory (MLI) feature enables per-location quantity tracking, per-location reordering and inter-location transfer orders. RFID readers are deployed per physical location; the middleware maps reader-source location to NetSuite location ID for every event.",
+        "Bin-level tracking (optional) — customers can enable bin management within each location, tracking inventory down to a specific storage bin (rack, shelf, drawer). RFID integration can surface bin-level data when the middleware knows the reader's physical bin zone; otherwise bin assignment falls back to a default or manual process.",
+        "Subsidiary structure (OneWorld) — organizations running NetSuite OneWorld have multiple legal entities (subsidiaries) with their own chart of accounts, tax settings and inventory visibility. RFID integration at the middleware layer must respect subsidiary scoping when creating transactions; cross-subsidiary transfers use different transaction types than intra-subsidiary transfers.",
+        "Transaction types relevant to RFID — Inventory Adjustment (Physical Count type for cycle-count reconciliation, Transfer type for inter-location moves, Worksheet type for miscellaneous adjustments); Item Receipt (linked to purchase order, goods-receipt posting); Inventory Transfer (multi-location transfer orders); Item Fulfillment (linked to sales order, ship confirmation); Work Order Completion (manufacturing completion). RFID middleware creates or updates these records via SuiteTalk or RESTlets.",
+        "GTIN and UPC fields — NetSuite item master includes UPC and matrix-option UPC fields that map to GS1 GTIN values. RFID tags encoded with SGTIN-96 carry the GTIN; the middleware extracts the GTIN from the EPC and looks up the matching NetSuite item via saved search or direct REST query. Consistent GTIN maintenance in the item master is a prerequisite for clean RFID-to-item resolution."
       ]
     },
     {
-      "title": "Key RFID-NetSuite integration scenarios",
+      "title": "SuiteTalk REST API and GraphQL — the primary RFID integration surface",
+      "intro": "NetSuite exposes its records, transactions and searches through the SuiteTalk REST API (REST-based record operations), the SuiteTalk GraphQL beta (evolving) and the legacy SuiteTalk SOAP API. RFID integration typically uses REST for straightforward record CRUD and RESTlets for custom endpoints; SOAP remains in use for some legacy middleware. This section covers the API surface and common integration patterns.",
       "bullets": [
-        "Inventory counting — RFID handheld count updates NetSuite inventory adjustment records (type: physical count). The adjustment reconciles physical count against NetSuite book quantity, posting gains and losses automatically.",
-        "Goods receipt — RFID portal reading at receiving dock creates NetSuite item receipt records linked to the purchase order. Quantity and item verification happen automatically based on EPC-to-item mapping.",
-        "Pick and pack verification — RFID scanning at pack stations confirms that fulfillment items match the sales order. NetSuite fulfillment record is created or updated with pack confirmation data.",
-        "Transfer between locations — RFID scanning at origin and destination locations creates and closes NetSuite inventory transfer orders, maintaining per-location stock accuracy across warehouses and stores.",
-        "Lot and serial tracking — RFID tags encoded with lot or serial numbers update NetSuite's lot/serial tracking records at each transaction point, maintaining full traceability for regulated products."
+        "SuiteTalk REST Record Service — resource-oriented URLs (`/record/v1/inventoryAdjustment`, `/record/v1/itemReceipt`, `/record/v1/inventoryItem`) support standard HTTP CRUD (GET / POST / PATCH / DELETE) plus an expand mechanism for related-record inclusion. Inventory transaction posting is a POST with a structured JSON body; RFID middleware builds this payload from the aggregated tag reads and posts it on a schedule or event basis.",
+        "SuiteTalk REST Query Service — SuiteQL (SQL-like syntax over NetSuite's data model) queries can be issued to the /query/v1/suiteql endpoint, supporting ad-hoc lookups without defining a saved search. RFID middleware uses SuiteQL to resolve incoming GTINs to item internal IDs and to fetch location-specific quantities before posting adjustments.",
+        "SuiteTalk GraphQL (beta) — a GraphQL interface introduced in 2023 that complements REST with flexible query composition. Useful for complex RFID dashboards or real-time inventory displays that need to fetch related records in a single round-trip.",
+        "OAuth 2.0 authentication — SuiteTalk REST uses OAuth 2.0 with token-based authentication (TBA for machine-to-machine or authorization-code flow for user-initiated). RFID middleware uses TBA credentials (consumer key + consumer secret + token + token secret) for unattended server-to-server operation; these credentials are stored securely in the middleware vault and rotated per NetSuite security policy.",
+        "Rate limits and concurrency — NetSuite imposes concurrency limits (the total number of simultaneous API requests per account) that vary by license tier. RFID integrations that post many transactions per second (e.g., high-throughput receiving) need to implement queueing and backoff logic to stay within concurrency limits; batch APIs and asynchronous patterns help here.",
+        "Error handling and idempotency — REST responses use standard HTTP status codes; duplicate-posting scenarios (network retries after timeout) should be handled by the middleware with idempotency keys or external-ID-based deduplication (NetSuite supports externalId on most records to enable client-side idempotency)."
+      ]
+    },
+    {
+      "title": "SuiteScript 2.1 server-side automation and RESTlets",
+      "intro": "For RFID workflows that need to run inside NetSuite (business-rule enforcement, transformation of raw RFID events into NetSuite transactions, custom endpoints that return RFID-ready data) SuiteScript 2.x and RESTlets are the native programming surfaces. This section covers the key script types and how they fit into an RFID integration architecture.",
+      "bullets": [
+        "SuiteScript 2.1 — NetSuite's JavaScript-based server-side scripting platform. SuiteScript 2.1 runs in a V8-based engine with full ES2019 support. Script types relevant to RFID include: User Event scripts (fire on record save / transformation), Scheduled scripts (run on interval, good for RFID batch reconciliation), Map/Reduce scripts (parallel data processing for large inventory reconciliation jobs), Workflow Action scripts (custom logic within SuiteFlow), and RESTlets (HTTP-callable custom endpoints).",
+        "RESTlets as RFID-specific endpoints — a RESTlet is a custom SuiteScript that exposes an HTTP endpoint accessible via a URL. RFID middleware posts RFID events (as JSON arrays of tag reads with timestamps and location context) to a custom RESTlet that interprets the events, looks up items, creates inventory adjustments or item receipts and returns a structured response. RESTlets give the RFID programme a domain-specific API surface rather than forcing all logic into the middleware layer.",
+        "User Event scripts for RFID-aware validation — when an RFID-generated inventory adjustment is posted, a User Event script can validate that the adjustment respects business rules (minimum stock levels, approval thresholds for large adjustments, audit logging for cycle count results). This keeps business logic in NetSuite rather than split across middleware and NetSuite.",
+        "Scheduled scripts for periodic reconciliation — a scheduled script running nightly can compare NetSuite's on-hand quantities against the RFID middleware's last-known counts, detecting drift (items added or removed without RFID observation) and surfacing them as alerts or tasks.",
+        "Map/Reduce for large imports — when RFID initial baseline counts or large inventory reconciliations arrive, a Map/Reduce script processes the data in parallel batches (up to 5 concurrent instances), posting inventory records in bulk without blocking interactive users.",
+        "Script logging and monitoring — SuiteScript's `log.audit` / `log.error` entries surface in NetSuite's Script Execution Log, and SuiteCloud Development Framework supports CI/CD for deploying RFID-related scripts from version control. Production RFID integrations should log every RFID-triggered transaction for audit purposes."
+      ]
+    },
+    {
+      "title": "SuiteFlow workflow triggers and RF-SMART WMS SuiteApp",
+      "intro": "Beyond direct API and SuiteScript integration, two NetSuite-native mechanisms matter for RFID programmes: SuiteFlow (NetSuite's declarative workflow engine) for triggering business processes on RFID events, and RF-SMART (the dominant NetSuite-native WMS SuiteApp) for customers who need a full warehouse management overlay on top of NetSuite including RFID readiness.",
+      "bullets": [
+        "SuiteFlow RFID-event triggers — RFID-triggered inventory adjustments or item receipts can kick off SuiteFlow workflows for approval routing, notification emails, downstream process initiation (replenishment transfer orders when on-hand drops below reorder point, stock-count variance escalation when RFID cycle-count deviation exceeds threshold). SuiteFlow workflows are configured declaratively in the NetSuite UI without code.",
+        "RF-SMART WMS SuiteApp — the most widely deployed NetSuite-native WMS, built directly on the NetSuite platform with full RFID support on handhelds and fixed readers. Customers running RF-SMART get RFID functionality (tag-triggered receiving, put-away, pick, cycle counting) out of the box, with configuration rather than custom development. RF-SMART's RFID module handles the middleware layer natively within the NetSuite ecosystem.",
+        "RF-SMART WMS inventory flows — receiving with RFID portal read creates an item receipt transaction; put-away with handheld RFID reader creates an inventory transfer to the target bin; pick with RFID verification generates a pick confirmation on the sales order fulfillment; cycle count with RFID reader posts an inventory adjustment physical count. All flows happen within NetSuite without external middleware.",
+        "Alternatives to RF-SMART — other NetSuite-native WMS alternatives include ScanForce and custom-developed WMS overlays. Pure-cloud RFID middleware platforms (Zebra Savanna, RFID4U TagMatiks, CloudRFID) integrate with NetSuite via SuiteTalk and can be deployed alongside customers' existing WMS tooling for customers not using RF-SMART.",
+        "Suite App Store RFID apps — the SuiteApp Marketplace hosts apps specifically for RFID-NetSuite integration, ranging from simple CSV importers to full WMS overlays. Evaluation criteria include: depth of RFID reader support, NetSuite transaction coverage, multi-subsidiary support, upgrade compatibility with NetSuite release schedules, and customer support responsiveness.",
+        "SuiteCloud Development Framework (SDF) — customers and partners who build custom RFID solutions can package scripts, workflows and custom records using SDF for consistent deployment across sandbox and production environments. SDF-based deployment is the modern alternative to the older Bundle framework and is the preferred approach for NetSuite ISV partners."
+      ]
+    },
+    {
+      "title": "RFID integration scenarios — receiving, put-away, pick, fulfillment, cycle count, omnichannel sync",
+      "intro": "This section walks through the specific RFID-triggered workflows typical of a mid-market NetSuite deployment: how each scenario maps to NetSuite transactions, the middleware patterns involved and the operational outcomes. These scenarios apply whether customers use RF-SMART, a competing WMS, or a custom middleware build.",
+      "bullets": [
+        "Goods receipt from purchase order — RFID portal at receiving dock reads incoming pallet and case EPCs. Middleware aggregates reads, extracts GTINs, matches against the open Purchase Order in NetSuite, and posts an Item Receipt via SuiteTalk REST. Discrepancies (unexpected items, over/under-quantity) surface as exceptions for manual reconciliation. Receiving time drops from 30-60 minutes per pallet to under 5 minutes.",
+        "Put-away to bin — handheld RFID reader scans tagged items and a bin-identifier tag (or typed bin code). Middleware creates an Inventory Transfer from the receiving location to the specific bin, or updates the bin assignment on the Item Receipt's inventory-detail line. Per-item put-away time drops significantly with RFID; operator doesn't need to individually barcode-scan each unit.",
+        "Pick verification — handheld RFID reader at the pick face scans items as they are picked. Middleware verifies picks against the Sales Order lines via SuiteQL lookup, flags missing or wrong items, and updates the Item Fulfillment record with verified pick status. Overpick / underpick errors drop to near zero, reducing customer-facing shipping errors.",
+        "Outbound ship confirmation — RFID portal at shipping dock reads all EPCs on an outbound pallet. Middleware matches the aggregated EPC list against the Item Fulfillment, confirms the pack-out, posts a Ship transaction in NetSuite and optionally triggers the SuiteFlow for ASN generation (via EDI) or shipping-label printing.",
+        "Cycle counting — RFID handheld reader performs bin-by-bin or zone-by-zone cycle count. Middleware compares the EPC list against the NetSuite on-hand quantity for the location and bins, posts an Inventory Adjustment (Physical Count type) for any variances, and triggers SuiteFlow approval routing for variances exceeding thresholds. Annual physical inventory contraction from multi-day shutdowns to hours of continuous counting.",
+        "Omnichannel stock sync — for NetSuite merchants also selling through Shopify / SuiteCommerce / Amazon, the RFID-updated NetSuite inventory feeds channel sync via SuiteCommerce native integration or third-party connectors (Celigo, Integrator.io). The RFID programme thus drives not just warehouse accuracy but online channel availability accuracy, avoiding overselling on high-velocity SKUs."
+      ]
+    },
+    {
+      "title": "Tag encoding patterns aligned with NetSuite item master fields",
+      "intro": "For the RFID integration to resolve tags to NetSuite items and transactions cleanly, the tag encoding strategy must align with NetSuite's data model. This section describes the common encoding patterns and how they map to NetSuite records.",
+      "bullets": [
+        "SGTIN-96 encoding for GTIN-aligned items — the most common pattern. Customer's GS1 Company Prefix + NetSuite item's UPC field as GTIN + unique serial per tag = SGTIN-96. Middleware extracts GTIN and resolves to NetSuite internal ID via saved search or SuiteQL. Works for inventory items and lot-numbered items; serialized items can use the SGTIN serial as the NetSuite serial number.",
+        "Custom-record-driven encoding — for items without GTINs (private-label, assembly components, internal-only SKUs), customers can encode the NetSuite internal ID or a custom reference string directly into the EPC's user-memory bank or into a custom URI EPC scheme. Middleware resolution is then a direct NetSuite record lookup by internal ID.",
+        "Lot / batch encoding — for lot-numbered items, the tag can encode GTIN + lot number in user memory (or as an extended EPC scheme). The middleware creates inventory adjustments with the correct lot reference, preserving traceability. Applies particularly to cosmetics, food, nutraceuticals and pharmaceuticals running on NetSuite.",
+        "Serialized item encoding — serialized inventory items in NetSuite require a 1:1 mapping between a physical unit's serial number and its NetSuite serial-number record. The RFID tag's SGTIN-96 serial (38-bit numeric) can be used as the NetSuite serial number, or the middleware can map a tag-level unique ID (EPC or TID) to a human-readable NetSuite serial stored in a custom field.",
+        "Location-qualified encoding (rare) — in some deployments, the tag encodes location information (store number, warehouse identifier). This is uncommon in NetSuite programmes because location context comes from the reader's physical position, not from the tag, but may apply to special use cases like returnable assets moving between depots.",
+        "Proud Tek pre-encoding delivery — customers provide a NetSuite item-export CSV with (internal ID, item name, UPC/GTIN, variant SKU) and the desired encoding pattern. Our encoding line produces tags with the matching EPC values and returns a TID-to-EPC mapping CSV ready for NetSuite saved-search matching or for direct import into the middleware's lookup table."
+      ]
+    },
+    {
+      "title": "Proud Tek engagement for mid-market NetSuite customers",
+      "intro": "Mid-market NetSuite customers have different procurement and pilot profiles from enterprise retail. Smaller SKU volumes, more SKU churn, leaner IT, more frequent reliance on partner integrators. This section describes how Proud Tek engages with NetSuite-using customers to fit those realities.",
+      "bullets": [
+        "NetSuite customer discovery — we start with the customer's NetSuite edition (SuiteSuccess, Standard, Limited, OneWorld), WMS overlay (RF-SMART, ScanForce, custom, none), item catalogue size, number of physical locations, and current pain points (inventory accuracy target, receiving throughput, fulfillment error rate). This maps to a recommended RFID scope — whether to start with one process (e.g., receiving) or multiple, and whether to deploy fixed infrastructure or handhelds first.",
+        "Sample batches sized for pilot — 200-1000 tags per SKU for pilot phases (larger than consumer NFC samples because NetSuite customers typically pilot receiving-level flows that need case-pack quantities). Multi-SKU sample packs coordinate per-SKU encoding for like-for-like pilot evaluation.",
+        "Pre-encoding against NetSuite item export — customer exports their NetSuite item master to CSV; Proud Tek's encoding-setup team maps the CSV fields to EPC encoding parameters and returns an encoding specification for customer confirmation before production. This avoids encoding-spec errors that typically cost 1-2 days of pilot delay.",
+        "Partner-channel engagement — many NetSuite customers reach Proud Tek through their NetSuite solution provider (BDO, Oracle Consulting, Myers-Holum, Techfino, Bigit and others). We support channel partners with co-marketing on RFID-for-NetSuite readiness and with technical integration briefings for partner consultants.",
+        "Post-pilot scaling — after pilot success, production orders typically ramp 2-10x per month as additional SKUs and processes come online. Proud Tek's production planning reserves capacity 4-6 weeks ahead based on customer forecast for consistent delivery; small but persistent lot sizes (1000-10000 tags per production run, versus enterprise retail's 100k+ runs) are common and sustainable.",
+        "Technical support during go-live — during the first 2-4 weeks of production RFID operation, our application-engineering team is on call for reader-configuration, read-rate troubleshooting and middleware-integration escalations, coordinating with the customer's NetSuite partner and WMS vendor as needed. Most go-lives complete without scope changes; occasional adjustments (filter-value tweaks, antenna placement) surface in the first 1-2 weeks."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "RFID products for NetSuite environments",
-      "description": "Tags and labels for NetSuite warehouse and inventory integration.",
+      "title": "UHF RFID products for NetSuite environments",
+      "description": "Pre-encoded UHF RFID labels and tags sized for mid-market NetSuite inventory, receiving and fulfillment programmes.",
       "links": [
         {
-          "href": "/product/uhf-rfid-tags/",
-          "label": "UHF RFID inventory tags"
+          "href": "/products/rfid-labels/uhf-rfid-inlay/",
+          "label": "UHF RFID inlays"
         },
+        {
+          "href": "/products/rfid-labels/impinj-m700-uhf-inlay/",
+          "label": "Impinj M700-series inlays"
+        },
+        {
+          "href": "/products/rfid-labels/anti-metal-rfid-label/",
+          "label": "Anti-metal UHF tags"
+        }
+      ]
+    },
+    {
+      "title": "Encoding standards and related integration guides",
+      "description": "Companion guides on GS1 EPC encoding, other ERP integrations and retailer mandates that often drive NetSuite RFID programmes.",
+      "links": [
         {
           "href": "/guides/gs1-epc-encoding-guide/",
           "label": "GS1 EPC encoding guide"
         },
         {
+          "href": "/guides/rfid-shopify-inventory-integration/",
+          "label": "Shopify RFID integration"
+        },
+        {
+          "href": "/guides/rfid-sap-wms-integration/",
+          "label": "SAP WMS RFID integration"
+        }
+      ]
+    },
+    {
+      "title": "Start a NetSuite RFID pilot",
+      "description": "Request samples sized for a NetSuite receiving or cycle-count pilot; share your NetSuite item export for pre-encoding specification.",
+      "links": [
+        {
           "href": "/contact/",
-          "label": "Discuss NetSuite RFID integration"
+          "label": "Plan NetSuite RFID integration"
+        },
+        {
+          "href": "/solutions/rfid-inventory-tracking/",
+          "label": "Inventory tracking solutions"
+        },
+        {
+          "href": "/solutions/rfid-warehouse-management/",
+          "label": "Warehouse management"
         }
       ]
     }
@@ -60,15 +173,31 @@
   "faq": [
     {
       "question": "Does NetSuite have built-in RFID support?",
-      "answer": "NetSuite does not include native RFID reader connectivity, but it provides robust APIs for RFID integration. The SuiteTalk REST API and SuiteScript platform enable middleware to push RFID data into NetSuite transactions. Several NetSuite SuiteApp partners offer RFID-to-NetSuite connector applications that simplify the integration without custom development."
+      "answer": "NetSuite does not include native RFID reader connectivity, but it provides a full API and scripting platform for RFID integration: SuiteTalk REST and GraphQL for record and transaction operations, SuiteScript 2.1 for server-side automation, RESTlets for custom endpoints and SuiteFlow for declarative workflow triggers. Several NetSuite-native WMS SuiteApps — most prominently RF-SMART — include RFID reader support out of the box, handling the middleware layer within the NetSuite ecosystem. For customers not using RF-SMART, third-party RFID middleware platforms (Zebra Savanna, RFID4U TagMatiks, CloudRFID) integrate with NetSuite via SuiteTalk and can be deployed alongside existing WMS or standalone."
     },
     {
-      "question": "What RFID middleware works with NetSuite?",
-      "answer": "RFID middleware platforms with NetSuite connectors include RF-SMART (popular NetSuite WMS partner), ScanForce, and custom integrations built with the NetSuite REST API. For simpler deployments, some RFID reader vendors offer cloud platforms that can push data to NetSuite via REST API or CSV import without a dedicated middleware layer."
+      "question": "Which RFID middleware or SuiteApp is recommended for a NetSuite programme?",
+      "answer": "For NetSuite customers who already use or plan to use RF-SMART WMS, the RF-SMART RFID module is the simplest path because it's built directly on the NetSuite platform with no external middleware required. For customers using a different WMS or wanting a pure-cloud RFID middleware, Zebra Savanna Data Services, RFID4U TagMatiks and Chainway CloudRFID are common choices with NetSuite connectors. For specific vertical programmes (apparel retail Walmart compliance, pharmaceutical DSCSA), specialized middleware with vertical-specific features (filter-value automation, EPCIS event generation) may be preferable. Proud Tek works with customers across all of these middleware options and supplies tags encoded to match the chosen middleware's expectations."
     },
     {
       "question": "How do I map RFID tags to NetSuite item records?",
-      "answer": "The mapping connects the RFID tag identifier (EPC or serial number) to the NetSuite internal item ID or item name/number. For GS1 EPC-encoded tags, the GTIN within the EPC maps to the UPC/EAN field on the NetSuite item record. The middleware maintains this lookup table and translates tag reads into NetSuite item references for transaction processing."
+      "answer": "The most common mapping uses the GTIN/UPC field on the NetSuite item master. For SGTIN-96 encoded tags, the middleware extracts the GTIN from the EPC and resolves it to the corresponding NetSuite internal item ID via saved search or SuiteQL query. For items without GTINs (private-label, internal-only SKUs), custom encoding schemes can embed the NetSuite item name or internal ID directly in the EPC or in user memory; the middleware resolves by the custom pattern. Consistent GTIN maintenance in the NetSuite item master is a prerequisite — items with blank or duplicate UPC fields cause resolution failures at RFID read time."
+    },
+    {
+      "question": "Can we run RFID with multi-location inventory and OneWorld subsidiaries?",
+      "answer": "Yes. NetSuite's multi-location inventory (MLI) feature is directly compatible with RFID: each physical RFID reader is associated with a specific NetSuite location at the middleware layer, and transactions are posted scoped to that location. For OneWorld customers with multiple subsidiaries, the middleware layer additionally respects subsidiary scoping — transactions are posted under the subsidiary that owns the location where the RFID event occurred, and inter-subsidiary transfers use NetSuite's intercompany transaction mechanics. RF-SMART supports both MLI and OneWorld out of the box; custom middleware deployments need to handle subsidiary logic explicitly during integration design."
+    },
+    {
+      "question": "What if our items are serialized — does RFID integration still work?",
+      "answer": "Yes, and RFID is a particularly good fit for serialized items because the 1:1 tag-to-unit correspondence aligns with NetSuite's serial-number tracking. The SGTIN-96 serial portion (38-bit integer, up to ~274 billion values per GTIN) can be used directly as the NetSuite serial number, or the middleware can map a unique tag identifier (TID or EPC) to a human-readable serial stored in a custom field. RF-SMART and other NetSuite WMS solutions include native support for RFID-to-serial workflows, automatically creating serial records on receipt and updating them through fulfillment, returns and warranty."
+    },
+    {
+      "question": "How does Proud Tek engage with NetSuite customers who have smaller volumes per SKU?",
+      "answer": "Mid-market NetSuite customers typically have smaller per-SKU tag volumes than enterprise retail programmes — maybe 1000-10000 tags per SKU per production run versus 100k+ at the retailer-mandate scale. Proud Tek's production lines are configured for consistent delivery at these mid-market volumes with competitive per-unit pricing. Our pre-encoding workflow accepts NetSuite item export CSVs directly and returns TID-to-EPC mapping files that import cleanly into RF-SMART or into the middleware's SKU lookup table. Pilot and sample batches start at 200-1000 tags per SKU, sized to validate the receiving or cycle-count pilot without committing to full production until the integration is proven."
+    },
+    {
+      "question": "Can we integrate RFID with our NetSuite SuiteCommerce or e-commerce programme for omnichannel inventory?",
+      "answer": "Yes. NetSuite's native SuiteCommerce and SuiteCommerce Advanced use the same inventory pool as the ERP; RFID-driven NetSuite inventory updates are immediately reflected in SuiteCommerce available-to-sell calculations. For customers using NetSuite as ERP with Shopify / Amazon / BigCommerce front-ends, RFID-updated NetSuite inventory feeds channel sync through native NetSuite integrations or Celigo / Integrator.io connectors. The result is tight inventory accuracy across every sales channel, which is where the omnichannel ROI of the RFID programme is most visible — fewer oversold orders, faster pick times, more accurate fulfillment."
     }
   ],
   "primaryAction": {
@@ -77,12 +206,16 @@
   },
   "secondaryActions": [
     {
-      "href": "/product/uhf-rfid-tags/",
+      "href": "/products/rfid-labels/uhf-rfid-inlay/",
       "label": "UHF RFID tags"
     },
     {
       "href": "/guides/rfid-sap-wms-integration/",
-      "label": "SAP WMS integration guide"
+      "label": "SAP WMS integration"
+    },
+    {
+      "href": "/guides/rfid-shopify-inventory-integration/",
+      "label": "Shopify integration"
     }
   ]
 }

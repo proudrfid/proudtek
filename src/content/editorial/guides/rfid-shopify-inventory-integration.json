@@ -1,74 +1,203 @@
 {
   "route": "/guides/rfid-shopify-inventory-integration/",
   "group": "guides",
-  "title": "RFID Integration with Shopify Inventory — Sync Physical Stock to Your Online Store",
-  "kicker": "RFID Shopify Integration",
-  "summary": "Shopify merchants with physical retail locations or warehouses can use RFID to maintain real-time inventory accuracy across online and in-store channels. RFID-enabled inventory counting syncs physical stock levels to Shopify's inventory management system, reducing overselling, improving fulfillment speed and enabling true omnichannel retail. This guide explains how to connect RFID hardware to Shopify via middleware and APIs.",
-  "heroPoints": [
-    "Eliminate overselling — RFID counting keeps Shopify stock quantities accurate in real time, preventing online orders for items that are actually out of stock in the warehouse or store.",
-    "Omnichannel inventory visibility — a single RFID count updates inventory levels across Shopify online store, POS locations and wholesale channels simultaneously.",
-    "Simple integration path — RFID middleware apps connect directly to Shopify's Inventory API, requiring no custom development for basic stock sync functionality."
+  "title": "RFID Integration with Shopify — Omnichannel Inventory Sync, Shopify Admin API, Inventory Levels, Multi-Location, Shopify POS and App Store Connectors for Growing DTC and Retail Merchants",
+  "kicker": "Shopify RFID Integration",
+  "summary": "An e-commerce and omnichannel merchant's guide to integrating RFID with Shopify for real-time inventory accuracy across the online store, Shopify POS locations, wholesale channels and external marketplaces. This page covers Shopify's multi-location inventory model, the Shopify Admin REST and GraphQL APIs (in particular the Inventory Levels mutations and inventoryAdjustQuantity mutations), Shopify POS integration with RFID readers for retail stores, the Shopify App Store ecosystem of RFID-inventory apps, webhook-driven event patterns, multi-channel inventory sync including Amazon / eBay / TikTok Shop / Walmart Marketplace via Shopify Markets and third-party channel connectors, and how Proud Tek delivers pre-encoded RFID tags sized for DTC brands, Shopify Plus retailers and fast-growing omnichannel businesses.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "RFID Shopify integration",
+    "Shopify Inventory Levels API",
+    "Shopify multi-location inventory RFID",
+    "Shopify POS RFID",
+    "Shopify App Store RFID app",
+    "omnichannel inventory sync RFID"
   ],
-  "imageAlt": "RFID handheld reader syncing inventory counts to Shopify dashboard",
+  "heroPoints": [
+    "Eliminate overselling across every channel — Shopify's multi-location inventory model propagates on-hand quantities to every connected sales channel (online store, Shopify POS, wholesale, Amazon, eBay, TikTok Shop, Walmart Marketplace, Instagram Shopping). A single RFID count at the warehouse or store updates every channel simultaneously, closing the gap between shelf reality and channel availability.",
+    "Fast time-to-value via App Store and REST/GraphQL APIs — Shopify's App Store hosts dozens of RFID-inventory apps that offer plug-and-play connectivity for common reader vendors (Zebra, Chainway, TSL). For merchants with custom workflows, the Shopify Admin REST and GraphQL APIs (particularly the Inventory Levels and inventoryAdjustQuantity mutations) support direct integration in days rather than months.",
+    "Proud Tek delivers tag programmes sized for DTC and omnichannel retail — smaller initial runs (500-10k tags per SKU), faster SKU refresh cycles, ready-to-apply pre-encoded labels with human-readable SKU printed alongside the RFID payload. Our TID-to-SKU mapping file imports directly into the merchant's Shopify app or middleware lookup table, getting stores live within a week of tag delivery."
+  ],
+  "imageAlt": "RFID integration with Shopify showing inventory sync to online store Shopify POS and omnichannel marketplaces",
   "heroImage": "/landing-images/retail-apparel.jpg",
   "imageSourceRoutes": [
-    "/product/uhf-rfid-tags/",
-    "/product/nfc-stickers/"
+    "/products/rfid-labels/uhf-rfid-inlay/",
+    "/products/rfid-labels/ntag213-nfc-sticker/"
   ],
   "sections": [
     {
-      "title": "How RFID-Shopify inventory sync works",
+      "title": "Shopify's multi-location inventory model — the foundation of omnichannel RFID",
+      "intro": "To design an RFID programme that works with Shopify, start with understanding Shopify's inventory and channel architecture. Products, variants, SKUs, locations and inventory levels compose a specific data model that RFID integration needs to respect. This section maps the model against the operational reality of a growing DTC or omnichannel retailer.",
       "bullets": [
-        "Tag your products — apply UHF RFID labels to every product in your inventory. Tags can be attached to price tickets, packaging or the product itself. Each tag is encoded with a unique identifier linked to the Shopify product SKU.",
-        "Count with RFID — use a handheld UHF RFID reader to count your entire store or warehouse inventory in minutes. The reader captures every tag's identifier and transmits the count to middleware software.",
-        "Middleware maps tags to SKUs — RFID middleware (cloud-based SaaS or Shopify app) translates tag identifiers into Shopify SKUs and calculates stock quantities by location.",
-        "API sync to Shopify — the middleware pushes updated inventory quantities to Shopify via the Inventory Levels API, updating available-to-sell quantities across all sales channels connected to each Shopify location.",
-        "Continuous or periodic updates — choose between scheduled sync (daily RFID count pushes inventory overnight) or near-real-time sync (RFID events update Shopify within minutes of each count)."
+        "Products, variants and SKUs — a Shopify product can have up to 100 variants (size, colour, material combinations). Each variant has its own SKU, its own barcode (typically UPC/EAN/ISBN matching the GS1 GTIN) and its own inventory levels per location. RFID tag encoding must resolve to the variant SKU level, not just the product level, because inventory, pricing and fulfillment all happen per variant.",
+        "Multi-location inventory — Shopify Plus supports unlimited locations; non-Plus plans support up to 10 locations. A 'location' represents a physical warehouse, a retail store with Shopify POS, a 3PL fulfillment partner or a drop-ship supplier. Inventory is tracked per-variant-per-location, and inventory levels (available quantity and committed quantity) propagate to every connected sales channel.",
+        "Available vs committed vs on-hand — Shopify distinguishes on-hand (total physical quantity), committed (reserved for orders in process), available (on-hand minus committed) and incoming (purchase orders pending). Channels display 'available' as the sellable quantity; RFID updates generally target the on-hand figure, letting Shopify's commitment logic handle order-side reservations.",
+        "Channels connected to inventory — Shopify's online store, Shopify POS (at each store location), Shopify Markets (multi-currency storefronts), Amazon / eBay / Walmart Marketplace (via channel apps), TikTok Shop, Instagram Shopping, Facebook Shop, and third-party B2B / wholesale platforms. An RFID count at the warehouse updates the backing inventory level, which Shopify then reflects across all connected channels within their respective sync latencies.",
+        "Shopify POS as a first-class location — Shopify POS is a retail POS system that runs as an iOS / Android app at store checkout. Each store is a Shopify location with its own inventory level. RFID counting at the store uses handheld readers connected to a Shopify app or to middleware that updates the store location's inventory. The same inventory pool serves walk-in POS transactions and online orders fulfilled from the store.",
+        "Fulfillment location selection — for online orders, Shopify's fulfillment logic selects a location based on inventory availability, proximity, fulfillment priority and custom rules. Accurate RFID-driven inventory at every location dramatically improves fulfillment routing accuracy; when a warehouse shows true on-hand thanks to RFID, Shopify's fulfillment engine doesn't accidentally route an order to a stockout."
       ]
     },
     {
-      "title": "RFID middleware options for Shopify merchants",
+      "title": "Shopify Admin REST and GraphQL APIs for RFID integration",
+      "intro": "Shopify exposes its admin surface through REST and GraphQL APIs, with GraphQL being the preferred interface for new development (Shopify is moving toward GraphQL-first and deprecating some REST endpoints). For RFID integration, the Inventory Levels and InventoryAdjustQuantity operations are the primary write surfaces. This section covers the API patterns relevant to RFID.",
       "bullets": [
-        "Dedicated RFID-Shopify apps — several Shopify App Store apps provide RFID reader connectivity, tag-to-SKU mapping and automated inventory sync. These are the easiest to set up for merchants without development resources.",
-        "General RFID middleware with Shopify connector — platforms like RFID4U TagMatiks, Chainway CloudRFID and SML offer RFID inventory management with Shopify integration modules for larger operations.",
-        "Custom API integration — developers can build custom integrations using Shopify's Admin API (GraphQL or REST) combined with RFID reader SDKs. This approach offers maximum flexibility for unique workflows.",
-        "Shopify POS integration — for retail stores using Shopify POS, RFID counts can update the same inventory pool used by in-store transactions, ensuring online and POS quantities match physical reality.",
-        "Multi-location support — Shopify's multi-location inventory feature works natively with RFID sync, allowing separate RFID counts at each warehouse or store to update their respective Shopify location inventories."
+        "GraphQL Admin API — the modern, preferred interface. Key mutations for RFID include `inventoryAdjustQuantities` (bulk-update available/on-hand quantities at specified location/inventoryItem combinations), `inventorySetOnHandQuantities` (set absolute on-hand values, used for RFID full-count reconciliation), and `inventoryActivate`/`inventoryDeactivate` (turn inventory tracking on/off per location). Introspection and strong typing make the GraphQL API easier to evolve with Shopify's versioned schema.",
+        "REST Admin API — the legacy interface, still supported. Equivalent operations include POST to `/admin/api/2024-04/inventory_levels/adjust.json` for delta adjustments and POST to `/admin/api/2024-04/inventory_levels/set.json` for absolute set. REST is convenient for simpler integrations and for middleware that was built before GraphQL became the default.",
+        "Authentication — Shopify apps authenticate with OAuth 2.0, receiving an access token scoped to the merchant's store. RFID middleware apps use the access token for server-to-server API calls. For private integrations (custom apps for a single merchant's store), the custom-app mechanism in the merchant's Shopify admin grants scoped API access without going through the App Store.",
+        "Rate limits — Shopify uses a leaky-bucket rate-limit model with per-app-per-shop limits (40 requests per minute for REST, 50 cost units per second for GraphQL on standard plans; higher on Shopify Plus). RFID integrations that post frequent small updates should batch updates and implement backoff on HTTP 429 responses. Bulk mutations in GraphQL let a single request update many inventory levels at once, reducing rate-limit pressure for large reconciliation jobs.",
+        "Webhooks for event-driven flows — Shopify can push webhooks to the middleware on relevant events: `orders/paid` (use to decrement inventory or trigger picking), `orders/fulfilled` (confirm RFID-verified pack-out), `inventory_levels/update` (confirm the RFID-driven inventory update was accepted). Webhook-driven architectures reduce polling and keep the RFID middleware in sync with Shopify state.",
+        "Bulk operations for large imports — GraphQL bulk operations (`bulkOperationRunQuery`, `bulkOperationRunMutation`) support asynchronous processing of large inventory exports and large-scale mutation. For initial RFID baseline loads or periodic full reconciliation runs involving 10k+ SKUs, bulk operations avoid rate-limit issues and complete in minutes rather than hours of sequential calls."
+      ]
+    },
+    {
+      "title": "Shopify POS integration — RFID in the retail store",
+      "intro": "For omnichannel retailers with physical stores running Shopify POS, the RFID opportunity is as much about in-store operations (count accuracy, self-service fitting-room counts, endless-aisle fulfillment) as it is about backroom receiving. This section covers the Shopify POS side of RFID integration.",
+      "bullets": [
+        "Shopify POS app and extensions — Shopify POS runs as an iOS / Android app on store terminals. POS UI extensions (built with Shopify's POS UI Kit) can integrate RFID reader output directly into the checkout and inventory workflows, letting store associates perform RFID-driven transactions inside the POS app.",
+        "Handheld RFID readers for retail — common retail readers include Zebra MC3330xR, Chainway C72, TSL 1166 Bluetooth UHF reader and Nordic ID Stix. These connect to the POS iPad/Android device via Bluetooth and are paired with a companion app (built by the merchant or provided by a Shopify App Store vendor) that translates RFID reads into Shopify Admin API calls.",
+        "Retail use cases for RFID in Shopify POS — cycle counting in the store aisle (associates walk the floor with a reader, comparing RFID reads against Shopify on-hand for the store location, adjusting for variance), receiving against a Shopify transfer order (incoming stock from warehouse to store validated by RFID), return acceptance (return tag scanned at POS counter for instant inventory credit), anti-theft detection (periodic RFID sweeps to identify missing items).",
+        "Endless aisle and omnichannel fulfillment — when a customer in-store asks for an item not on the shelf, an associate can use RFID to confirm availability in the backroom or at a nearby store location via Shopify's inventory view, then place an order through Shopify POS for warehouse or alternative-store fulfillment. RFID accuracy is what makes this workflow reliable; without RFID, backroom counts are wrong often enough that endless aisle promises backfire.",
+        "Self-service fitting-room RFID — specialized retail deployments use RFID-enabled fitting rooms where a reader at the fitting-room door inventories the items a customer has brought in. Integrated with Shopify, this enables personalized recommendations, fit analytics and queue-less checkout patterns popular with premium apparel brands.",
+        "Proud Tek tag formats for retail store environments — retail-friendly tag formats include small apparel hangtag inlays, fabric-friendly care-label inlays, jewelry-suitable small-format labels and tamper-evident tags for high-value merchandise. Each format is available with Shopify-SKU-aligned encoding (GTIN from the variant's barcode field, serial per tag)."
+      ]
+    },
+    {
+      "title": "Shopify App Store and middleware options for RFID merchants",
+      "intro": "Many Shopify merchants prefer to avoid custom development by selecting an RFID-inventory app from the Shopify App Store or a middleware platform with Shopify connectors. This section surveys the options and the criteria for selecting a fit for the merchant's specific programme.",
+      "bullets": [
+        "Dedicated Shopify RFID-inventory apps — several apps in the Shopify App Store offer RFID reader connectivity with out-of-the-box Shopify inventory integration. These apps handle tag-to-SKU mapping, reader discovery, count workflows and Shopify API sync without custom development. Fit: merchants with straightforward count-and-sync requirements who want fast deployment.",
+        "General RFID inventory platforms with Shopify connectors — platforms like RFID4U TagMatiks, Chainway CloudRFID, Detego and SML Clarity offer broader RFID inventory management (cycle counting, shrinkage analytics, planogram compliance) with Shopify sync as one of their channel connectors. Fit: larger Shopify Plus merchants with multiple locations and richer analytics needs.",
+        "Custom apps via the Shopify Admin API — merchants with internal development capacity or partner agencies can build a custom Shopify app (public or private) that integrates their chosen RFID reader's SDK with the Shopify Admin GraphQL API. Fit: merchants with unique workflow requirements or with cross-channel platforms already in place.",
+        "Headless commerce integration — for merchants running Shopify as the commerce engine behind a custom storefront (Shopify Hydrogen, custom Next.js, Shopify Plus with Storefront API), the RFID integration still uses the Admin API for inventory writes, and the custom storefront consumes the resulting inventory state via the Storefront API or Shopify's real-time inventory JavaScript library.",
+        "3PL integration patterns — many growing Shopify merchants rely on 3PL partners for warehousing and fulfillment. If the 3PL runs their own RFID programme, they typically expose inventory updates to the merchant via EDI or the 3PL's proprietary API, which a middleware (Celigo, MESA, or custom) translates into Shopify inventory adjustments. For merchants who own the 3PL relationship technically, a direct RFID middleware deployment at the 3PL location may be preferable.",
+        "Selection criteria — when evaluating Shopify App Store RFID apps, check: supported reader vendors (match to the customer's hardware choice), Shopify Plus / non-Plus feature parity, multi-location support, Shopify POS integration, tag encoding format compatibility, import/export format for initial load, monthly pricing structure, and customer reviews focused on inventory accuracy outcomes rather than just reader connectivity."
+      ]
+    },
+    {
+      "title": "Omnichannel inventory sync — propagating RFID updates across channels",
+      "intro": "The strategic value of RFID for Shopify merchants is almost always omnichannel: ensuring that one accurate count propagates to every sales channel without lag. This section details how Shopify's channel architecture distributes inventory updates and where RFID accuracy moves the needle on merchant KPIs.",
+      "bullets": [
+        "Shopify online store — the primary channel for most merchants. Inventory updates via Admin API are reflected on the online store's product pages typically within seconds. The available-to-sell calculation accounts for active carts; merchants see fewer 'out of stock' displays when RFID inventory is accurate because true on-hand is higher than the drift-corrupted book quantity.",
+        "Shopify POS — each POS location's inventory is updated simultaneously. Store associates see accurate on-hand for the store, improving customer-facing answers ('is this in stock?') and reducing unnecessary backroom trips looking for items that drift has misreported as available.",
+        "Marketplace channels (Amazon, eBay, Walmart Marketplace, TikTok Shop) — Shopify sync delay to external marketplaces varies by channel (Amazon typically 15-30 minutes, eBay faster, Walmart similar to Amazon). RFID-driven accuracy is particularly valuable here because marketplace oversells trigger penalty metrics (Amazon ODR, eBay seller ratings) that affect future discoverability.",
+        "Social commerce channels (Instagram Shopping, Facebook Shop, TikTok Shop) — Shopify's channel architecture propagates inventory to these channels via the product catalog sync; RFID-accurate on-hand ensures that shoppers tapping into a social-media product post can actually buy the item.",
+        "Wholesale B2B — merchants running Shopify Plus with the Wholesale channel or a B2B app get the same inventory pool visibility for wholesale customers. RFID-driven accuracy benefits B2B ordering where large-quantity allocations across multiple wholesale accounts can exacerbate inventory-drift effects.",
+        "Shopify Flow automation — Shopify Flow (Plus only) can trigger automations on inventory events: when RFID count drops a SKU below reorder point, Flow can create a purchase order draft, email the buying team, or tag the product for replenishment. This closes the loop between physical inventory reality and operational response."
+      ]
+    },
+    {
+      "title": "Tag encoding patterns for Shopify merchants",
+      "intro": "Shopify merchants span a wide range of maturity and data discipline. Some have pristine GTIN data on every variant; others use internal SKU codes without industry-standard barcodes. This section covers the tag encoding strategies that work well for each scenario.",
+      "bullets": [
+        "GTIN-based SGTIN-96 — the preferred pattern for merchants with GS1 Company Prefixes and GTINs on every variant's barcode field. Middleware extracts the GTIN from the tag's SGTIN-96 and queries Shopify for the matching variant by barcode. Clean, industry-standard, forward-compatible with retailer-mandate expansion.",
+        "Shopify SKU in EPC user memory — for merchants without GS1 Company Prefixes (common for DTC brands that haven't formalized their barcode strategy), the tag can encode a placeholder EPC header plus the Shopify variant's SKU string in user memory. Middleware resolves to variant by SKU lookup. Works well but lacks the cross-ecosystem portability of GTIN-based encoding.",
+        "Variant ID embedded encoding — tags can encode the Shopify numeric variant ID in the EPC (using a custom scheme or company-specific prefix). Resolution is a direct Shopify Admin API query by variant ID. Simplest middleware logic but couples the tag to a specific Shopify variant numbering, so re-platforming or duplicate-record scenarios require re-encoding.",
+        "Unique-per-tag serialization — every tag gets a unique serial regardless of the variant, enabling per-unit traceability (good for high-value items, returnable merchandise or anti-counterfeit programmes). The middleware maintains the tag-to-variant mapping in its database and uses the tag ID for unit-level lookups.",
+        "NFC tag alternative — for direct-to-consumer brands wanting a consumer-engagement tap-to-verify experience alongside inventory accuracy, NFC tags (NTAG 213 or NTAG 424 DNA) encoded with variant-specific URLs accomplish both functions. Product-page visits triggered by tags can be tracked alongside inventory counts for cross-function analytics.",
+        "Proud Tek pre-encoding — customers export their Shopify variant list (via admin CSV or GraphQL bulk query) with (variant ID, SKU, barcode/GTIN) and the desired encoding pattern. Our encoding-setup team produces a specification and the production line delivers pre-encoded tags with a TID-to-variant mapping CSV ready for the chosen middleware's lookup table."
+      ]
+    },
+    {
+      "title": "Proud Tek engagement with DTC and Shopify Plus merchants",
+      "intro": "Shopify merchants span the range from bootstrapped DTC brands to global Shopify Plus retailers. Proud Tek's engagement approach adapts to where the merchant is in their growth cycle and to the specific operational problems RFID is solving for them.",
+      "bullets": [
+        "DTC brand discovery — we start with the merchant's current order volume, SKU count, fulfillment location count (owned warehouse, 3PL, home-garage, or blend), current inventory pain points (overselling frequency, manual counting burden, cycle count accuracy) and Shopify plan tier. This scopes the RFID programme — whether to pilot at one warehouse first, whether to include POS, whether to integrate with an existing 3PL.",
+        "Sample batches sized for DTC — 200-2000 tags per SKU for pilot (smaller than mid-market NetSuite samples, larger than NFC consumer samples). Multi-SKU sample packs coordinate like-for-like pilot encoding.",
+        "Pre-encoding from Shopify variant exports — customers send a Shopify variant CSV (from the admin export tool or a GraphQL bulk query result); our encoding-setup team maps CSV columns to encoding parameters, validates GTIN / barcode completeness, and returns a specification for customer confirmation before production.",
+        "Shopify Plus enterprise engagement — for Shopify Plus merchants with multi-location inventory, multi-currency markets and multi-channel sync requirements, we engage with the merchant's Shopify Plus partner (a Plus Certified Agency like BVAccel, Tomorrow Agency, Kollective Agency) to coordinate technical integration with existing commerce architecture.",
+        "Omnichannel-retailer use cases — premium apparel, shoes, accessories, beauty, nutraceuticals and specialty food merchants running Shopify with physical stores are the sweet spot for omnichannel RFID programmes. Proud Tek's catalogue includes apparel-friendly hangtag inlays, cosmetic-friendly small-format labels, care-label inlays for sewn-in deployment and tamper-evident stickers for luxury goods.",
+        "Post-pilot scaling — DTC brands typically scale production gradually as new SKU drops are added; Shopify Plus retailers scale in waves as additional store locations and channels come online. Proud Tek's production planning accommodates both profiles with weekly delivery cadences for growing merchants and larger seasonal batches (back-to-school, holiday, resort) for Plus retailers."
       ]
     }
   ],
   "resourceCards": [
     {
       "title": "RFID products for Shopify merchants",
-      "description": "Tags and labels for retail inventory management.",
+      "description": "UHF RFID labels, NFC stickers and apparel-friendly tags pre-encoded against your Shopify variant catalogue. Small-batch flexibility for DTC brands; Plus-tier scale for omnichannel retailers.",
       "links": [
         {
-          "href": "/product/uhf-rfid-tags/",
-          "label": "UHF RFID inventory tags"
+          "href": "/products/rfid-labels/uhf-rfid-inlay/",
+          "label": "UHF RFID inlays"
         },
         {
-          "href": "/product/nfc-stickers/",
-          "label": "NFC product tags"
+          "href": "/products/rfid-labels/ntag213-nfc-sticker/",
+          "label": "NTAG 213 NFC stickers"
         },
+        {
+          "href": "/products/rfid-labels/impinj-m700-uhf-inlay/",
+          "label": "Impinj M700-series inlays"
+        }
+      ]
+    },
+    {
+      "title": "Encoding and related integration guides",
+      "description": "Companion guides on GS1 EPC encoding, NetSuite and SAP integrations and NDEF for NFC-based consumer engagement.",
+      "links": [
+        {
+          "href": "/guides/gs1-epc-encoding-guide/",
+          "label": "GS1 EPC encoding guide"
+        },
+        {
+          "href": "/guides/rfid-oracle-netsuite-integration/",
+          "label": "NetSuite RFID integration"
+        },
+        {
+          "href": "/guides/nfc-ndef-format-explained/",
+          "label": "NFC NDEF data format"
+        }
+      ]
+    },
+    {
+      "title": "Start a Shopify RFID pilot",
+      "description": "Request samples sized for a store or warehouse pilot; share your Shopify variant export for pre-encoding specification.",
+      "links": [
         {
           "href": "/contact/",
-          "label": "Request Shopify RFID consultation"
+          "label": "Set up Shopify RFID integration"
+        },
+        {
+          "href": "/solutions/rfid-inventory-tracking/",
+          "label": "Inventory tracking solutions"
+        },
+        {
+          "href": "/blog/rfid-inventory-roi-calculator/",
+          "label": "RFID ROI calculator"
         }
       ]
     }
   ],
   "faq": [
     {
-      "question": "How do I link RFID tags to Shopify product SKUs?",
-      "answer": "The link between an RFID tag and a Shopify SKU is maintained in the RFID middleware database. During initial setup, you associate each RFID tag identifier (or the EPC product code) with the corresponding Shopify SKU. For new inventory, tags can be pre-encoded with identifiers that map to your Shopify SKU catalog. Proud Tek can pre-encode tags with identifiers that match your Shopify product data."
+      "question": "How do I link RFID tags to Shopify product variants?",
+      "answer": "The preferred method is to encode tags with an SGTIN-96 value derived from your GS1 Company Prefix and the GTIN stored in the variant's barcode field on Shopify. The RFID middleware extracts the GTIN from the EPC and queries Shopify's Admin API to resolve the matching variant. For merchants without GS1 Company Prefixes (common for DTC brands), an alternative is to encode the Shopify variant SKU into the tag's user memory or use a custom EPC scheme with the variant ID; middleware resolution is then a direct SKU or variant ID lookup. Proud Tek pre-encodes tags based on a Shopify variant CSV the customer provides, returning a TID-to-variant mapping file that imports into the chosen middleware or Shopify app."
     },
     {
       "question": "Do I need to tag every item for Shopify RFID integration?",
-      "answer": "Yes, for accurate inventory sync, every item must carry an RFID tag. Untagged items will be invisible to the RFID count and show as zero stock in Shopify. Most merchants start by tagging all new incoming inventory and gradually backfill existing stock. Source tagging by suppliers is the most cost-effective approach for ongoing operations."
+      "answer": "For accurate inventory sync, yes — every physical unit that should appear in Shopify inventory counts must carry an RFID tag. Untagged items are invisible to the RFID read and will show as zero stock. The most cost-effective operational pattern is source tagging (supplier applies tags before shipping to your warehouse or 3PL) so that incoming inventory is already RFID-ready. For existing untagged stock, a one-time backfill tagging pass at the warehouse gets you to steady state; after that, source-tagged new arrivals eliminate ongoing tagging labour. Proud Tek can coordinate tag shipments directly to your suppliers for source-tagging workflows."
     },
     {
-      "question": "What RFID reader works with Shopify?",
-      "answer": "Shopify does not connect directly to RFID readers — the connection goes through middleware. Any UHF RFID handheld reader that works with your chosen middleware app will work with Shopify. Popular choices include Zebra MC3330xR, Chainway C72, and TSL 1166 Bluetooth UHF readers. The middleware app handles the reader communication and Shopify API sync."
+      "question": "What RFID readers work with Shopify?",
+      "answer": "Shopify doesn't connect directly to RFID readers — the integration runs through a middleware app (from the Shopify App Store or a third-party platform) that speaks to the reader via its native protocol and to Shopify via the Admin REST or GraphQL API. Common reader choices for Shopify merchants include Zebra MC3330xR (handheld Android), Chainway C72 (Android-based handheld), TSL 1166 Bluetooth UHF reader (pairs with iPad / iPhone / Android), and Nordic ID Stix. For fixed deployment (overhead readers, dock portals), Zebra FX9600 and Impinj Speedway R420 are common enterprise choices typically managed through a general RFID middleware platform rather than a Shopify-specific app."
+    },
+    {
+      "question": "Can Shopify POS work with RFID for in-store inventory counts and returns?",
+      "answer": "Yes. Shopify POS is an iOS / Android app that runs at each physical store; store associates can pair a Bluetooth RFID handheld (like the TSL 1166) to the POS device and use a companion app (from the App Store or custom-built) to perform RFID counts, receive transfer orders from the warehouse, validate returns at the counter and perform zone-by-zone cycle counts. The RFID-driven inventory updates propagate through Shopify's multi-location inventory to the online store, other POS locations, and connected marketplace channels. Retailers with omnichannel fulfillment (endless aisle, buy-online-pickup-in-store, ship-from-store) rely on RFID-accurate store inventory to make fulfillment routing reliable."
+    },
+    {
+      "question": "How do I handle multi-location inventory with RFID on Shopify?",
+      "answer": "Shopify's multi-location inventory model is directly compatible with RFID. Each physical location — warehouse, store, 3PL, drop-ship partner — is a Shopify location with its own inventory levels. RFID counts at each physical location update the corresponding Shopify location through the middleware, which scopes inventory adjustments to the reader's location ID. Shopify Plus supports unlimited locations; non-Plus plans support up to 10 (sufficient for most DTC brands and mid-size omnichannel retailers). For Plus merchants with global operations, Shopify Markets additionally enables per-market inventory and pricing while still sharing the underlying inventory pool."
+    },
+    {
+      "question": "Will RFID integration work if we use a 3PL or fulfillment partner?",
+      "answer": "Yes, with the 3PL's participation. If the 3PL already runs their own RFID programme, they typically expose inventory updates via EDI or their own API; a middleware like Celigo, MESA or a custom integration translates 3PL inventory events into Shopify inventory adjustments. If your 3PL doesn't run RFID yet, some will accept a customer-provided RFID infrastructure (readers installed at your allocated slot in their facility, managed by your middleware), while others prefer standardized processes across all their customers. We recommend confirming 3PL support early in the programme design; Proud Tek has experience coordinating source-tagged shipments directly to customer 3PL partners."
+    },
+    {
+      "question": "What does a Shopify RFID programme typically cost at DTC or Plus-merchant scale?",
+      "answer": "Programme cost has three components: tags (variable by SKU count and volume, typically a few cents per UHF label for retail apparel volumes), reader hardware (handhelds from USD 1,000-3,000 each, fixed portal infrastructure USD 5,000-15,000 per dock door, scaling with location count), and middleware / app subscription (App Store apps from USD 50-500/month depending on features; enterprise middleware platforms scale to thousands/month). For a DTC brand with one warehouse, a meaningful programme might start at USD 5,000-15,000 upfront plus USD 100-500/month ongoing. For a Shopify Plus retailer with multiple stores, costs scale with location count but so does the ROI from overselling reduction and fulfillment accuracy improvements. Proud Tek can provide tag-cost estimates alongside third-party hardware and software budgeting guidance as part of the sample-pass conversation."
     }
   ],
   "primaryAction": {
@@ -77,8 +206,12 @@
   },
   "secondaryActions": [
     {
-      "href": "/product/uhf-rfid-tags/",
+      "href": "/products/rfid-labels/uhf-rfid-inlay/",
       "label": "RFID inventory tags"
+    },
+    {
+      "href": "/guides/rfid-oracle-netsuite-integration/",
+      "label": "NetSuite integration"
     },
     {
       "href": "/blog/rfid-inventory-roi-calculator/",
