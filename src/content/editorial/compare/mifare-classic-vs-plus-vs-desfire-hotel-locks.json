@@ -1,139 +1,223 @@
 {
   "route": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
   "group": "compare",
-  "title": "MIFARE Classic Vs MIFARE Plus Vs DESFire For Hotel Locks",
-  "kicker": "Comparison Page",
-  "summary": "This comparison is for hotel lock projects deciding whether to stay close to legacy card behavior, take a migration-minded step up or move into a higher-security credential path.",
+  "title": "MIFARE Classic vs Plus vs DESFire for Hotel Locks — The Practical 2026 Chip Comparison",
+  "kicker": "Hotel Key Card Chip Selection: Classic / Plus EV2 / DESFire EV3",
+  "summary": "Hotel key card chip selection in 2026 is no longer a simple 'which is newest' question — it's a negotiation between the hotel's installed lock estate, the property's security posture and compliance exposure, the key-issuance workflow at the front desk, and the unit economics across a 5-7 year card refresh cycle. MIFARE Classic, MIFARE Plus EV2, and MIFARE DESFire EV3 each remain viable for specific hotel profiles in 2026 — though Classic has narrowing applicability given its CRYPTO1 break. This comparison walks through the lock-vendor matrix (Saflok, Onity, Kaba, Assa Abloy, Salto), the three chips' practical behavior in hotel key-card workflows, the migration math for brands refreshing their card fleet, and the scenarios where each remains the right choice.",
   "heroPoints": [
-    "Legacy compatibility, migration pressure and security level should drive the decision together.",
-    "The installed lock and encoder estate matters as much as the chip family name.",
-    "Sampling should start from the most realistic migration path, not the most ambitious spec sheet."
+    "Lock estate dictates the chip choice more than any other variable. A property with Saflok MT or Onity Advance circa-2010 readers can only reliably run MIFARE Classic. Saflok Confidant RFID (2015+) and Onity DirectKey (2017+) speak Plus and DESFire. Assa Abloy VingCard Signature RFID and Kaba 790 Series read the full HF ISO 14443-A stack. Identify the installed lock firmware before debating security — it often rules out the 'best' chip and leaves two practical options.",
+    "CRYPTO1 is publicly broken. MIFARE Classic has been cryptanalyzed since 2008; commodity tools (Proxmark3, mfoc, hardnested) recover sector keys in minutes on any Classic card. For properties where guest-key cloning has reputational or financial consequence — luxury hotels, urban business-class hotels in tech-literate markets — Classic is no longer acceptable for a new card fleet. For budget-tier and legacy-bound installations where the operational cost of cloning is negligible, Classic remains a functional choice.",
+    "Plus EV2 is the pragmatic middle. It presents as MIFARE Classic to legacy readers (SL1 mode = CRYPTO1-compatible byte-for-byte), which means hotels can swap the card fleet now without touching the reader estate, then upgrade readers to SL3 AES-128 over the next 1-2 years without a hard cutover. This phased-migration story is why the majority of hospitality-chain chip refreshes 2023-2026 specify Plus EV2 rather than DESFire. DESFire is the correct pick only when the property is doing a full lock-and-card replacement or opening a greenfield build."
   ],
-  "imageAlt": "Hotel lock chip family comparison",
+  "imageAlt": "Hotel key card MIFARE Classic Plus DESFire chip comparison",
+  "heroImage": "/landing-images/mifare-classic-plus-desfire-hotel-chip-compare.jpg",
   "imageSourceRoutes": [
-    "/product/mifare-classic-card/",
-    "/product/mifare-plus-card/",
-    "/product/mifare-desfire-cards/"
+    "/products/rfid-cards/mifare-classic-1k-card/",
+    "/products/rfid-cards/mifare-plus-se-card/",
+    "/products/rfid-cards/mifare-desfire-ev3-card/"
   ],
+  "keywords": [
+    "hotel key card chip",
+    "MIFARE Classic hotel",
+    "MIFARE Plus hotel key",
+    "DESFire EV3 hotel",
+    "Saflok RFID",
+    "Onity DirectKey",
+    "VingCard Signature RFID",
+    "Kaba 790",
+    "hotel key card security"
+  ],
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedAt": "2026-04-19",
   "sections": [
     {
       "title": "Quick comparison",
       "table": {
         "columns": [
-          "Chip family",
-          "Best fit",
-          "Main strengths",
-          "Watch-outs"
+          "Dimension",
+          "MIFARE Classic 1K/4K",
+          "MIFARE Plus EV2",
+          "DESFire EV3"
         ],
         "rows": [
-          [
-            "MIFARE Classic",
-            "Legacy estates still validating older lock behavior",
-            "Common reference point in older hospitality programs",
-            "Security expectations are limited and migration pressure is often rising"
-          ],
-          [
-            "MIFARE Plus",
-            "Hotels balancing migration with stronger security",
-            "More practical bridge path in many upgrade projects",
-            "Still needs lock, encoder and issuance validation"
-          ],
-          [
-            "DESFire",
-            "Higher-security hospitality or richer application logic",
-            "Stronger security position and broader application headroom",
-            "Validation tends to be more deliberate up front"
-          ]
+          ["Cryptographic security", "CRYPTO1 (broken 2008)", "AES-128 (SL3)", "AES-128 + file-level rights"],
+          ["Lock compatibility (2010 Saflok/Onity)", "Yes", "Yes (via SL1)", "Usually no"],
+          ["Lock compatibility (2018+ ISO 14443-A lock)", "Yes", "Yes", "Yes"],
+          ["Typical hotel price (1M cards)", "€0.15-0.25", "€0.30-0.40", "€0.60-0.90"],
+          ["Migration risk", "None (staying put)", "Low (SL1 drop-in)", "High (requires reader support)"],
+          ["Multi-application (loyalty / F&B / spa)", "Awkward", "Awkward", "Native"],
+          ["Card cloning resistance", "Low", "High (SL3)", "High"],
+          ["Suitable for luxury chain 2026", "No", "Yes", "Yes"],
+          ["Suitable for budget / legacy bound 2026", "Yes (with caveats)", "Yes", "Often over-spec"],
+          ["EAL certification", "EAL4+", "EAL4+", "EAL5+"]
         ]
       }
     },
     {
-      "title": "What usually decides it",
-      "intro": "The best comparison pages remove one high-friction decision. These are the details that usually decide the first shortlist fastest.",
+      "title": "The three chips at a glance (hotel context)",
       "bullets": [
-        "Use the current lock and encoder estate to rule out unrealistic chip families first.",
-        "Treat migration risk and staff workflow as part of the security decision, not separate topics.",
-        "Confirm whether the property needs a closer bridge path or can justify a stronger step change."
+        "MIFARE Classic 1K/4K — NXP MF1S50 (1K) / MF1S70 (4K). The dominant hotel-key-card chip 1997-2015. ~€0.15-0.25 per card at volume. 1,024 or 4,096 bytes organized as sectors with per-sector Key A / Key B. CRYPTO1 cipher, publicly broken since 2008 (nested / darkside / hardnested attacks; commodity tooling takes minutes). Still appropriate for properties where cloning risk is negligible and the reader fleet predates Plus/DESFire support.",
+        "MIFARE Plus EV2 — NXP MF1P family. Launched as successor to Plus EV1 in 2018. 2K or 4K memory, Classic-compatible sector layout, AES-128 session keys. The distinguishing feature: three security levels (SL1 = CRYPTO1 compatible, SL2 = CRYPTO1 auth + AES data, SL3 = full AES-128). Drop-in replacement for Classic cards on legacy readers (SL1); future-proof against the CRYPTO1 break (SL3). ~€0.30-0.40 per card at volume.",
+        "DESFire EV3 — NXP MF3DHx3 family. Launched 2020 as successor to DESFire EV2. 2K / 4K / 8K variants. File-system memory model — up to 28 applications per card, up to 32 files per application, per-file AES keys. EAL5+ hardware. ~€0.60-0.90 per card at volume. The architecturally-correct choice for multi-application credentials (room + spa + F&B + loyalty on one card).",
+        "All three chips are ISO 14443-A compliant at the physical and anti-collision layers. Classic stops at Part 3 (sector authentication frames on raw 14443-A). Plus EV2 supports both Part 3 (SL1/SL2 modes) and Part 4 (SL3 mode T=CL). DESFire EV3 uses Part 4 exclusively with APDU-wrapped commands.",
+        "For the full chip-level technical reference on each, see the dedicated guides: `/guides/mifare-classic-1k-4k-chip-encyclopedia/`, `/guides/mifare-desfire-ev3-commands-reference/`, and the `/compare/mifare-plus-ev2-vs-desfire-ev3/` deep dive."
       ]
     },
     {
-      "title": "What to confirm before broader ordering",
-      "intro": "Use the first sample round to validate the assumptions below before the project expands into premium materials or large quantities.",
+      "title": "Lock vendor compatibility matrix",
+      "intro": "Hotel chip selection is heavily gated by the installed lock firmware. This table reflects the common configurations seen in 2026 globally.",
+      "table": {
+        "columns": [
+          "Lock family",
+          "Classic",
+          "Plus EV2",
+          "DESFire EV3"
+        ],
+        "rows": [
+          ["Saflok MT (2006-2015)", "Yes", "Yes (SL1 only)", "No"],
+          ["Saflok Confidant RFID (2015+)", "Yes", "Yes", "Yes (firmware 4.1+)"],
+          ["Saflok Quantum IP (2022+)", "Yes", "Yes", "Yes"],
+          ["Onity Advance / HT28 (2010-2016)", "Yes", "Yes (SL1 only)", "No"],
+          ["Onity DirectKey (2017+)", "Yes", "Yes", "Yes"],
+          ["Assa Abloy VingCard Classic (pre-2014)", "Yes", "Yes (SL1 only)", "No"],
+          ["Assa Abloy VingCard Signature RFID", "Yes", "Yes", "Yes"],
+          ["Kaba 710/760 (legacy)", "Yes", "Partial", "No"],
+          ["Kaba 790 Series / Saflok RT", "Yes", "Yes", "Yes"],
+          ["SALTO XS4 / Neo", "Yes", "Yes", "Yes"],
+          ["dormakaba Saflok IN / QT", "Yes", "Yes", "Yes"]
+        ]
+      }
+    },
+    {
+      "title": "What drives the decision in practice",
       "bullets": [
-        "Test the most likely compatible card family before reviewing premium finishes.",
-        "Keep one fallback path in scope when the installed estate is not fully documented.",
-        "Validate encoding, issue flow and guest recovery procedures in the same pilot."
+        "Scenario A — Budget-tier or regional chain, 2010-era Saflok/Onity lock fleet, no CAPEX for lock replacement. Choose Classic 1K. The operational risk (opportunistic cloning) is accepted; the operational cost of lock replacement is not. Common in economy-tier properties and hospitality-adjacent verticals (hostels, small B&Bs). Re-encode cards frequently (every guest cycle) to limit the blast radius of any cloned key.",
+        "Scenario B — Mid-market chain with mixed Saflok MT + Confidant installed base, card-fleet refresh on the annual procurement cycle. Choose Plus EV2 in SL1 mode. Cards are reissued fleet-wide as Plus EV2; legacy-reader properties continue operating unchanged; Confidant-equipped properties can begin moving toward SL3 as firmware is updated. Matches the typical 3-5 year reader-fleet migration cadence.",
+        "Scenario C — Luxury chain, all-new property build or full lock replacement program. Choose DESFire EV3 2K. Per-card cost is negligible at luxury average-daily-rate economics. Multi-application capability supports room + fitness + spa + F&B + parking on a single card, which is a brand-experience differentiator.",
+        "Scenario D — Enterprise business hotel, frequent-traveler program with HID Mobile Access or equivalent mobile-credential. Choose DESFire EV3 for the physical-card fallback tier. Mobile-credential is the primary path; physical cards issued at front desk use DESFire because the existing reader fleet already speaks DESFire for the mobile integration.",
+        "Scenario E — Hotel with significant compliance exposure (hosting government or healthcare guests, certified against ISO 27001 or equivalent). Choose DESFire EV3. EAL5+ is often the documented security baseline in supplier audits; Plus EV2's EAL4+ can fail audit review even though the practical cryptographic strength is equivalent.",
+        "Scenario F — Timeshare or serviced-apartment chain with multi-year resident credentials and per-unit access requirements. Choose DESFire EV3. Long credential lifetime and complex access rules (owner access + housekeeping access + guest access + maintenance access on one card) are exactly what DESFire's file-system model is designed for."
+      ]
+    },
+    {
+      "title": "Migration math across a 500-property chain",
+      "bullets": [
+        "Assume 500 properties, average 200 cards in issue per property (guest-use + staff + master), 5-year card lifecycle. Annual card volume = 500 × 200 / 5 + 20% re-issuance = ~24,000 cards/year.",
+        "Classic at €0.20/card = €4,800 annual spend. Plus EV2 at €0.35/card = €8,400 annual spend (+€3,600 delta). DESFire EV3 at €0.80/card = €19,200 annual spend (+€14,400 delta over Classic).",
+        "On a €500M+ annual revenue chain the card-fleet cost is a rounding error. On a €50M regional chain the delta is visible budget. The differentiator is lock-fleet capex: a single lock replacement is €400-800, so upgrading 500 × 200 locks = €40-80M CAPEX. This dominates every card-chip decision.",
+        "The right strategy for mid-market chains is typically: standardize on Plus EV2 for the card fleet, mandate DESFire EV3 compatibility as a lock-vendor requirement for all new property builds and major refurbishments. This converges the fleet on DESFire over 7-10 years without a forced migration.",
+        "Luxury chains typically standardize on DESFire EV3 and specify Saflok Quantum or Kaba 790 (both DESFire-native) for all new builds.",
+        "Budget chains typically stay with Classic until a property's lock fleet reaches end-of-life, then jump to Plus EV2 as part of the lock refurbishment."
+      ]
+    },
+    {
+      "title": "Operational considerations beyond the chip",
+      "bullets": [
+        "Issuance encoder compatibility — Plus EV2 and DESFire EV3 require encoders that speak the newer command sets. Legacy Saflok and Onity front-desk encoders (2015-era hardware) often need firmware updates to emit Plus SL3 or DESFire cards. Include encoder-upgrade cost in the chip-migration business case.",
+        "Card durability — hotel-use card stock is typically 0.76 mm PVC rated for ~50-100 re-encodes per card before PVC delamination. The chip itself has ≥100,000 write cycles; card durability, not chip durability, is the operational constraint. Better PVC (+5-15 cents per card) buys more guest cycles.",
+        "Room-service and IoT integration — DESFire EV3's multi-application model enables the card to double as the guest's in-room-IoT credential (curtain controls, climate scheduling, minibar). Plus and Classic don't support this natively; separate credentials are needed.",
+        "Guest recovery workflows — if a guest loses a card, the front-desk reissuance workflow is identical across all three chips (card → encoder → new card). The relevant operational differences are in the audit-log richness: DESFire EV3 supports application-level audit trails; Plus and Classic provide coarser UID-level logging.",
+        "Master-key hierarchy — DESFire EV3's application/file key model mirrors the way hotels organize key privileges (floor master, housekeeping master, management master). Plus EV2 handles this via sector-key conventions; Classic handles it via operational segregation. DESFire's native fit reduces operational risk of key-hierarchy misconfiguration.",
+        "Staff-card differentiation — housekeeping, maintenance, minibar-service cards have different access windows and privilege sets. All three chips support this, but DESFire EV3 encodes it cleanly in per-file access rights rather than in sector-key conventions.",
+        "For the broader hotel-card program context (artwork, material selection, encoding workflows), see `/solutions/hotel-key-cards/`, `/guides/hotel-key-card-encoding/`, and `/guides/hotel-key-card-material-selection/`."
+      ]
+    },
+    {
+      "title": "Sampling and pilot guidance",
+      "bullets": [
+        "Pilot at 1-3 properties before fleet-wide commitment. Real-world behavior across lock firmware versions, encoder quirks, and front-desk workflow variations is always richer than the spec-sheet suggests.",
+        "Pilot duration 30-60 days minimum. Shorter pilots miss the edge cases (wedding groups checking in 50 cards at once, the ADA-access guest who needs a card to work through a wheelchair-width range limit on a particular door).",
+        "Pilot with the full card-issuance supply chain, not with engineering hand-samples. The bureau that actually personalizes the hotel's production fleet is a real supply-chain variable — their encoder, their QA tolerances, their batch-level key handling.",
+        "Verify the audit-log export path. Hotels run incident audits (lost card, unauthorized entry report, staff access review). Verify that Plus SL3 or DESFire EV3 audit logs export correctly to the property-management system (Opera, Infor HMS, Agilysys) before committing to the chip.",
+        "For Plus EV2 specifically, pilot the SL1 → SL3 upgrade path at scale. Some Saflok and Onity reader firmwares have documented edge cases in the SL1 → SL3 transition that are invisible at prototype scale.",
+        "For DESFire EV3 specifically, pilot the multi-application workflow even if only single-application is planned initially. DESFire EV3 cards encoded single-application at issuance time are hard to retrofit into multi-application later without a reissue; plan the application structure up front."
       ]
     }
   ],
   "resourceCards": [
     {
       "title": "Related product and solution pages",
-      "description": "Use these internal pages to move from comparison into the closest solution, product or support route.",
+      "description": "Proud Tek hotel card SKUs and the hotel key card solution landing.",
       "links": [
-        {
-          "href": "/solutions/hotel-key-cards/",
-          "label": "Hotel key card solution page"
-        },
-        {
-          "href": "/product/mifare-classic-card/",
-          "label": "MIFARE Classic cards"
-        },
-        {
-          "href": "/product/mifare-plus-card/",
-          "label": "MIFARE Plus cards"
-        },
-        {
-          "href": "/product/mifare-desfire-cards/",
-          "label": "MIFARE DESFire cards"
-        }
+        { "href": "/solutions/hotel-key-cards/", "label": "Hotel key cards solution" },
+        { "href": "/products/rfid-cards/mifare-classic-1k-card/", "label": "MIFARE Classic 1K card" },
+        { "href": "/products/rfid-cards/mifare-plus-se-card/", "label": "MIFARE Plus SE card" },
+        { "href": "/products/rfid-cards/mifare-desfire-ev3-card/", "label": "MIFARE DESFire EV3 card" },
+        { "href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/", "label": "Assa Abloy / VingCard compatible card" },
+        { "href": "/solutions/hotel-rfid-access-control/", "label": "Hotel RFID access control" }
+      ]
+    },
+    {
+      "title": "Chip and workflow references",
+      "description": "Chip-level encyclopedias and hotel-specific operational guides.",
+      "links": [
+        { "href": "/guides/mifare-classic-1k-4k-chip-encyclopedia/", "label": "MIFARE Classic 1K/4K chip encyclopedia" },
+        { "href": "/guides/mifare-desfire-ev3-commands-reference/", "label": "DESFire EV3 commands reference" },
+        { "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "Plus EV2 vs DESFire EV3" },
+        { "href": "/guides/hotel-key-card-encoding/", "label": "Hotel key card encoding" },
+        { "href": "/guides/hotel-key-card-material-selection/", "label": "Hotel key card material selection" },
+        { "href": "/compare/rfid-hotel-card-vs-magnetic-stripe/", "label": "RFID vs magnetic-stripe hotel cards" }
       ]
     },
     {
       "title": "Official references",
-      "description": "These external references help validate chip families, standards or platform guidance behind the comparison.",
+      "description": "NXP product pages for the three chip families.",
       "links": [
-        {
-          "href": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-classic/mifare-classic-ev1-1k-4k:MF1S50YYX_V1",
-          "label": "NXP MIFARE Classic EV1"
-        },
-        {
-          "href": "https://www.nxp.com/products/MFPEV2",
-          "label": "NXP MIFARE Plus EV2"
-        },
-        {
-          "href": "https://www.nxp.com/products/MF3DHx3",
-          "label": "NXP MIFARE DESFire EV3"
-        }
+        { "href": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-classic", "label": "NXP MIFARE Classic product page" },
+        { "href": "https://www.nxp.com/products/MFPEV2", "label": "NXP MIFARE Plus EV2 product page" },
+        { "href": "https://www.nxp.com/products/MF3DHx3", "label": "NXP MIFARE DESFire EV3 product page" }
       ]
     }
   ],
   "faq": [
     {
-      "question": "Is DESFire automatically the right choice for hotel locks?",
-      "answer": "Not automatically. DESFire often suits higher-security programs well, but the current lock estate and migration pressure can still make MIFARE Plus the more practical path."
+      "question": "Is MIFARE Classic still safe for hotel key cards in 2026?",
+      "answer": "For specific property profiles, yes — for others, no. Classic is acceptable at budget-tier properties where guest-key cloning has limited reputational and financial consequence, and where the reader fleet cannot support a newer chip without capital expenditure. Classic is NOT acceptable at luxury properties, corporate-hospitality flagships, or properties with compliance exposure (ISO 27001, government-guest programs). When in doubt, specify Plus EV2 — it reads on Classic-era readers via SL1 mode and upgrades cleanly to AES when the reader estate is ready."
     },
     {
-      "question": "Should hotels choose the chip family before checking encoder compatibility?",
-      "answer": "No. Encoder and lock compatibility should be part of the first chip-family decision because they shape which migration paths are realistic."
+      "question": "Does Plus EV2 require lock replacement in our existing property?",
+      "answer": "Usually not. Plus EV2 in SL1 mode presents to legacy readers byte-for-byte as MIFARE Classic. An existing Saflok MT or Onity Advance reader reads Plus SL1 cards without firmware change. Confirm this with your lock vendor on your specific firmware version — there are edge cases on very old reader generations (pre-2008) where even SL1 doesn't work. For the vast majority of post-2010 installed bases, Plus EV2 is a drop-in card replacement."
+    },
+    {
+      "question": "When is DESFire EV3 clearly the right chip over Plus EV2?",
+      "answer": "Three cases. (1) Multi-application cards — the card needs to serve room access AND spa access AND F&B charging AND loyalty AND parking on one credential; DESFire's file-system model is the correct architecture. (2) Compliance requirement — the property's compliance framework mandates EAL5+ hardware; Plus EV2's EAL4+ is insufficient. (3) Greenfield or full lock replacement — when you're installing new locks anyway, DESFire is the future-proof choice. For drop-in migration from Classic without lock replacement, Plus EV2 is the pragmatic pick."
+    },
+    {
+      "question": "Can we mix Classic, Plus, and DESFire cards across our portfolio?",
+      "answer": "Yes, but plan the encoder infrastructure. The lock readers speak the union of chip types their firmware supports, so a reader that speaks DESFire also reads Plus and Classic. The issuance-side complexity is in the front-desk encoder: one encoder SKU that speaks all three chips is available from all major vendors, but legacy encoders from the 2010s may only speak Classic. Verify the encoder fleet's chip support before standardizing cross-property."
+    },
+    {
+      "question": "How does the CRYPTO1 break affect our Classic-based properties?",
+      "answer": "Practically, any attacker with €100 of hardware (Proxmark3) and physical access to a Classic card for ~30 seconds can clone it. The operational mitigation is re-encoding cards on every check-in and checkout — a cloned card expires with the guest stay. For properties where a guest-stay-scoped cloning window is acceptable (most hotels), Classic remains operational. For properties where the threat model extends to multi-night cloning (extended-stay, timeshare, high-value suites), specify Plus SL3 or DESFire EV3."
+    },
+    {
+      "question": "Do NFC mobile wallets work with these hotel cards?",
+      "answer": "Different question. NFC mobile credential for hotels (HID Mobile Access, Salto JustIN Mobile, Assa Abloy Mobile Access) is a separate credential-delivery mechanism that works alongside physical cards — the phone emulates a DESFire-family credential over HCE or BLE. None of the three physical card chips (Classic, Plus, DESFire) is 'replaced' by mobile; they coexist. Properties with mobile-credential as the primary guest path typically standardize on DESFire EV3 for their physical-card backup fleet because the readers already support DESFire for the mobile integration."
+    },
+    {
+      "question": "What if our chain has 500 properties with mixed lock vendors — how do we standardize?",
+      "answer": "Two practical patterns. (a) Standardize the card fleet on Plus EV2, standardize the lock-vendor spec for new builds on DESFire-capable hardware, and migrate the card fleet to DESFire EV3 over 7-10 years as property refurbishments converge the lock estate. (b) Segment the fleet — luxury brands on DESFire EV3, mid-market on Plus EV2, economy on Classic. The second pattern reflects the reality of multi-brand portfolios; the first pattern is simpler operationally but costs more in the near term."
     }
   ],
   "primaryAction": {
     "href": "/contact/hotel-rfid/",
-    "label": "Ask for hotel lock chip guidance"
+    "label": "Request hotel card samples"
   },
   "secondaryActions": [
     {
-      "href": "/compatibility/",
-      "label": "Browse compatibility pages"
+      "href": "/solutions/hotel-key-cards/",
+      "label": "Hotel key cards solution"
     },
     {
-      "href": "/products/rfid-cards/",
-      "label": "Browse RFID cards"
+      "href": "/guides/mifare-classic-1k-4k-chip-encyclopedia/",
+      "label": "MIFARE Classic deep reference"
     },
     {
-      "href": "/contact/",
-      "label": "General contact details"
+      "href": "/compare/",
+      "label": "Browse all comparisons"
     }
   ]
 }
