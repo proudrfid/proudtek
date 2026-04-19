@@ -3,7 +3,7 @@
   "group": "guides",
   "title": "Google Review Cards For Fitness Franchises",
   "kicker": "Fitness Franchise Guide",
-  "summary": "A deployment playbook for fitness franchises rolling out Google review cards across multiple clubs — covering per-club URL routing, the specific member moments that drive conversion, the peak-vs-off-peak rhythm that distorts pilot results, staff training for high-turnover reception teams, and replacement logistics for high-touch countertop prompts.",
+  "summary": "A deployment playbook for fitness franchises rolling out Google review cards across multiple clubs — covering per-club URL routing, the specific member moments that drive conversion, the peak-vs-off-peak rhythm that distorts pilot results, staff training for high-turnover reception teams, 24/7 unstaffed-access coverage, the January member surge that breaks stock forecasts, and replacement logistics for high-touch countertop prompts.",
   "publishedAt": "2026-04-19",
   "modifiedAt": "2026-04-19",
   "reviewedAt": "2026-04-19",
@@ -18,9 +18,9 @@
     "gym review card replacement"
   ],
   "heroPoints": [
-    "Fitness franchises need per-club URL routing and a sustainable reception behaviour aligned before printing at scale — neither works without the other.",
-    "Peak and off-peak club traffic change what prompt is realistic; a pilot that only covers quiet hours misleads the full rollout.",
-    "A single pilot club paired with a representative mix of high-traffic and low-traffic time windows reveals more than a broad franchise-wide launch."
+    "Fitness franchises need per-club URL routing and a sustainable reception behaviour aligned before printing at scale — neither works without the other, and the January member surge compounds the cost of getting either wrong.",
+    "Peak and off-peak club traffic change what prompt is realistic; a pilot that only covers quiet hours misleads the full rollout, and the gap between them is wider in fitness than in any other review-card vertical.",
+    "A single pilot club paired with a representative mix of high-traffic and low-traffic time windows reveals more than a broad franchise-wide launch — format variation between big-box and boutique is larger than most franchise teams plan for."
   ],
   "imageAlt": "Google review card prompt at a fitness franchise reception desk",
   "imageSourceRoutes": [
@@ -31,82 +31,100 @@
   "sections": [
     {
       "title": "Why fitness franchises are a distinct review-programme case",
-      "intro": "Fitness franchises look like multi-location retail from a distance but behave very differently once the programme goes live. The member relationship is recurring, the traffic is cyclical, and reception staff rotate faster than almost any other service vertical. All three shape the card programme.",
+      "intro": "Fitness franchises look like multi-location retail from a distance but behave very differently once the programme goes live. The member relationship is recurring, the traffic is cyclical, reception staff rotate faster than almost any other service vertical, and the January new-year signup surge compresses a quarter of annual activity into six weeks. All four shape the card programme, and a generic retail rollout plan fails all four at once.",
       "bullets": [
-        "Recurring relationship: members enter the club several times a week, which creates many chances for the prompt to land — but also raises the bar for the prompt to feel natural rather than nagging.",
-        "Cyclical traffic: 6–8 am and 5–8 pm peak windows dominate; the lobby is quiet for long stretches in between. A prompt designed for the quiet hours fails in the peak; a prompt designed for the peak feels understaffed in the quiet hours.",
-        "Reception rotation: many franchise clubs rotate reception staff weekly, often between locations. Scripts and motions have to survive onboarding cycles of under two weeks, not the six-month onboarding of a hotel property."
+        "Recurring relationship: members enter the club several times a week, which creates many chances for the prompt to land — but also raises the bar for the prompt to feel natural rather than nagging. A member tapping the same card twelve times a week sees it as clutter; the card has to feel stable but not repetitive.",
+        "Cyclical traffic: 6–8 am and 5–8 pm peak windows dominate; the lobby is quiet for long stretches in between. A prompt designed for the quiet hours fails in the peak; a prompt designed for the peak feels understaffed in the quiet hours. The gap is wider than any other vertical — a salon's peak-to-trough ratio is 2:1, a gym's is often 6:1.",
+        "Reception rotation: many franchise clubs rotate reception staff weekly, often between locations, and many use part-time student workers with high semester-to-semester turnover. Scripts and motions have to survive onboarding cycles of under two weeks, not the six-month onboarding of a hotel property.",
+        "January surge: the new-year signup spike represents 20–30% of annual membership additions for most franchise chains, concentrated in the first six weeks of the year. The card programme faces its highest volume at the moment staff are most stretched and new members are least relationally bonded to the club. Print stock and training timing have to account for this.",
+        "Six-week attrition cliff: industry-wide, 40–60% of January signups have quit by mid-March. The programme cannot rely on a six-month bonding cycle before asking; the first four to six weeks are the window. Clubs that wait to 'let the member settle in' before prompting miss the peak conversion window entirely.",
+        "Unstaffed access: 24/7 chains and many big-box franchises run long unstaffed overnight and early-morning windows. Members enter with a keycard or fob, never see a receptionist, and have no opportunity for a staff-prompted ask. Self-serve stands and stickers become the only prompt available during these hours.",
+        "Class-based vs open-floor formats: class-based franchises (Orangetheory, CrossFit, F45, Barry's, SoulCycle, pilates reformer studios) see instructor-led relational bonds rather than reception-led ones. The prompt architecture has to follow the relationship, which means the instructor often replaces reception as the primary deliverer."
       ]
     },
     {
       "title": "Per-club URL routing and the franchise admin layer",
-      "intro": "Franchises nearly always need a per-club review URL. Most chains converge on a self-hosted redirect layer so the URL on the card stays stable for years while individual club profiles can change.",
+      "intro": "Franchises nearly always need a per-club review URL. Most chains converge on a self-hosted redirect layer so the URL on the card stays stable for years while individual club profiles can change. A single brand-wide URL routes some members to the wrong club and adds a 'pick your club' step that halves conversion, which for a franchise with thousands of cards in circulation is a very expensive mistake to make.",
       "bullets": [
-        "Subdomain pattern: review.brandname.com/club-downtown, review.brandname.com/club-westside, etc. Each redirect 301s to the specific Google Business Profile review URL for that club.",
-        "Central admin: a single spreadsheet or admin panel mapping club ID to Place ID to redirect URL. Source of truth for both card printing and profile ownership audits.",
-        "New-club onboarding: create the Business Profile, wait 48 hours for indexing, capture the Place ID, add a redirect row, print the club's card batch. Written SOP prevents mistakes.",
-        "Franchisee ownership: decide at group level whether the franchisee or the franchisor owns the Google Business Profile. Ownership changes the migration path when a franchise changes hands.",
-        "Closure and migration: when a club closes or relocates, decommission the redirect (404 the short URL) so residual cards do not drive traffic to a stale profile.",
-        "Avoid brand-wide URLs: a single 'find a club' landing page on the card always underperforms per-club routing. Members are at a specific club and expect to review that specific club."
+        "Subdomain pattern: review.brandname.com/club-downtown, review.brandname.com/club-westside, etc. Each redirect 301s to the specific Google Business Profile review URL for that club. The chain-owned subdomain survives Google URL format changes, club rebrandings and Business Profile migrations without reprinting cards.",
+        "Central admin: a single spreadsheet or admin panel mapping club ID to Place ID to redirect URL. Source of truth for both card printing and profile ownership audits. The admin also stores the manager account that owns each profile so the chain can respond to reviews centrally and reclaim access if a club manager leaves.",
+        "New-club onboarding: create the Business Profile, wait 48 hours for indexing, capture the Place ID, add a redirect row, print the club's card batch. Written SOP prevents the first-month error of printing cards pointing at a profile Google has not yet indexed.",
+        "Franchisee ownership: decide at group level whether the franchisee or the franchisor owns the Google Business Profile. Ownership changes the migration path when a franchise changes hands. Most franchise agreements now include a profile-ownership clause specifically because of review-asset disputes in franchise exits.",
+        "Closure and migration: when a club closes or relocates, decommission the redirect (404 the short URL) so residual cards do not drive traffic to a stale profile. Cards in member hands can circulate for years after a club closes; a live redirect to a deprecated profile is worse than a clean 404.",
+        "Reciprocal-access chains: some franchises let members visit sister clubs under reciprocal access. The card a member carries is attached to their home club, not the club they happen to visit today. Per-visit-club prompting handles this correctly; programmes that only print cards for the home club miss cross-club review opportunities.",
+        "Routing audit: quarterly, tap every club's card from a different city to verify the redirect resolves and lands on the correct profile. DNS and Place ID drift silently break 1–3% of cards per year in chains over fifty locations; a ten-minute quarterly audit catches it before members do.",
+        "Avoid brand-wide URLs: a single 'find a club' landing page on the card always underperforms per-club routing. Members are at a specific club and expect to review that specific club; sending them through a disambiguation step discards the emotional context of 'I just finished a workout here' and routes some reviews to the wrong profile."
       ]
     },
     {
-      "title": "The three member moments that drive gym reviews",
-      "intro": "Across the gym formats we have seen deploy review cards — boutique boxing, large-format chains, boutique pilates, 24/7 clubs — three moments generate the bulk of the conversions. Prioritise these.",
+      "title": "The four member moments that drive gym reviews",
+      "intro": "Across the gym formats we have seen deploy review cards — boutique boxing, large-format chains, boutique pilates, 24/7 clubs, functional-fitness box networks — four moments generate the bulk of the conversions. Prioritise these, and ignore the dozens of moments that feel intuitive but convert poorly.",
       "bullets": [
-        "Tour-conclusion moment: end of a trial tour, after the prospect has signed up or said no. The card earns a review if the tour went well; the prospect is already in an evaluation mindset.",
-        "First-visit follow-up: the second or third actual workout, once the member has formed a habit but the experience is still fresh. Staff at reception can flag new members and hand over the card at check-in.",
-        "Personal-training milestone: the tenth session, a PT block wrap-up, a weight-loss milestone. The PT is the one who hands over the card, not reception. Conversion is very high because the relationship is direct.",
-        "Lower-priority moments: renewal time (mixed reactions), cancellation (avoid), random peak check-in (prompt gets lost in the crowd).",
-        "Digital moment: a post-workout email or in-app nudge with the same review URL works as a supplement, not a replacement. The physical card still outperforms digital-only prompts by a wide margin."
+        "Tour-conclusion moment: end of a trial tour or intro class, after the prospect has signed up or said no. The card earns a review if the tour went well; the prospect is already in an evaluation mindset and the ask fits naturally into the 'what did you think' conversation. Tour-conclusion reviews are often the most substantive because prospects have just finished articulating their impression to a staff member.",
+        "First-month check-in: the second to fourth week of membership, when the member has formed a habit but the experience is still fresh and the January attrition risk is high. Staff at reception can flag new members using the membership-management system and hand over the card at check-in, paired with a 'how's the first month going' conversation.",
+        "Personal-training milestone: the tenth session, a PT block wrap-up, a weight-loss or strength milestone. The PT is the one who hands over the card, not reception. Conversion is very high (15–25% in most chains) because the relationship is direct and the emotional moment is real — a member who just hit a personal record is emotionally primed to review the coach who helped them get there.",
+        "Class-graduation moment: for class-based formats, the end of a beginner series or challenge programme (6-week transformation, intro-to-CrossFit, first-series Orangetheory, bridal-bootcamp completion). The instructor hands over the card at the final class. Strong conversion because the member just completed a goal the instructor visibly supported.",
+        "Lower-priority moments: renewal time (mixed reactions, many members are re-evaluating rather than celebrating), cancellation conversations (avoid, the member is already leaving), random peak check-in (prompt gets lost in the crowd and reception has no time to deliver it properly), locker-room exits (members are focused on leaving).",
+        "Do not prompt during billing disputes: overdue-payment or refund conversations create a quid-pro-quo perception if a review ask follows. Defer to the next clean member interaction.",
+        "Digital moment: a post-workout email or in-app nudge with the same review URL works as a supplement, not a replacement. The physical card still outperforms digital-only prompts by a wide margin — roughly 3–5× higher conversion in most chains we have measured — because the in-person moment carries emotional weight that an email cannot replicate.",
+        "Class-instructor-led prompt: class formats convert best when the instructor mentions the card during the cool-down rather than reception delivering it at exit. 'If today was useful, there's a card at the front to review the studio — takes thirty seconds' is the winning script."
       ]
     },
     {
       "title": "Matching card and stand format to the club layout",
-      "intro": "Gym reception areas vary enormously. A boutique studio has a two-metre reception counter; a big-box chain has a lobby with multiple checkpoints. Format has to match the layout, not the brand deck.",
+      "intro": "Gym reception areas vary enormously. A boutique studio has a two-metre reception counter; a big-box chain has a lobby with multiple checkpoints; a 24/7 chain has a turnstile and vending machines. Format has to match the layout, not the brand deck, and forcing one format across both boutique and big-box franchises produces half a rollout that works and half that sits idle.",
       "bullets": [
-        "Small reception counter (boutique studios): one hand-held card kept at the desk, staff-delivered during the first-visit follow-up or tour conclusion. Premium substrate because the card is held.",
-        "Large reception lobby (big-box chains): one NFC stand at reception plus one NFC sticker at each check-in turnstile. The stand collects staff-prompted conversions; the sticker catches unprompted taps.",
-        "PT-specific card: a personalised handheld card the trainer keeps in their kit bag. Carries the PT's name and a personal message — 'review my coaching on Google if today was useful'. Much higher conversion than a generic reception card.",
-        "Tabletop at the juice bar or shake counter: optional. Members already pause there post-workout; a small card or sticker earns extra conversions without competing with the main reception prompt.",
-        "Locker-room sticker: almost never works. Members are focused on leaving, not reviewing.",
-        "Substrate choice: the reception card is handled dozens of times a day. Plain PVC wears visibly within 60–90 days; premium PVC with a soft-touch laminate lasts 6 months. Metal-look cards project brand but scratch on gym keys."
+        "Small reception counter (boutique studios): one hand-held card kept at the desk, staff-delivered during the first-visit follow-up or tour conclusion. Premium substrate because the card is held. The tactile quality supports the boutique's premium positioning.",
+        "Large reception lobby (big-box chains): one NFC stand at reception plus one NFC sticker at each check-in turnstile. The stand collects staff-prompted conversions; the sticker catches unprompted taps from members who just had a good workout and want to volunteer a review.",
+        "Turnstile sticker for 24/7 clubs: for chains with significant unstaffed access, the turnstile sticker is the primary prompt. Members scan their keycard, see the sticker in the same hand motion, and some tap it on the way out. Conversion per tap is low but total volume is meaningful for clubs with heavy overnight and early-morning traffic.",
+        "PT-specific card: a personalised handheld card the trainer keeps in their kit bag. Carries the PT's name and a personal message — 'review my coaching on Google if today was useful'. Much higher conversion than a generic reception card because the relationship is direct.",
+        "Class-studio card: for class-based formats, a card at the front desk of the class studio (not the main reception) handed out by the instructor during cool-down. Fits the relational model of the class format.",
+        "Tabletop at the juice bar or shake counter: optional. Members already pause there post-workout; a small card or sticker earns extra conversions without competing with the main reception prompt. The pause length at a shake counter is longer than at any other spot in the club, which makes it a surprisingly productive micro-moment.",
+        "Apparel retail adjacency: larger chains sell branded apparel and supplements. A card at the retail counter reaches members browsing after their workout. Lower conversion than reception or PT, but the marginal cost is near zero.",
+        "Locker-room sticker: almost never works. Members are focused on leaving, showering, changing, or dealing with kids. Skip this placement.",
+        "Substrate choice: the reception card is handled dozens of times a day. Plain PVC wears visibly within 60–90 days; premium PVC with a soft-touch laminate lasts 6 months. Metal-look cards project brand but scratch on gym keys and fall below usability within 4 months in chains with shared-key reception systems."
       ]
     },
     {
       "title": "Staff training for fast-rotating reception teams",
-      "intro": "A script that depends on a stable senior reception team is not a fitness-franchise script. Design for the reality that the receptionist at the desk today may not be there next month.",
+      "intro": "A script that depends on a stable senior reception team is not a fitness-franchise script. Design for the reality that the receptionist at the desk today may not be there next month, that the club manager may change twice a year, and that the PT team will turn over by 30–50% annually. Durability of the script through turnover is more important than elegance of the script on paper.",
       "bullets": [
-        "Script simplicity: one-sentence ask, same across every club. 'Quick Google review if today was good?' fits on a laminated desk card reception staff can glance at.",
-        "Onboarding: the prompt is part of reception training from day one, along with check-in and membership queries. New staff should deliver it by the end of week one.",
-        "Manager prompting: the club manager prompts members themselves when they pass through the lobby. Staff models the manager's behaviour; a manager who never prompts teaches the team that the programme does not matter.",
-        "PT briefing: PTs have a separate briefing focused on their personalised card. Conversion per ask is typically 3–4× higher than reception-led asks, so PT prompting earns a dedicated training track.",
-        "Weekly review: the club manager pulls Google review velocity weekly and shares it at the team stand-up. Visibility sustains the programme through staff turnover.",
-        "Franchise-wide leaderboard: a simple top-ten list across clubs converts team pride into consistent prompting behaviour. The leaderboard compares reviews per active member, not total reviews, so small clubs can compete."
+        "Script simplicity: one-sentence ask, same across every club. 'Quick Google review if today was good?' fits on a laminated desk card reception staff can glance at. Reception teams who memorise a five-line script drop to one line within three weeks; design for the endpoint.",
+        "Onboarding: the prompt is part of reception training from day one, along with check-in, membership queries, and prospect-tour handling. New staff should deliver it comfortably by the end of week one. Making the prompt part of onboarding is cheaper than retraining existing staff later.",
+        "Manager prompting: the club manager prompts members themselves when they pass through the lobby. Staff model the manager's behaviour; a manager who never prompts teaches the team that the programme does not matter. Managers who themselves deliver three or four asks per shift set a norm that sustains the programme through staff turnover.",
+        "PT briefing: PTs have a separate briefing focused on their personalised card. Conversion per ask is typically 3–4× higher than reception-led asks, so PT prompting earns a dedicated training track. Include a segment on when not to ask (immediately after a missed session, after a pricing-renewal conversation, after an injury).",
+        "Class-instructor briefing: for class-based formats, instructors get their own training on when to mention the card during cool-down. The timing is delicate — too early and the class has not finished, too late and members are already walking to the door.",
+        "Weekly review: the club manager pulls Google review velocity weekly and shares it at the team stand-up. Visibility sustains the programme through staff turnover. Clubs that run the weekly check sustain 80%+ of peak conversion through staff rotations; clubs that skip it drop to 30–40% within two quarters.",
+        "Franchise-wide leaderboard: a simple top-ten list across clubs converts team pride into consistent prompting behaviour. The leaderboard compares reviews per active member, not total reviews, so small clubs can compete with large ones on a fair basis.",
+        "PT leaderboard: separate from the reception leaderboard. Publish monthly; pair with a symbolic (non-cash) recognition to avoid compliance edge cases around incentivised reviews. A dedicated trainer-of-the-month board sustains PT adoption through the staff turnover cycle."
       ]
     },
     {
       "title": "Peak, off-peak and pilot discipline",
-      "intro": "Fitness traffic is the most cyclical of any review-card vertical. A pilot that averages across the week can hide patterns that matter.",
+      "intro": "Fitness traffic is the most cyclical of any review-card vertical. A pilot that averages across the week can hide patterns that matter, and a pilot that runs entirely in one season misreads the January and September peaks. The programme has to sample across both time-of-day and time-of-year variation to produce a rollout plan that works all twelve months.",
       "bullets": [
-        "Peak windows: 6–8 am, 12–1 pm in city clubs, 5–8 pm. The reception team is stretched, prompts can feel rushed, and member patience is thinner.",
-        "Off-peak windows: 9 am–noon, 1–4 pm, late evening. The team has time; prompts feel natural. But volume is low, so conversion in absolute review count is smaller.",
-        "Pilot structure: four weeks at one pilot club, measured separately for peak and off-peak windows. Report conversion rate per window, not an aggregated rate.",
-        "Peak-specific design: at peak, shift toward self-serve (NFC sticker at the turnstile, stand visible at reception) rather than handoff.",
-        "Off-peak-specific design: at off-peak, lean into handoff (reception card, PT card). The quiet moments are when the relationship-based ask converts best.",
-        "Decision rule: scale only after the pilot shows a workable conversion pattern in both peak and off-peak windows. If the programme only works off-peak, the rollout plan needs peak-window adjustments before printing 5,000 cards."
+        "Peak windows: 6–8 am, 12–1 pm in city clubs, 5–8 pm. The reception team is stretched, prompts can feel rushed, and member patience is thinner. At peak, reception may be actively managing access or membership issues and has no bandwidth for a handoff conversation.",
+        "Off-peak windows: 9 am–noon, 1–4 pm, late evening. The team has time; prompts feel natural. But volume is low, so conversion in absolute review count is smaller even at higher per-ask rates.",
+        "Pilot structure: six weeks at one pilot club, measured separately for peak, off-peak and weekend windows. Report conversion rate per window, not an aggregated rate. Four weeks is too short to catch a slow adoption ramp; eight weeks is ideal if the team can commit.",
+        "Peak-specific design: at peak, shift toward self-serve (NFC sticker at the turnstile, stand visible at reception) rather than handoff. Accept lower per-tap conversion in exchange for volume reach. Peak-window prompts are a volume play, not a quality play.",
+        "Off-peak-specific design: at off-peak, lean into handoff (reception card, PT card, tour-conclusion card). The quiet moments are when the relationship-based ask converts best because reception has time to deliver the prompt properly.",
+        "Seasonality overlay: run a mid-pilot check that covers at least one seasonal transition if possible (end of September, early January, mid-May bridal-prep). Clubs whose entire pilot ran in August miss the January surge dynamics, the September student-return peak, and the May wedding-prep boutique uptick.",
+        "Decision rule: scale only after the pilot shows a workable conversion pattern in both peak and off-peak windows across at least one seasonal transition. If the programme only works off-peak, the rollout plan needs peak-window adjustments before printing 50,000 cards.",
+        "Cohort segmentation: track pilot conversion separately for new members (first 60 days), established members (60 days to 2 years), and long-tenured members (2+ years). New-member prompts convert the highest because the experience is fresh; long-tenured members often need a milestone trigger (anniversary, PR, weight goal) to review. A pilot that only samples established-member prompts misreads the new-member window."
       ]
     },
     {
       "title": "Replacement logistics and refresh rhythm",
-      "intro": "Gym reception is a high-touch environment. Cards and stands wear faster than in most other verticals, and a refreshed prompt converts measurably better than a worn one.",
+      "intro": "Gym reception is a high-touch environment. Cards and stands wear faster than in most other verticals, and a refreshed prompt converts measurably better than a worn one. Members notice a grubby card the way they notice a grubby water fountain — it signals neglect and reduces the trust the prompt relies on.",
       "bullets": [
-        "Reception card wear: visible by day 30 on plain PVC, by day 90 on soft-touch laminate, by day 120 on metal. Replacement cadence: quarterly at minimum.",
-        "Stand wear: acrylic stands yellow and crack within a year under fluorescent lighting. Plan for annual replacement.",
-        "Sticker wear: turnstile stickers lose contrast and edge adhesion within 60–90 days, especially in clubs where members swipe a keycard right next to the sticker.",
-        "Central replenishment: franchise HQ ships replacement stock quarterly. Clubs do not self-order card stock; central control keeps branding and routing consistent.",
-        "Seasonal spikes: January (new-year signup surge) requires 2–3× normal card stock. Plan the Q4 print run accordingly.",
-        "Audit rhythm: quarterly review-card health check per club. Photograph the current stand and card; if either looks worn, replace it, then retrain reception."
+        "Reception card wear: visible by day 30 on plain PVC, by day 90 on soft-touch laminate, by day 120 on metal. Replacement cadence: quarterly at minimum for reception-handled cards, more often at high-traffic clubs.",
+        "Stand wear: acrylic stands yellow and crack within a year under fluorescent lighting. Plan for annual replacement; a stand that has visibly yellowed is worse than no stand because it projects neglect and reduces tap rate.",
+        "Sticker wear: turnstile stickers lose contrast and edge adhesion within 60–90 days, especially in clubs where members swipe a keycard right next to the sticker. The keycard edge wears the sticker mechanically; check and replace every 90 days.",
+        "Central replenishment: franchise HQ ships replacement stock quarterly. Clubs do not self-order card stock; central control keeps branding and routing consistent and prevents clubs from switching suppliers under local cost pressure, which invariably breaks the consistency of the programme.",
+        "January surge: the new-year signup spike requires 2–3× normal card stock. Plan the Q4 print run to cover January and the first half of February. Running out of cards in the second week of January costs a chain more than a full year of marginal review volume at some clubs.",
+        "September student return: clubs near universities see a secondary surge as students return in September. Plan August print runs for these clubs specifically; the surge is 30–50% of January's magnitude but concentrated in clubs that may not be the chain's flagship locations.",
+        "Audit rhythm: quarterly review-card health check per club. Photograph the current stand and card; if either looks worn, replace it, then retrain reception. Pair the audit with a tap test — physically tap each card and confirm the URL resolves.",
+        "Renovation sync: when a club refurbishes reception, the card programme refresh should sync to the renovation date, not lag it. A renovated reception with a worn card stand from the previous design era reads cheap and undercuts the renovation investment."
       ]
     }
   ],
@@ -169,31 +187,31 @@
   "faq": [
     {
       "question": "Do fitness franchises need different review-card handling for peak and off-peak times?",
-      "answer": "Yes. Peak windows (6–8 am, 5–8 pm) are too busy for reliable staff handoffs, so the prompt has to lean toward self-serve stands and turnstile stickers. Off-peak windows support the higher-converting reception handoff and PT-prompted asks. A pilot that averages across both hides this pattern and produces a rollout plan that works in only half the day."
+      "answer": "Yes. Peak windows (6–8 am, 5–8 pm) are too busy for reliable staff handoffs, so the prompt has to lean toward self-serve stands and turnstile stickers. Off-peak windows support the higher-converting reception handoff and PT-prompted asks. A pilot that averages across both hides this pattern and produces a rollout plan that works in only half the day — and the gap between peak and off-peak is wider in fitness than in any other review-card vertical, often 6:1 in member traffic."
     },
     {
       "question": "What should a fitness-franchise pilot prove first?",
-      "answer": "Per-club URL routing, reception adoption separately in peak and off-peak windows, and the replacement cadence for high-touch countertop prompts. Pilot at one club for four weeks; measure conversion rate separately for peak and off-peak; measure card wear at week four. If any of these fails, the rollout plan needs adjustment before the chain-wide print run."
+      "answer": "Per-club URL routing works end to end, reception adoption separately in peak and off-peak windows, PT adoption at session-milestone moments, and the replacement cadence for high-touch countertop prompts. Pilot at one club for six weeks; measure conversion rate separately for peak, off-peak and weekend windows; measure card wear at week six. If any of these fails, the rollout plan needs adjustment before the chain-wide print run. Eight weeks is ideal if the pilot team can commit; four is too short to catch adoption-ramp patterns."
     },
     {
       "question": "Should each club have its own URL on the card?",
-      "answer": "Yes, always. A brand-wide review URL sends members through a 'pick your club' step that halves conversion and routes some reviews to the wrong profile. Per-club URL routing is not optional for franchise programmes — it is the minimum viable setup."
+      "answer": "Yes, always. A brand-wide review URL sends members through a 'pick your club' step that halves conversion and routes some reviews to the wrong profile. Per-club URL routing is not optional for franchise programmes — it is the minimum viable setup, and the chain-owned subdomain wrapper keeps the URL stable even when underlying Google URL formats or individual profile URLs change."
     },
     {
       "question": "What role do personal trainers play in the programme?",
-      "answer": "The strongest one. PT-prompted asks convert 3–4× higher than reception-led asks because the relationship is direct. Equip PTs with a personalised card carrying their name and a one-line message ('review my coaching if today was useful'). Train PTs separately; make the PT programme a visible track in the franchise leaderboard."
+      "answer": "The strongest one. PT-prompted asks convert 3–4× higher than reception-led asks because the relationship is direct and the emotional moment is real — a member who just hit a personal record is primed to review the coach. Equip PTs with a personalised card carrying their name and a one-line message ('review my coaching if today was useful'). Train PTs separately; make the PT programme a visible track in the franchise leaderboard, with non-cash recognition to avoid compliance edge cases around incentivised reviews."
     },
     {
       "question": "How fast do reception cards wear out in a gym?",
-      "answer": "Plain PVC shows visible wear within 30 days of heavy reception handling. Soft-touch laminate lasts 90 days. Metal-look cards scratch on member keys within 120 days. Quarterly replacement is the default cadence; January needs an extra print run to cover the new-year signup surge."
+      "answer": "Plain PVC shows visible wear within 30 days of heavy reception handling. Soft-touch laminate lasts 90 days. Metal-look cards scratch on member keys within 120 days, and in chains using shared-key reception systems the wear is faster still. Quarterly replacement is the default cadence; January needs an extra print run to cover the new-year signup surge, and university-adjacent clubs need a separate August run to cover student return."
     },
     {
       "question": "How should franchise HQ manage stock and refresh?",
-      "answer": "Central replenishment, not club-level ordering. HQ ships replacement stock quarterly based on club size and verified review velocity. Club-level ordering drifts on branding and routing consistency within months. Central control keeps the card system honest as clubs open, close and change hands."
+      "answer": "Central replenishment, not club-level ordering. HQ ships replacement stock quarterly based on club size and verified review velocity. Club-level ordering drifts on branding and routing consistency within months — a club manager under cost pressure switches to a cheaper local printer who uses the wrong substrate or a slightly different subdomain, and the chain discovers it only when a routing audit turns up a batch of cards pointing at the wrong profile."
     },
     {
       "question": "What is the single biggest avoidable mistake in fitness-franchise programmes?",
-      "answer": "Rolling out franchise-wide stock before the per-club URL routing and the peak-window prompt model are proven. Franchises that print 50,000 cards before one club has a clean four-week pilot burn the first order on rework when the URL routing or the peak prompt turns out to need fixing."
+      "answer": "Rolling out franchise-wide stock before the per-club URL routing and the peak-window prompt model are proven. Franchises that print 50,000 cards before one club has a clean six-week pilot burn the first order on rework when the URL routing, peak prompt, or member-flow assumption turns out to need fixing. The pilot cost is small; the rework cost when the pilot is skipped is large, and the timing pressure of the January surge makes the rework cost compound dramatically if the chain is mid-rollout in November."
     }
   ],
   "primaryAction": {
