@@ -3,67 +3,161 @@
   "group": "guides",
   "title": "Hotel Key Card Encoding Guide",
   "kicker": "Hospitality Guide",
-  "summary": "This guide helps hotel teams scope card encoding work, reduce avoidable compatibility mistakes and prepare a tighter brief before asking for encoded samples or production support.",
-  "heroPoints": [
-    "Encoding should be planned together with compatibility, not after the card material is chosen.",
-    "The current lock and encoder estate determines what is realistic first.",
-    "A small pilot should validate issue flow and guest recovery procedures, not only opening behavior."
+  "summary": "A practical encoding guide for hotels that covers lock-estate discovery, chip family selection, pre-encoding brief structure, pilot validation, replacement workflow, mobile key integration, and the specific questions that separate a clean rollout from a renegotiation six months in.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "hotel key card encoding",
+    "pre-encoded hotel cards",
+    "MIFARE Classic hotel locks",
+    "MIFARE DESFire hotel migration",
+    "hotel lock encoder",
+    "PMS integration RFID cards"
   ],
-  "imageAlt": "Hotel key card encoding workflow",
+  "heroPoints": [
+    "Encoding, compatibility and chip family are one decision — separating them is the most common cause of re-ordered cards.",
+    "The installed lock and encoder estate determines what pre-encoding is realistic before a single sample is produced.",
+    "A good pilot validates guest recovery, front-desk handling and PMS re-issue flow — not just whether the door opens."
+  ],
+  "imageAlt": "Hotel key card encoding workflow at the front desk encoder",
   "imageSourceRoutes": [
     "/product/hotel-key-cards/",
     "/product/printed-rfid-cards/"
   ],
   "sections": [
     {
-      "title": "What this guide covers",
-      "intro": "Use this guide when the project already knows the use case, but still needs a tighter implementation or validation workflow before requesting samples or pricing.",
+      "title": "Why hotel card encoding is a systems decision, not a print decision",
+      "intro": "Most hotel card projects slow down for the same reason: procurement treats encoding as a production detail to be figured out after the card finish is approved, while the engineering team treats it as a lock vendor problem. Both views are incomplete.",
       "bullets": [
-        "How to collect the right property and lock-estate details before asking for encoded cards.",
-        "How to keep compatibility, chip family and encoding workflow in one first brief.",
-        "How to structure a pilot that tests both technical performance and front-desk handling."
+        "A hotel key card is only as useful as the encoder, lock firmware and PMS integration behind it. Get any one of those wrong and the prettiest card fails at the first door.",
+        "Encoding spans three layers: the chip family on the card, the bit layout the lock vendor expects, and the issue sequence the PMS drives at check-in. Every layer has to be aligned before artwork matters.",
+        "Retrofits are harder than greenfield rollouts because existing locks constrain chip family and memory layout. A greenfield property can often standardise on DESFire EV3 and never look back; a refurb may have to live with MIFARE Classic 1K for years while phased upgrades roll through floors."
       ]
     },
     {
-      "title": "Recommended workflow",
-      "intro": "These steps keep the first sample or deployment round focused on the questions that change the buying decision most.",
+      "title": "Audit the lock and encoder estate before talking about cards",
+      "intro": "The first working session should be a lock estate audit, not a card review. If you can't describe the lock firmware, encoder model and PMS bridge in two sentences, no supplier can give a realistic encoding proposal.",
       "bullets": [
-        "Confirm the installed lock and encoder environment first.",
-        "Define chip family, numbering, pre-encoding and artwork requirements in one document.",
-        "Pilot the encoded cards on the real locks and in the real front-desk issue flow.",
-        "Use the pilot to capture opening behavior, replacement handling and staff feedback before scaling."
+        "Lock inventory: brand, model and firmware of every lock type in the property — including back-of-house doors, lifts, garage barriers, pool gates and spa entrances. A 200-room hotel typically has three to five distinct lock firmware versions once you include non-guest doors.",
+        "Encoder inventory: model, firmware and connection type (serial, USB, PoE, cloud-bridged) at each front desk, plus any mobile encoders used by housekeeping and engineering. Aged encoders often cap write speed and limit the chip families they can program.",
+        "PMS bridge: which property management system drives check-in, which middleware talks to the lock vendor, and whether the integration is online (live re-issue) or batch (cards encoded at the desk from a key list).",
+        "Roaming and corporate requirements: if the property is part of a chain with a shared loyalty credential, chip family and key diversification rules are often set at the group level, not the property level.",
+        "Exception inventory: suite overrides, do-not-disturb behaviour, staff master cards, spare cards, lost-card workflow. Encoding has to cover every one of these or the front desk invents a workaround the auditor doesn't like."
       ]
     },
     {
-      "title": "Common mistakes to avoid",
-      "intro": "These are the patterns that often slow down projects because the team moves into samples or pricing before the core workflow is clear enough.",
+      "title": "Chip family selection: what the lock firmware actually reads",
+      "intro": "The chip family is not a branding choice. It is constrained by lock firmware and by the encryption posture the chain has committed to. These are the common starting points.",
       "bullets": [
-        "Choosing the card finish before confirming the encoding path.",
-        "Treating compatibility and encoding as separate workstreams too late in the process.",
-        "Testing only door opening and skipping front-desk issue or replacement workflows."
+        "MIFARE Classic 1K: still widespread in legacy locks. Adequate when the lock vendor implements diversified keys properly, risky when the property relies on default keys. Best for short-runway retrofits where the upgrade budget cannot stretch to new locks.",
+        "MIFARE Plus SL3 / MIFARE DESFire EV3: the current best practice for new builds and for any property refreshing locks. AES-128, audit-grade key diversification, and room for multi-application credentials (room access, lift, pool, spa).",
+        "NTAG424 DNA: worth considering for boutique properties that also want guest-facing phone tap experiences (wellness menus, room service), since the SUN CMAC mechanism gives verifiable tap URLs without a separate medium.",
+        "iCODE SLIX: rare in hotels but seen in some laundry-linen hybrid deployments. Usually ruled out at the lock firmware review step.",
+        "LF 125 kHz (EM/TK): found only on truly legacy systems. If a property still runs LF hotel cards, the real project is lock replacement, not card re-encoding."
+      ]
+    },
+    {
+      "title": "Pre-encoding vs site encoding: when to bake the data in",
+      "intro": "The cards can arrive blank (site-encoded at check-in), partially encoded (UID fixed, sector data written at the desk), or fully pre-encoded (including printed numbering, sector data and security keys). Each has tradeoffs.",
+      "bullets": [
+        "Blank cards work when the property has plenty of encoder capacity and the front desk writes every card at check-in. Pros: simplest logistics, no key exchange at supply time. Cons: slow peak-check-in throughput, higher encoder wear, no pre-printed unique numbering.",
+        "Partial pre-encoding (UID-locked, printed unique serial, keys loaded at site) is the most common middle ground. The supplier handles printing and serial assignment; the property applies its own keys via the lock vendor tool before first issue.",
+        "Full pre-encoding (keys, sector layout, printed numbering, optionally pre-assigned room ranges) shortens site setup dramatically but requires a secure key exchange with the supplier. DESFire DAM (Delegated Application Management) or a qualified key-injection partner is the professional path.",
+        "Emergency stock: most properties keep a blank card inventory regardless, so a DESFire Classic-compatible encoder can issue replacements if supplier delivery slips.",
+        "Security posture: fully pre-encoded orders require a signed key-handling agreement. Treat it like handling safe combinations — not a courier tracking number."
+      ]
+    },
+    {
+      "title": "Pilot structure: what a useful first 200 cards actually tests",
+      "intro": "A weak pilot orders 50 cards, tries one door, and declares success. A useful pilot stress-tests the parts that actually break in the first year of operation.",
+      "bullets": [
+        "Opening behaviour across every lock firmware variant in the property, not just guest rooms. Test back-of-house, lift overrides and spa doors.",
+        "Issue speed at peak check-in: measure time-per-key with the real PMS integration, not a lab bench. A 20-second issue time becomes a lobby queue at 3 pm on a Friday.",
+        "Replacement and invalidation: lose a card on purpose, re-issue from the PMS, and confirm the lost card is dead at the door within the expected window.",
+        "Housekeeping override: test staff master cards, DND override and expired-card behaviour against the housekeeping app.",
+        "Guest recovery: what happens when a guest's card demagnetises? Returns to the desk? Can't find the card at the door? The pilot is the only time these workflows get tested without real-guest pressure.",
+        "Durability sample: hand 20 cards to front-desk staff and ask them to rotate them through daily use for two weeks. Wear patterns appear fast on cheap PVC.",
+        "Exit conditions: define in writing what has to pass before the pilot authorises the full order. Without a written exit list, the pilot drifts into ordering."
+      ]
+    },
+    {
+      "title": "Mobile keys and encoded card coexistence",
+      "intro": "Most properties now run encoded cards alongside Apple Wallet / Google Wallet mobile keys. That coexistence changes encoding assumptions.",
+      "bullets": [
+        "Mobile keys usually ride on a separate credential layer (the lock vendor's BLE or NFC provisioning stack). They do not replace the encoded card — they supplement it for loyalty members and returning guests.",
+        "Encoded cards remain the fallback for walk-ins, guests without the app installed, accompanying guests, and any door that does not have a mobile-key-capable lock. Plan for 100% card coverage even if 40% of stays go mobile-key-first.",
+        "Chip family choice still matters: lock vendors typically require DESFire EV3 or Plus SL3 when they unlock their mobile key SDK. A MIFARE Classic estate cannot enable mobile keys until lock firmware is upgraded.",
+        "Training: staff need one issuance workflow, not two. A good PMS integration sends the same re-issue command whether the guest chose a card or a mobile key, so the front desk does not have to remember which one is active."
+      ]
+    },
+    {
+      "title": "Documentation that makes a supplier reply with a real proposal",
+      "intro": "The difference between a two-week RFQ cycle and a six-week RFQ cycle is usually the quality of the initial document. Pack the following into one PDF and most suppliers can reply with realistic samples and pricing.",
+      "bullets": [
+        "Property profile: number of rooms, lock firmware list, encoder fleet, PMS, chain affiliation, expected annual card volume, replacement rate.",
+        "Chip family and encoding preference: preferred chip, fallback chip, pre-encoding scope (blank / partial / full), key-handling method.",
+        "Numbering and print rules: whether cards carry printed unique serial, room-range assignments, loyalty-tier variants, language variants for international properties.",
+        "Artwork references: brand guide, finish expectations (matte, gloss, soft-touch), sustainability claims if any, lanyard slot or no.",
+        "Pilot plan: quantity, delivery address, pilot exit criteria, timeline for full order decision.",
+        "Compliance: GDPR posture on any UID logging, any chain-level security standard (PCI-DSS adjacency, ISO 27001 references) the supplier must acknowledge."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "Related pages",
-      "description": "Use these solution, comparison and product pages to move from the guide into a sharper shortlist.",
+      "title": "Hospitality pillars",
+      "description": "Solution and compatibility pages that anchor the encoding decision in the broader hotel access stack.",
       "links": [
         {
           "href": "/solutions/hotel-key-cards/",
           "label": "Hotel key card solution page"
         },
         {
-          "href": "/compatibility/",
-          "label": "Hotel compatibility pages"
+          "href": "/solutions/hotel-rfid-access-control/",
+          "label": "Hotel RFID access control"
         },
+        {
+          "href": "/compatibility/",
+          "label": "Hotel lock compatibility library"
+        }
+      ]
+    },
+    {
+      "title": "Chip and compare context",
+      "description": "Chip encyclopedia and compare pages that sharpen the chip-family decision.",
+      "links": [
         {
           "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
-          "label": "Hotel chip-family comparison"
+          "label": "MIFARE Classic vs Plus vs DESFire for hotels"
         },
         {
-          "href": "/product/hotel-key-cards/",
-          "label": "Hotel key cards"
+          "href": "/compare/rfid-hotel-card-vs-magnetic-stripe/",
+          "label": "RFID hotel card vs magnetic stripe"
+        },
+        {
+          "href": "/guides/mifare-desfire-ev3-commands-reference/",
+          "label": "MIFARE DESFire EV3 command reference"
+        }
+      ]
+    },
+    {
+      "title": "Adjacent hotel playbooks",
+      "description": "Material, artwork and sample planning guides that pair with the encoding decision.",
+      "links": [
+        {
+          "href": "/guides/hotel-key-card-material-selection/",
+          "label": "Hotel key card material selection"
+        },
+        {
+          "href": "/guides/hotel-key-card-artwork-and-printing-checklist/",
+          "label": "Hotel key card artwork and print checklist"
+        },
+        {
+          "href": "/guides/hotel-key-card-sample-planning/",
+          "label": "Hotel key card sample planning"
         }
       ]
     }
@@ -71,11 +165,31 @@
   "faq": [
     {
       "question": "What should a hotel send before asking for pre-encoded card samples?",
-      "answer": "The best first brief includes the lock or encoder environment, likely chip family, numbering rules, artwork needs and the pilot quantity and deadline."
+      "answer": "A one-page brief that covers the lock brand and firmware across every door type, the encoder fleet at every desk, the PMS and middleware, the preferred chip family, the pre-encoding scope, any numbering or print rules, the pilot quantity and the timeline for the full order decision. Suppliers who get this document reply with realistic samples in two weeks; suppliers who only get a finish preference reply with a revision cycle."
     },
     {
       "question": "What should an encoding pilot validate besides lock opening?",
-      "answer": "It should also validate front-desk issue logic, replacement handling, staff workflow and whether the encoded card path is practical enough to scale."
+      "answer": "Issue speed at peak check-in against the real PMS integration, re-issue and invalidation latency when a card is lost, housekeeping override and master-card workflows, DND behaviour, expired-card handling, guest recovery when a card demagnetises, and durability after two weeks of staff handling. Door opening is the easiest test to pass and the least useful one to rely on."
+    },
+    {
+      "question": "Can a hotel run encoded cards and mobile keys together?",
+      "answer": "Yes, and most properties do. Mobile keys supplement encoded cards rather than replacing them; walk-ins, guests without the app, accompanying guests and non-mobile-capable doors all still need cards. The chip family matters here — DESFire EV3 or MIFARE Plus SL3 is usually required before the lock vendor will unlock its mobile key SDK."
+    },
+    {
+      "question": "When is full pre-encoding worth the extra setup cost?",
+      "answer": "When the property issues more than a few thousand cards a year, when the front desk cannot afford slow site encoding at peak check-in, or when the property wants printed unique serials per card. The cost is a signed key-handling agreement and a qualified key-injection path (DESFire DAM or equivalent); the benefit is faster desk issuance and cleaner audit trails."
+    },
+    {
+      "question": "What is the safest migration path from MIFARE Classic to DESFire?",
+      "answer": "Run both chip families in parallel during the lock firmware upgrade window. Keep Classic active on legacy floors while DESFire comes online on upgraded floors, and issue dual-chip cards only when the encoder and lock vendor both support a clean handoff. A forced cutover on a single night is the most common source of check-in outages in hotel retrofits."
+    },
+    {
+      "question": "How does the encoding brief change for boutique versus chain properties?",
+      "answer": "Boutique properties have more freedom to pick chip family and encoding posture, but less internal support for key handling. Chain properties usually have a group-level credential standard that constrains chip choice, but also provide a key-handling partner and PMS integration the property can rely on. The brief stays the same — only the authority to decide shifts between the property and the group office."
+    },
+    {
+      "question": "What is the most common avoidable mistake in hotel encoding projects?",
+      "answer": "Treating the card finish as the first decision. Finish is the last decision — it follows chip family, encoding scope, pilot result and rollout timing. Projects that sample wood and PVA before confirming lock firmware almost always re-sample after the first pilot fails."
     }
   ],
   "primaryAction": {
