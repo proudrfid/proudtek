@@ -1,0 +1,221 @@
+{
+  "route": "/guides/mifare-ultralight-c-chip-encyclopedia/",
+  "group": "guides",
+  "title": "MIFARE Ultralight C — HF Chip Technical Encyclopedia (Memory, 3DES Auth, Counters, Deployment)",
+  "kicker": "MIFARE Ultralight C (MF0ICU2) / Ultralight EV1 / Ultralight Nano Reference",
+  "summary": "MIFARE Ultralight C (NXP MF0ICU2) is the low-cost, paper-ticket-oriented HF 13.56 MHz chip that brought triple-DES authentication to single-use and short-life credentials. Shipping since 2008, it extends the original Ultralight architecture with 144 bytes of user memory, 3DES mutual authentication (16-byte key, based on NIST SP 800-67 Triple DES), a one-way 24-bit counter for event-ticket validation, and the ISO 14443-A Part 3 layer. Used in event tickets, transport single-ride tickets, limited-edition gift cards, and any application where a paper-substrate HF chip with tamper-resistant authentication is needed.",
+  "heroPoints": [
+    "Paper-first form factor — the Ultralight family is the standard chip for printed event tickets, transit single-rides, and NFC business cards printed on paper/PVC. Ultralight C adds 3DES to the mix: 48 bytes more user memory than the original Ultralight, plus a proper cryptographic auth handshake that makes cloning meaningfully harder than raw Ultralight.",
+    "3DES mutual authentication — 16-byte (112-bit effective) key authenticated via a two-step challenge/response. NIST SP 800-67 Triple-DES with the 3-key variant. Not as strong as AES-128, but considerably stronger than Classic's CRYPTO1 and the original Ultralight's UID-only binding. Adequate for short-validity event tickets.",
+    "One-way 24-bit counter — a hardware-enforced monotonic counter that only increments. Perfect for event-ticket validation (counter bumps on entry scan), single-ride transit tickets, and anti-replay tokens. The counter cannot be decremented by any command, giving downstream systems a hard audit trail."
+  ],
+  "imageAlt": "MIFARE Ultralight C card with ISO 14443-A antenna layout",
+  "heroImage": "/landing-images/mifare-ultralight-c-card.webp",
+  "imageSourceRoutes": [
+    "/products/rfid-cards/mifare-ultralight-c-card/",
+    "/products/rfid-cards/mifare-ultralight-c-cards/"
+  ],
+  "keywords": [
+    "MIFARE Ultralight C",
+    "MF0ICU2",
+    "Ultralight 3DES",
+    "Ultralight EV1",
+    "Ultralight C memory map",
+    "Ultralight C one-way counter",
+    "Ultralight C vs NTAG213",
+    "Ultralight C event ticket",
+    "ISO 14443-A"
+  ],
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedAt": "2026-04-19",
+  "sections": [
+    {
+      "title": "Family and part numbers",
+      "bullets": [
+        "MIFARE Ultralight C — NXP part number MF0ICU2. The 3DES-capable variant. 192 bytes total memory, of which 144 bytes are user-writable. Launched 2008, still in volume production as of 2026.",
+        "MIFARE Ultralight (original) — MF0ICU1. 64 bytes total, 48 bytes user. No crypto. Was the original paper-ticket chip for transit and events; mostly superseded by Ultralight EV1 or NTAG213 in new deployments.",
+        "MIFARE Ultralight EV1 — MF0UL11 / MF0UL21. Launched 2012. 48-byte and 128-byte user-memory variants. Adds per-block lock, 32-bit one-way counter, and an Originality Signature (ECDSA-based tag-authentication using an NXP key) for anti-counterfeit. No 3DES — EV1 is sold as a drop-in replacement for the original Ultralight plus NTAG21x-style features rather than as an Ultralight C successor.",
+        "MIFARE Ultralight Nano — MF0UN00. 40-byte user memory, 'bare-bones' chip for single-use paper tickets at the lowest possible cost. No crypto. 2017 launch.",
+        "NTAG21x relationship — NTAG213 / NTAG215 / NTAG216 are a parallel product family aimed at general-purpose NFC tagging rather than ticketing. Shared 14443-A layer but different command sets; NTAG21x has its own Fast Read and dynamic-URL features that Ultralight does not.",
+        "Counterfeit watch — authentic Ultralight C returns ATQA = 0x0044 and SAK = 0x00 (ISO 14443-3 cascade continues beyond the first anti-collision round). The GET_VERSION command (0x60) on Ultralight EV1 and newer returns NXP manufacturer ID 0x04; pre-GET_VERSION Ultralight C identifies via page 2-3 header data."
+      ]
+    },
+    {
+      "title": "Memory architecture",
+      "bullets": [
+        "Ultralight C total layout — 48 pages of 4 bytes each = 192 bytes total. Pages 0-3 hold UID, BCC, internal config. Pages 4-39 are user-writable data (144 bytes). Pages 40-43 hold the 3DES key and lock bits. Pages 44-47 are configuration (counter, key config).",
+        "User data — 144 bytes starting at page 4. Typical NDEF-formatted Ultralight C carries a URL NDEF record (for NFC tap-to-web), or a transit/ticket-specific binary format with ticket type, validity window, and digital signature.",
+        "UID and serial — 7-byte unique UID returned via the 14443-A anti-collision layer. Pages 0-1 contain the UID bytes; this is factory-programmed and cannot be rewritten.",
+        "Lock bytes — pages 2 and 40 contain static and dynamic lock bits. Once a page is locked, its data becomes read-only. Block-level lock is the mechanism used to commit a ticket after initial personalization so it cannot be re-used or re-programmed.",
+        "One-way 16-bit counter (EV1) / 24-bit counter (C) — hardware monotonic counter. Readable at any time without authentication. Writable via INCREMENT_COUNTER (0xA5) command, which increments the counter by a reader-supplied delta. Cannot be decremented or reset.",
+        "3DES key storage — the 16-byte 3DES key lives in pages 44-47, write-only after initial personalization. Key-set via WRITE commands during factory/issuance; after the configuration bit is set, the key pages return 0x00 on read but still participate in the 3DES authentication math.",
+        "Write endurance — 10,000 write cycles per page (significantly lower than Classic or NTAG21x). Data retention ≥ 5 years. These numbers reflect the low-cost-paper positioning; Ultralight C is not for long-lived or frequently-updated credentials."
+      ]
+    },
+    {
+      "title": "3DES authentication protocol",
+      "bullets": [
+        "3DES — Triple DES with three 56-bit keys (K1, K2, K3) for 112 bits effective security. NIST SP 800-67 Rev. 2 compliant. Per NIST SP 800-131A, 3DES is deprecated for new US-government systems as of 2024 but remains acceptable for legacy interoperability through 2030.",
+        "Mutual-authentication handshake — 2-message protocol. (1) Reader sends AUTHENTICATE (0x1A) with key-slot selector. (2) Tag generates nonce RndB, encrypts it with the 3DES key, returns enc(RndB). (3) Reader decrypts RndB, generates its own RndA, concatenates RndA + RndB' (RndB left-rotated by one byte), encrypts, sends to tag. (4) Tag decrypts, verifies its RndB' matches, returns enc(RndA') as confirmation.",
+        "Session key derivation — after successful mutual auth, both sides derive a session key from RndA + RndB. Subsequent Read and Write commands on protected pages use this session key for MAC verification and optional encryption.",
+        "Anti-cloning vs anti-counterfeit — Ultralight C's 3DES provides anti-cloning for the key material: an attacker cannot recover the 3DES key by observing the handshake. Does NOT provide anti-counterfeit against clones with the same key (all cards in a batch typically share a key); add the EV1 Originality Signature if per-chip authenticity verification is needed.",
+        "Performance — the 3DES exchange adds ~20-40 ms to each reader tap compared to non-authenticated Ultralight. For event-turnstile throughput this is inside the acceptable latency budget.",
+        "Key management — a single Ultralight C key is shared across the issuance batch. For event-ticket applications this is fine (ticket-by-ticket diversification is achieved via the serial + UID). For higher-security uses, diversify the 3DES key per-card using a master-key-and-UID KDF; see NXP AN12196 for the recipe."
+      ]
+    },
+    {
+      "title": "One-way counter and ticket validation",
+      "bullets": [
+        "24-bit counter on Ultralight C / 16-bit counter per-key on EV1 — hardware monotonic increment-only counter. Starting value zero, max 2^24 - 1 (~16.7 M). Cannot be decremented or reset.",
+        "Read without auth — READ_COUNTER (0x39) returns the current value without requiring authentication. Useful for reader-only verification of ticket state before the 3DES auth adds its tax to the transaction.",
+        "Increment command — INCREMENT_COUNTER (0xA5) with a 3-byte delta. The tag adds the delta to the counter and persists. Default delta = 1 for a simple ticket-used bump. Implementers can choose larger deltas for multi-ride tickets (burn 4 units on entry to a 4-ride pass).",
+        "Typical ticket flow — at issuance, the ticket is personalized with counter = 0 and locked. At the entry gate, the reader (a) reads the counter, (b) verifies ticket validity server-side, (c) increments counter by 1, (d) displays green light. Re-entry attempts find counter > 0 and are rejected.",
+        "Anti-replay security — because the counter is monotonic, a captured authentication transcript cannot be replayed to gain entry; the authentication includes the counter value which will have advanced. This is Ultralight C's main appeal over the original Ultralight for single-use event tickets.",
+        "Counter rollover — at 2^24 events per card, the counter cannot be reset. For single-use tickets this is not a concern. For multi-use memberships (e.g., 1000-use gym cards) this exceeds lifetime event count."
+      ]
+    },
+    {
+      "title": "ISO 14443-A Part 3 compliance and RF",
+      "bullets": [
+        "Ultralight family implements ISO/IEC 14443-A Parts 1-3. Like Classic, it does not implement ISO 14443-4 (T=CL transmission protocol). Reader interacts via raw 14443-A frames wrapping Ultralight-specific command opcodes (READ, WRITE, AUTHENTICATE, COMPATIBILITY_WRITE, INCREMENT_COUNTER, READ_COUNTER, GET_VERSION).",
+        "ATQA / SAK — ATQA = 0x0044 for Ultralight (all variants). SAK = 0x00, indicating cascade continues to 7-byte UID. UID bytes are returned via the anti-collision sequence.",
+        "Command opcodes — READ (0x30, returns 16 bytes starting at specified page), WRITE (0xA2, writes 4 bytes to a page), GET_VERSION (0x60, returns chip-identification bytes on EV1+), AUTHENTICATE (0x1A, Ultralight C), READ_SIG (0x3C, EV1 originality signature).",
+        "RF range — 0-8 cm typical on ID-1 card antenna, shorter on paper ticket antenna (30-40 mm × 20 mm typical loop). Paper-ticket antennas are aggressively miniaturized to fit on credit-card-size paper; read range reflects this.",
+        "Compatibility — every NFC phone, turnstile, access reader, and library kiosk shipped since 2015 supports Ultralight at the 14443-A level. Ultralight C's 3DES exchange requires reader-side software; not all readers implement it, but major transit and event vendors do."
+      ]
+    },
+    {
+      "title": "Commercial deployments and application fit",
+      "bullets": [
+        "Event tickets — concerts, sports matches, conferences. Paper or PVC tickets with Ultralight C print at ~€0.10-0.20 per unit at volume; the 3DES gives enough cloning resistance to deter opportunistic counterfeiting. Monotonic counter enables single-use validation. Volume deployers: Ticketmaster, large festival operators, national-league sports clubs.",
+        "Transit single-ride tickets — paper tickets for subway and bus single rides. Original Ultralight dominated this segment 2004-2015; Ultralight C has grown share where single-ride revenue warrants tamper-resistance. City-scale deployments exist in the Netherlands, Japan, and several German cities.",
+        "Gift cards and promotional tags — limited-edition campaigns where a short-lived NFC tap experience is sufficient. 144 bytes of user memory accommodates a URL + small payload (campaign ID, one-time token).",
+        "NFC business cards (legacy) — Ultralight C was used in early NFC business card products 2012-2018; mostly displaced by NTAG213/215/216 which have better sensitivity, more memory, and the modern NTAG Fast Read for snappier phone taps. A few premium card vendors still spec Ultralight C for its 3DES.",
+        "Museum and venue visitor credentials — day-pass credentials for museums, theme-park day-pass wristbands. Ultralight C's 3DES + counter fits the use case: authenticated entry + one-way-per-turnstile logging.",
+        "Where Ultralight C is NOT the right choice — permanent access credentials (use Plus or DESFire for crypto agility + file system), high-read-cycle applications (write endurance is 10k vs 100k on Classic), and applications needing read-only tag-authenticity proof (the Originality Signature is on EV1, not C). Also not suitable for new-greenfield NDEF-only NFC stickers where NTAG213 is cheaper and has Fast Read.",
+        "Migration options — for applications where 3DES is becoming inadequate (2030+ NIST deprecation), the migration path is Ultralight EV1 (drops 3DES but adds signature) or NTAG424 DNA (adds AES-128 + SUN cryptographic URL) depending on whether the replacement workflow needs symmetric-auth or dynamic-URL proofing."
+      ]
+    },
+    {
+      "title": "NXP and ISO reference documents",
+      "bullets": [
+        "NXP MF0ICU2 Product Data Sheet — the canonical Ultralight C reference. Memory map, command opcodes, 3DES handshake state diagram, electrical characterization.",
+        "NXP AN11340 — MIFARE Ultralight feature comparison. Covers Ultralight / Ultralight C / Ultralight EV1 / Ultralight Nano differences across memory, commands, and security features.",
+        "NXP AN12196 — MIFARE diversification keys. Includes the key-derivation-from-UID recipe used by production issuance systems to assign a unique 3DES key per card.",
+        "ISO/IEC 14443-3:2018 — air-interface standard Ultralight implements.",
+        "NIST SP 800-67 Rev. 2 — Triple DES block cipher specification. The 3DES variant used by Ultralight C is 'TDEA-EDE3' (Encrypt-Decrypt-Encrypt with 3 independent keys) per this document.",
+        "NIST SP 800-131A Rev. 2 — crypto-deprecation guidance. Deprecates 3DES for new US-government systems in 2024; allows legacy interoperability through 2030. Governs migration planning for Ultralight C-based installations."
+      ]
+    },
+    {
+      "title": "Specifications at a glance",
+      "table": {
+        "columns": [
+          "Parameter",
+          "Ultralight (MF0ICU1)",
+          "Ultralight C (MF0ICU2)",
+          "Ultralight EV1 (MF0UL21)"
+        ],
+        "rows": [
+          ["Operating frequency", "13.56 MHz", "13.56 MHz", "13.56 MHz"],
+          ["Air-interface", "ISO 14443-A Parts 1–3", "ISO 14443-A Parts 1–3", "ISO 14443-A Parts 1–3"],
+          ["Total memory", "64 bytes", "192 bytes", "164 bytes"],
+          ["User memory", "48 bytes", "144 bytes", "128 bytes"],
+          ["UID length", "7 bytes", "7 bytes", "7 bytes"],
+          ["Crypto", "None", "3DES (112-bit)", "None"],
+          ["Originality Signature", "No", "No", "Yes (ECDSA)"],
+          ["One-way counter", "No", "Yes (24-bit)", "Yes (3 × 16-bit)"],
+          ["Data retention", "≥ 5 years", "≥ 5 years", "≥ 10 years"],
+          ["Endurance (writes)", "10,000 cycles", "10,000 cycles", "100,000 cycles"],
+          ["Typical read range", "0–6 cm (paper antenna)", "0–6 cm (paper antenna)", "0–8 cm (ID-1 antenna)"],
+          ["Typical cost (1 M volume)", "~€0.06", "~€0.10", "~€0.08"]
+        ]
+      }
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "MIFARE Ultralight product pages",
+      "description": "Proud Tek HF SKUs built on Ultralight-family silicon.",
+      "links": [
+        { "href": "/products/rfid-cards/mifare-ultralight-c-card/", "label": "MIFARE Ultralight C card (single)" },
+        { "href": "/products/rfid-cards/mifare-ultralight-c-cards/", "label": "MIFARE Ultralight C cards (bulk)" },
+        { "href": "/products/rfid-cards/", "label": "RFID cards pillar" },
+        { "href": "/products/rfid-wristbands/rfid-event-wristbands/", "label": "RFID event wristbands (Ultralight C variant)" },
+        { "href": "/products/rfid-cards/nfc-card-custom-printing/", "label": "NFC card custom printing" },
+        { "href": "/solutions/rfid-event-access-control/", "label": "RFID event access control solution" }
+      ]
+    },
+    {
+      "title": "Related comparisons and guides",
+      "description": "Ultralight C in context — NTAG ecosystem, NDEF format, and NFC phone compatibility.",
+      "links": [
+        { "href": "/compare/ntag213-vs-ntag215-vs-ntag216/", "label": "NTAG213 vs 215 vs 216" },
+        { "href": "/guides/ntag21x-family-memory-map-commands/", "label": "NTAG21x memory map + commands" },
+        { "href": "/guides/iso-14443-explained/", "label": "ISO 14443 explained" },
+        { "href": "/guides/nfc-ndef-format-explained/", "label": "NFC NDEF format explained" },
+        { "href": "/guides/ntag424-dna-sun-cmac-authentication/", "label": "NTAG424 DNA SUN authentication" },
+        { "href": "/guides/nfc-business-card-iphone-android-compatibility/", "label": "NFC business card phone compatibility" }
+      ]
+    },
+    {
+      "title": "Authoritative external references",
+      "description": "NXP, ISO, and NIST documents that define Ultralight C.",
+      "links": [
+        { "href": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-ultralight", "label": "NXP MIFARE Ultralight product family page" },
+        { "href": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-67r2.pdf", "label": "NIST SP 800-67 Rev. 2 (3DES)" }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Is Ultralight C's 3DES still secure enough in 2026?",
+      "answer": "For short-validity event tickets and single-use transit rides, yes. NIST SP 800-131A deprecates 3DES for new US-government systems as of 2024 but permits legacy interoperability through 2030. Ultralight C tickets typically have a validity window measured in hours to days, so they age out faster than 3DES's deprecation window. For long-validity credentials (multi-year membership cards, building access), migrate to NTAG424 DNA or DESFire EV3 with AES-128."
+    },
+    {
+      "question": "When should I pick Ultralight C vs NTAG213?",
+      "answer": "Pick Ultralight C when you need 3DES authentication (anti-cloning for event tickets), a one-way counter (single-use validation), or compatibility with an installed base of Ultralight-aware transit/event readers. Pick NTAG213 when you need general-purpose NFC tagging (tap-to-URL, NDEF-based campaigns), faster reads (NTAG Fast Read), or a unique per-chip Originality Signature (NTAG213 has it; Ultralight C does not). Per-unit cost is similar at volume."
+    },
+    {
+      "question": "Can the one-way counter on Ultralight C be reset or decremented?",
+      "answer": "No. The counter is hardware-enforced monotonic; there is no command to decrement or reset it. This is by design — for single-use event tickets the counter is the anti-replay mechanism. If the ticket is scanned erroneously and the counter bumps, the fix is operational (issue a replacement ticket) rather than protocol-level (un-bump the counter). Plan your ticket issuance with enough counter headroom for expected misreads."
+    },
+    {
+      "question": "How many key slots does Ultralight C support?",
+      "answer": "One. Ultralight C stores a single 16-byte 3DES key (pages 44-47). For multi-application credentials needing multiple access domains, use MIFARE Plus (multiple sector keys) or DESFire EV3 (file-system with per-file AES keys). Ultralight C's single-key model is appropriate for single-purpose tickets and single-application credentials."
+    },
+    {
+      "question": "Is there an 'Ultralight D' with AES?",
+      "answer": "Not under that name. NXP's AES-capable Ultralight-positioned chip is NTAG424 DNA (NT4H2421), which adds AES-128, SUN (Secure Unique NFC) message format, and CMAC-based tag authentication. If you were planning an 'Ultralight C successor with AES', NTAG424 DNA is the recommended chip."
+    },
+    {
+      "question": "What's the typical write endurance of Ultralight C in laundry or outdoor deployments?",
+      "answer": "Write endurance is 10,000 cycles per page — roughly 10× less than Classic or NTAG21x. For deployments that write frequently (counter-bump per day, per-use status updates) this is a real constraint. A card written once at issuance and only read thereafter (typical ticket pattern) will outlast its validity window. For frequently-written credentials, choose Ultralight EV1 (100k cycles) or DESFire."
+    },
+    {
+      "question": "Does Ultralight C work with iPhone and Android for NDEF taps?",
+      "answer": "Yes. iPhone (iOS 11+) and all recent Android phones read Ultralight C as a standard NFC Forum Type 2 tag. NDEF-formatted user memory is accessible to stock wallet and browser apps via standard NFC tap-to-launch flows. The 3DES authentication layer is NOT exposed to stock phone apps; applications requiring the 3DES handshake need a custom app using the NFC APIs (Core NFC on iOS, android.nfc on Android) to drive the authenticate command directly."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/",
+    "label": "Request Ultralight C samples"
+  },
+  "secondaryActions": [
+    {
+      "href": "/products/rfid-cards/mifare-ultralight-c-card/",
+      "label": "MIFARE Ultralight C card"
+    },
+    {
+      "href": "/compare/ntag213-vs-ntag215-vs-ntag216/",
+      "label": "NTAG213 vs 215 vs 216"
+    },
+    {
+      "href": "/guides/nfc-ndef-format-explained/",
+      "label": "NFC NDEF format explained"
+    }
+  ]
+}

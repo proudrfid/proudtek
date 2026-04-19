@@ -1,0 +1,221 @@
+{
+  "route": "/guides/mifare-classic-1k-4k-chip-encyclopedia/",
+  "group": "guides",
+  "title": "MIFARE Classic 1K / 4K — HF Chip Technical Encyclopedia (Memory, CRYPTO1, Sectors, Deployment)",
+  "kicker": "MIFARE Classic 1K (MF1S50) / Classic 4K (MF1S70) Reference",
+  "summary": "MIFARE Classic is the HF 13.56 MHz chip that defined the first two decades of contactless access control. Shipping in volume since 1996, the 1K (MF1S50) and 4K (MF1S70) variants use the proprietary CRYPTO1 stream cipher, a sector-based memory model with per-sector key-A / key-B authentication, and the ISO 14443-A Part 3 anti-collision/UID layer. CRYPTO1 has been publicly broken since 2008, so Classic is no longer appropriate for new greenfield security-critical deployments — but the installed base is enormous (hotels, transit, corporate access) and Classic remains the reference HF chip for low-cost loyalty, membership, and legacy-reader compatibility programs.",
+  "heroPoints": [
+    "Sector-and-block memory architecture — 1K = 16 sectors × 4 blocks × 16 bytes (1024 bytes total); 4K = 32 small sectors + 8 large sectors (4096 bytes total). Every sector's last block is the Sector Trailer containing Key A, access bits, Key B. This per-sector key separation is Classic's killer feature for multi-application cards.",
+    "CRYPTO1 stream cipher — 48-bit key authenticated via a 3-pass nested-authentication handshake. Publicly cryptanalyzed since 2008 (Nohl / Plötz / Starbug). Nested / hardnested / darkside attacks recover keys in seconds to minutes on commodity hardware. Hence the migration path to MIFARE Plus / DESFire EV3 for any deployment where card cloning has a meaningful cost.",
+    "ISO 14443-A Part 3 UID and anti-collision — 4-byte UID (pre-2013 silicon) or 7-byte UID (current NXP silicon, MF1ICS50 rev 1.1+). Readers authenticate against the manufacturer block 0 UID; this layer is independent of CRYPTO1 and fully ISO-compliant. Classic is interoperable with every HF 14443-A reader ever shipped."
+  ],
+  "imageAlt": "NXP MIFARE Classic 1K and 4K card with ISO 14443-A antenna layout",
+  "heroImage": "/landing-images/mifare-classic-1k-card.jpg",
+  "imageSourceRoutes": [
+    "/products/rfid-cards/mifare-classic-1k-card/",
+    "/products/rfid-cards/"
+  ],
+  "keywords": [
+    "MIFARE Classic 1K",
+    "MIFARE Classic 4K",
+    "MF1S50",
+    "MF1S70",
+    "CRYPTO1",
+    "MIFARE Classic memory map",
+    "MIFARE Classic sector trailer",
+    "MIFARE Classic vs DESFire",
+    "ISO 14443-A"
+  ],
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedAt": "2026-04-19",
+  "sections": [
+    {
+      "title": "Family and part numbers",
+      "bullets": [
+        "MIFARE Classic 1K — NXP part number MF1S50 (or MF1ICS50 on older silicon). 1024 bytes of user-accessible EEPROM organized as 16 sectors of 4 blocks each. The volume chip for hotel key cards, building access, student ID, and low-end loyalty.",
+        "MIFARE Classic 4K — MF1S70 / MF1ICS70. 4096 bytes organized as 32 small sectors (4 blocks each) plus 8 large sectors (16 blocks each). Used when a single card carries multiple independent applications (building access + canteen payment + printer quota).",
+        "MIFARE Classic EV1 — MF1S50yyX/V1 and MF1S70yyX/V1. Refresh launched 2014 with improved EMC, Common Criteria EAL4 certification on the hardware (not the CRYPTO1 cipher), and a 7-byte UID option. Functionally identical API; protocol backwards-compatible with pre-EV1 Classic.",
+        "MIFARE Classic Mini — MF1ICS20. 320-byte cut-down variant. 5 sectors. Rare in current deployments; most vendors have migrated this tier to MIFARE Plus S or NTAG213 depending on application.",
+        "Clones and compatibles — Fudan FM11RF08, Shanghai Huahong SHC1102, and numerous 'MIFARE-compatible' Chinese die designs exist. Most implement CRYPTO1 and the 14443-A layer compatibly, with UID read-only enforcement varying by silicon. UID-changeable clones (sometimes sold as 'Chinese magic cards' or 'UID-writable') are pentest tools and are rejected by most commercial access systems that UID-whitelist their cards.",
+        "Counterfeit watch — authentic NXP Classic returns SAK = 0x08 (Classic 1K) or 0x18 (Classic 4K) and ATQA = 0x0004 / 0x0002 respectively. Block 0 manufacturer data begins with the NXP mask ID byte 0x04 on 7-byte UID silicon. Incoming-inspection should sample-read these three values against a known-good reference."
+      ]
+    },
+    {
+      "title": "Memory architecture",
+      "bullets": [
+        "1K memory layout — 16 sectors, sector index 0-15. Each sector = 4 blocks × 16 bytes = 64 bytes. Sector 0, block 0 is the Manufacturer Block (UID + NXP data, permanently locked). Blocks 1-2 of every sector are data blocks. Block 3 of every sector is the Sector Trailer (Key A + access bits + Key B).",
+        "4K memory layout — sectors 0-31 are small sectors (4 blocks × 16 bytes = 64 bytes each); sectors 32-39 are large sectors (16 blocks × 16 bytes = 256 bytes each). Total user-accessible = 3,840 bytes data + Sector Trailers. Large sectors are the right home for value-block-heavy applications (transit rides, canteen points).",
+        "Sector Trailer format — bytes 0-5 = Key A (6 bytes, write-only after personalization), bytes 6-9 = access bits (3 bytes + inverted copy for tamper detection), bytes 10-15 = Key B (6 bytes, readable depending on access-bit configuration). Per-sector keys mean losing or compromising one sector's key does not expose the rest of the card.",
+        "Value Blocks — a special block format holding a 4-byte value (twice inverted for redundancy) plus a 1-byte address. Supports atomic Increment, Decrement, Restore, Transfer operations — useful for loyalty stamp counters and stored-value wallets where the increment/decrement must be transactional.",
+        "Data Blocks — general-purpose 16-byte blocks. Read via Read(block_addr) after authentication. Write via Write(block_addr, 16 bytes). Reads and writes are plaintext over the air but only after successful CRYPTO1 authentication for the containing sector.",
+        "Personalization workflow — virgin Classic cards ship with Key A = Key B = 0xFFFFFFFFFFFF (factory default), access bits = 0xFF 0x07 0x80 (the 'transport' configuration). Site personalization writes the operator's sector keys and access bits to replace the defaults; from that point forward only authenticated readers can access that sector.",
+        "Non-user-accessible storage — Classic has no scratch RAM; all state lives in EEPROM. Data retention ≥ 10 years; write endurance ≥ 100,000 cycles per byte (NXP datasheet)."
+      ]
+    },
+    {
+      "title": "CRYPTO1 cipher and 3-pass authentication",
+      "bullets": [
+        "CRYPTO1 — NXP-proprietary stream cipher with a 48-bit state and 48-bit key. Published for the first time via reverse engineering (Nohl, Plötz) in 2007-2008, with full cryptographic breaks published 2008-2009 (nested-authentication attack) and strengthened in 2014-2015 (darkside / hardnested).",
+        "Authentication handshake — 3-pass nested protocol. (1) Reader sends Authentication-A (0x60) or Authentication-B (0x61) with target block. (2) Tag replies with nT, a 32-bit nonce. (3) Reader computes the expected tag-authentication-response using the sector key and sends it, along with its own nonce nR. (4) Tag verifies, generates the combined authentication-response using both nonces, and replies.",
+        "From 2008 onwards CRYPTO1 is considered practically broken. Nested attack recovers subsequent sector keys in seconds after the first key is known. Darkside attack recovers the first key in <1 minute on an unprepared card. hardnested attack works on EV1 hardware that fixes the nested weakness. Open-source tools (mfcuk, mfoc, libnfc, proxmark3 scripts) implement all three and are widely available.",
+        "Security posture for 2026 — Classic is unsuitable for any application where cloning has meaningful cost. Migrate to MIFARE Plus (AES-128 with CRYPTO1 compatibility mode) for drop-in reader compatibility, or to DESFire EV3 (AES/3DES, file-level access control) for greenfield deployments.",
+        "Mitigations that do not work — UID-based verification alone is insufficient because UID-changeable clones exist. Anti-cloning is only provided by actually authenticating with AES-grade keys; CRYPTO1 cannot be retrofitted to be secure.",
+        "Mitigations that do work — issuing cards in mixed modes on MIFARE Plus so that reader fleets can be upgraded gradually; monitoring for anomalous authentication patterns server-side; short-validity card cycling. None of these make Classic itself secure — they bound the blast radius."
+      ]
+    },
+    {
+      "title": "ISO 14443-A Part 3 compliance",
+      "bullets": [
+        "Classic implements ISO/IEC 14443 Parts 1-3 — physical characteristics, RF signal interface, and initialization/anti-collision. It does NOT implement Part 4 (T=CL transmission protocol). Readers interact via raw 14443-A commands wrapped in sector authentication.",
+        "ATQA / SAK / UID — ATQA = 0x0004 (Classic 1K) or 0x0002 (Classic 4K). SAK = 0x08 (1K) or 0x18 (4K). UID returned via the anti-collision loop before any CRYPTO1 authentication; readers can use this to identify a card prior to key-based access, but UID alone is not an authentication.",
+        "4-byte vs 7-byte UID — pre-2013 Classic silicon used a 4-byte UID (32 bits of entropy). Post-2013 silicon (Classic EV1 and later production batches) uses a 7-byte UID (56 bits of entropy). Deployments that enrolled UID-based whitelists on 4-byte UIDs encountered collisions in installed bases over 100k cards; 7-byte UID migration resolved this.",
+        "RF operating range — 0-10 cm for typical reader/antenna combinations. Power budget determined by the reader's field; the chip itself is passive with no internal power source. Effective range in practice is determined by antenna geometry on both sides and by card material (metal inserts, wet surfaces reduce range).",
+        "Interoperability — every 14443-A-capable reader shipped since 2000 can initialize a Classic card. Whether it can authenticate and read depends on whether the reader exposes the CRYPTO1 stack; virtually all access-control and transit readers do."
+      ]
+    },
+    {
+      "title": "Antenna, physical, and environmental",
+      "bullets": [
+        "Chip impedance at 13.56 MHz — approximately 17 pF effective capacitance + series ESR around 50 ohms at the chip pad. Standard ISO ID-1 PVC inlays use a 3.5-turn rectangular antenna tuned to resonate with this capacitance.",
+        "Form factors — ID-1 card (85.6 × 54 × 0.76 mm), keyfob, wristband silicone/PPS, sticker (38 mm circular for HF is common). The chip is identical across form factors; the antenna is retuned for each substrate.",
+        "Operating temperature — -25 °C to +70 °C for the standard MF1S50 and MF1S70. Storage range -40 °C to +85 °C. For laundry-resistant deployments (up to 90 °C tunnel wash) choose a Classic-on-silicone wristband or PPS-encapsulated tag rather than a PVC card.",
+        "Durability — ISO 10373 bend, torsion, and impact tests. 100k bending cycles without chip failure when embedded in 0.76 mm PVC. ISO 14443 RF durability typically exceeds 100k read cycles.",
+        "Incompatibility with metal — like all 13.56 MHz HF chips, Classic requires a ferrite spacer of 0.3+ mm to function on metal surfaces. Without the ferrite the antenna Q-factor collapses and the chip cannot power up."
+      ]
+    },
+    {
+      "title": "Commercial deployments and application fit",
+      "bullets": [
+        "Hotel key cards — the dominant HF chip for hotel locks deployed 2005-2020 (Saflok, Onity, Assa Abloy, Kaba). New builds since ~2018 increasingly migrate to DESFire EV3 because of the CRYPTO1 break; Classic remains in legacy deployments and in budget-focused new installations where the operator accepts the cloning risk.",
+        "Public transit — MIFARE Classic was the backbone of dozens of city transit cards (London Oyster 1st-gen, NL OV-chipkaart 1st-gen, HK Octopus legacy, many East-European systems). All major transit operators have now migrated to MIFARE Plus or DESFire; Classic is primarily a compatibility layer in 2026.",
+        "Corporate access control — commonly deployed 2000-2015. HID Mobile Access, Assa Abloy HID Signo, and similar next-generation readers still accept Classic as a legacy credential type; new rollouts specify Plus or DESFire or mobile-credential BLE.",
+        "Student ID and membership cards — Classic remains price-competitive for low-threat-model uses where cloning is unlikely to have financial impact. Universities with library-checkout + printer-quota workflows on Classic cards continue renewing the fleet in place.",
+        "Loyalty and stored-value — Value Blocks are used for canteen-point stored-value and loyalty stamp counters. For programs where the stored value is nominal (small balance, replenished centrally), Classic is acceptable; for higher-balance wallets, migrate to DESFire EV3 with AES-protected files.",
+        "Where Classic is NOT the right choice — financial-grade payment, building access for high-security premises, any greenfield deployment where the procurement team has the option to specify Plus / DESFire. The marginal chip cost delta is a few cents; the security delta is an order of magnitude.",
+        "Migration partners — NXP's recommended migration path is MIFARE Plus EV2 (drop-in CRYPTO1 compatibility mode + AES security level) or DESFire EV3 (full file-system-based AES). Plus allows one-step reader-firmware updates on existing installed bases."
+      ]
+    },
+    {
+      "title": "NXP and ISO reference documents",
+      "bullets": [
+        "NXP MF1S50 / MF1S70 Product Data Sheet — the canonical reference. Block diagram, memory map, command set, electrical characterization, timings. Publicly available from NXP under NDA for the detailed version; a public short version exists.",
+        "NXP AN10922 — MIFARE Classic default keys and anti-cloning guidance. Acknowledges the known CRYPTO1 weaknesses and documents the recommended migration paths.",
+        "ISO/IEC 14443-3:2018 — the air-interface standard Classic implements. Parts 1-3 define the physical layer, RF signaling, initialization and anti-collision; Classic does not use Part 4.",
+        "NXP AN1305 — MIFARE Classic to MIFARE Plus migration guide. Describes Plus's SL1 / SL3 security-level mechanism and the key-rollover flow that lets an installed reader fleet upgrade without re-issuing cards.",
+        "Radboud University MIFARE Classic security analysis (2008) — the first public end-to-end cryptanalysis of CRYPTO1. Establishes the theoretical and practical basis for the nested, darkside, and hardnested attacks.",
+        "Proxmark3 community scripts for Classic — practical reference for UID cloning, key recovery and sector dumping, used by pentest teams to validate Classic-based access-control installations."
+      ]
+    },
+    {
+      "title": "Specifications at a glance",
+      "table": {
+        "columns": [
+          "Parameter",
+          "Classic 1K (MF1S50)",
+          "Classic 4K (MF1S70)"
+        ],
+        "rows": [
+          ["Operating frequency", "13.56 MHz", "13.56 MHz"],
+          ["Air-interface standard", "ISO/IEC 14443-A (Parts 1–3)", "ISO/IEC 14443-A (Parts 1–3)"],
+          ["Total EEPROM", "1,024 bytes", "4,096 bytes"],
+          ["Sector layout", "16 × 4-block sectors", "32 × 4-block + 8 × 16-block sectors"],
+          ["UID length", "4 or 7 bytes", "4 or 7 bytes"],
+          ["Crypto", "CRYPTO1 (48-bit key)", "CRYPTO1 (48-bit key)"],
+          ["Per-sector keys", "Key A + Key B (6 bytes each)", "Key A + Key B (6 bytes each)"],
+          ["Value Block support", "Yes", "Yes"],
+          ["Anti-collision", "ISO 14443-A Part 3", "ISO 14443-A Part 3"],
+          ["Operating temperature", "-25 °C to +70 °C", "-25 °C to +70 °C"],
+          ["Data retention", "≥ 10 years", "≥ 10 years"],
+          ["Endurance (writes)", "100,000 cycles", "100,000 cycles"],
+          ["Public crypto break", "2008 (nested / darkside)", "2008 (nested / darkside)"],
+          ["Typical read range", "0–10 cm (ISO ID-1 antenna)", "0–10 cm (ISO ID-1 antenna)"]
+        ]
+      }
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "MIFARE Classic product pages",
+      "description": "Proud Tek HF SKUs built on MIFARE Classic 1K / 4K silicon.",
+      "links": [
+        { "href": "/products/rfid-cards/mifare-classic-1k-card/", "label": "MIFARE Classic 1K card" },
+        { "href": "/products/rfid-cards/", "label": "RFID cards pillar" },
+        { "href": "/products/rfid-keyfobs/", "label": "RFID keyfobs" },
+        { "href": "/products/rfid-wristbands/rfid-adjustable-silicone-wristband/", "label": "RFID silicone wristband (Classic variant)" },
+        { "href": "/products/rfid-cards/rfid-employee-badge/", "label": "RFID employee badge" },
+        { "href": "/products/rfid-cards/rfid-student-id-card/", "label": "RFID student ID card" }
+      ]
+    },
+    {
+      "title": "Related comparisons and guides",
+      "description": "Classic in context — migration paths and HF ecosystem references.",
+      "links": [
+        { "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "Classic vs Plus vs DESFire for hotel locks" },
+        { "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "MIFARE Plus EV2 vs DESFire EV3" },
+        { "href": "/guides/iso-14443-explained/", "label": "ISO 14443 explained" },
+        { "href": "/guides/mifare-desfire-ev3-commands-reference/", "label": "MIFARE DESFire EV3 commands reference" },
+        { "href": "/solutions/hotel-key-cards/", "label": "Hotel key cards solution" },
+        { "href": "/compare/125khz-vs-13.56mhz-rfid/", "label": "125 kHz vs 13.56 MHz RFID" }
+      ]
+    },
+    {
+      "title": "Authoritative external references",
+      "description": "NXP and ISO documents that define MIFARE Classic.",
+      "links": [
+        { "href": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-classic", "label": "NXP MIFARE Classic product page" },
+        { "href": "https://www.iso.org/standard/73599.html", "label": "ISO/IEC 14443-3 standard" }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Is MIFARE Classic still safe to use in 2026?",
+      "answer": "Not for security-critical deployments. CRYPTO1 was publicly broken in 2008 and commodity tools (Proxmark3, mfoc, mfcuk, hardnested) recover sector keys in seconds to minutes. Classic is still acceptable for low-threat-model uses (canteen loyalty stamps, library checkout, printer-quota cards) where the operational cost of a cloned card is negligible. For hotel locks, building access, transit, or anything touching money or personal data, migrate to MIFARE Plus EV2 or DESFire EV3."
+    },
+    {
+      "question": "What's the difference between MIFARE Classic 1K and 4K?",
+      "answer": "Memory size and sector layout. 1K has 16 sectors of 64 bytes each (1,024 bytes total). 4K has 32 small sectors (64 bytes each) plus 8 large sectors (256 bytes each) for 4,096 bytes total. The larger 4K sectors are well-suited to value-block-heavy applications like transit rides or canteen wallets. Command set, CRYPTO1, and 14443-A behavior are identical; the choice is capacity-driven."
+    },
+    {
+      "question": "Can I upgrade a Classic installation to Plus without reissuing cards?",
+      "answer": "Partially. MIFARE Plus EV2 in SL1 (Security Level 1) mode is byte-for-byte CRYPTO1-compatible, so an existing reader fleet with CRYPTO1 support can read Plus SL1 cards without firmware changes. Readers then upgrade over time to SL3 (AES-128), and cards are re-keyed to SL3 on next encounter. This lets you replace the card fleet with Plus in one sweep, then retire CRYPTO1 across the reader fleet without a hard cutover. See NXP AN1305 for the canonical migration recipe."
+    },
+    {
+      "question": "Does the Classic UID alone provide any security?",
+      "answer": "No. UID can be read by any 14443-A reader without authentication, and UID-changeable clones exist (often sold as 'magic' or 'UID-writable' cards). UID-based whitelists are therefore bypassable by any attacker with a Proxmark3 or similar. Real security on Classic comes from CRYPTO1 authentication, and CRYPTO1 itself is broken — hence the Plus / DESFire migration recommendation for any deployment where cloning matters."
+    },
+    {
+      "question": "Why does Classic have both Key A and Key B per sector?",
+      "answer": "Role separation. The access bits in each Sector Trailer map operations (Read, Write, Increment, Decrement, Transfer, Restore, block-level read of the trailer) to one or both keys. A typical configuration: Key A is the 'read' key (known to many readers in the field), Key B is the 'write' key (known only to a central personalization station). Losing Key A compromises read access for that sector only; Key B remains intact, preventing unauthorized writes. This two-key model is a design advantage Classic retains over simpler HF chips like Ultralight."
+    },
+    {
+      "question": "What is a Value Block and when should I use it?",
+      "answer": "A Value Block is a Classic memory block formatted for atomic integer operations: a 4-byte signed value stored twice (inverted) for redundancy, plus a 1-byte address for fault-tolerance. Supported commands are Read, Write, Increment, Decrement, Restore, Transfer. Use them for stored-value wallets and stamp counters where you need a transactional guarantee that an increment survives a power interruption. Regular Data Blocks don't have this atomicity guarantee."
+    },
+    {
+      "question": "Can I tell authentic NXP MIFARE Classic apart from clone silicon?",
+      "answer": "Partially. Authentic NXP Classic returns SAK = 0x08 (1K) or 0x18 (4K) and ATQA = 0x0004 / 0x0002, and the manufacturer block 0 first byte is 0x04 on 7-byte UID silicon. Clone silicon (Fudan FM11RF08, Huahong SHC1102, and others) typically matches these externally-visible values because 14443-A compliance requires them. Cryptographic behavior under edge-case commands (like block 0 write attempts or specific timing patterns) can differ. For high-integrity procurement, request NXP-authorized-distributor chain of custody rather than relying on fingerprinting."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/",
+    "label": "Request MIFARE Classic samples"
+  },
+  "secondaryActions": [
+    {
+      "href": "/products/rfid-cards/mifare-classic-1k-card/",
+      "label": "MIFARE Classic 1K card"
+    },
+    {
+      "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
+      "label": "Classic vs Plus vs DESFire"
+    },
+    {
+      "href": "/guides/iso-14443-explained/",
+      "label": "ISO 14443 explained"
+    }
+  ]
+}
