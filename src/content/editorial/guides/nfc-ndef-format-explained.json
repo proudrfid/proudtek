@@ -1,70 +1,173 @@
 {
   "route": "/guides/nfc-ndef-format-explained/",
   "group": "guides",
-  "title": "NFC NDEF Format Explained — How NFC Tags Store and Share Data",
-  "kicker": "NDEF Data Format Guide",
-  "summary": "NDEF (NFC Data Exchange Format) is the standard data format that NFC tags use to store and share information with smartphones and other NFC readers. When you tap a phone on an NFC tag and a URL opens, a Wi-Fi network connects, or a contact card saves — that data was stored in NDEF format. This guide explains NDEF record types, message structure and how to use NDEF encoding for your NFC tag projects.",
-  "heroPoints": [
-    "Universal compatibility — NDEF is the standard data format recognized by all NFC-enabled smartphones (iOS and Android), ensuring tags work across all devices.",
-    "Multiple record types — NDEF supports URLs, text, vCards, Wi-Fi configurations, Bluetooth pairing, MIME types and custom application records.",
-    "Simple structure — NDEF messages contain one or more records, each with a type, ID and payload. The format is lightweight enough for NFC tags with as little as 144 bytes of memory."
+  "title": "NFC NDEF Format Explained — Record Types, Memory Planning, Encoding Workflows and iPhone/Android Tap Behavior for Production NFC Deployments",
+  "kicker": "NDEF Implementation Guide",
+  "summary": "A practical implementer's guide to the NFC Data Exchange Format (NDEF) — the standard data structure NFC tags use to store URLs, vCards, Wi-Fi configs, SMS templates and application-launch records that iPhone and Android phones can read with a single tap. This page covers NDEF message and record structure, the well-known and external record type system, URI prefix compression, memory planning across NTAG 213/215/216 and NTAG 424 DNA, encoding workflows (SDKs, bureau encoding, production-line pre-encoding), iOS Core NFC and Android Nfc behavior differences, locking and tamper-evidence strategies, and how Proud Tek delivers pre-encoded NDEF tags at production scale for consumer-facing NFC programmes.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "NFC NDEF format",
+    "NDEF record types",
+    "NFC URI prefix compression",
+    "NTAG 213 215 216 NDEF memory",
+    "iOS Core NFC NDEF",
+    "NFC tag pre-encoding production"
   ],
-  "imageAlt": "NFC NDEF data format structure showing records and message layout",
+  "heroPoints": [
+    "The universal data format for consumer NFC — NDEF (NFC Data Exchange Format) is maintained by the NFC Forum as the standard on-tag data structure. Every modern smartphone — iPhone 7 and later with iOS 13+, Android phones with NFC hardware running Android 4.0+ — reads NDEF records without any app installation, which is why URL-based NFC tags, Wi-Fi hand-off tags and digital business cards all rely on NDEF.",
+    "Rich record-type ecosystem with memory-efficient encoding — NDEF supports well-known record types (URI, Text, Smart Poster), external types (vCard, Wi-Fi, Bluetooth), MIME-typed payloads and application-specific records. URI prefix compression stores common prefixes like `https://www.` in a single byte, saving 10-20 bytes that matter on memory-constrained 144-byte NTAG 213 tags.",
+    "Production-grade pre-encoding from Proud Tek — our encoding lines program NDEF records during label manufacturing using your URL template, vCard schema, Wi-Fi credentials or custom payload. Every tag is read-verified, optionally locked against modification, and shipped with a database file linking each tag's TID to its encoded NDEF content for your CMS / analytics integration."
+  ],
+  "imageAlt": "NFC NDEF data format diagram showing message records URI prefix compression and tag memory layout",
   "heroImage": "/landing-images/ntag213-nfc-sticker.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/ntag213-nfc-sticker/",
+    "/products/rfid-labels/ntag215-nfc-sticker/",
     "/products/rfid-labels/ntag216-nfc-sticker/"
   ],
   "sections": [
     {
-      "title": "NDEF message and record structure",
+      "title": "NDEF message and record structure — the on-tag data model",
+      "intro": "NDEF is a binary data format defined by the NFC Forum that specifies how information is structured on an NFC tag so that any compliant reader — including every modern smartphone — can interpret it consistently. Understanding the message-and-record hierarchy and the header byte layout is the foundation for planning memory use, debugging encoding errors and designing consumer-facing NFC programmes.",
       "bullets": [
-        "NDEF message — the top-level container stored on an NFC tag. A message contains one or more NDEF records. Each NFC tag stores exactly one NDEF message (though that message can contain multiple records).",
-        "NDEF record — individual data units within a message. Each record has a type (what kind of data), a payload (the actual data), and optional ID (for application-specific identification).",
-        "Record type indicator — specifies the data format of the payload: URI (U), text (T), MIME media type (M), NFC Forum external type (X), or application-specific (custom).",
-        "URI record — the most common NDEF record type. Stores a URL (web address) that the smartphone opens automatically when the tag is tapped. The URI type supports shorthand prefix codes (http://, https://, tel:, mailto:) to save tag memory.",
-        "Text record — stores plain text in a specified language encoding (UTF-8 or UTF-16). Used for labels, descriptions and messages that the reading application can display.",
-        "Smart poster record — a composite record type containing a URI, a title, an icon and an action indicator, designed for marketing and advertising use cases."
+        "One message per tag, multiple records per message — each NFC tag stores exactly one NDEF message. The message is a container that holds one or more NDEF records arranged in sequence. A Smart Poster use case may store a URI record plus a Text record plus an action record in the same message; a simple URL tag stores just one URI record.",
+        "NDEF record header byte — every record begins with a header byte encoding five flag bits (MB message begin, ME message end, CF chunk flag, SR short record, IL ID-length present) and a three-bit TNF (Type Name Format) value. The MB and ME flags mark the first and last records in the message, letting the parser discover message boundaries.",
+        "TNF (Type Name Format) values — 0x00 Empty, 0x01 NFC Forum well-known type, 0x02 MIME media type (RFC 2046), 0x03 Absolute URI (RFC 3986), 0x04 NFC Forum external type, 0x05 Unknown, 0x06 Unchanged (chunk continuation). The TNF value tells the parser how to interpret the Type field that follows.",
+        "Type, ID and Payload fields — after the header byte and length fields comes the Type field (e.g., 'U' for URI well-known, 'T' for Text), optional ID field (used when multiple records in the same message need to be distinguished by application ID), and the Payload field carrying the actual record content. Length fields preceding each variable-length section let the parser safely skip unknown record types.",
+        "Short record optimization — the SR (Short Record) flag indicates payload length fits in a single byte (up to 255 bytes), allowing the length field to be 1 byte instead of 4. This saves 3 bytes per record and is the default for most consumer-facing NDEF content, which rarely exceeds 255 bytes.",
+        "NDEF on tag memory — on NFC Forum Type 2 tags (NTAG 213/215/216, most common), the NDEF message is stored beginning at a fixed memory offset (page 4 in the user area), preceded by a TLV (Type-Length-Value) wrapper that identifies the NDEF region. The tag may also hold terminator TLVs, lock bytes and configuration pages outside the NDEF region."
       ]
     },
     {
-      "title": "Common NDEF record types for NFC tags",
+      "title": "NDEF record types — URI, Text, Smart Poster, vCard, Wi-Fi, Bluetooth and application-launch",
+      "intro": "The NFC Forum defines a standard vocabulary of well-known record types that every compliant reader interprets consistently. This section covers the most common record types encountered in consumer-facing NFC programmes, the memory footprint of each, and the smartphone-side behaviour when a user taps the tag.",
       "bullets": [
-        "URL record — tap to open a website, product page, review form, social media profile, or authentication page. The single most common use case for encoded NFC tags.",
-        "vCard record — tap to save a contact with name, phone, email, company and address. Used for NFC business cards and networking tags.",
-        "Wi-Fi configuration record — tap to connect to a Wi-Fi network with SSID and password automatically configured. Used in hotels, restaurants, offices and events.",
-        "Bluetooth pairing record — tap to initiate Bluetooth pairing with a speaker, headphone or other device. Eliminates manual Bluetooth search and pairing.",
-        "SMS record — tap to compose an SMS message to a predefined number with predefined text. Used for voting, feedback and opt-in marketing.",
-        "Application launch record — tap to open a specific app on the phone, or redirect to the app store if the app is not installed. Used for custom brand apps and loyalty programs."
+        "URI record (TNF 0x01, Type 'U') — the most common NDEF record type in production NFC programmes. Stores a URL that the smartphone opens automatically on tap. The payload begins with a 1-byte URI prefix code followed by the remainder of the URL. Prefix codes replace common prefixes like `http://www.` (0x01), `https://www.` (0x02), `https://` (0x04), `tel:` (0x05), `mailto:` (0x06), saving 7-12 bytes versus storing the full string.",
+        "Text record (TNF 0x01, Type 'T') — stores plain text in UTF-8 or UTF-16 encoding with an IANA language code. Used for simple labels, display strings and announcements that a reading app can render as-is. Text records are rarely the primary payload for consumer URL tags (where URI records are used) but are common in Smart Poster records as a descriptive title.",
+        "Smart Poster record (TNF 0x01, Type 'Sp') — a composite record carrying a URI, one or more Text records (as titles in different languages), an optional icon and an action indicator. The Smart Poster record type dates from early NFC marketing campaigns and is less used today because a simple URI record achieves the same result on both iOS and Android without the extra bytes.",
+        "vCard record (TNF 0x02, Type 'text/vcard') — an NDEF record carrying a MIME-typed vCard 3.0 or 4.0 payload with name, phone, email, company and address fields. On tap, iPhone offers to save the contact to Contacts.app; Android offers to save to the contact store. Memory usage is typically 100-300 bytes depending on the number of vCard fields and whether a photo is included.",
+        "Wi-Fi Alliance Wireless Configuration record — a Wi-Fi-Forum-specified record (MIME type `application/vnd.wfa.wsc`) carrying SSID, authentication type, encryption key and passphrase. On tap, Android prompts to join the Wi-Fi network; iPhone support has been inconsistent historically (iOS 11+ added partial support via Core NFC). Common in hotel check-in, restaurant guest Wi-Fi and conference venue tags.",
+        "Bluetooth handover record (TNF 0x02, Type `application/vnd.bluetooth.ep.oob`) — carries a Bluetooth device address and class of device for automatic pairing on tap. Widely used in pair-on-tap speakers, headphones and IoT devices. Handover to Bluetooth is a standardized NFC Forum flow; the NFC tap triggers the pairing, and subsequent communication runs over Bluetooth.",
+        "Application launch record (Android AAR) — an Android-specific NDEF external-type record (`android.com:pkg`) carrying a package name. On tap, Android launches the specified app (or redirects to the Play Store if the app is not installed). iOS uses a different mechanism (Universal Links in the URI payload) to achieve app-launch behaviour; cross-platform NFC programmes typically use a URI record that resolves to a Universal Link which in turn routes users to the iOS or Android app."
       ]
     },
     {
-      "title": "NDEF and NFC tag memory considerations",
+      "title": "Memory planning — fitting your NDEF content into NTAG 213, 215, 216 and 424 DNA",
+      "intro": "Memory planning is the single most common implementation challenge in production NFC programmes. Consumer URLs can exceed the 144-byte budget of NTAG 213 if tracking parameters or campaign IDs are included; vCards with embedded photos rarely fit on NTAG 213 or even 215. This section provides concrete memory budgets and planning heuristics to avoid encoding failures at production time.",
       "bullets": [
-        "NTAG 213 (144 bytes usable) — sufficient for short URLs (up to ~130 characters), single text records, and basic vCards. The most cost-effective tag for URL-based applications.",
-        "NTAG 215 (504 bytes usable) — enough for longer URLs, full vCards with multiple contact fields, Wi-Fi configurations, and small multi-record messages.",
-        "NTAG 216 (888 bytes usable) — the largest standard NFC tag, supporting complex vCards with photos, multiple NDEF records, and larger data payloads.",
-        "Memory optimization — NDEF URI records use prefix compression (e.g., 'https://www.' is stored as a single byte code), saving 10-20 bytes compared to storing the full URL string. Short URL services can further reduce memory usage.",
-        "Read-only lock — after encoding, the tag can be permanently locked to prevent data modification. This is recommended for production deployments to ensure consumers always see the intended content."
+        "NTAG 213 (144 bytes usable NDEF memory) — the workhorse of high-volume consumer NFC. Sufficient for URLs up to ~130 characters (with prefix compression), basic plain-text vCards without photos, simple Wi-Fi credentials for short SSID / passphrase combinations. NTAG 213 is the cost-optimal choice for URL-based marketing, loyalty tags and digital business cards with minimal contact fields.",
+        "NTAG 215 (504 bytes usable NDEF memory) — mid-tier capacity that accommodates longer URLs (up to ~490 characters), vCards with multiple phone numbers, emails and addresses, multi-record messages (URI + Text + vCard), and Wi-Fi configurations with long passphrases. Popular for premium digital business cards, luxury brand authentication pre-2020, and consumer product NFC where the payload exceeds NTAG 213's budget.",
+        "NTAG 216 (888 bytes usable NDEF memory) — the largest single-chip NFC Forum Type 2 option. Accommodates vCards with embedded photos (base64-encoded in the vCard), complex multi-record messages, embedded JSON data payloads for IoT use cases, or tag-level configuration data beyond the URL.",
+        "NTAG 424 DNA (416 bytes NDEF memory, with dynamic mirroring) — premium authenticated-NFC chip with AES-128 SUN (Secure Unique NFC) messaging. NDEF memory is smaller than NTAG 216, but the SUN feature dynamically mirrors a cryptographic MAC into the URI record at read time, so the static-NDEF approach of pre-encoding a URL must be reconciled with the dynamic-mirror template syntax. Memory planning for NTAG 424 DNA focuses on URL template design, not raw byte budgeting.",
+        "URL template design for tracking and personalization — most production NFC programmes embed an identifier in the URL (e.g., `https://go.brand.com/?id=X` where X is unique per tag). The identifier length, base-URL length, and any additional query parameters (UTM campaign tags, locale preferences) must be summed against the tag's NDEF budget. Shorter branded domains and compact identifier encodings (Base62 rather than UUIDs) dramatically expand what fits on NTAG 213.",
+        "Memory headroom and firmware overhead — the advertised 'usable NDEF memory' figures already account for NDEF TLV wrappers and headers. Additional overhead from multi-record messages (MB/ME flags and per-record headers) is typically 5-10 bytes per record beyond the first. Leave 5-10% memory headroom in your plan to accommodate future payload changes without re-sourcing to a larger chip."
+      ]
+    },
+    {
+      "title": "Encoding workflows — SDKs, bureau encoding and production-line pre-encoding",
+      "intro": "There are three dominant encoding workflows for getting NDEF content onto NFC tags: self-encoding with a consumer or professional SDK, bureau encoding by a service provider after tag sourcing, and production-line pre-encoding during tag manufacturing. This section describes the tradeoffs and when each workflow is appropriate, including Proud Tek's production-line pre-encoding service.",
+      "bullets": [
+        "Consumer / small-batch self-encoding — a smartphone app (NFC Tools on iOS / Android, NXP TagWriter on Android, Flipper Zero or Proxmark on desktop) encodes tags one at a time. Suitable for prototyping, very small batches (under 100 tags), or in-field updates to a handful of tags. The workflow is: open the app, compose the NDEF message, tap the blank tag to encode. Throughput is limited to roughly 60-200 tags per hour depending on the app and device.",
+        "Professional SDK encoding — a desktop or server-side application using a USB / network reader (ACR122U, HID OMNIKEY, Identiv uTrust family) and an SDK (NFC Tools SDK, PC/SC APDUs, NXP TagXplorer, libnfc) encodes tags in batches. Throughput scales to 500-2000 tags per hour with batch feeding; unique per-tag content (URLs with embedded IDs, personalized vCards) is supported by generating each NDEF payload programmatically from a database.",
+        "Bureau encoding after tag sourcing — some NFC programme operators source blank tags and ship them to an encoding bureau for third-party encoding before distribution. This introduces an extra logistics step and split ownership of encoding quality; it survives mainly in programmes where the tag supplier cannot or will not encode (historically common before pre-encoding became a routine service).",
+        "Production-line pre-encoding (Proud Tek) — the encoding is integrated into the label-manufacturing line, so every tag leaves the factory pre-encoded, verified and optionally locked. Proud Tek's encoding line handles unique per-tag content (unique URL per tag, sequential or randomized IDs), common-content bulk encoding (same URL or vCard on every tag), multi-record NDEF messages, and NTAG 424 DNA URL-template + SUN configuration. Throughput reaches 10k-50k tags per day per line.",
+        "Encoding-verify QC — every tag on the Proud Tek line is read-verified after encoding: the encoded NDEF payload is read back and compared to the intended payload; mismatches are automatically rejected and replaced. The output QC report lists each tag's TID (unique hardware identifier), encoded NDEF content, and pass/fail status. This report is delivered as a CSV / JSON file alongside the physical tags.",
+        "Locking strategy — after encoding, tags can be locked using NTAG lock bytes (static lock, irreversible) or password protection (32-bit PWD with reversible unlock for authorized updates). Locking is essential for consumer-facing deployments to prevent malicious rewriting; Proud Tek applies locking per the customer specification during the same encoding pass."
+      ]
+    },
+    {
+      "title": "iPhone vs Android behavior — what actually happens when a user taps",
+      "intro": "Despite NDEF being a cross-platform standard, real-world user experience differs subtly between iPhone and Android. Understanding these behavioral differences is essential for designing NFC programmes that work consistently across both ecosystems and avoid edge cases where a tag works on one platform but not the other.",
+      "bullets": [
+        "iPhone background tag reading (iOS 14+) — iPhone XS and later running iOS 14 or newer automatically read NDEF tags in the background while the screen is unlocked, without requiring any app to be open. A URI record triggers Safari (or the user's default browser) to open the URL. Older iPhones (iPhone 7 through iPhone X with iOS 13) require launching Apple's built-in NFC Tag Reader in Control Center or an app calling Core NFC to read a tag.",
+        "Android background tag reading — Android phones with NFC enabled read NDEF tags in the background whenever the screen is on and the phone is unlocked. The URI record routes to the default browser, the Play Store for apps with AAR records, or the relevant system app (Contacts for vCards, Settings for Wi-Fi). Background reading has been supported since Android 4.0 (2011), making Android the more permissive platform historically.",
+        "Deep link versus URI routing — iPhone uses Universal Links (HTTPS URLs registered to an app) and App Clips to route NFC-triggered URLs into apps without manual routing on the part of the NFC programme. Android uses App Links (also HTTPS-based) plus legacy AAR records. Cross-platform programmes should prefer Universal Links / App Links over AAR, because AAR is Android-only and Universal Links work without any Android-specific record.",
+        "Password-protected and authenticated tags — NTAG 213/215/216 password protection and NTAG 424 DNA AES-128 authentication require a custom app to exchange the authentication APDUs. The background NDEF reader on iPhone and Android does not perform authentication; it simply reads the open NDEF memory. For NTAG 424 DNA SUN-mirror URLs, the SUN value is automatically included in the mirrored URI record and is validated on the server-side without any phone-side authentication exchange.",
+        "HCE (Host Card Emulation) versus tag reading — both iOS and Android can emulate NFC tags (HCE mode) in addition to reading them. HCE lets a phone appear as an NDEF tag to an external reader, enabling dynamic NFC use cases (digital business cards that update via the app, loyalty programmes). HCE is outside the NDEF-on-tag scope but is worth mentioning because many 'NFC business card' programmes mix physical tag distribution with phone-based HCE for their users.",
+        "Cross-platform testing — every NFC programme should test on at least iPhone XS, iPhone 14, Pixel 6 and Samsung Galaxy S22 (or equivalents) before mass deployment. Differences in NFC controller sensitivity, tap-zone size and default-browser behaviour can surface corner cases (tags read inconsistently on certain phones, URLs that open in a webview rather than the browser) that pilot testing catches before production rollout."
+      ]
+    },
+    {
+      "title": "Locking, password protection and tamper-evidence strategies",
+      "intro": "Production NFC programmes need a strategy for preventing end-user modification of encoded tags. The options range from irreversible static locking through password protection to cryptographic authentication with NTAG 424 DNA. This section compares the options against common threat models and helps buyers choose the right protection level for their application.",
+      "bullets": [
+        "Static NDEF lock — NTAG 21x family supports irreversible locking of the NDEF memory region by setting lock bits after encoding. Once locked, the tag cannot be rewritten; any attempt to write returns an error. Suitable for static-URL consumer tags where the URL will never change. Throughput-efficient because locking is a one-shot operation during production encoding. Irreversible: a locked tag with a bad URL must be replaced.",
+        "Password protection (NTAG 213/215/216) — a 32-bit PWD is set at encoding time and can be reversibly set / cleared. Read access can optionally require PWD (for private tags); write access always requires PWD. Useful for consumer-facing tags that may need occasional reprogramming (campaign updates, promotional URL rotation) while blocking casual modification.",
+        "AUTH0 and AUTHLIM settings — NTAG 21x tag configuration pages control how many pages are password-protected (AUTH0) and how many incorrect password attempts are allowed before the tag locks permanently (AUTHLIM). Production configurations typically set AUTHLIM = 7 to allow some operator retry while blocking brute-force attacks.",
+        "NTAG 424 DNA SUN (Secure Unique NFC) — the flagship anti-counterfeit protection. Each NDEF read includes a cryptographic Message Authentication Code (CMAC) and a monotonic read counter mirrored into the URL at read time. A backend server can verify the CMAC using the tag's AES-128 key and detect clones (which cannot produce valid CMACs) and replay attacks (stale counter values). SUN is the industry-standard choice for luxury-goods authentication, high-value consumer-goods validation, and brand-protected digital-twin NFC programmes.",
+        "Originality signature — NTAG 213/215/216 and NTAG 424 DNA include a 32-byte ECDSA signature over the TID (Tag ID) signed by an NXP master key. A backend server that knows the NXP public key can verify that the tag is a genuine NXP chip. This protects against fake chips from unauthorized manufacturers but does not protect against chip-level cloning by anyone with access to the signature (NTAG 424 DNA SUN solves that problem with per-read cryptography).",
+        "Tamper-evident form factor — beyond cryptography, physical tamper-evidence (void-sticker substrates, frangible adhesives, sealed enclosures) detects attempts to remove and reattach a tag. Proud Tek offers void-label and frangible-face-stock options alongside standard NFC stickers; choose a physical tamper-evident construction if your threat model includes removing a genuine tag and reattaching it to a counterfeit product."
+      ]
+    },
+    {
+      "title": "Proud Tek production encoding workflow and buyer engagement",
+      "intro": "To translate the technical concepts above into an actual production programme, here is how Proud Tek engages with buyers from specification through bulk shipment. The workflow applies across NFC stickers, cards, wristbands, keychains and embedded-tag products.",
+      "bullets": [
+        "Specification intake — buyers provide: chip selection (NTAG 213 for URL tags up to 130 chars, NTAG 215 for longer or multi-record, NTAG 216 for large payload, NTAG 424 DNA for authenticated), NDEF content template (URL pattern with variable ID placeholder, vCard schema, Wi-Fi config, custom payload), lock / password strategy, and form factor (sticker dimensions, card type, wristband material).",
+        "Sample pass — a 25-100 tag sample batch is produced and shipped within 5-7 business days with the full encoding applied. Buyers test the samples on target devices (iPhone, Android, vendor app) and confirm the end-to-end user experience before production commit. Sample QC reporting is included (same CSV format as production).",
+        "Unique-per-tag content generation — for programmes with unique identifiers per tag, buyers supply either a pre-generated list of IDs (CSV / JSON) or a generation specification (prefix + sequential range, random alphanumeric, specific character set). Proud Tek's encoding line reserves the ID range, applies it during encoding, and returns the ID-to-TID mapping in the QC report.",
+        "NTAG 424 DNA programming — for authenticated NFC programmes, Proud Tek configures the AES-128 keys (customer-supplied key or factory-generated with secure key export), sets the SUN message template, and configures the NDEF URL pattern with dynamic mirror placeholders. The per-tag AES key, AES-ID and file configuration are exported in the encrypted QC file for the buyer's backend authentication system.",
+        "Production lead time and throughput — standard NDEF-encoded NFC orders ship in 2-4 weeks from PO for stock chip models; custom configurations (NTAG 424 DNA SUN, custom-shape printed stickers, embedded tags) run 4-8 weeks. Production throughput is 10k-50k tags per day per encoding line; very large programmes coordinate multi-line scheduling with 4-6 weeks of advance planning.",
+        "Integration handoff — the final shipment includes the physical tags, the QC CSV / JSON file (each tag's TID, encoded NDEF, encoded URL including any unique ID, lock / auth status), and for NTAG 424 DNA programmes the encrypted key-export file for the buyer's backend. Optional integration support includes sample backend validation code, iOS / Android app SDK integration guidance and analytics-pipeline connector documentation."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "NFC tag products for NDEF encoding",
-      "description": "Tags with various memory sizes for NDEF data storage.",
+      "title": "Pre-encoded NFC tag catalogue",
+      "description": "Proud Tek's NFC tag catalogue with production-grade NDEF encoding, locking and optional NTAG 424 DNA SUN authentication. Chip-by-chip memory and feature comparison.",
       "links": [
         {
           "href": "/products/rfid-labels/ntag213-nfc-sticker/",
-          "label": "NTAG 213 stickers (144 bytes)"
+          "label": "NTAG 213 NFC stickers (144 bytes)"
         },
         {
           "href": "/products/rfid-labels/ntag215-nfc-sticker/",
-          "label": "NTAG 215 stickers (504 bytes)"
+          "label": "NTAG 215 NFC stickers (504 bytes)"
         },
         {
           "href": "/products/rfid-labels/ntag216-nfc-sticker/",
-          "label": "NTAG 216 stickers (888 bytes)"
+          "label": "NTAG 216 NFC stickers (888 bytes)"
+        }
+      ]
+    },
+    {
+      "title": "NFC protocol and encoding guides",
+      "description": "Companion technical guides on the ISO 14443 protocol stack, NFC programming workflows and product-selection comparisons.",
+      "links": [
+        {
+          "href": "/guides/iso-14443-explained/",
+          "label": "ISO 14443 protocol deep-dive"
+        },
+        {
+          "href": "/guides/nfc-tag-programming-iphone/",
+          "label": "NFC tag programming on iPhone"
+        },
+        {
+          "href": "/guides/nfc-tag-programming-android-guide/",
+          "label": "NFC tag programming on Android"
+        }
+      ]
+    },
+    {
+      "title": "Request encoding samples and quotes",
+      "description": "Start a pilot with a pre-encoded sample batch, or request a quote for production-line NDEF encoding with your URL template or NDEF schema.",
+      "links": [
+        {
+          "href": "/contact/",
+          "label": "Request NFC encoding samples"
+        },
+        {
+          "href": "/solutions/nfc-business-card/",
+          "label": "NFC business card programmes"
+        },
+        {
+          "href": "/solutions/nfc-brand-authentication/",
+          "label": "NFC brand authentication"
         }
       ]
     }
@@ -72,15 +175,31 @@
   "faq": [
     {
       "question": "Can Proud Tek pre-encode NDEF data on NFC tags during production?",
-      "answer": "Yes. We encode NDEF records (URLs, vCards, Wi-Fi configs, custom records) during production on our automated encoding lines. Each tag can receive a unique NDEF record (unique URL with tag ID parameter, unique vCard) or the same static content across the entire batch. We also lock tags after encoding if requested to prevent end-user modification."
+      "answer": "Yes. Every NFC product on our catalogue — NTAG 213/215/216 stickers, NTAG 424 DNA tags, NFC business cards, wristbands, keychains and embedded tags — can be pre-encoded on our production lines with your NDEF content. Common encoding patterns include: a unique URL per tag with a sequential or randomized ID; a common URL across the batch; vCard records with customer-supplied contact fields; Wi-Fi configuration records with SSID and passphrase; and multi-record messages combining URI + Text + application identifiers. Each tag is read-verified after encoding, optionally locked or password-protected per your specification, and shipped with a QC CSV listing TID, encoded NDEF content and verification status for each tag."
     },
     {
-      "question": "What is the maximum URL length that fits on an NTAG 213?",
-      "answer": "NTAG 213 has 144 bytes of usable memory. With NDEF URI record overhead (about 7-10 bytes) and the URI prefix compression, a typical URL of approximately 130 characters fits on an NTAG 213. For longer URLs, use NTAG 215 (504 bytes) or NTAG 216 (888 bytes), or shorten the URL with a URL shortener service."
+      "question": "What is the maximum URL length that fits on NTAG 213 with NDEF encoding?",
+      "answer": "NTAG 213 has 144 bytes of NDEF-usable memory after subtracting TLV wrappers and NDEF record headers. With URI prefix compression applied to the leading `https://www.` or `https://`, a typical URL of approximately 130 characters fits on NTAG 213. URLs longer than that require NTAG 215 (504 bytes, ~490 characters) or NTAG 216 (888 bytes, ~870 characters), or the use of a branded URL shortener (e.g., `go.brand.com/ABC123`) to compress the URL before encoding. Tracking query parameters (UTM codes, campaign identifiers) consume memory at the same rate as URL path characters and should be budgeted accordingly."
     },
     {
-      "question": "Do iPhones and Android phones both read NDEF records?",
-      "answer": "Yes. iPhones (7 and later, iOS 13+) and Android phones (with NFC hardware) both read NDEF records automatically when tapped to a tag. For URI records, the phone opens the URL in the default browser without any app download required. For vCards, the phone offers to save the contact. This cross-platform compatibility is what makes NDEF the universal standard for consumer-facing NFC tags."
+      "question": "Do iPhones and Android phones both read NDEF records consistently?",
+      "answer": "Both platforms read NDEF records from background tag reading, but there are behavioural differences. iPhone XS and later running iOS 14+ read NDEF tags in the background with the screen unlocked; older iPhones (iPhone 7 through iPhone X on iOS 13) require Apple's NFC Tag Reader from Control Center or a Core NFC app. Android phones with NFC enabled have supported background reading since Android 4.0 (2011). URI records route to the default browser on both platforms. Wi-Fi records are handled inconsistently on iOS (better on Android). vCard records open Contacts on both. For cross-platform programmes, test on iPhone XS, iPhone 14, Pixel 6 and Samsung S22 before mass deployment to confirm behaviour on the devices your audience uses."
+    },
+    {
+      "question": "What happens if a consumer tries to modify a tag after it leaves the factory?",
+      "answer": "The outcome depends on the locking strategy. For tags locked with static NDEF lock (NTAG 213/215/216), any write attempt returns an error and the existing NDEF content is preserved. For tags with password protection, unauthorized write attempts fail and after AUTHLIM incorrect password attempts the tag permanently rejects further writes. For NTAG 424 DNA tags in SUN mode, an attacker cannot produce a valid CMAC without the AES-128 key, so a modified tag's backend verification fails and the server rejects the counterfeit. For high-assurance programmes (luxury goods, pharmaceuticals), NTAG 424 DNA with AES-128 SUN is the recommended choice; for consumer marketing where tamper resistance is less critical, NTAG 213 with static NDEF lock is cost-effective."
+    },
+    {
+      "question": "How do I choose between URL records and app-launch records (AAR) for my NFC programme?",
+      "answer": "For cross-platform programmes — where iPhone and Android users must both have a good experience — use a URI record pointing to a Universal Link / App Link (an HTTPS URL registered to your app in both App Store Connect and Google Play Console). On iPhone with the app installed, the URL opens in the app; without the app, it opens in Safari. On Android the behaviour is symmetric via App Links. Adding an Android-specific AAR record alongside the URI record is redundant for modern programmes and complicates the NDEF message. AAR is useful only for Android-only programmes that specifically want to bypass the Play Store redirect behaviour."
+    },
+    {
+      "question": "Can I change the NDEF content on tags after they're in the field?",
+      "answer": "For tags locked with static NDEF lock, no — the content is permanent. For tags with password protection, authorized rewriting is possible using a phone app or reader that knows the password; this is useful for campaign updates on retained physical tags. For NTAG 424 DNA tags, the URL template is fixed at production time but the SUN mirror dynamically injects authentication values per-read, so the effective URL changes on every tap without the tag being rewritten. Most production NFC programmes lock tags at production because the operational complexity of in-field rewriting exceeds the cost of issuing fresh tags for major campaign changes; use password protection only if your programme specifically requires in-field updates."
+    },
+    {
+      "question": "What is the difference between NDEF on NTAG 424 DNA versus NDEF on NTAG 216?",
+      "answer": "NTAG 216 stores a static NDEF message in its 888 bytes of user memory; whatever NDEF content is encoded is what every phone reads. NTAG 424 DNA has 416 bytes of NDEF memory plus dynamic SUN mirroring: the encoded URL template contains placeholder tokens that the chip replaces at read time with the current read counter, the tag's UID and a cryptographic CMAC computed with the per-tag AES-128 key. The effective URL is dynamic per-read, which is the basis of clone detection and replay resistance. NTAG 216 is the right choice for large static payloads; NTAG 424 DNA is the right choice for authenticated URLs that a backend server can verify as coming from a genuine, non-cloned tag."
     }
   ],
   "primaryAction": {
@@ -89,12 +208,16 @@
   },
   "secondaryActions": [
     {
-      "href": "/blog/how-to-program-nfc-tags/",
-      "label": "How to program NFC tags"
+      "href": "/guides/nfc-tag-programming-iphone/",
+      "label": "NFC programming on iPhone"
     },
     {
       "href": "/products/rfid-labels/ntag213-nfc-sticker/",
       "label": "NTAG 213 NFC stickers"
+    },
+    {
+      "href": "/guides/iso-14443-explained/",
+      "label": "ISO 14443 protocol"
     }
   ]
 }

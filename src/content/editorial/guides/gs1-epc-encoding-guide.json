@@ -1,68 +1,171 @@
 {
   "route": "/guides/gs1-epc-encoding-guide/",
   "group": "guides",
-  "title": "GS1 EPC Encoding Guide — How to Encode SGTIN, SSCC and GRAI on UHF RFID Tags",
-  "kicker": "GS1 EPC Encoding",
-  "summary": "The GS1 Electronic Product Code (EPC) is the global standard for encoding product identification data on UHF RFID tags. Understanding EPC encoding formats — SGTIN-96, SSCC-96 and GRAI-96 — is essential for any organization deploying RFID in retail, logistics or asset tracking. This technical guide explains EPC memory structure, encoding schemes, and how Proud Tek pre-encodes GS1-compliant RFID tags at the factory.",
-  "heroPoints": [
-    "SGTIN-96 for retail — the most common EPC format encodes your GS1 Company Prefix, GTIN and a unique serial number into a 96-bit string stored in the tag's EPC memory bank.",
-    "SSCC-96 for logistics — Serial Shipping Container Codes encoded on case and pallet tags enable supply chain visibility from manufacturer to retailer distribution center.",
-    "Factory pre-encoding — Proud Tek encodes GS1 EPC data during tag manufacturing, delivering ready-to-apply RFID labels with verified encoding and database export files."
+  "title": "GS1 EPC Encoding Guide — SGTIN-96, SSCC-96, GRAI-96, GIAI-96, SGLN-96 Schemes, Partition Tables, EPCIS Alignment and Factory Pre-Encoding Workflow",
+  "kicker": "GS1 EPC Encoding Handbook",
+  "summary": "A buyer's and integrator's handbook for GS1 Electronic Product Code (EPC) encoding on UHF RFID tags. This page covers GS1 organization governance and Company Prefix acquisition, the Tag Data Standard (TDS) family of encoding schemes — SGTIN-96 for serialized GTINs, SSCC-96 for shipping container codes, GRAI-96 for returnable assets, GIAI-96 for fixed assets, SGLN-96 for location identifiers — the bit-level memory layout of the EPC memory bank, partition tables that map Company Prefix length to encoding width, filter-value semantics, alignment with EPCIS for event-driven supply-chain visibility, and the Proud Tek production-line pre-encoding workflow that delivers ready-to-apply GS1-compliant tags with per-tag TID-to-EPC mapping files.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "GS1 EPC encoding",
+    "SGTIN-96 encoding",
+    "SSCC-96 RFID encoding",
+    "GS1 Tag Data Standard",
+    "GS1 Company Prefix RFID",
+    "EPCIS supply chain visibility"
   ],
-  "imageAlt": "GS1 EPC encoded UHF RFID label with SGTIN-96 data structure diagram",
+  "heroPoints": [
+    "GS1 is the global data-standards body for trade identification — the Electronic Product Code (EPC) Tag Data Standard (TDS) is the GS1-maintained specification that governs how UHF RFID tags carry GS1 identification keys (GTIN, SSCC, GRAI, GIAI, SGLN). Every retailer mandate (Walmart, Target, Nordstrom, Macy's) and pharmaceutical serialization programme (DSCSA, EU FMD) references TDS-compliant encoding for cross-ecosystem readability.",
+    "Five major encoding schemes cover the common supply-chain use cases — SGTIN-96 serializes GTINs for item-level retail and pharmaceutical tracking; SSCC-96 identifies shipping containers and pallets for ASN reconciliation; GRAI-96 tracks returnable transport items like kegs, crates and pallets; GIAI-96 covers fixed assets like tools, equipment and vehicles; SGLN-96 identifies locations. The 96-bit EPC memory bank fits the serial number alongside the identification key for every scheme.",
+    "Proud Tek pre-encodes at production scale — our UHF encoding lines program your Company Prefix, partition value, filter value, GTIN/SSCC key and unique serial per tag during label manufacturing. Each tag is read-verified and shipped with a per-tag CSV/JSON file mapping TID (unique chip hardware ID) to encoded EPC to human-readable GTIN/serial for your WMS, EPCIS repository or ERP integration."
+  ],
+  "imageAlt": "GS1 EPC SGTIN-96 SSCC-96 encoding structure showing Company Prefix GTIN serial and partition value bit layout",
   "heroImage": "/landing-images/eu-compliance.jpg",
   "imageSourceRoutes": [
-    "/product/uhf-rfid-tags/",
-    "/product/rfid-cards/"
+    "/products/rfid-labels/uhf-rfid-inlay/",
+    "/products/rfid-labels/impinj-m700-uhf-inlay/"
   ],
   "sections": [
     {
-      "title": "EPC memory structure and encoding fundamentals",
+      "title": "GS1 organization, the Tag Data Standard and Company Prefix acquisition",
+      "intro": "GS1 is the global non-profit standards body that maintains the barcode identification keys (GTIN, SSCC, GLN) used in every grocery, retail, pharmaceutical and logistics supply chain. The same identification keys are carried on UHF RFID tags using the EPC Tag Data Standard (TDS). Understanding GS1's governance, the Company Prefix allocation process and the TDS specification family is the prerequisite for any GS1-compliant RFID programme.",
       "bullets": [
-        "Tag memory banks — Gen2 UHF RFID tags have four memory banks: Reserved (kill/access passwords), EPC (the encoded product identifier), TID (manufacturer tag ID), and User (optional custom data). GS1 EPC data lives in the EPC memory bank.",
-        "EPC header — the first 8 bits of the EPC identify the encoding scheme (SGTIN-96, SSCC-96, GRAI-96, etc.), allowing readers and middleware to parse the remaining bits correctly.",
-        "Partition value — a 3-bit field that defines the boundary between the GS1 Company Prefix and the item/serial reference, accommodating different lengths of Company Prefix assigned by GS1.",
-        "Filter value — a 3-bit field indicating the packaging level (item, inner pack, case, pallet), enabling readers to filter scans by hierarchy level during inventory processes.",
-        "Binary encoding — GS1 identifiers (GTINs, SSCCs) are converted from their decimal form to binary and packed into the 96-bit EPC according to the GS1 Tag Data Standard, with each field occupying a fixed number of bits determined by the partition value."
+        "GS1 global structure — GS1 is headquartered in Brussels and operates through 116 Member Organizations (MOs) covering individual countries or regions (GS1 US, GS1 UK, GS1 China, GS1 Germany, etc.). Each MO issues Company Prefixes to its members, maintains local support and runs regional compliance programmes. A Company Prefix obtained from GS1 US is globally valid; there is no need to register separately with other MOs.",
+        "GS1 Tag Data Standard (TDS) — the TDS document, maintained by GS1 EPCglobal and regularly updated (currently TDS 2.1 with amendments), specifies how GS1 identification keys are encoded into binary strings stored in the EPC memory bank of a UHF RFID tag. TDS defines the encoding schemes (SGTIN-96, SSCC-96, GRAI-96, etc.), the partition tables that vary encoding width per Company Prefix length, the filter-value assignments and the URI mapping used for cross-system interchange.",
+        "Company Prefix acquisition — an organization joins its local GS1 MO by paying a one-time initial fee and annual renewal fee (varying by MO and company size — GS1 US starts around USD 250/year). The MO issues a Company Prefix consisting of a country-code indicator followed by a variable-length identifier (typically 7-10 digits) allocated to the organization for perpetuity (while dues are paid). The Company Prefix is the root from which all GTINs, SSCCs, GLNs and related identifiers are derived.",
+        "GS1 identification keys — the GTIN (Global Trade Item Number, 8 / 12 / 13 / 14 digits) identifies a product type; the SSCC (Serial Shipping Container Code, 18 digits) identifies a specific logistics unit; the GLN (Global Location Number, 13 digits) identifies a physical or legal location; the GRAI identifies a returnable asset type and optional serial; the GIAI identifies an individual fixed asset; the SGLN extends the GLN with a sub-location extension.",
+        "EPC 'serialized' forms — the base GS1 keys are product-level or location-level. The EPC Tag Data Standard defines serialized forms (SGTIN serializes GTIN, SGLN serializes GLN) that add an item-level serial number so each physical tag can be uniquely identified. Serialization is where EPC-on-RFID goes beyond what a printed barcode can do, and it is what makes item-level tracking in retail and pharmaceutical compliance possible.",
+        "TDS versioning and backward compatibility — TDS 1.x preceded TDS 2.0 (released 2017 with reorganized memory schemes and additional support for NRN / NHRN alternative schemes) and TDS 2.1 (current). New retailer mandates typically reference TDS 2.x; legacy deployments may reference TDS 1.11 or earlier. GS1 maintains backward compatibility for the widely deployed 96-bit schemes (SGTIN-96, SSCC-96, GRAI-96, GIAI-96, SGLN-96) across TDS revisions, so a tag encoded to TDS 1.11 SGTIN-96 is readable by TDS 2.1-compliant middleware."
       ]
     },
     {
-      "title": "Common EPC encoding schemes explained",
+      "title": "EPC memory bank structure and the bit-level layout of 96-bit encodings",
+      "intro": "To plan and validate GS1 EPC encoding correctly, it helps to understand the physical memory layout on a Gen2 UHF tag and the bit-level breakdown of the encoded EPC value. This section covers the EPC memory bank structure, the CRC and PC (Protocol Control) words, the EPC itself, and how the 96 bits of a SGTIN-96 break down into header, filter, partition, Company Prefix, Item Reference and Serial.",
       "bullets": [
-        "SGTIN-96 — Serialized Global Trade Item Number. Encodes a GTIN-12 or GTIN-13 plus a unique serial number per item. Used for item-level and case-level identification in retail (Walmart mandate, Target, Nordstrom) and pharmaceutical tracking.",
-        "SSCC-96 — Serial Shipping Container Code. Encodes the 18-digit SSCC used for logistics unit identification on pallets, cases and containers. Essential for advance ship notice (ASN) reconciliation at DC receiving.",
-        "GRAI-96 — Global Returnable Asset Identifier. Encodes identification for returnable transport items such as pallets, crates, kegs and containers that cycle between trading partners.",
-        "GIAI-96 — Global Individual Asset Identifier. Encodes unique identification for fixed and movable assets (equipment, tools, vehicles) in enterprise asset management systems.",
-        "SGLN-96 — Global Location Number with extension. Encodes location identifiers for RFID-enabled location tracking and zone-based inventory management systems."
+        "Gen2 tag memory banks (recap) — ISO/IEC 18000-63 defines four memory banks per tag: Reserved (access and kill passwords, 64 bits total), EPC (the encoded identifier, variable size with 16-bit CRC and 16-bit PC words preceding it), TID (manufacturer's chip ID, typically 64-96 bits, read-only), and User (optional additional memory, 0-8 kbits depending on chip).",
+        "EPC memory bank word layout — the EPC memory bank starts with a 16-bit CRC (integrity check for the PC and EPC), followed by a 16-bit PC (Protocol Control) word, followed by the EPC itself. The PC word encodes the EPC length in 16-bit words (so 96-bit EPC = 6 words, PC length field = 6), a toggle bit for extended PC usage, and optional numbering-system identifier bits. The reader exposes the EPC to applications as a fixed-length byte string.",
+        "SGTIN-96 bit layout — 96 bits total, broken down as: 8-bit header (0x30 for SGTIN-96), 3-bit filter value (0-7 indicating packaging level), 3-bit partition value (0-6 indicating Company Prefix length), variable-width Company Prefix, variable-width Item Reference (including indicator digit + Item Reference), 38-bit Serial number. The partition value determines how many bits go to Company Prefix versus Item Reference.",
+        "SSCC-96 bit layout — 96 bits total, broken down as: 8-bit header (0x31), 3-bit filter value, 3-bit partition value, variable-width Company Prefix, variable-width Serial Reference, 24 unused bits (reserved). SSCC identifies a specific logistics unit with no separate product-type reference; the SSCC serial reference is unique per Company Prefix across time, so the combination with Company Prefix forms a globally unique SSCC.",
+        "GRAI-96 bit layout — 96 bits total, broken down as: 8-bit header (0x33), 3-bit filter value, 3-bit partition value, variable-width Company Prefix, variable-width Asset Type, 38-bit Serial number. GRAI is conceptually like SGTIN for returnable assets: the Asset Type plays the role of GTIN (identifies the class of returnable item like 'heavy pallet type X') and the serial uniquely identifies the individual asset.",
+        "GIAI-96 and SGLN-96 layouts — GIAI-96 has 82 bits for individual-asset identifier (Company Prefix + variable-length asset reference, unlike SGTIN there is no separate item-class reference because GIAI identifies individual assets directly). SGLN-96 has Company Prefix + Location Reference + 41-bit Extension (for sub-locations like specific bays, shelves or zones)."
       ]
     },
     {
-      "title": "Proud Tek GS1 EPC encoding services",
+      "title": "Partition tables — how Company Prefix length determines encoding width",
+      "intro": "Because GS1 allocates Company Prefixes of variable length (typically 7-10 digits, but can extend further for small-volume companies), the EPC Tag Data Standard uses partition tables to flexibly allocate the fixed 96-bit EPC budget between Company Prefix and Item Reference / Serial Reference / Asset Type. Getting the partition value right is essential for correct encoding and is a common source of errors in first-time deployments.",
       "bullets": [
-        "Pre-encoded tags on roll — we encode SGTIN-96, SSCC-96 or any GS1 EPC scheme during label manufacturing, using your GS1 Company Prefix and product data. Tags arrive ready to apply with no encoding equipment needed at your facility.",
-        "Encoding verification — every tag is read-verified after encoding, with failed tags automatically rejected. We provide an encoding report listing each tag's EPC, TID and human-readable GTIN/serial for your database.",
-        "Serialization management — we generate sequential or randomized serial numbers per your specification, maintaining uniqueness across orders and providing serial number allocation reports.",
-        "Custom user memory programming — for applications requiring additional data beyond the EPC, we program the tag's User memory bank with supplementary fields (batch codes, dates, custom identifiers).",
-        "GS1 consultation — if you need help mapping your existing GTIN catalog to EPC encoding, our team assists with partition value selection, filter value assignment, and test encoding for reader compatibility validation."
+        "Partition value semantics — the 3-bit partition value (0-6) is an index into a scheme-specific partition table that defines how many bits are allocated to the Company Prefix versus the following field. For SGTIN-96, partition value 0 means 40-bit Company Prefix + 4-bit Item Reference (for 12-digit Company Prefix + 1-digit Item Reference case); partition value 6 means 20-bit Company Prefix + 24-bit Item Reference (for 6-digit Company Prefix + 7-digit Item Reference case). Each value corresponds to a specific (Company Prefix length, Item Reference length) pairing that sums to a fixed total.",
+        "SGTIN-96 partition table — Partition 0: 40 bits CP (12 digits) + 4 bits Item Ref (1 digit). Partition 1: 37 bits CP (11 digits) + 7 bits Item Ref (2 digits). Partition 2: 34 bits CP (10 digits) + 10 bits Item Ref (3 digits). Partition 3: 30 bits CP (9 digits) + 14 bits Item Ref (4 digits). Partition 4: 27 bits CP (8 digits) + 17 bits Item Ref (5 digits). Partition 5: 24 bits CP (7 digits) + 20 bits Item Ref (6 digits). Partition 6: 20 bits CP (6 digits) + 24 bits Item Ref (7 digits). The CP digit count includes the GS1 Prefix (country indicator) but not the company extension.",
+        "Matching partition to your Company Prefix — if your GS1-allocated Company Prefix is 9 digits (for example `061414928`), use partition value 3 for SGTIN-96 encoding. If you have a 7-digit Company Prefix, use partition value 5. Misusing the partition value produces encoded EPCs that decode to the wrong Company Prefix and will fail retailer-receiving validation.",
+        "SSCC-96 and GRAI-96 partition tables — each encoding scheme has its own partition table because the non-Company-Prefix portion of the encoding has a different size budget. SSCC-96 non-CP portion is 58 bits (for Serial Reference) minus filter (3) minus header (8), so partition tables are different from SGTIN-96. Always consult the current TDS document for the exact partition table of the scheme you are encoding.",
+        "Automation in encoding software — Proud Tek's encoding line software automatically selects the partition value based on the Company Prefix length declared in the order specification, so customers don't need to hand-calculate partition values. Encoding validation includes partition-consistency checks: if a declared Company Prefix length does not match the actual digit count, the job rejects before producing tags.",
+        "Partition-value validation by retailers — retailers receiving SGTIN-encoded tags (Walmart, Target) validate the partition value as part of the EPC-parse logic: an invalid partition value causes the EPC to decode incorrectly and be rejected as 'unparseable'. This is one of the most common reasons for EPC rejection in early deployments, which is why production-line encoding with automatic partition selection is preferred over hand-encoded pilot runs."
+      ]
+    },
+    {
+      "title": "Filter values — semantic metadata on packaging level",
+      "intro": "Alongside the partition value, every 96-bit EPC carries a 3-bit filter value that semantically tags the encoded identifier with its packaging level (item, case, pallet, etc.). Filter values allow readers and middleware to efficiently distinguish hierarchical packaging levels during inventory operations, but correct filter-value assignment is also a mandate-compliance requirement.",
+      "bullets": [
+        "SGTIN-96 filter values — value 0: All Others (uncategorized or ambiguous); value 1: Point of Sale Trade Item (consumer-facing SKU); value 2: Full Case for Transport; value 3: Reserved / Future Use; value 4: Inner Pack Trade Item Grouping; value 5: Reusable Packaging; value 6: Unit Load. Retailers typically specify filter value 1 for item-level apparel tags and filter value 2 for case tags in their tagging standards.",
+        "SSCC-96 filter values — value 0: All Others; value 1: Reserved; value 2: Reserved; value 3: Reserved; value 4: Reserved; value 5: Reserved; value 6: Reserved. SSCC filter is less semantically loaded than SGTIN filter because SSCC identifies logistics units at one granularity (the specific shipping container); most SSCC applications use filter value 0.",
+        "GRAI-96 and GIAI-96 filter values — value 0: All Others; values 1-6: specifically defined per scheme or reserved. GRAI filter is conceptually similar to SGTIN for returnable-asset hierarchies.",
+        "Reader-side filtering — filter values enable reader inventory filtering: a reader can issue a Select command targeting only tags with a specific filter value (e.g., only inventory case tags, ignoring item tags), accelerating large-scale inventory. This is useful in mixed-level environments where a reader is mounted at a receiving dock and should prioritize case / pallet reads over item-level reads.",
+        "Retailer filter-value requirements — retailer tagging standards (Walmart, Target, Nordstrom) specify required filter values in their source-tagging documents. Tagging an item-level SKU with filter value 2 (case) will typically pass chip-level conformance but fail retailer receiving validation because the filter value is semantically wrong. Always consult the retailer tagging standard before encoding and confirm filter-value requirements alongside the GTIN partition and serial-number scheme.",
+        "Filter value in encoding specification — Proud Tek's encoding order form includes explicit filter-value selection with retailer-mandate presets (Walmart item = filter 1, Walmart case = filter 2, Target item = filter 1, etc.) to avoid the common error of leaving the filter value at the default 0 when the retailer requires a specific value."
+      ]
+    },
+    {
+      "title": "Serial number strategies — sequential, randomized, GS1-SN-96 and domain-specific",
+      "intro": "The serial-number portion of a SGTIN-96 or GRAI-96 (38 bits, up to ~274 billion unique values per GTIN) is assigned by the brand owner, not by GS1. Choosing the right serial-number allocation strategy is the key decision that determines whether the tag programme supports anti-counterfeit use cases, how it integrates with existing ERP serialization, and whether it provides long-term forward compatibility.",
+      "bullets": [
+        "Sequential serials — allocate serials 1, 2, 3, ..., N per GTIN. Simplest approach, compact in databases, supports easy duplicate detection (two tags with the same serial means an encoding error). Downsides: sequential serials are observable to counterfeiters who might produce tags with 'likely next' serial numbers; they reveal production volumes to anyone decoding EPCs; and they can cause serial-collision bugs if encoding jobs are interleaved across production lines without centralized serial allocation.",
+        "Randomized (UUID-like) serials — allocate random 38-bit integers (or subsets of a larger random space mapped onto 38 bits) per tag. Defeats serial-prediction attacks on anti-counterfeit programmes; avoids serial-collision across interleaved production lines (probabilistic uniqueness); hides production volumes. Downsides: requires centralized coordination (database of already-used serials) to prevent duplicate allocation; loses the simple 'highest serial = latest produced' intuition.",
+        "GS1 SN-96 conventions — GS1 recommends serials in the range 0 to 2^38 - 1 (about 2.74 x 10^11 values per GTIN) for SGTIN-96; alphabetic serials require SGTIN-198 instead. Pharmaceutical DSCSA and EU FMD compliance often prefers alphanumeric serials, which drives use of SGTIN-198 despite its longer EPC and lower reader compatibility with constrained chips.",
+        "Domain-specific serial encodings — some industries embed semantic information in the serial (batch/lot number, production date, production line ID). Walmart apparel tagging prefers opaque random serials; pharmaceutical serialization under DSCSA requires serials that remain unique across the entire GTIN's lifetime. Match the serial-encoding strategy to the industry compliance expectation.",
+        "Serial-number reserve windows — programmes allocate serial-number ranges to production lines ('Line A gets serials 1,000,000-9,999,999 for GTIN X; Line B gets 10,000,000-19,999,999') to avoid central-coordination bottlenecks. Reserve-window management is coordinated through the ERP or a dedicated serialization server (Tracelink, rfXcel, SAP ATTP).",
+        "Proud Tek serial-number allocation — buyers can supply a pre-generated serial-number list (CSV of GTIN + serial), a reserve window specification (starting serial + count), or request Proud Tek to generate serials sequentially or randomly per spec. All production runs include duplicate-check validation against both the current job and historical jobs for the same GTIN."
+      ]
+    },
+    {
+      "title": "Beyond encoding — EPCIS, ONS and the trading-partner ecosystem",
+      "intro": "GS1 EPC encoding is one component of a broader ecosystem for event-driven supply-chain visibility. The companion standards — EPCIS for capturing and sharing supply-chain events, ONS for resolving EPC URIs to information services, and Digital Link for bridging GS1 identifiers to web URIs — extend the value of on-tag encoding into cross-enterprise data flow. This section orients the encoded-tag discussion within that ecosystem.",
+      "bullets": [
+        "EPCIS (GS1 EPC Information Services) — a standard data model and HTTP REST API for capturing supply-chain events ('this GTIN+serial was shipped from location A at time T') and sharing them between trading partners. EPCIS events carry the EPC URI form of the encoded tag (urn:epc:id:sgtin:...), making the encoded tag the primary key for event correlation across enterprises. Mandated by DSCSA for pharmaceutical serialization, widely used for Walmart supplier visibility and EU ESPR Digital Product Passport integration.",
+        "ONS (Object Name Service) — a DNS-based mechanism for resolving EPC URIs to authoritative information services. The brand owner publishes ONS records mapping their GTINs to EPCIS endpoint URLs, enabling trading partners to discover where to query events for specific EPCs. ONS adoption has been uneven in practice, with many brand owners preferring private trading-partner connections; GS1 Digital Link has largely superseded ONS for new deployments.",
+        "GS1 Digital Link — a standard that maps GS1 identifiers to web URIs of the form `https://id.brand.com/01/{GTIN}/21/{serial}` enabling NFC tags, QR codes and RFID-derived lookups to resolve into consumer-facing web destinations. For a UHF RFID tag encoded with SGTIN-96, the decoded (GTIN, serial) can be composed into a Digital Link URI that routes to brand landing pages, warranty registration, authenticity verification or traceability displays.",
+        "EPCIS event types and the tagged-item lifecycle — OBJECT events (EPC observed), AGGREGATION events (EPCs combined into a parent), TRANSACTION events (EPCs associated with a business transaction), TRANSFORMATION events (EPCs consumed and new EPCs created). Each event carries the when/where/what/why attributes that reconstruct the tagged item's path through the supply chain.",
+        "Trading-partner data-sharing patterns — private EPCIS endpoints between 1-to-1 trading partners (brand owner <-> retailer); EPCIS-as-a-service platforms for n-to-n sharing (Tracelink, Movilitas, rfXcel); industry-specific closed networks (FDA DSCSA Blockchain Working Group for pharmaceutical). The on-tag encoding is the stable identifier; the data-sharing layer evolves with industry practice.",
+        "Alignment check for new deployments — before committing a tagging programme, validate that the (GTIN, serial, encoded EPC, EPCIS event URI, Digital Link URI) chain is consistent end-to-end. Common failures: encoded SGTIN-96 bits don't decode to the claimed GTIN (partition-value error); EPCIS events reference the human-readable GTIN+serial but not the URI form (breaks ONS / Digital Link resolution); Digital Link URIs resolve to 404 because the brand domain is not configured. Proud Tek's integration handoff includes an end-to-end alignment test with customer-supplied sample EPCIS captures."
+      ]
+    },
+    {
+      "title": "Proud Tek factory pre-encoding workflow and buyer engagement",
+      "intro": "This closing section maps the GS1 encoding concepts onto concrete engagement with Proud Tek for production-line pre-encoded UHF tag programmes. Goal: translate the standards into the fields of a procurement specification and the data artefacts exchanged during production.",
+      "bullets": [
+        "Encoding specification intake — buyers provide: GS1 Company Prefix (and MO of origin for verification), GTIN catalogue (list of GTINs to encode, or a GTIN template for single-SKU programmes), partition value (automatically derived from Company Prefix length, but customer can override), filter value (per retailer mandate or per internal policy), serial-number allocation strategy (sequential range, random, pre-supplied list), optional User memory content (batch, date, custom data), and chip / form-factor selection.",
+        "Tag model selection — retail apparel programmes typically use Impinj M730 / M770 standard inlays in a retailer-qualified size (Auburn RFID Lab standard sizes for Walmart ARC); pharmaceutical serialization may use NXP UCODE 8 or NXP UCODE 9 depending on memory requirements; industrial asset programmes use anti-metal tags or hard tags with NXP UCODE 9xe for higher memory. Proud Tek's catalogue maps each chip / form-factor to GS1 encoding capability (all modern UHF chips support at least SGTIN-96; larger-memory chips enable SGTIN-198 and user-memory extensions).",
+        "Sample pass — 25-100 tag sample batch ships within 5-7 business days with encoding applied. Customer validates sample reads on their target reader (Zebra FX9600, Impinj Speedway R420 or similar), parses the EPC with their middleware (Rfid middleware, SAP ATTP, Infor M3) and confirms the decoded GTIN, partition, filter and serial match the specification.",
+        "Production encoding and QC — each tag is read-verified after encoding with the full EPC decoded back and compared to the intended payload. Failed tags are automatically rejected and replaced. Production QC report includes: TID per tag (unique chip hardware ID), encoded EPC hex, decoded GTIN, decoded serial, filter value, partition value, and pass/fail status.",
+        "TID-to-EPC mapping file for back-end integration — the QC report is delivered as a CSV or JSON file for each production batch, sized to be imported directly into the customer's WMS, EPCIS repository, serialization management system (Tracelink, rfXcel) or ERP. The mapping file is the bridge between the physical encoded tags and the enterprise serialization database.",
+        "Production lead times and scale — standard encoded UHF orders ship in 2-4 weeks from PO for in-stock chip models; custom configurations (novel antenna designs, unusual form factors, NXP UCODE DNA with crypto authentication) run 4-8 weeks. Encoding throughput reaches 10k-100k tags per day per production line. For retailer-mandate volumes (100k+ per week sustained), multi-line scheduling is coordinated 4-8 weeks in advance with weekly delivery windows."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "GS1 EPC encoded RFID products",
-      "description": "Pre-encoded UHF RFID tags and labels for retail and logistics compliance.",
+      "title": "UHF RFID products for GS1 EPC encoding",
+      "description": "Pre-encoded UHF RFID tags, labels and inlays for retail mandates, pharmaceutical serialization and returnable-asset tracking.",
       "links": [
         {
-          "href": "/product/uhf-rfid-tags/",
-          "label": "UHF RFID tags & labels"
+          "href": "/products/rfid-labels/uhf-rfid-inlay/",
+          "label": "UHF RFID inlays"
+        },
+        {
+          "href": "/products/rfid-labels/impinj-m700-uhf-inlay/",
+          "label": "Impinj M700-series inlays"
+        },
+        {
+          "href": "/products/rfid-labels/anti-metal-rfid-label/",
+          "label": "Anti-metal UHF tags"
+        }
+      ]
+    },
+    {
+      "title": "Related UHF standards and compliance guides",
+      "description": "Companion technical guides on the EPC Gen2 air interface, retailer mandates that drive GS1 encoding requirements, and RAIN ecosystem context.",
+      "links": [
+        {
+          "href": "/guides/epc-gen2-uhf-rfid/",
+          "label": "EPC Gen2 protocol"
         },
         {
           "href": "/guides/walmart-rfid-tagging-mandate/",
-          "label": "Walmart RFID mandate guide"
+          "label": "Walmart RFID mandate"
         },
+        {
+          "href": "/guides/rain-rfid-explained/",
+          "label": "RAIN RFID ecosystem"
+        }
+      ]
+    },
+    {
+      "title": "Request pre-encoding quotes and samples",
+      "description": "Start a pilot with a pre-encoded sample batch matching your GTIN catalogue and partition-value specification, or request production quotes for large-volume programmes.",
+      "links": [
         {
           "href": "/contact/",
           "label": "Request EPC encoding quote"
+        },
+        {
+          "href": "/guides/item-level-rfid-tagging-mandate/",
+          "label": "Retailer item-level mandates"
+        },
+        {
+          "href": "/guides/fda-rfid-pharmaceutical-tracking/",
+          "label": "DSCSA pharmaceutical serialization"
         }
       ]
     }
@@ -70,15 +173,31 @@
   "faq": [
     {
       "question": "Do I need a GS1 Company Prefix to encode EPC on RFID tags?",
-      "answer": "Yes. A GS1 Company Prefix is required to create valid EPC-encoded tags. The Company Prefix is assigned by your local GS1 Member Organization and forms the foundation of your GTINs, SSCCs and other GS1 identifiers. If you do not have a GS1 Company Prefix, you need to register with GS1 before starting RFID deployment. Proud Tek can encode tags using any valid GS1 Company Prefix you provide."
+      "answer": "Yes. A GS1 Company Prefix is the prerequisite for creating valid EPC-encoded tags that will be accepted by any GS1-compliant trading partner. The Company Prefix is issued by your local GS1 Member Organization (GS1 US, GS1 UK, GS1 China, etc.) and forms the root of every GTIN, SSCC, GRAI and other GS1 identifier your organization uses. Without a Company Prefix, tags can still be technically encoded with a Gen2 chip, but they will not be recognizable by retailer receiving systems, pharmaceutical serialization repositories or EPCIS-based trading-partner networks. If you do not yet have a Company Prefix, contact your national GS1 MO before starting the RFID deployment; Proud Tek can encode tags using any valid Company Prefix you supply."
     },
     {
       "question": "What is the difference between SGTIN-96 and SGTIN-198?",
-      "answer": "SGTIN-96 encodes serial numbers as numeric values up to 38 bits (approximately 274 billion unique serials per GTIN). SGTIN-198 uses a 198-bit EPC to support alphanumeric serial numbers up to 20 characters. Most retail mandates (Walmart, Target) use SGTIN-96 because numeric serials are sufficient. SGTIN-198 is primarily used in pharmaceutical serialization where alphanumeric serial numbers are common."
+      "answer": "SGTIN-96 uses the 96-bit EPC memory bank and encodes serials as numeric values up to 38 bits wide (about 2.74 x 10^11 unique serials per GTIN). SGTIN-198 uses a 198-bit EPC memory bank and supports alphanumeric serial numbers up to 20 characters. Most retail mandates (Walmart, Target, Nordstrom) specify SGTIN-96 because numeric serials are sufficient for apparel item-level tracking. Pharmaceutical serialization under DSCSA and EU FMD often uses SGTIN-198 because pharmaceutical serial numbers include alphanumeric content (batch / lot information, country-specific schemes). SGTIN-198 requires a Gen2 chip with sufficient EPC memory (most modern chips support 256-bit or larger EPC, so this is rarely a hardware constraint), but it does consume more tag memory and slightly reduces the maximum number of concurrent tags readable in dense environments."
     },
     {
-      "question": "Can Proud Tek encode tags using our existing GTIN catalog?",
-      "answer": "Yes. Send us your GTIN catalog (spreadsheet with GTIN, product description, and desired serial number ranges) along with your GS1 Company Prefix and partition value. We will configure our encoding systems to map each GTIN to the correct SGTIN-96 binary encoding and generate unique serial numbers per tag. We provide a database file linking each tag's TID (unique hardware ID) to its encoded EPC and human-readable GTIN/serial."
+      "question": "How do partition values map to my Company Prefix length?",
+      "answer": "The partition value is a 3-bit field (values 0-6) that tells the EPC parser how to split the Company Prefix and following reference field within the fixed 96-bit EPC budget. For SGTIN-96 the mapping is: Partition 0 = 12-digit Company Prefix, 1-digit Item Reference; Partition 1 = 11-digit CP, 2-digit Item Ref; Partition 2 = 10-digit CP, 3-digit Item Ref; Partition 3 = 9-digit CP, 4-digit Item Ref; Partition 4 = 8-digit CP, 5-digit Item Ref; Partition 5 = 7-digit CP, 6-digit Item Ref; Partition 6 = 6-digit CP, 7-digit Item Ref. Count the digits of your GS1-allocated Company Prefix (including the country indicator) and select the matching partition. Proud Tek's encoding-order form automates this calculation when you declare your Company Prefix, so customers don't need to select partition values manually."
+    },
+    {
+      "question": "Can Proud Tek encode tags using our existing GTIN catalogue?",
+      "answer": "Yes. Customers send their GTIN catalogue as a CSV / Excel file (columns: GTIN, product description, retailer-specific tag size if applicable, serial-number range or allocation strategy per GTIN) plus the GS1 Company Prefix. Our encoding line software maps each GTIN to the corresponding SGTIN-96 binary encoding (with auto-partition selection) and generates or applies the specified serial numbers. The production output includes a TID-to-EPC mapping file listing each tag's chip hardware ID, encoded EPC in hex, decoded human-readable GTIN and serial, filter value, and encoding verification status. For customers without an existing GTIN catalogue, we provide a GTIN allocation template and validation against your declared Company Prefix before encoding begins."
+    },
+    {
+      "question": "What is EPCIS and does my programme need to adopt it?",
+      "answer": "EPCIS (EPC Information Services) is the GS1 standard data model and REST API for capturing and sharing supply-chain events tied to encoded EPCs — 'GTIN+serial X was shipped from location A at time T toward destination B.' EPCIS adoption is mandatory for pharmaceutical serialization under DSCSA (Drug Supply Chain Security Act, US) and EU FMD (Falsified Medicines Directive), and increasingly expected for EU ESPR Digital Product Passport programmes. For retail apparel mandates, EPCIS adoption is not always required at the supplier level — retailers often operate their own internal EPCIS repositories and ingest supplier ASN data. For cross-enterprise supply-chain visibility programmes, EPCIS is the de facto standard for interchange. Proud Tek's pre-encoded tag output includes EPCIS-compatible URI formatting in the TID-to-EPC mapping file, so customers adopting EPCIS can bulk-import the mapping as OBJECT events."
+    },
+    {
+      "question": "How do I choose between sequential and randomized serial numbers?",
+      "answer": "Choose sequential serials when: your programme prioritizes simplicity of database management; duplicate-detection logic relies on monotonic IDs; and you are not concerned about counterfeiters predicting next-likely serials. Choose randomized serials when: your programme includes anti-counterfeit / brand-protection objectives; you want to hide production-volume signals from outside observers; and your serialization database can handle non-monotonic IDs. Most Walmart / Target apparel programmes use randomized serials for brand-protection reasons. Most industrial asset programmes use sequential serials for operational simplicity. Pharmaceutical serialization programmes under DSCSA typically use randomized serials to defeat counterfeit prediction; EU FMD permits either. Proud Tek supports both strategies and can also accept a customer-supplied serial list for full control of serial allocation."
+    },
+    {
+      "question": "What data does Proud Tek provide after production to integrate with our WMS or EPCIS?",
+      "answer": "Each production batch ships with a TID-to-EPC mapping file in CSV or JSON format, listing for every encoded tag: the TID (unique chip hardware identifier assigned by the chip manufacturer, 96-bit hex), the encoded EPC hex value, the decoded human-readable GTIN, decoded serial number, filter value, partition value, encoded User memory content (if any), and encoding-verification status. The file is structured for direct import into WMS systems, EPCIS repositories (as OBJECT-event captures), serialization management platforms (Tracelink, rfXcel, SAP ATTP) and ERP systems. For customers with specific import requirements (custom column names, EPCIS XML event format, trading-partner specific CSV layouts), we match the delivery format to the target system during the order setup phase."
     }
   ],
   "primaryAction": {
@@ -87,8 +206,12 @@
   },
   "secondaryActions": [
     {
-      "href": "/product/uhf-rfid-tags/",
-      "label": "UHF RFID labels"
+      "href": "/products/rfid-labels/uhf-rfid-inlay/",
+      "label": "UHF RFID inlays"
+    },
+    {
+      "href": "/guides/epc-gen2-uhf-rfid/",
+      "label": "EPC Gen2 protocol"
     },
     {
       "href": "/guides/walmart-rfid-tagging-mandate/",
