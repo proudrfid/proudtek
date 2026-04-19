@@ -1,98 +1,223 @@
 {
   "route": "/guides/python-rfid-reader-library/",
   "group": "guides",
-  "title": "Python RFID Reader Library — How to Read NFC and UHF RFID Tags with Python",
+  "title": "Python RFID Reader Library Guide — nfcpy, sllurp, pyscard, MFRC522, libnfc and the Python RFID Ecosystem",
   "kicker": "Python RFID Library Guide",
-  "summary": "Python is widely used for RFID prototyping, data collection and system integration thanks to libraries like nfcpy, sllurp and pyscard. Developers building RFID applications need to understand which Python library to use for their tag type (NFC, HF RFID, UHF RFID), reader hardware and use case. This guide covers the most popular Python RFID libraries, compatible reader hardware and the tag products that work with each approach.",
-  "heroPoints": [
-    "nfcpy for NFC/HF — the most popular Python library for reading and writing NFC tags (NTAG, MIFARE) using USB NFC readers like the ACR122U and Sony RC-S380.",
-    "sllurp for UHF RFID — a Python client for LLRP (Low Level Reader Protocol) that communicates with UHF RFID fixed readers from Impinj, Zebra and ThingMagic for inventory and data capture.",
-    "Proud Tek tags work with all major Python RFID libraries — our NFC stickers, RFID cards and UHF tags are standard-compliant and readable by any library supporting the relevant ISO standard."
+  "summary": "A Python developer's guide to the RFID reader library ecosystem — nfcpy for NFC/HF reading and writing with PC/SC and USB readers, sllurp for LLRP-based UHF fixed-reader integration, pyscard for smart-card APDU communication, MFRC522 and PN532 libraries for Raspberry Pi and microcontroller-scale projects, libnfc Python bindings for low-level NFC control, and vendor-specific Python SDKs (python-mercuryapi, Impinj Octane bindings, Chainway Android Python bridges). This page covers the full Python RFID landscape with code patterns, reader hardware compatibility, tag-chip selection for prototyping and the Proud Tek sample kits sized for Python developers, researchers and makers.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "Python RFID library",
+    "nfcpy",
+    "sllurp LLRP Python",
+    "pyscard APDU",
+    "MFRC522 Raspberry Pi RFID",
+    "python-mercuryapi ThingMagic"
   ],
-  "imageAlt": "Python code reading NFC tag with USB reader and RFID development setup",
+  "heroPoints": [
+    "Python is the dominant language for RFID prototyping, research and integration glue — nfcpy gives a clean API for NFC read/write with affordable USB readers (ACR122U, Sony RC-S380), sllurp speaks LLRP to Impinj/Zebra/ThingMagic fixed UHF readers, pyscard handles PC/SC smart-card APDU communication for MIFARE DESFire and JavaCard, and the MFRC522 / PN532 libraries enable Raspberry Pi and microcontroller-class RFID projects. This ecosystem covers every layer of the RFID stack from consumer NFC stickers to enterprise dock-door portals.",
+    "The Python RFID library choice is driven by three questions — what frequency/standard is the programme (125 kHz LF, 13.56 MHz HF/NFC, 860-960 MHz UHF), what reader hardware is available (USB NFC reader, SPI RFID module, LLRP fixed reader, vendor-specific device) and what is the use case (prototyping, research, production integration, edge-device deployment). Matching the library to those three dimensions keeps the project on a short ramp rather than fighting platform mismatches.",
+    "Proud Tek supplies Python-developer-friendly sample kits and production-scale tags across the full ecosystem — NTAG 213/215/216 NFC stickers for nfcpy and pyscard development, MIFARE Classic 1K/4K and DESFire EV3 cards for access-control prototyping, ISO 15693 (ICODE SLIX) tags for industrial research, and UHF RFID inlays with Impinj Monza and M700/M750/M800 chips for sllurp and vendor-SDK development. Sample kits ship with TID-to-EPC mapping CSVs and chip-family documentation ready to import into Python applications."
+  ],
+  "imageAlt": "Python RFID development setup with ACR122U USB NFC reader reading NTAG sticker and Raspberry Pi MFRC522 module",
   "heroImage": "/landing-images/ntag213-nfc-sticker.jpg",
   "imageSourceRoutes": [
-    "/product/nfc-stickers/",
-    "/product/rfid-cards/"
+    "/products/rfid-labels/ntag213-nfc-sticker/",
+    "/products/rfid-labels/uhf-rfid-inlay/"
   ],
   "sections": [
     {
-      "title": "Python libraries for NFC and HF RFID",
+      "title": "NFC and HF RFID with nfcpy — reading, writing and the PC/SC ecosystem",
+      "intro": "For NFC and 13.56 MHz HF RFID development, nfcpy is the most popular and best-supported Python library. It covers NFC Forum Type 1-5 tags, supports the most common USB NFC readers and exposes a clean, Pythonic API. This section surveys nfcpy and the PC/SC-compatible reader ecosystem it works with.",
       "bullets": [
-        "nfcpy — open-source library for NFC communication with Type 2, 3, 4 and 5 NFC Forum tags. Supports reading/writing NDEF records, tag discovery, card emulation and peer-to-peer. Works with ACR122U, RC-S380 and other contactless USB readers on Linux and macOS.",
-        "pyscard — Python wrapper for the PC/SC smart card interface. Works with any PC/SC-compliant reader (ACR122U, Identiv uTrust, HID Omnikey) to send APDU commands to MIFARE, DESFire, and other ISO 14443 cards. Cross-platform on Windows, Linux and macOS.",
-        "MFRC522 (SPI) — Python library for the MFRC522 RFID reader module connected to Raspberry Pi via SPI. Reads MIFARE Classic and NTAG tags at close range. Popular for IoT prototyping and Raspberry Pi-based RFID projects.",
-        "libnfc bindings — Python bindings for the libnfc C library, providing low-level access to NFC hardware. More complex than nfcpy but offers greater control over the NFC communication layer.",
-        "CircuitPython NFC — Adafruit's CircuitPython libraries for NFC readers (PN532, ST25DV) on microcontrollers. Useful for embedded RFID projects running on RP2040, ESP32 and other CircuitPython-supported boards."
+        "nfcpy library overview — open-source Python library (https://github.com/nfcpy/nfcpy) supporting NFC communication with Type 1 (Topaz), Type 2 (NTAG, MIFARE Ultralight), Type 3 (FeliCa), Type 4 (MIFARE DESFire via ISO 7816-4 APDUs) and Type 5 (ISO 15693) tags. Provides tag discovery, NDEF read/write, card emulation and peer-to-peer NFC. Runs on Linux, macOS and Windows (with appropriate USB driver setup).",
+        "Supported NFC readers — ACR122U (the most common USB NFC reader, ~US$25-35), Sony RC-S380/P and RC-S380/S, SCL3711 (ACS legacy), PN532 (via USB, UART or SPI breakout boards). ACR122U is the recommended starting point for nfcpy development because of its low cost, wide availability and broad library support. For FeliCa-heavy projects, RC-S380 gives better FeliCa performance.",
+        "Getting started with nfcpy — `pip install nfcpy`, connect a supported USB reader, run `python -m nfc` to verify reader detection. A basic read example is under 15 lines of Python: open a clf (contactless frontend), call `clf.connect(rdwr={'on-connect': ...})` with an on-connect callback, inspect the returned Tag object, read NDEF content via `tag.ndef.records`. Writing is similarly straightforward with the NDEF message construction API.",
+        "NDEF record handling — nfcpy ships a companion `ndeflib` package providing Python classes for the major NDEF record types (URI, Text, Smart Poster, vCard, Wi-Fi Simple Configuration, Bluetooth Simple Pairing). Building an NDEF message is a matter of composing record objects and assigning to `tag.ndef.records`, which triggers the write on session close.",
+        "nfcpy limitations — doesn't provide direct MIFARE Classic Crypto1 access (use pyscard or libnfc for MIFARE Classic); may require specific udev rules on Linux to give the user access to USB readers without root; some NFC Forum Type 4 tags require careful APDU sequencing which nfcpy partially abstracts. For advanced MIFARE DESFire work, pyscard or custom APDU libraries are usually preferable.",
+        "Common use cases — consumer NFC app prototyping (build a custom URL/vCard programmer for your Google Review or business card programme), NDEF content validation (batch-scan programmed tags to verify encoding), research projects (signal analysis, Tag Forum compliance testing), classroom teaching and maker projects. Pairs especially well with Proud Tek NTAG 213/215/216 stickers as the cheap, universally compatible tag target."
       ]
     },
     {
-      "title": "Python libraries for UHF RFID",
+      "title": "Smart-card APDUs with pyscard — MIFARE DESFire, JavaCard, HID iCLASS SE integration",
+      "intro": "For smart-card-class RFID programmes — MIFARE DESFire, JavaCard-based credentials, HID iCLASS SE — the PC/SC (Personal Computer/Smart Card) framework provides the standard integration layer. pyscard is the Python wrapper for PC/SC and is the go-to library for APDU-based RFID work on any PC/SC-compatible reader.",
       "bullets": [
-        "sllurp — Python implementation of the LLRP (Low Level Reader Protocol) used by fixed UHF RFID readers. Connects to Impinj Speedway, Zebra FX, and other LLRP-compatible readers over TCP/IP to inventory tags, read/write EPC and user memory, and manage reader settings.",
-        "python-mercuryapi — Python wrapper for ThingMagic's Mercury API, supporting ThingMagic UHF RFID readers (M6e, Nano, Sargas). Provides tag inventory, read/write operations and reader configuration.",
-        "octane-sdk-python — Impinj's Python SDK for their Octane reader platform. Provides high-level abstractions for tag inventory, filtered reads, and GPI/GPO control on Impinj fixed readers.",
-        "uhf-rfid (generic serial) — community Python libraries for serial-port-connected UHF readers from Chinese manufacturers (Chafon, Yanzeo, etc.). These readers use proprietary serial protocols that these libraries abstract.",
-        "Reader vendor SDKs — most UHF RFID reader manufacturers provide Python SDKs or REST API interfaces. Zebra (DataCapture DNA), Impinj (Octane), and Alien Technology all support Python integration."
+        "pyscard library — Python wrapper for PC/SC (Windows winscard.dll, Linux/macOS pcsc-lite). Install via `pip install pyscard`. Works with any PC/SC-compliant reader: ACR122U, Identiv uTrust, HID Omnikey 5022/5325/5427, SCM Microsystems SCL01xx, Feitian FBB-10. Provides low-level APDU exchange with `connection.transmit(apdu)` returning response and SW1/SW2 status bytes.",
+        "PC/SC versus native USB access — PC/SC abstracts the reader at the OS level, so your Python code is reader-agnostic as long as the reader has a PC/SC driver installed. nfcpy bypasses PC/SC on some reader families for better NFC-specific behavior; pyscard goes through PC/SC for maximum reader-hardware flexibility. For smart-card-class integrations (DESFire, JavaCard), PC/SC is the natural fit.",
+        "MIFARE DESFire EV1/EV2/EV3 programming with pyscard — DESFire uses ISO 7816-4 APDUs for authentication (AES/3DES), application creation, file creation and encrypted reads/writes. Community libraries like `py-nxp-desfire`, `nfcpy-desfire`, and `nfcpy/pyscard-desfire` wrap the raw APDU exchange with DESFire-aware abstractions. Production access-control development typically uses these wrappers rather than hand-coding APDUs.",
+        "JavaCard communication — for programmes using JavaCard-based credentials (PIV, CAC, EMV payment cards, government eID), pyscard is the integration layer. The SELECT applet, GET_DATA / GET_CHALLENGE, and applet-specific APDUs all flow through `connection.transmit`. Python-JavaCard development enables smart-card emulation testing, credential issuance pipelines, and cross-referencing for government / corporate security programmes.",
+        "HID iCLASS and iCLASS SE — HID's smart-card-class credentials talk over PC/SC with HID OMNIKEY readers. pyscard provides the communication layer; HID-specific APDUs and key-management require either HID's SDK or community-researched protocol knowledge. Useful for access-control research and integration testing.",
+        "EMV contactless reading — for research and education purposes, pyscard can read public EMV data (PAN, expiration, cardholder name) from contactless credit cards via standard EMV ATR and GPO APDUs. Useful for fintech prototyping; not for production payment processing (which requires EMVCo certification and specialized terminals)."
       ]
     },
     {
-      "title": "Choosing tags for Python RFID development",
+      "title": "Raspberry Pi and microcontroller RFID — MFRC522, PN532, SPI/I2C/UART RFID modules",
+      "intro": "For embedded and maker projects running on Raspberry Pi, Arduino, ESP32 or RP2040-class boards, a different class of RFID library applies: libraries that talk directly to MFRC522 or PN532 RFID chips over SPI, I2C or UART. These libraries power thousands of DIY RFID projects and are the foundation of low-cost RFID prototyping.",
       "bullets": [
-        "NFC development — start with NTAG213 or NTAG215 NFC stickers for general-purpose NFC reading/writing with nfcpy or pyscard. These chips have well-documented memory maps and universal reader compatibility.",
-        "MIFARE projects — use MIFARE Classic 1K cards for access control prototyping with pyscard. For encrypted communication development, use MIFARE DESFire EV3 cards that support full AES-128 authentication in Python.",
-        "UHF RFID development — use standard UHF RFID labels with Impinj Monza or NXP UCODE chips for sllurp development. These inlays have broad reader compatibility and well-documented EPC Gen2 behavior.",
-        "Raspberry Pi prototyping — MFRC522-compatible tags (MIFARE Classic, NTAG) work with the popular MFRC522 SPI reader module. Proud Tek supplies sample kits with multiple chip types for development testing.",
-        "Sample kits for developers — Proud Tek offers developer sample kits containing assorted NFC stickers, RFID cards and UHF labels, providing multiple chip types for library compatibility testing and application prototyping."
+        "MFRC522 module on Raspberry Pi — the RC522 module (NXP MFRC522 chip on a breakout board, under US$5 on AliExpress) reads MIFARE Classic and NTAG tags at close range over SPI. Python library `mfrc522` (https://github.com/pimylifeup/MFRC522-python) provides tag UID reading, MIFARE Classic authenticate/read/write and NTAG basic interactions. A working RFID door-lock or presence-detection prototype takes an afternoon.",
+        "PN532 module — the NXP PN532 is a more capable NFC transceiver than MFRC522, supporting NFC Forum Type 1-5 tags, card emulation and peer-to-peer. Python libraries include `Adafruit-CircuitPython-PN532` (for CircuitPython on RP2040, ESP32) and `py532lib` (for Raspberry Pi Linux). PN532 is the preferred chip for NFC-focused embedded projects because of its richer feature set.",
+        "CircuitPython NFC — Adafruit's CircuitPython ecosystem supports NFC development on microcontroller boards (RP2040, ESP32, nRF52, SAMD51). Libraries `adafruit_pn532` and `adafruit_st25dv` give embedded Python developers NDEF-level APIs on constrained hardware. Useful for battery-powered NFC peripherals, wearable NFC devices and educational workshops.",
+        "Raspberry Pi RFID project patterns — access control (RFID-triggered door lock via relay), attendance tracking (log tag UIDs to SQLite, export to CSV), inventory prototyping (scan-and-count with ~1 meter range limitation), museum kiosks (tap a tag, display content), learning-language flashcards (tag-triggered audio), home automation (tag-triggered HomeAssistant scenes via MQTT publish).",
+        "Limitations of MFRC522/PN532 for UHF — these chips are 13.56 MHz HF/NFC readers and cannot read UHF RFID. For UHF (860-960 MHz) on Raspberry Pi, options include USB UHF readers with serial protocols (Chafon CF-RU5106, Yanzeo R784) accessed via pyserial, or small-form-factor UHF modules (M6e-Nano from ThingMagic, Chainway R4 Lite) with their own Python SDKs.",
+        "Hardware integration tips — antennas matter: MFRC522 reads only within ~1-3 cm, PN532 up to ~5-8 cm, so positioning is critical. Power supply stability matters for reliable reads (noisy USB power on Pi can cause intermittent failures). SPI bus speed affects read latency. Libraries handle most of this but project debugging often reduces to electrical hardware issues rather than software."
+      ]
+    },
+    {
+      "title": "UHF RFID with sllurp, python-mercuryapi and vendor SDKs",
+      "intro": "For UHF RFID — the 860-960 MHz enterprise and industrial frequency band used for retail apparel, pallet-level logistics, manufacturing and warehouse inventory — Python libraries talk to fixed readers over TCP/IP (LLRP) or to specialized readers over vendor-specific SDKs. This section covers the Python UHF stack.",
+      "bullets": [
+        "sllurp — the premier Python LLRP client (https://github.com/sllurp/sllurp). Implements the LLRP binary protocol over TCP, connecting to Impinj Speedway, Zebra FX7500/FX9600, ThingMagic Sargas and any LLRP-compliant reader. Supports full ROSpec/AccessSpec lifecycle, report callbacks, tag filtering and reader configuration. Install via `pip install sllurp`. Connecting to a reader and streaming tag reads is under 30 lines of Python.",
+        "python-mercuryapi — Python wrapper for JADAK/ThingMagic Mercury API, supporting M6e, Nano, Sargas, Izar and embedded modules. Not a pure-Python library — it's a binding to ThingMagic's native library — but provides full Mercury API feature access including multi-protocol support (Gen2, ISO 18000-6B, ISO 11784/85) and ThingMagic-specific features (TMR transponder counting, region-of-interest commands). Useful when the Mercury API features outweigh the pure-Python preference.",
+        "Impinj Octane SDK Python bindings — community-maintained Python bindings for Impinj Octane SDK; official Python support is limited. For Impinj-specific features (Autopilot, chip-model-specific behavior, IoT Interface / MQTT), the official Java/C# SDKs are more mature. Python integration typically routes through sllurp or via Impinj's REST/MQTT API on R700/R720 smart readers.",
+        "Chainway handheld Android-Python bridges — Chainway UHF handheld readers run Android with Java/Kotlin SDKs. For Python projects on handhelds, developers typically use pyjnius or similar bridges to invoke the Chainway Java SDK from Python running on the handheld. Alternatively, the handheld can publish tag events over TCP/WebSocket to a Python server.",
+        "Serial UHF readers — budget Chinese UHF readers (Chafon, Yanzeo, JLT) use proprietary serial command protocols over USB or RS-232. Community Python libraries (`uhf-rfid`, `chafon-reader-python`) abstract these protocols; pyserial handles the raw serial layer. Useful for low-cost UHF prototyping but with limited feature depth compared to LLRP-based readers.",
+        "REST/MQTT UHF integration — modern smart readers (Impinj R700/R720, Zebra FXR90 with recent firmware) publish tag events over MQTT and expose configuration via REST. Python integration uses paho-mqtt for MQTT subscription and requests for REST configuration, bypassing LLRP entirely. This is the preferred pattern for cloud-native UHF RFID architectures in 2024-2026."
+      ]
+    },
+    {
+      "title": "Low-level NFC control with libnfc bindings and custom protocol work",
+      "intro": "For projects that need lower-level NFC control than nfcpy provides — research into NFC air-interface timing, MIFARE Classic key recovery, custom NFC Forum protocol extensions, or access to hardware features nfcpy doesn't expose — libnfc and its Python bindings are the next layer of abstraction.",
+      "bullets": [
+        "libnfc C library — mature open-source C library (http://www.libnfc.org) providing low-level NFC-A / NFC-B / NFC-F / ISO 15693 control. Supports a wide range of USB, serial and custom-interfaced NFC readers. More powerful than nfcpy but also more complex, with a lower-level API.",
+        "Python bindings — `pyscard-libnfc`, `libnfc-python`, and custom ctypes wrappers give Python access to libnfc. Use when nfcpy doesn't expose the feature you need: raw polling configurations, custom modulation timing, proprietary chip command sets, or unusual reader hardware.",
+        "MIFARE Classic research — libnfc's nfc-mfclassic and related tools are widely used in MIFARE Classic research (Crypto1 weakness demonstration, key recovery, cloning). Python bindings give researchers scripting access to these capabilities. Legally, MIFARE Classic programming is generally allowed for owned-credential research; be careful about systems you don't own (public transit systems, others' access control).",
+        "Custom protocol development — for NFC Forum protocol extensions, new tag types, or protocol-layer research, libnfc's low-level APIs let Python scripts generate custom NFC modulation sequences and parse responses. Useful in academic RFID security research and vendor-specific protocol reverse engineering.",
+        "Embedded Linux integration — libnfc runs on Raspberry Pi and embedded Linux platforms, providing a consistent API across desktop and embedded targets. Python projects can deploy from Mac/Linux development machines to Pi-based production devices using the same libnfc-based code.",
+        "When to choose libnfc over nfcpy — (1) you need access to reader-specific low-level features, (2) you're doing NFC research requiring deep protocol access, (3) you need to support an unusual NFC reader not in nfcpy's driver list, (4) you're integrating with existing C/C++ NFC codebases. For standard NDEF read/write development, nfcpy is easier and more Pythonic; libnfc is the power-user option."
+      ]
+    },
+    {
+      "title": "Code patterns and project architecture for production Python RFID systems",
+      "intro": "Python is excellent for RFID prototyping but deploying RFID-driven systems to production requires attention to concurrency, reliability and operational concerns that go beyond basic library usage. This section covers the patterns that take Python RFID projects from demo to production.",
+      "bullets": [
+        "Asynchronous tag processing — for event-driven patterns (sllurp callbacks, MQTT subscriptions, nfcpy connect loops), use asyncio or threading to decouple tag processing from I/O. A typical architecture: a reader thread receives tag events, a bounded queue buffers events, a processing thread (or asyncio task) handles business logic and persistence. This scales to 500-2000 events per second on commodity hardware.",
+        "Retry and reconnection logic — readers disconnect (network partition, reader restart, firmware update), tags drop out of the field, and transient errors are common. Production Python RFID code wraps reader connections in retry loops with exponential backoff, uses supervisor patterns (e.g., systemd service with Restart=always) and logs disconnection events for operations teams.",
+        "Tag deduplication and rate-limiting — the same tag often appears in many consecutive reads. Application logic typically filters to \"first read in a window\" (e.g., first read per tag per 10 seconds) or \"persistence-in-zone detected\" (tag seen for N consecutive reads before event fires). This reduces downstream processing load and handles noisy RF environments naturally.",
+        "Persistence and queue durability — persist tag events to a durable store (SQLite for small projects, PostgreSQL / MongoDB for mid-scale, Kafka / Kinesis for cloud-scale) before acknowledging to the reader. This survives application crashes and enables replay / reconciliation. For edge deployments, local SQLite with periodic cloud sync is a common pattern.",
+        "Secrets and credential management — reader credentials, TLS certificates, cloud-service API keys must not be hardcoded. Use environment variables, .env files (excluded from git), HashiCorp Vault or cloud-provider secret managers (AWS Secrets Manager, Azure Key Vault). Python's `python-dotenv` and `python-keyring` simplify local dev; cloud SDKs handle production.",
+        "Logging, monitoring and observability — structured logging (structlog, loguru) with tag events, reader status and errors feeds monitoring platforms (Prometheus, Grafana, Datadog, Splunk). Per-reader metrics (read rate, error rate, uptime) and per-tag-pattern metrics (unique tags per minute, duplicate rate) help operations teams detect issues proactively. Opentelemetry is useful for distributed tracing across RFID event pipelines.",
+        "Testing RFID code without hardware — unit tests mock the reader library (sllurp, nfcpy) to verify application logic without physical hardware. Integration tests run against a physical reader in a test environment. Fixtures generating synthetic tag event streams enable load testing and edge-case validation. Proud Tek can provide Python-friendly sample tag fixtures for customers building test infrastructure."
+      ]
+    },
+    {
+      "title": "Proud Tek Python-developer sample kits and production tag supply",
+      "intro": "Python developers building RFID projects need tags that work cleanly with their library of choice — standard-compliant chips, well-documented memory layouts, and sample content suited to library testing. Proud Tek's developer sample kits and production tag supply are designed to fit into Python workflows from prototype through production.",
+      "bullets": [
+        "Python-developer sample kits — assorted NFC stickers (NTAG 213/215/216), MIFARE cards (Classic 1K, DESFire EV3), ISO 15693 tags (ICODE SLIX) and UHF RFID inlays (Impinj Monza or M700-series). Typical kit: 50-200 tags across chip families, shipped with a TID-to-EPC mapping CSV for UHF tags and chip-family documentation (memory maps, default keys, NDEF pre-encoding status).",
+        "Pre-encoded sample tags — for customers whose Python projects will parse specific NDEF content patterns (URL redirects, vCards, custom MIME types, GS1 EPC schemes), Proud Tek can pre-encode sample tags at production time with the target content. Developers can then skip the encoding step during prototyping and focus on read-path library work.",
+        "TID-to-EPC mapping files — UHF RFID production runs include a CSV mapping chip TID (unique manufactured serial) to encoded EPC, which imports directly into sllurp tag-dictionary initialization, Impinj Octane tag databases or custom Python tag-resolution caches. Eliminates the need for customers to run encoding-verification passes during development.",
+        "Volume scaling — Python-developer pilots typically start with 100-500 tags per chip family; production scales to 10k-1M+ tags depending on use case. Proud Tek's production capacity spans small batches for makers and research through enterprise-scale runs for consumer marketing programmes. Per-unit pricing improves significantly above 10k units per chip family.",
+        "Chip-family selection advice — NTAG 213 is the default for general Python NFC development (cheapest, most universal); NTAG 216 for larger-memory projects; NTAG 424 DNA for authentication research; MIFARE Classic for access-control prototyping (aware of Crypto1 vulnerabilities); DESFire EV3 for modern encrypted access; Impinj M700 for UHF-library development. Proud Tek's application-engineering team advises on chip selection based on the specific Python library and use case.",
+        "Community and open-source support — Proud Tek maintains technical documentation covering chip memory maps, default MIFARE Classic keys (for developers recovering community-known keys to read unlocked tags), NTAG counter behavior and UHF filter-value assignments. Documentation is designed to import cleanly into Python project READMEs and test fixtures. For researchers and educators, we provide documentation use under fair-use terms for open-source RFID projects.",
+        "Engagement for production transitions — Python projects that outgrow prototyping phase often need a scaled tag-supply plan, per-tag unique encoding, production QA processes and chip-family decisions that affect multi-year TCO. Proud Tek's engagement model handles this transition: technical discovery call, sample-kit evaluation, pre-production encoding specification, small production run (1k-10k units) for pilot, full production (10k-1M+) once pilot passes, with ongoing supply matched to customer forecasting."
       ]
     }
   ],
   "resourceCards": [
     {
       "title": "RFID tags for Python development",
-      "description": "NFC stickers, RFID cards and UHF tags for developer projects.",
+      "description": "NFC stickers, MIFARE cards, ISO 15693 tags and UHF RFID inlays across chip families for Python library development and testing.",
       "links": [
         {
-          "href": "/product/nfc-stickers/",
-          "label": "NFC development stickers"
+          "href": "/products/rfid-labels/ntag213-nfc-sticker/",
+          "label": "NTAG 213 NFC stickers"
         },
         {
-          "href": "/product/rfid-cards/",
-          "label": "RFID development cards"
+          "href": "/products/rfid-labels/ntag216-nfc-sticker/",
+          "label": "NTAG 216 NFC stickers"
         },
+        {
+          "href": "/products/rfid-labels/uhf-rfid-inlay/",
+          "label": "UHF RFID inlays"
+        }
+      ]
+    },
+    {
+      "title": "Related RFID integration and encoding guides",
+      "description": "Companion pages on UHF reader APIs, GS1 EPC encoding and NFC programming that typically surround a Python RFID project.",
+      "links": [
+        {
+          "href": "/guides/uhf-rfid-reader-api-guide/",
+          "label": "UHF RFID reader API guide"
+        },
+        {
+          "href": "/guides/gs1-epc-encoding-guide/",
+          "label": "GS1 EPC encoding guide"
+        },
+        {
+          "href": "/guides/nfc-ndef-format-explained/",
+          "label": "NFC NDEF format guide"
+        }
+      ]
+    },
+    {
+      "title": "Order a Python-developer sample kit",
+      "description": "Request an assorted NFC / HF / UHF sample kit sized for Python RFID library development and testing, with TID-to-EPC mapping files included.",
+      "links": [
         {
           "href": "/contact/",
           "label": "Request developer sample kit"
+        },
+        {
+          "href": "/solutions/rfid-inventory-tracking/",
+          "label": "Inventory tracking solutions"
+        },
+        {
+          "href": "/solutions/nfc-marketing/",
+          "label": "NFC marketing solutions"
         }
       ]
     }
   ],
   "faq": [
     {
-      "question": "What is the easiest Python library for reading NFC tags?",
-      "answer": "nfcpy is the easiest starting point for NFC tag reading in Python. With an ACR122U USB reader ($20-30 on Amazon) and nfcpy installed via pip, you can read NTAG and MIFARE tag UIDs and NDEF records in under 10 lines of Python code. The library handles the NFC communication protocol transparently, so you focus on your application logic rather than low-level commands."
+      "question": "What's the easiest way to start reading NFC tags with Python?",
+      "answer": "Install nfcpy (`pip install nfcpy`), buy an ACR122U USB NFC reader (~US$25-35 on Amazon/AliExpress), plug it into your Mac or Linux machine, and you can read NTAG or MIFARE tag UIDs and NDEF records in under 10 lines of Python. On Windows, install the ACR122U driver first; on macOS, no driver installation needed. nfcpy handles the NFC communication protocol transparently, so you focus on application logic rather than low-level commands. Proud Tek NTAG 213 stickers are the cheapest tag to use for testing (~US$0.05-0.10 each at sample volume)."
     },
     {
-      "question": "Can Python read UHF RFID tags?",
-      "answer": "Yes. Python reads UHF RFID tags through libraries that communicate with UHF reader hardware. sllurp is the most popular option, connecting to LLRP-compatible fixed readers (Impinj, Zebra) over TCP/IP. For development-scale projects, serial-port USB UHF readers with Python serial libraries provide a lower-cost entry point. The Python code sends commands to the reader, which handles the RF communication with the tags."
+      "question": "How do I read UHF RFID tags with Python?",
+      "answer": "The standard approach is sllurp, a Python LLRP client that connects to any LLRP-compatible fixed UHF RFID reader (Impinj Speedway, R-series, R700; Zebra FX7500/FX9600; ThingMagic Sargas; Alien ALR-F800). Install via `pip install sllurp`, configure the reader's IP address, and you can stream tag read events with timestamps, antenna numbers and RSSI values. For budget UHF prototyping, serial USB UHF readers (Chafon, Yanzeo) with community Python libraries over pyserial are a lower-cost entry point at the expense of feature depth. For cloud-native architectures, modern Impinj R700/R720 smart readers publish tag events over MQTT that Python clients can subscribe to via paho-mqtt."
     },
     {
-      "question": "What NFC tags should I buy for Python development?",
-      "answer": "Start with NTAG213 NFC stickers — they are the most widely supported chip, work with every Python NFC library, and cost $0.05-0.10 each. For projects requiring more memory, NTAG215 (504 bytes) or NTAG216 (888 bytes) stickers are the next step up. For access control development, add MIFARE Classic 1K cards. Proud Tek offers developer sample kits with a mix of chip types."
+      "question": "Can Python program NFC tags (write NDEF content) or only read them?",
+      "answer": "Python can both read and write NFC tags. nfcpy supports writing NDEF content to any NFC Forum Type 2-5 tag (NTAG 21x, NTAG 424 DNA, MIFARE Ultralight, ISO 15693 tags like ICODE SLIX, MIFARE DESFire via NDEF on Type 4). pyscard handles APDU-based writes for MIFARE DESFire application and file operations. MFRC522/PN532 libraries on Raspberry Pi support NTAG and MIFARE Classic writes. The writing pattern is consistent across libraries: discover the tag, check write capability, compose the NDEF message or raw command, execute the write, verify. Most library examples include write samples in their documentation."
+    },
+    {
+      "question": "What's the difference between nfcpy and pyscard?",
+      "answer": "nfcpy is NFC-specific and provides higher-level NDEF abstractions; it's optimized for NFC Forum tag types and NDEF content. pyscard is a general PC/SC smart-card library that works with any smart card or contactless reader supporting PC/SC — useful for MIFARE DESFire APDU communication, JavaCard applets, EMV card research and government eID work. For straightforward NFC tag reading/writing (URLs, vCards, Wi-Fi records), nfcpy is easier. For APDU-level smart-card programming (DESFire application management, JavaCard invocation, HID iCLASS SE work), pyscard is more appropriate. Many projects use both — pyscard for smart-card APDUs and nfcpy for NDEF-level interactions."
+    },
+    {
+      "question": "Can I run Python RFID code on a Raspberry Pi?",
+      "answer": "Yes, Raspberry Pi is one of the most popular Python RFID platforms. For 13.56 MHz NFC/HF, use an MFRC522 or PN532 module connected over SPI with the `mfrc522` or `Adafruit-CircuitPython-PN532` libraries — a complete NFC-gated door lock or presence detector takes an afternoon to build. Alternatively, connect a USB NFC reader (ACR122U) and use nfcpy with the same API as on a desktop. For UHF, Pi works well with USB UHF readers over pyserial, or with network-attached LLRP readers over sllurp. Production Pi deployments should pay attention to power-supply stability, persistent storage reliability and WiFi/Ethernet network configuration for reader connectivity."
+    },
+    {
+      "question": "Which Python RFID library is best for MIFARE Classic work?",
+      "answer": "It depends on what you need to do with MIFARE Classic. For basic Classic read/write with known sector keys on a USB reader (ACR122U), pyscard via the MIFARE Classic APDU set or via the ACR122U-specific pseudo-APDUs works well. For Raspberry Pi with an MFRC522 module, the `mfrc522` Python library has native Classic support including authentication. For research or key recovery work (Crypto1 weakness exploitation), libnfc with its Python bindings provides the lower-level access needed. For production access control on Classic, be aware that Crypto1 has known vulnerabilities and new programmes should migrate to MIFARE DESFire EV3 with AES — pyscard is the preferred library for DESFire work."
+    },
+    {
+      "question": "What RFID sample tags does Proud Tek recommend for Python developers?",
+      "answer": "For Python developers starting a new RFID project, we recommend a kit that lets you exercise multiple library-chip combinations. A typical starter kit: 20-50 NTAG 213 stickers (for nfcpy URL/vCard work), 10-20 NTAG 216 stickers (for memory-constrained testing), 5-10 MIFARE Classic 1K cards (for pyscard/mfrc522 access-control prototyping), 5 MIFARE DESFire EV3 cards (for encrypted access research), 5-10 ICODE SLIX tags (for ISO 15693 / nfcpy Type 5 work), and 20-50 UHF RFID inlays with Impinj M700 chips (for sllurp / LLRP work). Proud Tek ships kits like this with chip-family documentation, default-key information where relevant, and TID-to-EPC mapping files for the UHF portion. Contact us to spec a kit sized to your specific project."
     }
   ],
   "primaryAction": {
     "href": "/contact/",
-    "label": "Order developer NFC/RFID sample kit"
+    "label": "Request Python developer sample kit"
   },
   "secondaryActions": [
     {
-      "href": "/product/nfc-stickers/",
+      "href": "/products/rfid-labels/ntag213-nfc-sticker/",
       "label": "NFC stickers"
     },
     {
-      "href": "/product/rfid-cards/",
-      "label": "RFID cards"
+      "href": "/products/rfid-labels/uhf-rfid-inlay/",
+      "label": "UHF RFID inlays"
+    },
+    {
+      "href": "/guides/uhf-rfid-reader-api-guide/",
+      "label": "UHF reader API guide"
     }
   ]
 }

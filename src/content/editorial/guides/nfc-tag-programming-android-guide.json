@@ -1,68 +1,175 @@
 {
   "route": "/guides/nfc-tag-programming-android-guide/",
   "group": "guides",
-  "title": "NFC Tag Programming on Android — Step-by-Step Guide for NDEF Writing & Reading",
+  "title": "NFC Tag Programming on Android — android.nfc API, NDEF Writing, Tag Dispatch, HCE and the Full Android NFC Stack",
   "kicker": "NFC Programming Android",
-  "summary": "Android phones with NFC capability can read and write NFC tags without any special hardware. Using free apps or the Android NFC API, you can program NFC stickers and cards with URLs, text, Wi-Fi credentials, contact information and custom data payloads. This guide covers the tools, apps, and tag types you need to start programming NFC tags with your Android device.",
-  "heroPoints": [
-    "No special equipment needed — any NFC-enabled Android phone can write data to NFC tags. The phone's built-in NFC antenna serves as both the reader and writer.",
-    "Free apps available — NFC Tools, NFC TagWriter by NXP, and TagInfo are free Android apps that let you read tag information and write NDEF records without writing code.",
-    "Proud Tek NFC tags are Android-compatible — all our NTAG, MIFARE Ultralight and ICODE NFC stickers and cards support NDEF writing from Android devices."
+  "summary": "A comprehensive guide to NFC tag programming on Android — covering App Store apps for code-free tag writing, the android.nfc framework for developers, tag dispatch and intent filter patterns, NDEF message construction, foreground dispatch for dedicated scanner apps, Host-based Card Emulation (HCE), MIFARE Classic and DESFire programming, Tasker automation and the Android-versus-iPhone capability delta. This page serves both non-technical users who need to program NFC stickers and cards with their Android phone and Android developers integrating NFC into custom apps.",
+  "publishedAt": "2026-04-19",
+  "modifiedAt": "2026-04-19",
+  "reviewedAt": "2026-04-19",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "keywords": [
+    "Android NFC programming",
+    "android.nfc API",
+    "Android NDEF writing",
+    "Android tag dispatch",
+    "Android MIFARE Classic",
+    "Tasker NFC automation"
   ],
-  "imageAlt": "Android phone programming NFC sticker tag with NDEF URL record",
+  "heroPoints": [
+    "Android has the most permissive NFC API of any mobile platform — the android.nfc package exposes full NDEF read/write, raw tag-level access to MIFARE Classic / MIFARE Ultralight / MIFARE DESFire / ISO 14443 Type A/B / ISO 15693 / FeliCa, foreground dispatch that can capture any NFC tap while a dedicated app is in focus, and Host-based Card Emulation (HCE) for turning the phone into an NFC-emulated card. This makes Android the preferred platform for NFC developers building custom experiences.",
+    "Android NFC programming splits into two tracks that serve different users — a consumer track where free Play Store apps (NFC Tools, NXP TagWriter, TagInfo, TagMo) let anyone program NFC tags without coding, and a developer track where the android.nfc API lets developers build custom apps with tag dispatch filters, foreground intent handling, advanced chip-family access (MIFARE Classic Crypto1 authentication, DESFire AES sessions, NTAG 424 DNA SUN verification) and HCE integration with transit/loyalty/access-control backends.",
+    "Proud Tek supplies Android-tested NFC products across the NFC Forum Type 1-5 range — NTAG 213/215/216 for general-purpose programmes, NTAG 424 DNA for authentication, MIFARE Classic 1K/4K for legacy access control, MIFARE DESFire EV1/EV2/EV3 for modern encrypted access, MIFARE Ultralight C / EV1 for memory-optimized deployments, and ISO 15693 (ICODE SLIX) for industrial programmes. All tags are supplied blank, unlocked, ready for Android programming, with chip-family documentation including MIFARE key defaults and Android-developer-specific notes."
+  ],
+  "imageAlt": "Android phone programming NFC sticker tag with NDEF URL record using android.nfc API",
   "heroImage": "/landing-images/ntag213-nfc-sticker.jpg",
   "imageSourceRoutes": [
-    "/product/nfc-stickers/",
-    "/product/rfid-cards/"
+    "/products/rfid-labels/ntag213-nfc-sticker/",
+    "/products/rfid-labels/ntag216-nfc-sticker/"
   ],
   "sections": [
     {
-      "title": "Tools and apps for NFC tag programming on Android",
+      "title": "Android NFC hardware landscape and compatibility considerations",
+      "intro": "Unlike iPhone where NFC hardware and API capability advance lockstep across generations, Android devices vary significantly by manufacturer, model year and OS version. Understanding the landscape is the first step for any NFC programme targeting Android users at scale.",
       "bullets": [
-        "NFC Tools — the most popular free Android NFC app. Read tag information (chip type, memory size, UID), write NDEF records (URL, text, phone number, email, Wi-Fi, Bluetooth, location) and set tag options (read-only lock, password protection).",
-        "NFC TagWriter by NXP — official app from NXP (manufacturer of NTAG and MIFARE chips). Provides guided tag writing, QR code to NFC conversion, and tag cloning. Best for NXP chip types including NTAG213/215/216 and NTAG 424 DNA.",
-        "TagInfo by NXP — diagnostic app that reads detailed technical information from NFC tags including chip type, memory map, NDEF content, and NFC Forum compliance. Essential for verifying tag programming results.",
-        "Android NFC API — for developers, Android's android.nfc package provides programmatic control over NFC tag reading and writing. Use NfcAdapter, Tag, Ndef, and NdefMessage classes to build custom NFC applications.",
-        "Tasker and Trigger — automation apps that can perform Android device actions (open app, toggle settings, launch URL) when specific NFC tags are tapped, enabling NFC-triggered automation workflows."
+        "NFC hardware prevalence — essentially all flagship Android phones from 2015 onward include NFC hardware (Samsung Galaxy S and Note series, Google Pixel all generations, OnePlus flagship and Nord series, Xiaomi flagship, Sony Xperia, Huawei Mate/P series pre-sanction, Motorola Edge). Budget Android phones are inconsistent — some include NFC, some don't; customers in emerging markets frequently have NFC-less budget devices.",
+        "Android OS version distribution — Android 4.0+ (Ice Cream Sandwich, 2011) introduced android.nfc; Android 5.0 (Lollipop, 2014) added Host-based Card Emulation (HCE); Android 10+ (2019) added Default Wallet app preferences; Android 13+ added refined NFC-reader mode APIs. Modern consumer programmes can safely target Android 9 (Pie) or Android 10 as baseline, covering 95%+ of active devices.",
+        "Verifying NFC capability on a specific device — Settings > Connected Devices > Connection Preferences > NFC (exact path varies by OEM UI overlay). If NFC is listed and toggleable, the device supports NFC. Some manufacturers hide NFC in an \"Other Settings\" submenu; Samsung phones surface it in the Quick Settings panel.",
+        "NFC antenna location variance — unlike iPhone where the antenna is consistently at the top-center of the back, Android antenna locations vary by OEM. Samsung Galaxy phones typically have the antenna near the top-center; Pixel phones slightly lower; OnePlus varies by model. App prompts guide users to \"hold the tag against the back of the phone\" rather than specifying exact location; programmers of consumer experiences should plan for multi-location tapping attempts by users.",
+        "Samsung vs. Google vs. other OEM NFC behavior — Samsung's OneUI adds some NFC-related customization (Wireless PowerShare overlap, Bixby routine integration, Samsung Pay priority). Google Pixel runs stock Android NFC behavior. Other OEMs (Xiaomi MIUI, OnePlus OxygenOS, Motorola) mostly mirror stock Android with minor UX variations. For developers, android.nfc API is consistent across OEMs; for content designers, consumer NFC interactions should work identically.",
+        "Reader-mode iPhone interoperability — modern Android NFC radios are fully backward-compatible with iPhone NDEF patterns. Consumer NFC programmes using NDEF URL records work identically on Android and iPhone, with background detection (Android: system NDEF URL dispatch to default browser; iPhone: system notification banner) behaving equivalently."
       ]
     },
     {
-      "title": "Common NFC tag programming use cases",
+      "title": "Free Play Store apps for Android NFC programming (no coding required)",
+      "intro": "For non-developer users programming NFC tags with Android — marketing teams, small business owners, hospitality operators, event planners, DIY hobbyists — the Play Store has a mature ecosystem of free and freemium apps that handle the underlying android.nfc interaction. This section surveys the apps most commonly used for Android-based NFC tag writing.",
       "bullets": [
-        "URL links — program a tag with a website URL. When tapped, the phone opens the URL automatically in the browser. Used for marketing, product information, restaurant menus and business cards.",
-        "Wi-Fi credentials — write your Wi-Fi network name (SSID) and password to an NFC tag. Guests and visitors tap the tag to connect without manually entering credentials. Popular in hotels, cafes and offices.",
-        "Contact cards (vCard) — encode your contact information as a vCard NDEF record. Tapping the tag adds your name, phone, email and address directly to the phone's contacts app.",
-        "App launch — program a tag with an Android Application Record (AAR) that launches a specific app when tapped. Used for loyalty programs, check-in systems and interactive marketing displays.",
-        "Smart home triggers — NFC tags placed around the home trigger automation routines via Tasker or similar apps. Tap a tag by the door to activate leaving-home mode, or tap a bedside tag to set alarm and enable do-not-disturb."
+        "NFC Tools (wakdev) — the most popular free Android NFC app. Read and write NDEF records (URL, text, phone, email, SMS, Wi-Fi, Bluetooth, geolocation, app launch via Android Application Record), read raw tag content, verify NDEF compliance, lock tags to read-only, and manage advanced chip features (NTAG password, NTAG mirror, MIFARE Classic sector reads with known keys). Paid Pro tier adds batch operations, MIFARE DESFire support and custom NDEF record types.",
+        "NXP TagWriter — NXP's official app optimized for NTAG and MIFARE chip programming. Strong support for Wi-Fi Simple Configuration records, Bluetooth pairing records, vCard encoding, and NTAG 424 DNA feature configuration (SUN messaging setup, per-tap counter enablement). Free from NXP with no upsell.",
+        "NXP TagInfo — diagnostic app that reads NFC tags in great detail, revealing chip type (model, silicon revision), memory map (configuration pages, counters), NDEF structure (record parsing, validation) and NFC Forum compliance. Essential for QA workflows; reveals whether a tag is genuinely NTAG 213 or a mis-branded compatible chip, and validates that NDEF writes succeeded correctly.",
+        "TagMo — specialized app for Amiibo-style NTAG215-based NFC programming (gaming community tool). Demonstrates advanced NFC capability on Android that isn't possible on iPhone. Not commercial-grade for most programmes, but a useful data point on Android platform capability.",
+        "Tasker and NFC Task Launcher — automation apps that bind NFC tag UIDs (or NDEF content patterns) to Android device actions (launch app, toggle Wi-Fi/Bluetooth, set sound profile, send SMS, run HTTP request, invoke Google Assistant routine). More flexible than iPhone Shortcuts because of Android's richer action catalog and deeper system access.",
+        "GoToTags Android — commercial app with batch programming capability, CSV import, per-tag unique content generation and enterprise-focused features. Used by customers programming thousands of NFC tags from spreadsheet data on Android for staging or mid-scale deployments."
       ]
     },
     {
-      "title": "Choosing the right NFC tag for Android programming",
+      "title": "Android NFC programming step-by-step (consumer workflow)",
+      "intro": "For users programming a batch of NFC tags with Android without writing code, the workflow is straightforward and fast — one tag can typically be programmed in under 5 seconds. This section walks through the end-to-end process with the tips that improve first-time success rate.",
       "bullets": [
-        "NTAG213 (144 bytes) — the standard choice for URL links, Wi-Fi records and simple text. Enough memory for URLs up to about 130 characters. The most cost-effective option for single-record programming.",
-        "NTAG215 (504 bytes) — mid-range memory for larger data payloads, multiple NDEF records, or longer URLs. Also used for Amiibo-compatible projects.",
-        "NTAG216 (888 bytes) — largest memory in the NTAG2xx family. Suitable for vCards with full contact details, multiple URL records, or combined text and URL records on a single tag.",
-        "NTAG 424 DNA — advanced chip with per-scan cryptographic authentication and dynamic URL generation. Requires the NXP TagWriter app or custom Android development to program the authentication features.",
-        "Form factor selection — NFC stickers (self-adhesive) for surfaces and objects, NFC cards (CR80 PVC) for business cards and access badges, NFC key fobs for keychains, and NFC wristbands for events and access control."
+        "Step 1 — Choose the right tag chip for your content. NTAG 213 (144 bytes) fits short URLs (under ~130 chars), simple text, Wi-Fi credentials for most consumer routers, and single-record programmes. NTAG 215 (504 bytes) and NTAG 216 (888 bytes) accommodate longer URLs, vCards, multi-record tags and extended text. For legacy access-control integration, MIFARE Classic or DESFire may be required — program these with NFC Tools or a dedicated app.",
+        "Step 2 — Install an NFC writing app. NFC Tools is the most popular all-purpose choice; NXP TagWriter is the official NXP option with better guidance for NTAG-specific features. Both are free from the Play Store. Enable NFC in Settings if it's not already on.",
+        "Step 3 — Open the app and select the NDEF record type. Common choices: URL (for web links and QR-code-equivalent tags), Wi-Fi (for network-sharing tags), vCard (for contact cards), Text (for plain text content), Android Application Record (AAR) to force a specific app to open when tapped.",
+        "Step 4 — Enter the content. URLs should be URL-encoded; text is UTF-8 native; Wi-Fi passwords need exact router-matching characters. The app displays the encoded NDEF size so you can verify the payload fits the tag's memory (145 bytes for NTAG 213 user memory, accounting for 4-byte overhead).",
+        "Step 5 — Tap the tag against the Android phone's NFC antenna area (usually the top-center of the back cover). The app will guide you with a visual prompt; hold the phone still for 1-2 seconds during the write, then release when the success confirmation appears. Failed writes (too-small memory, read-only tag, poor antenna alignment) produce clear error messages.",
+        "Step 6 — Verify the write by reading the tag back. In most NFC writer apps there's a dedicated Read mode; alternatively, for URL tags, simply bring the programmed tag near the unlocked phone — Android will automatically prompt to open the URL, confirming the NDEF content is correct and the tag is working for end-user consumption.",
+        "Step 7 — Optionally lock or protect the tag. NFC Forum Type 2 tags support a permanent read-only lock (one-way, irreversible); NTAG 424 DNA supports password-protected writes that can be temporarily secured and later unlocked with the password. Locking is appropriate for public-facing tags where accidental overwrite or malicious tampering could disrupt the programme."
+      ]
+    },
+    {
+      "title": "android.nfc developer framework — NfcAdapter, Tag, NdefMessage, intent filters and tag dispatch",
+      "intro": "For Android developers building custom NFC-integrated apps, the android.nfc package provides full access to the NFC subsystem. This section surveys the core classes, the tag dispatch system and the common implementation patterns.",
+      "bullets": [
+        "NfcAdapter — the entry point for NFC operations in an Android app. Access via `NfcAdapter.getDefaultAdapter(context)`. Returns null on devices without NFC hardware; check `isEnabled()` to verify NFC is currently turned on. Used to enable foreground dispatch, reader mode, and for NDEF push (deprecated; Android Beam removed in Android 10).",
+        "Tag and TagTechnology classes — when an NFC tag is discovered, Android creates a Tag object containing the chip's UID and supported technologies. TagTechnology subclasses represent the different protocols: Ndef (generic NDEF read/write), MifareClassic (MIFARE Classic sector access), MifareUltralight (Ultralight reads, NTAG family), NfcA / NfcB (low-level ISO 14443 Type A/B), NfcF (FeliCa), NfcV (ISO 15693), IsoDep (ISO 14443-4 for DESFire, JavaCard, EMV).",
+        "NdefMessage and NdefRecord — NDEF data structures. NdefMessage holds an ordered list of NdefRecord objects; each NdefRecord has a TNF (Type Name Format), type (well-known, MIME, URI), ID and payload. The SDK provides convenience constructors for common patterns: `NdefRecord.createUri(uri)`, `NdefRecord.createTextRecord(lang, text)`, `NdefRecord.createApplicationRecord(packageName)` (AAR), `NdefRecord.createMime(mimeType, data)`.",
+        "Tag dispatch system — when Android detects an NFC tag, it matches the tag's NDEF content and TagTechnology against activity intent filters in installed apps and launches the best-matching activity. Intent filter categories include NDEF_DISCOVERED (match specific MIME types or URI schemes), TECH_DISCOVERED (match specific TagTechnology), and TAG_DISCOVERED (catch-all fallback). Proper intent filter configuration is the primary way apps bind to specific NFC experiences without requiring the app to be in foreground.",
+        "Foreground dispatch — for apps in the foreground (e.g., a dedicated scanner app), `NfcAdapter.enableForegroundDispatch()` captures all NFC events regardless of tag dispatch rules, routing them back to the app's `onNewIntent()` handler. Use this for dedicated NFC scanner apps where the user expects all NFC interactions to be handled by the current app.",
+        "Writing NDEF to a tag — retrieve the Ndef object from the tag, connect (`ndef.connect()`), build an NdefMessage, call `ndef.writeNdefMessage(message)`, close the connection. Error paths handle tag-out-of-range, read-only tags, insufficient memory and unsupported tag types. Production apps wrap this in retry logic with user-friendly error messaging and async handling via Kotlin coroutines.",
+        "Android 14+ refinements — Android 14 added refined NFC reader mode APIs (`NfcAdapter.enableReaderMode()` with polling options), improved handling of multiple tags in the field, and cleaner lifecycle semantics. Legacy code written against Android 5-10 APIs continues to work, but new projects should use the reader-mode APIs for cleaner tag discovery control."
+      ]
+    },
+    {
+      "title": "Advanced Android NFC — MIFARE Classic, MIFARE DESFire, NTAG 424 DNA, Host-based Card Emulation",
+      "intro": "Beyond NDEF read/write, Android's unrestricted NFC access enables programmes that aren't possible on iPhone — MIFARE Classic Crypto1 authentication, MIFARE DESFire AES sessions, NTAG 424 DNA SUN verification, and Host-based Card Emulation where the phone itself emulates an NFC card to external readers. This section surveys the advanced capabilities.",
+      "bullets": [
+        "MIFARE Classic programming — use the MifareClassic TagTechnology class to authenticate with sector keys (default keys, custom keys from key-management), read/write 16-byte blocks, and modify sector-access bits. Common for legacy access control integration, gym-checkin, public-transit fare cards. The Classic 1K has 16 sectors of 64 bytes each; Classic 4K has 40 sectors. Classic's Crypto1 cipher has known vulnerabilities; production programmes should migrate to DESFire.",
+        "MIFARE DESFire EV1/EV2/EV3 programming — use IsoDep TagTechnology to send APDU commands compliant with the MIFARE DESFire command set (authenticate with AES/3DES keys, create applications, read/write files). DESFire is the modern successor to Classic, with AES-128 authentication, multiple file types (standard, backup, value, linear record, cyclic record) and per-application key management. Used for high-security access control (NYC OMNY, London TfL replacement), student-ID programmes and stadium access.",
+        "NTAG 424 DNA SUN message verification — NTAG 424 DNA generates a cryptographically signed URL on each tap (Secure Unique NFC Message, SUN). Android apps using IsoDep or NfcA can read the SUN-mirrored NDEF or authenticate directly against the DNA chip's AES keys to verify the tag is genuine (not a clone) and has not been tampered with. Used for luxury authentication (handbags, wine, cosmetics), pharmaceutical anti-counterfeit and product-provenance programmes.",
+        "ISO 15693 (ICODE SLIX) programming — use NfcV TagTechnology for ISO 15693 tags (ICODE SLIX, ST25DV). ISO 15693 operates at 13.56 MHz with longer read range than ISO 14443 (up to 1-1.5 meters), making it suitable for inventory and healthcare programmes where ISO 14443 close-range scanning isn't practical. Proud Tek supplies ICODE SLIX-based tags for these use cases.",
+        "Host-based Card Emulation (HCE) — Android 4.4+ lets apps emulate contactless cards to external readers. Use a HostApduService to receive APDU commands from the reader and respond with emulated-card data. Used for transit apps (Google Wallet, Apple-style but on Android), loyalty programmes that deliver digital membership cards, access-control apps that make the phone a key. HCE is the mechanism behind Google Pay, Samsung Pay (partially), and countless branded transit apps.",
+        "HCE-F and FeliCa — Android 7+ added HCE-F for FeliCa emulation (NfcF), enabling Japanese transit-card emulation (Suica, Pasmo, JR). Less widely used outside Japan but important for programmes targeting that market.",
+        "Secure Element (SE) — some Android devices include an embedded Secure Element for hardware-backed credential storage (Google Pixel with Titan M, Samsung with Knox). HCE on these devices can leverage SE for key storage. Older devices may offer UICC-based SE via the SIM card. Enterprise programmes with high-security requirements (payment, government ID) rely on SE-backed HCE rather than pure software HCE."
+      ]
+    },
+    {
+      "title": "Tasker, Automate and NFC-triggered automation on Android",
+      "intro": "Android's more permissive system access lets end users build rich NFC-triggered automation without writing code. Tasker, Automate and similar apps are popular for personal productivity, home automation, accessibility and small-business workflows. This section covers the automation layer.",
+      "bullets": [
+        "Tasker NFC profiles — Tasker is a long-standing Android automation app. Create a profile with \"NFC Tag\" trigger (matched by tag UID or NDEF content), and attach task actions: launch app, navigate to specific app screen via deep link, toggle Wi-Fi/Bluetooth/Mobile Data, set volume/sound profile, run HTTP request to a webhook, send SMS, dim screen brightness, run Tasker scene. Extremely flexible; supports complex conditional logic via Tasker variables.",
+        "Automate (LlamaLab) — visual flowchart-based automation app. NFC tag triggers similarly bind to UID or NDEF content. Designed to be more approachable than Tasker's text-based configuration; used by less-technical users and for quickly prototyping automation flows.",
+        "Use cases — bedside \"goodnight\" tag sets alarm, enables DND, turns off Wi-Fi; car dashboard tag starts navigation, connects to car Bluetooth, launches music; office entry tag silences phone, opens work calendar; home entry tag turns on lights via webhook to smart-home hub; workout tag opens fitness tracker and starts timer; kitchen recipe tag opens recipe app to specific recipe URL.",
+        "Automation layering with NDEF content — programmes can layer multiple capabilities. The tag's NDEF URL record provides default behavior on any NFC-capable device (Android and iPhone both); the automation app provides enhanced behavior specifically for Android users who have bound the tag to their own flow. This layered approach works well for membership tags, venue tags and multi-device households.",
+        "Accessibility NFC workflows — Android's accessibility services allow NFC automation for accessibility use cases (large-button \"call mom\" tag for elderly users, \"make a note\" tag for voice-capture). These use cases benefit from Android's richer system access compared to iPhone Shortcuts.",
+        "Enterprise automation — Android Enterprise and MDM-managed fleets can deploy NFC-triggered workflows via managed automation tools (SOTI MobiControl, Microsoft Intune, VMware Workspace ONE). Useful for field-service, retail associates, hospitality staff where consistent NFC-driven behavior across a managed device fleet is important."
+      ]
+    },
+    {
+      "title": "Proud Tek Android-tested NFC products and engagement for Android NFC programmes",
+      "intro": "As with iPhone programmes, the choice of NFC product is material to Android programming success. Proud Tek's NFC product range covers the chip families Android customers most often need — from NTAG 213 for consumer marketing through MIFARE DESFire EV3 for encrypted access control. This section surveys the product-to-use-case fit and the engagement model for Android-focused programmes.",
+      "bullets": [
+        "NTAG 213 stickers and cards — most cost-effective choice for Android URL, text and simple Wi-Fi record programmes. 144 bytes of user memory, compatible with every Android phone's NFC radio and every Play Store writing app. Ideal for Google Review cards, business cards, restaurant menus, event wristbands and promotional campaigns.",
+        "NTAG 215/216 stickers — mid and high-memory variants for programmes needing 504 or 888 bytes respectively. NTAG 215 is notable for Amiibo community use; NTAG 216 for full-content vCards or multi-record tags. Android programming workflow is identical to NTAG 213.",
+        "NTAG 424 DNA tags — advanced chip with per-tap cryptographic signature (SUN message) and password-protected writes. Android apps can both write the DNA configuration (via NXP TagWriter or custom app with IsoDep APDUs) and verify the SUN signature at read time. Used for luxury authentication, pharmaceutical anti-counterfeit and high-value digital-passport programmes.",
+        "MIFARE Classic 1K/4K cards — legacy access control and transit card chip. Android supports full Classic read/write via MifareClassic TagTechnology with sector key authentication. Proud Tek supplies Classic cards with factory-default keys and customer-provided key sets as required.",
+        "MIFARE DESFire EV1/EV2/EV3 cards — modern AES-encrypted access control chip. Android IsoDep APDU access enables full DESFire programming: application creation, file creation, key provisioning, encrypted reads/writes. Preferred chip for high-security modern access control and transit replacement programmes.",
+        "MIFARE Ultralight C and EV1 tags — memory-optimized alternatives to NTAG 21x for large-volume disposable programmes (event tickets, laundry tags, field-trial consumables). Ultralight has smaller memory (48-128 bytes) but lower per-unit cost. Fully Android-compatible.",
+        "Engagement model — Proud Tek's free Android-tested sample kits (100-500 tags across chip families) let Android programmers validate compatibility and workflow. Pre-encoding service scales from 1k-1M+ tags with per-tag unique content (unique URL serialization, per-tag MIFARE Classic key provisioning, DESFire application-key deployment). Production QA includes Android-specific read-verification on sampled lots, with chip-family documentation and key-handoff procedures tailored to Android integration projects."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "NFC tags for Android programming",
-      "description": "Blank NFC stickers and cards ready for programming with your Android phone.",
+      "title": "Android-tested NFC products",
+      "description": "NFC stickers, cards, fobs and wristbands across NTAG, MIFARE Classic, MIFARE DESFire and MIFARE Ultralight chip families, tested with Android phones.",
       "links": [
         {
-          "href": "/product/nfc-stickers/",
-          "label": "NFC stickers (NTAG213/215/216)"
+          "href": "/products/rfid-labels/ntag213-nfc-sticker/",
+          "label": "NTAG 213 NFC stickers"
         },
         {
-          "href": "/product/rfid-cards/",
-          "label": "NFC cards"
+          "href": "/products/rfid-labels/ntag216-nfc-sticker/",
+          "label": "NTAG 216 NFC stickers"
         },
+        {
+          "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
+          "label": "NTAG 424 DNA tags"
+        }
+      ]
+    },
+    {
+      "title": "Related NFC programming and format guides",
+      "description": "Companion pages on iPhone NFC programming, NDEF format structure and the Python RFID ecosystem for cross-platform NFC programmes.",
+      "links": [
+        {
+          "href": "/guides/nfc-tag-programming-iphone/",
+          "label": "iPhone NFC programming guide"
+        },
+        {
+          "href": "/guides/nfc-ndef-format-explained/",
+          "label": "NFC NDEF format guide"
+        },
+        {
+          "href": "/guides/python-rfid-reader-library/",
+          "label": "Python RFID library guide"
+        }
+      ]
+    },
+    {
+      "title": "Order Android-compatible NFC tags",
+      "description": "Request Android-tested sample kits or discuss pre-encoding and per-tag unique content generation for your Android NFC programme.",
+      "links": [
         {
           "href": "/contact/",
-          "label": "Order NFC sample kit"
+          "label": "Order NFC tags for Android"
+        },
+        {
+          "href": "/solutions/nfc-marketing/",
+          "label": "NFC marketing solutions"
+        },
+        {
+          "href": "/solutions/nfc-luxury-authentication/",
+          "label": "NFC luxury authentication"
         }
       ]
     }
@@ -70,29 +177,49 @@
   "faq": [
     {
       "question": "Can all Android phones program NFC tags?",
-      "answer": "Most modern Android phones (2015 and later) include NFC hardware capable of both reading and writing NFC tags. To verify, check Settings > Connected Devices > NFC on your phone. Some budget Android devices may lack NFC, and a few older models have read-only NFC. Samsung, Google Pixel, OnePlus and most flagship Android devices fully support NFC tag writing."
+      "answer": "Most modern Android phones (2015 and later flagship models) include NFC hardware capable of both reading and writing NFC tags. To verify, go to Settings > Connected Devices > NFC (exact path varies by OEM). Samsung, Google Pixel, OnePlus, Xiaomi flagship, and most Sony/Motorola flagships support full NFC read/write. Budget Android phones (under US$200 mid-market devices) are inconsistent — some include NFC, some don't. For commercial programmes targeting consumer reach, assume ~80-90% of your Android audience has NFC; the remainder are on NFC-less budget devices where you need a QR-code fallback."
     },
     {
-      "question": "Can I rewrite NFC tags after programming them?",
-      "answer": "Yes, NFC tags can be rewritten thousands of times unless they have been locked (made read-only). Locking is an optional step that permanently prevents further writing. For testing and development, leave tags unlocked so you can reprogram them as needed. Proud Tek supplies all NFC tags in unlocked, blank state by default."
+      "question": "What's the difference between Android NFC programming and iPhone NFC programming?",
+      "answer": "Android has a more permissive NFC API with full access to chip-level features. Android apps can read and write MIFARE Classic, fully manage MIFARE DESFire AES sessions, handle FeliCa, and use Host-based Card Emulation to turn the phone into an NFC card. iPhone Core NFC restricts access — MIFARE Classic is not supported on iPhone, and only limited HCE-like capabilities exist (Apple Wallet passes, which are not generally-programmable by third-party apps). For consumer programmes using NDEF URL records, Android and iPhone behave equivalently. For advanced programmes (encrypted access control, transit emulation, Amiibo), Android is the only viable platform."
     },
     {
-      "question": "How close does my Android phone need to be to program an NFC tag?",
-      "answer": "NFC operates at extremely close range — typically 1-4 centimeters. For reliable writing, hold the tag directly against the back of your phone near the NFC antenna (usually the upper center of the phone back). Keep the phone still during the write operation, which takes 1-2 seconds. Moving the phone during writing can corrupt the tag data."
+      "question": "Do I need to write Android code to program NFC tags?",
+      "answer": "No. Free Play Store apps (NFC Tools, NXP TagWriter, NXP TagInfo, GoToTags) let any Android user program NFC tags without writing code. These apps handle the android.nfc interaction, NDEF encoding, memory management and tag verification. Coding is only required for custom workflows — building your own branded app that reads/writes NFC, integrating NFC into an existing app, handling advanced chip features (NTAG 424 DNA SUN verification, MIFARE DESFire custom applications), or implementing Host-based Card Emulation. Most commercial NFC programmes start with Play Store apps and only move to custom development when the use case requires it."
+    },
+    {
+      "question": "Can Android read and write MIFARE Classic tags?",
+      "answer": "Yes. Android's MifareClassic TagTechnology provides full MIFARE Classic 1K / 4K read and write capability, including sector-level authentication with known keys and block-level data access. This is a capability iPhone does not have (Apple Core NFC excludes MIFARE Classic). Android MIFARE Classic support is widely used for legacy access-control integration, fare-card programming, and reverse-engineering / research. Keep in mind that MIFARE Classic's Crypto1 cipher has known cryptographic vulnerabilities (published 2007-2008); new programmes should use MIFARE DESFire EV2/EV3 with AES-128 instead of continuing on Classic."
+    },
+    {
+      "question": "How does Android's tag dispatch system work?",
+      "answer": "When Android detects an NFC tag, it looks at the tag's NDEF content and TagTechnology type and matches them against intent filters declared by installed apps. The tag dispatch priority is: (1) NDEF_DISCOVERED filters with specific MIME type or URI scheme match; (2) TECH_DISCOVERED filters matching a specific TagTechnology (MifareClassic, Ndef, IsoDep); (3) TAG_DISCOVERED as a catch-all fallback. The highest-priority matching activity is launched. App developers can declare intent filters in AndroidManifest.xml to bind specific NFC experiences to their app without requiring the app to be in foreground. For apps in foreground that want to capture all NFC events, use NfcAdapter.enableForegroundDispatch() which bypasses normal dispatch."
+    },
+    {
+      "question": "What is Host-based Card Emulation (HCE) and what can I do with it?",
+      "answer": "HCE (Android 4.4+) lets an Android app emulate an NFC contactless card to an external NFC reader. The phone behaves like an ISO 14443 Type A or ISO 14443-4 card, receiving APDU commands from the reader and responding with emulated-card data. HCE is the foundation for Google Pay (payment card emulation), countless branded transit apps (e.g., BART, Beijing Yikatong), loyalty and membership apps (Starbucks, gym cards), and access-control apps (corporate badge emulation). HCE-F (Android 7+) adds FeliCa emulation for Japanese transit cards. For enterprise programmes requiring HCE, the development pattern is a HostApduService that handles reader APDU commands and optionally leverages the device's Secure Element (where available) for hardware-backed key storage."
+    },
+    {
+      "question": "What NFC chip should I choose for my Android programme?",
+      "answer": "For consumer NDEF programmes (URL redirects, business cards, Wi-Fi sharing, Google Review cards, restaurant menus), NTAG 213 is the default — cheap, Android-universal, and fits short URLs. For longer content, step up to NTAG 215 (504 bytes) or NTAG 216 (888 bytes). For authentication or tamper-evident programmes, NTAG 424 DNA with SUN messaging. For legacy access control, MIFARE Classic 1K; for new high-security access control, MIFARE DESFire EV3 with AES-128. For industrial and pharmaceutical programmes needing longer read range, ISO 15693 (ICODE SLIX). For cross-platform iPhone and Android programmes, stick to NTAG-family or DESFire chips since those work on both platforms; avoid MIFARE Classic where iPhone reach matters."
     }
   ],
   "primaryAction": {
     "href": "/contact/",
-    "label": "Order blank NFC tags for programming"
+    "label": "Order Android-compatible NFC tags"
   },
   "secondaryActions": [
     {
-      "href": "/product/nfc-stickers/",
-      "label": "NFC stickers"
+      "href": "/products/rfid-labels/ntag213-nfc-sticker/",
+      "label": "NTAG 213 NFC stickers"
     },
     {
       "href": "/guides/nfc-tag-programming-iphone/",
-      "label": "iPhone NFC programming guide"
+      "label": "iPhone NFC programming"
+    },
+    {
+      "href": "/guides/nfc-ndef-format-explained/",
+      "label": "NDEF format guide"
     }
   ]
 }
