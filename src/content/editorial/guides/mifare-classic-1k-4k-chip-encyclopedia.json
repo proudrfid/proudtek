@@ -236,6 +236,62 @@
       "answer": "Partially. Authentic NXP Classic returns SAK = 0x08 (1K) or 0x18 (4K) and ATQA = 0x0004 / 0x0002, and the manufacturer block 0 first byte is 0x04 on 7-byte UID silicon. Clone silicon (Fudan FM11RF08, Huahong SHC1102, and others) typically matches these externally-visible values because 14443-A compliance requires them. Cryptographic behavior under edge-case commands (like block 0 write attempts or specific timing patterns) can differ. For high-integrity procurement, request NXP-authorized-distributor chain of custody rather than relying on fingerprinting."
     }
   ],
+  "sources": [
+    {
+      "label": "NXP MIFARE Classic EV1 1K Product Page (MF1S50yyX/V1)",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-classic/mifare-classic-ev1-1k-4k:MF1S50YYX_V1",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-04-20",
+      "note": "Canonical NXP product page for MIFARE Classic EV1 1K — authority for the 16-sector / 4-block memory layout, Crypto-1 authentication, SAK / ATQA signatures and UID randomization options referenced in the chip-encyclopedia."
+    },
+    {
+      "label": "NXP MIFARE Classic EV1 4K Product Page (MF1S70yyX/V1)",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-classic/mifare-classic-ev1-1k-4k:MF1S70YYX_V1",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-04-20",
+      "note": "NXP product page for MIFARE Classic EV1 4K — authority for the 32 small + 8 large sector layout (4 KB total), used in the 1K vs 4K comparison section."
+    },
+    {
+      "label": "ISO/IEC 14443-3:2018 — Initialization and anticollision",
+      "url": "https://www.iso.org/standard/73598.html",
+      "publisher": "ISO",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-20",
+      "note": "Reference for the REQA/WUPA/ATQA/SAK exchange that identifies MIFARE Classic variants on the air interface — cited in the chip-fingerprinting FAQ."
+    },
+    {
+      "label": "Nohl, K., Evans, D., Starbug, Plötz, H. — Reverse-Engineering a Cryptographic RFID Tag (USENIX Security 2008)",
+      "url": "https://www.usenix.org/legacy/events/sec08/tech/full_papers/nohl/nohl.pdf",
+      "publisher": "USENIX Security Symposium",
+      "publishedAt": "2008-07-28",
+      "accessedAt": "2026-04-20",
+      "note": "The seminal academic paper that reverse-engineered Crypto-1 from silicon imaging, exposing the proprietary stream cipher that underpins MIFARE Classic security. Cited in the cryptanalysis history section."
+    },
+    {
+      "label": "Garcia, F. D., de Koning Gans, G., Muijrers, R., et al. — Dismantling MIFARE Classic (ESORICS 2008)",
+      "url": "https://www.usenix.org/legacy/event/sec09/tech/full_papers/garcia.pdf",
+      "publisher": "ESORICS / Radboud University Nijmegen",
+      "publishedAt": "2008-10-06",
+      "accessedAt": "2026-04-20",
+      "note": "Foundational practical key-recovery attack on MIFARE Classic Crypto-1 — recovers 48-bit keys in minutes on commodity hardware. Basis for the Crypto-1 weakness discussion."
+    },
+    {
+      "label": "Courtois, N. T. — The Dark Side of Security by Obscurity and Cloning MIFARE Classic Rail and Building Passes Anywhere, Anytime (SECRYPT 2009)",
+      "url": "https://eprint.iacr.org/2009/137.pdf",
+      "publisher": "IACR ePrint / SECRYPT",
+      "publishedAt": "2009-03-24",
+      "accessedAt": "2026-04-20",
+      "note": "Follow-on cryptanalysis demonstrating the 'dark-side' attack that recovers a Classic sector key in seconds given a single valid key — cited as the practical attack form used by MFOC / MFCUK tooling."
+    },
+    {
+      "label": "ISO/IEC 14443-4:2018 — Transmission protocol",
+      "url": "https://www.iso.org/standard/73599.html",
+      "publisher": "ISO",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-20",
+      "note": "Reference for the T=CL transport and why MIFARE Classic (which stops at ISO 14443-3 and uses a proprietary Crypto-1 session rather than T=CL) does not support ISO 7816-4 APDU applications."
+    }
+  ],
   "primaryAction": {
     "href": "/contact/",
     "label": "Request MIFARE Classic samples"

@@ -206,6 +206,61 @@
       "answer": "Gen2 defines four independent sessions (S0, S1, S2, S3), each with its own per-tag inventory flag. Different readers can operate in different sessions so that reader-1's inventory does not toggle reader-2's flags, preventing mutual interference. Within each session, tags have a target flag that can be A or B. A reader's Query command specifies the target (A or B), and only tags with matching target flag respond; responding flips the flag to the other value. Alternating A→B→A→B inventory lets a reader repeatedly cycle through a stable tag population. Session flags have different persistence: S0 resets when the tag loses power (useful for presence-detection scenarios), S1 has a millisecond-scale persistence timer (useful for short-interval inventory), and S2/S3 persist for seconds to hours (useful for long-range portal scenarios where a tag should not be re-inventoried every pass). Typical dense-reader deployments assign long-range portals to S2 or S3 and short-range handhelds or cycle-counts to S0 or S1, reflecting the different persistence requirements of each use case. Proper session and target assignment is one of the highest-leverage tuning parameters in production Gen2 deployments."
     }
   ],
+  "sources": [
+    {
+      "label": "GS1 EPC Radio-Frequency Identity Protocols — Generation-2 UHF RFID Standard (EPC Gen2v3 / Gen2v2.1)",
+      "url": "https://www.gs1.org/standards/rfid/uhf-air-interface-protocol",
+      "publisher": "GS1",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-20",
+      "note": "The authoritative industry-authored Gen2 air-interface specification maintained by GS1 — defines commands, memory banks, Q-algorithm anticollision, sessions S0-S3, target A/B flags and the cryptographic suite identifiers (Gen2v2 onward)."
+    },
+    {
+      "label": "ISO/IEC 18000-63:2015 — Parameters for air interface communications at 860 MHz to 960 MHz Type C",
+      "url": "https://www.iso.org/standard/59643.html",
+      "publisher": "ISO",
+      "publishedAt": "2015-12-01",
+      "accessedAt": "2026-04-20",
+      "note": "The ISO-balloted international version of the Gen2 air-interface specification — the formal counterpart to the GS1 Gen2v2 document referenced throughout the guide."
+    },
+    {
+      "label": "FCC Rules and Regulations, Title 47 CFR Part 15.247 — Operation within the bands 902-928 MHz",
+      "url": "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-A/part-15/subpart-C/section-15.247",
+      "publisher": "U.S. Federal Communications Commission (FCC)",
+      "accessedAt": "2026-04-20",
+      "note": "Regulatory source for US UHF RFID operation — FHSS / digital modulation requirements, 1 W conducted output, 4 W EIRP (36 dBm) interrogator ceiling, and 50-channel minimum hopping in the 902-928 MHz band."
+    },
+    {
+      "label": "ETSI EN 302 208 V3.3.1 — RFID equipment operating in the band 865 MHz to 868 MHz with power levels up to 2 W and in the band 915 MHz to 921 MHz with power levels up to 4 W",
+      "url": "https://www.etsi.org/deliver/etsi_en/302200_302299/302208/",
+      "publisher": "European Telecommunications Standards Institute (ETSI)",
+      "accessedAt": "2026-04-20",
+      "note": "European harmonized standard for UHF RFID — Listen-Before-Talk (LBT) requirements, the 10-channel ERP-limited 865.6-867.6 MHz sub-band, and the updated 915-921 MHz allocations."
+    },
+    {
+      "label": "GS1 EPC Tag Data Standard (TDS) v2.0",
+      "url": "https://www.gs1.org/standards/rfid/tds",
+      "publisher": "GS1",
+      "publishedAt": "2022-03-01",
+      "accessedAt": "2026-04-20",
+      "note": "Specifies the binary encoding of GS1 identification keys (SGTIN, SSCC, GRAI, GIAI, GDTI, GSRN) into the 96-bit / 128-bit / 496-bit EPC memory bank used by Gen2 tags."
+    },
+    {
+      "label": "RAIN Alliance — RAIN RFID (UHF) Technology and Certification",
+      "url": "https://rainrfid.org/technology/",
+      "publisher": "RAIN Alliance",
+      "accessedAt": "2026-04-20",
+      "note": "Industry body for Gen2 UHF RFID — reference for the 'RAIN RFID' brand that encompasses Gen2-based deployments and the tag-level certification programme."
+    },
+    {
+      "label": "GS1 EPCIS 2.0 — Electronic Product Code Information Services",
+      "url": "https://www.gs1.org/standards/epcis",
+      "publisher": "GS1",
+      "publishedAt": "2022-06-01",
+      "accessedAt": "2026-04-20",
+      "note": "Event-data standard consumed by upstream systems that ingest Gen2 tag reads — cited where the guide traces the path from EPC encoding through reader middleware into traceability applications."
+    }
+  ],
   "primaryAction": {
     "href": "/contact/",
     "label": "Get UHF Gen2 tag recommendations"

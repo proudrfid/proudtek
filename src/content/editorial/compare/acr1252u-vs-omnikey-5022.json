@@ -1,0 +1,317 @@
+{
+  "route": "/compare/acr1252u-vs-omnikey-5022/",
+  "group": "compare",
+  "title": "ACR1252U vs HID Omnikey 5022 — The Practical Desktop NFC Encoder Comparison",
+  "kicker": "ACR1252U vs Omnikey 5022 Comparison",
+  "summary": "The ACS ACR1252U and HID Omnikey 5022 are the two desktop NFC / 13.56 MHz encoders that dominate enrollment workstations, hotel front desks and developer workbenches. Both are USB, PC/SC + CCID class, ISO/IEC 14443 Type A/B capable, natively supported on Windows, macOS and Linux. Both sit in the USD 30-120 street-price band. They win different projects for different reasons: the ACR1252U is the developer-friendly choice with the broadest chip coverage (ISO 14443 A/B, FeliCa, ISO 18092 P2P), a SAM slot on the -MZ variant and the cheapest unit price; the Omnikey 5022 is the enterprise choice with HID's iCLASS SE / Seos credential support on the 5422 sibling, FIPS-grade firmware signing and the depth of HID's integrator channel. This page walks through the dimensions that actually decide the specification.",
+  "heroPoints": [
+    "Both readers implement PC/SC 2.01 and CCID natively — any middleware that talks PC/SC (OpenSC, pyscard, .NET SmartCard, Java javax.smartcardio) drives either with no code change.",
+    "ACR1252U wins on chip coverage and developer ergonomics — FeliCa, NFC Forum Tag 1-4, ISO 18092 peer-to-peer, MIFARE Classic / Plus / DESFire / Ultralight, plus ACR's free SDK with direct APDU examples.",
+    "Omnikey 5022 wins on enterprise credential support — the 5022 handles MIFARE and generic ISO 14443; its 5422 sibling extends that to HID iCLASS SE, Seos, Prox over BLE and signed firmware for FIPS-adjacent enterprise deployments."
+  ],
+  "imageAlt": "ACS ACR1252U contactless NFC reader versus HID Omnikey 5022 CL — both USB desktop encoders on a test bench with MIFARE Classic and DESFire EV3 cards",
+  "imageSourceRoutes": [
+    "/product/acr122u/",
+    "/product/nfc-reader-writer-with-free-sdks/",
+    "/product/bluetooth-rfid-scanner/"
+  ],
+  "keywords": [
+    "ACR1252U",
+    "Omnikey 5022",
+    "ACR1252U vs Omnikey 5022",
+    "HID Omnikey 5022 CL",
+    "NFC desktop encoder",
+    "PC/SC CCID reader",
+    "MIFARE DESFire encoder",
+    "SAM slot reader",
+    "iCLASS Seos reader"
+  ],
+  "publishedAt": "2026-04-20",
+  "modifiedAt": "2026-04-20",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedAt": "2026-04-20",
+  "sections": [
+    {
+      "title": "Quick comparison",
+      "table": {
+        "columns": ["Dimension", "ACS ACR1252U", "HID Omnikey 5022"],
+        "rows": [
+          ["Generation / launched", "ACR1252U launched 2014, still in active production; ACR1252U-M1 adds SAM slot", "Omnikey 5022 launched 2016, still in active production; 5422 sibling adds iCLASS SE / Seos"],
+          ["Form factor", "Desktop USB, plastic enclosure, LED + buzzer", "Desktop USB, matte black enclosure, LED"],
+          ["Host interface", "USB 2.0 full-speed, CCID class", "USB 2.0 full-speed, CCID class"],
+          ["Frequency", "13.56 MHz only", "13.56 MHz only"],
+          ["Chip families (native)", "ISO 14443 Type A/B, FeliCa, ISO 18092 P2P, NFC Forum Tag 1-4, MIFARE Classic / Plus / DESFire / Ultralight", "ISO 14443 Type A/B, MIFARE Classic / Plus / DESFire / Ultralight, ISO 15693 (on some firmware)"],
+          ["HID iCLASS / Seos support", "Not supported on ACR1252U (use ACR122U-iCLASS variant for legacy iCLASS CSN read)", "5022 reads iCLASS CSN only; Omnikey 5422 required for iCLASS SE / Seos secure sessions"],
+          ["SAM slot", "Yes on ACR1252U-MZ (single ISO 7816 SAM)", "No on 5022; 5422 carries Authenticator-class secure-element"],
+          ["NFC peer-to-peer", "Yes — ISO 18092 P2P with Android / phone handsets", "Not officially supported"],
+          ["Keyboard HID emulation", "Yes — via KBD firmware profile", "Yes — via firmware configuration"],
+          ["OS support", "Windows 7–11, Windows Server, macOS 10.12+, Linux (kernel CCID), Android (USB Host)", "Windows 7–11, Windows Server, macOS 10.12+, Linux (kernel CCID), optional Omnikey drivers for advanced features"],
+          ["SDK", "ACS CCID SDK (free) + APDU reference, Android SDK, sample code in C / C# / Java / Python", "HID Omnikey SDK + Authentikey (enterprise); PC/SC middleware works without proprietary SDK"],
+          ["Firmware signing", "ACS signs firmware updates", "HID signs firmware updates; FIPS-adjacent posture on enterprise SKUs"],
+          ["Typical duty cycle", "Continuous — tested for 24/7 enrollment stations", "Continuous — tested for 24/7 enrollment stations"],
+          ["Typical street price (2026)", "USD 30-50 (standard) / USD 55-80 (MZ with SAM)", "USD 90-130"],
+          ["Ideal deployment", "Developer bench, hotel front desk, MIFARE / DESFire enrollment, NFC app dev", "Enterprise IT, HID-credential estates (via 5422), government / FIPS-adjacent workflows"]
+        ]
+      }
+    },
+    {
+      "title": "The two readers at a glance",
+      "bullets": [
+        "ACS ACR1252U — Advanced Card Systems' workhorse contactless reader/writer, launched 2014 and refreshed several times since. Covers ISO 14443 A/B, FeliCa and ISO 18092 peer-to-peer in a single unit. The ACR1252U-MZ variant adds a single SAM slot for secure-element workflows (ticketing, MIFARE SAM AV3, branded credentials). Base unit USD 30-50; SAM variant USD 55-80. The default choice for developers, hotel front desks, membership kiosks and any workflow that needs broad MIFARE / NFC coverage at low cost.",
+        "HID Omnikey 5022 — HID Global's contactless smart-card reader positioned for enterprise desktops. Covers ISO 14443 A/B and MIFARE natively; the closely related Omnikey 5422 extends the same form factor to HID iCLASS SE, Seos and BLE-based HID Mobile Access. HID signs firmware updates and the reader line is integrated into HID's enterprise service portal for fleet management. Base unit USD 90-130. The default choice for enterprise IT that already runs HID physical access, for government workflows that need a vendor with a FIPS-adjacent posture, and for mixed HID-credential environments.",
+        "Both readers are PC/SC 2.01 + CCID class devices. Either is recognised out of the box on modern Windows, macOS and Linux as a generic smart-card reader without a proprietary driver. Vendor-specific SDKs add features (keyboard emulation modes, SAM control, Omnikey secure sessions) but are not required for basic read/write operation.",
+        "Both support continuous (24/7) operation and are rated for high-volume enrollment stations. Neither has a fan; thermal envelope is adequate for typical desktop workloads.",
+        "Both emulate a keyboard (HID KBD) as an optional mode — present a card, and the UID is typed into the focused text field. Useful for quick integration with legacy applications that cannot take a PC/SC dependency."
+      ]
+    },
+    {
+      "title": "Chip and credential coverage in practice",
+      "bullets": [
+        "MIFARE Classic 1K / 4K — both readers handle Classic natively with full sector authentication, read/write and key management via standard APDU commands (or vendor SDK helpers). No practical difference for hotel, access and membership enrollment.",
+        "MIFARE Plus (SE / S / X) — both support Plus in SL0/SL1/SL2/SL3 modes. For SL3 AES-128 authenticated sessions, the vendor SDK makes the key-diversification step cleaner but is not required.",
+        "MIFARE DESFire EV1 / EV2 / EV3 — both support DESFire full application, file and authentication workflows. ACR1252U ships with DESFire APDU examples in its SDK; Omnikey requires either PC/SC DESFire libraries (libfreefare, NXP Taplinx) or HID's enterprise middleware.",
+        "MIFARE Ultralight / Ultralight C / NTAG — both cover Ultralight family including NTAG21x and NTAG424 DNA for NDEF / SUN-message workflows.",
+        "FeliCa (Sony) — supported natively on ACR1252U; not supported on Omnikey 5022. For Japan-market transit, FeliCa-based loyalty or FeliCa Lite-S NDEF workflows, ACR1252U is the only option between these two.",
+        "HID iCLASS CSN — both can read the iCLASS Card Serial Number without authentication. For secure iCLASS SE / Seos sessions that unlock HID-signed credential payloads, the Omnikey 5422 (iCLASS variant, not the 5022) is required. ACR1252U cannot establish HID secure sessions.",
+        "ISO 15693 / ICODE SLIX — supported on Omnikey 5022 (firmware-dependent); not natively supported on standard ACR1252U (ACS ACR1255U / ACR1281U cover ISO 15693 in the ACS range).",
+        "ISO 18092 peer-to-peer — supported on ACR1252U for NFC phone-to-reader exchanges; not supported on Omnikey 5022."
+      ]
+    },
+    {
+      "title": "SDK, middleware and integration paths",
+      "bullets": [
+        "PC/SC baseline — both readers appear as PC/SC smart-card readers to the OS. Any PC/SC-capable language binding (pyscard on Python, javax.smartcardio on Java, .NET SmartCard, winscard.h on native Windows, pcsclite on Linux and macOS) drives either reader identically. For simple UID read and MIFARE sector read/write, no vendor SDK is needed.",
+        "ACS SDK — free download from ACS. Includes the ACR1252U API reference with full APDU examples (escape commands for buzzer, LED, SAM control, firmware mode), sample code in C, C++, C#, VB.NET, Java, Python and Android (USB Host and OTG). The SDK is typical for quick-start developer adoption.",
+        "HID Omnikey SDK — HID provides the Omnikey Workbench and Synchronous API for advanced features (secure sessions, iCLASS SIO decoding on 5422, firmware management). For organisations running HID's Origo / Authentikey enterprise stack, the HID SDK is the right path.",
+        "Keyboard emulation — both readers can be reconfigured from PC/SC mode to HID keyboard-emulation mode using a vendor tool. In keyboard mode the reader types the UID into any focused text field — the lowest-integration path for legacy applications.",
+        "OpenSC / PKCS#11 — both readers are PKCS#11-compatible for smart-card-based authentication (e.g., PIV cards, government eID, CAC). OpenSC handles both on Linux and macOS without additional drivers.",
+        "NFC phone integration — ACR1252U supports ISO 18092 P2P, which the phone OS sees as an NFC reader. Useful for peer-to-peer NDEF exchange, device pairing and NFC app-to-reader messaging. Omnikey 5022 does not support P2P."
+      ]
+    },
+    {
+      "title": "Deployment fit — hotel, enterprise, developer and government",
+      "bullets": [
+        "Hotel front desk — ACR1252U is the near-universal choice for new hotel PMS + RFID card integrations. Broad MIFARE and DESFire coverage, low unit cost, and PC/SC baseline match what most PMS drivers expect. Omnikey 5022 works but typically costs 2-3× and adds no practical capability in a pure MIFARE / DESFire hotel environment.",
+        "Enterprise IT with HID-credential estates — Omnikey 5022 or 5422 is the right pick. The 5022 handles the MIFARE-class credentials that coexist alongside HID Prox / iCLASS; the 5422 is required if any of those credentials are iCLASS SE or Seos with secure sessions (the common case for post-2018 HID deployments).",
+        "Developer bench / labs — ACR1252U. Lower unit cost means more readers for parallel development workstations, free SDK with APDU examples, and the broad chip coverage (FeliCa, P2P, Ultralight, DESFire) means one reader covers most prototyping scenarios.",
+        "Government / FIPS-adjacent workflows — Omnikey 5022. HID's firmware signing, enterprise service portal and audit posture are more aligned with federal procurement than ACS's posture. ACR1252U is PC/SC-compliant but does not have the same enterprise-facing governance posture.",
+        "Education / membership cards — ACR1252U for price and DESFire coverage; Omnikey 5022 only if the campus has an existing HID iCLASS deployment that must coexist with the membership card.",
+        "NFC phone / tablet integration (payment, transit, smart-city) — ACR1252U. FeliCa support is required for Japan-market transit prototyping; ISO 18092 P2P is required for some NFC payment and device-pairing flows. Omnikey 5022 does not cover these."
+      ]
+    },
+    {
+      "title": "Operational, lifecycle and channel considerations",
+      "bullets": [
+        "Duty cycle — both readers are production-rated for continuous 24/7 operation in front-desk and enrollment workstation deployments. Neither has moving parts. The limiting factor is USB cable wear and host-PC uptime, not the reader itself.",
+        "MTBF / reliability — no published MTBF from either vendor, but field data from multi-year hotel and enrollment deployments shows <1% per-year failure rate for both on ISO-standard card stocks. The most common field failure is USB cable degradation, which is user-replaceable.",
+        "Firmware management — ACS ships firmware updates via its download portal; updates are typically optional and are applied to the reader over USB using the ACS utility. HID ships firmware updates through its enterprise service portal with signed packages; updates are part of the enterprise governance model.",
+        "Support contracts — ACS sells through a distributor channel with best-effort email support on the free SDK. HID sells through both direct and integrator channels with enterprise support contracts available (Origo enterprise service, HID OneCare). For government and regulated enterprise, HID's support posture is more aligned with procurement requirements.",
+        "Regional availability — both readers are globally distributed through major electronics distributors (Mouser, Digi-Key, Arrow, Farnell) and direct integrator channels. ACR1252U is more commonly available through low-volume / single-unit channels because of its broader developer base.",
+        "End-of-life risk — neither reader has been end-of-life announced as of Q2 2026. Both have 8-10 year track records and continue to receive firmware updates. For a new 5-7 year deployment either has adequate runway."
+      ]
+    },
+    {
+      "title": "Decision framework — which reader for which project",
+      "bullets": [
+        "MIFARE or DESFire workflow only, price-sensitive, developer bench or hotel front desk — ACR1252U. Baseline ~USD 35 unit price, PC/SC standard, broad NFC coverage. The default for most new deployments.",
+        "Workflow must support FeliCa (Japan transit, FeliCa Lite-S NDEF, Japan-market loyalty) — ACR1252U. Omnikey 5022 does not cover FeliCa.",
+        "Workflow includes HID iCLASS SE / Seos credentials (post-2018 enterprise HID estates) — Omnikey 5422 (not 5022). For CSN-only iCLASS legacy, either the 5022 or the ACR1252U can read the serial number.",
+        "Workflow needs SAM slot for MIFARE SAM AV3, transit branding or multi-application secure-element operations — ACR1252U-MZ (with SAM) or a SAM-equipped enterprise reader. Omnikey 5022 does not carry a SAM slot.",
+        "Government, FIPS-adjacent or regulated-enterprise procurement — Omnikey 5022. HID's firmware-signing, signed-SDK and enterprise service portal posture matches federal and large-enterprise governance expectations.",
+        "NFC peer-to-peer or phone-as-reader workflow — ACR1252U. ISO 18092 P2P is required; Omnikey does not support it.",
+        "Multi-reader fleet on a hotel, casino or campus with PMS + access coexistence — depends on the installed credential stack. If HID Prox / iCLASS coexists with MIFARE, Omnikey 5022 unifies the reader under one vendor. If only MIFARE / DESFire, ACR1252U is cheaper per unit at scale.",
+        "Side-by-side pilot — for teams that cannot decide on paper: run both readers on the same PC/SC middleware against the same card population for a two-week pilot. Capture latency, error rate and per-card workflow time. The real-world results often make the decision obvious."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Related product pages",
+      "description": "The reader SKUs, cluster pillar and adjacent encoder references.",
+      "links": [
+        {
+          "href": "/products/rfid-readers/desktop-nfc-reader-encoder/",
+          "label": "Desktop NFC reader / encoder (ACR1252U, Omnikey, uTrust class)"
+        },
+        {
+          "href": "/products/rfid-readers/",
+          "label": "RFID readers cluster pillar"
+        },
+        {
+          "href": "/product/acr122u/",
+          "label": "ACR122U reader (ACR1252U predecessor)"
+        },
+        {
+          "href": "/product/nfc-reader-writer-with-free-sdks/",
+          "label": "NFC reader/writer with free SDK"
+        }
+      ]
+    },
+    {
+      "title": "Integration guides and references",
+      "description": "Technical references that go deep on PC/SC, APDU, SDKs and enrollment workflows.",
+      "links": [
+        {
+          "href": "/guides/rfid-reader-writer-selection/",
+          "label": "RFID reader and writer selection guide"
+        },
+        {
+          "href": "/guides/python-rfid-reader-library/",
+          "label": "Python RFID reader library guide (pyscard, nfcpy)"
+        },
+        {
+          "href": "/guides/hotel-key-card-encoding/",
+          "label": "Hotel key card encoding guide"
+        },
+        {
+          "href": "/blog/how-rfid-readers-work/",
+          "label": "How RFID readers work"
+        },
+        {
+          "href": "/blog/hotel-key-card-encoding-explained/",
+          "label": "Hotel key card encoding explained"
+        }
+      ]
+    },
+    {
+      "title": "Adjacent comparisons",
+      "description": "Head-to-head comparisons for the rest of the RFID reader / chip decision stack.",
+      "links": [
+        {
+          "href": "/compare/impinj-r700-vs-zebra-fx9600/",
+          "label": "Impinj R700 vs Zebra FX9600 (fixed UHF)"
+        },
+        {
+          "href": "/compare/mifare-plus-vs-desfire/",
+          "label": "MIFARE Plus vs DESFire (chip family)"
+        },
+        {
+          "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
+          "label": "MIFARE Plus EV2 vs DESFire EV3 (chip version)"
+        }
+      ]
+    },
+    {
+      "title": "Official references",
+      "description": "Vendor product pages and standards references.",
+      "links": [
+        {
+          "href": "https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/",
+          "label": "ACS ACR1252U product page"
+        },
+        {
+          "href": "https://www.hidglobal.com/products/readers/omnikey/5022",
+          "label": "HID Omnikey 5022 product page"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can I use one PC/SC middleware to drive both ACR1252U and Omnikey 5022?",
+      "answer": "Yes. Both readers are CCID-class and appear as generic PC/SC smart-card readers. Any PC/SC binding — pyscard, javax.smartcardio, .NET SmartCard, winscard.h, pcsclite — drives them identically for UID read and standard ISO 14443 APDU operations. Vendor-specific features (SAM control on ACR1252U-MZ, secure sessions on Omnikey 5422) require the respective vendor SDK, but the baseline MIFARE / DESFire workflow is portable."
+    },
+    {
+      "question": "Does the Omnikey 5022 read HID iCLASS SE or Seos credentials?",
+      "answer": "No — the 5022 reads the iCLASS Card Serial Number (CSN) only. For secure sessions against iCLASS SE or Seos credentials (needed for most post-2018 HID enterprise deployments), the Omnikey 5422 is required. The 5422 shares the same form factor and host interface as the 5022 but adds the HID secure-element module that unlocks Seos decrypted payloads."
+    },
+    {
+      "question": "Why would I pick the ACR1252U-MZ over the base ACR1252U?",
+      "answer": "The MZ variant adds an ISO 7816 SAM slot that houses a secure-element chip (typically MIFARE SAM AV3 or a transit / branded SAM). If the workflow involves MIFARE SAM-protected key derivation, branded transit credentials, or multi-application secure sessions where keys should never leave the reader, the MZ variant is required. For pure card-only MIFARE or DESFire encoding without SAM-protected keys, the base ACR1252U is sufficient and cheaper."
+    },
+    {
+      "question": "Which reader is better for Android / NFC phone integration?",
+      "answer": "The ACR1252U. It supports USB Host and USB OTG on Android, has official Android SDK and sample apps, and handles ISO 18092 peer-to-peer which allows NFC phone-to-reader exchanges. The Omnikey 5022 is not positioned for Android / phone integration and does not support P2P."
+    },
+    {
+      "question": "Can I use either reader to encode DESFire EV3 AES keys?",
+      "answer": "Yes. Both readers handle DESFire EV3 AES-128 mutual authentication, key loading and file-level AES encryption through standard PC/SC APDUs. ACR1252U ships DESFire APDU examples in its SDK; Omnikey requires either libfreefare, NXP Taplinx or HID's enterprise middleware. The reader is not the bottleneck — the chip-side application and key-derivation plan is."
+    },
+    {
+      "question": "Is keyboard-emulation mode reliable for production enrollment?",
+      "answer": "For one-shot UID capture into a legacy application (press card, UID types into the form field), yes — both readers handle this well. For anything beyond UID capture (DESFire read, Plus authentication, sector write), keyboard-emulation mode is the wrong tool — use PC/SC mode and APDUs. Most enterprise deployments use keyboard mode only for low-trust identity lookups and switch to PC/SC for card issuance and encoding."
+    },
+    {
+      "question": "How do I pilot both readers side-by-side before deciding?",
+      "answer": "Run both on the same host PC, drive them through the same PC/SC middleware against the same card population for a two-week evaluation. Capture latency (time from card present to UID delivered), per-card workflow time (issue, encode, verify), error rate, and any vendor-specific feature that matters for the project (SAM on ACR1252U-MZ, secure sessions on Omnikey 5422). The PC/SC baseline means the same test harness runs against both — the comparison is fair and fast. Proud Tek ships reference dual-reader evaluation kits on request."
+    }
+  ],
+  "sources": [
+    {
+      "label": "Advanced Card Systems (ACS) — ACR1252U USB NFC Reader III Product Page",
+      "url": "https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/",
+      "publisher": "Advanced Card Systems Ltd.",
+      "accessedAt": "2026-04-20",
+      "note": "Canonical ACS product page for the ACR1252U — authority for NFC Forum certification, PC/SC and CCID compliance, supported chip families (MIFARE Classic / Plus / DESFire / Ultralight / NTAG / FeliCa), and ACR1252U-MZ SAM variant."
+    },
+    {
+      "label": "HID Global — OMNIKEY 5022 CL Contactless Smart Card Reader Product Page",
+      "url": "https://www.hidglobal.com/products/omnikey-5022-reader",
+      "publisher": "HID Global",
+      "accessedAt": "2026-04-20",
+      "note": "Canonical HID product page for the Omnikey 5022 — authority for PC/SC and CCID support, iCLASS / MIFARE / DESFire / NTAG / FeliCa coverage, and the positioning relative to the higher-tier Omnikey 5422 (with secure session support)."
+    },
+    {
+      "label": "HID Global — OMNIKEY 5022 CL Reader Datasheet",
+      "url": "https://www.hidglobal.com/sites/default/files/resource_files/omnikey-5022-reader-ds-en.pdf",
+      "publisher": "HID Global",
+      "accessedAt": "2026-04-20",
+      "note": "Omnikey 5022 datasheet containing chip-family support matrix, electrical characteristics, LED and buzzer specification, and certifications (FCC Part 15, CE, PC/SC v2.01.14) cited in the quick-comparison table."
+    },
+    {
+      "label": "ACS ACR1252U Reference Manual",
+      "url": "https://www.acs.com.hk/download-manual/6402/API-ACR1252U-2.07.pdf",
+      "publisher": "Advanced Card Systems Ltd.",
+      "accessedAt": "2026-04-20",
+      "note": "Detailed ACR1252U API / control commands, PICC Interface command set, pseudo-APDU escape commands, and LED/buzzer control referenced where the guide compares vendor SDK paths."
+    },
+    {
+      "label": "PC/SC Workgroup Specifications (Parts 1-10)",
+      "url": "https://pcscworkgroup.com/specifications/",
+      "publisher": "PC/SC Workgroup",
+      "accessedAt": "2026-04-20",
+      "note": "The Workgroup specifications for Interoperability between PCs and Smart Card Systems — governs the PC/SC reader-driver interface that both the ACR1252U and Omnikey 5022 implement, enabling vendor-agnostic host-application code."
+    },
+    {
+      "label": "USB Implementers Forum — Device Class Specification for USB Chip/Smart Card Interface Devices (CCID) v1.1",
+      "url": "https://www.usb.org/document-library/ccid-11",
+      "publisher": "USB Implementers Forum",
+      "accessedAt": "2026-04-20",
+      "note": "The USB-IF CCID specification that both readers implement — basis for the claim that both readers register as standard CCID devices without requiring vendor-specific kernel drivers on Windows, Linux and macOS."
+    },
+    {
+      "label": "NFC Forum Certified Products Directory",
+      "url": "https://nfc-forum.org/members/nfc-forum-certified-products/",
+      "publisher": "NFC Forum",
+      "accessedAt": "2026-04-20",
+      "note": "NFC Forum product directory where the ACR1252U is listed as an NFC Forum Certified Reader Device — referenced where the guide cites the certification distinction between the two readers."
+    },
+    {
+      "label": "ISO/IEC 14443-4:2018 — Transmission protocol",
+      "url": "https://www.iso.org/standard/73599.html",
+      "publisher": "ISO",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-20",
+      "note": "T=CL transport carried by both readers — baseline interoperability reference for APDU exchanges with DESFire EV3, Plus EV2, NTAG 424 DNA and other ISO 14443-4 cards."
+    }
+  ],
+  "primaryAction": {
+    "href": "/contact/rfid-readers/",
+    "label": "Request an ACR1252U + Omnikey 5022 evaluation kit"
+  },
+  "secondaryActions": [
+    {
+      "href": "/products/rfid-readers/desktop-nfc-reader-encoder/",
+      "label": "Desktop NFC reader / encoder SKU"
+    },
+    {
+      "href": "/products/rfid-readers/",
+      "label": "RFID readers cluster pillar"
+    },
+    {
+      "href": "/compare/impinj-r700-vs-zebra-fx9600/",
+      "label": "Impinj R700 vs Zebra FX9600 comparison"
+    }
+  ]
+}

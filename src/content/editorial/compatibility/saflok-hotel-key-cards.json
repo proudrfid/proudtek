@@ -3,16 +3,17 @@
   "group": "compatibility",
   "title": "Saflok Hotel Key Cards Compatibility Guide",
   "kicker": "Compatibility Guide",
-  "summary": "Use this page when the property already knows it runs on a Saflok estate and needs a faster path to compatible hotel card samples, material choices and pre-encoding discussion.",
+  "summary": "A technical compatibility guide for dormakaba Saflok hotel lock estates — covering lock generations (Quantum IV, Quantum RT, Confidant RFID, MT RFID, Messenger LENS, Quantum Plus), chip families per generation, the Saflok System 6000 / Ambiance encoding stack, PMS integration points and the field failure modes that most often derail a Saflok card refresh.",
   "heroPoints": [
-    "Start with the installed lock estate and current card reference first.",
-    "Use compatibility pages to cut out the wrong card paths before artwork review.",
-    "Keep encoding, material and pilot planning in the same first conversation."
+    "Identify the lock generation and firmware line before specifying a card chip — Saflok spans magstripe, MIFARE Classic and DESFire estates.",
+    "Match the encoder (System 6000, Ambiance, Messenger LENS front-desk unit) to the target chip family rather than the other way around.",
+    "Prove opening behaviour, re-encode flow and replacement logic on the real lock estate before scaling artwork or premium materials."
   ],
-  "imageAlt": "Saflok hotel key card compatibility",
+  "imageAlt": "dormakaba Saflok hotel key card compatibility — Quantum and Messenger LENS locks with RFID guest card",
   "imageSourceRoutes": [
     "/product/hotel-key-cards/",
-    "/product/printed-rfid-cards/"
+    "/product/printed-rfid-cards/",
+    "/product/mifare-desfire-cards/"
   ],
   "brief": [
     {
@@ -20,93 +21,312 @@
       "items": [
         "Hotels refreshing Saflok room-key stock without broad platform change.",
         "Properties validating card material upgrades after baseline compatibility is understood.",
-        "Teams comparing standard issue cards with branded or premium variants."
+        "Teams comparing standard issue cards with branded or premium variants.",
+        "Estates consolidating mixed Classic and DESFire stock under one SKU."
       ]
     },
     {
       "label": "What to send",
       "items": [
-        "Saflok lock or encoder reference, or a current guest card sample.",
-        "Need for plain stock, branded printing, numbering or pre-encoding.",
-        "Chip family notes, magstripe requirements and pilot quantity."
+        "Saflok lock model (Quantum IV, Quantum RT, Confidant, MT RFID, Messenger LENS, Quantum Plus) or a current guest card sample.",
+        "Encoder reference — Saflok System 6000, Ambiance, Messenger LENS workstation — and PMS name (OPERA, Mews, Protel, Agilysys).",
+        "Need for plain stock, branded printing, inkjet numbering, pre-encoding or dual-interface (magstripe + RFID)."
       ]
     },
     {
       "label": "Testing checklist",
       "items": [
-        "Validate opening behavior on the real lock estate before artwork refinement.",
-        "Confirm encoding workflow and front-desk issue logic in the same pilot.",
-        "Keep one baseline compatible card in scope before moving into premium materials."
-      ]
-    }
-  ],
-  "sections": [
-    {
-      "title": "Where this compatibility page helps most",
-      "intro": "Use this page when the property already knows the installed platform and the next step is not broad browsing, but a more targeted compatibility-first sample request.",
-      "bullets": [
-        "Hotels refreshing Saflok room-key stock without broad platform change.",
-        "Properties validating card material upgrades after baseline compatibility is understood.",
-        "Teams comparing standard issue cards with branded or premium variants."
+        "Validate opening on the real lock estate before artwork refinement.",
+        "Confirm encoder round-trip — issue, extend, replace, cancel — on a live PMS reservation.",
+        "Keep one baseline compatible card in scope before moving into premium materials.",
+        "Cross-check firmware version on at least two door controllers before rolling out to the full estate."
       ]
     },
     {
-      "title": "What to send before the first sample round",
-      "intro": "The more specific the first message is, the faster the project can move from brand-level compatibility talk to a realistic test set.",
-      "bullets": [
-        "Saflok lock or encoder reference, or a current guest card sample.",
-        "Need for plain stock, branded printing, numbering or pre-encoding.",
-        "Chip family notes, magstripe requirements and pilot quantity."
-      ]
-    },
-    {
-      "title": "How to validate before scaling",
-      "intro": "A compatibility-first pilot should prove both technical fit and operational handling before premium materials or larger volumes enter the discussion.",
-      "bullets": [
-        "Validate opening behavior on the real lock estate before artwork refinement.",
-        "Confirm encoding workflow and front-desk issue logic in the same pilot.",
-        "Keep one baseline compatible card in scope before moving into premium materials."
-      ]
-    }
-  ],
-  "resourceCards": [
-    {
-      "title": "Useful internal pages",
-      "description": "Use these internal pages to move from compatibility into product, guide or comparison detail.",
+      "label": "Reference pages",
       "links": [
         {
           "href": "/product/hotel-key-cards/",
           "label": "Hotel key cards"
         },
         {
+          "href": "/products/rfid-cards/mifare-desfire-ev3-cards/",
+          "label": "MIFARE DESFire EV3 cards"
+        },
+        {
+          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
+          "label": "MIFARE Classic vs Plus vs DESFire for hotel locks"
+        },
+        {
+          "href": "/guides/hotel-key-card-encoding/",
+          "label": "Hotel key card encoding guide"
+        },
+        {
+          "href": "/blog/how-hotel-rfid-key-cards-work/",
+          "label": "How hotel RFID key cards work"
+        }
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "Saflok lock generations and what they accept",
+      "intro": "Saflok is a dormakaba brand with locks spanning three decades. The installed generation dictates which card technology is accepted — and often which encoder firmware must be paired with which chip family. Identifying the generation is the first diagnostic step before any card specification discussion.",
+      "paragraphs": [
+        "A property rarely runs a single Saflok generation cleanly — refurbishments, partial upgrades and suite renovations leave most estates with two or three generations coexisting. The card SKU that ships to the property must be the lowest common denominator across the active door controllers, which usually pushes the decision towards MIFARE Classic 1K or a dual-track (magstripe + RFID) card during migration windows.",
+        "The table below maps the most common Saflok generations to their native credential technology and the encoder family that typically ships with them. Firmware updates released after 2023 shift some of these boundaries — always confirm the door controller firmware line and not just the mechanical model."
+      ],
+      "table": {
+        "columns": [
+          "Saflok generation",
+          "Era",
+          "Native credential",
+          "Typical encoder",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "MT magstripe",
+            "1990s–2005",
+            "ISO 7811 Track 1/2/3 magstripe",
+            "Saflok MT encoder",
+            "Legacy estate; magstripe only, often still in use in budget properties"
+          ],
+          [
+            "Confidant RFID",
+            "2005–2012",
+            "MIFARE Classic 1K (13.56 MHz)",
+            "Saflok System 6000 encoder",
+            "First widely deployed RFID generation; sector 0 reserved, Saflok sectors typically 1–2"
+          ],
+          [
+            "MT RFID / Quantum IV",
+            "2009–2016",
+            "MIFARE Classic 1K; optional magstripe combo",
+            "System 6000 encoder",
+            "Dual-interface common; magstripe often retained as fallback during migration"
+          ],
+          [
+            "Quantum RT",
+            "2014–2020",
+            "MIFARE Classic 1K or Plus (SL1 compatibility)",
+            "System 6000 or Ambiance",
+            "Some firmware lines accept Plus SL1 backwards-compatible mode"
+          ],
+          [
+            "Messenger LENS",
+            "2016–",
+            "MIFARE Classic 1K or DESFire EV1/EV2",
+            "Messenger LENS front-desk + Ambiance",
+            "Supports online/offline hybrid; BLE mobile-key extension available"
+          ],
+          [
+            "Quantum Plus / Saflok series 8",
+            "2019–",
+            "MIFARE DESFire EV2/EV3; optional Classic fallback",
+            "Ambiance + Messenger LENS",
+            "Current generation; DESFire native with AES-128 authenticated sessions"
+          ]
+        ]
+      },
+      "callout": {
+        "label": "Identification tip",
+        "text": "If the door controller has a visible LENS logo or a dormakaba branding strip, the property is on Messenger LENS or newer — both generations accept DESFire. Pure Saflok branding (no dormakaba strip) usually means Quantum-era hardware that is Classic-native.",
+        "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/"
+      }
+    },
+    {
+      "title": "Chip-family compatibility per generation",
+      "intro": "The practical consequence of the generation split is that a single card SKU cannot cover every Saflok estate. This section summarises which chip families drop in cleanly and which require firmware uplift or encoder replacement.",
+      "bullets": [
+        "MIFARE Classic 1K — the widest compatibility envelope across Saflok. Works on Confidant, MT RFID, Quantum IV, Quantum RT, Messenger LENS and — via compatibility mode — most Quantum Plus door controllers. Sector 0 (manufacturer block) is reserved; Saflok typically writes access data to sectors 1 and 2.",
+        "MIFARE Plus (SE / S / X) — accepted by Quantum RT and later in SL1 mode; SL3 AES-128 mode requires Messenger LENS or Quantum Plus with a post-2020 firmware line. Most properties deploy Plus as a migration step, not as a permanent target.",
+        "MIFARE DESFire EV1/EV2/EV3 — native on Messenger LENS and Quantum Plus; not readable by Confidant or early MT RFID hardware. DESFire on a mixed estate requires either a controller firmware uplift on legacy doors or a dual-chip card during migration.",
+        "Magstripe (Track 2 / Track 3 ISO 7811) — accepted by MT magstripe, Quantum IV combo locks and some Quantum RT variants with a magstripe read head; used as a fallback during migration windows or when a subset of the estate has not been upgraded.",
+        "125 kHz proximity (HID Prox, EM4100) — not natively supported on Saflok hospitality locks; appears only on hybrid access-control integrations using a separate reader head."
+      ],
+      "image": {
+        "src": "/blog-images/mifare-cards.jpg",
+        "alt": "MIFARE card family variants used with Saflok hotel locks — Classic 1K, Plus, DESFire EV3"
+      }
+    },
+    {
+      "title": "System 6000, Ambiance and Messenger LENS — the encoder stack",
+      "intro": "Saflok has used three generations of front-desk encoder stack, and the chip-family support of the card must align with the encoder, not just the lock. Ordering DESFire stock for a property that still runs a System 6000 encoder produces silent encoding failures even if the doors themselves would accept DESFire.",
+      "bullets": [
+        "Saflok System 6000 — the longest-serving Saflok PMS/encoder platform. Runs on Windows Server, drives desktop encoders via serial or USB-to-serial adapters, and natively supports MIFARE Classic 1K encoding. DESFire encoding on System 6000 requires a specific encoder firmware version; most estates on System 6000 should specify Classic cards.",
+        "Ambiance — dormakaba's newer hospitality back-end. Runs under Windows and supports MIFARE Classic, Plus and DESFire EV1/EV2/EV3 encoding via PC/SC-class encoders. Ambiance is the platform most properties migrate to when they introduce Quantum Plus locks.",
+        "Messenger LENS — the online/offline hybrid platform used on Messenger LENS locks. Combines BLE, Wi-Fi, ZigBee and NFC into one credential orchestration layer; encodes both physical cards and BLE mobile keys from the same reservation.",
+        "Saflok desktop encoder models include the RCU (legacy serial), the USB RCU and the current Ambiance-era USB reader/encoder; all three are PC/SC compliant on recent firmware lines.",
+        "Encoder firmware — not PMS version — is the limiting factor for DESFire support on System 6000 installs. Firmware should be verified with dormakaba service before ordering DESFire stock."
+      ]
+    },
+    {
+      "title": "PMS integration — OPERA, Mews, Protel, Agilysys",
+      "intro": "Saflok integrates with the major PMS platforms through certified interface drivers that sit between the PMS and the Saflok encoder service. Compatibility is usually a question of driver version, not card chip — but the driver still dictates the payload structure that is written to the card.",
+      "bullets": [
+        "Oracle OPERA — the most common PMS pairing for Saflok; uses the certified OPERA Interface for Electronic Locking. Both OPERA 5 (on-premise) and OPERA Cloud are supported when the Saflok-side driver is on a current revision.",
+        "Mews — integrates via Mews Connector with Ambiance and Messenger LENS platforms; batch encoding for group check-in is supported where the encoder firmware permits.",
+        "Protel — supported on both System 6000 and Ambiance via the protel.I/O or legacy serial interface; some properties on Protel Air (cloud) use a local Saflok encoding agent on the front-desk PC.",
+        "Agilysys (LMS / rGuest) — common in resort and casino estates; supported via Agilysys certified interface on Ambiance and Messenger LENS.",
+        "Cloud-based PMS platforms usually rely on a local Saflok encoding agent (Windows service) that bridges the cloud PMS to the USB encoder hardware. The agent must run on the same workstation as the encoder."
+      ],
+      "callout": {
+        "label": "PMS driver reminder",
+        "text": "A card sample rarely fails because of the chip itself — more often the PMS driver and encoder firmware are out of sync. Confirm both versions before sending a new sample batch.",
+        "href": "/guides/hotel-key-card-encoding/"
+      }
+    },
+    {
+      "title": "Common field failure modes",
+      "intro": "Field failures on Saflok estates follow a predictable pattern. Understanding where the break usually happens shortens the troubleshooting cycle and prevents unnecessary card replacements.",
+      "bullets": [
+        "Silent DESFire rejection on a Quantum IV lock — the door controller does not support DESFire; verify generation before blaming the card batch.",
+        "Sector-key mismatch on Classic cards — Saflok-specific sector keys were not loaded into the encoder, usually after a PMS reinstall or workstation image refresh.",
+        "Magstripe-only fallback re-engaging unexpectedly — the RFID chip is reachable but the lock's RFID module is disabled in firmware; check the door controller configuration profile.",
+        "Bent or delaminated cards — Saflok antennas are tolerant but not immune to damage; delamination from lanyard punch holes or wallet wear causes intermittent reads.",
+        "Sector 0 collision — a third-party loyalty or access application writing to sector 0 breaks Saflok's UID-based authentication flow; always reserve sector 0 for Saflok on shared-card estates.",
+        "Encoder firmware older than required for DESFire write — card reads but does not encode; firmware update rather than a card change is the fix."
+      ]
+    },
+    {
+      "title": "Card material and thickness constraints",
+      "intro": "Saflok readers are relatively permissive on card material but there are real limits that appear only at scale. These are the constraints that most often surface in a pilot-to-production transition.",
+      "bullets": [
+        "Standard ISO/IEC 7810 ID-1 thickness (0.76 mm ± 0.08 mm) is the safe default for all Saflok lock generations.",
+        "Thicker cards (1.0–1.2 mm) — common for premium PVC or printed eco-material cards — read reliably on Quantum RT and newer; Confidant RFID readers can be marginal above 0.9 mm.",
+        "Bamboo and wood cards — acceptable on Messenger LENS and Quantum Plus when the embedded inlay is a Classic 1K or DESFire EV3 reference; pilot a production sample before committing to a full order.",
+        "Metal-edge or anti-metal cards — not recommended for Saflok; the shielding detunes the antenna and produces intermittent reads on Confidant and Quantum IV hardware.",
+        "Transparent PVC — read-compatible but loses the printed branding surface; usually used as a second-key card rather than the primary guest card.",
+        "Dual-interface (magstripe + RFID) cards — add roughly 0.05 mm to the card stack; still within ISO tolerance but should be validated on the specific lock generation."
+      ]
+    },
+    {
+      "title": "What to validate before scaling",
+      "intro": "A Saflok pilot should exercise both the hardware path (chip, antenna, lock) and the operational path (encoder, PMS, front-desk workflow). Scaling before both paths are proven is the most common source of pilot regret.",
+      "bullets": [
+        "Test one baseline Classic 1K card on at least three different door generations before approving DESFire for the estate.",
+        "Run a full check-in, extend, re-encode and cancel cycle on a live PMS reservation — not just a test reservation — to surface driver edge cases.",
+        "Log the encoder firmware version and the door controller firmware version for every tested door; these are the two numbers dormakaba support will ask for first.",
+        "If magstripe is still in active use, confirm the magstripe track format matches the existing estate — Saflok has used two proprietary Track 3 layouts over the years.",
+        "Plan a small (100–200 card) first production batch before scaling to the full property order; most field failures show up in the first 30 days of live issuance."
+      ]
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Card products that ship on Saflok",
+      "description": "Hotel card SKUs that the Saflok reader family accepts out of the box — start with Classic for broad compatibility, DESFire when the estate is fully on Messenger LENS or Quantum Plus.",
+      "links": [
+        {
+          "href": "/product/hotel-key-cards/",
+          "label": "Hotel key cards (all materials)"
+        },
+        {
+          "href": "/products/rfid-cards/mifare-classic-1k-card/",
+          "label": "MIFARE Classic 1K card"
+        },
+        {
+          "href": "/products/rfid-cards/mifare-desfire-ev3-cards/",
+          "label": "MIFARE DESFire EV3 card"
+        },
+        {
           "href": "/product/printed-rfid-cards/",
           "label": "Printed RFID cards"
+        }
+      ]
+    },
+    {
+      "title": "Related guides and comparisons",
+      "description": "Deeper reading for the chip-family, encoding and material decisions that usually follow the compatibility question.",
+      "links": [
+        {
+          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
+          "label": "MIFARE Classic vs Plus vs DESFire for hotel locks"
+        },
+        {
+          "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
+          "label": "MIFARE Plus EV2 vs DESFire EV3"
         },
         {
           "href": "/compare/pvc-vs-wood-vs-pla-hotel-key-cards/",
-          "label": "Hotel card material comparison"
+          "label": "PVC vs wood vs PLA hotel key cards"
+        },
+        {
+          "href": "/guides/hotel-key-card-encoding/",
+          "label": "Hotel key card encoding guide"
+        },
+        {
+          "href": "/guides/hotel-key-card-material-selection/",
+          "label": "Hotel key card material selection"
+        }
+      ]
+    },
+    {
+      "title": "Related editorial",
+      "description": "Background articles for teams that want to understand the Saflok ecosystem before the first sample conversation.",
+      "links": [
+        {
+          "href": "/blog/how-hotel-rfid-key-cards-work/",
+          "label": "How hotel RFID key cards work"
+        },
+        {
+          "href": "/blog/hotel-key-card-encoding-explained/",
+          "label": "Hotel key card encoding explained"
+        },
+        {
+          "href": "/blog/mifare-classic-vs-desfire-hotel-chips/",
+          "label": "MIFARE Classic vs DESFire for hotel chips"
+        },
+        {
+          "href": "/blog/hotel-key-card-not-working-troubleshooting/",
+          "label": "Hotel key card troubleshooting"
         }
       ]
     },
     {
       "title": "Platform references",
-      "description": "These external references help anchor the platform discussion before the sample request is submitted.",
+      "description": "dormakaba product references that anchor the Saflok platform discussion before a sample request is submitted.",
       "links": [
         {
           "href": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/electronic-hotel-locks/saflok-quantumiv--dk_310",
-          "label": "dormakaba Saflok QuantumIV"
+          "label": "dormakaba Saflok Quantum IV"
+        },
+        {
+          "href": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/electronic-hotel-locks",
+          "label": "dormakaba hospitality electronic locks overview"
         }
       ]
     }
   ],
   "faq": [
     {
-      "question": "What helps a Saflok card request move fastest?",
-      "answer": "A current guest card sample or a clear Saflok lock reference usually shortens the path to a realistic sample set the most."
+      "question": "How do I identify the Saflok lock generation before ordering cards?",
+      "answer": "Three indicators usually settle it: the visible branding on the lock face (plain Saflok badge = Quantum-era, dormakaba strip = Messenger LENS or newer), the encoder model at the front desk (System 6000 = Classic-era, Ambiance or Messenger LENS workstation = DESFire-capable), and the door controller firmware version retrievable from a dormakaba service tool. If all three are unclear, send a current guest card sample to the supplier for an inspection read before committing to a production chip."
     },
     {
-      "question": "Should the property choose premium materials first?",
-      "answer": "Usually no. Start with baseline compatibility, then move into material upgrades once the card path is already proven."
+      "question": "Can I put DESFire EV3 cards on a Saflok estate that still has Quantum IV doors?",
+      "answer": "Not as a single card type. Quantum IV controllers are Classic-native and will not read DESFire. The three practical options are: a Classic-only SKU covering the full estate during migration, a dual-chip card that carries both a Classic and a DESFire inlay (rare and expensive), or a phased firmware uplift of the Quantum IV controllers before switching the card stock."
+    },
+    {
+      "question": "Does Saflok use sector 0 of MIFARE Classic cards?",
+      "answer": "Saflok reserves sector 0 for the manufacturer block and uses it as part of its UID-based authentication flow. Access data is typically written to sectors 1 and 2. If a third-party loyalty or access application tries to write to sector 0, Saflok authentication breaks — always reserve sector 0 for Saflok on shared-card estates and document sector allocation in a card data map."
+    },
+    {
+      "question": "Will a thicker premium card (1.0 mm bamboo or wood) read reliably on Saflok?",
+      "answer": "On Quantum RT, Messenger LENS and Quantum Plus, yes — these readers are tuned for card-stack thicknesses up to roughly 1.2 mm. On older Confidant RFID and early Quantum IV hardware, card thickness above 0.9 mm can introduce marginal reads because the antenna resonance was tuned for standard 0.76 mm PVC. Pilot a production-thickness sample on the real door estate before ordering a full batch."
+    },
+    {
+      "question": "What PMS systems are certified on Saflok?",
+      "answer": "Oracle OPERA (5 and Cloud), Mews, Protel, Agilysys LMS / rGuest and a long tail of regional PMS platforms are certified against either Saflok System 6000 or Ambiance. The limiting factor is usually the Saflok-side interface driver version, not the PMS itself — a PMS upgrade can break encoding if the Saflok driver is not brought to a matching revision at the same time."
+    },
+    {
+      "question": "How do I handle the migration window from magstripe to RFID on Saflok?",
+      "answer": "Most properties order a dual-interface card that carries both a Track 2 / Track 3 magstripe and a MIFARE Classic 1K inlay for the migration period. Every guest gets a card that works on both old and new doors, which removes the operational complexity of two card stocks at the front desk. Dual-interface encoding adds roughly 200 ms per card but is well within check-in queue tolerance."
+    },
+    {
+      "question": "Is the 2024 Saflok vulnerability still a concern for new card orders?",
+      "answer": "The vulnerability disclosed in 2024 affected the key derivation in certain Saflok lock firmware lines and has been addressed by dormakaba with a field firmware update. The remediation is a door-controller firmware change, not a card change — a new card order does not by itself mitigate or expose the issue. Properties should confirm with dormakaba service that the installed firmware is on the remediated line before relying on Saflok for high-value access zones."
     }
   ],
   "primaryAction": {
@@ -121,6 +341,10 @@
     {
       "href": "/compatibility/",
       "label": "Browse compatibility pages"
+    },
+    {
+      "href": "/product/hotel-key-cards/",
+      "label": "Hotel key cards overview"
     },
     {
       "href": "/contact/",

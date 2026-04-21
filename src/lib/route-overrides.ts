@@ -98,8 +98,8 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/product/rfid-windshield-tag/":           "/products/rfid-labels/long-range-uhf-windshield-sticker/",
   "/product/rfid-tag-with-led-light/":       "/products/rfid-tags/",
 
-  /* Hardware (readers / scanners) → rfid-readers pillar */
-  "/product/acr122u/":                       "/products/rfid-readers/",
-  "/product/bluetooth-rfid-scanner/":        "/products/rfid-readers/",
-  "/product/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/",
+  /* Hardware (readers / scanners) → rfid-readers cluster SKUs */
+  "/product/acr122u/":                       "/products/rfid-readers/desktop-nfc-reader-encoder/",
+  "/product/bluetooth-rfid-scanner/":        "/products/rfid-readers/handheld-uhf-rfid-reader/",
+  "/product/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/desktop-nfc-reader-encoder/",
 };

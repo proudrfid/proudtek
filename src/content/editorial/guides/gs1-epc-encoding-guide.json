@@ -227,6 +227,62 @@
       "answer": "Each production batch ships with a TID-to-EPC mapping file in CSV or JSON format, listing for every encoded tag: the TID (unique chip hardware identifier assigned by the chip manufacturer, 96-bit hex), the encoded EPC hex value, the decoded human-readable GTIN, decoded serial number, filter value, partition value, encoded User memory content (if any), and encoding-verification status. The file is structured for direct import into WMS systems, EPCIS repositories (as OBJECT-event captures), serialization management platforms (Tracelink, rfXcel, SAP ATTP) and ERP systems. For customers with specific import requirements (custom column names, EPCIS XML event format, trading-partner specific CSV layouts), we match the delivery format to the target system during the order setup phase."
     }
   ],
+  "sources": [
+    {
+      "label": "GS1 EPC Tag Data Standard (TDS) v2.0",
+      "url": "https://www.gs1.org/standards/rfid/tds",
+      "publisher": "GS1",
+      "publishedAt": "2022-03-01",
+      "accessedAt": "2026-04-20",
+      "note": "The authoritative specification for encoding GS1 identification keys (SGTIN-96/198, SSCC-96, GRAI-96/170, GIAI-96/202, GDTI-96/174, GSRN-96, CPI-96/var) into the 96-bit / 128-bit / 496-bit EPC memory bank — referenced throughout for header bytes, partition values, filter values and serial-number field widths."
+    },
+    {
+      "label": "GS1 EPC Tag Data Translation (TDT) v2.0",
+      "url": "https://www.gs1.org/standards/epcis/tdt",
+      "publisher": "GS1",
+      "publishedAt": "2022-03-01",
+      "accessedAt": "2026-04-20",
+      "note": "Machine-readable XML translation rules between binary EPC encodings and the canonical EPC URI representation (urn:epc:id:sgtin:...) — authoritative source for the encode/decode round-trip examples."
+    },
+    {
+      "label": "GS1 General Specifications — GTIN, SSCC, GRAI, GIAI, GDTI, GSRN key definitions",
+      "url": "https://www.gs1.org/standards/barcodes-epcrfid-id-keys/gs1-general-specifications",
+      "publisher": "GS1",
+      "publishedAt": "2024-01-01",
+      "accessedAt": "2026-04-20",
+      "note": "The upstream GS1 General Specifications document defining each identification key's structure, check-digit calculation and allocation rules — authority for the GTIN company-prefix + item-reference + check-digit model that flows into SGTIN EPC encoding."
+    },
+    {
+      "label": "GS1 EPCIS 2.0 — Electronic Product Code Information Services",
+      "url": "https://www.gs1.org/standards/epcis",
+      "publisher": "GS1",
+      "publishedAt": "2022-06-01",
+      "accessedAt": "2026-04-20",
+      "note": "Event-data standard consumed by traceability applications ingesting EPC-encoded Gen2 reads — cited in the delivery-file integration section explaining how TID-to-EPC mapping files import as OBJECT events."
+    },
+    {
+      "label": "GS1 Core Business Vocabulary (CBV) 2.0",
+      "url": "https://www.gs1.org/standards/epcis/cbv",
+      "publisher": "GS1",
+      "publishedAt": "2022-06-01",
+      "accessedAt": "2026-04-20",
+      "note": "Companion to EPCIS specifying the vocabulary (business steps, dispositions, source/destination types) used in EPCIS events carrying encoded EPC identities."
+    },
+    {
+      "label": "ISO/IEC 15459 — Information technology — Automatic identification and data capture techniques — Unique identification",
+      "url": "https://www.iso.org/standard/74780.html",
+      "publisher": "ISO",
+      "accessedAt": "2026-04-20",
+      "note": "ISO standard for unique-identifier structures that aligns with GS1 identification keys — referenced where the guide distinguishes GS1-issued identities from ISO 15459 issuing-agency identifiers encoded in GIAI/ADI headers."
+    },
+    {
+      "label": "GS1 EPC Tag Data Standard Examples and Encoder/Decoder Reference Implementation",
+      "url": "https://www.gs1.org/services/epc-encoderdecoder",
+      "publisher": "GS1",
+      "accessedAt": "2026-04-20",
+      "note": "GS1-hosted encoder/decoder utility used as a canonical reference implementation — cited in the verification section where the guide recommends round-trip checking hand-computed EPC values against the GS1 reference tool."
+    }
+  ],
   "primaryAction": {
     "href": "/contact/",
     "label": "Get EPC encoding consultation"
