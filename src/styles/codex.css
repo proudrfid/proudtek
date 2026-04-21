@@ -42,16 +42,26 @@
   --codex-transition-normal: 250ms ease;
   --codex-error: #c0392b;
   --codex-success: #27ae60;
+
+  /* Focus ring tokens — DS-5, 2026-04-22 (WCAG 2.1 AA keyboard nav).
+     --codex-ring         : default ring on light / warm surfaces
+     --codex-ring-on-dark : high-contrast ring on dark / gold CTAs
+     --codex-ring-width   : ring thickness
+     --codex-ring-offset  : ring offset from element edge */
+  --codex-ring: var(--codex-gold, #c39a5f);
+  --codex-ring-on-dark: #ffffff;
+  --codex-ring-width: 2px;
+  --codex-ring-offset: 2px;
 }
 
 /* ═══════════════════════════════════════════
    Global Accessibility
    ═══════════════════════════════════════════ */
 
-/* C1: Focus indicators for keyboard navigation */
+/* C1: Focus indicators for keyboard navigation (tokenised DS-5 2026-04-22) */
 :focus-visible {
-  outline: 2px solid var(--codex-gold);
-  outline-offset: 2px;
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
 }
 
 /* Reduced motion: disable all transitions and animations */
@@ -4531,3 +4541,74 @@ body.codex-catalog-rail-locked { overflow: hidden; }
     margin-bottom: 0.6rem;
   }
 }
+
+/* ═══════════════════════════════════════════
+   Editorial Component Focus Indicators (DS-5, 2026-04-22)
+   Explicit :focus-visible rules for every interactive element in the
+   18 editorial components. Defends keyboard-only users and satisfies
+   WCAG 2.1 AA Success Criterion 2.4.7 (Focus Visible).
+   ═══════════════════════════════════════════ */
+
+/* Shared baseline — links, buttons and list items that carry
+   .codex-editorial-* BEM classes inside editorial layouts. */
+.codex-editorial-primary:focus-visible,
+.codex-editorial-secondary:focus-visible,
+.codex-editorial-brief-link:focus-visible,
+.codex-editorial-snapshot-link:focus-visible,
+.codex-editorial-jump-link:focus-visible,
+.codex-editorial-link-card:focus-visible,
+.codex-editorial-callout__link:focus-visible,
+.codex-editorial-trail a:focus-visible,
+.codex-sources-link:focus-visible,
+.codex-byline-name:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  /* drop any inherited text-decoration jitter so the ring owns the focus affordance */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* High-contrast ring on dark / gold CTA — default gold ring fails AA on the
+   gold-gradient hero button. Swap to white and thicken for AAA-grade contrast. */
+.codex-hero-cta-btn:focus-visible,
+.codex-editorial-primary:focus-visible {
+  outline: calc(var(--codex-ring-width) + 1px) solid var(--codex-ring-on-dark);
+  outline-offset: var(--codex-ring-offset);
+  box-shadow: 0 0 0 calc(var(--codex-ring-width) + 3px) var(--codex-ring);
+}
+
+/* FaqSection — <details><summary> is the interactive control, not <details>. */
+.codex-editorial-faq summary:focus-visible,
+.codex-editorial-faq details > summary:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  border-radius: var(--codex-radius-sm);
+}
+
+/* IndustryProductGrid uses legacy .ind-cat-card until the rename sweep lands. */
+.ind-cat-card:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+}
+
+/* InlineRfqForm — form controls get a ring that also absorbs the offset,
+   because inputs already sit in a shadow-bordered container. */
+.codex-inline-rfq input:focus-visible,
+.codex-inline-rfq textarea:focus-visible,
+.codex-inline-rfq-form input:focus-visible,
+.codex-inline-rfq-form textarea:focus-visible,
+.codex-inline-rfq-form button:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  /* Neutralise the existing :focus border-color swap so the ring is unambiguous */
+  border-color: var(--codex-ring);
+}
+
+/* Breadcrumb plain <a> (no class) fallback — covers the one un-classed link. */
+.codex-editorial-trail a:focus-visible,
+.codex-editorial-trail [href]:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  border-radius: 3px;
+}
+
