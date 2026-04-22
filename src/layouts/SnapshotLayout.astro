@@ -10,6 +10,7 @@ import BaseLayout from "./BaseLayout.astro";
 import type { SnapshotPage } from "../lib/site-data";
 import { prepareSnapshot } from "../lib/render-snapshot";
 import { buildMachineRoute, buildPageSeo } from "../lib/seo";
+import { buildAuthorityLdForRoute } from "../lib/editorial-authority-ld";
 
 const { page } = Astro.props as { page: SnapshotPage };
 const snapshot = prepareSnapshot(page);
@@ -20,6 +21,16 @@ const seo = buildPageSeo({
   headHtml: snapshot.headHtml,
   bodyHtml: snapshot.bodyHtml,
 });
+
+// Authority JSON-LD (E-E-A-T): if an editorial JSON matches this route and
+// carries authorSlug / reviewedBySlug / sources, emit a standalone Article
+// schema so Google sees bylined, reviewed, cited content on industries /
+// products / lp / markets / compatibility — not just on editorially-rendered
+// pages. Appended to seo.jsonLd so BaseLayout writes it alongside the existing
+// Organization / WebSite / WebPage / Product / BreadcrumbList entries.
+const authorityLd = await buildAuthorityLdForRoute(page.route);
+if (authorityLd) seo.jsonLd = [...seo.jsonLd, authorityLd];
+
 const machineJsonPath = buildMachineRoute(page.route, "json");
 const machineTextPath = buildMachineRoute(page.route, "txt");
 ---

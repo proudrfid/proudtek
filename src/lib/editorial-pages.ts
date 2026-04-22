@@ -261,7 +261,7 @@ const EDITORIAL_PRIMARY_ACTION_LABELS: Record<string, string> = {
 
 let _editorialDefsCache: EditorialDefinition[] | null = null;
 
-async function loadEditorialDefinitions(): Promise<EditorialDefinition[]> {
+export async function loadEditorialDefinitions(): Promise<EditorialDefinition[]> {
   if (_editorialDefsCache) return _editorialDefsCache;
   const entries = await getCollection("editorial");
   const active = entries
