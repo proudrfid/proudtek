@@ -3,6 +3,14 @@
 Third-party images used in `public/landing-images/` that require attribution
 under their source license are listed here.
 
+## impinj-m700-uhf-inlay.jpg
+
+- **Source:** Wikimedia Commons — "RFID tag in a label 1"
+- **URL:** https://commons.wikimedia.org/wiki/File:RFID_tag_in_a_label_1.png
+- **License:** Creative Commons Zero (CC0 1.0) — public-domain dedication, attribution not legally required but credited here for transparency.
+- **Modifications:** flattened RGBA → RGB on white, resized from 2214 × 1024 to 1600 × 740, re-encoded as JPEG q85 progressive.
+- **Used on:** `/products/rfid-labels/impinj-m700-uhf-inlay/` (round-3 hero fix, 2026-04-22). Replaces a stock photo of HF/NFC copper loop antennas that did not match the UHF inlay subject. The new image shows a real UHF inlay (dipole + central UHF chip strap) embedded under a printed shipping/asset label — visually accurate for the M700's primary retail/logistics use cases. The same image now also drives the M730 catalog tile via `CATALOG_IMAGE_OVERRIDES` (M730 shares the M700 inlay reference per the comment in `src/lib/catalog-pages.ts`).
+
 ## rfid-wet-inlay.jpg
 
 - **Source:** Wikimedia Commons — "IC Inlay of Standard Ticket Transit Card"

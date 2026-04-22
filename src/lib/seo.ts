@@ -1828,34 +1828,184 @@ export async function initBlogDefinitions(): Promise<void> {
     .map((e) => ({ route: e.data.route, title: e.data.title, summary: e.data.summary, kicker: e.data.kicker }));
 }
 
+/**
+ * Blog topic taxonomy.
+ *
+ * Author kickers in the editorial collection are extremely long-tail (50+
+ * variants across 90 posts), so we map each kicker to a small set of broad
+ * topics that make sense as a left-rail navigator — same UX pattern as the
+ * /products/all/ catalog rail (Product Families). Order here is the order
+ * shown in the rail.
+ */
+const BLOG_TOPICS: Array<{ id: string; label: string; icon: string; kickers: RegExp[] }> = [
+  {
+    id: "fundamentals",
+    label: "RFID & NFC Basics",
+    icon: "📡",
+    kickers: [
+      /^RFID Technology$/i,
+      /^NFC Technology$/i,
+      /^Smart Cards$/i,
+      /^How RFID Cards Work$/i,
+      /^NFC vs\.? RFID/i,
+      /^NFC Chip Memory/i,
+      /^RFID (Read Range|Card Demagnetization)/i,
+      /^UHF RFID Read Range$/i,
+      /^Procurement$/i,
+      /^RAIN RFID/i,
+    ],
+  },
+  {
+    id: "hotels",
+    label: "Hotels & Hospitality",
+    icon: "🏨",
+    kickers: [/Hotel/i],
+  },
+  {
+    id: "events",
+    label: "Events & Experiences",
+    icon: "🎟️",
+    kickers: [
+      /^Event Technology$/i,
+      /Festival/i,
+      /Conference/i,
+      /Marathon/i,
+      /Wristband/i,
+      /Ski Pass/i,
+    ],
+  },
+  {
+    id: "industrial",
+    label: "Industrial & Warehouse",
+    icon: "🏭",
+    kickers: [
+      /^Industrial RFID$/i,
+      /Warehouse/i,
+      /Asset Tracking/i,
+      /Inventory/i,
+      /Manual Counting/i,
+      /Interference on Metal/i,
+      /Vehicle RFID/i,
+      /AI-Powered RFID/i,
+      /Laundry/i,
+      /RFID Tag Lifespan/i,
+      /Shrinkage/i,
+    ],
+  },
+  {
+    id: "nfc-marketing",
+    label: "NFC Marketing",
+    icon: "📱",
+    kickers: [
+      /^NFC Marketing$/i,
+      /NFC Wearables/i,
+      /Google Review/i,
+      /Christmas Gift/i,
+      /Wedding Favor/i,
+      /NFC.*(Cloning|Cloned|Clone)/i,
+    ],
+  },
+  {
+    id: "security",
+    label: "Security & Access",
+    icon: "🔐",
+    kickers: [/^Access Control$/i, /Access Card Copied/i],
+  },
+  {
+    id: "costs",
+    label: "Costs & ROI",
+    icon: "💰",
+    kickers: [
+      /Cost/i,
+      /Pricing/i,
+      /ROI/i,
+      /Revenue Impact/i,
+    ],
+  },
+  {
+    id: "trends",
+    label: "Industry Trends",
+    icon: "📈",
+    kickers: [/Industry Trends/i, /Industry Applications/i, /Best Hotel RFID Card/i],
+  },
+  {
+    id: "sustainability",
+    label: "Sustainability",
+    icon: "🌱",
+    kickers: [/Eco RFID/i, /Sustainability/i],
+  },
+  {
+    id: "troubleshooting",
+    label: "Troubleshooting & Fixes",
+    icon: "🔧",
+    kickers: [/^Fix:/i, /Troubleshooting/i, /Barcode Label Peeling/i],
+  },
+];
+
+const BLOG_TOPIC_FALLBACK_ID = "fundamentals";
+
+function classifyBlogKicker(kicker: string): string {
+  const k = kicker.trim();
+  for (const topic of BLOG_TOPICS) {
+    if (topic.kickers.some((re) => re.test(k))) {
+      return topic.id;
+    }
+  }
+  return BLOG_TOPIC_FALLBACK_ID;
+}
+
 function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
   if (!_blogDefsCache || _blogDefsCache.length === 0) {
     return;
   }
 
-  // Collect all posts with their cluster
+  // Collect all posts; classify each into a normalized topic so the left rail
+  // shows ~10 stable categories instead of 50+ raw kicker strings.
   const thumbMap = getBlogThumbnails();
-  const allPosts: Array<{ route: string; title: string; summary: string; kicker: string; thumb: string }> = [];
-  const clusterSet = new Set<string>();
+  const allPosts: Array<{
+    route: string;
+    title: string;
+    summary: string;
+    kicker: string;
+    topicId: string;
+    thumb: string;
+  }> = [];
   for (const blog of _blogDefsCache) {
     const kicker = blog.kicker || "RFID Technology";
-    clusterSet.add(kicker);
-    allPosts.push({ route: blog.route, title: blog.title, summary: blog.summary, kicker, thumb: thumbMap[blog.route] ?? "" });
+    allPosts.push({
+      route: blog.route,
+      title: blog.title,
+      summary: blog.summary,
+      kicker,
+      topicId: classifyBlogKicker(kicker),
+      thumb: thumbMap[blog.route] ?? "",
+    });
   }
 
-  // Topic filter pills
-  const topicPills = Array.from(clusterSet)
-    .map((topic) => {
-      const count = allPosts.filter((p) => p.kicker === topic).length;
-      return `<button class="codex-blog-pill" data-topic="${escapeXml(topic)}">${escapeXml(topic)} <span>${count}</span></button>`;
-    })
+  const topicCounts: Record<string, number> = {};
+  for (const post of allPosts) {
+    topicCounts[post.topicId] = (topicCounts[post.topicId] ?? 0) + 1;
+  }
+
+  // Rail links — one per non-empty topic, in declaration order.
+  const railLinksHtml = BLOG_TOPICS
+    .filter((t) => (topicCounts[t.id] ?? 0) > 0)
+    .map(
+      (t) => `<a href="#topic-${t.id}" class="codex-industries-sidebar__link" data-topic="${t.id}">
+          <span class="codex-industries-sidebar__emoji">${t.icon}</span>
+          <span class="codex-industries-sidebar__label">${escapeXml(t.label)}</span>
+          <span class="codex-industries-sidebar__count" data-cat-count="${t.id}">${topicCounts[t.id]}</span>
+        </a>`,
+    )
     .join("");
 
-  // All cards in a flat 3-column grid
+  // All cards in a flat 3-column grid. data-topic is the normalized topic id
+  // so the rail click-handler can filter by topic. We also keep the human
+  // kicker as the visible card tag.
   const cardsHtml = allPosts
     .map(
       (post) =>
-        `<a class="codex-blog-grid-card" href="${escapeXml(post.route)}" data-topic="${escapeXml(post.kicker)}">
+        `<a class="codex-blog-grid-card" href="${escapeXml(post.route)}" data-topic="${escapeXml(post.topicId)}" data-kicker="${escapeXml(post.kicker)}">
           ${post.thumb ? `<img class="codex-blog-grid-card__thumb" src="${escapeXml(post.thumb)}" alt="${escapeXml(post.title)}" loading="lazy" decoding="async" />` : ""}
           <span class="codex-blog-grid-card__tag">${escapeXml(post.kicker)}</span>
           <strong>${escapeXml(post.title)}</strong>
@@ -1865,35 +2015,115 @@ function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
     )
     .join("");
 
-  const sectionHtml = `<section class="codex-blog-index" aria-label="Blog articles">
+  // Left rail mirroring /products/all/. The rail is `position: fixed` (CSS
+  // .codex-catalog-rail) on >=1280px and collapses behind a floating toggle
+  // button on narrower viewports.
+  const railHtml = `
+    <button type="button"
+            class="codex-catalog-rail-toggle"
+            aria-expanded="false"
+            aria-controls="codex-catalog-rail-panel"
+            aria-label="Show blog topics">
+      <span class="codex-catalog-rail-toggle__icon" aria-hidden="true">📚</span>
+      <span class="codex-catalog-rail-toggle__label">Topics</span>
+    </button>
+    <div class="codex-catalog-rail-backdrop" hidden></div>
+    <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--blog" aria-label="Blog topics">
+      <button type="button" class="codex-catalog-rail__close" aria-label="Close topics">✕</button>
+      <nav class="codex-industries-sidebar__nav">
+        <div class="codex-industries-sidebar__title">Topics</div>
+        <a href="#topic-all" class="codex-industries-sidebar__link active" data-topic="all">
+          <span class="codex-industries-sidebar__emoji">📚</span>
+          <span class="codex-industries-sidebar__label">All articles</span>
+          <span class="codex-industries-sidebar__count" data-cat-count="all">${allPosts.length}</span>
+        </a>
+        ${railLinksHtml}
+      </nav>
+    </aside>`;
+
+  const sectionHtml = `${railHtml}
+  <section class="codex-blog-index codex-blog-index--with-rail" id="topic-all" aria-label="Blog articles">
     <div class="codex-blog-index__header">
       <h1>RFID &amp; NFC Knowledge Base</h1>
       <p>${allPosts.length} technical guides for procurement teams evaluating RFID cards, tags, labels, readers, keyfobs and wristbands.</p>
     </div>
-    <nav class="codex-blog-index__topics" aria-label="Filter by topic">
-      <button class="codex-blog-pill codex-blog-pill--active" data-topic="all">All <span>${allPosts.length}</span></button>
-      ${topicPills}
-    </nav>
     <div class="codex-blog-index__grid">
       ${cardsHtml}
     </div>
+    <div class="codex-blog-index__empty" hidden>
+      <div class="codex-blog-index__empty-icon" aria-hidden="true">🔍</div>
+      <h3>No articles in this topic yet</h3>
+      <p>Try another topic, or view all articles.</p>
+      <button type="button" class="codex-blog-index__empty-clear">Show all articles</button>
+    </div>
     <script>
       (function() {
-        var pills = document.querySelectorAll('.codex-blog-pill');
-        var cards = document.querySelectorAll('.codex-blog-grid-card');
-        pills.forEach(function(pill) {
-          pill.addEventListener('click', function() {
-            var topic = this.getAttribute('data-topic');
-            pills.forEach(function(p) { p.classList.remove('codex-blog-pill--active'); });
-            this.classList.add('codex-blog-pill--active');
-            cards.forEach(function(card) {
-              if (topic === 'all' || card.getAttribute('data-topic') === topic) {
-                card.style.display = '';
-              } else {
-                card.style.display = 'none';
-              }
-            });
+        var rail = document.getElementById('codex-catalog-rail-panel');
+        var toggle = document.querySelector('.codex-catalog-rail-toggle');
+        var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
+        var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
+        var links = rail ? rail.querySelectorAll('.codex-industries-sidebar__link') : [];
+        var cards = document.querySelectorAll('.codex-blog-index .codex-blog-grid-card');
+        var emptyState = document.querySelector('.codex-blog-index__empty');
+        var emptyClear = emptyState ? emptyState.querySelector('.codex-blog-index__empty-clear') : null;
+        if (!links.length || !cards.length) return;
+
+        function setActiveTopic(topic) {
+          var visible = 0;
+          links.forEach(function(l) {
+            if (l.getAttribute('data-topic') === topic) l.classList.add('active');
+            else l.classList.remove('active');
           });
+          cards.forEach(function(card) {
+            if (topic === 'all' || card.getAttribute('data-topic') === topic) {
+              card.style.display = '';
+              visible++;
+            } else {
+              card.style.display = 'none';
+            }
+          });
+          if (emptyState) emptyState.hidden = visible !== 0;
+        }
+
+        // Collapse / expand behaviour (only active at narrow viewports via CSS).
+        function openRail() {
+          if (!rail) return;
+          rail.classList.add('is-open');
+          if (toggle) toggle.setAttribute('aria-expanded', 'true');
+          if (backdrop) backdrop.hidden = false;
+          document.body.classList.add('codex-catalog-rail-locked');
+        }
+        function closeRail() {
+          if (!rail) return;
+          rail.classList.remove('is-open');
+          if (toggle) toggle.setAttribute('aria-expanded', 'false');
+          if (backdrop) backdrop.hidden = true;
+          document.body.classList.remove('codex-catalog-rail-locked');
+        }
+        if (toggle) toggle.addEventListener('click', function() {
+          if (rail && rail.classList.contains('is-open')) closeRail(); else openRail();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', closeRail);
+        if (backdrop) backdrop.addEventListener('click', closeRail);
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && rail && rail.classList.contains('is-open')) closeRail();
+        });
+
+        links.forEach(function(l) {
+          l.addEventListener('click', function(e) {
+            e.preventDefault();
+            var topic = l.getAttribute('data-topic');
+            setActiveTopic(topic);
+            // Scroll the grid back to the top of the index so the user sees
+            // the new filter take effect.
+            var index = document.getElementById('topic-all');
+            if (index) index.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (window.matchMedia('(max-width: 1279px)').matches) closeRail();
+          });
+        });
+
+        if (emptyClear) emptyClear.addEventListener('click', function() {
+          setActiveTopic('all');
         });
       })();
     </script>

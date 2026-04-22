@@ -108,6 +108,52 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     </div>
     <script is:inline>
     (function() {
+      /* Sticky site header — toggle `.is-scrolled` for the shadow effect.
+         CSS does the actual sticky positioning; this just adds a visual
+         cue once the user has scrolled past the very top. Threshold of 8px
+         avoids flicker from sub-pixel scroll jitter on touch devices. */
+      var stickyHeader = document.getElementById('masthead');
+      if (stickyHeader) {
+        var headerScrollTicking = false;
+        function updateHeaderScrolled() {
+          if (window.scrollY > 8) stickyHeader.classList.add('is-scrolled');
+          else stickyHeader.classList.remove('is-scrolled');
+          headerScrollTicking = false;
+        }
+        window.addEventListener('scroll', function() {
+          if (!headerScrollTicking) {
+            headerScrollTicking = true;
+            requestAnimationFrame(updateHeaderScrolled);
+          }
+        }, { passive: true });
+        updateHeaderScrolled();
+      }
+
+      /* Mobile menu — second-level group accordion.
+         Each `[data-codex-mobile-group-toggle]` button is paired with its
+         next-sibling <ul.codex-mobile-group-list>. Click toggles aria-expanded
+         and the `hidden` attribute. Buttons natively handle Enter/Space, no
+         extra keyboard wiring needed. Multiple groups can be open at once —
+         this is a disclosure pattern, not an exclusive accordion. */
+      var mobileGroupToggles = document.querySelectorAll('[data-codex-mobile-group-toggle]');
+      mobileGroupToggles.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          var controlsId = btn.getAttribute('aria-controls');
+          var panel = controlsId ? document.getElementById(controlsId) : btn.nextElementSibling;
+          if (!panel) return;
+          if (expanded) {
+            btn.setAttribute('aria-expanded', 'false');
+            panel.setAttribute('hidden', '');
+          } else {
+            btn.setAttribute('aria-expanded', 'true');
+            panel.removeAttribute('hidden');
+          }
+        });
+      });
+
       /* Jump-nav active state tracking */
       var links = document.querySelectorAll('.codex-editorial-jump-link');
       if (links.length) {

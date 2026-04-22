@@ -400,7 +400,7 @@ export async function mergeCatalogPages(siteData: SiteData): Promise<SiteData> {
     buildCatalogRedirectPage(siteData, template, "/products/all/page/1/", "/products/all/", "Products"),
     buildCatalogRedirectPage(siteData, template, "/product-category/products/", "/products/all/", "Products"),
     buildCatalogRedirectPage(siteData, template, "/product-category/products/page/1/", "/products/all/", "Products"),
-    ...(await buildLegacyCollectionAliasPages(siteData)),
+    ...buildLegacyCollectionAliasPages(siteData, template),
     buildIndustriesPage(siteData, template, products),
   ];
 
@@ -559,23 +559,57 @@ async function collectCatalogProducts(siteData: SiteData): Promise<CatalogProduc
   return [...wpProducts, ...landingProducts].sort((left, right) => left.route.localeCompare(right.route));
 }
 
-async function buildLegacyCollectionAliasPages(siteData: SiteData): Promise<SnapshotPage[]> {
-  const stubs = siteData.pages
-    .filter((page) => /^\/products\/[^/]+\/(?:page\/\d+\/)?$/.test(page.route))
-    .filter((page) => !page.route.startsWith("/products/all/"));
-
+/**
+ * Convert legacy `/product-category/products/{cluster}/` (and paginated
+ * variants) into meta-refresh redirects pointing at the canonical pillar
+ * `/products/{cluster}/`.
+ *
+ * Earlier this function CLONED the pillar body to the legacy route, which
+ * created exact duplicate content. Even with `seo.ts` writing a canonical
+ * link back to the pillar, duplicate-body archives are SEO noise and
+ * occasionally rank in place of the canonical version. Redirecting puts the
+ * legacy URLs in a clean "deprecated → here" state and matches the pattern
+ * already used for `/product-category/products/` itself.
+ *
+ * Cluster slugs without an authored pillar (none today, but defensively
+ * handled) fall back to redirecting to `/products/all/#{slug}` so the user
+ * still lands on the relevant catalog section.
+ */
+function buildLegacyCollectionAliasPages(siteData: SiteData, template: SnapshotPage): SnapshotPage[] {
+  const seen = new Set<string>();
   const results: SnapshotPage[] = [];
-  for (const stub of stubs) {
-    try {
-      const fullPage = await loadPageFromDisk(stub.route);
-      results.push(cloneSnapshotPage(siteData, fullPage, stub.route.replace(/^\/products\//, "/product-category/products/")));
-    } catch {
-      // Page doesn't exist on disk (synthetic) — clone stub as-is
-      results.push(cloneSnapshotPage(siteData, stub, stub.route.replace(/^\/products\//, "/product-category/products/")));
-    }
+
+  for (const page of siteData.pages) {
+    const match = /^\/products\/([^/]+)\/(?:page\/(\d+)\/)?$/.exec(page.route);
+    if (!match) continue;
+    const cluster = match[1];
+    if (cluster === "all") continue;
+
+    const aliasRoute = page.route.replace(/^\/products\//, "/product-category/products/");
+    if (seen.has(aliasRoute)) continue;
+    seen.add(aliasRoute);
+
+    const target = `/products/${cluster}/`;
+    const label = PILLAR_CLUSTER_LABEL[cluster] ?? "Products";
+    results.push(buildCatalogRedirectPage(siteData, template, aliasRoute, target, label));
   }
+
   return results;
 }
+
+/**
+ * Display labels for the cluster slugs that have a `/products/{slug}/` pillar.
+ * Used by the legacy alias redirector so the redirect body says
+ * "Continue to RFID Cards" instead of "Continue to Products".
+ */
+const PILLAR_CLUSTER_LABEL: Record<string, string> = {
+  "rfid-cards": "RFID Cards",
+  "rfid-keyfobs": "RFID Keyfobs",
+  "rfid-labels": "RFID Labels",
+  "rfid-readers": "RFID Readers",
+  "rfid-tags": "RFID Tags",
+  "rfid-wristbands": "RFID Wristbands",
+};
 
 function buildCatalogArchivePage(
   siteData: SiteData,
@@ -616,18 +650,6 @@ function buildCatalogArchivePage(
     bodyAttrs: { ...template.bodyAttrs },
     headHtml: template.headHtml,
     bodyHtml,
-  };
-}
-
-function cloneSnapshotPage(siteData: SiteData, sourcePage: SnapshotPage, route: string): SnapshotPage {
-  return {
-    route,
-    sourceUrl: `${siteData.siteOrigin}${route}`,
-    title: sourcePage.title,
-    htmlAttrs: { ...sourcePage.htmlAttrs },
-    bodyAttrs: { ...sourcePage.bodyAttrs },
-    headHtml: sourcePage.headHtml,
-    bodyHtml: sourcePage.bodyHtml,
   };
 }
 
@@ -878,7 +900,7 @@ function categorizeProductsSync(products: CatalogProduct[]): { category: Product
   const uncategorized = products.filter((product) => !assignedRoutes.has(product.route));
   if (uncategorized.length > 0) {
     result.push({
-      category: { id: "other", label: "Other Products", icon: "📦", description: "Additional RFID and NFC products.", routes: [] },
+      category: { id: "other", label: "RFID Reader", icon: "📡", description: "RFID readers and additional reader-related products.", routes: [] },
       items: uncategorized,
     });
   }
@@ -960,19 +982,42 @@ function renderCatalogMain({
     .join("");
   const hasFilters = filterPanelHtml.length > 0;
 
+  // Cluster ids that have a `/products/{id}/` pillar page authored in
+  // src/content/editorial/products/{id}/_pillar.json. Used to render a
+  // "Read the {label} guide →" link in the catalog section header so the
+  // catalog (broad/SKU intent) and pillar (informational/guide intent) can
+  // cross-reference cleanly without competing for the same query.
+  // The synthetic "other" fallback has no pillar and is intentionally excluded.
+  const PILLAR_CLUSTER_IDS = new Set([
+    "rfid-cards",
+    "rfid-keyfobs",
+    "rfid-labels",
+    "rfid-readers",
+    "rfid-tags",
+    "rfid-wristbands",
+  ]);
+
   const categorySectionsHtml = categorized
     .map(
-      ({ category, items }) => `
+      ({ category, items }) => {
+        const guideLink = PILLAR_CLUSTER_IDS.has(category.id)
+          ? `<a class="codex-catalog-category-guide" href="/products/${category.id}/">Read the ${category.label} guide →</a>`
+          : "";
+        return `
         <section class="codex-catalog-category" id="${category.id}">
           <div class="codex-catalog-category-header">
             <h2>${category.icon} ${category.label}</h2>
             <p>${category.description}</p>
-            <span class="codex-catalog-count">${items.length} products</span>
+            <div class="codex-catalog-category-meta">
+              <span class="codex-catalog-count">${items.length} products</span>
+              ${guideLink}
+            </div>
           </div>
           <ul class="products columns-4">
             ${items.map((product, i) => renderProductCard(product, i === 0 && items.length >= 4)).join("")}
           </ul>
-        </section>`,
+        </section>`;
+      },
     )
     .join("");
 
@@ -1557,6 +1602,213 @@ export const INDUSTRY_CATEGORIES: Array<{
       "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
     ],
   },
+  {
+    id: "luxury-brands",
+    title: "Luxury Brands",
+    href: "/industries/luxury-brands/",
+    description: "NFC authentication tags for handbags, sneakers, watches, wines and spirits — tap-to-verify, anti-counterfeit and Digital Product Passport ready.",
+    emoji: "👜",
+    heroImage: "/landing-images/ntag424-dna-tamper-evident-tag.jpg",
+    productRoutes: [
+      "/products/rfid-labels/nfc-luxury-handbag-tag/",
+      "/products/rfid-labels/nfc-sneaker-authentication-tag/",
+      "/products/rfid-labels/nfc-wine-bottle-tag/",
+      "/products/rfid-labels/nfc-spirits-authentication-label/",
+      "/products/rfid-labels/nfc-cosmetics-authentication-label/",
+      "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
+      "/products/rfid-labels/nfc-warranty-seal-tag/",
+      "/products/rfid-cards/ntag424-dna-tt-card/",
+    ],
+  },
+  {
+    id: "pharmaceutical",
+    title: "Pharmaceutical",
+    href: "/industries/pharmaceutical/",
+    description: "RFID labels for drug serialization, vial-level identification, blood bags, cryogenic specimens and DSCSA / EU FMD compliance.",
+    emoji: "💊",
+    heroImage: "/landing-images/rfid-medication-vial-label.jpg",
+    productRoutes: [
+      "/products/rfid-labels/nfc-pharmaceutical-label/",
+      "/products/rfid-labels/rfid-medication-vial-label/",
+      "/products/rfid-labels/rfid-cryogenic-specimen-label/",
+      "/products/rfid-tags/rfid-blood-bag-tag/",
+      "/products/rfid-labels/rfid-tamper-evident-label/",
+      "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
+      "/products/rfid-tags/rfid-temperature-sensor-tag/",
+    ],
+  },
+  {
+    id: "libraries",
+    title: "Libraries",
+    href: "/industries/libraries/",
+    description: "HF RFID tags for book and media circulation, self-checkout kiosks, automated sorting and patron membership cards.",
+    emoji: "📚",
+    heroImage: "/landing-images/rfid-library-book-tag.jpg",
+    productRoutes: [
+      "/products/rfid-tags/rfid-library-book-tag/",
+      "/products/rfid-labels/rfid-book-spine-label/",
+      "/products/rfid-cards/rfid-membership-card/",
+      "/products/rfid-labels/rfid-document-tracking-label/",
+      "/products/rfid-labels/rfid-asset-label/",
+      "/products/rfid-readers/desktop-nfc-reader-encoder/",
+    ],
+  },
+  {
+    id: "laundry-services",
+    title: "Laundry Services",
+    href: "/industries/laundry-services/",
+    description: "Industrial laundry RFID tags built for 200+ wash cycles — silicone, PPS, woven textile and tunnel-reader workflows.",
+    emoji: "🧺",
+    heroImage: "/site-assets/wp-content/uploads/2024/04/textile_uhf_laundry_tag.jpg",
+    productRoutes: [
+      "/products/rfid-tags/rfid-pps-laundry-chip/",
+      "/products/rfid-tags/rfid-high-temp-silicone-tag/",
+      "/products/rfid-tags/rfid-textile-laundry-tag/",
+      "/product/rfid-laundry-tags/",
+      "/product/rfid-silicone-laundry-tag/",
+      "/product/pps-rfid-laundry-tag/",
+      "/products/rfid-readers/handheld-uhf-rfid-reader/",
+    ],
+  },
+  {
+    id: "education",
+    title: "Education",
+    href: "/industries/education/",
+    description: "Campus ID cards, staff badges, library tags and event wristbands for K-12, college and university operations.",
+    emoji: "🎓",
+    heroImage: "/landing-images/ppc-custom-rfid-cards.jpg",
+    productRoutes: [
+      "/products/rfid-cards/rfid-student-id-card/",
+      "/products/rfid-cards/rfid-employee-badge/",
+      "/products/rfid-cards/mifare-desfire-ev3-card/",
+      "/products/rfid-cards/mifare-classic-1k-card/",
+      "/products/rfid-wristbands/silicone-wristband-mifare-classic/",
+      "/products/rfid-tags/rfid-library-book-tag/",
+      "/products/rfid-keyfobs/rfid-abs-keyfob/",
+    ],
+  },
+  {
+    id: "fitness",
+    title: "Fitness",
+    href: "/industries/fitness/",
+    description: "Member access cards, NFC fitness wristbands and key fobs for gyms, health clubs and 24/7 unstaffed facilities.",
+    emoji: "💪",
+    heroImage: "/landing-images/pvc-rfid-wristband.png",
+    productRoutes: [
+      "/products/rfid-wristbands/nfc-fitness-wristband/",
+      "/products/rfid-wristbands/silicone-wristband-mifare-classic/",
+      "/products/rfid-wristbands/rfid-adjustable-silicone-wristband/",
+      "/products/rfid-cards/rfid-membership-card/",
+      "/products/rfid-cards/rfid-loyalty-card/",
+      "/products/rfid-keyfobs/rfid-abs-keyfob/",
+      "/products/rfid-keyfobs/rfid-silicone-keyfob/",
+      "/products/rfid-keyfobs/nfc-epoxy-key-tag/",
+    ],
+  },
+  {
+    id: "agriculture",
+    title: "Agriculture",
+    href: "/industries/agriculture/",
+    description: "Livestock ear tags, leg bands, glass capsules and plant nursery labels for traceability and herd management.",
+    emoji: "🌾",
+    heroImage: "/landing-images/rfid-animal-ear-tag.png",
+    productRoutes: [
+      "/products/rfid-tags/rfid-animal-ear-tag/",
+      "/products/rfid-tags/rfid-ear-tag-livestock/",
+      "/products/rfid-tags/rfid-livestock-leg-band/",
+      "/products/rfid-labels/rfid-plant-nursery-label/",
+      "/products/rfid-tags/rfid-tree-tag/",
+      "/products/rfid-tags/rfid-fish-tag/",
+      "/products/rfid-tags/nfc-pet-tag/",
+      "/products/rfid-tags/rfid-glass-capsule-tag/",
+    ],
+  },
+  {
+    id: "automotive-tire-oem",
+    title: "Automotive & Tire OEM",
+    href: "/industries/automotive-tire-oem/",
+    description: "UHF tire tags, windshield stickers and on-metal vehicle tags for assembly-line tracking, parking access and tolling.",
+    emoji: "🚗",
+    heroImage: "/landing-images/rfid-tire-tag.jpg",
+    productRoutes: [
+      "/products/rfid-tags/rfid-tire-tag/",
+      "/products/rfid-labels/long-range-uhf-windshield-sticker/",
+      "/product/car-transponder-chip/",
+      "/product/rfid-windshield-tag/",
+      "/products/rfid-tags/rfid-anti-metal-tag/",
+      "/products/rfid-tags/rfid-on-metal-uhf-tag/",
+      "/products/rfid-tags/rfid-tool-tracking-tag/",
+    ],
+  },
+  {
+    id: "aerospace-aviation-mro",
+    title: "Aerospace & Aviation MRO",
+    href: "/industries/aerospace-aviation-mro/",
+    description: "ATA Spec 2000-aligned aircraft part tags, baggage labels and high-temperature tags for MRO and ground handling.",
+    emoji: "✈️",
+    heroImage: "/landing-images/rfid-aircraft-part-tag.jpg",
+    productRoutes: [
+      "/products/rfid-tags/rfid-aircraft-part-tag/",
+      "/products/rfid-labels/rfid-airline-baggage-tag/",
+      "/products/rfid-tags/rfid-high-temperature-ceramic-tag/",
+      "/products/rfid-tags/high-temperature-rfid-tag-200c/",
+      "/products/rfid-tags/rfid-tool-tracking-tag/",
+      "/products/rfid-tags/rfid-anti-metal-tag/",
+      "/products/rfid-tags/rfid-bolt-seal/",
+    ],
+  },
+  {
+    id: "data-center-it-asset-tracking",
+    title: "Data Center & IT Assets",
+    href: "/industries/data-center-it-asset-tracking/",
+    description: "On-metal UHF tags for servers, switches and storage arrays — automated audits, cable-tie tags and asset labels.",
+    emoji: "💻",
+    heroImage: "/landing-images/anti-metal-uhf-it-asset-tag.jpg",
+    productRoutes: [
+      "/products/rfid-tags/anti-metal-uhf-it-asset-tag/",
+      "/products/rfid-tags/rfid-anti-metal-tag/",
+      "/products/rfid-tags/rfid-on-metal-uhf-tag/",
+      "/products/rfid-tags/rfid-cable-tie-tag/",
+      "/products/rfid-labels/rfid-asset-label/",
+      "/products/rfid-readers/handheld-uhf-rfid-reader/",
+      "/products/rfid-readers/fixed-uhf-rfid-reader/",
+    ],
+  },
+  {
+    id: "government-defense-supply-chain",
+    title: "Government & Defense",
+    href: "/industries/government-defense-supply-chain/",
+    description: "IUID-aligned weapon, ammo and asset tags, tamper-evident bolt seals and DESFire credentials for secure facilities.",
+    emoji: "🪖",
+    heroImage: "/landing-images/rfid-weapon-tracking-tag.jpg",
+    productRoutes: [
+      "/products/rfid-tags/rfid-weapon-tracking-tag/",
+      "/products/rfid-tags/rfid-ammo-can-tag/",
+      "/products/rfid-tags/rfid-bolt-seal/",
+      "/products/rfid-tags/rfid-cable-seal-tag/",
+      "/products/rfid-tags/rfid-tamper-seal-tag/",
+      "/products/rfid-tags/rfid-guard-tour-tag/",
+      "/products/rfid-cards/mifare-desfire-ev3-card/",
+      "/products/rfid-cards/rfid-employee-badge/",
+    ],
+  },
+  {
+    id: "cold-chain-food-traceability",
+    title: "Cold Chain & Food Traceability",
+    href: "/industries/cold-chain-food-traceability/",
+    description: "Temperature-sensor tags, frozen-food labels and farm-to-fork NFC traceability for FSMA 204 and EU 178/2002 compliance.",
+    emoji: "❄️",
+    heroImage: "/landing-images/rfid-frozen-food-label.jpg",
+    productRoutes: [
+      "/products/rfid-tags/rfid-temperature-sensor-tag/",
+      "/products/rfid-labels/rfid-frozen-food-label/",
+      "/products/rfid-labels/nfc-food-traceability-label/",
+      "/products/rfid-labels/nfc-olive-oil-authentication-label/",
+      "/products/rfid-labels/nfc-wine-bottle-tag/",
+      "/products/rfid-labels/nfc-pharmaceutical-label/",
+      "/products/rfid-tags/rfid-keg-tag/",
+    ],
+  },
 ];
 
 function buildIndustriesPage(
@@ -1640,7 +1892,8 @@ function buildIndustriesPage(
       </section>`;
   }).join("");
 
-  // Sidebar navigation
+  // Sidebar navigation — mirrors /products/all/ catalog rail (floating fixed
+  // rail on desktop, drawer behind a 🗂️ toggle on narrow viewports).
   const sidebarLinks = INDUSTRY_CATEGORIES.map((cat) =>
     `<a href="#${cat.id}" class="codex-industries-sidebar__link" data-target="${cat.id}">
       <span class="codex-industries-sidebar__emoji">${cat.emoji}</span>
@@ -1650,49 +1903,90 @@ function buildIndustriesPage(
   ).join("");
 
   main.html(`
-    <div class="codex-industries-page">
+    <button type="button"
+            class="codex-catalog-rail-toggle"
+            aria-expanded="false"
+            aria-controls="codex-catalog-rail-panel"
+            aria-label="Show industries">
+      <span class="codex-catalog-rail-toggle__icon" aria-hidden="true">🗂️</span>
+      <span class="codex-catalog-rail-toggle__label">Industries</span>
+    </button>
+    <div class="codex-catalog-rail-backdrop" hidden></div>
+    <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--industries" aria-label="Industries">
+      <button type="button" class="codex-catalog-rail__close" aria-label="Close industries">✕</button>
+      <nav class="codex-industries-sidebar__nav">
+        <div class="codex-industries-sidebar__title">Industries</div>
+        ${sidebarLinks}
+      </nav>
+    </aside>
+    <div class="codex-industries-page codex-industries-page--with-rail">
       <header class="codex-industries-header">
         <nav class="woocommerce-breadcrumb"><a href="/">Home</a> / Industries</nav>
         <h1>RFID Solutions by Industry</h1>
         <p class="codex-industries-header__sub">Select your industry to find the right RFID and NFC products. Each solution is tailored to meet sector-specific requirements for tracking, authentication and access control.</p>
       </header>
-      <div class="codex-industries-layout">
-        <aside class="codex-industries-sidebar">
-          <nav class="codex-industries-sidebar__nav">
-            <div class="codex-industries-sidebar__title">Industries</div>
-            ${sidebarLinks}
-          </nav>
-        </aside>
-        <div class="codex-industries-content">
-          <div class="codex-industries-hero-grid">${heroCards}</div>
-          ${sections}
-        </div>
+      <div class="codex-industries-content">
+        <div class="codex-industries-hero-grid">${heroCards}</div>
+        ${sections}
       </div>
     </div>
     <script>
     (function(){
-      var links = document.querySelectorAll('.codex-industries-sidebar__link');
+      var rail = document.getElementById('codex-catalog-rail-panel');
+      var toggle = document.querySelector('.codex-catalog-rail-toggle');
+      var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
+      var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
+      var links = rail ? rail.querySelectorAll('.codex-industries-sidebar__link') : [];
       var sections = document.querySelectorAll('.codex-industries-section');
       if (!links.length || !sections.length) return;
+
+      // Scroll-spy: highlight the rail entry for the section currently in view.
       function update(){
         var scrollY = window.scrollY + 120;
         var active = null;
-        sections.forEach(function(s){
-          if (s.offsetTop <= scrollY) active = s.id;
-        });
+        sections.forEach(function(s){ if (s.offsetTop <= scrollY) active = s.id; });
         links.forEach(function(l){
           if (l.getAttribute('data-target') === active) l.classList.add('active');
           else l.classList.remove('active');
         });
       }
       var ticking = false;
-      window.addEventListener('scroll', function(){ if (!ticking) { ticking = true; requestAnimationFrame(function(){ update(); ticking = false; }); } }, {passive:true});
+      window.addEventListener('scroll', function(){
+        if (!ticking) { ticking = true; requestAnimationFrame(function(){ update(); ticking = false; }); }
+      }, {passive:true});
       update();
+
+      // Open / close the rail as an overlay on narrow viewports.
+      function openRail(){
+        if (!rail) return;
+        rail.classList.add('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+        if (backdrop) backdrop.hidden = false;
+        document.body.classList.add('codex-catalog-rail-locked');
+      }
+      function closeRail(){
+        if (!rail) return;
+        rail.classList.remove('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        if (backdrop) backdrop.hidden = true;
+        document.body.classList.remove('codex-catalog-rail-locked');
+      }
+      if (toggle) toggle.addEventListener('click', function(){
+        if (rail && rail.classList.contains('is-open')) closeRail(); else openRail();
+      });
+      if (closeBtn) closeBtn.addEventListener('click', closeRail);
+      if (backdrop) backdrop.addEventListener('click', closeRail);
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && rail && rail.classList.contains('is-open')) closeRail();
+      });
+
+      // Smooth-scroll on link click; auto-close drawer on narrow viewports.
       links.forEach(function(l){
         l.addEventListener('click', function(e){
           e.preventDefault();
           var target = document.getElementById(l.getAttribute('data-target'));
           if (target) target.scrollIntoView({behavior:'smooth', block:'start'});
+          if (window.matchMedia('(max-width: 1279px)').matches) closeRail();
         });
       });
     })();

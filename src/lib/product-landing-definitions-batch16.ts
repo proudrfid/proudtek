@@ -695,7 +695,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH16: Array<{
       "All-in-one resort credential — room access, pool/beach entry, restaurant charging, spa booking and activity reservation on a single waterproof wristband.",
     ],
     imageAlt: "RFID vinyl wristband with snap closure for multi-day resort and cruise use",
-    heroImage: "/landing-images/pvc-rfid-wristband.png",
+    heroImage: "/landing-images/rfid-vinyl-wristband.jpg",
     imageSourceRoutes: ["/product/rfid-wristbands-for-events/", "/product/rfid-cards/"],
     sections: [
       {
