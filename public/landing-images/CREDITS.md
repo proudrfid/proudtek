@@ -75,14 +75,14 @@ under their source license are listed here.
 - **Modifications:** resized from 2069 × 3422 to 726 × 1200; no color or content alteration.
 - **Used on:** `/products/rfid-labels/nfc-spirits-authentication-label/` (round-3 hero fix, 2026-04-18).
 
-## rfid-reader-with-antenna.jpg
+## rfid-panel-antenna.jpg
 
-- **Source:** Wikimedia Commons — "TransCore RFID reader and antenna.jpg"
-- **URL:** https://commons.wikimedia.org/wiki/File:TransCore_RFID_reader_and_antenna.jpg
-- **Author:** Z22 (Wikimedia Commons contributor)
-- **License:** Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0) — https://creativecommons.org/licenses/by-sa/3.0/
-- **Modifications:** none beyond filename rename; original 3264 × 2448 retained.
-- **Used on:** `/products/rfid-readers/fixed-uhf-rfid-reader/` (round-4 hero fix, 2026-04-22 — replaced a wrong Bluetooth-handheld scanner image that had leaked in from the WordPress snapshot resolver).
+- **Source:** Wikimedia Commons — "Rfid-antenna.JPG"
+- **URL:** https://commons.wikimedia.org/wiki/File:Rfid-antenna.JPG
+- **Author:** Lvova (Wikimedia Commons contributor)
+- **License:** Public domain — released worldwide by the author via Template:PD-self.
+- **Modifications:** none beyond filename rename; original 2115 × 1722 retained.
+- **Used on:** `/products/rfid-readers/fixed-uhf-rfid-reader/` (round-5 hero fix, 2026-04-22 — supersedes a round-4 pole-mounted TransCore shot that read as street/tolling photography rather than the warehouse-dock / portal context the page actually covers; the panel antenna is the most visually-recognisable part of a fixed R700 / FX9600 / ALR-F800 installation).
 
 ## Round-3 provenance-unverified images (2026-04-18)
 
