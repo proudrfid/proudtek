@@ -5,7 +5,7 @@ import type { SiteData, SnapshotPage } from "./site-data";
 import { loadPageFromDisk } from "./site-data";
 import { INDUSTRY_CATEGORIES } from "./catalog-pages";
 
-export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products";
+export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "resources";
 
 interface EditorialLink {
   href: string;
@@ -287,7 +287,48 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
   "/products/rfid-wristbands/",
   "/products/rfid-keyfobs/",
   "/industries/",
+  "/resources/",
 ]);
+
+/**
+ * Route-pattern overrides — same intent as EDITORIAL_OVERRIDE_ROUTES but
+ * matches a family of routes by regex instead of exact URL. Used for the
+ * 15+ /industries/<slug>/ pages whose WP snapshots predate the editorial
+ * pillar rewrite (and therefore lack the left rail). Any pattern listed
+ * here forces the editorial JSON to replace the on-disk snapshot.
+ */
+const EDITORIAL_OVERRIDE_PATTERNS: RegExp[] = [
+  /^\/industries\/[^/]+\/$/,
+  /^\/solutions\/[^/]+\/$/,
+];
+
+function isEditorialOverrideRoute(route: string): boolean {
+  return EDITORIAL_OVERRIDE_ROUTES.has(route)
+    || EDITORIAL_OVERRIDE_PATTERNS.some((pattern) => pattern.test(route));
+}
+
+/**
+ * Cluster ids that have both a `/products/{id}/` editorial pillar and a
+ * matching `#{id}` section in the `/products/all/` catalog. Used to render
+ * a pillar→catalog "Browse all SKUs" bridge CTA, mirroring the catalog→pillar
+ * "Read the {label} guide" link in `renderCatalogMain`. The two CTAs let
+ * informational and SKU-discovery intent stay on their own pages while still
+ * being one click apart.
+ */
+const PILLAR_CLUSTER_LABELS: Record<string, string> = {
+  "rfid-cards": "RFID Cards",
+  "rfid-keyfobs": "RFID Keyfobs",
+  "rfid-labels": "RFID Labels",
+  "rfid-readers": "RFID Readers",
+  "rfid-tags": "RFID Tags",
+  "rfid-wristbands": "RFID Wristbands",
+};
+
+function getPillarClusterId(route: string): string | null {
+  const match = /^\/products\/([^/]+)\/$/.exec(route);
+  if (!match) return null;
+  return match[1] in PILLAR_CLUSTER_LABELS ? match[1] : null;
+}
 
 export async function mergeEditorialPages(siteData: SiteData): Promise<SiteData> {
   const extraPages = await buildEditorialPages(siteData);
@@ -299,8 +340,10 @@ export async function mergeEditorialPages(siteData: SiteData): Promise<SiteData>
     const existingAt = existingIndex.get(page.route);
     if (existingAt === undefined) {
       pages.push(page);
-    } else if (EDITORIAL_OVERRIDE_ROUTES.has(page.route)) {
-      // Pillar editorial page replaces the WP snapshot at the cluster root.
+    } else if (isEditorialOverrideRoute(page.route)) {
+      // Pillar editorial page replaces the WP snapshot at the cluster root
+      // (and at every /industries/<slug>/ vertical, so the left rail and
+      // any other render-time additions actually reach the rendered page).
       pages[existingAt] = page;
     }
     // Otherwise: keep the existing page (SKU pages already map 1:1 to JSON).
@@ -425,6 +468,96 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
     }
   }
 
+  // Populate the /industries/ hub data — join the curated INDUSTRY_HUB_META
+  // ordering with the loaded definitions so the hub rail + card grid pull
+  // authored summaries and hero images. Slugs missing a definition are
+  // silently dropped (they'll just be omitted from the hub).
+  _industriesHubData.length = 0;
+  for (const meta of INDUSTRY_HUB_META) {
+    const route = `/industries/${meta.slug}/`;
+    const def = EDITORIAL_DEFINITIONS.find((d) => d.route === route);
+    if (!def) continue;
+    _industriesHubData.push({
+      slug: meta.slug,
+      route,
+      label: meta.label,
+      emoji: meta.emoji,
+      summary: def.summary,
+      heroImage: def.heroImage ?? "",
+    });
+  }
+
+  // Same join-and-cache for /solutions/. SOLUTION_HUB_META drives display
+  // order; entries without a matching editorial JSON are silently skipped.
+  _solutionsHubData.length = 0;
+  for (const meta of SOLUTION_HUB_META) {
+    const route = `/solutions/${meta.slug}/`;
+    const def = EDITORIAL_DEFINITIONS.find((d) => d.route === route);
+    if (!def) continue;
+    _solutionsHubData.push({
+      slug: meta.slug,
+      route,
+      label: meta.label,
+      emoji: meta.emoji,
+      summary: def.summary,
+      heroImage: def.heroImage ?? "",
+    });
+  }
+
+  // Build the /resources/ grouped hub data — auto-pulled from every editorial
+  // definition matching one of the four Resources groups (blog, guides, compare,
+  // compatibility). No hand-curated meta per item: label is derived from the
+  // editorial title (preferring the part before " — " / " | " for brevity),
+  // emoji is the group's shared emoji. Items sort alphabetically by label.
+  _resourcesHubData.length = 0;
+  for (const groupMeta of RESOURCES_GROUP_META) {
+    const items: HubEntry[] = [];
+    for (const def of EDITORIAL_DEFINITIONS) {
+      // Skip the resources pillar itself and any nested non-leaf routes.
+      if (def.route === "/resources/") continue;
+      if (!def.route.startsWith(groupMeta.routePrefix)) continue;
+      // Match the leaf form /<prefix>/<slug>/ — exclude the group root if it exists.
+      const slugMatch = def.route.match(new RegExp(`^${groupMeta.routePrefix}([^/]+)/$`));
+      if (!slugMatch) continue;
+      const slug = slugMatch[1];
+
+      // Prefer the part before " — " / " – " / " | " for a short rail label.
+      const shortTitle = def.title.split(/—|–|\||:/, 1)[0]?.trim() || def.title;
+      const label = shortTitle.length > 60 ? shortTitle.slice(0, 57).trimEnd() + "…" : shortTitle;
+
+      items.push({
+        slug,
+        route: def.route,
+        label,
+        emoji: groupMeta.emoji,
+        summary: def.summary,
+        heroImage: def.heroImage ?? "",
+      });
+    }
+    items.sort((a, b) => a.label.localeCompare(b.label));
+    _resourcesHubData.push({
+      groupLabel: groupMeta.groupLabel,
+      groupSlug: groupMeta.groupSlug,
+      emoji: groupMeta.emoji,
+      items,
+    });
+  }
+
+  // Flat 4-item rail nav for the /resources/ left rail — mirrors the dropdown
+  // menu shown in the global header. Each entry links to the matching group's
+  // anchor on /resources/ (so the rail acts as a TOC for the page body).
+  _resourcesRailData.length = 0;
+  for (const group of _resourcesHubData) {
+    _resourcesRailData.push({
+      slug: group.groupSlug,
+      route: `/resources/#resources-hub-grid-${group.groupSlug}`,
+      label: `${group.groupLabel} (${group.items.length})`,
+      emoji: group.emoji,
+      summary: "",
+      heroImage: "",
+    });
+  }
+
   const pages: SnapshotPage[] = [];
   for (const definition of EDITORIAL_DEFINITIONS) {
     pages.push({
@@ -494,6 +627,144 @@ function buildBodyHtml(templateBodyHtml: string, definition: EditorialDefinition
 /** Lookup maps for product images — populated in buildEditorialPages() */
 const _editorialImageMap: Map<string, { title: string; heroImage: string }> = new Map();
 const _wpProductImageMap: Map<string, { title: string; image: string }> = new Map();
+
+/**
+ * Display metadata for industry sub-pages on the /industries/ hub.
+ * Order in this map drives both the rail order and the card-grid order.
+ * Short labels (vs. the long editorial titles) are used in the rail and on
+ * each card; the emoji becomes a quick visual key. INDUSTRY_CATEGORIES has
+ * its own emoji set for the 8 "core" verticals — we mirror those here for
+ * consistency, then add the remaining 12 verticals that exist as editorial
+ * pillars but aren't in the homepage rail.
+ */
+const INDUSTRY_HUB_META: Array<{ slug: string; label: string; emoji: string }> = [
+  { slug: "hospitality",                      label: "Hospitality",                      emoji: "🏨" },
+  { slug: "retail-apparel",                   label: "Retail & Apparel",                 emoji: "🛍️" },
+  { slug: "brand-protection",                 label: "Brand Protection",                 emoji: "🛡️" },
+  { slug: "events-venues",                    label: "Events & Venues",                  emoji: "🎪" },
+  { slug: "healthcare",                       label: "Healthcare",                       emoji: "🏥" },
+  { slug: "logistics",                        label: "Logistics & Supply Chain",         emoji: "📦" },
+  { slug: "industrial",                       label: "Industrial & Manufacturing",       emoji: "🏭" },
+  { slug: "eu-compliance",                    label: "EU Compliance",                    emoji: "🇪🇺" },
+  { slug: "luxury-brands",                    label: "Luxury Brands",                    emoji: "👜" },
+  { slug: "pharmaceutical",                   label: "Pharmaceutical",                   emoji: "💊" },
+  { slug: "libraries",                        label: "Libraries",                        emoji: "📚" },
+  { slug: "laundry-services",                 label: "Laundry Services",                 emoji: "🧺" },
+  { slug: "education",                        label: "Education",                        emoji: "🎓" },
+  { slug: "fitness",                          label: "Fitness",                          emoji: "💪" },
+  { slug: "agriculture",                      label: "Agriculture",                      emoji: "🌾" },
+  { slug: "automotive-tire-oem",              label: "Automotive & Tire OEM",            emoji: "🚗" },
+  { slug: "aerospace-aviation-mro",           label: "Aerospace & Aviation MRO",         emoji: "✈️" },
+  { slug: "data-center-it-asset-tracking",    label: "Data Center & IT Assets",          emoji: "💻" },
+  { slug: "government-defense-supply-chain",  label: "Government & Defense",             emoji: "🪖" },
+  { slug: "cold-chain-food-traceability",     label: "Cold Chain & Food Traceability",   emoji: "❄️" },
+];
+
+/**
+ * Industries hub data — populated in buildEditorialPages() by joining the
+ * INDUSTRY_HUB_META display table with the loaded editorial definitions
+ * (so we can pull authored summary + heroImage). Used by both the left rail
+ * and the card grid on /industries/.
+ *
+ * `HubEntry` is the generic shape used by all hub-style sections (industries,
+ * solutions, …). Adding a new hub means: declare a META list, populate a
+ * `_<section>HubData: HubEntry[]` in buildEditorialPages, and call
+ * `renderHubRail` / `renderHubGrid` from `renderEditorialMain`.
+ */
+type HubEntry = { slug: string; route: string; label: string; emoji: string; summary: string; heroImage: string };
+type IndustryHubEntry = HubEntry;
+const _industriesHubData: HubEntry[] = [];
+
+/**
+ * Display metadata for solution sub-pages on the /solutions/ hub. Order in
+ * this map drives both the rail order and the card-grid order. Themes are
+ * grouped contiguously (hospitality → events → laundry → healthcare → library
+ * → brand auth → cards → asset/inventory → warehouse → vehicle → access
+ * control → attendance → google review variants) so the rail scans naturally
+ * even though it's a flat list.
+ */
+const SOLUTION_HUB_META: Array<{ slug: string; label: string; emoji: string }> = [
+  { slug: "hotel-key-cards",                           label: "Hotel Key Cards",                emoji: "🔑" },
+  { slug: "hotel-rfid-access-control",                 label: "Hotel Access Control",           emoji: "🏨" },
+  { slug: "rfid-event-access-control",                 label: "Event Access Control",           emoji: "🎟️" },
+  { slug: "rfid-event-wristbands",                     label: "Event Wristbands",               emoji: "🎫" },
+  { slug: "rfid-race-timing",                          label: "Race Timing",                    emoji: "🏁" },
+  { slug: "rfid-laundry-tags",                         label: "Laundry Tags",                   emoji: "🏷️" },
+  { slug: "rfid-laundry-management",                   label: "Laundry Management",             emoji: "🧺" },
+  { slug: "rfid-laundry-tracking",                     label: "Laundry Tracking",               emoji: "🔁" },
+  { slug: "rfid-patient-tracking",                     label: "Patient Tracking",               emoji: "🏥" },
+  { slug: "rfid-library-management",                   label: "Library Management",             emoji: "📚" },
+  { slug: "nfc-brand-authentication",                  label: "Brand Authentication",           emoji: "🛡️" },
+  { slug: "nfc-luxury-authentication",                 label: "Luxury Authentication",          emoji: "💎" },
+  { slug: "digital-product-passport",                  label: "Digital Product Passport",       emoji: "🇪🇺" },
+  { slug: "nfc-business-card",                         label: "NFC Business Cards",             emoji: "💳" },
+  { slug: "nfc-business-card-programs",                label: "Business Card Programs",         emoji: "🪪" },
+  { slug: "rfid-asset-tracking-labels",                label: "Asset-Tracking Labels",          emoji: "📦" },
+  { slug: "rfid-inventory-tracking",                   label: "Inventory Tracking",             emoji: "📊" },
+  { slug: "rfid-tool-tracking",                        label: "Tool Tracking",                  emoji: "🔧" },
+  { slug: "rfid-warehouse-management",                 label: "Warehouse Management",           emoji: "🏭" },
+  { slug: "rfid-supply-chain-management",              label: "Supply Chain",                   emoji: "🚚" },
+  { slug: "vehicle-rfid-identification",               label: "Vehicle ID",                     emoji: "🚗" },
+  { slug: "rfid-parking-management",                   label: "Parking Management",             emoji: "🅿️" },
+  { slug: "rfid-access-control",                       label: "Access Control",                 emoji: "🚪" },
+  { slug: "rfid-keyfobs-access-control",               label: "Keyfob Access",                  emoji: "🔐" },
+  { slug: "rfid-attendance-system",                    label: "Attendance System",              emoji: "⏱️" },
+  { slug: "rfid-readers-and-encoding",                 label: "Readers & Encoding",             emoji: "📡" },
+  { slug: "google-review-nfc-card",                    label: "Google Review NFC Cards",        emoji: "⭐" },
+  { slug: "google-review-cards-for-restaurants",       label: "Review · Restaurants",           emoji: "🍽️" },
+  { slug: "google-review-cards-for-hotels",            label: "Review · Hotels",                emoji: "🛎️" },
+  { slug: "google-review-cards-for-clinics",           label: "Review · Clinics",               emoji: "🩺" },
+  { slug: "google-review-cards-for-salons-and-spas",   label: "Review · Salons & Spas",         emoji: "💇" },
+  { slug: "google-review-cards-for-retail-stores",     label: "Review · Retail Stores",         emoji: "🛍️" },
+  { slug: "google-review-cards-for-gyms-and-fitness-studios", label: "Review · Gyms & Fitness", emoji: "💪" },
+  { slug: "google-review-cards-for-front-desks",       label: "Review · Front Desks",           emoji: "📋" },
+  { slug: "google-review-cards-for-checkout-counters", label: "Review · Checkout Counters",     emoji: "🧾" },
+  { slug: "google-review-cards-for-tabletop-prompts",  label: "Review · Tabletop Prompts",      emoji: "🍴" },
+  { slug: "google-review-cards-for-pickup-counters",   label: "Review · Pickup Counters",       emoji: "🛒" },
+];
+
+/** Solutions hub data — built in buildEditorialPages() (same shape as industries). */
+const _solutionsHubData: HubEntry[] = [];
+
+/**
+ * Grouped hub shape — used by sections that aggregate multiple editorial
+ * groups under one umbrella (e.g. /resources/ pulls guides + compare +
+ * compatibility into a single rail with group headers). Each group renders
+ * as its own labelled section in both the rail and the card grid.
+ */
+type GroupedHubData = Array<{
+  groupLabel: string;
+  groupSlug: string;
+  emoji: string;
+  items: HubEntry[];
+}>;
+
+/**
+ * Display metadata for the /resources/ aggregate hub. Four groups in the
+ * order they appear in the Resources dropdown menu: Blog → Buying Guides →
+ * Product Comparisons → Hotel Lock Compatibility. Labels are intentionally
+ * the same as the menu wording so the rail feels like the menu "stayed open".
+ * Items inside each group are auto-derived from matching editorial JSONs
+ * (no per-item curation — there are 170+, and the per-page emoji is replaced
+ * by a single group emoji).
+ */
+const RESOURCES_GROUP_META: Array<{ groupLabel: string; groupSlug: string; emoji: string; routePrefix: string; editorialGroup: EditorialGroup }> = [
+  { groupLabel: "Blog — Industry Articles",   groupSlug: "blog",          emoji: "📰", routePrefix: "/blog/",          editorialGroup: "blog" },
+  { groupLabel: "Buying Guides",              groupSlug: "guides",        emoji: "📖", routePrefix: "/guides/",        editorialGroup: "guides" },
+  { groupLabel: "Product Comparisons",        groupSlug: "compare",       emoji: "⚖️", routePrefix: "/compare/",       editorialGroup: "compare" },
+  { groupLabel: "Hotel Lock Compatibility",   groupSlug: "compatibility", emoji: "🔌", routePrefix: "/compatibility/", editorialGroup: "compatibility" },
+];
+
+/** Resources hub data — built in buildEditorialPages() (grouped shape). */
+const _resourcesHubData: GroupedHubData = [];
+
+/**
+ * Resources rail nav data — flat 4-item list mirroring the dropdown menu.
+ * Each entry links to the matching group's anchor on /resources/ itself
+ * (TOC pattern), NOT to a sub-page. Built from RESOURCES_GROUP_META so
+ * label / emoji / count stay in sync with the body grid.
+ */
+const _resourcesRailData: HubEntry[] = [];
 
 /**
  * Route → keyword-phrase lookup for JSON-LD `keywords` field.
@@ -604,6 +875,413 @@ function renderIndustryProductGrid(definition: EditorialDefinition): string {
     </section>`;
 }
 
+/**
+ * Render a product card grid for a /solutions/<slug>/ sub-page. Auto-driven
+ * off the editorial JSON's `imageSourceRoutes` field — same data the hero
+ * illustration picker uses — so each solution gets a relevant SKU shortlist
+ * without a hand-curated mapping. Reuses the industry product grid styles
+ * (.codex-industries-cat-*) so the visual treatment matches.
+ */
+function renderSolutionProductGrid(definition: EditorialDefinition): string {
+  // Hub itself doesn't get this grid (it has the full-section card grid instead).
+  if (!/^\/solutions\/[^/]+\/$/.test(definition.route)) return "";
+  const routes = definition.imageSourceRoutes ?? [];
+  if (routes.length === 0) return "";
+
+  // Prefer the short rail label over the long editorial title for the
+  // section heading. Falls back to a slug-derived title if the slug isn't
+  // in SOLUTION_HUB_META yet.
+  const hubEntry = _solutionsHubData.find((e) => e.route === definition.route);
+  const sectionLabel = hubEntry?.label
+    ?? definition.route
+        .replace(/^\/solutions\//, "")
+        .replace(/\/$/, "")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  const cards = routes.map((route) => {
+    const editorial = _editorialImageMap.get(route);
+    const wpProduct = _wpProductImageMap.get(route);
+    const name = editorial?.title
+      ?? wpProduct?.title
+      ?? route.split("/").filter(Boolean).pop()?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+      ?? route;
+    const shortName = name.length > 50 ? name.slice(0, 47).trimEnd() + "..." : name;
+    const img = editorial?.heroImage ?? wpProduct?.image ?? "";
+
+    return `
+      <a href="${escapeAttribute(route)}" class="codex-industries-cat-card">
+        ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" loading="lazy">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
+        <div class="codex-industries-cat-card__body">
+          <h3>${escapeHtml(shortName)}</h3>
+          <span class="codex-industries-cat-card__arrow">&rarr;</span>
+        </div>
+      </a>`;
+  }).join("");
+
+  return `
+    <section class="codex-industries-cat-products" aria-label="Products for ${escapeAttribute(sectionLabel)}">
+      <h2 class="codex-industries-cat-products__title">Featured ${escapeHtml(sectionLabel)} Products</h2>
+      <p class="codex-industries-cat-products__sub">SKUs we typically deploy for ${escapeHtml(sectionLabel.toLowerCase())}. Tap a card for specs and samples.</p>
+      <div class="codex-industries-cat-products__grid">${cards}</div>
+    </section>`;
+}
+
+/**
+ * Build the floating left rail used by hub pages (/industries/, /solutions/).
+ * Mirrors the /products/all/ pattern — each rail entry deep-links to a
+ * specific sub-page (NOT an on-page anchor). The list is driven by the
+ * relevant *_HUB_META order, joined with editorial JSON to skip slugs that
+ * don't have a definition. Hidden below 1280px; opens as a drawer behind a
+ * floating toggle on narrow viewports.
+ *
+ * `sectionLabel` is used in the toggle text, the aside title, and aria
+ * labels — pass "Industries", "Solutions", etc.
+ */
+function renderHubRail(items: HubEntry[], currentRoute: string, sectionLabel: string): string {
+  if (items.length === 0) return "";
+
+  const links = items
+    .map((entry) => {
+      const isActive = entry.route === currentRoute;
+      const classAttr = isActive
+        ? "codex-industries-sidebar__link active"
+        : "codex-industries-sidebar__link";
+      const ariaCurrent = isActive ? ' aria-current="page"' : "";
+      return `<a href="${escapeAttribute(entry.route)}" class="${classAttr}" data-slug="${escapeAttribute(entry.slug)}"${ariaCurrent}>
+          <span class="codex-industries-sidebar__emoji" aria-hidden="true">${entry.emoji}</span>
+          <span class="codex-industries-sidebar__label">${escapeHtml(entry.label)}</span>
+        </a>`;
+    })
+    .join("");
+
+  const lowerSection = sectionLabel.toLowerCase();
+  const railModifier = sectionLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+  return `
+    <button type="button"
+            class="codex-catalog-rail-toggle"
+            aria-expanded="false"
+            aria-controls="codex-catalog-rail-panel"
+            aria-label="Show ${escapeAttribute(lowerSection)}">
+      <span class="codex-catalog-rail-toggle__icon" aria-hidden="true">🗂️</span>
+      <span class="codex-catalog-rail-toggle__label">${escapeHtml(sectionLabel)}</span>
+    </button>
+    <div class="codex-catalog-rail-backdrop" hidden></div>
+    <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--${escapeAttribute(railModifier)}" aria-label="${escapeAttribute(sectionLabel)}">
+      <button type="button" class="codex-catalog-rail__close" aria-label="Close ${escapeAttribute(lowerSection)}">✕</button>
+      <nav class="codex-industries-sidebar__nav">
+        <div class="codex-industries-sidebar__title">${escapeHtml(sectionLabel)}</div>
+        ${links}
+      </nav>
+    </aside>
+    <script>
+    (function(){
+      var rail = document.getElementById('codex-catalog-rail-panel');
+      var toggle = document.querySelector('.codex-catalog-rail-toggle');
+      var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
+      var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
+      if (!rail) return;
+
+      function openRail(){
+        rail.classList.add('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+        if (backdrop) backdrop.hidden = false;
+        document.body.classList.add('codex-catalog-rail-locked');
+      }
+      function closeRail(){
+        rail.classList.remove('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        if (backdrop) backdrop.hidden = true;
+        document.body.classList.remove('codex-catalog-rail-locked');
+      }
+      if (toggle) toggle.addEventListener('click', function(){
+        if (rail.classList.contains('is-open')) closeRail(); else openRail();
+      });
+      if (closeBtn) closeBtn.addEventListener('click', closeRail);
+      if (backdrop) backdrop.addEventListener('click', closeRail);
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) closeRail();
+      });
+    })();
+    </script>
+  `;
+}
+
+/**
+ * Render a hub card grid — one card per sub-page. Lives directly under the
+ * pillar hero so visitors can jump straight into the relevant page without
+ * scrolling through the body. Uses the editorial heroImage when available,
+ * falling back to an emoji placeholder.
+ *
+ * `sectionLabel` is used in the section heading and aria label — pass
+ * "industries", "solutions", etc. (lower-case noun, the function adds
+ * "all N" prefix and "Browse" verb).
+ */
+function renderHubGrid(items: HubEntry[], sectionLabel: string): string {
+  if (items.length === 0) return "";
+
+  const lowerSection = sectionLabel.toLowerCase();
+  const sectionId = `${lowerSection.replace(/[^a-z0-9]+/g, "-")}-hub-grid`;
+  const introCopy = lowerSection === "industries"
+    ? "Pick the vertical closest to your project — each page lists the relevant SKUs, real-world deployments and any compliance notes."
+    : `Pick the ${lowerSection.replace(/s$/, "")} closest to your use case — each page covers the relevant SKUs, deployment notes and compatible hardware.`;
+
+  const cards = items
+    .map(
+      (entry) => `
+        <a href="${escapeAttribute(entry.route)}" class="codex-industries-hub-card">
+          <div class="codex-industries-hub-card__media">
+            ${entry.heroImage
+              ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" loading="lazy" decoding="async">`
+              : `<div class="codex-industries-hub-card__placeholder" aria-hidden="true">${entry.emoji}</div>`}
+            <span class="codex-industries-hub-card__emoji" aria-hidden="true">${entry.emoji}</span>
+          </div>
+          <div class="codex-industries-hub-card__body">
+            <h3 class="codex-industries-hub-card__title">${escapeHtml(entry.label)}</h3>
+            <p class="codex-industries-hub-card__summary">${escapeHtml(truncateEditorialText(entry.summary, 140))}</p>
+            <span class="codex-industries-hub-card__cta">Explore ${escapeHtml(entry.label)} <span aria-hidden="true">→</span></span>
+          </div>
+        </a>`,
+    )
+    .join("");
+
+  return `
+    <section class="codex-editorial-section codex-industries-hub-grid" id="${escapeAttribute(sectionId)}" aria-label="All ${escapeAttribute(lowerSection)}">
+      <h2>Browse all ${items.length} ${escapeHtml(lowerSection)}</h2>
+      <p class="codex-editorial-section-intro">${escapeHtml(introCopy)}</p>
+      <div class="codex-industries-hub-grid__list">
+        ${cards}
+      </div>
+    </section>
+  `;
+}
+
+/**
+ * Grouped variant of `renderHubRail`. Same drawer/toggle structure (so the
+ * mobile interaction + CSS classes match), but each group renders its own
+ * labelled `<div class="codex-industries-sidebar__group-title">` header
+ * followed by the items belonging to that group. Used by /resources/ to keep
+ * Guides / Compare / Compatibility visually distinct in a single rail.
+ */
+function renderGroupedHubRail(groups: GroupedHubData, currentRoute: string, sectionLabel: string): string {
+  const totalItems = groups.reduce((sum, g) => sum + g.items.length, 0);
+  if (totalItems === 0) return "";
+
+  const groupHtml = groups
+    .filter((g) => g.items.length > 0)
+    .map((group) => {
+      const links = group.items
+        .map((entry) => {
+          const isActive = entry.route === currentRoute;
+          const classAttr = isActive
+            ? "codex-industries-sidebar__link active"
+            : "codex-industries-sidebar__link";
+          const ariaCurrent = isActive ? ' aria-current="page"' : "";
+          return `<a href="${escapeAttribute(entry.route)}" class="${classAttr}" data-slug="${escapeAttribute(entry.slug)}"${ariaCurrent}>
+              <span class="codex-industries-sidebar__emoji" aria-hidden="true">${entry.emoji}</span>
+              <span class="codex-industries-sidebar__label">${escapeHtml(entry.label)}</span>
+            </a>`;
+        })
+        .join("");
+      return `<div class="codex-industries-sidebar__group">
+          <div class="codex-industries-sidebar__group-title">${escapeHtml(group.groupLabel)} <span class="codex-industries-sidebar__group-count">${group.items.length}</span></div>
+          ${links}
+        </div>`;
+    })
+    .join("");
+
+  const lowerSection = sectionLabel.toLowerCase();
+  const railModifier = sectionLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+
+  return `
+    <button type="button"
+            class="codex-catalog-rail-toggle"
+            aria-expanded="false"
+            aria-controls="codex-catalog-rail-panel"
+            aria-label="Show ${escapeAttribute(lowerSection)}">
+      <span class="codex-catalog-rail-toggle__icon" aria-hidden="true">🗂️</span>
+      <span class="codex-catalog-rail-toggle__label">${escapeHtml(sectionLabel)}</span>
+    </button>
+    <div class="codex-catalog-rail-backdrop" hidden></div>
+    <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--${escapeAttribute(railModifier)} codex-catalog-rail--grouped" aria-label="${escapeAttribute(sectionLabel)}">
+      <button type="button" class="codex-catalog-rail__close" aria-label="Close ${escapeAttribute(lowerSection)}">✕</button>
+      <nav class="codex-industries-sidebar__nav">
+        <div class="codex-industries-sidebar__title">${escapeHtml(sectionLabel)}</div>
+        ${groupHtml}
+      </nav>
+    </aside>
+    <script>
+    (function(){
+      var rail = document.getElementById('codex-catalog-rail-panel');
+      var toggle = document.querySelector('.codex-catalog-rail-toggle');
+      var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
+      var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
+      if (!rail) return;
+
+      function openRail(){
+        rail.classList.add('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'true');
+        if (backdrop) backdrop.hidden = false;
+        document.body.classList.add('codex-catalog-rail-locked');
+      }
+      function closeRail(){
+        rail.classList.remove('is-open');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        if (backdrop) backdrop.hidden = true;
+        document.body.classList.remove('codex-catalog-rail-locked');
+      }
+      if (toggle) toggle.addEventListener('click', function(){
+        if (rail.classList.contains('is-open')) closeRail(); else openRail();
+      });
+      if (closeBtn) closeBtn.addEventListener('click', closeRail);
+      if (backdrop) backdrop.addEventListener('click', closeRail);
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && rail.classList.contains('is-open')) closeRail();
+      });
+    })();
+    </script>
+  `;
+}
+
+/**
+ * Grouped variant of `renderHubGrid`. Renders one `<section>` per group, each
+ * with its own heading + count + grid of cards. Reuses .codex-industries-hub-*
+ * card styles so visual treatment matches the flat /industries/ + /solutions/
+ * grids. Used on the /resources/ hub to surface all 80+ resources at once,
+ * grouped by type so visitors can scan by intent (learn vs. compare vs. integrate).
+ */
+function renderGroupedHubGrid(groups: GroupedHubData, sectionLabel: string): string {
+  const totalItems = groups.reduce((sum, g) => sum + g.items.length, 0);
+  if (totalItems === 0) return "";
+
+  const lowerSection = sectionLabel.toLowerCase();
+  const sectionId = `${lowerSection.replace(/[^a-z0-9]+/g, "-")}-hub-grid`;
+
+  const groupSections = groups
+    .filter((g) => g.items.length > 0)
+    .map((group) => {
+      const cards = group.items
+        .map(
+          (entry) => `
+            <a href="${escapeAttribute(entry.route)}" class="codex-industries-hub-card">
+              <div class="codex-industries-hub-card__media">
+                ${entry.heroImage
+                  ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" loading="lazy" decoding="async">`
+                  : `<div class="codex-industries-hub-card__placeholder" aria-hidden="true">${entry.emoji}</div>`}
+                <span class="codex-industries-hub-card__emoji" aria-hidden="true">${entry.emoji}</span>
+              </div>
+              <div class="codex-industries-hub-card__body">
+                <h3 class="codex-industries-hub-card__title">${escapeHtml(entry.label)}</h3>
+                <p class="codex-industries-hub-card__summary">${escapeHtml(truncateEditorialText(entry.summary, 140))}</p>
+                <span class="codex-industries-hub-card__cta">Read ${escapeHtml(entry.label)} <span aria-hidden="true">→</span></span>
+              </div>
+            </a>`,
+        )
+        .join("");
+      const groupId = `${sectionId}-${group.groupSlug}`;
+      const blurb = group.groupSlug === "guides"
+        ? "Long-form technical reference: protocol internals, chip family encyclopedias, integration walkthroughs, regulatory deep-dives."
+        : group.groupSlug === "compare"
+          ? "Side-by-side picker pages: chip vs chip, frequency band vs band, form-factor vs form-factor — for buyers narrowing a shortlist."
+          : "Vendor lock cross-reference: which RFID/NFC card encodes for which OEM lock estate, with chip family + sample-request notes.";
+      return `<section class="codex-editorial-section codex-resources-group" id="${escapeAttribute(groupId)}" aria-label="${escapeAttribute(group.groupLabel)}">
+        <h2 class="codex-resources-group__title"><span class="codex-resources-group__emoji" aria-hidden="true">${group.emoji}</span> ${escapeHtml(group.groupLabel)} <span class="codex-resources-group__count">${group.items.length}</span></h2>
+        <p class="codex-editorial-section-intro">${escapeHtml(blurb)}</p>
+        <div class="codex-industries-hub-grid__list">
+          ${cards}
+        </div>
+      </section>`;
+    })
+    .join("");
+
+  return `
+    <section class="codex-editorial-section codex-industries-hub-grid codex-industries-hub-grid--grouped" id="${escapeAttribute(sectionId)}" aria-label="All ${escapeAttribute(lowerSection)}">
+      <h2>Browse all ${totalItems} ${escapeHtml(lowerSection)}</h2>
+      <p class="codex-editorial-section-intro">Three ways into the catalog: read the long-form guides, compare two options head-to-head, or look up vendor compatibility. Pick the one that matches where you are in the buying cycle.</p>
+      ${groupSections}
+    </section>
+  `;
+}
+
+/**
+ * /resources/ hub renderer — 4 large category cards, one per group, mirroring
+ * the products summary page (`/industries/`) hub-grid pattern but at a higher
+ * abstraction level (one card per category, not one card per leaf). Each card
+ * holds a count badge, a one-line summary, a short list of sample leaf links
+ * (so visitors get an immediate taste of what's inside), and a "Browse all N
+ * <items>" CTA that drops the visitor onto the dedicated category landing
+ * page (`/blog/`, `/guides/`, `/compare/`, `/compatibility/`).
+ *
+ * The leaf-card grid (176 cards) lives on each of those four landing pages,
+ * not here — `/resources/` stays at the category-router level.
+ */
+function renderResourcesCategoryHub(groups: GroupedHubData, sectionLabel: string): string {
+  const totalItems = groups.reduce((sum, g) => sum + g.items.length, 0);
+  if (totalItems === 0) return "";
+
+  const lowerSection = sectionLabel.toLowerCase();
+  const sectionId = `${lowerSection.replace(/[^a-z0-9]+/g, "-")}-hub-grid`;
+
+  const cards = groups
+    .filter((g) => g.items.length > 0)
+    .map((group) => {
+      const groupId = `${sectionId}-${group.groupSlug}`;
+      const browseHref = `/${group.groupSlug}/`;
+      const itemNoun =
+        group.groupSlug === "blog"
+          ? "articles"
+          : group.groupSlug === "guides"
+            ? "guides"
+            : group.groupSlug === "compare"
+              ? "comparisons"
+              : "compatibility pages";
+      const blurb =
+        group.groupSlug === "blog"
+          ? "Industry articles, deployment notes and field reports — written for buyers and integrators in the field."
+          : group.groupSlug === "guides"
+            ? "Long-form technical reference: protocol internals, chip family encyclopedias, integration walkthroughs, regulatory deep-dives."
+            : group.groupSlug === "compare"
+              ? "Side-by-side picker pages: chip vs chip, frequency band vs band, form-factor vs form-factor — for buyers narrowing a shortlist."
+              : "Vendor lock cross-reference: which RFID/NFC card encodes for which OEM lock estate, with chip family + sample-request notes.";
+
+      const sampleItems = group.items.slice(0, 4);
+      const sampleLinks = sampleItems
+        .map(
+          (entry) =>
+            `<li><a href="${escapeAttribute(entry.route)}">${escapeHtml(entry.label)}</a></li>`,
+        )
+        .join("");
+
+      return `
+        <article class="codex-resources-category-card" id="${escapeAttribute(groupId)}">
+          <header class="codex-resources-category-card__header">
+            <span class="codex-resources-category-card__emoji" aria-hidden="true">${group.emoji}</span>
+            <div class="codex-resources-category-card__heading">
+              <h3 class="codex-resources-category-card__title">${escapeHtml(group.groupLabel)}</h3>
+              <p class="codex-resources-category-card__count">${group.items.length} ${itemNoun}</p>
+            </div>
+          </header>
+          <p class="codex-resources-category-card__summary">${escapeHtml(blurb)}</p>
+          <ul class="codex-resources-category-card__samples" aria-label="Sample ${escapeAttribute(itemNoun)}">
+            ${sampleLinks}
+          </ul>
+          <a class="codex-resources-category-card__cta" href="${escapeAttribute(browseHref)}">Browse all ${group.items.length} ${escapeHtml(itemNoun)} <span aria-hidden="true">→</span></a>
+        </article>`;
+    })
+    .join("");
+
+  return `
+    <section class="codex-editorial-section codex-resources-category-hub" id="${escapeAttribute(sectionId)}" aria-label="Resource categories">
+      <h2>Browse the ${groups.filter((g) => g.items.length > 0).length} resource categories</h2>
+      <p class="codex-editorial-section-intro">${totalItems} resources across four categories. Pick the one that matches where you are in the buying cycle — read the blog for field stories, guides for technical depth, comparisons for shortlisting, compatibility for vendor lock-in checks.</p>
+      <div class="codex-resources-category-hub__grid">
+        ${cards}
+      </div>
+    </section>
+  `;
+}
+
 function renderEditorialMain(definition: EditorialDefinition, illustration: { src: string; alt: string } | null): string {
   const outline = buildEditorialOutline(definition);
 
@@ -614,9 +1292,54 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
   const publishedLabel = new Date(published).toISOString().slice(0, 10);
   const modifiedLabel = new Date(modified).toISOString().slice(0, 10);
 
+  // Industries + Solutions sections opt into the same left-rail pattern that
+  // /products/all/ and /blog/ use. The rail appears on the section hub AND on
+  // every sub-page so visitors can hop between siblings without backtracking.
+  // Each rail entry deep-links to a specific sub-page (NOT an on-page TOC);
+  // the entry matching the current route gets an `active` class so the
+  // visitor's location is visible. Only the hub also gets the aggregate
+  // card grid below the hero.
+  const isIndustriesHub = definition.route === "/industries/";
+  const isIndustriesPage = isIndustriesHub || /^\/industries\/[^/]+\/$/.test(definition.route);
+  const isSolutionsHub = definition.route === "/solutions/";
+  const isSolutionsPage = isSolutionsHub || /^\/solutions\/[^/]+\/$/.test(definition.route);
+  // Resources hub aggregates Blog + Buying Guides + Product Comparisons +
+  // Hotel Lock Compatibility under one rail. The hub gets the grouped card
+  // grid; each /blog/<slug>/, /guides/<slug>/, /compare/<slug>/,
+  // /compatibility/<slug>/ leaf gets only the rail (so visitors can hop
+  // back to the resources hub from any leaf).
+  const isResourcesHub = definition.route === "/resources/";
+  const isResourcesPage = isResourcesHub || /^\/(?:blog|guides|compare|compatibility)\/[^/]+\/$/.test(definition.route);
+
+  let railHtml = "";
+  let hubGridHtml = "";
+  if (isIndustriesPage) {
+    railHtml = renderHubRail(_industriesHubData, definition.route, "Industries");
+    if (isIndustriesHub) hubGridHtml = renderHubGrid(_industriesHubData, "industries");
+  } else if (isSolutionsPage) {
+    railHtml = renderHubRail(_solutionsHubData, definition.route, "Solutions");
+    if (isSolutionsHub) hubGridHtml = renderHubGrid(_solutionsHubData, "solutions");
+  } else if (isResourcesPage) {
+    // Resources rail = the same 4 items as the dropdown menu (Blog, Buying
+    // Guides, Product Comparisons, Hotel Lock Compatibility). Each item is
+    // an in-page anchor link to the matching category card in the body hub.
+    railHtml = renderHubRail(_resourcesRailData, definition.route, "Resources");
+    // Body grid = 4 large category cards (one per group), each with count
+    // badge, sample-item links and a "Browse all N items" CTA pointing to the
+    // category's dedicated landing page (/blog/, /guides/, /compare/,
+    // /compatibility/). The full 176-leaf grid lives on those landing pages,
+    // not here — /resources/ is the category-router level.
+    if (isResourcesHub) hubGridHtml = renderResourcesCategoryHub(_resourcesHubData, "resources");
+  }
+
+  const contentWrapClass = (isIndustriesPage || isSolutionsPage || isResourcesPage)
+    ? "content-wrap codex-editorial-pillar--with-rail"
+    : "content-wrap";
+
   return `
     <div class="woocommerce kadence-woo-messages-none-woo-pages woocommerce-notices-wrapper"></div>
-    <div class="content-wrap">
+    ${railHtml}
+    <div class="${contentWrapClass}">
       <article class="entry content-bg single-entry page type-page status-publish hentry codex-editorial-page">
         <div class="entry-content-wrap">
           <div class="entry-content single-content">
@@ -638,6 +1361,12 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
                 </ul>
                 ${definition.group !== "contact" ? `<div class="codex-hero-cta">
                   <a class="codex-hero-cta-btn" href="${escapeAttribute(definition.primaryAction.href)}">${escapeHtml(definition.primaryAction.label)}</a>
+                  ${(() => {
+                    const pillarClusterId = getPillarClusterId(definition.route);
+                    if (!pillarClusterId) return "";
+                    const label = PILLAR_CLUSTER_LABELS[pillarClusterId];
+                    return `<a class="codex-hero-cta-btn codex-hero-cta-btn--ghost" href="/products/all/#${escapeAttribute(pillarClusterId)}" data-pillar-bridge="${escapeAttribute(pillarClusterId)}">Browse all ${escapeHtml(label)} SKUs →</a>`;
+                  })()}
                 </div>
                 <div class="codex-hero-trust-bar">
                   <span><strong>10+</strong> Years</span>
@@ -654,7 +1383,10 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
                   : ""
               }
             </section>
+            ${definition.group === "contact" ? renderContactChannels(definition) : ""}
+            ${hubGridHtml}
             ${renderIndustryProductGrid(definition)}
+            ${renderSolutionProductGrid(definition)}
             ${renderRelatedIndustriesGrid(definition)}
             ${renderDecisionSnapshot(definition, outline.snapshotId)}
             ${renderJumpNav(outline.jumpLinks)}
@@ -662,7 +1394,7 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
             ${renderResourceGrid(definition.resourceCards, outline.resourcesId)}
             ${definition.faq.length > 0 && outline.faqId ? renderFaq(definition.faq, outline.faqId) : ""}
             ${definition.group !== "contact" ? renderTrustSignals() : ""}
-            ${definition.group !== "contact" ? renderInlineRfqForm(definition) : ""}
+            ${renderInlineRfqForm(definition)}
             ${renderActionBar(definition, outline.nextStepId)}
           </div>
         </div>
@@ -691,13 +1423,24 @@ function renderTrail(definition: EditorialDefinition): string {
   } else if (definition.group === "solutions") {
     links.push({ href: "/solutions/", label: "Solutions" });
   } else if (definition.group === "compare") {
-    links.push({ href: "/compare/", label: "Compare" });
+    // /compare/, /guides/, /compatibility/, /blog/ have no standalone hub of
+    // their own — route through the new aggregate /resources/ hub instead,
+    // with a group-specific anchor so the visitor lands at the right band
+    // of cards. Labels mirror the dropdown menu wording.
+    links.push({ href: "/resources/", label: "Resources" });
+    links.push({ href: "/resources/#resources-hub-grid-compare", label: "Product Comparisons" });
   } else if (definition.group === "compatibility") {
-    links.push({ href: "/compatibility/", label: "Compatibility" });
+    links.push({ href: "/resources/", label: "Resources" });
+    links.push({ href: "/resources/#resources-hub-grid-compatibility", label: "Hotel Lock Compatibility" });
   } else if (definition.group === "guides") {
-    links.push({ href: "/guides/", label: "Guides" });
+    links.push({ href: "/resources/", label: "Resources" });
+    links.push({ href: "/resources/#resources-hub-grid-guides", label: "Buying Guides" });
   } else if (definition.group === "blog") {
-    links.push({ href: "/blog/", label: "Blog" });
+    links.push({ href: "/resources/", label: "Resources" });
+    links.push({ href: "/resources/#resources-hub-grid-blog", label: "Blog — Industry Articles" });
+  } else if (definition.group === "resources") {
+    // The /resources/ pillar itself — already a section root, no extra crumb.
+    links.push({ href: "/resources/", label: "Resources" });
   } else {
     links.push({ href: "/contact/", label: "Contact" });
   }
@@ -1112,6 +1855,74 @@ function renderTrustSignals(): string {
   </section>`;
 }
 
+function renderContactChannels(definition: EditorialDefinition): string {
+  // Use the page-specific mailto if primaryAction is one; otherwise build a default
+  // tied to this routing page's title.
+  const primary = definition.primaryAction;
+  const mailtoFromPrimary =
+    primary && typeof primary.href === "string" && primary.href.toLowerCase().startsWith("mailto:")
+      ? primary.href
+      : null;
+  const fallbackSubject = encodeURIComponent(`Inquiry: ${definition.title}`);
+  const fallbackBody = encodeURIComponent(
+    `Hi Proud Tek,\n\nI'm reaching out via the ${definition.kicker} contact route about: ${definition.title}\n\nProject details:\n- Application:\n- Chip / frequency requirement:\n- Quantity:\n- Target date:\n\nThanks`,
+  );
+  const mailtoHref = mailtoFromPrimary ?? `mailto:info@proudtek.com?subject=${fallbackSubject}&body=${fallbackBody}`;
+
+  // Phone / WhatsApp number kept consistent with the global contact page and footer.
+  const phoneDisplay = "+86 186 6582 0632";
+  const phoneHref = "tel:+8618665820632";
+  const whatsappHref = "https://wa.me/8618665820632";
+
+  // Inline SVG icons (stroke-based, sized to fit the 40px circle).
+  const iconEmail = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>`;
+  const iconPhone = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92Z"/></svg>`;
+  const iconWhatsApp = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 1 1-3.86-7.13L21 3l-1.37 3.86A8.46 8.46 0 0 1 21 11.5Z"/><path d="M8.5 9.5c.5 2 2 3.5 4 4l1-1c.4-.4 1-.5 1.5-.3l1.5.6c.3.13.5.43.5.77V15a1 1 0 0 1-1 1c-4.42 0-8-3.58-8-8a1 1 0 0 1 1-1h.43c.34 0 .64.2.77.5l.6 1.5c.2.5.1 1.1-.3 1.5l-1 1Z"/></svg>`;
+  const iconForm = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+
+  return `<section class="codex-editorial-channels" aria-label="How to contact us about ${escapeAttribute(definition.kicker)}">
+    <div class="codex-editorial-channels__head">
+      <p class="codex-editorial-kicker">How to reach us</p>
+      <h2>Three ways to start this ${escapeHtml(definition.kicker.toLowerCase())} conversation</h2>
+      <p class="codex-editorial-channels__lede">Pick whichever channel fits your team. Email opens with the recommended subject and project checklist already filled in for this route.</p>
+    </div>
+    <div class="codex-editorial-channels__grid">
+      <a class="codex-editorial-channel" href="${escapeAttribute(mailtoHref)}">
+        <span class="codex-editorial-channel__icon" aria-hidden="true">${iconEmail}</span>
+        <span class="codex-editorial-channel__body">
+          <span class="codex-editorial-channel__label">Email</span>
+          <span class="codex-editorial-channel__value">info@proudtek.com</span>
+          <span class="codex-editorial-channel__hint">Opens prefilled with the ${escapeHtml(definition.kicker.toLowerCase())} brief →</span>
+        </span>
+      </a>
+      <a class="codex-editorial-channel" href="${escapeAttribute(phoneHref)}">
+        <span class="codex-editorial-channel__icon" aria-hidden="true">${iconPhone}</span>
+        <span class="codex-editorial-channel__body">
+          <span class="codex-editorial-channel__label">Phone</span>
+          <span class="codex-editorial-channel__value">${escapeHtml(phoneDisplay)}</span>
+          <span class="codex-editorial-channel__hint">Mon–Fri, 9:00–18:00 (UTC+8)</span>
+        </span>
+      </a>
+      <a class="codex-editorial-channel" href="${escapeAttribute(whatsappHref)}" target="_blank" rel="noopener">
+        <span class="codex-editorial-channel__icon" aria-hidden="true">${iconWhatsApp}</span>
+        <span class="codex-editorial-channel__body">
+          <span class="codex-editorial-channel__label">WhatsApp</span>
+          <span class="codex-editorial-channel__value">${escapeHtml(phoneDisplay)}</span>
+          <span class="codex-editorial-channel__hint">Fastest for quick spec checks</span>
+        </span>
+      </a>
+      <a class="codex-editorial-channel codex-editorial-channel--alt" href="/contact/">
+        <span class="codex-editorial-channel__icon" aria-hidden="true">${iconForm}</span>
+        <span class="codex-editorial-channel__body">
+          <span class="codex-editorial-channel__label">Contact form</span>
+          <span class="codex-editorial-channel__value">Send a structured brief</span>
+          <span class="codex-editorial-channel__hint">Use the main form on /contact/ →</span>
+        </span>
+      </a>
+    </div>
+  </section>`;
+}
+
 function renderInlineRfqForm(definition: EditorialDefinition): string {
   const productName = escapeAttribute(definition.title);
   return `<section class="codex-inline-rfq">
@@ -1231,6 +2042,7 @@ function resolvePageType(group: EditorialGroup): string {
     case "compatibility": return "compatibility";
     case "contact": return "contact";
     case "products": return "product";
+    case "resources": return "resources";
     default: return "";
   }
 }

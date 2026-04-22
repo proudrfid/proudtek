@@ -5,7 +5,7 @@
  * and Astro components can import them without circular dependencies.
  */
 
-export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "lp" | "markets" | "about";
+export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "lp" | "markets" | "about" | "resources";
 
 export interface EditorialLink {
   href: string;
@@ -219,7 +219,7 @@ export function isWorkflowSection(title: string): boolean {
 }
 
 export function isSectionRoot(route: string): boolean {
-  return route === "/solutions/" || route === "/compare/" || route === "/compatibility/" || route === "/guides/" || route === "/contact/";
+  return route === "/solutions/" || route === "/compare/" || route === "/compatibility/" || route === "/guides/" || route === "/contact/" || route === "/resources/";
 }
 
 export function resolvePageType(group: EditorialGroup): string {
@@ -230,6 +230,7 @@ export function resolvePageType(group: EditorialGroup): string {
     case "compatibility": return "compatibility";
     case "contact": return "contact";
     case "products": return "product";
+    case "resources": return "resources";
     default: return "";
   }
 }

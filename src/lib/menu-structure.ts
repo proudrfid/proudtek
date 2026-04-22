@@ -233,7 +233,7 @@ export const SOLUTIONS_MENU: MenuDropdown = {
 
 export const RESOURCES_MENU: MenuDropdown = {
   label: "Resources",
-  href: "/blog/",
+  href: "/resources/",
   groups: [
     {
       links: [
@@ -258,6 +258,17 @@ export interface FooterSection {
 }
 
 export const FOOTER_SECTIONS: FooterSection[] = [
+  {
+    heading: "Products",
+    links: [
+      { href: "/products/rfid-tags/", label: "RFID Tags" },
+      { href: "/products/rfid-labels/", label: "RFID Labels" },
+      { href: "/products/rfid-readers/", label: "RFID Readers" },
+      { href: "/products/rfid-cards/", label: "RFID Cards" },
+      { href: "/products/rfid-keyfobs/", label: "RFID Keyfobs" },
+      { href: "/products/rfid-wristbands/", label: "RFID Wristbands" },
+    ],
+  },
   {
     heading: "Industries",
     links: [
