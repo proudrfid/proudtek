@@ -35,9 +35,9 @@
       "title": "Family and part numbers",
       "bullets": [
         "UCODE 8 — NXP part number SL3S1203. 128-bit EPC, no user memory, 32-bit Kill password, 32-bit Access password, 96-bit factory-unique TID. Optimized for applications where the EPC itself carries all the identity information (SGTIN-96, SGTIN-128, SSCC-96, GIAI-96) and no additional item-specific data needs to live on the tag. The 128-bit EPC bank is the distinguishing feature versus the -m variant and suits retailers who use non-standard proprietary encoding beyond the GS1 96-bit family.",
-        "UCODE 8m — NXP part number SL3S1213. 96-bit EPC plus 32 bits of user memory, same 32-bit passwords and 96-bit unique TID. Same chip architecture and sensitivity — literally the same silicon die, per NXP's data sheet, with the memory partition configured differently at manufacturing. The added 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01) provide space for a backup serial, a factory lot code, a care-instruction index, an authentication password salt, or a hospitality-chain laundry-cycle counter.",
+        "UCODE 8m — NXP part number SL3S1213. 96-bit EPC plus 32 bits of user memory, same 32-bit passwords and 96-bit unique TID. Same chip architecture and sensitivity. Literally the same silicon die, per NXP's data sheet, with the memory partition configured differently at manufacturing. The added 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01) provide space for a backup serial, a factory lot code, a care-instruction index, an authentication password salt, or a hospitality-chain laundry-cycle counter.",
         "UCODE 8xm — NXP part number SL3S1215. Extended variant with 96-bit EPC plus 128 bits of user memory (eight 16-bit words). Less common in production and less widely stocked by major inlay converters (Smartrac/Avery Dennison/Arizon), partly because the ~15% cost premium over SL3S1213 narrows the economic case; where UCODE 8xm's memory is called for, projects often jump directly to UCODE 9xm for sensitivity reasons.",
-        "Strap and inlay availability — UCODE 8 has been shipped on flip-chip straps and wire-bond strapped formats by every major inlay vendor (Smartrac / Avery Dennison / Arizon / Neology / SATO / Identiv / Beontag) in a full range of standard reference-design antennas: the Avery AD-Dogbone (U8 variant), AD-Frog 3D, AD-383u7 apparel inlay, AD-Minute small-format, the Smartrac DogBone, Miniweb, and ShortDipole, the Arizon AZ-9629 / AZ-9654, and the Beontag PaperTag. For most of these antennas a UCODE 9 drop-in variant now exists, but converters maintain UCODE 8 SKUs indefinitely for the cost-sensitive programs still ordering billions of units per year.",
+        "Strap and inlay availability. UCODE 8 has been shipped on flip-chip straps and wire-bond strapped formats by every major inlay vendor (Smartrac / Avery Dennison / Arizon / Neology / SATO / Identiv / Beontag) in a full range of standard reference-design antennas: the Avery AD-Dogbone (U8 variant), AD-Frog 3D, AD-383u7 apparel inlay, AD-Minute small-format, the Smartrac DogBone, Miniweb, and ShortDipole, the Arizon AZ-9629 / AZ-9654, and the Beontag PaperTag. For most of these antennas a UCODE 9 drop-in variant now exists, but converters maintain UCODE 8 SKUs indefinitely for the cost-sensitive programs still ordering billions of units per year.",
         "Operating temperature — -40 °C to +85 °C normal range per the NXP short data sheet, with peak 125 °C permitted for short excursions (minutes, not hours — typical specification is 30 minutes cumulative over the chip's life). Not suitable for tire-cure (where Monza R6-P is the reference choice with sustained 200 °C compatibility for 40 minutes), sustained autoclave at 134 °C for 18 minutes, or Pirelli/Michelin-class tire-pressure internal tags where ambient exceeds 100 °C for extended periods.",
         "Counterfeit watch — authentic UCODE 8 returns TID = 0xE28011xxx where E28011 = EPC class identifier (E2) + NXP mask designer ID (0x801 equivalent encoding) with model-ID bits indicating UCODE 8 (0x070 for SL3S1203, 0x050 for SL3S1213, 0x0A0 for SL3S1215). Clones marketed as 'UCODE 8 compatible' — most commonly produced by unauthorized Chinese fabs — often present with a zero or randomized model ID, an incorrect mask-designer segment, or a non-unique TID serial (revealed by scanning 500+ tags and finding repeats). Incoming inspection should script-verify the full 96-bit TID pattern and cross-reference against NXP's published mask-ID registry (publicly available via the NXP Community TID Registry page)."
       ]
@@ -73,24 +73,24 @@
         "Practical read range — ~6-8 m on a reference dipole inlay (e.g., Avery AD-Dogbone U8) at 30 dBm (1 W ERP) reader output on a 6 dBi circular-polarized antenna, in free-air over dry cardboard. Shorter than UCODE 9 (typically 9-12 m on the same antenna setup) and Monza R6 (typically 8-10 m), but adequate for the applications UCODE 8 is typically used in (POS item-level at <1 m, event wristbands at <2 m, promotional inserts at <3 m, dock-door portals at <5 m).",
         "Temperature sensitivity — stable from -40 °C to +85 °C; beyond 85 °C the forward-link sensitivity degrades approximately 0.05 dB per degree C per NXP's high-temperature characterization report. Below -40 °C the chip continues to function in most fabs but is out of warranted specification. Not a concern for retail or indoor-industrial deployments; becomes a factor only for outdoor yard-tracking in arid climates where tag surface temperature can exceed 85 °C in direct sun.",
         "Antenna match — chip impedance at 915 MHz is approximately 11-j120 ohms (real part 11, imaginary part -120 ohms, capacitive). Most commercial UCODE 8 dipoles target an antenna impedance of 11+j120 (conjugate match) for maximum power transfer. The majority of reference inlay designs in circulation are tuned for UCODE 8's impedance rather than UCODE 9's (which is ~11-j200 ohms at 915 MHz — meaningfully different), which is why drop-in substituting UCODE 9 silicon onto an antenna designed for UCODE 8 almost always requires antenna retuning.",
-        "Frequency response across the global RAIN bands — characterized across 860-960 MHz by NXP; peak sensitivity is at ~915 MHz (FCC and ETSI). Within the ETSI 865-868 MHz band the sensitivity degrades by roughly 0.5-1.0 dB versus the FCC 902-928 MHz band because the reference antenna is typically tuned to 915 MHz; inlay converters selling into pure-EU programs occasionally offer an ETSI-tuned variant with retuned antenna to close that gap."
+        "Frequency response across the global RAIN bands. Characterized across 860-960 MHz by NXP; peak sensitivity is at ~915 MHz (FCC and ETSI). Within the ETSI 865-868 MHz band the sensitivity degrades by roughly 0.5-1.0 dB versus the FCC 902-928 MHz band because the reference antenna is typically tuned to 915 MHz; inlay converters selling into pure-EU programs occasionally offer an ETSI-tuned variant with retuned antenna to close that gap."
       ]
     },
     {
       "title": "When UCODE 8 is the right choice in 2026",
       "bullets": [
-        "Billion-unit promotional campaigns — event tickets (Olympics badge inlays, Taylor Swift Eras Tour wristband program class), conference badges, single-use retail inserts, festival wristbands. Cost dominates; the tag's life is measured in days or a single use. UCODE 9's sensitivity upgrade doesn't justify the 30-50% cost premium at the scale these programs operate (typical cost delta ~US$0.015-0.025 per unit, multiplied by 500M-2B units annually = US$7.5M-50M program cost swing).",
-        "Library RFID replacement inlays — existing deployments with millions of UCODE 8 tags in circulation (major university systems, national libraries, the UK's Bibliotheca deployments) continue to specify UCODE 8 for replacement inlays to maintain read consistency across the installed base. Mixing UCODE 9 and UCODE 8 in the same collection creates noticeable read-rate variance at self-service kiosks, increasing the false-negative rate enough that librarians push back; fleet consistency trumps per-tag performance.",
+        "Billion-unit promotional campaigns. Event tickets (Olympics badge inlays, Taylor Swift Eras Tour wristband program class), conference badges, single-use retail inserts, festival wristbands. Cost dominates; the tag's life is measured in days or a single use. UCODE 9's sensitivity upgrade doesn't justify the 30-50% cost premium at the scale these programs operate (typical cost delta ~US$0.015-0.025 per unit, multiplied by 500M-2B units annually = US$7.5M-50M program cost swing).",
+        "Library RFID replacement inlays. Existing deployments with millions of UCODE 8 tags in circulation (major university systems, national libraries, the UK's Bibliotheca deployments) continue to specify UCODE 8 for replacement inlays to maintain read consistency across the installed base. Mixing UCODE 9 and UCODE 8 in the same collection creates noticeable read-rate variance at self-service kiosks, increasing the false-negative rate enough that librarians push back; fleet consistency trumps per-tag performance.",
         "Transport ticketing — mass-transit disposable fare cards (e.g., Paris RATP Navigo Easy, selected São Paulo municipal ticketing, many one-day tourist-pass formats) and event venue ticket strips. Read range requirements are modest (10-20 cm at a gate reader operating at 18 dBm ETSI-compliant output); UCODE 8's performance envelope is comfortable and the cost difference on a 100M-unit annual run is material to the agency budget.",
         "Asset-labeling programs where the reader network is already sized for UCODE 8 — upgrading mid-program to UCODE 9 often introduces unintended read-rate variance (UCODE 9's better sensitivity causes it to respond from unintended distances or through packaging the RF model wasn't calibrated for, increasing duplicate-read events) that can complicate portal calibration. Consistency across the tag population matters more than per-tag maximum range; most large retailers formalize this by 'freezing' chip selection for a given SKU family for 3-5 years.",
-        "Supply-chain tertiary packaging — outer carton and pallet tags where the read distance is short (dock-door portal <2 m tag-to-antenna) and cost scales with the number of cartons. UCODE 8 at sub-cent chip cost is appropriate. Walmart's Tier-2 mandate (2022-2026) specifies UCODE 8 or UCODE 9 interchangeably; the majority of non-apparel compliant inlay SKUs ship on UCODE 8 for cost reasons.",
+        "Supply-chain tertiary packaging. Outer carton and pallet tags where the read distance is short (dock-door portal <2 m tag-to-antenna) and cost scales with the number of cartons. UCODE 8 at sub-cent chip cost is appropriate. Walmart's Tier-2 mandate (2022-2026) specifies UCODE 8 or UCODE 9 interchangeably; the majority of non-apparel compliant inlay SKUs ship on UCODE 8 for cost reasons.",
         "When UCODE 8 is wrong — retail POS portals with high read-rate requirements (use UCODE 9 where the 3-5 percentage-point first-pass read improvement translates to fewer manual rescans), harsh industrial with >85 °C ambient (use Monza R6-P or industrial-rated variants), high-counterfeit-risk brand authentication (use NTAG424 DNA at HF or UCODE DNA at UHF — the Authenticate strength on UCODE 8 short-form is insufficient), ultra-long-range yard/warehouse (use Impinj M800 class silicon with -24 to -25 dBm forward-link sensitivity), and tire-cure or autoclave applications (use Monza R6-P with tested 200 °C tolerance)."
       ]
     },
     {
       "title": "UCODE 8 vs UCODE 8m vs UCODE 9 selection",
       "bullets": [
-        "Need extra memory for a serialized backup? — UCODE 8m (SL3S1213) with 32 bits user memory. Most common for hospitality/linen applications that serialize items at the wash cycle and want a backup on-tag beyond the central database — a typical encoding uses 16 bits for a wash-cycle counter and 16 bits for a garment-class code. Also the default choice for rental-equipment programs that need a minimal on-tag record when the back-office database is temporarily unreachable.",
+        "Need extra memory for a serialized backup? — UCODE 8m (SL3S1213) with 32 bits user memory. Most common for hospitality/linen applications that serialize items at the wash cycle and want a backup on-tag beyond the central database. A typical encoding uses 16 bits for a wash-cycle counter and 16 bits for a garment-class code. Also the default choice for rental-equipment programs that need a minimal on-tag record when the back-office database is temporarily unreachable.",
         "Need longer EPC (128-bit SGTIN-198 truncated or similar)? — UCODE 8 (SL3S1203) with 128-bit EPC. Less common in mainstream retail; most retailers use 96-bit SGTIN-96 or SSCC-96 encodings. SL3S1203 shows up for defense/aerospace programs using custom 128-bit proprietary identifiers, and for some pharmaceutical track-and-trace programs encoding full GTIN plus expiry plus lot code in the EPC bank.",
         "Need best-in-class sensitivity for POS portal performance? — UCODE 9 (SL3S4011). UCODE 8's ~5 dB forward-link sensitivity gap becomes material at POS gate distances, where the difference between 95% first-pass read and 99% first-pass read determines whether the POS clerk has to manually scan missed items. Typical retailer rule-of-thumb: at <US$0.15/item chip-cost-neutral threshold, specify UCODE 9; at >US$0.15 economic sensitivity, specify UCODE 8m.",
         "Need Untraceable / Authenticate for EU retail privacy? — both UCODE 8m and UCODE 9 support it. Either works under the CEN CWA 16924 recommendation. If no other driver, UCODE 8m is the cost-optimal choice; if the retailer also wants the stronger crypto suite 0x00 02 and range-reduction privacy mode, upgrade to UCODE 9.",
@@ -101,11 +101,11 @@
     {
       "title": "NXP reference documents",
       "bullets": [
-        "UCODE 8 SL3S1203 / SL3S1213 Product Short Data Sheet (doc ID SL3S1203_1213_SDS, rev 3.x, 2023) — memory organization, command set, sensitivity characterization across 860-960 MHz, electrical characteristics tables, package information.",
-        "UCODE 8 SL3S1215 Data Sheet (doc ID SL3S1215_DS) — for the UCODE 8xm extended-memory variant where needed; covers the additional 96 bits of user-memory addressing and File Open mechanism.",
+        "UCODE 8 SL3S1203 / SL3S1213 Product Short Data Sheet (doc ID SL3S1203_1213_SDS, rev 3.x, 2023). Memory organization, command set, sensitivity characterization across 860-960 MHz, electrical characteristics tables, package information.",
+        "UCODE 8 SL3S1215 Data Sheet (doc ID SL3S1215_DS). For the UCODE 8xm extended-memory variant where needed; covers the additional 96 bits of user-memory addressing and File Open mechanism.",
         "AN11734 — UCODE 8 personalization guide. EPC encoding examples (SGTIN-96, SGTIN-128, SSCC-96, GIAI-96), TID-based serialization workflow, password management flow, recommended Lock command sequence for tamper protection.",
         "AN12126 — UCODE 8 privacy features: Untraceable and short-form Authenticate command sequences with test vectors, recommended POS integration flow for EU retail privacy compliance.",
-        "GS1 EPC Gen2 v2.1 Air Interface Protocol (Release 2.1, August 2015 with errata through 2023) — the specification UCODE 8 implements. UCODE 8 was one of the first v2-compliant chips to reach cost-sensitive retail volume, and GS1's v2 conformance program listed it at launch.",
+        "GS1 EPC Gen2 v2.1 Air Interface Protocol (Release 2.1, August 2015 with errata through 2023). The specification UCODE 8 implements. UCODE 8 was one of the first v2-compliant chips to reach cost-sensitive retail volume, and GS1's v2 conformance program listed it at launch.",
         "ISO/IEC 18000-63:2015 — the ISO air-interface equivalent of Gen2 v2. UCODE 8 carries full ISO certification, relevant for markets (Japan, Korea, certain Latin American procurement frameworks) that require ISO rather than GS1 certification statements in the tender documentation."
       ]
     },
@@ -113,15 +113,15 @@
       "title": "UCODE 8 commercial posture, legacy-program economics and long-tail supply reality",
       "intro": "UCODE 8 has been the cost-of-gravity UHF silicon for so long that a generation of inlay converters, retailer RFID managers and library-system integrators have built their operating models around its specific performance envelope, pricing curve and multi-source availability. Understanding the commercial dynamics — how UCODE 8 shipped through the 2020-2022 shortage, how the pricing curve has moved in the UCODE 9 era, and why several large programs still lock SKUs to UCODE 8 through the end of the decade — is essential for procurement, program engineering and strategic-sourcing decisions in 2026.",
       "bullets": [
-        "Wafer fab and process node — UCODE 8 is produced at NXP Kirchheim-Teck (Germany) and Singapore fab sites on a 300 nm RF-CMOS process node, the same node that carried UCODE 7 and UCODE 7xm production. The 300 nm geometry is modest by modern standards but economically efficient for the sub-1-mm² die sizes typical of UHF RFID silicon (where the chip is dominated by RF front-end analog area, not digital logic). UCODE 9's migration to 180 nm gave it both the sensitivity uplift and a smaller die, but the 300 nm UCODE 8 line remains cost-advantaged for the foreseeable future because the depreciated 300 nm wafer-fab capacity has effectively zero marginal capital cost to NXP. Internal NXP conference disclosures through 2024 indicate UCODE 8 will run on the 300 nm line through at least 2028.",
+        "Wafer fab and process node. UCODE 8 is produced at NXP Kirchheim-Teck (Germany) and Singapore fab sites on a 300 nm RF-CMOS process node, the same node that carried UCODE 7 and UCODE 7xm production. The 300 nm geometry is modest by modern standards but economically efficient for the sub-1-mm² die sizes typical of UHF RFID silicon (where the chip is dominated by RF front-end analog area, not digital logic). UCODE 9's migration to 180 nm gave it both the sensitivity uplift and a smaller die, but the 300 nm UCODE 8 line remains cost-advantaged for the foreseeable future because the depreciated 300 nm wafer-fab capacity has effectively zero marginal capital cost to NXP. Internal NXP conference disclosures through 2024 indicate UCODE 8 will run on the 300 nm line through at least 2028.",
         "2020-2022 semiconductor shortage and UCODE 8 allocation — the pandemic-era wafer-capacity crunch that disrupted automotive and consumer-electronics silicon hit UHF RFID unevenly: UCODE 8 was partially insulated because its 300 nm process ran in legacy fabs not competing for advanced-node capacity, but the strap-assembly bottleneck (limited flip-chip capacity at Smartrac, Avery Dennison, Arizon, Muhlbauer) squeezed availability. Strap lead times stretched from 4-6 weeks baseline to 20-30 weeks at peak Q2-2022; finished inlay prices rose 40-60% on spot buys and 15-25% on quarterly agreements. The aftermath has been a structural shift toward dual-sourcing (UCODE 8 + Impinj Monza R6 + Alien Higgs-3) at converter level and multi-year supply commitments (18-36 months) at enterprise buyer level for Walmart, Tesco, Zara and Decathlon tier-1 mandate programs.",
-        "Strap pricing trajectory and 2026 economic reality — 2019 baseline UCODE 8 strap pricing was approximately USD 0.015-0.025 per unit at 100M+ volume. 2022 peak pricing reached USD 0.025-0.040 during the shortage. 2025-2026 normalized pricing is in the USD 0.010-0.018 range as UCODE 9 volume ramp relieved allocation pressure on UCODE 8 and the 300 nm line returned to full utilization. Finished dry-inlay pricing at 100M volume is USD 0.025-0.040 per tag; finished wet-inlay (PSA-backed label ready for thermal printing) is USD 0.045-0.065 per tag. These price points are the floor for any UHF RFID application — no other cost-focused chip (EM Microelectronic em|echo, Alien Higgs-3, Fudan Microelectronics FM-13DL family) materially undercuts UCODE 8 at these volumes in 2026, and the pricing has anchored the industry-wide per-unit floor for retail apparel tertiary tags, library inlays and transit-ticket substrates.",
+        "Strap pricing trajectory and 2026 economic reality — 2019 baseline UCODE 8 strap pricing was approximately USD 0.015-0.025 per unit at 100M+ volume. 2022 peak pricing reached USD 0.025-0.040 during the shortage. 2025-2026 normalized pricing is in the USD 0.010-0.018 range as UCODE 9 volume ramp relieved allocation pressure on UCODE 8 and the 300 nm line returned to full utilization. Finished dry-inlay pricing at 100M volume is USD 0.025-0.040 per tag; finished wet-inlay (PSA-backed label ready for thermal printing) is USD 0.045-0.065 per tag. These price points are the floor for any UHF RFID application. No other cost-focused chip (EM Microelectronic em|echo, Alien Higgs-3, Fudan Microelectronics FM-13DL family) materially undercuts UCODE 8 at these volumes in 2026, and the pricing has anchored the industry-wide per-unit floor for retail apparel tertiary tags, library inlays and transit-ticket substrates.",
         "Authorized converter landscape — NXP's authorized strap-assembler list for UCODE 8 runs through Smartrac/Avery Dennison (the largest single volume customer globally post their 2020 acquisition merge), Invengo, Arizon, Beontag, Xerafy (specialized in industrial form factors), Hana Micron (Korea-centric), CCL Industries (after the 2022 Checkpoint Systems reacquisition realignment), and Muhlbauer (equipment-led with some direct strap-assembly capacity). Downstream inlay converter landscape for finished inlays: Avery Dennison ~40% global UHF finished-inlay share (UCODE 8 and UCODE 9 combined), Beontag 10-12% (strong in LATAM and EU), Arizon 8-10% (strong in APAC), SATO 6-8% (strong in APAC), Honeywell/Intermec, Checkpoint, Confidex (industrial), HID FLeX (industrial/government), Identiv, Xerafy (industrial). Proud Tek sources UCODE 8 inlays from Avery Dennison, Smartrac, Arizon and a verified Chinese converter network with chip-authenticity clauses in the master-supply agreements.",
-        "Authorized distribution and counterfeit exposure — authorized NXP UCODE 8 distribution moves through Arrow Electronics and Richardson RFPD in the Americas and Europe, and through a small number of NXP direct accounts at USD 5M+ annual threshold. Chip purchases outside this authorized channel — particularly through Shenzhen Huaqiangbei distributors, Taobao/1688 direct sellers and some Middle-Eastern resellers — frequently turn up with TID-field anomalies indicating counterfeit re-marking: UCODE 7 (TID model ID 0x030) re-marked as UCODE 8 (0x070/0x050) is the most common pattern in 2023-2025 incoming-inspection data. Authentic UCODE 8 returns TID prefix 0xE280 + correct model ID and passes a random-serial-uniqueness test (scan 500+ tags, confirm no repeating serials within the lot). Authenticate round-trip verification is available but seldom deployed at incoming inspection because of the extra reader workflow required.",
-        "Legacy-program freeze and SKU-lock dynamics — several large UCODE-8-specified programs explicitly freeze chip selection for 3-5 years to maintain read-rate consistency across the installed tag population. Bibliotheca's library-RFID installed base (UK, Scandinavia, Benelux) continues to specify UCODE 8 replacement inlays; Paris RATP's Navigo Easy fare-card format is UCODE-8-spec through the 2026 contract renewal window; most major US retail Tier-2 mandate suppliers still deliver on UCODE 8 for case and pallet tertiary packaging. The freeze is rational engineering — UCODE 9's stronger sensitivity would create false-read and over-range issues in reader networks calibrated for UCODE 8's envelope — but it also means UCODE 8 production demand remains structurally high through at least 2028 independent of new-deployment preference for UCODE 9.",
+        "Authorized distribution and counterfeit exposure. Authorized NXP UCODE 8 distribution moves through Arrow Electronics and Richardson RFPD in the Americas and Europe, and through a small number of NXP direct accounts at USD 5M+ annual threshold. Chip purchases outside this authorized channel — particularly through Shenzhen Huaqiangbei distributors, Taobao/1688 direct sellers and some Middle-Eastern resellers — frequently turn up with TID-field anomalies indicating counterfeit re-marking: UCODE 7 (TID model ID 0x030) re-marked as UCODE 8 (0x070/0x050) is the most common pattern in 2023-2025 incoming-inspection data. Authentic UCODE 8 returns TID prefix 0xE280 + correct model ID and passes a random-serial-uniqueness test (scan 500+ tags, confirm no repeating serials within the lot). Authenticate round-trip verification is available but seldom deployed at incoming inspection because of the extra reader workflow required.",
+        "Legacy-program freeze and SKU-lock dynamics. Several large UCODE-8-specified programs explicitly freeze chip selection for 3-5 years to maintain read-rate consistency across the installed tag population. Bibliotheca's library-RFID installed base (UK, Scandinavia, Benelux) continues to specify UCODE 8 replacement inlays; Paris RATP's Navigo Easy fare-card format is UCODE-8-spec through the 2026 contract renewal window; most major US retail Tier-2 mandate suppliers still deliver on UCODE 8 for case and pallet tertiary packaging. The freeze is rational engineering — UCODE 9's stronger sensitivity would create false-read and over-range issues in reader networks calibrated for UCODE 8's envelope — but it also means UCODE 8 production demand remains structurally high through at least 2028 independent of new-deployment preference for UCODE 9.",
         "Sourcing strategy for 2026 buyers — single-source UCODE 8 procurement was acceptable through 2019, then dangerous through 2022, and in 2026 is typically a dual-source specification (UCODE 8 primary + Monza R6 or Higgs-3 qualified alternate, both validated on the same reference inlay antenna family). Triple-sourcing (adding Alien Higgs-9 or a Fudan/Quanray Chinese-origin chip) is increasingly common for buyers who experienced severe 2021-2022 shortage impact. Chinese-origin UHF silicon from Fudan Microelectronics (FM-13DL series) and Quanray Electronics has closed a substantial portion of the sensitivity gap with UCODE 8 at slightly lower unit cost and is qualified into the converter stacks of Beontag, SATO and some HID FLeX programs, though Western-domiciled buyers sometimes decline to qualify Chinese-origin silicon for geopolitical-supply-chain policy reasons (US CHIPS Act, EU Chips Act, UK National Security and Investment Act 2021).",
-        "EOL posture and UCODE 8 transition timing — NXP has not announced UCODE 8 end-of-life and has signaled at converter-partner conferences through 2024 that UCODE 8 production will continue through at least 2028. The transition to UCODE 10 (expected 2027-2028, rumored 180 nm RF-CMOS with ~1 dB additional sensitivity over UCODE 9 plus expanded in-chip temperature sensor and crypto-agility features) is expected to displace UCODE 9 first, then gradually flow down to displace UCODE 8 in low-cost tiers around 2030. Buyers specifying new 2026-2028 programs should generally default to UCODE 9 for any SKU above the USD 0.15/unit cost-neutral threshold and default to UCODE 8 or UCODE 8m for below-threshold SKUs, with a planned 2028-2030 re-spec-to-UCODE 9 review as UCODE 8 supply naturally tails off.",
-        "Proud Tek converter stance and buyer-support posture — Proud Tek maintains UCODE 8 and UCODE 9 side-by-side on our reference antenna families (standard Dogbone, Miniweb, Short Dipole, apparel AD-383u7-class, anti-metal Ironside-class), enabling drop-in chip substitution with minimal antenna retuning where the retailer mandate permits interchangeability. Our master purchase agreements with NXP authorized strap assemblers include chip-authenticity clauses with penalty terms for TID-mismatch failures, incoming-inspection TID-field validation on every strap lot, and sample-unit retention for 24 months post-delivery in case of downstream compliance disputes. Buyers specifying UCODE 8 for legacy-program continuity can expect consistent silicon authenticity, stable per-unit pricing at the 100M+ volume tier, and the option to qualify UCODE 9 or alternative-source chips into the same SKU family as a future migration path."
+        "EOL posture and UCODE 8 transition timing. NXP has not announced UCODE 8 end-of-life and has signaled at converter-partner conferences through 2024 that UCODE 8 production will continue through at least 2028. The transition to UCODE 10 (expected 2027-2028, rumored 180 nm RF-CMOS with ~1 dB additional sensitivity over UCODE 9 plus expanded in-chip temperature sensor and crypto-agility features) is expected to displace UCODE 9 first, then gradually flow down to displace UCODE 8 in low-cost tiers around 2030. Buyers specifying new 2026-2028 programs should generally default to UCODE 9 for any SKU above the USD 0.15/unit cost-neutral threshold and default to UCODE 8 or UCODE 8m for below-threshold SKUs, with a planned 2028-2030 re-spec-to-UCODE 9 review as UCODE 8 supply naturally tails off.",
+        "Proud Tek converter stance and buyer-support posture. Proud Tek maintains UCODE 8 and UCODE 9 side-by-side on our reference antenna families (standard Dogbone, Miniweb, Short Dipole, apparel AD-383u7-class, anti-metal Ironside-class), enabling drop-in chip substitution with minimal antenna retuning where the retailer mandate permits interchangeability. Our master purchase agreements with NXP authorized strap assemblers include chip-authenticity clauses with penalty terms for TID-mismatch failures, incoming-inspection TID-field validation on every strap lot, and sample-unit retention for 24 months post-delivery in case of downstream compliance disputes. Buyers specifying UCODE 8 for legacy-program continuity can expect consistent silicon authenticity, stable per-unit pricing at the 100M+ volume tier, and the option to qualify UCODE 9 or alternative-source chips into the same SKU family as a future migration path."
       ]
     },
     {
@@ -133,24 +133,96 @@
           "UCODE 8m (SL3S1213)"
         ],
         "rows": [
-          ["Operating frequency", "860–960 MHz", "860–960 MHz"],
-          ["Air-interface standard", "EPC Gen2 v2 / ISO 18000-63", "EPC Gen2 v2 / ISO 18000-63"],
-          ["EPC memory", "128 bits", "96 bits"],
-          ["User memory", "0", "32 bits"],
-          ["TID memory", "96 bits unique", "96 bits unique"],
-          ["Kill/Access passwords", "32 bits each", "32 bits each"],
-          ["Forward-link sensitivity", "-19 dBm", "-19 dBm"],
-          ["Backscatter sensitivity", "-15 dBm", "-15 dBm"],
-          ["Untraceable support", "Yes (Gen2 v2 §6.3.2.5)", "Yes (Gen2 v2 §6.3.2.5)"],
-          ["Authenticate (short-form)", "Yes (suite 0x0001)", "Yes (suite 0x0001)"],
-          ["Anti-collision rate (typical)", "~500 tags/sec", "~500 tags/sec"],
-          ["Chip impedance at 915 MHz", "~11-j120 Ω", "~11-j120 Ω"],
-          ["Operating temperature", "-40 °C to +85 °C", "-40 °C to +85 °C"],
-          ["Peak temperature", "125 °C (short excursion)", "125 °C (short excursion)"],
-          ["Data retention", "≥ 20 years at 25 °C", "≥ 20 years at 25 °C"],
-          ["Endurance (writes)", "100,000 cycles", "100,000 cycles"],
-          ["TID model ID", "0x070", "0x050"],
-          ["Typical unit cost (at strap volume)", "Lowest in class", "~10% premium over SL3S1203"]
+          [
+            "Operating frequency",
+            "860–960 MHz",
+            "860–960 MHz"
+          ],
+          [
+            "Air-interface standard",
+            "EPC Gen2 v2 / ISO 18000-63",
+            "EPC Gen2 v2 / ISO 18000-63"
+          ],
+          [
+            "EPC memory",
+            "128 bits",
+            "96 bits"
+          ],
+          [
+            "User memory",
+            "0",
+            "32 bits"
+          ],
+          [
+            "TID memory",
+            "96 bits unique",
+            "96 bits unique"
+          ],
+          [
+            "Kill/Access passwords",
+            "32 bits each",
+            "32 bits each"
+          ],
+          [
+            "Forward-link sensitivity",
+            "-19 dBm",
+            "-19 dBm"
+          ],
+          [
+            "Backscatter sensitivity",
+            "-15 dBm",
+            "-15 dBm"
+          ],
+          [
+            "Untraceable support",
+            "Yes (Gen2 v2 §6.3.2.5)",
+            "Yes (Gen2 v2 §6.3.2.5)"
+          ],
+          [
+            "Authenticate (short-form)",
+            "Yes (suite 0x0001)",
+            "Yes (suite 0x0001)"
+          ],
+          [
+            "Anti-collision rate (typical)",
+            "~500 tags/sec",
+            "~500 tags/sec"
+          ],
+          [
+            "Chip impedance at 915 MHz",
+            "~11-j120 Ω",
+            "~11-j120 Ω"
+          ],
+          [
+            "Operating temperature",
+            "-40 °C to +85 °C",
+            "-40 °C to +85 °C"
+          ],
+          [
+            "Peak temperature",
+            "125 °C (short excursion)",
+            "125 °C (short excursion)"
+          ],
+          [
+            "Data retention",
+            "≥ 20 years at 25 °C",
+            "≥ 20 years at 25 °C"
+          ],
+          [
+            "Endurance (writes)",
+            "100,000 cycles",
+            "100,000 cycles"
+          ],
+          [
+            "TID model ID",
+            "0x070",
+            "0x050"
+          ],
+          [
+            "Typical unit cost (at strap volume)",
+            "Lowest in class",
+            "~10% premium over SL3S1203"
+          ]
         ]
       }
     }
@@ -160,47 +232,89 @@
       "title": "UCODE 8 product pages",
       "description": "Proud Tek UHF SKUs built on NXP UCODE 8 silicon.",
       "links": [
-        { "href": "/products/rfid-labels/impinj-m700-uhf-inlay/", "label": "Impinj M700 class UHF inlay" },
-        { "href": "/products/rfid-tags/uhf-rfid-hard-tag/", "label": "UHF RFID hard tag" },
-        { "href": "/products/rfid-tags/rfid-waste-bin-tag/", "label": "RFID waste bin tag" },
-        { "href": "/products/rfid-labels/rfid-airline-baggage-tag/", "label": "RFID airline baggage tag" },
-        { "href": "/products/rfid-tags/rfid-event-wristband/", "label": "UHF event wristband" },
-        { "href": "/products/rfid-tags/rfid-library-tag/", "label": "RFID library tag" }
+        {
+          "href": "/products/rfid-labels/impinj-m700-uhf-inlay/",
+          "label": "Impinj M700 class UHF inlay"
+        },
+        {
+          "href": "/products/rfid-tags/uhf-rfid-hard-tag/",
+          "label": "UHF RFID hard tag"
+        },
+        {
+          "href": "/products/rfid-tags/rfid-waste-bin-tag/",
+          "label": "RFID waste bin tag"
+        },
+        {
+          "href": "/products/rfid-labels/rfid-airline-baggage-tag/",
+          "label": "RFID airline baggage tag"
+        },
+        {
+          "href": "/products/rfid-tags/rfid-event-wristband/",
+          "label": "UHF event wristband"
+        },
+        {
+          "href": "/products/rfid-tags/rfid-library-tag/",
+          "label": "RFID library tag"
+        }
       ]
     },
     {
       "title": "Related comparisons and guides",
       "description": "UHF chip-family context and cross-chip references.",
       "links": [
-        { "href": "/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/", "label": "UCODE 8 vs UCODE 9 vs Monza R6 vs Higgs 9" },
-        { "href": "/guides/ucode-9-uhf-chip-encyclopedia/", "label": "UCODE 9 UHF chip encyclopedia" },
-        { "href": "/guides/monza-r6-family-chip-encyclopedia/", "label": "Monza R6 family chip encyclopedia" },
-        { "href": "/guides/rain-rfid-explained/", "label": "RAIN RFID explained" },
-        { "href": "/guides/gs1-epc-encoding-guide/", "label": "GS1 EPC encoding guide" },
-        { "href": "/guides/iso-18000-6c-uhf-rfid-standard/", "label": "ISO 18000-6C UHF standard" }
+        {
+          "href": "/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/",
+          "label": "UCODE 8 vs UCODE 9 vs Monza R6 vs Higgs 9"
+        },
+        {
+          "href": "/guides/ucode-9-uhf-chip-encyclopedia/",
+          "label": "UCODE 9 UHF chip encyclopedia"
+        },
+        {
+          "href": "/guides/monza-r6-family-chip-encyclopedia/",
+          "label": "Monza R6 family chip encyclopedia"
+        },
+        {
+          "href": "/guides/rain-rfid-explained/",
+          "label": "RAIN RFID explained"
+        },
+        {
+          "href": "/guides/gs1-epc-encoding-guide/",
+          "label": "GS1 EPC encoding guide"
+        },
+        {
+          "href": "/guides/iso-18000-6c-uhf-rfid-standard/",
+          "label": "ISO 18000-6C UHF standard"
+        }
       ]
     },
     {
       "title": "Authoritative external references",
       "description": "NXP, GS1 and ISO documents that define UCODE 8.",
       "links": [
-        { "href": "https://www.nxp.com/products/rfid-nfc/ucode-and-label-ics/ucode-8:SL3S1203_1213", "label": "NXP UCODE 8 product page" },
-        { "href": "https://www.gs1.org/standards/epc-rfid/tds", "label": "GS1 Tag Data Standard" }
+        {
+          "href": "https://www.nxp.com/products/rfid-nfc/ucode-and-label-ics/ucode-8:SL3S1203_1213",
+          "label": "NXP UCODE 8 product page"
+        },
+        {
+          "href": "https://www.gs1.org/standards/epc-rfid/tds",
+          "label": "GS1 Tag Data Standard"
+        }
       ]
     }
   ],
   "faq": [
     {
       "question": "Should I specify UCODE 8 or UCODE 9 for a new retail deployment?",
-      "answer": "UCODE 9 for new deployments at any meaningful scale where POS portal performance matters. The sensitivity upgrade (~5 dB forward-link, ~7 dB backscatter) pays back in portal read-rate improvement — typically 3-5 percentage points of first-pass read, which compounds to a 40-60% reduction in manual-rescan events at the POS. Operationally, that time saving is worth far more than the ~30% per-chip cost premium on any SKU above roughly US$0.15 retail. UCODE 8 remains appropriate for billion-unit promotional and single-use programs (conference badges, disposable transit tickets, event wristbands, festival access) where the tag is discarded quickly, the read environment is controlled, and per-unit cost dominates the economics — that cohort is still where the majority of UCODE 8 silicon ships in 2026. A common hybrid strategy: UCODE 9 for apparel and durables, UCODE 8m for promotional and packaging tertiary, both deployed under the same EPC encoding scheme so the back-end software is chip-agnostic."
+      "answer": "UCODE 9 for new deployments at any meaningful scale where POS portal performance matters. The sensitivity upgrade (~5 dB forward-link, ~7 dB backscatter) pays back in portal read-rate improvement. Typically 3-5 percentage points of first-pass read, which compounds to a 40-60% reduction in manual-rescan events at the POS. Operationally, that time saving is worth far more than the ~30% per-chip cost premium on any SKU above roughly US$0.15 retail. UCODE 8 remains appropriate for billion-unit promotional and single-use programs (conference badges, disposable transit tickets, event wristbands, festival access) where the tag is discarded quickly, the read environment is controlled, and per-unit cost dominates the economics. That cohort is still where the majority of UCODE 8 silicon ships in 2026. A common hybrid strategy: UCODE 9 for apparel and durables, UCODE 8m for promotional and packaging tertiary, both deployed under the same EPC encoding scheme so the back-end software is chip-agnostic."
     },
     {
       "question": "What is the difference between UCODE 8 (SL3S1203) and UCODE 8m (SL3S1213)?",
-      "answer": "User memory. SL3S1203 has a 128-bit EPC with no user memory — maximum encoding flexibility at the expense of on-tag item-specific data. SL3S1213 has a 96-bit EPC plus 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01), which is the more common choice for applications that want a backup serial, a factory lot code, or item-level metadata on the tag itself — typical usage is 16 bits for a wash-cycle or maintenance counter and 16 bits for a class/category identifier. Both chips have identical sensitivity (-19 dBm forward-link), temperature envelope (-40 °C to +85 °C), command support (Untraceable / short-form Authenticate / File Open with one FileID) and anti-collision performance; the only functional differences are the memory partition and the TID model ID (0x070 vs 0x050), which are both reader-transparent for standard EPC Gen2 operations. Price delta is typically 5-10% at strap volume."
+      "answer": "User memory. SL3S1203 has a 128-bit EPC with no user memory. Maximum encoding flexibility at the expense of on-tag item-specific data. SL3S1213 has a 96-bit EPC plus 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01), which is the more common choice for applications that want a backup serial, a factory lot code, or item-level metadata on the tag itself. Typical usage is 16 bits for a wash-cycle or maintenance counter and 16 bits for a class/category identifier. Both chips have identical sensitivity (-19 dBm forward-link), temperature envelope (-40 °C to +85 °C), command support (Untraceable / short-form Authenticate / File Open with one FileID) and anti-collision performance; the only functional differences are the memory partition and the TID model ID (0x070 vs 0x050), which are both reader-transparent for standard EPC Gen2 operations. Price delta is typically 5-10% at strap volume."
     },
     {
       "question": "Can UCODE 8 be used for EU retail deployments that require privacy compliance?",
-      "answer": "Yes. UCODE 8 supports the EPC Gen2 v2 Untraceable command (Section 6.3.2.5), which when activated at the POS with the Access password shortens the tag's response to a non-unique pattern, restricts TID bank reads to the allocation class identifier, and suppresses user-memory reads — giving the customer privacy after the item leaves the store. Syntax is the same as UCODE 9's Untraceable command. Short-form Authenticate (suite 0x0001) is also supported for anti-counterfeiting. The CEN CWA 16924 workshop agreement (the EU retail RFID industrial framework) recognizes Gen2 v2 Untraceable as the minimum acceptable privacy mechanism for item-level RFID at retail, and UCODE 8m is the lowest-cost silicon in production that meets it. For retailers where UHF RFID is a 2024+ deployment, UCODE 9 is the more common specification for new inlay runs (it adds a 'range reduction' privacy mode that continues to allow short-range reads post-sale for returns), but UCODE 8 with Untraceable satisfies the privacy requirement at a roughly 30% lower silicon cost."
+      "answer": "Yes. UCODE 8 supports the EPC Gen2 v2 Untraceable command (Section 6.3.2.5), which when activated at the POS with the Access password shortens the tag's response to a non-unique pattern, restricts TID bank reads to the allocation class identifier, and suppresses user-memory reads. Giving the customer privacy after the item leaves the store. Syntax is the same as UCODE 9's Untraceable command. Short-form Authenticate (suite 0x0001) is also supported for anti-counterfeiting. The CEN CWA 16924 workshop agreement (the EU retail RFID industrial framework) recognizes Gen2 v2 Untraceable as the minimum acceptable privacy mechanism for item-level RFID at retail, and UCODE 8m is the lowest-cost silicon in production that meets it. For retailers where UHF RFID is a 2024+ deployment, UCODE 9 is the more common specification for new inlay runs (it adds a 'range reduction' privacy mode that continues to allow short-range reads post-sale for returns), but UCODE 8 with Untraceable satisfies the privacy requirement at a roughly 30% lower silicon cost."
     },
     {
       "question": "How do I detect counterfeit chips being sold as UCODE 8?",
@@ -208,7 +322,7 @@
     },
     {
       "question": "Does UCODE 8 work on metal surfaces?",
-      "answer": "Only with a dedicated anti-metal inlay design — typically 0.5-1 mm PET, foam spacer, or ferrite absorber between the antenna and the metal substrate. Standard UCODE 8 inlays laminated directly onto metal detune to the point of non-functionality (the metal effectively short-circuits the antenna's near-field). Proud Tek stocks anti-metal UCODE 8 variants for cost-sensitive applications — waste-bin tags, laundry hangers, metal shelving labels — typically 5-8 m read range on 30 dBm reader output with a purpose-designed antenna. For performance-critical metal applications (automotive assembly-line asset tracking, mining equipment, oil-and-gas pipeline assets) use Monza R6 or Monza R6-P on a reference anti-metal antenna (e.g., Xerafy Global Trak, Confidex Ironside) where the combination of higher chip sensitivity and optimized antenna geometry delivers 8-12 m practical range. For extreme cases (embedded-in-metal), use an on-metal tag with a resonant-cavity antenna — here chip selection matters less than antenna design."
+      "answer": "Only with a dedicated anti-metal inlay design. Typically 0.5-1 mm PET, foam spacer, or ferrite absorber between the antenna and the metal substrate. Standard UCODE 8 inlays laminated directly onto metal detune to the point of non-functionality (the metal effectively short-circuits the antenna's near-field). Proud Tek stocks anti-metal UCODE 8 variants for cost-sensitive applications — waste-bin tags, laundry hangers, metal shelving labels — typically 5-8 m read range on 30 dBm reader output with a purpose-designed antenna. For performance-critical metal applications (automotive assembly-line asset tracking, mining equipment, oil-and-gas pipeline assets) use Monza R6 or Monza R6-P on a reference anti-metal antenna (e.g., Xerafy Global Trak, Confidex Ironside) where the combination of higher chip sensitivity and optimized antenna geometry delivers 8-12 m practical range. For extreme cases (embedded-in-metal), use an on-metal tag with a resonant-cavity antenna. Here chip selection matters less than antenna design."
     },
     {
       "question": "What is the longest EPC I can encode on UCODE 8 (SL3S1203)?",
@@ -239,7 +353,7 @@
       "url": "https://www.nxp.com/docs/en/application-note/AN11809.pdf",
       "publisher": "NXP Semiconductors",
       "accessedAt": "2026-04-20",
-      "note": "NXP application note covering command flow, Self-Adjust initialization, and Brand Protection origins — referenced in the operational-features section."
+      "note": "NXP application note covering command flow, Self-Adjust initialization, and Brand Protection origins. Referenced in the operational-features section."
     },
     {
       "label": "ISO/IEC 18000-63:2015 — Parameters for air interface communications at 860-960 MHz Type C",
@@ -276,7 +390,7 @@
       "url": "https://rainrfid.org/technology/certification/",
       "publisher": "RAIN Alliance",
       "accessedAt": "2026-04-20",
-      "note": "Tag-level certification programme for UHF RFID inlays — cited where the guide discusses conformance beyond chip-level pre-conformance."
+      "note": "Tag-level certification programme for UHF RFID inlays. Cited where the guide discusses conformance beyond chip-level pre-conformance."
     }
   ],
   "primaryAction": {

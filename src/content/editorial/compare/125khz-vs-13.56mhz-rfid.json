@@ -3,10 +3,10 @@
   "group": "compare",
   "title": "125 kHz Vs 13.56 MHz RFID — LF Vs HF Frequency Comparison For Access Control",
   "kicker": "125 kHz vs 13.56 MHz",
-  "summary": "125 kHz (low frequency) and 13.56 MHz (high frequency) are the two RFID bands still fighting each other in the access-control cabinet. 125 kHz is the world of EM4100, T5577, HID ProxCard II and Indala — cheap, simple, read-only or sector-writeable, and cloneable in under five seconds with a $25 handheld. 13.56 MHz is the world of MIFARE Classic, MIFARE Plus, MIFARE DESFire EV3, LEGIC advant, iCLASS SEOS and NFC — AES-128 mutual authentication, multi-application filesystems, and native compatibility with every smartphone shipped since 2015. Choosing between them is less a technology decision and more a question about the true cost of an unauthorized entry and the realistic cost of reader replacement. This page walks through the physics, the cloning attack economics, reader market pricing, migration patterns using dual-frequency cards, and the specific inflection points where the 13.56 MHz upgrade pays back fastest.",
+  "summary": "125 kHz (low frequency) and 13.56 MHz (high frequency) are the two RFID bands still fighting each other in the access-control cabinet. 125 kHz is the world of EM4100, T5577, HID ProxCard II and Indala. Cheap, simple, read-only or sector-writeable, and cloneable in under five seconds with a $25 handheld. 13.56 MHz is the world of MIFARE Classic, MIFARE Plus, MIFARE DESFire EV3, LEGIC advant, iCLASS SEOS and NFC. AES-128 mutual authentication, multi-application filesystems, and native compatibility with every smartphone shipped since 2015. Choosing between them is less a technology decision and more a question about the true cost of an unauthorized entry and the realistic cost of reader replacement. This page walks through the physics, the cloning attack economics, reader market pricing, migration patterns using dual-frequency cards, and the specific inflection points where the 13.56 MHz upgrade pays back fastest.",
   "heroPoints": [
     "Security gap is absolute — 125 kHz cards broadcast a 40-bit ID in the clear and clone in under five seconds with a $20-$50 Proxmark3-class handheld; DESFire EV3 uses AES-128 mutual authentication with no known practical attack path after eighteen years of public scrutiny.",
-    "Card cost delta is small — EM4100 cards land at $0.08-$0.15 FOB, MIFARE Classic 1K at $0.12-$0.25, DESFire EV3 at $0.40-$0.80. Reader cost is typically the bigger budget line, and dual-frequency readers at $80-$250 allow phased migration without stranding installed 125 kHz credentials overnight.",
+    "Card cost delta is small. EM4100 cards land at $0.08-$0.15 FOB, MIFARE Classic 1K at $0.12-$0.25, DESFire EV3 at $0.40-$0.80. Reader cost is typically the bigger budget line, and dual-frequency readers at $80-$250 allow phased migration without stranding installed 125 kHz credentials overnight.",
     "Smartphone and mobile-wallet compatibility only exists on 13.56 MHz — NFC Type A/B/F in every iPhone and Android phone shipped in the last decade reads ISO 14443 but cannot read 125 kHz at all, so mobile credentials via Apple Wallet, Google Wallet, HID Mobile Access and LEGIC mobile require a 13.56 MHz reader footprint."
   ],
   "imageAlt": "125 kHz EM4100 card compared with 13.56 MHz MIFARE DESFire card",
@@ -31,18 +31,18 @@
   "sections": [
     {
       "title": "The physics of the two bands",
-      "intro": "Before the security conversation, it is worth understanding why these two frequencies exist at all and why they behave the way they do in the reader lane. The two bands were never chosen for security reasons — they were chosen for propagation and regulatory reasons, and their security profiles emerged as a consequence of the silicon that got built into each era.",
+      "intro": "Before the security conversation, it is worth understanding why these two frequencies exist at all and why they behave the way they do in the reader lane. The two bands were never chosen for security reasons. They were chosen for propagation and regulatory reasons, and their security profiles emerged as a consequence of the silicon that got built into each era.",
       "bullets": [
-        "125 kHz sits in the LF (low frequency) band, 30 kHz to 300 kHz. It uses near-field magnetic coupling — the reader antenna pushes energy into the card's copper coil through induction, similar to a transformer. Wavelengths are roughly 2400 m, so the entire coupling happens in the magnetic near field and is effectively unaffected by body tissue, concrete walls or wooden doors. LF penetrates metal poorly but penetrates water and human flesh well enough to work through a jacket pocket or a gloved hand.",
+        "125 kHz sits in the LF (low frequency) band, 30 kHz to 300 kHz. It uses near-field magnetic coupling. The reader antenna pushes energy into the card's copper coil through induction, similar to a transformer. Wavelengths are roughly 2400 m, so the entire coupling happens in the magnetic near field and is effectively unaffected by body tissue, concrete walls or wooden doors. LF penetrates metal poorly but penetrates water and human flesh well enough to work through a jacket pocket or a gloved hand.",
         "13.56 MHz sits in the HF (high frequency) band, 3 MHz to 30 MHz. It also uses near-field magnetic coupling but at a much higher carrier, which allows far greater data bandwidth (106-848 kbps for ISO 14443 vs roughly 2 kbps for EM4100). The shorter wavelength (~22 m) shrinks antenna dimensions, so a 13.56 MHz antenna can be etched directly into a card lamination rather than wound as a discrete coil.",
         "Read range follows antenna geometry and field strength, not frequency per se. Typical production values are 5-15 cm for 125 kHz ISO-compliant cards and 3-10 cm for 13.56 MHz cards. Higher-power 13.56 MHz 'vicinity' readers conforming to ISO 15693 reach 50-100 cm — useful for library self-checkout and hands-free access — but the overwhelming majority of access-control deployments stay in the proximity range.",
         "Bandwidth is the hidden gap. 125 kHz supports one-way broadcast of a 40-64 bit serial number and, on T5577 and similar chips, a handful of write cycles. 13.56 MHz ISO 14443 supports full bidirectional challenge-response transactions, multi-sector file systems, and cryptographic authentication in under 100 ms — the runway on which every modern secure credential is built.",
-        "Regional regulation is uniform for both bands. 125 kHz and 13.56 MHz are globally allocated as license-free ISM bands, so the same credentials work identically in North America, Europe, China, Japan, India and the Middle East. This is the reason 125 kHz remains so entrenched — a single SKU works everywhere the tenant operates, and a 1990s-era 125 kHz reader in Detroit still reads a card issued yesterday in Riyadh."
+        "Regional regulation is uniform for both bands. 125 kHz and 13.56 MHz are globally allocated as license-free ISM bands, so the same credentials work identically in North America, Europe, China, Japan, India and the Middle East. This is the reason 125 kHz remains so entrenched. A single SKU works everywhere the tenant operates, and a 1990s-era 125 kHz reader in Detroit still reads a card issued yesterday in Riyadh."
       ]
     },
     {
       "title": "Security reality — cloning attack economics",
-      "intro": "Security discussions about LF vs HF often devolve into abstractions about 'encryption strength'. The practical question is different — how cheap and how fast is a working clone? That is the number a building owner should weigh against the cost of credential and reader replacement.",
+      "intro": "Security discussions about LF vs HF often devolve into abstractions about 'encryption strength'. The practical question is different. How cheap and how fast is a working clone? That is the number a building owner should weigh against the cost of credential and reader replacement.",
       "bullets": [
         "EM4100 / EM4102 / EM4200 (125 kHz): no encryption, no authentication, UID broadcast in plain Manchester-encoded ASK. Clone time with a $25 Keysy-class handheld: under three seconds, including the time to press the button. The resulting T5577 copy works on every reader the original works on, forever.",
         "HID ProxCard II and Indala (125 kHz with proprietary modulation): marginally more resistant than EM4100 because the bit encoding is non-standard, but a Proxmark3 RDV4 at $350 breaks them in under thirty seconds and writes the captured data to a T5577 blank. Over a million HID Prox credentials have been cloned this way since 2013.",
@@ -63,25 +63,77 @@
           "13.56 MHz HF (MIFARE/DESFire/NTAG)"
         ],
         "rows": [
-          ["Encryption", "None (EM4100) or weak (proprietary)", "AES-128 (DESFire EV3, Plus SL3)"],
-          ["Mutual authentication", "No", "Yes (ISO 14443-4 challenge-response)"],
-          ["Cloning time (commercial tool)", "3-30 seconds, $20-$50 tool", "No practical attack on DESFire EV3"],
-          ["Typical read range", "5-15 cm", "3-10 cm (proximity), up to 1 m (vicinity)"],
-          ["Data rate", "~2 kbps", "106-848 kbps"],
-          ["Memory options", "40-264 bits (read-only) to 1 kB (T5577 writeable)", "1 kB to 8 kB file system, multi-application"],
-          ["Multi-application", "No", "Yes (access + payment + loyalty on one card)"],
-          ["NFC smartphone read", "No", "Yes (iPhone 7+, all Android NFC)"],
-          ["Mobile wallet compatibility", "No", "Yes (Apple Wallet, Google Wallet, HID Mobile, LEGIC mobile)"],
-          ["Card cost FOB (10k qty)", "$0.08-$0.15 (EM4100), $0.20-$0.35 (T5577)", "$0.12-$0.25 (Classic), $0.40-$0.80 (DESFire EV3)"],
-          ["Reader cost", "$30-$150", "$50-$350"],
-          ["Dual-frequency reader", "n/a", "$80-$250 (reads both LF and HF)"],
-          ["Typical use cases", "Legacy offices, parking, storage units", "Modern offices, campuses, hotels, hospitals, transit"]
+          [
+            "Encryption",
+            "None (EM4100) or weak (proprietary)",
+            "AES-128 (DESFire EV3, Plus SL3)"
+          ],
+          [
+            "Mutual authentication",
+            "No",
+            "Yes (ISO 14443-4 challenge-response)"
+          ],
+          [
+            "Cloning time (commercial tool)",
+            "3-30 seconds, $20-$50 tool",
+            "No practical attack on DESFire EV3"
+          ],
+          [
+            "Typical read range",
+            "5-15 cm",
+            "3-10 cm (proximity), up to 1 m (vicinity)"
+          ],
+          [
+            "Data rate",
+            "~2 kbps",
+            "106-848 kbps"
+          ],
+          [
+            "Memory options",
+            "40-264 bits (read-only) to 1 kB (T5577 writeable)",
+            "1 kB to 8 kB file system, multi-application"
+          ],
+          [
+            "Multi-application",
+            "No",
+            "Yes (access + payment + loyalty on one card)"
+          ],
+          [
+            "NFC smartphone read",
+            "No",
+            "Yes (iPhone 7+, all Android NFC)"
+          ],
+          [
+            "Mobile wallet compatibility",
+            "No",
+            "Yes (Apple Wallet, Google Wallet, HID Mobile, LEGIC mobile)"
+          ],
+          [
+            "Card cost FOB (10k qty)",
+            "$0.08-$0.15 (EM4100), $0.20-$0.35 (T5577)",
+            "$0.12-$0.25 (Classic), $0.40-$0.80 (DESFire EV3)"
+          ],
+          [
+            "Reader cost",
+            "$30-$150",
+            "$50-$350"
+          ],
+          [
+            "Dual-frequency reader",
+            "n/a",
+            "$80-$250 (reads both LF and HF)"
+          ],
+          [
+            "Typical use cases",
+            "Legacy offices, parking, storage units",
+            "Modern offices, campuses, hotels, hospitals, transit"
+          ]
         ]
       }
     },
     {
       "title": "Reader market and installed base",
-      "intro": "Reader selection is where the migration math gets real. An office with 400 doors cannot upgrade overnight — what is feasible is a phased reader swap over eighteen to thirty-six months, using dual-frequency cards to bridge the populations.",
+      "intro": "Reader selection is where the migration math gets real. An office with 400 doors cannot upgrade overnight. What is feasible is a phased reader swap over eighteen to thirty-six months, using dual-frequency cards to bridge the populations.",
       "bullets": [
         "Major 125 kHz reader lines still in production: HID ProxPoint Plus, Indala, AWID, Keri Systems Proximity. Price band $50-$150, wiring on Wiegand 26-bit or 32-bit output. Shipment volumes have declined every year since 2017 as customers migrate.",
         "Major 13.56 MHz reader lines: HID iCLASS SE and Signo, LEGIC advant, NXP SAM-based OEM integrations, Allegion aptiQ, Schlage ENGAGE. Output now commonly OSDP v2 over RS-485 (secure channel) rather than the clear-text Wiegand used on legacy LF readers.",
@@ -107,11 +159,11 @@
       "intro": "Not every deployment needs DESFire EV3. There are genuinely legitimate reasons to stay on 125 kHz for another cycle, and there are deployments where sticking with 125 kHz is organizational malpractice.",
       "bullets": [
         "Stay on 125 kHz when: the facility has low intrinsic security value (storage units, unattended parking lots, rural facilities with perimeter fencing and cameras), the cost of a reader swap exceeds the remaining useful life of the facility, and there is no regulatory or insurance requirement for encrypted credentials.",
-        "Stay on 125 kHz when: the existing card population is under two hundred and the building owner can afford to issue a completely new credential population on a single day in two years — at that point, migrating directly to DESFire EV3-only cards and readers is cheaper than a multi-year phased migration with dual-frequency cards.",
+        "Stay on 125 kHz when: the existing card population is under two hundred and the building owner can afford to issue a completely new credential population on a single day in two years. At that point, migrating directly to DESFire EV3-only cards and readers is cheaper than a multi-year phased migration with dual-frequency cards.",
         "Upgrade to 13.56 MHz when: the facility holds regulated data (HIPAA, PCI-DSS, SOC 2, GDPR personal data, classified information), the tenant offers mobile credentials to staff, the access-control system is part of a corporate security audit, or insurance carriers require encrypted physical access control.",
-        "Upgrade to 13.56 MHz when: the building operates shared amenities that require cashless payments (campus dining, vending, parking, laundry) — DESFire EV3 supports a payment application in a separate file from the access application, on the same card.",
-        "Upgrade to 13.56 MHz when: credential churn is high (conference hotels, student housing, co-working) — mobile credentials via Apple Wallet or Google Wallet reduce the cost of credential issuance to near zero and are only available on 13.56 MHz.",
-        "Upgrade to 13.56 MHz for any new installation in 2024 or later. There is no financial argument for specifying 125 kHz in a greenfield build — the reader cost delta is under $50 per door, and it avoids the inevitable migration cost cycle in five to eight years."
+        "Upgrade to 13.56 MHz when: the building operates shared amenities that require cashless payments (campus dining, vending, parking, laundry). DESFire EV3 supports a payment application in a separate file from the access application, on the same card.",
+        "Upgrade to 13.56 MHz when: credential churn is high (conference hotels, student housing, co-working). Mobile credentials via Apple Wallet or Google Wallet reduce the cost of credential issuance to near zero and are only available on 13.56 MHz.",
+        "Upgrade to 13.56 MHz for any new installation in 2024 or later. There is no financial argument for specifying 125 kHz in a greenfield build. The reader cost delta is under $50 per door, and it avoids the inevitable migration cost cycle in five to eight years."
       ]
     },
     {
@@ -197,7 +249,7 @@
     },
     {
       "question": "How easily can 125 kHz access cards be cloned?",
-      "answer": "Standard EM4100 125 kHz cards clone in under three seconds using handheld RFID copiers that cost $20-$50 on Amazon or Alibaba. The card broadcasts its 40-bit serial number as unencrypted Manchester-encoded ASK, so any device within range reads and duplicates it without the owner noticing. HID ProxCard II is marginally harder — a Proxmark3 RDV4 at $350 breaks it in about thirty seconds. This cloning attack is the single strongest argument for migrating any security-sensitive 125 kHz deployment to DESFire EV3 on 13.56 MHz."
+      "answer": "Standard EM4100 125 kHz cards clone in under three seconds using handheld RFID copiers that cost $20-$50 on Amazon or Alibaba. The card broadcasts its 40-bit serial number as unencrypted Manchester-encoded ASK, so any device within range reads and duplicates it without the owner noticing. HID ProxCard II is marginally harder. A Proxmark3 RDV4 at $350 breaks it in about thirty seconds. This cloning attack is the single strongest argument for migrating any security-sensitive 125 kHz deployment to DESFire EV3 on 13.56 MHz."
     },
     {
       "question": "Is MIFARE Classic 1K secure enough for access control?",
@@ -205,7 +257,7 @@
     },
     {
       "question": "Do the two bands interfere with each other?",
-      "answer": "No. 125 kHz and 13.56 MHz are four orders of magnitude apart in frequency and do not interfere, so a card with both chips in it works reliably and readers of either type ignore the other band entirely. The only installation concern is physical — the two antennas share the card body, so dual-frequency cards are typically slightly thicker (0.86-0.90 mm) than single-frequency cards (0.76-0.82 mm) and should be specified with the customer's lock manufacturer to confirm slot tolerance."
+      "answer": "No. 125 kHz and 13.56 MHz are four orders of magnitude apart in frequency and do not interfere, so a card with both chips in it works reliably and readers of either type ignore the other band entirely. The only installation concern is physical. The two antennas share the card body, so dual-frequency cards are typically slightly thicker (0.86-0.90 mm) than single-frequency cards (0.76-0.82 mm) and should be specified with the customer's lock manufacturer to confirm slot tolerance."
     },
     {
       "question": "Does 13.56 MHz work with existing HID iCLASS readers?",
@@ -213,7 +265,7 @@
     },
     {
       "question": "What about mobile credentials — do they work on both bands?",
-      "answer": "Mobile credentials only work on 13.56 MHz. The NFC radio in every iPhone shipped since the iPhone 7, and in every NFC-enabled Android phone, communicates on the 13.56 MHz ISO 14443 standard. There is no 125 kHz radio in any consumer smartphone and there never will be — the antenna size alone makes it impractical. If mobile-credential capability via Apple Wallet, Google Wallet, HID Mobile Access, or LEGIC mobile is a requirement, 13.56 MHz is the only option. Mobile credentials cost roughly $2-$5 per user per year in licensing and typically replace plastic-card issuance for 20-50% of staff in a mature deployment."
+      "answer": "Mobile credentials only work on 13.56 MHz. The NFC radio in every iPhone shipped since the iPhone 7, and in every NFC-enabled Android phone, communicates on the 13.56 MHz ISO 14443 standard. There is no 125 kHz radio in any consumer smartphone and there never will be. The antenna size alone makes it impractical. If mobile-credential capability via Apple Wallet, Google Wallet, HID Mobile Access, or LEGIC mobile is a requirement, 13.56 MHz is the only option. Mobile credentials cost roughly $2-$5 per user per year in licensing and typically replace plastic-card issuance for 20-50% of staff in a mature deployment."
     },
     {
       "question": "Should we upgrade OSDP at the same time as LF to HF?",

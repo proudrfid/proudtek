@@ -3,13 +3,13 @@
   "group": "compare",
   "title": "MIFARE Plus vs MIFARE DESFire — Family-Level Decision Guide for HF 13.56 MHz Cards",
   "kicker": "MIFARE Plus family vs MIFARE DESFire family",
-  "summary": "MIFARE Plus and MIFARE DESFire are NXP's two medium- and high-security HF 13.56 MHz product families. Both are ISO/IEC 14443-A compliant, both implement AES-128, and both are in volume production in 2026. They solve structurally different problems — Plus is the engineered migration path from MIFARE Classic (sector-based memory, CRYPTO1-compatible SL1 mode, drop-in reader compatibility); DESFire is the file-system chip for greenfield multi-application deployments (up to 28 AIDs × 32 files per card, per-file AES keys). This page is the family-level primer for that decision; once the family is chosen, the chip-version pick (Plus SE vs EV1 vs EV2, or DESFire Light vs EV2 vs EV3) belongs in the deeper `/compare/mifare-plus-ev2-vs-desfire-ev3/` sibling page.",
+  "summary": "MIFARE Plus and MIFARE DESFire are NXP's two medium- and high-security HF 13.56 MHz product families. Both are ISO/IEC 14443-A compliant, both implement AES-128, and both are in volume production in 2026. They solve structurally different problems. Plus is the engineered migration path from MIFARE Classic (sector-based memory, CRYPTO1-compatible SL1 mode, drop-in reader compatibility); DESFire is the file-system chip for greenfield multi-application deployments (up to 28 AIDs × 32 files per card, per-file AES keys). This page is the family-level primer for that decision; once the family is chosen, the chip-version pick (Plus SE vs EV1 vs EV2, or DESFire Light vs EV2 vs EV3) belongs in the deeper `/compare/mifare-plus-ev2-vs-desfire-ev3/` sibling page.",
   "heroPoints": [
-    "Choose the family by architecture, not by feature list. MIFARE Plus is sector-based and CRYPTO1-compatible in SL1 mode — an existing MIFARE Classic reader fleet reads Plus SL1 cards without firmware changes, which makes the family the default migration chip for any deployment with meaningful Classic installed base. MIFARE DESFire is file-system-based with per-file AES keys — the right design when the card must carry multiple independent applications (badge + cafeteria + printer quota + transit + parking) under separate key control.",
+    "Choose the family by architecture, not by feature list. MIFARE Plus is sector-based and CRYPTO1-compatible in SL1 mode — an existing MIFARE Classic reader fleet reads Plus SL1 cards without firmware changes, which makes the family the default migration chip for any deployment with meaningful Classic installed base. MIFARE DESFire is file-system-based with per-file AES keys. The right design when the card must carry multiple independent applications (badge + cafeteria + printer quota + transit + parking) under separate key control.",
     "Security posture is comparable at the modern tier, but differs in structure. Plus EV2 and DESFire EV3 both implement AES-128 with 128-bit session keys and NIST SP 800-108 key derivation; there is no public cryptanalytic break against either as of 2026. DESFire hardware carries Common Criteria EAL5+ (from EV2 onwards); Plus hardware carries EAL4+. Plus's distinguishing feature is the three-level SL0/SL1/SL2/SL3 ladder that supports in-field migration from CRYPTO1 to AES. DESFire's distinguishing feature is the per-file access-rights matrix that supports multi-application credentials by design.",
     "Per-unit cost favours Plus roughly 1.5-2.5×. At the 1 M-unit tier Plus EV2 ships at €0.30-0.40 finished, DESFire EV3 ships at €0.60-0.90 for the 2K variant and above €1.20 for 8K; DESFire Light narrows the gap at €0.35-0.55 but only offers ~640 bytes of user memory. For volume access-control (40,000-employee badge refresh, city-wide transit reissue) the €0.30-0.50 per-card delta is real money; for small-fleet high-value applications (hotel master keys, executive cards, multi-application corporate-ID) the delta is noise and DESFire's architecture wins."
   ],
-  "imageAlt": "MIFARE Plus family card versus MIFARE DESFire family card — sector-based versus file-system memory architecture at 13.56 MHz",
+  "imageAlt": "MIFARE Plus family card versus MIFARE DESFire family card. Sector-based versus file-system memory architecture at 13.56 MHz",
   "imageSourceRoutes": [
     "/products/rfid-cards/mifare-plus-se-card/",
     "/products/rfid-cards/mifare-desfire-ev3-card/",
@@ -39,17 +39,61 @@
           "MIFARE DESFire family"
         ],
         "rows": [
-          ["NXP part prefix", "MF1P (SE / S / X / EV1 / EV2)", "MF3 (DESFire Light / EV1 / EV2 / EV3)"],
-          ["Air interface", "ISO/IEC 14443-A Parts 1–4", "ISO/IEC 14443-A Parts 1–4"],
-          ["Memory architecture", "Sector-based (MIFARE Classic-compatible)", "File system (up to 28 AIDs × 32 files)"],
-          ["User memory range", "2,048 / 4,096 bytes", "640 / 2,048 / 4,096 / 8,192 bytes"],
-          ["Crypto primitives", "AES-128, CRYPTO1 (SL1), 3DES (legacy)", "AES-128, 3DES, DES (EV1 legacy)"],
-          ["Security-level model", "SL0 / SL1 / SL2 / SL3 ladder", "Per-file 4-entry access-rights field"],
-          ["Classic-reader compatibility", "Yes at SL1 (CRYPTO1-compatible frames)", "No — requires T=CL + DESFire command set"],
-          ["Hardware certification", "Common Criteria EAL4+ (EV2)", "Common Criteria EAL5+ (EV2/EV3)"],
-          ["Per-card price (1 M tier)", "€0.30–0.40", "€0.35–1.20 depending on variant"],
-          ["Best-fit deployment", "Classic-estate migration, single-application at volume", "Greenfield multi-application, compliance-driven (EAL5+)"],
-          ["Typical verticals", "Access control migrations, hotel Classic→AES, secondary transit", "Multi-operator transit, corporate multi-app, payment-adjacent closed-loop"]
+          [
+            "NXP part prefix",
+            "MF1P (SE / S / X / EV1 / EV2)",
+            "MF3 (DESFire Light / EV1 / EV2 / EV3)"
+          ],
+          [
+            "Air interface",
+            "ISO/IEC 14443-A Parts 1–4",
+            "ISO/IEC 14443-A Parts 1–4"
+          ],
+          [
+            "Memory architecture",
+            "Sector-based (MIFARE Classic-compatible)",
+            "File system (up to 28 AIDs × 32 files)"
+          ],
+          [
+            "User memory range",
+            "2,048 / 4,096 bytes",
+            "640 / 2,048 / 4,096 / 8,192 bytes"
+          ],
+          [
+            "Crypto primitives",
+            "AES-128, CRYPTO1 (SL1), 3DES (legacy)",
+            "AES-128, 3DES, DES (EV1 legacy)"
+          ],
+          [
+            "Security-level model",
+            "SL0 / SL1 / SL2 / SL3 ladder",
+            "Per-file 4-entry access-rights field"
+          ],
+          [
+            "Classic-reader compatibility",
+            "Yes at SL1 (CRYPTO1-compatible frames)",
+            "No — requires T=CL + DESFire command set"
+          ],
+          [
+            "Hardware certification",
+            "Common Criteria EAL4+ (EV2)",
+            "Common Criteria EAL5+ (EV2/EV3)"
+          ],
+          [
+            "Per-card price (1 M tier)",
+            "€0.30–0.40",
+            "€0.35–1.20 depending on variant"
+          ],
+          [
+            "Best-fit deployment",
+            "Classic-estate migration, single-application at volume",
+            "Greenfield multi-application, compliance-driven (EAL5+)"
+          ],
+          [
+            "Typical verticals",
+            "Access control migrations, hotel Classic→AES, secondary transit",
+            "Multi-operator transit, corporate multi-app, payment-adjacent closed-loop"
+          ]
         ]
       }
     },
@@ -59,7 +103,7 @@
       "bullets": [
         "MIFARE Plus family — NXP part prefix MF1P. The family launched as Plus EV0 in 2008 to provide an AES-capable migration target for MIFARE Classic installations, was refreshed as EV1 in 2012 (adding SL2 intermediate mode) and again as EV2 in 2018 (adding Originality Signature, virtual card architecture, and tighter side-channel countermeasures). Current variants: Plus SE (entry tier, 2K sector-compatible memory, AES-128 only, EAL4), Plus S (standard, 2K/4K, AES + CRYPTO1 for SL1/SL2, EAL4+), Plus X (extended, 4K, adds proximity check and random-ID counters, EAL4+). Per-card pricing at 1 M units lands between €0.30-0.40 across the variants; the SE variant is the volume workhorse for access-control refresh programmes.",
         "MIFARE DESFire family — NXP part prefix MF3. The family launched as DESFire in 2002 (3DES only), was refreshed as EV1 in 2008 (adding AES-128), EV2 in 2016 (adding Transaction MAC, proximity check, delegated application management), and EV3 in 2020 (adding SUN message, Secure Dynamic Messaging, Transaction Timer). Current variants: DESFire Light (MF2DLHx0, ~640 bytes, single application, AES-128, €0.35-0.55 tier — the cost-optimised variant), DESFire EV2 (2K/4K/8K, 28 applications, in volume production since 2016, gradually phasing out as EV3 takes over), DESFire EV3 (MF3DHx3, 2K/4K/8K, the current flagship, EAL5+ hardware, €0.60-1.20 tier).",
-        "Both families are ISO/IEC 14443-A Parts 1-4 compliant. Part 4 (T=CL transmission protocol) is the layer that exposes APDUs to the reader — this is how both families expose command sets like AuthenticateAES, ReadData, CreateApplication, ChangeKey. MIFARE Classic stops at Part 3 (raw anti-collision frames); this is the deepest structural difference between Classic and the Plus/DESFire generation, and the reason modern secure access-control readers must support T=CL.",
+        "Both families are ISO/IEC 14443-A Parts 1-4 compliant. Part 4 (T=CL transmission protocol) is the layer that exposes APDUs to the reader. This is how both families expose command sets like AuthenticateAES, ReadData, CreateApplication, ChangeKey. MIFARE Classic stops at Part 3 (raw anti-collision frames); this is the deepest structural difference between Classic and the Plus/DESFire generation, and the reason modern secure access-control readers must support T=CL.",
         "NFC phone compatibility — stock iPhone (iOS 13+ with Core NFC reader mode) and Android (NFC API since Android 2.3, HCE since Android 4.4) read both families. Apple's wallet-only HCE restriction means iPhone-side card emulation is not available for arbitrary Plus/DESFire applications; Android HCE is fully available for custom apps. For corporate mobile-credential programmes the industry norm is a vendor platform (HID Mobile Access, Allegion Engage, SALTO JustIN, dormakaba exivo) rather than a custom HCE build.",
         "The two families are not mutually exclusive. Many large deployments use DESFire EV3 for the primary multi-application credential (staff badge, resident pass, primary transit card) and Plus EV2 for secondary or concession cards where per-unit cost dominates. Readers that implement both command sets (most access-control and transit readers sold since 2020) handle the mixed fleet without modification."
       ]
@@ -69,9 +113,9 @@
       "intro": "The biggest structural difference between the two families is how memory is organised. This is the decision that usually makes itself if the team writes down the use case clearly.",
       "bullets": [
         "MIFARE Plus memory is sector-based, inheriting the MIFARE Classic layout. A Plus 1K / 2K card has 16 sectors of 4 blocks × 16 bytes, with the last block of each sector being the sector trailer (two 6-byte keys + access bits). A Plus 4K adds 24 more sectors (the first 32 are 4-block, the last 8 are 16-block). Applications are written as blocks within sectors; multi-application credentials require dividing sector ownership by convention (sectors 0-5 for badge, 6-10 for canteen, 11-15 for printer, etc.) rather than by chip-enforced separation.",
-        "MIFARE DESFire memory is file-system-based. The card holds up to 28 applications (identified by a 3-byte Application Identifier, AID). Each application has up to 32 files, each file has its own type (Standard Data, Backup Data, Value File, Linear Record, Cyclic Record), its own size, and its own 4-entry access-rights field that specifies which of the application's up to 14 AES keys is required for Read, Write, ReadWrite, and ChangeKey operations. Applications are chip-enforced silos — a compromise of one application's keys does not expose any other application's data.",
-        "This architectural difference drives the per-application TCO. Plus requires external key-management logic to enforce separation of applications (the reader firmware must know which sectors belong to which app and check keys accordingly); DESFire enforces separation in silicon. For single-application deployments (pure access control, single-operator transit), Plus's sector model is simpler, cheaper, and fully adequate. For multi-application deployments the TCO delta reverses — Plus application-management logic becomes a maintenance burden that DESFire's file system eliminates.",
-        "Memory capacity tracks the architecture. Plus tops out at 4 KB user memory; DESFire tops out at 8 KB for EV3 (and 640 bytes for DESFire Light — cost-optimised, single-application only). Most single-application credentials fit in 1-2 KB with significant room to spare; multi-application credentials routinely use 4-6 KB. 8 KB DESFire EV3 is specified for heavy multi-application (enterprise badge + government-ID overlay, dual-operator transit with history log, loyalty + stored-value + access).",
+        "MIFARE DESFire memory is file-system-based. The card holds up to 28 applications (identified by a 3-byte Application Identifier, AID). Each application has up to 32 files, each file has its own type (Standard Data, Backup Data, Value File, Linear Record, Cyclic Record), its own size, and its own 4-entry access-rights field that specifies which of the application's up to 14 AES keys is required for Read, Write, ReadWrite, and ChangeKey operations. Applications are chip-enforced silos. A compromise of one application's keys does not expose any other application's data.",
+        "This architectural difference drives the per-application TCO. Plus requires external key-management logic to enforce separation of applications (the reader firmware must know which sectors belong to which app and check keys accordingly); DESFire enforces separation in silicon. For single-application deployments (pure access control, single-operator transit), Plus's sector model is simpler, cheaper, and fully adequate. For multi-application deployments the TCO delta reverses. Plus application-management logic becomes a maintenance burden that DESFire's file system eliminates.",
+        "Memory capacity tracks the architecture. Plus tops out at 4 KB user memory; DESFire tops out at 8 KB for EV3 (and 640 bytes for DESFire Light. Cost-optimised, single-application only). Most single-application credentials fit in 1-2 KB with significant room to spare; multi-application credentials routinely use 4-6 KB. 8 KB DESFire EV3 is specified for heavy multi-application (enterprise badge + government-ID overlay, dual-operator transit with history log, loyalty + stored-value + access).",
         "Write endurance is comparable (≥100,000 cycles per byte for both families). Data retention is ≥10 years on both. For typical access-control write patterns (occasional key rollover, infrequent application update) neither family hits the wear budget over a 5-7 year card lifecycle; for stored-value use cases with daily balance writes, DESFire's Value File type provides hardware-enforced transaction semantics that Plus cannot match."
       ]
     },
@@ -79,10 +123,10 @@
       "title": "Security posture — how the families actually differ",
       "intro": "Both families implement modern AES-128. The differences are in the migration story, the certification tier, and the attack surface that each family exposes.",
       "bullets": [
-        "MIFARE Plus security levels — SL0 (virgin / pre-personalisation, CRYPTO1-compatible for reader testing), SL1 (CRYPTO1 output with AES keys stored but not used for auth — readers see a Classic-compatible card), SL2 (CRYPTO1 authentication + AES encrypted data — the transitional state), SL3 (full AES-128 authentication + encrypted session, CRYPTO1 disabled). SL0→SL1→SL2→SL3 is a one-way ladder; SL3 cards cannot be downgraded. The SL2 intermediate is the feature that makes Plus the migration chip — a reader fleet can be upgraded from CRYPTO1 to AES one device at a time while the card fleet runs in mixed SL2 and SL3 modes.",
+        "MIFARE Plus security levels — SL0 (virgin / pre-personalisation, CRYPTO1-compatible for reader testing), SL1 (CRYPTO1 output with AES keys stored but not used for auth — readers see a Classic-compatible card), SL2 (CRYPTO1 authentication + AES encrypted data — the transitional state), SL3 (full AES-128 authentication + encrypted session, CRYPTO1 disabled). SL0→SL1→SL2→SL3 is a one-way ladder; SL3 cards cannot be downgraded. The SL2 intermediate is the feature that makes Plus the migration chip. A reader fleet can be upgraded from CRYPTO1 to AES one device at a time while the card fleet runs in mixed SL2 and SL3 modes.",
         "MIFARE DESFire security model — no ladder. Each file's access-rights field assigns one of the application's up to 14 AES keys to each of four operations (Read, Write, ReadWrite, ChangeKey); 'Free' (no key) is a valid assignment for public files. Master keys exist at the PICC level (overall card) and per application. Authentication uses AuthenticateAES (EV2/EV3, replaces the EV1 AuthenticateISO with mandatory CMAC-protected response verification).",
-        "CVE and cryptanalytic history — MIFARE Classic's CRYPTO1 was broken in 2008 (Nohl / Plötz / Teepe) and again in 2012 (Courtois nested attack); a Classic 1K card can be cloned in minutes on low-cost hardware. This is the baseline threat model that drives any Classic→Plus/DESFire migration. Neither Plus EV2 nor DESFire EV3 has a public cryptanalytic break against the AES-128 layer as of 2026. CVE-2023-35788 and similar reports affect implementation flaws (insufficient reader-side CMAC verification, weak key diversification practice), not the chip itself — the operator still has to implement diversified keys, CMAC verification, and reader-side replay protection correctly.",
-        "Side-channel and physical attack resistance — DESFire EV2/EV3 hardware carries Common Criteria EAL5+ with dedicated on-die shielding, clock randomisation, voltage-glitch sensors, and power-analysis countermeasures. Plus EV2 hardware carries EAL4+ with a somewhat lighter countermeasure set. For government, high-security defence, and payment-adjacent procurements EAL5+ is frequently a hard requirement; for corporate access control EAL4+ is normally sufficient and the Plus cost advantage wins.",
+        "CVE and cryptanalytic history. MIFARE Classic's CRYPTO1 was broken in 2008 (Nohl / Plötz / Teepe) and again in 2012 (Courtois nested attack); a Classic 1K card can be cloned in minutes on low-cost hardware. This is the baseline threat model that drives any Classic→Plus/DESFire migration. Neither Plus EV2 nor DESFire EV3 has a public cryptanalytic break against the AES-128 layer as of 2026. CVE-2023-35788 and similar reports affect implementation flaws (insufficient reader-side CMAC verification, weak key diversification practice), not the chip itself. The operator still has to implement diversified keys, CMAC verification, and reader-side replay protection correctly.",
+        "Side-channel and physical attack resistance. DESFire EV2/EV3 hardware carries Common Criteria EAL5+ with dedicated on-die shielding, clock randomisation, voltage-glitch sensors, and power-analysis countermeasures. Plus EV2 hardware carries EAL4+ with a somewhat lighter countermeasure set. For government, high-security defence, and payment-adjacent procurements EAL5+ is frequently a hard requirement; for corporate access control EAL4+ is normally sufficient and the Plus cost advantage wins.",
         "Originality Signature — both families ship with an NXP-signed originality signature (ECC P-224 signature over the UID) that a reader can verify against NXP's public key without any shared secret. This detects re-marked or counterfeit silicon without requiring diversified keys. Incoming-inspection scripts should sample Originality Signature on 1-2% of every card batch; the verification takes ~40 ms per card on a standard PC/SC reader.",
         "Key management is where deployments actually fail. Both families support diversified keys (unique per-card keys derived from a master secret and the UID), but a diversification scheme implemented in an insecure reader or a plaintext HSM config is less secure than CRYPTO1 done well. Operator-side key management — HSM integration, key rotation policy, revocation — is the real security variable; the chip-level difference between Plus EV2 and DESFire EV3 is usually smaller than the difference between a well-run key-management programme and a sloppy one."
       ]
@@ -94,9 +138,9 @@
         "Corporate access control — Plus EV2 dominates the mid-market refresh cycle (Fortune-1000 companies replacing a legacy HID Prox or MIFARE Classic estate). DESFire EV3 dominates Fortune-100 greenfield deployments where multi-application (badge + cafeteria + printer + parking + guest-WiFi captive-portal identity) is designed in from day one. Reader vendors HID Signo, Assa Abloy Signo, Kaba evolo and SALTO XS4 support both families on current firmware.",
         "Transit — the major multi-operator transit deployments (Hong Kong Octopus, London Oyster, Singapore EZ-Link, Netherlands OV-chipkaart, Taiwan EasyCard) specify DESFire EV2/EV3 for primary cards because the file-system architecture cleanly segregates operator keys (metro, bus, ferry, retail purse). Plus EV2 remains in secondary-card tiers (occasional-user, concession, tourist) where per-unit cost dominates.",
         "Hotel key cards — Plus EV2 is the pragmatic default for mid-market and upscale hotels moving off MIFARE Classic because Saflok, VingCard, Onity, Salto and Häfele Dialock readers mostly support Plus at SL1/SL3. DESFire EV3 ships in ultra-luxury and corporate-hospitality chains (Marriott Luxury Collection, Four Seasons, Mandarin Oriental) where the cost delta is immaterial and multi-application (room access + spa + fitness + F&B + valet) is valuable. See `/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/` for the hospitality-specific decision tree.",
-        "Payment-adjacent closed-loop — campus canteen, transit purse, gym class credits, corporate vending. Neither family is an EMV payment chip; both are appropriate for closed-loop stored value. For stored-value above ~€50 per card, DESFire's file-level access control and Value File type (with hardware-enforced credit/debit semantics) are typically specified by operator compliance frameworks. For sub-€50 closed-loop, Plus EV2 with a CMAC-protected counter sector is adequate and roughly half the cost.",
-        "Loyalty, event, public-library — Plus and DESFire are both overspecified for UID-only loyalty programmes where the backend does all validation. NTAG424 DNA (for NFC phone-tap workflows with SUN message authentication), MIFARE Ultralight C (for one-time event tickets, 3DES authentication, €0.12-0.20 per chip), or ICODE SLIX (for library book tags with ISO 15693 anti-collision on pallet-scan) are more cost-effective. See `/guides/mifare-classic-1k-4k-chip-encyclopedia/` and `/guides/ntag21x-family-memory-map-commands/` for the cases where each entry-tier chip stays the right choice.",
-        "UHF supply-chain and asset tracking — outside the Plus/DESFire decision. For pallet, carton, and item-level supply-chain use cases at 860-960 MHz use the UHF chip families instead (UCODE 8/9/9xe/DNA, Monza R6/M700/M800, Alien Higgs-9). See `/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/` for the UHF tag-IC comparison."
+        "Payment-adjacent closed-loop. Campus canteen, transit purse, gym class credits, corporate vending. Neither family is an EMV payment chip; both are appropriate for closed-loop stored value. For stored-value above ~€50 per card, DESFire's file-level access control and Value File type (with hardware-enforced credit/debit semantics) are typically specified by operator compliance frameworks. For sub-€50 closed-loop, Plus EV2 with a CMAC-protected counter sector is adequate and roughly half the cost.",
+        "Loyalty, event, public-library. Plus and DESFire are both overspecified for UID-only loyalty programmes where the backend does all validation. NTAG424 DNA (for NFC phone-tap workflows with SUN message authentication), MIFARE Ultralight C (for one-time event tickets, 3DES authentication, €0.12-0.20 per chip), or ICODE SLIX (for library book tags with ISO 15693 anti-collision on pallet-scan) are more cost-effective. See `/guides/mifare-classic-1k-4k-chip-encyclopedia/` and `/guides/ntag21x-family-memory-map-commands/` for the cases where each entry-tier chip stays the right choice.",
+        "UHF supply-chain and asset tracking. Outside the Plus/DESFire decision. For pallet, carton, and item-level supply-chain use cases at 860-960 MHz use the UHF chip families instead (UCODE 8/9/9xe/DNA, Monza R6/M700/M800, Alien Higgs-9). See `/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/` for the UHF tag-IC comparison."
       ]
     },
     {
@@ -105,21 +149,21 @@
       "bullets": [
         "If the deployment has a meaningful MIFARE Classic installed base and the reader fleet's remaining useful life exceeds 18 months — choose the Plus family. The SL1 compatibility mode lets you reissue the card fleet first (readers see Classic-compatible frames), upgrade readers to support SL3 AES over the next 12-24 months, and migrate cards to SL3 once the reader estate is ready. Three-phase migration is less disruptive and less risky than any single-step Classic→DESFire cutover.",
         "If the deployment is greenfield and the credential must carry multiple independent applications — choose DESFire. File-system architecture with per-file AES keys is the correct design for multi-application credentials; retrofitting multi-application into Plus's sector model requires reader-firmware application-management logic that DESFire's file system eliminates.",
-        "If credential volume exceeds 500,000 units and the application is single-purpose — choose Plus EV2. The €0.30-0.50 per-card cost advantage compounds into real budget at this scale. For Fortune-500 corporate-ID refresh, city-transit annual reissue, and large hotel-chain card programmes this is usually the dominant decision factor.",
+        "If credential volume exceeds 500,000 units and the application is single-purpose. Choose Plus EV2. The €0.30-0.50 per-card cost advantage compounds into real budget at this scale. For Fortune-500 corporate-ID refresh, city-transit annual reissue, and large hotel-chain card programmes this is usually the dominant decision factor.",
         "If the procurement is subject to regulatory or governmental audit requiring Common Criteria EAL5+ — choose DESFire EV2 or EV3. Plus EV2's EAL4+ is insufficient for many EU public-sector procurements, US federal-contractor programmes, and payment-adjacent compliance frameworks. Confirm the target EAL from the buyer's information-security requirements document, not from assumption.",
-        "If the deployment is very cost-sensitive and single-application (loyalty, closed-loop €10-50 purse, library, event ticket) — choose DESFire Light rather than full DESFire EV3. €0.35-0.55 per card at 1 M units with AES-128, a simplified single-application model, and 640 bytes of user memory is often the sweet spot. Cheaper than Plus EV2 at the small-memory end, with DESFire-grade security and certification.",
-        "If the project needs to mix card tiers (premium multi-application credentials for staff + cost-optimised single-application credentials for visitors and concessions) — use DESFire EV3 and Plus EV2 (or DESFire EV3 and DESFire Light) in the same reader fleet. Any reader that implements the DESFire and Plus command sets handles the mixed fleet without modification. Do not try to mix Plus and DESFire cards on a reader fleet that only implements Classic-compatible firmware — that is the one combination where the reader estate forces the family choice."
+        "If the deployment is very cost-sensitive and single-application (loyalty, closed-loop €10-50 purse, library, event ticket). Choose DESFire Light rather than full DESFire EV3. €0.35-0.55 per card at 1 M units with AES-128, a simplified single-application model, and 640 bytes of user memory is often the sweet spot. Cheaper than Plus EV2 at the small-memory end, with DESFire-grade security and certification.",
+        "If the project needs to mix card tiers (premium multi-application credentials for staff + cost-optimised single-application credentials for visitors and concessions). Use DESFire EV3 and Plus EV2 (or DESFire EV3 and DESFire Light) in the same reader fleet. Any reader that implements the DESFire and Plus command sets handles the mixed fleet without modification. Do not try to mix Plus and DESFire cards on a reader fleet that only implements Classic-compatible firmware. That is the one combination where the reader estate forces the family choice."
       ]
     },
     {
       "title": "Migration from MIFARE Classic — the operational recipe",
       "intro": "Most Plus-vs-DESFire decisions in 2026 are actually Classic-migration decisions, and the operational steps matter more than the chip-feature comparison. A compressed summary of the canonical NXP AN1305 recipe adapted to field practice.",
       "bullets": [
-        "Phase 1 — reissue the card fleet. Order Plus EV2 cards personalised in SL1 mode, or DESFire EV3 cards with the application structure pre-loaded. Issue the new cards alongside the legacy Classic cards and let operational staff rotate users onto the new fleet over 3-6 months. In Plus SL1 mode the existing Classic readers see Plus cards as Classic-compatible and nothing changes at the reader side. DESFire requires readers that support T=CL and DESFire commands — verify reader firmware before issuing DESFire cards.",
+        "Phase 1 — reissue the card fleet. Order Plus EV2 cards personalised in SL1 mode, or DESFire EV3 cards with the application structure pre-loaded. Issue the new cards alongside the legacy Classic cards and let operational staff rotate users onto the new fleet over 3-6 months. In Plus SL1 mode the existing Classic readers see Plus cards as Classic-compatible and nothing changes at the reader side. DESFire requires readers that support T=CL and DESFire commands. Verify reader firmware before issuing DESFire cards.",
         "Phase 2 — upgrade the reader firmware. For Plus migrations this enables SL3 AES authentication in parallel with SL1 compatibility; for DESFire migrations this adds AuthenticateAES and the file-access command set if not already present. Roll out to 5-10% of the reader estate first, monitor transaction-latency and error-rate metrics for 1-2 weeks, then proceed with the full rollout. Keep the legacy firmware version in the rollback plan until the new firmware has been in production for at least 30 days.",
         "Phase 3 — migrate cards to full AES mode. For Plus, this is the SL1→SL3 rollover (usually coincident with annual card reissue). For DESFire, this is when the application structure switches from read-only bootstrap mode to full per-file access control with diversified keys. Phase 3 is the point at which the legacy CRYPTO1 threat vector is closed for good; cards still in SL1 or bootstrap mode are cryptographically equivalent to Classic and should be tracked and retired deliberately.",
-        "Common migration failure modes — (1) Reader firmware that claims Plus support but implements only SL1 compatibility without SL3 authentication; test the full SL3 flow before bulk ordering. (2) Key-management pipeline from the personalisation bureau that assumes Classic sector-key diversification and breaks on AES sector keys; align the HSM integration before the first batch. (3) PMS / access-control software that reads the card UID as the credential identifier and ignores the application data; the migration gains no security benefit until the software actually uses the AES-authenticated read.",
-        "Sampling discipline during migration — order a 100-500 card engineering sample before the production order. Verify the full personalisation flow end-to-end: key injection, application/sector creation, access-rights configuration, AES authentication, encrypted read/write. Many migration projects fail not on the chip but on the key-management integration between the personalisation bureau, the issuance station, and the reader estate."
+        "Common migration failure modes. (1) Reader firmware that claims Plus support but implements only SL1 compatibility without SL3 authentication; test the full SL3 flow before bulk ordering. (2) Key-management pipeline from the personalisation bureau that assumes Classic sector-key diversification and breaks on AES sector keys; align the HSM integration before the first batch. (3) PMS / access-control software that reads the card UID as the credential identifier and ignores the application data; the migration gains no security benefit until the software actually uses the AES-authenticated read.",
+        "Sampling discipline during migration. Order a 100-500 card engineering sample before the production order. Verify the full personalisation flow end-to-end: key injection, application/sector creation, access-rights configuration, AES authentication, encrypted read/write. Many migration projects fail not on the chip but on the key-management integration between the personalisation bureau, the issuance station, and the reader estate."
       ]
     }
   ],
@@ -128,39 +172,84 @@
       "title": "Deeper comparisons and chip-version decisions",
       "description": "After the family is chosen, these pages narrow the chip-version pick inside the family.",
       "links": [
-        {"href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "MIFARE Plus EV2 vs DESFire EV3 (chip-version deep compare)"},
-        {"href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "Classic vs Plus vs DESFire for hotel locks"},
-        {"href": "/guides/mifare-desfire-ev3-commands-reference/", "label": "DESFire EV3 commands reference"},
-        {"href": "/guides/mifare-classic-1k-4k-chip-encyclopedia/", "label": "MIFARE Classic 1K/4K chip encyclopedia"},
-        {"href": "/guides/iso-14443-explained/", "label": "ISO/IEC 14443 explained"}
+        {
+          "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
+          "label": "MIFARE Plus EV2 vs DESFire EV3 (chip-version deep compare)"
+        },
+        {
+          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
+          "label": "Classic vs Plus vs DESFire for hotel locks"
+        },
+        {
+          "href": "/guides/mifare-desfire-ev3-commands-reference/",
+          "label": "DESFire EV3 commands reference"
+        },
+        {
+          "href": "/guides/mifare-classic-1k-4k-chip-encyclopedia/",
+          "label": "MIFARE Classic 1K/4K chip encyclopedia"
+        },
+        {
+          "href": "/guides/iso-14443-explained/",
+          "label": "ISO/IEC 14443 explained"
+        }
       ]
     },
     {
       "title": "Product and solution pages",
       "description": "Proud Tek SKUs and solution landings for Plus and DESFire applications.",
       "links": [
-        {"href": "/products/rfid-cards/mifare-plus-se-card/", "label": "MIFARE Plus SE card"},
-        {"href": "/products/rfid-cards/mifare-desfire-ev3-card/", "label": "MIFARE DESFire EV3 card"},
-        {"href": "/products/rfid-cards/mifare-desfire-ev3-cards/", "label": "MIFARE DESFire EV3 cards (bulk)"},
-        {"href": "/solutions/rfid-access-control/", "label": "RFID access control solution"},
-        {"href": "/solutions/hotel-key-cards/", "label": "Hotel key cards solution"}
+        {
+          "href": "/products/rfid-cards/mifare-plus-se-card/",
+          "label": "MIFARE Plus SE card"
+        },
+        {
+          "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
+          "label": "MIFARE DESFire EV3 card"
+        },
+        {
+          "href": "/products/rfid-cards/mifare-desfire-ev3-cards/",
+          "label": "MIFARE DESFire EV3 cards (bulk)"
+        },
+        {
+          "href": "/solutions/rfid-access-control/",
+          "label": "RFID access control solution"
+        },
+        {
+          "href": "/solutions/hotel-key-cards/",
+          "label": "Hotel key cards solution"
+        }
       ]
     },
     {
       "title": "Reader hardware for Plus and DESFire",
       "description": "Desktop encoders and fixed readers that implement both family command sets.",
       "links": [
-        {"href": "/products/rfid-readers/desktop-nfc-reader-encoder/", "label": "Desktop NFC reader / encoder class"},
-        {"href": "/products/rfid-readers/", "label": "All RFID reader categories"},
-        {"href": "/guides/rfid-reader-writer-selection/", "label": "RFID reader and writer selection guide"}
+        {
+          "href": "/products/rfid-readers/desktop-nfc-reader-encoder/",
+          "label": "Desktop NFC reader / encoder class"
+        },
+        {
+          "href": "/products/rfid-readers/",
+          "label": "All RFID reader categories"
+        },
+        {
+          "href": "/guides/rfid-reader-writer-selection/",
+          "label": "RFID reader and writer selection guide"
+        }
       ]
     },
     {
       "title": "Official references",
       "description": "NXP product pages and supporting standards documents.",
       "links": [
-        {"href": "https://www.nxp.com/products/MIFARE-Plus:MC_42982", "label": "NXP MIFARE Plus product family"},
-        {"href": "https://www.nxp.com/products/MIFARE-DESFire:MC_53450", "label": "NXP MIFARE DESFire product family"}
+        {
+          "href": "https://www.nxp.com/products/MIFARE-Plus:MC_42982",
+          "label": "NXP MIFARE Plus product family"
+        },
+        {
+          "href": "https://www.nxp.com/products/MIFARE-DESFire:MC_53450",
+          "label": "NXP MIFARE DESFire product family"
+        }
       ]
     }
   ],
@@ -187,11 +276,11 @@
     },
     {
       "question": "When is DESFire Light the right pick instead of DESFire EV3?",
-      "answer": "When the application is single-purpose (one AID, one or two files), cost matters at volume, and the 640-byte user memory is adequate. Typical fits: library book tags, closed-loop small-value stored-value (≤€50 purse), loyalty cards with a small authenticated counter, transit concession cards. DESFire Light lands at €0.35-0.55 per card at 1 M units — cheaper than Plus EV2 for small-memory workloads, with DESFire-grade AES-128 and EAL5+ hardware. Outgrown by any multi-application credential; pick full DESFire EV3 from the start if the roadmap will add a second application within 2-3 years."
+      "answer": "When the application is single-purpose (one AID, one or two files), cost matters at volume, and the 640-byte user memory is adequate. Typical fits: library book tags, closed-loop small-value stored-value (≤€50 purse), loyalty cards with a small authenticated counter, transit concession cards. DESFire Light lands at €0.35-0.55 per card at 1 M units. Cheaper than Plus EV2 for small-memory workloads, with DESFire-grade AES-128 and EAL5+ hardware. Outgrown by any multi-application credential; pick full DESFire EV3 from the start if the roadmap will add a second application within 2-3 years."
     },
     {
       "question": "What's the biggest non-chip risk in a Plus or DESFire deployment?",
-      "answer": "Key management. Both families support per-card diversified keys derived from a master secret plus the card UID — but a diversification scheme implemented in an insecure reader, a plaintext HSM configuration, or a compromised personalisation bureau undoes all the cryptographic benefit. The chip-level difference between a correctly-configured Plus SL3 and a correctly-configured DESFire EV3 is usually smaller than the gap between a well-run key-management programme and a sloppy one. Invest in HSM-based key derivation, quarterly key-rotation capability, and a documented revocation process before worrying about the chip-version-selection margins."
+      "answer": "Key management. Both families support per-card diversified keys derived from a master secret plus the card UID. But a diversification scheme implemented in an insecure reader, a plaintext HSM configuration, or a compromised personalisation bureau undoes all the cryptographic benefit. The chip-level difference between a correctly-configured Plus SL3 and a correctly-configured DESFire EV3 is usually smaller than the gap between a well-run key-management programme and a sloppy one. Invest in HSM-based key derivation, quarterly key-rotation capability, and a documented revocation process before worrying about the chip-version-selection margins."
     }
   ],
   "sources": [
@@ -222,7 +311,7 @@
       "publisher": "ISO",
       "publishedAt": "2018-07-01",
       "accessedAt": "2026-04-20",
-      "note": "Air-interface anticollision specification under which both Plus and DESFire operate as ISO 14443 Type A PICCs — cited in the 'both are Type A at the air interface' baseline."
+      "note": "Air-interface anticollision specification under which both Plus and DESFire operate as ISO 14443 Type A PICCs. Cited in the 'both are Type A at the air interface' baseline."
     },
     {
       "label": "ISO/IEC 14443-4:2018 — Transmission protocol (T=CL)",
@@ -230,7 +319,7 @@
       "publisher": "ISO",
       "publishedAt": "2018-07-01",
       "accessedAt": "2026-04-20",
-      "note": "Transport protocol that carries ISO 7816-4 APDU wrappers for DESFire and native Plus commands — referenced in the command-model comparison."
+      "note": "Transport protocol that carries ISO 7816-4 APDU wrappers for DESFire and native Plus commands. Referenced in the command-model comparison."
     },
     {
       "label": "BSI-CC-PP-0084-2014 — Protection Profile for Security IC Platform with Augmentation Packages",
@@ -238,7 +327,7 @@
       "publisher": "Bundesamt für Sicherheit in der Informationstechnik (BSI) / Common Criteria Portal",
       "publishedAt": "2014-01-01",
       "accessedAt": "2026-04-20",
-      "note": "The Protection Profile against which NXP evaluates MIFARE Plus EV2 (EAL4+) and DESFire EV3 (EAL5+) — authority for the assurance-level claims compared in this page."
+      "note": "The Protection Profile against which NXP evaluates MIFARE Plus EV2 (EAL4+) and DESFire EV3 (EAL5+). Authority for the assurance-level claims compared in this page."
     },
     {
       "label": "BSI-DSZ-CC-1149-V2-2024 — Common Criteria Certification Report for NXP MIFARE DESFire EV3",

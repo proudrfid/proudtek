@@ -3,10 +3,10 @@
   "group": "guides",
   "title": "EM4100 / EM4305 / T5577 — LF 125 kHz Chip Technical Encyclopedia (Read-Only, Writable, Emulator)",
   "kicker": "EM Microelectronic EM4100 / EM4305 / Atmel T5577 Reference",
-  "summary": "The 125 kHz LF (low-frequency) RFID chip family is the bedrock of legacy access control — hotels, buildings, gates, car-park systems, pet microchips, and livestock tagging. EM4100 is the read-only, Manchester-encoded 40-bit-ID reference chip shipping since the early 1990s. EM4305 is its writable EEPROM cousin, still carrying the same air-interface compatibility. T5577 (originally Atmel, now part of Microchip) is the programmable 'universal LF emulator' that can be configured to impersonate EM4100, HID Prox, Indala, ioProx, AWID, and a dozen other proprietary LF formats. Together they cover the vast majority of deployed LF credentials worldwide.",
+  "summary": "The 125 kHz LF (low-frequency) RFID chip family is the bedrock of legacy access control. Hotels, buildings, gates, car-park systems, pet microchips, and livestock tagging. EM4100 is the read-only, Manchester-encoded 40-bit-ID reference chip shipping since the early 1990s. EM4305 is its writable EEPROM cousin, still carrying the same air-interface compatibility. T5577 (originally Atmel, now part of Microchip) is the programmable 'universal LF emulator' that can be configured to impersonate EM4100, HID Prox, Indala, ioProx, AWID, and a dozen other proprietary LF formats. Together they cover the vast majority of deployed LF credentials worldwide.",
   "heroPoints": [
-    "125 kHz LF — inductively-coupled RFID operating at the unlicensed LF ISM band. Short read range (2-10 cm depending on form factor), robust against water, human tissue, and most non-ferrous materials. Not suitable for metal surfaces without a ferrite backing because the inductive field cancels at a conductive surface. No meaningful crypto on any of these chips; LF security depends entirely on the downstream backend — an attacker with ~€100 of Proxmark3 hardware can clone any LF credential in field-read range in minutes, so LF is a 'convenience token' technology rather than a security technology.",
-    "EM4100 vs EM4305 vs T5577 — EM4100 is read-only, factory-mask-programmed, 40-bit ID, EM/H2/H3 Manchester-encoded, ~€0.04-0.06 at 100k volume. EM4305 is EEPROM-writable (512 bits user memory) while keeping EM4100 air-interface compatibility, with optional 32-bit password protection and 134.2 kHz mode for ISO 11784/11785 animal-ID compliance, ~€0.08-0.12 at 100k volume. T5577 is the programmable 'universal LF emulator' — configurable via 7 × 32-bit memory blocks plus a config-word register to emulate EM4100, HID Prox H10301 (26-bit), Indala ASP and LogE, ioProx (Kantech), AWID, HITAG 1, and most other common LF protocols, ~€0.10-0.15 at 100k volume.",
+    "125 kHz LF — inductively-coupled RFID operating at the unlicensed LF ISM band. Short read range (2-10 cm depending on form factor), robust against water, human tissue, and most non-ferrous materials. Not suitable for metal surfaces without a ferrite backing because the inductive field cancels at a conductive surface. No meaningful crypto on any of these chips; LF security depends entirely on the downstream backend. An attacker with ~€100 of Proxmark3 hardware can clone any LF credential in field-read range in minutes, so LF is a 'convenience token' technology rather than a security technology.",
+    "EM4100 vs EM4305 vs T5577 — EM4100 is read-only, factory-mask-programmed, 40-bit ID, EM/H2/H3 Manchester-encoded, ~€0.04-0.06 at 100k volume. EM4305 is EEPROM-writable (512 bits user memory) while keeping EM4100 air-interface compatibility, with optional 32-bit password protection and 134.2 kHz mode for ISO 11784/11785 animal-ID compliance, ~€0.08-0.12 at 100k volume. T5577 is the programmable 'universal LF emulator'. Configurable via 7 × 32-bit memory blocks plus a config-word register to emulate EM4100, HID Prox H10301 (26-bit), Indala ASP and LogE, ioProx (Kantech), AWID, HITAG 1, and most other common LF protocols, ~€0.10-0.15 at 100k volume.",
     "Legacy-reader interoperability — every 125 kHz access-control reader shipped since ~1995 reads EM4100-encoded cards. T5577's killer feature is the ability to clone an existing legacy credential onto a programmable chip, enabling both pentest workflows and legitimate key-duplication services (the locksmith-duplication market in the US alone is estimated at US$100-200M annually for LF/HF credentials). No other LF chip offers this level of format-flexibility; the T5577 is why generic 'universal' LF duplicator products exist at commodity pricing."
   ],
   "imageAlt": "125 kHz LF RFID card and keyfob using EM4100 / EM4305 / T5577 silicon",
@@ -36,10 +36,10 @@
       "title": "Family and part numbers",
       "bullets": [
         "EM4100 — EM Microelectronic (Marin, Switzerland) LF chip family. 40-bit read-only factory-programmed ID. Variants include EM4102 (Manchester encoding, reference chip and the chip most commonly shipped as 'EM4100' in bulk), EM4200 (newer silicon, Manchester, pin-compatible), EM4102-V41 (higher-endurance production run with tightened electrical characterization). Sold as wafer, die, or finished card / keyfob through EM's global distribution network including Arrow, Mouser, Digi-Key, and regional LF-card specialists.",
-        "EM4200 — EM4100 successor with improved sensitivity (approximately 3 dB better power-up threshold) and lower power consumption (30% reduction in idle-state current draw). 128-bit ID field but with the first 40 bits Manchester-encoded for legacy-reader backwards compatibility — an EM4200 card reads as a standard EM4100 in any legacy reader, while EM4200-aware readers can access the full 128-bit ID. Replaces EM4100 in most new production since 2018 but the marketplace still refers to the category as 'EM4100' regardless of actual silicon.",
+        "EM4200 — EM4100 successor with improved sensitivity (approximately 3 dB better power-up threshold) and lower power consumption (30% reduction in idle-state current draw). 128-bit ID field but with the first 40 bits Manchester-encoded for legacy-reader backwards compatibility. An EM4200 card reads as a standard EM4100 in any legacy reader, while EM4200-aware readers can access the full 128-bit ID. Replaces EM4100 in most new production since 2018 but the marketplace still refers to the category as 'EM4100' regardless of actual silicon.",
         "EM4305 — EM4100's EEPROM-writable sibling. 512 bits of user-writable memory plus password-protected sections and a configuration register. Can emulate EM4100 Manchester output, making it usable as a drop-in EM4100 replacement in locations that want writable cards for in-field provisioning (hotel chains reconfiguring guest cards per stay, car-park operators rotating card IDs on a periodic refresh). Supports both 125 kHz standard and 134.2 kHz animal-ID mode.",
-        "Atmel T5577 — originally Atmel (now Microchip after the 2016 acquisition completed) part number AT5577. Programmable LF emulator with 7 × 32-bit memory blocks (224 bits total user) and configuration registers that determine output encoding, modulation type, bit rate, and data payload. Can emulate EM4100 (Manchester at RF/64), HID Prox 26-bit H10301 format (FSK2a at RF/50), HID Prox 37-bit H10304, Indala ASP (FSK at RF/50), Indala LogE, ioProx (Kantech XSF), AWID, HITAG 1, HITAG 2 (partial — only the non-crypto LogE mode), Viking, and a few other protocols. The 'universal emulator' positioning is why T5577 has become the default chip for locksmith duplicator devices and for specialty access-control programs that need multi-format output.",
-        "HITAG 1 / HITAG 2 / HITAG S — NXP LF chips (formerly Philips Semiconductors, transferred to NXP in the 2006 divestiture) with 48-bit crypto authentication (HITAG 2 with the proprietary and now-broken Hitag2 cipher) or Public-Key crypto (HITAG S with AES-128). Used in automotive-immobilizer systems (most pre-2015 European vehicle immobilizers use HITAG 2 or HITAG Pro) and some European access-control systems (Legic Advant uses HITAG S in some products). Out of scope for this guide's main focus but noted as the 'secured LF' alternative — with the caveat that HITAG 2's Hitag2 cipher was broken in 2012 and is no longer considered cryptographically secure.",
+        "Atmel T5577 — originally Atmel (now Microchip after the 2016 acquisition completed) part number AT5577. Programmable LF emulator with 7 × 32-bit memory blocks (224 bits total user) and configuration registers that determine output encoding, modulation type, bit rate, and data payload. Can emulate EM4100 (Manchester at RF/64), HID Prox 26-bit H10301 format (FSK2a at RF/50), HID Prox 37-bit H10304, Indala ASP (FSK at RF/50), Indala LogE, ioProx (Kantech XSF), AWID, HITAG 1, HITAG 2 (partial. Only the non-crypto LogE mode), Viking, and a few other protocols. The 'universal emulator' positioning is why T5577 has become the default chip for locksmith duplicator devices and for specialty access-control programs that need multi-format output.",
+        "HITAG 1 / HITAG 2 / HITAG S. NXP LF chips (formerly Philips Semiconductors, transferred to NXP in the 2006 divestiture) with 48-bit crypto authentication (HITAG 2 with the proprietary and now-broken Hitag2 cipher) or Public-Key crypto (HITAG S with AES-128). Used in automotive-immobilizer systems (most pre-2015 European vehicle immobilizers use HITAG 2 or HITAG Pro) and some European access-control systems (Legic Advant uses HITAG S in some products). Out of scope for this guide's main focus but noted as the 'secured LF' alternative. With the caveat that HITAG 2's Hitag2 cipher was broken in 2012 and is no longer considered cryptographically secure.",
         "Counterfeit watch — 'EM4100-compatible' generic LF cards often ship as T5577 chips configured for EM4100 emulation rather than actual EM4102 silicon. For most access-control deployments this is functionally indistinguishable (both respond correctly to the EM4100 read-sequence and broadcast a valid-looking 40-bit ID). For pet/livestock ISO 11784/11785 compliance where the chip ID format is audited by veterinary authorities (EU pet-passport program, AVID pet-microchip registry in the US), insist on authentic EM4305 or ISO-compliant HDX/FDX-B silicon sourced through veterinary-supply-chain distributors. Functional diagnostic: a legitimate EM4100 silently ignores WRITE commands; a T5577-masquerading card will accept writes and change its ID."
       ]
     },
@@ -47,9 +47,9 @@
       "title": "Memory architecture — EM4100 (read-only)",
       "bullets": [
         "Total memory — 64 bits, factory-mask-programmed in a 2-line metal mask applied at wafer fabrication (the mask is serialized per-production-lot by EM's fab and cannot be altered post-manufacturing). Structure: 9 bits header (all 1s, forming the preamble sync pattern), 10 bytes ID in Manchester/H2/H3 encoding (44 bits for ID + parity), 1 stop bit. Total per-broadcast frame = 64 bits.",
-        "ID field structure — 40 bits. Bytes 1-2 = customer/version code (8 bits, allocated by EM per customer order — large customers like HID have dedicated customer codes). Bytes 3-5 = unique ID (32 bits, drawn sequentially from EM's production counter within a customer-code partition). This is the 'tag ID' reported by LF readers; access-control backends whitelist these numbers. The Wiegand 26-bit format widely used in US corporate access control truncates this to 24 bits of data + 2 parity, which is why some facilities see ID collisions when mixing 40-bit EM4100 and 26-bit Wiegand credentials.",
+        "ID field structure — 40 bits. Bytes 1-2 = customer/version code (8 bits, allocated by EM per customer order. Large customers like HID have dedicated customer codes). Bytes 3-5 = unique ID (32 bits, drawn sequentially from EM's production counter within a customer-code partition). This is the 'tag ID' reported by LF readers; access-control backends whitelist these numbers. The Wiegand 26-bit format widely used in US corporate access control truncates this to 24 bits of data + 2 parity, which is why some facilities see ID collisions when mixing 40-bit EM4100 and 26-bit Wiegand credentials.",
         "Encoding — Manchester (EM4102 default), Biphase (H2 variant), or PSK1 (phase-shift keying, less common) depending on chip variant. Manchester is the dominant encoding for EM4100; at 125 kHz carrier with 64-bit ID and 64-clock modulation per bit (RF/64 convention), full broadcast frame takes ~33 ms. The card broadcasts this frame continuously in a loop while powered in the reader field, so readers simply demodulate a few successive frames and majority-vote on the decoded ID for noise rejection.",
-        "No authentication, no writable memory — the chip simply broadcasts its ID continuously whenever it is in an LF reader's inductive field. Nothing else. No challenge-response, no state, no way to distinguish a real card from a clone or replayed signal. This is the fundamental security property that makes LF unsuitable for anything past low-consequence access control.",
+        "No authentication, no writable memory. The chip simply broadcasts its ID continuously whenever it is in an LF reader's inductive field. Nothing else. No challenge-response, no state, no way to distinguish a real card from a clone or replayed signal. This is the fundamental security property that makes LF unsuitable for anything past low-consequence access control.",
         "UID uniqueness — factory-guaranteed uniqueness within the EM production run. Across global installed-base, the 40-bit ID space (1.1 trillion) is theoretically adequate but collision has been reported within budget-card production batches from non-EM clone houses (particularly small Chinese fabs producing 'EM4100-compatible' cards at ultra-low cost), where production counters reset or overlap causing identical IDs across lots. Large distributors occasionally have to recall specific lot codes when collisions are discovered.",
         "Lifetime — no wear-out mechanism; the ROM is mask-programmed silicon and does not degrade. Card lifetime is limited by physical damage to the antenna coil (wire-break from repeated flexing), substrate delamination (PVC laminate coming apart after UV or moisture exposure), or the chip-to-coil bond failing (common failure mode in cheap injection-molded keyfobs). Typical PVC cards rated ≥ 10 years outdoor (UV exposure being the limiting factor), ≥ 20 years indoor office use; fob-format shorter because of higher mechanical stress on the coil bond."
       ]
@@ -61,7 +61,7 @@
         "EM4305 write — programmable via LF field modulation at the reader. The reader sends WRITE commands by modulating the LF field (gap-modulation scheme at specified timing); the chip decodes the command, validates parity, and writes the specified block to its EEPROM. Write latency ~5-20 ms per block (dominated by the EEPROM programming time, not the RF), so a full 13-block user-memory rewrite takes ~150-300 ms.",
         "EM4305 password protection — optional 32-bit password required for write operations when the password-lock bit is set. Without the password, cards can be read but not modified (which is the typical factory-default state for most EM4305 shipments; personalization lines set the password at card issuance). Password can be set at personalization time and locked thereafter; unsetting the password flag once set requires writing a 'password-off' value while knowing the current password, preventing a captured card from having its password rotated by an attacker without knowing the existing one.",
         "T5577 memory — 7 × 32-bit blocks (224 bits user), plus configuration registers. Block 0 = config word (modulation type in bits 25-27, bit rate in bits 18-24, password flag in bit 28, max block in bits 0-2). Blocks 1-7 = user data / emulated-credential payload. Configuration word determines how the chip broadcasts the blocks: set config for Manchester + RF/64 + max_block = 2 to get EM4100 emulation from blocks 1-2; set config for FSK2a + RF/50 + max_block = 2 for HID Prox 26-bit emulation.",
-        "T5577 modulation modes — supports Manchester, Biphase, PSK1, PSK2, PSK3, FSK1, FSK2, FSK1a, FSK2a encoding. Combined with programmable bit rate (RF/8, RF/16, RF/32, RF/40, RF/50, RF/64, RF/100, RF/128), this covers the output formats of essentially every deployed LF protocol. The bit-rate and modulation flexibility is what makes T5577 a true 'universal emulator' — the Proxmark3 community maintains a catalog of ~40 documented config-word values corresponding to different commercial LF credential formats.",
+        "T5577 modulation modes — supports Manchester, Biphase, PSK1, PSK2, PSK3, FSK1, FSK2, FSK1a, FSK2a encoding. Combined with programmable bit rate (RF/8, RF/16, RF/32, RF/40, RF/50, RF/64, RF/100, RF/128), this covers the output formats of essentially every deployed LF protocol. The bit-rate and modulation flexibility is what makes T5577 a true 'universal emulator'. The Proxmark3 community maintains a catalog of ~40 documented config-word values corresponding to different commercial LF credential formats.",
         "T5577 password — optional 32-bit password for write operations. When enabled (config-word bit 28 set), writes require a PASSWORD command preceding the WRITE sequence. Unsetting the password flag once set requires writing a 'password-off' value while knowing the current password. A T5577 with password set and password lost is effectively bricked for writes (but still functional as the emulated credential it was last configured as).",
         "T5577 endurance — 100,000 write cycles per block per the datasheet. Data retention ≥ 10 years at 25 °C. More than adequate for issuance-and-forget access-control cards; at 1 write per year (rare refresh cycle) the chip outlasts any realistic deployment life; at 1 write per month (aggressive refresh for hotel-card reissuance programs) still ~8000 years of write headroom, so the binding lifetime constraint is always physical damage to card or coil, never EEPROM wear."
       ]
@@ -72,8 +72,8 @@
         "Carrier frequency — 125 kHz (some chips support 134.2 kHz for ISO 11784/11785 animal-ID compliance — EM4305 supports this mode, T5577 can be configured for 134.2 kHz in its config word). LF ISM unlicensed globally per ITU allocations; reader output power limits are less stringent than at HF or UHF, which is why LF readers can afford larger antenna loops and higher per-reader power draw.",
         "Coupling mechanism — inductive coupling (near-field magnetic). The reader's antenna coil (typically a 100-150 turn copper wire wound around a plastic or ferrite core) generates an oscillating magnetic field at 125 kHz; the card's coil (3 turns on ID-1 card, 30 turns on keyfob, 100+ turns on glass-tag for maximum inductance in small space) receives the field, rectifies for power, and modulates its load back to the reader to transmit data. Range is short (2-10 cm) because near-field strength decays as 1/r³ (compared to 1/r² in far-field UHF, which is why UHF achieves multi-meter range).",
         "Power budget — LF cards require substantially more reader power than HF 13.56 MHz cards (roughly 10-100× the inductive-coupling power density at the card because of the 100× longer wavelength and correspondingly reduced coupling efficiency). This is why LF reader antennas are physically larger than HF equivalents — a typical LF reader antenna is 10-15 cm diameter vs 4-6 cm for HF — and why battery-powered LF readers have shorter battery life than battery-powered HF readers.",
-        "Read range by form factor — ID-1 card (86 × 54 mm, 3-turn coil around the edge): 8-10 cm on a quality desktop reader, 3-5 cm on a budget reader or wall-mount reader with small antenna. Keyfob (30 mm round, 30-turn coil): 4-6 cm. Glass-tag (12 × 2 mm, tightly-wound 100-turn coil with ferrite core): 1-2 cm. Animal microchip (11-12 × 2 mm, implanted subcutaneously): in-body 0.5-2 cm — which is why livestock scanners and pet-ID wands have to be held directly against the animal's skin.",
-        "Interference and read reliability — LF is robust against water, wet fur, fabric, and human tissue (the 125 kHz wavelength of ~2.4 km is vastly larger than any practical absorber, so attenuation is minimal). Poor on metal (field cancellation at the conductive surface, since the induced eddy currents in the metal oppose the incoming field) unless a ferrite spacer is used to redirect the field. Electromagnetic interference from motors, switching power supplies (20-100 kHz switching harmonics overlap 125 kHz), and LED drivers can introduce read errors, but LF is generally less susceptible than HF because it operates below the 150 kHz emissions-regulation threshold where most ambient EM noise is concentrated.",
+        "Read range by form factor. ID-1 card (86 × 54 mm, 3-turn coil around the edge): 8-10 cm on a quality desktop reader, 3-5 cm on a budget reader or wall-mount reader with small antenna. Keyfob (30 mm round, 30-turn coil): 4-6 cm. Glass-tag (12 × 2 mm, tightly-wound 100-turn coil with ferrite core): 1-2 cm. Animal microchip (11-12 × 2 mm, implanted subcutaneously): in-body 0.5-2 cm — which is why livestock scanners and pet-ID wands have to be held directly against the animal's skin.",
+        "Interference and read reliability. LF is robust against water, wet fur, fabric, and human tissue (the 125 kHz wavelength of ~2.4 km is vastly larger than any practical absorber, so attenuation is minimal). Poor on metal (field cancellation at the conductive surface, since the induced eddy currents in the metal oppose the incoming field) unless a ferrite spacer is used to redirect the field. Electromagnetic interference from motors, switching power supplies (20-100 kHz switching harmonics overlap 125 kHz), and LED drivers can introduce read errors, but LF is generally less susceptible than HF because it operates below the 150 kHz emissions-regulation threshold where most ambient EM noise is concentrated.",
         "Standards — EM4100 / EM4305 have no ISO standard per se; they are de-facto references defined by their chip data sheets. ISO/IEC 18000-2 is the 'formal' LF RFID air-interface standard and specifies Type A (active comms) and Type B (passive polling) protocols, but it is less commercially relevant than EM's de-facto standards because the EM4100 installed base predates ISO 18000-2 by a decade. Animal RFID is governed by ISO 11784/11785 (128-bit ID + FDX-B or HDX encoding at 134.2 kHz) which is enforced by veterinary regulations in most jurisdictions."
       ]
     },
@@ -82,34 +82,34 @@
       "bullets": [
         "T5577 programming hardware — Proxmark3 (open-source LF/HF reader-writer platform, ~€300-400 for the RDV4 reference hardware) is the reference tool and runs custom firmware that implements every documented T5577 command plus LF protocol analysis tooling. Commercial alternatives include RFIDeas RF IDEAS pcProx series (closed-source, ~€150-250), Identiv SCL3711, various Chinese keyfob duplicators (ZX-R6 at ~€30, ABCD-R108 at ~€60), and the Flipper Zero (~€170) which ships a functional-enough T5577 writer for consumer use cases. All implement the standard T5577 WRITE protocol defined in the Microchip data sheet.",
         "Cloning an EM4100 onto T5577 — (1) read the source EM4100 to recover the 40-bit ID (any LF reader works; Proxmark3 command `lf em 410x_read`). (2) set T5577 block 0 to config_word 0x0014_8040 corresponding to Manchester encoding at RF/64 bit rate, max_block = 2, no password. (3) format the 40-bit ID into the 64-bit EM4100 frame (header + Manchester-encoded ID + parity + stop bit) and write 32 bits into each of blocks 1 and 2 via WRITE commands. (4) verify by reading back; the T5577 now broadcasts as a functional EM4100 clone indistinguishable from an authentic EM4102 card in any legacy reader.",
-        "Cloning HID Prox 26-bit — HID H10301 format is 26 bits: 1 parity + 8 facility code + 16 card number + 1 parity, transmitted as a preamble + payload + sentinel at FSK2a modulation. On T5577: block 0 config_word 0x00107060 for FSK2a, RF/50 bit rate, max_block = 2. Blocks 1-2 hold the 26-bit HID preamble + payload + sentinel bits formatted into 64 bits. Proxmark3 `lf hid sim` / `lf hid clone` commands automate the encoding. HID 37-bit and 26-bit/48-bit corporate formats use different config words documented in the Proxmark3 wiki.",
+        "Cloning HID Prox 26-bit. HID H10301 format is 26 bits: 1 parity + 8 facility code + 16 card number + 1 parity, transmitted as a preamble + payload + sentinel at FSK2a modulation. On T5577: block 0 config_word 0x00107060 for FSK2a, RF/50 bit rate, max_block = 2. Blocks 1-2 hold the 26-bit HID preamble + payload + sentinel bits formatted into 64 bits. Proxmark3 `lf hid sim` / `lf hid clone` commands automate the encoding. HID 37-bit and 26-bit/48-bit corporate formats use different config words documented in the Proxmark3 wiki.",
         "Legitimate use cases — locksmiths offering key-duplication services (US$20-50 per duplicate at typical retail pricing, a multi-million-dollar service market), access-control integrators migrating legacy LF installations to new credential technologies (read all existing credentials onto T5577 clones, swap readers, then re-issue on modern silicon over a transition window), facility-management teams maintaining their own spares rather than paying the OEM's replacement-card premium. Most of these workflows have been legal for decades in most jurisdictions; the exception is cloning a credential you do not own without the owner's permission, which is access-control fraud.",
-        "Pentest use cases — red-team engagements assessing the threat model of LF-based physical security. Since LF credentials have no authentication, any LF card in field read range (typically 5-10 cm on a Proxmark3, extendable to 50+ cm with a purpose-built long-range LF antenna) can be cloned in minutes with ~€300 of hardware. The typical attack is a 'skimming' variant — an attacker carries a Proxmark3 in a bag or coat pocket past a target, reads any LF credential the target carries, clones it at leisure. Treat LF access tokens as secrets protected only by physical proximity.",
-        "Operational hardening for LF installations — if replacing a legacy LF fleet is infeasible (because the reader capex is too high to justify for a low-risk application), harden the downstream: turnstile + security camera per entry point so cloned-card use is recorded, facility-wide single-sign-on with second factor (PIN pad on reader, or mobile-credential overlay) for sensitive zones, LF audit-log correlation with other sensors (CCTV face match, motion sensor, network login at target workstation) so use outside normal patterns triggers alerts. Many US federal facilities implemented exactly this hardening under the 2011-2020 PIV-I rollout rather than ripping out HID Prox LF installations."
+        "Pentest use cases — red-team engagements assessing the threat model of LF-based physical security. Since LF credentials have no authentication, any LF card in field read range (typically 5-10 cm on a Proxmark3, extendable to 50+ cm with a purpose-built long-range LF antenna) can be cloned in minutes with ~€300 of hardware. The typical attack is a 'skimming' variant. An attacker carries a Proxmark3 in a bag or coat pocket past a target, reads any LF credential the target carries, clones it at leisure. Treat LF access tokens as secrets protected only by physical proximity.",
+        "Operational hardening for LF installations. If replacing a legacy LF fleet is infeasible (because the reader capex is too high to justify for a low-risk application), harden the downstream: turnstile + security camera per entry point so cloned-card use is recorded, facility-wide single-sign-on with second factor (PIN pad on reader, or mobile-credential overlay) for sensitive zones, LF audit-log correlation with other sensors (CCTV face match, motion sensor, network login at target workstation) so use outside normal patterns triggers alerts. Many US federal facilities implemented exactly this hardening under the 2011-2020 PIV-I rollout rather than ripping out HID Prox LF installations."
       ]
     },
     {
       "title": "Commercial deployments and application fit",
       "bullets": [
-        "Hotel key cards (legacy) — LF was dominant 1995-2010 for hotel locks in the Assa Abloy VingCard Classic product line (pre-RFID VingCard Signature replaced them with 13.56 MHz HF starting around 2005) and Onity's LF generation (later replaced by the HT series at HF). Largely displaced by HF 13.56 MHz from 2005 onwards and by BLE/mobile-credential from 2018 onwards. Residual LF fleet exists in budget hotel chains globally and in older properties that haven't been through a lock-refresh capex cycle; any hotel currently running LF should be planning an HF or mobile migration by 2028 because the LF chip supply chain from EM is increasingly concentrated and pricing is trending up.",
-        "Office and corporate access control — HID Prox (26-bit H10301 and 37-bit H10304 formats) on T5577-compatible cards is the second-largest US corporate-access-control segment after HID iCLASS (which is HF, not LF). Dozens of millions of active credentials globally; replacement cycle is slow because new credentials must be compatible with the installed reader base, and the reader installed base in US commercial real estate is extremely long-lived (20+ year reader life is common). Major integrators (Convergint, Allied Universal Technology Services, Securitas) still sell HID Prox new installations to budget-conscious customers despite knowing the security is weak.",
-        "Car-park and gate access — single-family residential gates (LiftMaster, Mighty Mule), apartment-building garages, industrial-site gates (Came, Nice, FAAC). LF's proximity-based convenience (the user has to physically touch the reader to authenticate) fits the human-factor model for low-risk applications. EM4100 or EM4305 dominate in new residential deployments; the card is sold with the gate opener and replacement cards are available at US$5-15 each.",
-        "Pet and livestock identification — ISO 11784/11785-compliant FDX-B chips (HDX at 134.2 kHz is the ISO default for new implantable chips; FDX-B is the older technology still widely used in the US). EM4305 supports this mode; dedicated chips like HITAG S 256 are also used. Implantable glass-tag form factor, ~12 × 2 mm, injected subcutaneously via a 14-gauge needle. Mandatory for pet movement in the EU (EU Pet Passport program since 2003), voluntary but nearly universal in the US (AVID and HomeAgain registries).",
-        "Car-wash, gym, printer — low-value-per-use tokens where UID-only authorization is sufficient. EM4100 cards and keyfobs cost ~€0.08-0.15 each at volume; acceptable for scratch-off or monthly subscription use cases (24-Hour Fitness, Planet Fitness, printer-vending kiosks at WeWork and office-services providers). Typical deployment: issue the card with an account ID on the backend, any swipe authenticates the account, no crypto needed because the worst-case cloning loss is one month's subscription.",
-        "Where LF is NOT the right choice — payment (use HF contactless EMV, ISO 14443), high-security building access (use HF AES-authenticated credentials or mobile BLE with phone-OS crypto), crypto-grade identification (use HF DESFire EV3, NTAG424 DNA, or HID iCLASS SE). Any application where cloning has meaningful cost. Also not suitable for long-range operations (>30 cm, specialized LF portal readers can reach 30-60 cm but at significant hardware cost) where UHF is the only practical option, or metal-surface mounting where HF + ferrite is the primary choice.",
+        "Hotel key cards (legacy). LF was dominant 1995-2010 for hotel locks in the Assa Abloy VingCard Classic product line (pre-RFID VingCard Signature replaced them with 13.56 MHz HF starting around 2005) and Onity's LF generation (later replaced by the HT series at HF). Largely displaced by HF 13.56 MHz from 2005 onwards and by BLE/mobile-credential from 2018 onwards. Residual LF fleet exists in budget hotel chains globally and in older properties that haven't been through a lock-refresh capex cycle; any hotel currently running LF should be planning an HF or mobile migration by 2028 because the LF chip supply chain from EM is increasingly concentrated and pricing is trending up.",
+        "Office and corporate access control. HID Prox (26-bit H10301 and 37-bit H10304 formats) on T5577-compatible cards is the second-largest US corporate-access-control segment after HID iCLASS (which is HF, not LF). Dozens of millions of active credentials globally; replacement cycle is slow because new credentials must be compatible with the installed reader base, and the reader installed base in US commercial real estate is extremely long-lived (20+ year reader life is common). Major integrators (Convergint, Allied Universal Technology Services, Securitas) still sell HID Prox new installations to budget-conscious customers despite knowing the security is weak.",
+        "Car-park and gate access. Single-family residential gates (LiftMaster, Mighty Mule), apartment-building garages, industrial-site gates (Came, Nice, FAAC). LF's proximity-based convenience (the user has to physically touch the reader to authenticate) fits the human-factor model for low-risk applications. EM4100 or EM4305 dominate in new residential deployments; the card is sold with the gate opener and replacement cards are available at US$5-15 each.",
+        "Pet and livestock identification. ISO 11784/11785-compliant FDX-B chips (HDX at 134.2 kHz is the ISO default for new implantable chips; FDX-B is the older technology still widely used in the US). EM4305 supports this mode; dedicated chips like HITAG S 256 are also used. Implantable glass-tag form factor, ~12 × 2 mm, injected subcutaneously via a 14-gauge needle. Mandatory for pet movement in the EU (EU Pet Passport program since 2003), voluntary but nearly universal in the US (AVID and HomeAgain registries).",
+        "Car-wash, gym, printer. Low-value-per-use tokens where UID-only authorization is sufficient. EM4100 cards and keyfobs cost ~€0.08-0.15 each at volume; acceptable for scratch-off or monthly subscription use cases (24-Hour Fitness, Planet Fitness, printer-vending kiosks at WeWork and office-services providers). Typical deployment: issue the card with an account ID on the backend, any swipe authenticates the account, no crypto needed because the worst-case cloning loss is one month's subscription.",
+        "Where LF is NOT the right choice. Payment (use HF contactless EMV, ISO 14443), high-security building access (use HF AES-authenticated credentials or mobile BLE with phone-OS crypto), crypto-grade identification (use HF DESFire EV3, NTAG424 DNA, or HID iCLASS SE). Any application where cloning has meaningful cost. Also not suitable for long-range operations (>30 cm, specialized LF portal readers can reach 30-60 cm but at significant hardware cost) where UHF is the only practical option, or metal-surface mounting where HF + ferrite is the primary choice.",
         "Migration partners — the modern LF successor is MIFARE Plus / DESFire EV3 (HF 13.56 MHz with AES-128), or mobile-credential BLE (HID Mobile Access, Openpath, Kisi). Many installed LF readers are replaced with dual-technology HF+LF readers (HID multiCLASS series, STid Architect, Allegion aptiQ) that read legacy credentials during a transition window, then the LF side is disabled once all credentials have been reissued on HF. Typical transition windows are 18-36 months; rushing compresses capex and causes cardholder-experience problems."
       ]
     },
     {
       "title": "ISO and manufacturer reference documents",
       "bullets": [
-        "EM Microelectronic EM4100 / EM4102 datasheet (doc ID EM4100_DS, rev 5.x) — the canonical reference. Memory map, encoding specification (Manchester / Biphase / PSK1 bit-level diagrams), electrical characterization including minimum field strength for power-up, antenna resonance recommendations.",
+        "EM Microelectronic EM4100 / EM4102 datasheet (doc ID EM4100_DS, rev 5.x). The canonical reference. Memory map, encoding specification (Manchester / Biphase / PSK1 bit-level diagrams), electrical characterization including minimum field strength for power-up, antenna resonance recommendations.",
         "EM Microelectronic EM4305 datasheet — describes write protocol (gap-modulation timing), password structure (32-bit + lock bits), and multi-mode emulation (EM4100-compatible output + 134.2 kHz animal mode). Essential for EEPROM-based personalization workflow design.",
         "EM Microelectronic EM4200 datasheet — the successor chip's characterization, including backward-compatibility mode that emulates EM4100 Manchester output for the first 40 bits of its 128-bit ID.",
-        "Microchip T5577 datasheet (legacy Atmel doc3132 retained under Microchip) — config word bitfield definitions, modulation-mode table (Manchester / Biphase / PSK1/2/3 / FSK1/2/1a/2a with example waveform diagrams), write command timing, password command sequence.",
+        "Microchip T5577 datasheet (legacy Atmel doc3132 retained under Microchip). Config word bitfield definitions, modulation-mode table (Manchester / Biphase / PSK1/2/3 / FSK1/2/1a/2a with example waveform diagrams), write command timing, password command sequence.",
         "ISO/IEC 18000-2:2009 — formal LF RFID air-interface standard. Less commercially relevant than EM's de-facto standards but referenced in government and enterprise procurements where ISO conformance is a contract requirement.",
         "ISO 11784 / 11785 — animal RFID identification standard. 134.2 kHz, 128-bit ID, FDX-B or HDX encoding. Compulsory for pet and livestock identification in most jurisdictions (EU Pet Passport, UK DEFRA pet-travel scheme, USDA animal-disease-traceability APHIS program for cattle and sheep).",
-        "Proxmark3 community wiki (rfid-research-group on GitHub) — practical reference for T5577 programming, LF protocol reverse engineering, and legacy-credential cloning procedures. Maintained by the Proxmark3 open-source community; the most comprehensive practical reference for T5577 emulation config-words."
+        "Proxmark3 community wiki (rfid-research-group on GitHub). Practical reference for T5577 programming, LF protocol reverse engineering, and legacy-credential cloning procedures. Maintained by the Proxmark3 open-source community; the most comprehensive practical reference for T5577 emulation config-words."
       ]
     },
     {
@@ -122,19 +122,84 @@
           "T5577"
         ],
         "rows": [
-          ["Operating frequency", "125 kHz", "125 / 134.2 kHz", "100 / 125 / 134.2 kHz"],
-          ["Memory", "64 bits ROM (read-only)", "512 bits EEPROM", "224 bits EEPROM + config"],
-          ["User writable", "No", "Yes (416 bits user)", "Yes (all blocks user-configurable)"],
-          ["ID length", "40 bits", "64 or 96 bits", "Configurable (typically 32–64 bits)"],
-          ["Encoding modes", "Manchester / Biphase / PSK1", "Manchester / Biphase / PSK1 / FSK", "Manchester / Biphase / PSK1-3 / FSK1-2a"],
-          ["Bit-rate options", "RF/64 fixed", "RF/8 to RF/128", "RF/8 to RF/128 configurable"],
-          ["Password protection", "No", "Optional (32-bit)", "Optional (32-bit)"],
-          ["Emulation capability", "—", "EM4100 only", "EM4100 / HID Prox / Indala / AWID / ioProx / …"],
-          ["Read range (ID-1 card)", "8–10 cm", "8–10 cm", "8–10 cm"],
-          ["Data retention", "ROM (permanent)", "≥ 10 years", "≥ 10 years"],
-          ["Endurance", "n/a (ROM)", "100,000 write cycles", "100,000 write cycles"],
-          ["Operating temperature", "-40 °C to +85 °C", "-40 °C to +85 °C", "-40 °C to +85 °C"],
-          ["Typical cost (100k volume)", "~€0.04–0.06", "~€0.08–0.12", "~€0.10–0.15"]
+          [
+            "Operating frequency",
+            "125 kHz",
+            "125 / 134.2 kHz",
+            "100 / 125 / 134.2 kHz"
+          ],
+          [
+            "Memory",
+            "64 bits ROM (read-only)",
+            "512 bits EEPROM",
+            "224 bits EEPROM + config"
+          ],
+          [
+            "User writable",
+            "No",
+            "Yes (416 bits user)",
+            "Yes (all blocks user-configurable)"
+          ],
+          [
+            "ID length",
+            "40 bits",
+            "64 or 96 bits",
+            "Configurable (typically 32–64 bits)"
+          ],
+          [
+            "Encoding modes",
+            "Manchester / Biphase / PSK1",
+            "Manchester / Biphase / PSK1 / FSK",
+            "Manchester / Biphase / PSK1-3 / FSK1-2a"
+          ],
+          [
+            "Bit-rate options",
+            "RF/64 fixed",
+            "RF/8 to RF/128",
+            "RF/8 to RF/128 configurable"
+          ],
+          [
+            "Password protection",
+            "No",
+            "Optional (32-bit)",
+            "Optional (32-bit)"
+          ],
+          [
+            "Emulation capability",
+            "—",
+            "EM4100 only",
+            "EM4100 / HID Prox / Indala / AWID / ioProx / …"
+          ],
+          [
+            "Read range (ID-1 card)",
+            "8–10 cm",
+            "8–10 cm",
+            "8–10 cm"
+          ],
+          [
+            "Data retention",
+            "ROM (permanent)",
+            "≥ 10 years",
+            "≥ 10 years"
+          ],
+          [
+            "Endurance",
+            "n/a (ROM)",
+            "100,000 write cycles",
+            "100,000 write cycles"
+          ],
+          [
+            "Operating temperature",
+            "-40 °C to +85 °C",
+            "-40 °C to +85 °C",
+            "-40 °C to +85 °C"
+          ],
+          [
+            "Typical cost (100k volume)",
+            "~€0.04–0.06",
+            "~€0.08–0.12",
+            "~€0.10–0.15"
+          ]
         ]
       }
     }
@@ -144,32 +209,74 @@
       "title": "LF 125 kHz product pages",
       "description": "Proud Tek LF SKUs using EM / T5577 silicon.",
       "links": [
-        { "href": "/products/rfid-cards/em4100-rfid-card/", "label": "EM4100 RFID card" },
-        { "href": "/products/rfid-cards/", "label": "RFID cards pillar" },
-        { "href": "/products/rfid-keyfobs/", "label": "RFID keyfobs" },
-        { "href": "/products/rfid-cards/rfid-employee-badge/", "label": "RFID employee badge" },
-        { "href": "/products/rfid-cards/rfid-parking-card/", "label": "RFID parking card" },
-        { "href": "/products/rfid-cards/rfid-membership-card/", "label": "RFID membership card" }
+        {
+          "href": "/products/rfid-cards/em4100-rfid-card/",
+          "label": "EM4100 RFID card"
+        },
+        {
+          "href": "/products/rfid-cards/",
+          "label": "RFID cards pillar"
+        },
+        {
+          "href": "/products/rfid-keyfobs/",
+          "label": "RFID keyfobs"
+        },
+        {
+          "href": "/products/rfid-cards/rfid-employee-badge/",
+          "label": "RFID employee badge"
+        },
+        {
+          "href": "/products/rfid-cards/rfid-parking-card/",
+          "label": "RFID parking card"
+        },
+        {
+          "href": "/products/rfid-cards/rfid-membership-card/",
+          "label": "RFID membership card"
+        }
       ]
     },
     {
       "title": "Related comparisons and guides",
       "description": "LF in context — HF comparison, hotel-card history, and standards.",
       "links": [
-        { "href": "/compare/125khz-vs-13.56mhz-rfid/", "label": "125 kHz vs 13.56 MHz RFID" },
-        { "href": "/compare/uhf-vs-hf-rfid/", "label": "UHF vs HF RFID" },
-        { "href": "/compare/rfid-hotel-card-vs-magnetic-stripe/", "label": "RFID hotel card vs magstripe" },
-        { "href": "/guides/iso-14443-explained/", "label": "ISO 14443 explained (HF neighbor)" },
-        { "href": "/solutions/rfid-access-control/", "label": "RFID access control solution" },
-        { "href": "/guides/rfid-tag-card-wristband-lifespan/", "label": "RFID tag/card/wristband lifespan" }
+        {
+          "href": "/compare/125khz-vs-13.56mhz-rfid/",
+          "label": "125 kHz vs 13.56 MHz RFID"
+        },
+        {
+          "href": "/compare/uhf-vs-hf-rfid/",
+          "label": "UHF vs HF RFID"
+        },
+        {
+          "href": "/compare/rfid-hotel-card-vs-magnetic-stripe/",
+          "label": "RFID hotel card vs magstripe"
+        },
+        {
+          "href": "/guides/iso-14443-explained/",
+          "label": "ISO 14443 explained (HF neighbor)"
+        },
+        {
+          "href": "/solutions/rfid-access-control/",
+          "label": "RFID access control solution"
+        },
+        {
+          "href": "/guides/rfid-tag-card-wristband-lifespan/",
+          "label": "RFID tag/card/wristband lifespan"
+        }
       ]
     },
     {
       "title": "Authoritative external references",
       "description": "Manufacturer and ISO documents that define LF 125 kHz RFID.",
       "links": [
-        { "href": "https://www.emmicroelectronic.com/product/animal-identification-read-only-icso-11784/em4100", "label": "EM Microelectronic EM4100 product page" },
-        { "href": "https://ww1.microchip.com/downloads/en/DeviceDoc/doc3132.pdf", "label": "Microchip T5577 datasheet" }
+        {
+          "href": "https://www.emmicroelectronic.com/product/animal-identification-read-only-icso-11784/em4100",
+          "label": "EM Microelectronic EM4100 product page"
+        },
+        {
+          "href": "https://ww1.microchip.com/downloads/en/DeviceDoc/doc3132.pdf",
+          "label": "Microchip T5577 datasheet"
+        }
       ]
     }
   ],
@@ -196,11 +303,11 @@
     },
     {
       "question": "Can an NFC phone read 125 kHz LF cards?",
-      "answer": "No. NFC phones use HF 13.56 MHz exclusively because the NFC standard (ISO 14443, ISO 15693) is defined at that frequency and phone NFC antennas are tuned for it. There is no commodity phone hardware with 125 kHz LF; some Android phones with external USB-OTG LF reader dongles (the Flipper Zero in Bluetooth-bridge mode, or specific USB-LF readers) can read LF, but this is specialist equipment outside a normal user's kit. For phone-readable LF-equivalents, provide a dual-frequency card (125 kHz LF coil for legacy access-control reader + 13.56 MHz HF NFC antenna for phone tap — typical in hotel keycard programs mid-migration) or migrate fully to HF. Some modern access-control readers (HID multiCLASS RP40, STid Architect) read both LF and HF so a dual-frequency card can transit both eras; this is the standard migration pattern for corporate access-control refreshes."
+      "answer": "No. NFC phones use HF 13.56 MHz exclusively because the NFC standard (ISO 14443, ISO 15693) is defined at that frequency and phone NFC antennas are tuned for it. There is no commodity phone hardware with 125 kHz LF; some Android phones with external USB-OTG LF reader dongles (the Flipper Zero in Bluetooth-bridge mode, or specific USB-LF readers) can read LF, but this is specialist equipment outside a normal user's kit. For phone-readable LF-equivalents, provide a dual-frequency card (125 kHz LF coil for legacy access-control reader + 13.56 MHz HF NFC antenna for phone tap. Typical in hotel keycard programs mid-migration) or migrate fully to HF. Some modern access-control readers (HID multiCLASS RP40, STid Architect) read both LF and HF so a dual-frequency card can transit both eras; this is the standard migration pattern for corporate access-control refreshes."
     },
     {
       "question": "What are the signs that an LF card I bought is fake or non-compliant?",
-      "answer": "Fake EM4100 often ships as T5577 emulating EM4100. Functional difference: T5577 responds to WRITE commands while EM4100 silently ignores them (EM4100 is mask-ROM so there is no electrical path to write). A legitimate EM4100 will accept only READ commands; a T5577-masquerading card will accept writes and change its ID. Incoming inspection for access-control SKUs: send a WRITE to a subset of every incoming lot and confirm the card ID changes (indicating T5577) or does not change (indicating authentic EM4100). For pet-microchip ISO 11784/11785 applications where the chip ID format is audited by ICAR-registered veterinary authorities, insist on ISO-certified supply chain from a named vendor with a veterinary-specific product number; for general access-control applications, the functional equivalence between EM4100 and T5577-emulating-EM4100 is usually acceptable and the distinction doesn't affect deployment behavior. Lot-level traceability in the master purchase agreement is the enforceable mechanism — demand chip-type-on-lot-label and spot-inspection rights."
+      "answer": "Fake EM4100 often ships as T5577 emulating EM4100. Functional difference: T5577 responds to WRITE commands while EM4100 silently ignores them (EM4100 is mask-ROM so there is no electrical path to write). A legitimate EM4100 will accept only READ commands; a T5577-masquerading card will accept writes and change its ID. Incoming inspection for access-control SKUs: send a WRITE to a subset of every incoming lot and confirm the card ID changes (indicating T5577) or does not change (indicating authentic EM4100). For pet-microchip ISO 11784/11785 applications where the chip ID format is audited by ICAR-registered veterinary authorities, insist on ISO-certified supply chain from a named vendor with a veterinary-specific product number; for general access-control applications, the functional equivalence between EM4100 and T5577-emulating-EM4100 is usually acceptable and the distinction doesn't affect deployment behavior. Lot-level traceability in the master purchase agreement is the enforceable mechanism. Demand chip-type-on-lot-label and spot-inspection rights."
     }
   ],
   "sources": [
@@ -230,7 +337,7 @@
       "url": "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-9187-RFID-ATA5577C_Datasheet.pdf",
       "publisher": "Microchip Technology (Atmel)",
       "accessedAt": "2026-04-20",
-      "note": "Atmel ATA5577C (commonly sold as T5577) full datasheet — authority for the 330-bit EEPROM, Manchester / Biphase / FSK / PSK emission modes, password-protected programming, and the 'emulate EM4100 on T5577' configuration used in the field-flashing discussion."
+      "note": "Atmel ATA5577C (commonly sold as T5577) full datasheet. Authority for the 330-bit EEPROM, Manchester / Biphase / FSK / PSK emission modes, password-protected programming, and the 'emulate EM4100 on T5577' configuration used in the field-flashing discussion."
     },
     {
       "label": "ISO/IEC 11784:1996 — Radio frequency identification of animals — Code structure",
@@ -246,7 +353,7 @@
       "publisher": "ISO",
       "publishedAt": "1996-10-01",
       "accessedAt": "2026-04-20",
-      "note": "Technical specification for the 134.2 kHz HDX / FDX-B air interface used by ICAR-compliant animal identification — cited in the veterinary application section."
+      "note": "Technical specification for the 134.2 kHz HDX / FDX-B air interface used by ICAR-compliant animal identification. Cited in the veterinary application section."
     },
     {
       "label": "ISO/IEC 14223-1:2018 — Radio frequency identification of animals — Advanced transponders — Part 1: Air interface",
@@ -254,7 +361,7 @@
       "publisher": "ISO",
       "publishedAt": "2018-06-01",
       "accessedAt": "2026-04-20",
-      "note": "Advanced transponder air-interface for animal identification — referenced in the LF ecosystem positioning discussion."
+      "note": "Advanced transponder air-interface for animal identification. Referenced in the LF ecosystem positioning discussion."
     },
     {
       "label": "ICAR International Committee for Animal Recording — RFID Device Certification Registry",

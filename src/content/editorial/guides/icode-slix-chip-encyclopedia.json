@@ -6,8 +6,8 @@
   "summary": "ICODE SLIX (and its successor SLIX2) is the NXP HF 13.56 MHz chip optimized for ISO/IEC 15693 vicinity cards. Shipping since 2009, ICODE SLIX extends the original ICODE-1 platform with larger user memory (896 bits on SLIX, 2,560 bits on SLIX2), hardware-enforced EAS (Electronic Article Surveillance) for library-gate anti-theft, a built-in privacy mode, 64-bit password protection, and backwards compatibility with the worldwide installed base of ISO 15693 readers. It is the chip behind the vast majority of library-book tags, industrial laundry tunnels at the HF tier, museum exhibit tags, and large-inlay HF supply-chain tracking.",
   "heroPoints": [
     "Long-range HF — ISO 15693 operates at 13.56 MHz like 14443 but uses a different air-interface protocol (vicinity vs proximity) that allows read ranges up to 1.5 m with a large reader antenna and a large card antenna. This is the dominant reason libraries and laundry tunnels chose ICODE SLIX over MIFARE: a book tag on a shelf or a linen tunnel with 50 items per batch can be read end-to-end in one pass.",
-    "Built-in EAS (Electronic Article Surveillance) — a library-optimized feature. The chip has a hardware-enforced 'EAS bit' that can be set or reset by a reader. Library gates interrogate only the EAS state (faster than a full read) and alarm if any tagged item is un-reset leaving the library. Zero middleware required — the anti-theft logic lives entirely in the chip.",
-    "64-bit password protection + PRIVACY mode — SLIX2 adds 64-bit password-protected memory sections and a PRIVACY command that makes the tag unresponsive until a correct password is received. Used for reader-controlled inventory workflows where the book tag should be invisible to unauthorized readers after checkout."
+    "Built-in EAS (Electronic Article Surveillance). A library-optimized feature. The chip has a hardware-enforced 'EAS bit' that can be set or reset by a reader. Library gates interrogate only the EAS state (faster than a full read) and alarm if any tagged item is un-reset leaving the library. Zero middleware required — the anti-theft logic lives entirely in the chip.",
+    "64-bit password protection + PRIVACY mode. SLIX2 adds 64-bit password-protected memory sections and a PRIVACY command that makes the tag unresponsive until a correct password is received. Used for reader-controlled inventory workflows where the book tag should be invisible to unauthorized readers after checkout."
   ],
   "imageAlt": "ICODE SLIX HF ISO 15693 card and library tag antenna layout",
   "heroImage": "/landing-images/icode-slix-card.jpg",
@@ -42,19 +42,19 @@
         "ICODE SLIX-L — SL2S5502. Compact-memory variant optimized for the smallest inlays (laundry PPS chips, pharma blister tags). 320 bits user memory.",
         "ICODE SLI — the pre-SLIX generation (SL2ICS50). Still supported but with less user memory and without the password features of SLIX2. Phased out of NXP catalog but still present in some long-tail library installations.",
         "Counterfeit watch — authentic NXP ICODE SLIX returns DSFID (Data Storage Format Identifier) per ISO 15693 plus a chip-type byte in the Block Security Status response. SLIX specifically identifies as chip type 0x02 in the Get System Information response; SLIX2 as 0x01. Incoming-inspection should verify this alongside the 8-byte ISO 15693 UID format (UID[0] = 0xE0, UID[1] = 0x04 for NXP manufacturer).",
-        "ICODE DNA — NXP's AES-128-capable ISO 15693 chip (SL2S3002), launched 2017. Adds AES mutual authentication, SUN (Secure Unique NFC) tap-URL signing, and audit-grade anti-cloning. Where SLIX2 relies on a 64-bit password for protection, DNA uses proper AES cryptography — the right choice for brand-authentication or high-value asset-tracking deployments where CRYPTO1-equivalent weak protection is not acceptable.",
-        "Originality Signature (SLIX2 and DNA only) — a 32-byte ECDSA signature over the UID, signed with NXP's private key at wafer test. Readers verify with NXP's public key (published in AN11350) to confirm authentic NXP silicon without relying on external databases. This is the strongest anti-counterfeit signal available on the ISO 15693 tier; SLIX (SL2S2002) does not have it and is fingerprintable only via SAK/ATQA."
+        "ICODE DNA — NXP's AES-128-capable ISO 15693 chip (SL2S3002), launched 2017. Adds AES mutual authentication, SUN (Secure Unique NFC) tap-URL signing, and audit-grade anti-cloning. Where SLIX2 relies on a 64-bit password for protection, DNA uses proper AES cryptography. The right choice for brand-authentication or high-value asset-tracking deployments where CRYPTO1-equivalent weak protection is not acceptable.",
+        "Originality Signature (SLIX2 and DNA only). A 32-byte ECDSA signature over the UID, signed with NXP's private key at wafer test. Readers verify with NXP's public key (published in AN11350) to confirm authentic NXP silicon without relying on external databases. This is the strongest anti-counterfeit signal available on the ISO 15693 tier; SLIX (SL2S2002) does not have it and is fingerprintable only via SAK/ATQA."
       ]
     },
     {
       "title": "Memory architecture",
-      "intro": "ICODE SLIX's memory map is simpler than the sector-and-block structure of MIFARE Classic, because ISO 15693 tags address memory as a flat array of 4-byte blocks rather than as segmented sectors with per-segment keys. This simplicity is part of why SLIX works well for library, laundry and museum deployments where the use case is 'write barcode and flags, read back at gate', but it also limits the chip's role in access control — there is no multi-application partitioning, and the 64-bit password mechanism is a uniform protection across all user memory rather than per-sector role separation.",
+      "intro": "ICODE SLIX's memory map is simpler than the sector-and-block structure of MIFARE Classic, because ISO 15693 tags address memory as a flat array of 4-byte blocks rather than as segmented sectors with per-segment keys. This simplicity is part of why SLIX works well for library, laundry and museum deployments where the use case is 'write barcode and flags, read back at gate', but it also limits the chip's role in access control. There is no multi-application partitioning, and the 64-bit password mechanism is a uniform protection across all user memory rather than per-sector role separation.",
       "bullets": [
         "SLIX total memory — 896 bits (112 bytes) user-accessible, organized as 28 × 32-bit blocks. Block 0 is typically used for SSI/AFI system state; blocks 1-27 hold user data (librarian-determined usage: patron ID, book barcode, branch code, checkout flags).",
         "SLIX2 total memory — 2,560 bits (320 bytes) organized as 80 × 32-bit blocks. Adds 64-bit EAS/AFI password area and separate 64-bit DESTROY password area.",
-        "UID — 8 bytes (64 bits), factory-programmed and immutable. First byte 0xE0 (per ISO 15693), second byte 0x04 (NXP manufacturer code), remaining 6 bytes unique serial. The ISO 15693 UID space gives ~281 trillion unique identifiers — sufficient for any conceivable library or industrial inventory.",
-        "AFI (Application Family Identifier) — a 1-byte field identifying the application domain (libraries, retail, transport, financial). ISO 15693 allows readers to query only tags of a specific AFI, enabling efficient multi-tenant coexistence — a library reader can ignore non-library tags in the field.",
-        "DSFID (Data Storage Format Identifier) — a 1-byte field indicating how the user memory is formatted (e.g., NDEF, library-specific schemas). Libraries often set DSFID to a specific value identifying their particular ILS (Integrated Library System) vendor's memory layout.",
+        "UID — 8 bytes (64 bits), factory-programmed and immutable. First byte 0xE0 (per ISO 15693), second byte 0x04 (NXP manufacturer code), remaining 6 bytes unique serial. The ISO 15693 UID space gives ~281 trillion unique identifiers. Sufficient for any conceivable library or industrial inventory.",
+        "AFI (Application Family Identifier). A 1-byte field identifying the application domain (libraries, retail, transport, financial). ISO 15693 allows readers to query only tags of a specific AFI, enabling efficient multi-tenant coexistence. A library reader can ignore non-library tags in the field.",
+        "DSFID (Data Storage Format Identifier). A 1-byte field indicating how the user memory is formatted (e.g., NDEF, library-specific schemas). Libraries often set DSFID to a specific value identifying their particular ILS (Integrated Library System) vendor's memory layout.",
         "EAS bit — 1-bit flag that library gates interrogate via the fast EAS Check command. Readers at checkout set or reset this bit when a book is borrowed or returned. If not reset when an item exits the library, the gate alarms.",
         "Block lock bits — per-block lock flags. Once a block is locked, it becomes read-only permanently. Used to finalize a library tag's static data (barcode, branch code) at issuance so that only the 'dynamic' portion (EAS, flags) can be modified thereafter.",
         "NFC Forum Type 5 mapping — the library-book memory map on SLIX2 can optionally be formatted as an NDEF-bearing Type 5 tag. Block 0 becomes a Capability Container (CC) with 4 bytes identifying NDEF version, memory size in 8-byte units, read/write access, and NDEF magic number 0xE1. Subsequent blocks hold the TLV-encoded NDEF message. This dual-use lets the same book carry both the library's ILS data and a consumer-phone-tappable NDEF URL for patron-facing features (read more about the author, reserve a copy of the next volume).",
@@ -68,26 +68,26 @@
         "ISO/IEC 15693 is the 'vicinity card' standard — 13.56 MHz carrier, different air interface from the 'proximity card' ISO 14443. Reader-to-tag data rate 1.65 kbps or 26.48 kbps (subcarrier) / 53 kbps (ASK); tag-to-reader rate 6.62 kbps or 26.48 kbps.",
         "ISO/IEC 18000-3 Mode 1 — the 'air interface for HF items' standard that ICODE SLIX is certified compliant with. Mode 1 = 15693-compatible; Mode 2 is different and not relevant to SLIX.",
         "Read range — up to ~1.5 m on a large library-gate antenna (50 × 50 cm portal) with a library-book-sized card antenna (book-inlay is ~70 × 40 mm). Typical cost/performance sweet spot: 80-100 cm range on a 30 × 30 cm reader antenna.",
-        "Anti-collision — ISO 15693 anti-collision via slotted ALOHA using the UID. Reader broadcasts an Inventory command; tags respond in slots determined by their UID bits. Very effective for batch reads — a 50-item linen-tunnel batch is resolved in <100 ms.",
+        "Anti-collision — ISO 15693 anti-collision via slotted ALOHA using the UID. Reader broadcasts an Inventory command; tags respond in slots determined by their UID bits. Very effective for batch reads. A 50-item linen-tunnel batch is resolved in <100 ms.",
         "Command set — Inventory, Stay Quiet, Read Single Block, Read Multiple Blocks, Write Single Block, Write Multiple Blocks, Get System Information, Get Block Security Status. Plus the ICODE-specific proprietary commands: EAS Check, Set EAS, Reset EAS, Get Random Number, Set Password, Write Password, PRIVACY (SLIX2), Destroy (SLIX2).",
         "Power budget — ICODE SLIX has excellent sensitivity; the chip can power up from ~1.5 µW received RF power. This is what allows the long-range reads in library portal applications where the reader's field is spread over a large volume.",
         "Reader chipset families — NXP CLRC663 plus, ST CR95HF, Texas Instruments TRF7970A, and Impinj's RFIC stack all support ISO 15693 Mode 1. Consumer-phone NFC controllers (PN7150, PN7160 in newer Android handsets; Apple's proprietary NFC-NCI module) also include ISO 15693 Mode 1 decoding, enabling NFC Forum Type 5 tag reads from phones. 14443-only chipsets (older ACR122U firmware, some budget embedded NFC modules) cannot read ISO 15693 at all.",
-        "Fast mode and high-speed flag — the ISO 15693 Inventory command carries flag bits that configure data rate, subcarrier scheme and slot count. SLIX and SLIX2 support 'fast mode' (26.48 kbps single-subcarrier) which approximately doubles batch-read throughput at slightly reduced range. Gate-portal deployments typically keep fast mode off for range; laundry-tunnel and library-conveyor deployments usually turn it on for throughput."
+        "Fast mode and high-speed flag. The ISO 15693 Inventory command carries flag bits that configure data rate, subcarrier scheme and slot count. SLIX and SLIX2 support 'fast mode' (26.48 kbps single-subcarrier) which approximately doubles batch-read throughput at slightly reduced range. Gate-portal deployments typically keep fast mode off for range; laundry-tunnel and library-conveyor deployments usually turn it on for throughput."
       ]
     },
     {
       "title": "EAS (Electronic Article Surveillance) and library workflows",
-      "intro": "The EAS feature is the defining advantage of ICODE SLIX over every other HF chip in the market — it is a hardware-enforced, low-latency gate-interrogation mechanism that makes anti-theft practical at throughput levels impossible with full memory reads. Library deployments that want to check out 200 books in a patron's bag in under 2 seconds, or lose-leaf inventory reads across a 50-book shelf in a single swipe, can only do this because EAS reduces gate interrogation to a single bit per tag. Understanding EAS at a protocol level matters because the subtle differences between SLIX and SLIX2 (password protection on the EAS write commands, lockability) change the security posture of the entire anti-theft workflow.",
+      "intro": "The EAS feature is the defining advantage of ICODE SLIX over every other HF chip in the market. It is a hardware-enforced, low-latency gate-interrogation mechanism that makes anti-theft practical at throughput levels impossible with full memory reads. Library deployments that want to check out 200 books in a patron's bag in under 2 seconds, or lose-leaf inventory reads across a 50-book shelf in a single swipe, can only do this because EAS reduces gate interrogation to a single bit per tag. Understanding EAS at a protocol level matters because the subtle differences between SLIX and SLIX2 (password protection on the EAS write commands, lockability) change the security posture of the entire anti-theft workflow.",
       "bullets": [
         "EAS bit — single-bit hardware state. Readable by the fast EAS Check command, writable by Set EAS and Reset EAS. Library-specific semantics: set on books currently on loan, reset on books returned.",
         "Library checkout flow — at the self-service kiosk, the reader (1) identifies the book via Inventory, (2) reads the book's barcode from memory, (3) logs the checkout in the ILS, (4) calls Reset EAS so the item can leave the library without tripping the gate.",
         "Library return flow — reverse. At the return kiosk or book drop, the reader (1) identifies the book, (2) logs the return, (3) calls Set EAS. The book goes back on the shelf with its EAS bit active.",
         "Gate alarm workflow — library gates run continuous Inventory scans. When any tag responds with EAS bit set, the gate alarms. Because EAS Check is a lightweight command (no full memory read), gates can process multiple books in a patron's bag simultaneously.",
         "EAS password protection — SLIX2 allows setting a 64-bit password on the EAS write commands. Once set, only readers with the password can Set/Reset EAS, preventing casual EAS tampering. Unprotected SLIX (SL2S2002) has no such protection; EAS is writable by anyone with an ISO 15693 reader.",
-        "PRIVACY mode (SLIX2 only) — on Privacy command invocation, the chip stops responding to all ISO 15693 commands except the specific unlock sequence (using the 64-bit privacy password). Used for after-checkout mode where the book should be invisible to bookstore/library inventory systems during patron transit.",
-        "Multi-use laundry and linen tunnels — same EAS mechanism is used by some industrial linen operators as a 'dirty/clean' state flag, although laundry typically uses UHF for throughput today. SLIX still has share in high-temperature laundry where the HF + silicone/PPS chip combo tolerates the wash cycles better than UHF paper inlays.",
-        "AFI-filtered gates vs EAS — some library vendors use the AFI (Application Family Identifier) byte as a secondary mechanism to distinguish loaned vs returned books. A gate reader issuing an Inventory command with a specific AFI filter (e.g., 0xC2 for 'libraries') will only see tags in that application domain; setting the AFI to a different value on checkout effectively 'hides' the book from the return gate. EAS and AFI-filtered gates are complementary: EAS for fast gate checks, AFI for multi-tenant coexistence when a single reader might see library books, museum tags and laundry items in the same field.",
-        "NISO data profile compatibility — the NISO RP-6-2012 library RFID data profile (and its German DIN ISO 28560 cousin) specifies that library book tags store a primary item identifier in a specific block layout, with mandatory fields for owner institution and optional fields for patron ID, acquisition date and item type. ICODE SLIX memory is large enough for both the NISO required-fields subset and the extended-fields layer. SLIX2 is needed only when deployments want additional fields beyond the base profile."
+        "PRIVACY mode (SLIX2 only). On Privacy command invocation, the chip stops responding to all ISO 15693 commands except the specific unlock sequence (using the 64-bit privacy password). Used for after-checkout mode where the book should be invisible to bookstore/library inventory systems during patron transit.",
+        "Multi-use laundry and linen tunnels. Same EAS mechanism is used by some industrial linen operators as a 'dirty/clean' state flag, although laundry typically uses UHF for throughput today. SLIX still has share in high-temperature laundry where the HF + silicone/PPS chip combo tolerates the wash cycles better than UHF paper inlays.",
+        "AFI-filtered gates vs EAS. Some library vendors use the AFI (Application Family Identifier) byte as a secondary mechanism to distinguish loaned vs returned books. A gate reader issuing an Inventory command with a specific AFI filter (e.g., 0xC2 for 'libraries') will only see tags in that application domain; setting the AFI to a different value on checkout effectively 'hides' the book from the return gate. EAS and AFI-filtered gates are complementary: EAS for fast gate checks, AFI for multi-tenant coexistence when a single reader might see library books, museum tags and laundry items in the same field.",
+        "NISO data profile compatibility. The NISO RP-6-2012 library RFID data profile (and its German DIN ISO 28560 cousin) specifies that library book tags store a primary item identifier in a specific block layout, with mandatory fields for owner institution and optional fields for patron ID, acquisition date and item type. ICODE SLIX memory is large enough for both the NISO required-fields subset and the extended-fields layer. SLIX2 is needed only when deployments want additional fields beyond the base profile."
       ]
     },
     {
@@ -100,35 +100,35 @@
         "Operating temperature — -40 °C to +85 °C standard operation. Peak 125 °C for short excursions (allows commercial-cure lamination of PVC around the chip). For sustained high-temperature use (autoclave ~135 °C, tire-cure >180 °C), switch to silicon purpose-built for that (NXP offers extended-temperature ICODE derivatives; industrial laundry vendors typically spec the PPS-housing variant).",
         "Water and humidity — ICODE SLIX is IP-rated via the housing material, not the chip itself. HF ISO 15693 is robust through water (library returns in rain-wet books read correctly). Typical library-book survival is ≥ 10 years before the antenna adhesive fails.",
         "ISO 14443 coexistence — at the same frequency (13.56 MHz), ISO 15693 and ISO 14443 tags can be read by dual-mode readers. Physical separation is by air-interface protocol, not by frequency. A library gate reader is typically ISO 15693-only; a reception desk card reader may be ISO 14443-only. Combined readers (both standards) exist for mixed-credential deployments.",
-        "Industrial PPS laundry chip specifications — the standard PPS (polyphenylene sulfide) laundry chip housing ICODE SLIX or SLIX-L measures 22 × 16 × 4 mm or 30 × 15 × 3 mm, tolerates 200+ industrial wash cycles at 90°C, 50+ tumble-dry cycles at 180°C, and 30+ autoclave cycles at 134°C. Standard chip mounting methods are silicone-RTV adhesion into garment seams (for linen tunnels) or direct pre-sewn pockets (for uniform rental). These are the numbers that matter at RFQ, not the SL2S-series datasheet numbers alone.",
-        "Antenna-tuning interaction with metal — ferrite-backed inlays (typical 0.3–1 mm thickness) recover 80–95% of the free-air read range when the tag sits on steel. Common ferrite compositions for HF are MnZn (manganese-zinc) or NiZn (nickel-zinc); NiZn is more expensive but tolerates higher temperatures and is preferred for industrial laundry chips. Without ferrite, a SLIX tag on steel typically reads at 5% or less of its free-air range."
+        "Industrial PPS laundry chip specifications. The standard PPS (polyphenylene sulfide) laundry chip housing ICODE SLIX or SLIX-L measures 22 × 16 × 4 mm or 30 × 15 × 3 mm, tolerates 200+ industrial wash cycles at 90°C, 50+ tumble-dry cycles at 180°C, and 30+ autoclave cycles at 134°C. Standard chip mounting methods are silicone-RTV adhesion into garment seams (for linen tunnels) or direct pre-sewn pockets (for uniform rental). These are the numbers that matter at RFQ, not the SL2S-series datasheet numbers alone.",
+        "Antenna-tuning interaction with metal. Ferrite-backed inlays (typical 0.3–1 mm thickness) recover 80–95% of the free-air read range when the tag sits on steel. Common ferrite compositions for HF are MnZn (manganese-zinc) or NiZn (nickel-zinc); NiZn is more expensive but tolerates higher temperatures and is preferred for industrial laundry chips. Without ferrite, a SLIX tag on steel typically reads at 5% or less of its free-air range."
       ]
     },
     {
       "title": "Commercial deployments and application fit",
-      "intro": "ICODE SLIX has the narrowest commercial profile of the major HF chips — it is genuinely dominant in libraries, present in industrial laundry and museums, and almost entirely absent from access control, payment and broad supply chain. Understanding where SLIX fits and where it doesn't prevents the most common chip-selection mistakes: specifying ISO 15693 for an access-control project (where MIFARE Plus or DESFire is the right answer), or specifying ISO 14443 MIFARE for a library deployment (where the short read range makes gate deployment impractical). The wrong chip for the application is a far more common failure mode than the wrong chip within the same family.",
+      "intro": "ICODE SLIX has the narrowest commercial profile of the major HF chips. It is genuinely dominant in libraries, present in industrial laundry and museums, and almost entirely absent from access control, payment and broad supply chain. Understanding where SLIX fits and where it doesn't prevents the most common chip-selection mistakes: specifying ISO 15693 for an access-control project (where MIFARE Plus or DESFire is the right answer), or specifying ISO 14443 MIFARE for a library deployment (where the short read range makes gate deployment impractical). The wrong chip for the application is a far more common failure mode than the wrong chip within the same family.",
       "bullets": [
         "Libraries — ICODE SLIX / SLIX2 is the dominant HF chip in library RFID globally. Bibliotheca, Envisionware, 3M-RFID (Checkpoint), Innovative Interfaces, SirsiDynix, and most regional library-automation vendors specify ISO 15693 ICODE SLIX compatibility as the minimum for book tags. Tens of millions of books tagged worldwide since 2005.",
-        "Museum and exhibit tagging — museums use ISO 15693 for exhibit RFID because of the long-range + robust single-tag read. A visitor walking past an exhibit triggers audio-guide or display content via a tag embedded in the exhibit stand. Smithsonian, The Met, V&A, Louvre all have ISO 15693 installations (not always ICODE SLIX specifically, but mostly).",
-        "Industrial laundry at the HF tier — for wash-tolerant on-textile tags where the read-range of HF is sufficient (pre-sort and post-wash inventory). UHF is dominant in tunnel reads, but HF ICODE SLIX remains competitive for laundry where water/metal/batching conditions make UHF reads unreliable.",
-        "Pharmaceutical track-and-trace — some pharmaceutical blister-pack inventory uses ICODE SLIX for its long-range + dense-anti-collision combination. Not a volume segment but niche in hospital pharmacy and high-value cold-chain pharma.",
+        "Museum and exhibit tagging. Museums use ISO 15693 for exhibit RFID because of the long-range + robust single-tag read. A visitor walking past an exhibit triggers audio-guide or display content via a tag embedded in the exhibit stand. Smithsonian, The Met, V&A, Louvre all have ISO 15693 installations (not always ICODE SLIX specifically, but mostly).",
+        "Industrial laundry at the HF tier. For wash-tolerant on-textile tags where the read-range of HF is sufficient (pre-sort and post-wash inventory). UHF is dominant in tunnel reads, but HF ICODE SLIX remains competitive for laundry where water/metal/batching conditions make UHF reads unreliable.",
+        "Pharmaceutical track-and-trace. Some pharmaceutical blister-pack inventory uses ICODE SLIX for its long-range + dense-anti-collision combination. Not a volume segment but niche in hospital pharmacy and high-value cold-chain pharma.",
         "Animal identification (niche) — ISO 15693 is NOT the ISO standard for animal identification (that's ISO 11784/11785 at 134.2 kHz LF). ICODE SLIX is not suited for animal implants.",
         "Where ICODE SLIX is NOT the right choice — payment (use MIFARE DESFire / PayPass HF 14443), secure access control (use DESFire / MIFARE Plus), UHF supply chain (use UCODE 9 / Monza R6 / Higgs 9), simple NFC tap-to-URL campaigns (use NTAG213/215/216 — ICODE SLIX is not ISO 14443 and won't be read by standard NFC phones as a plain NFC tag).",
         "NFC phone compatibility — Android phones with NFC READER mode typically support ISO 15693 (NFC Forum Type 5 Tag). iPhone supports ISO 15693 via Core NFC as of iOS 13. Standard consumer NFC-tap flows (open URL on tap) work on ICODE SLIX tags configured as NFC Type 5 with NDEF records.",
-        "Healthcare linen and uniform rental — hospital laundry operators (Unitex, CTC Group, Mewa, Elis, Alsco, Cintas) deploy ICODE SLIX-L in PPS laundry chips for high-temperature wash and autoclave cycles. Linen plants process 500-2000 items per batch through HF tunnel readers in under 60 seconds. UHF is dominant in non-medical uniform laundry where higher throughput matters more than wet-metal read robustness, but HF ICODE retains share in medical-grade deployments.",
+        "Healthcare linen and uniform rental. Hospital laundry operators (Unitex, CTC Group, Mewa, Elis, Alsco, Cintas) deploy ICODE SLIX-L in PPS laundry chips for high-temperature wash and autoclave cycles. Linen plants process 500-2000 items per batch through HF tunnel readers in under 60 seconds. UHF is dominant in non-medical uniform laundry where higher throughput matters more than wet-metal read robustness, but HF ICODE retains share in medical-grade deployments.",
         "Museum collection management — the Smithsonian American Art Museum, Tate Modern, Rijksmuseum and dozens of national museums have moved to ISO 15693 tagging for collection inventory, loan tracking and conservation history. The long read range lets curators inventory a gallery wall without touching each object, and the NFC Forum Type 5 mode supports visitor-facing audio-guide tap-to-play on the same tag.",
-        "Document and archive tagging — government archives (US National Archives, UK National Archives, Bundesarchiv, Archives Nationales de France) use ICODE SLIX for file-folder tracking in climate-controlled storage. Paper-safe inlays (archival-grade adhesives, no plasticiser migration) are a specialised converter product; Smartrac's Archive-grade line and LAB ID's ArchivHF are the common references."
+        "Document and archive tagging. Government archives (US National Archives, UK National Archives, Bundesarchiv, Archives Nationales de France) use ICODE SLIX for file-folder tracking in climate-controlled storage. Paper-safe inlays (archival-grade adhesives, no plasticiser migration) are a specialised converter product; Smartrac's Archive-grade line and LAB ID's ArchivHF are the common references."
       ]
     },
     {
       "title": "NXP and ISO reference documents",
-      "intro": "The ICODE SLIX documentation layer has two tiers — a public documentation layer anyone can download from NXP, and an under-NDA detailed data-sheet layer for converters and integrators. For most deployment decisions the public layer plus the ISO 15693 standard itself are sufficient; the NDA tier becomes necessary only when building custom readers, designing novel inlays, or implementing the DESTROY and PRIVACY command sequences on SLIX2. The list below is the short-form reference library every serious SLIX integrator keeps bookmarked.",
+      "intro": "The ICODE SLIX documentation layer has two tiers. A public documentation layer anyone can download from NXP, and an under-NDA detailed data-sheet layer for converters and integrators. For most deployment decisions the public layer plus the ISO 15693 standard itself are sufficient; the NDA tier becomes necessary only when building custom readers, designing novel inlays, or implementing the DESTROY and PRIVACY command sequences on SLIX2. The list below is the short-form reference library every serious SLIX integrator keeps bookmarked.",
       "bullets": [
-        "NXP SL2S2002 (ICODE SLIX) and SL2S2602 (ICODE SLIX2) Product Data Sheets — the canonical references. Memory map, command set, electrical characterization, timings.",
+        "NXP SL2S2002 (ICODE SLIX) and SL2S2602 (ICODE SLIX2) Product Data Sheets. The canonical references. Memory map, command set, electrical characterization, timings.",
         "NXP AN11809 — ICODE SLIX2 features and security application note. Documents the PRIVACY command, 64-bit password structure, and EAS password-protection workflows.",
         "ISO/IEC 15693-3:2019 — the air-interface standard. Defines Inventory, Stay Quiet, Read/Write Single and Multiple Block commands, AFI and DSFID, lock mechanisms.",
         "ISO/IEC 18000-3 Mode 1:2010 — 'air interface at 13.56 MHz' item-management standard. Mode 1 is functionally 15693-compatible; ICODE SLIX is certified for this.",
-        "NFC Forum Type 5 Tag Technical Specification — defines how an ISO 15693 tag maps to the NFC Forum Type 5 tag model for consumer-phone NDEF-tap compatibility.",
+        "NFC Forum Type 5 Tag Technical Specification. Defines how an ISO 15693 tag maps to the NFC Forum Type 5 tag model for consumer-phone NDEF-tap compatibility.",
         "NISO RP-6-2012 — library RFID data profile. Defines the recommended memory schema for library book tags (branch code + patron ID + item barcode + checkout flags), ensuring interoperability between library-automation vendors.",
         "DIN ISO 28560-1/-2/-3 — the international library RFID data model. Part 1 defines the general data model, Part 2 the encoding rules, Part 3 the per-country profiles. Widely adopted across European libraries as the migration target from NISO RP-6 for cross-border interoperability.",
         "NXP AN11350 — Originality Signature public keys and verification procedure for ICODE SLIX2 and ICODE DNA. Contains the ECC public keys and sample verification code that reader vendors use to authenticate NXP silicon at read time. Without this document, integrators cannot implement the anti-counterfeit signature layer correctly."
@@ -136,13 +136,13 @@
     },
     {
       "title": "Typical personalisation and command sequence",
-      "intro": "The operational flow for programming an ICODE SLIX library book tag or laundry chip is a short, well-defined sequence that hasn't changed since 2010. Integrators writing personalisation scripts for Bibliotheca Select, Envisionware EZscan, 3M/Checkpoint ScanEase or in-house library-automation stacks typically encounter the same five-to-seven-step pattern. Understanding the command sequence helps diagnose failures at the pilot stage — almost all SLIX issuance bugs fall into the categories 'wrong block addressed', 'wrong DSFID/AFI convention' or 'EAS password not set before lock'.",
+      "intro": "The operational flow for programming an ICODE SLIX library book tag or laundry chip is a short, well-defined sequence that hasn't changed since 2010. Integrators writing personalisation scripts for Bibliotheca Select, Envisionware EZscan, 3M/Checkpoint ScanEase or in-house library-automation stacks typically encounter the same five-to-seven-step pattern. Understanding the command sequence helps diagnose failures at the pilot stage. Almost all SLIX issuance bugs fall into the categories 'wrong block addressed', 'wrong DSFID/AFI convention' or 'EAS password not set before lock'.",
       "bullets": [
         "Identify the tag — Inventory command with optional AFI filter. Reader receives the 8-byte UID (UID[0]=0xE0, UID[1]=0x04 for NXP). On SLIX2, read the Originality Signature via the proprietary READ_SIGNATURE command (0xBD with vendor prefix 0x04) and verify against NXP's public key before proceeding.",
-        "Read existing state — Get System Information (0x2B) returns DSFID, AFI, memory size in blocks (27 or 28 for SLIX, 79 or 80 for SLIX2), and IC reference. Use this to confirm the chip type before writing — assuming SLIX when SLIX2 is present (or vice versa) leads to block addresses past the end of memory returning success codes but writing nothing.",
+        "Read existing state — Get System Information (0x2B) returns DSFID, AFI, memory size in blocks (27 or 28 for SLIX, 79 or 80 for SLIX2), and IC reference. Use this to confirm the chip type before writing. Assuming SLIX when SLIX2 is present (or vice versa) leads to block addresses past the end of memory returning success codes but writing nothing.",
         "Write library data — Write Single Block (0x21 + 4-byte block address + 4 bytes data) or Write Multiple Blocks (0x24 + start address + count + data). Library data typically includes a 16-byte item identifier per DIN ISO 28560, 1 byte item type, 1 byte checkin/checkout flag, 2-4 bytes branch code, plus optional fields.",
-        "Set DSFID and AFI — Write DSFID (0x29) and Write AFI (0x27) to register the tag's data format and application domain. Libraries typically use DSFID values specified by their ILS vendor (Bibliotheca, Envisionware, Innovative, SirsiDynix) and AFI 0xC2 for 'libraries' or a custom library-chain-specific AFI.",
-        "Set EAS — Set EAS (0xA2 with NXP vendor prefix). Now the tag will alarm library gates. For SLIX2, call the password-protected variant (0xB4) after setting the EAS password via Set Password (0xB3). Without password protection, any ISO 15693 reader can reset the EAS later — acceptable in low-threat library environments, not acceptable in high-theft retail or high-value museum contexts.",
+        "Set DSFID and AFI. Write DSFID (0x29) and Write AFI (0x27) to register the tag's data format and application domain. Libraries typically use DSFID values specified by their ILS vendor (Bibliotheca, Envisionware, Innovative, SirsiDynix) and AFI 0xC2 for 'libraries' or a custom library-chain-specific AFI.",
+        "Set EAS — Set EAS (0xA2 with NXP vendor prefix). Now the tag will alarm library gates. For SLIX2, call the password-protected variant (0xB4) after setting the EAS password via Set Password (0xB3). Without password protection, any ISO 15693 reader can reset the EAS later. Acceptable in low-threat library environments, not acceptable in high-theft retail or high-value museum contexts.",
         "Lock static blocks — Lock Block (0x22 + block address) to permanently freeze blocks holding the item identifier, branch code and other static data. Block lock is irreversible; verify the data is correct before locking, because a mis-locked tag becomes useless and has to be weeded from the collection.",
         "Verify and archive — Read back the tag via Read Multiple Blocks to confirm all writes landed. Log the UID, item identifier, and personalisation timestamp to the ILS database for later audit. Most library automation stacks automate this entire flow at the checkout or self-issue station, but pilot deployments and custom tag programmes often write the script from scratch."
       ]
@@ -157,20 +157,90 @@
           "ICODE SLIX-L (SL2S5502)"
         ],
         "rows": [
-          ["Operating frequency", "13.56 MHz", "13.56 MHz", "13.56 MHz"],
-          ["Air-interface standard", "ISO 15693 / ISO 18000-3 Mode 1", "ISO 15693 / ISO 18000-3 Mode 1", "ISO 15693 / ISO 18000-3 Mode 1"],
-          ["User memory", "896 bits (112 bytes)", "2,560 bits (320 bytes)", "320 bits (40 bytes)"],
-          ["UID", "64-bit (8 bytes)", "64-bit (8 bytes)", "64-bit (8 bytes)"],
-          ["EAS (Electronic Article Surveillance)", "Yes", "Yes (password-protected)", "Yes"],
-          ["PRIVACY mode", "No", "Yes (64-bit password)", "No"],
-          ["DESTROY password", "No", "Yes (64-bit)", "No"],
-          ["Originality Signature", "No", "Yes", "No"],
-          ["AFI / DSFID", "Yes", "Yes", "Yes"],
-          ["Block lock bits", "Yes", "Yes", "Yes"],
-          ["Operating temperature", "-40 °C to +85 °C", "-40 °C to +85 °C", "-40 °C to +85 °C"],
-          ["Data retention", "≥ 50 years", "≥ 50 years", "≥ 50 years"],
-          ["Endurance (writes)", "100,000 cycles", "100,000 cycles", "100,000 cycles"],
-          ["Max read range (large antenna)", "~1.5 m", "~1.5 m", "~1.2 m"]
+          [
+            "Operating frequency",
+            "13.56 MHz",
+            "13.56 MHz",
+            "13.56 MHz"
+          ],
+          [
+            "Air-interface standard",
+            "ISO 15693 / ISO 18000-3 Mode 1",
+            "ISO 15693 / ISO 18000-3 Mode 1",
+            "ISO 15693 / ISO 18000-3 Mode 1"
+          ],
+          [
+            "User memory",
+            "896 bits (112 bytes)",
+            "2,560 bits (320 bytes)",
+            "320 bits (40 bytes)"
+          ],
+          [
+            "UID",
+            "64-bit (8 bytes)",
+            "64-bit (8 bytes)",
+            "64-bit (8 bytes)"
+          ],
+          [
+            "EAS (Electronic Article Surveillance)",
+            "Yes",
+            "Yes (password-protected)",
+            "Yes"
+          ],
+          [
+            "PRIVACY mode",
+            "No",
+            "Yes (64-bit password)",
+            "No"
+          ],
+          [
+            "DESTROY password",
+            "No",
+            "Yes (64-bit)",
+            "No"
+          ],
+          [
+            "Originality Signature",
+            "No",
+            "Yes",
+            "No"
+          ],
+          [
+            "AFI / DSFID",
+            "Yes",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "Block lock bits",
+            "Yes",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "Operating temperature",
+            "-40 °C to +85 °C",
+            "-40 °C to +85 °C",
+            "-40 °C to +85 °C"
+          ],
+          [
+            "Data retention",
+            "≥ 50 years",
+            "≥ 50 years",
+            "≥ 50 years"
+          ],
+          [
+            "Endurance (writes)",
+            "100,000 cycles",
+            "100,000 cycles",
+            "100,000 cycles"
+          ],
+          [
+            "Max read range (large antenna)",
+            "~1.5 m",
+            "~1.5 m",
+            "~1.2 m"
+          ]
         ]
       }
     }
@@ -180,32 +250,74 @@
       "title": "ICODE SLIX product pages",
       "description": "Proud Tek HF SKUs built on ICODE SLIX / SLIX2 silicon.",
       "links": [
-        { "href": "/products/rfid-cards/icode-slix-card/", "label": "ICODE SLIX card" },
-        { "href": "/products/rfid-tags/rfid-library-tag/", "label": "RFID library book tag" },
-        { "href": "/products/rfid-tags/", "label": "RFID tags pillar" },
-        { "href": "/products/rfid-labels/", "label": "RFID labels pillar" },
-        { "href": "/products/rfid-tags/rfid-high-temp-silicone-tag/", "label": "RFID high-temperature silicone tag (HF variant)" },
-        { "href": "/products/rfid-tags/rfid-pps-laundry-chip/", "label": "RFID PPS laundry chip" }
+        {
+          "href": "/products/rfid-cards/icode-slix-card/",
+          "label": "ICODE SLIX card"
+        },
+        {
+          "href": "/products/rfid-tags/rfid-library-tag/",
+          "label": "RFID library book tag"
+        },
+        {
+          "href": "/products/rfid-tags/",
+          "label": "RFID tags pillar"
+        },
+        {
+          "href": "/products/rfid-labels/",
+          "label": "RFID labels pillar"
+        },
+        {
+          "href": "/products/rfid-tags/rfid-high-temp-silicone-tag/",
+          "label": "RFID high-temperature silicone tag (HF variant)"
+        },
+        {
+          "href": "/products/rfid-tags/rfid-pps-laundry-chip/",
+          "label": "RFID PPS laundry chip"
+        }
       ]
     },
     {
       "title": "Related comparisons and guides",
-      "description": "ICODE SLIX in context — HF ecosystem, NFC Forum Type 5, and library deployments.",
+      "description": "ICODE SLIX in context. HF ecosystem, NFC Forum Type 5, and library deployments.",
       "links": [
-        { "href": "/guides/iso-14443-explained/", "label": "ISO 14443 explained (proximity neighbor)" },
-        { "href": "/compare/uhf-vs-hf-rfid/", "label": "UHF vs HF RFID" },
-        { "href": "/compare/uhf-vs-hf-rfid-laundry-tags/", "label": "UHF vs HF laundry tags" },
-        { "href": "/compare/125khz-vs-13.56mhz-rfid/", "label": "125 kHz vs 13.56 MHz RFID" },
-        { "href": "/guides/nfc-ndef-format-explained/", "label": "NFC NDEF format explained" },
-        { "href": "/solutions/rfid-laundry-tags/", "label": "RFID laundry tags solution" }
+        {
+          "href": "/guides/iso-14443-explained/",
+          "label": "ISO 14443 explained (proximity neighbor)"
+        },
+        {
+          "href": "/compare/uhf-vs-hf-rfid/",
+          "label": "UHF vs HF RFID"
+        },
+        {
+          "href": "/compare/uhf-vs-hf-rfid-laundry-tags/",
+          "label": "UHF vs HF laundry tags"
+        },
+        {
+          "href": "/compare/125khz-vs-13.56mhz-rfid/",
+          "label": "125 kHz vs 13.56 MHz RFID"
+        },
+        {
+          "href": "/guides/nfc-ndef-format-explained/",
+          "label": "NFC NDEF format explained"
+        },
+        {
+          "href": "/solutions/rfid-laundry-tags/",
+          "label": "RFID laundry tags solution"
+        }
       ]
     },
     {
       "title": "Authoritative external references",
       "description": "NXP, ISO, and NFC Forum documents that define ICODE SLIX.",
       "links": [
-        { "href": "https://www.nxp.com/products/rfid-nfc/nfc-hf/icode/icode-slix-standard-label-ic-is-iso-15693-compliant:SL2S2002", "label": "NXP ICODE SLIX product page" },
-        { "href": "https://www.iso.org/standard/73602.html", "label": "ISO/IEC 15693-3 standard" }
+        {
+          "href": "https://www.nxp.com/products/rfid-nfc/nfc-hf/icode/icode-slix-standard-label-ic-is-iso-15693-compliant:SL2S2002",
+          "label": "NXP ICODE SLIX product page"
+        },
+        {
+          "href": "https://www.iso.org/standard/73602.html",
+          "label": "ISO/IEC 15693-3 standard"
+        }
       ]
     }
   ],
@@ -216,11 +328,11 @@
     },
     {
       "question": "Can an NFC phone read ICODE SLIX tags?",
-      "answer": "Yes, as NFC Forum Type 5 tags. Android phones with NFC reader mode support ISO 15693 natively (since Android 4.4 Kit-Kat). iPhone supports ISO 15693 via Core NFC starting iOS 13. A SLIX tag formatted with NDEF records in NFC Type 5 layout responds to standard consumer NFC taps — opening URLs, triggering Apple Shortcuts, launching apps. Note that the proprietary EAS and PRIVACY commands are NOT accessible to stock phone apps; only standard NFC reads/writes work."
+      "answer": "Yes, as NFC Forum Type 5 tags. Android phones with NFC reader mode support ISO 15693 natively (since Android 4.4 Kit-Kat). iPhone supports ISO 15693 via Core NFC starting iOS 13. A SLIX tag formatted with NDEF records in NFC Type 5 layout responds to standard consumer NFC taps. Opening URLs, triggering Apple Shortcuts, launching apps. Note that the proprietary EAS and PRIVACY commands are NOT accessible to stock phone apps; only standard NFC reads/writes work."
     },
     {
       "question": "How far can an ICODE SLIX tag be read?",
-      "answer": "Up to ~1.5 m with a large library-gate antenna (50 × 50 cm portal) and a typical book-inlay size tag (70 × 40 mm). Typical library gate deployment is 80-100 cm effective range on a 30 × 30 cm reader antenna. This long range is the main structural advantage over ISO 14443 (MIFARE), which is proximity-only (0-10 cm) due to its different air interface. ICODE SLIX's range comes at the cost of slower data rates and no crypto — it's a vicinity RFID, not a secure card."
+      "answer": "Up to ~1.5 m with a large library-gate antenna (50 × 50 cm portal) and a typical book-inlay size tag (70 × 40 mm). Typical library gate deployment is 80-100 cm effective range on a 30 × 30 cm reader antenna. This long range is the main structural advantage over ISO 14443 (MIFARE), which is proximity-only (0-10 cm) due to its different air interface. ICODE SLIX's range comes at the cost of slower data rates and no crypto. It's a vicinity RFID, not a secure card."
     },
     {
       "question": "What is the EAS bit used for?",
@@ -236,7 +348,7 @@
     },
     {
       "question": "Can I use ICODE SLIX on metal surfaces or in water?",
-      "answer": "Metal requires a ferrite-backed inlay, same as any HF tag. With a 0.3-1 mm ferrite spacer, SLIX works on metal with 2-5 dB sensitivity penalty. Water is generally fine — HF is robust through moisture (books returned in wet weather read correctly). For harsh conditions (industrial laundry autoclaves, chemical immersion), use the PPS-housing or silicone-encapsulated SLIX tag variants rather than paper-inlay book labels."
+      "answer": "Metal requires a ferrite-backed inlay, same as any HF tag. With a 0.3-1 mm ferrite spacer, SLIX works on metal with 2-5 dB sensitivity penalty. Water is generally fine. HF is robust through moisture (books returned in wet weather read correctly). For harsh conditions (industrial laundry autoclaves, chemical immersion), use the PPS-housing or silicone-encapsulated SLIX tag variants rather than paper-inlay book labels."
     }
   ],
   "sources": [
@@ -245,7 +357,7 @@
       "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/icode/icode-slix-label-ic:SL2ICS2002",
       "publisher": "NXP Semiconductors",
       "accessedAt": "2026-04-20",
-      "note": "Canonical NXP product page for ICODE SLIX — authority for the 896-bit user memory, password-protected read/write, AFI and DSFID fields, and ISO/IEC 15693 compliance referenced throughout the guide."
+      "note": "Canonical NXP product page for ICODE SLIX. Authority for the 896-bit user memory, password-protected read/write, AFI and DSFID fields, and ISO/IEC 15693 compliance referenced throughout the guide."
     },
     {
       "label": "NXP ICODE SLIX2 Product Page (SL2S2602)",
@@ -275,7 +387,7 @@
       "publisher": "ISO",
       "publishedAt": "2019-08-01",
       "accessedAt": "2026-04-20",
-      "note": "Specifies the 13.56 MHz carrier, 1/256 or 1/4 pulse-position forward-link coding, and single/dual-subcarrier reverse link — basis for the vicinity-coupling physical-layer discussion."
+      "note": "Specifies the 13.56 MHz carrier, 1/256 or 1/4 pulse-position forward-link coding, and single/dual-subcarrier reverse link. Basis for the vicinity-coupling physical-layer discussion."
     },
     {
       "label": "NFC Forum — Type 5 Tag Technical Specification",
@@ -289,7 +401,7 @@
       "url": "https://www.nxp.com/docs/en/application-note/AN11597.pdf",
       "publisher": "NXP Semiconductors",
       "accessedAt": "2026-04-20",
-      "note": "NXP application note covering the originality signature and privacy-mode features of the ICODE family — referenced where the guide discusses library anti-theft and supply-chain anti-counterfeiting use cases."
+      "note": "NXP application note covering the originality signature and privacy-mode features of the ICODE family. Referenced where the guide discusses library anti-theft and supply-chain anti-counterfeiting use cases."
     }
   ],
   "primaryAction": {

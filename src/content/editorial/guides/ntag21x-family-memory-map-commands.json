@@ -3,10 +3,10 @@
   "group": "guides",
   "title": "NTAG21x Family — Memory Map, Commands and NDEF Architecture Encyclopedia",
   "kicker": "NTAG213 / NTAG215 / NTAG216 Technical Reference",
-  "summary": "NXP's NTAG21x family (NTAG213, NTAG215, NTAG216) is the most deployed NFC Type-2 chip family on the planet — the workhorse silicon behind billions of review cards, event wristbands, loyalty touchpoints, anti-counterfeit labels and IoT pairing tags. This encyclopedia documents the three chips' memory maps page by page, the 13-command Type-2 command set with hex opcodes, the NDEF TLV framing rules, the mirror and counter features, the lock/CFG bytes, and the specific tradeoffs that decide when NTAG213 is enough and when NTAG215 / NTAG216 are required.",
+  "summary": "NXP's NTAG21x family (NTAG213, NTAG215, NTAG216) is the most deployed NFC Type-2 chip family on the planet. The workhorse silicon behind billions of review cards, event wristbands, loyalty touchpoints, anti-counterfeit labels and IoT pairing tags. This encyclopedia documents the three chips' memory maps page by page, the 13-command Type-2 command set with hex opcodes, the NDEF TLV framing rules, the mirror and counter features, the lock/CFG bytes, and the specific tradeoffs that decide when NTAG213 is enough and when NTAG215 / NTAG216 are required.",
   "heroPoints": [
     "NTAG213 / 215 / 216 — the same command set, the same memory model, only the user-memory size and the address of the configuration pages differ. Write code once, support all three with a single firmware path.",
-    "Type-2 tag operation (ISO/IEC 14443-3 Type A + NFC Forum T2T) — reads and writes operate on 4-byte pages. 13 commands: READ, FAST_READ, WRITE, COMPATIBILITY_WRITE, READ_CNT, PWD_AUTH, READ_SIG, GET_VERSION and four memory-access helpers. Entire command set fits on a reference card.",
+    "Type-2 tag operation (ISO/IEC 14443-3 Type A + NFC Forum T2T). Reads and writes operate on 4-byte pages. 13 commands: READ, FAST_READ, WRITE, COMPATIBILITY_WRITE, READ_CNT, PWD_AUTH, READ_SIG, GET_VERSION and four memory-access helpers. Entire command set fits on a reference card.",
     "Features that differentiate NTAG21x from vanilla Type-2 — ASCII-mirror (UID / NFC counter / PWD-AUTH result written directly into a NDEF URL), password-protected memory (32-bit PWD + 16-bit PACK), originality-signature (ECDSA on chip UID, proof of authenticity), scan counter (24-bit, optionally mirrored) and a configurable strong-modulation mode."
   ],
   "imageAlt": "NTAG21x family chips — NTAG213, NTAG215, NTAG216 with memory map diagram",
@@ -34,14 +34,14 @@
   "sections": [
     {
       "title": "Chip family and part numbers",
-      "intro": "NXP ships NTAG21x under a single data sheet with three memory-capacity variants. The branding stability across three generations (NT2H13/15/16) is deliberate — converters, reader OEMs, and procurement teams treat NTAG21x as a single SKU family with a size parameter, and NXP's road-map holds the command set unchanged even as silicon processes migrate. The COT (chip-on-tape) wafer business is served by NXP's distribution network (Avnet, Arrow, Rutronik) with lead times typically 8-12 weeks and MOQ 100k wafers for direct allocations; smaller orders flow through NXP-authorised converters such as Smartrac (now Avery Dennison Smartrac), Linxens, Identiv, and Zebra.",
+      "intro": "NXP ships NTAG21x under a single data sheet with three memory-capacity variants. The branding stability across three generations (NT2H13/15/16) is deliberate. Converters, reader OEMs, and procurement teams treat NTAG21x as a single SKU family with a size parameter, and NXP's road-map holds the command set unchanged even as silicon processes migrate. The COT (chip-on-tape) wafer business is served by NXP's distribution network (Avnet, Arrow, Rutronik) with lead times typically 8-12 weeks and MOQ 100k wafers for direct allocations; smaller orders flow through NXP-authorised converters such as Smartrac (now Avery Dennison Smartrac), Linxens, Identiv, and Zebra.",
       "bullets": [
         "NTAG213 — 180 bytes total memory, 144 bytes user NDEF, 13.56 MHz ISO/IEC 14443-3 Type A, part number NT2H1311. The entry-level chip of the family. Used in ~80% of promotional NFC deployments because its per-unit cost (wafer / COT) is the lowest of any ISO-compliant NFC chip shipping in inlay volume.",
         "NTAG215 — 540 bytes total, 504 bytes user NDEF, part number NT2H1511. The memory-balance chip. Amiibo, vCards with photos, longer encrypted payloads, and applications that pre-load a few hundred bytes of metadata alongside the URL.",
         "NTAG216 — 924 bytes total, 888 bytes user NDEF, part number NT2H1611. The maximum-memory chip. Digital business cards with embedded contact photos, multi-language NDEF payloads, longer signed URLs, and developer test tags where headroom matters more than cost.",
         "All three chips are electrically identical. The ATQA, SAK, command set, page-based access model, and originality-signature algorithm are all the same. Only the total memory, the page address of the configuration block, and the GET_VERSION response byte differ.",
         "Drop-in compatible with NTAG21x-compatible host firmware. A reader that can program NTAG213 can program NTAG215 and NTAG216 without code changes if the firmware reads the GET_VERSION response and adjusts the upper-bound page address accordingly.",
-        "Counterfeit chips marked 'NTAG213 compatible' usually run MIFARE Ultralight C or an unspecified Chinese-OEM Type-2 silicon. They typically lack the ASCII mirror feature, respond with a different GET_VERSION byte, and cannot produce a valid ECDSA originality signature — your incoming-inspection test should GET_VERSION, then READ_SIG, then verify the signature against NXP's published public key.",
+        "Counterfeit chips marked 'NTAG213 compatible' usually run MIFARE Ultralight C or an unspecified Chinese-OEM Type-2 silicon. They typically lack the ASCII mirror feature, respond with a different GET_VERSION byte, and cannot produce a valid ECDSA originality signature. Your incoming-inspection test should GET_VERSION, then READ_SIG, then verify the signature against NXP's published public key.",
         "Inlay form factors — NTAG21x silicon ships in wet inlays (adhesive-backed antenna + chip, typical antenna sizes 22×22 mm, 35×35 mm, 40×25 mm, 85×54 mm CR80), dry inlays (for downstream lamination), and pre-laminated PVC cards. Converter-specific antenna tuning targets 13.56 MHz nominal resonance with Q factors of 20-40 depending on the end product (sticker vs. card vs. wristband).",
         "Variant cost ladder — at 100k-unit volume, indicative 2026 per-inlay prices run approximately USD 0.06-0.09 for NTAG213 wet inlays, USD 0.14-0.18 for NTAG215, and USD 0.24-0.32 for NTAG216. Printed and finished NTAG213 stickers typically retail at USD 0.20-0.35 each at 10k volume; these prices drop 20-40 % at 100k+ and another 10-15 % at 1M+."
       ]
@@ -54,7 +54,7 @@
         "Pages 0–1 — UID (serial number). 7 bytes + 1 byte BCC (block check character). Read-only, factory-programmed, globally unique.",
         "Page 2 — internal use (byte 0) + static lock bytes (bytes 2–3). The lock bytes control per-page write-protection on pages 3–15; set a bit to permanently lock the corresponding page. Once locked, pages cannot be unlocked.",
         "Page 3 — Capability Container (CC). 4 bytes. Byte 0 = magic number (0xE1), byte 1 = version (0x10 for NTAG21x), byte 2 = total NDEF memory size / 8, byte 3 = read/write access byte. The CC is written once at personalization and typically locked.",
-        "Pages 4 to (E)TLV-end — NDEF TLV data. NDEF messages are wrapped in a TLV frame: [0x03][length][NDEF bytes][0xFE terminator]. For NTAG213 the NDEF area ends at page 39 (page 40 onwards is configuration). For NTAG215 it ends at page 129. For NTAG216 at page 225.",
+        "Pages 4 to (E)TLV-end. NDEF TLV data. NDEF messages are wrapped in a TLV frame: [0x03][length][NDEF bytes][0xFE terminator]. For NTAG213 the NDEF area ends at page 39 (page 40 onwards is configuration). For NTAG215 it ends at page 129. For NTAG216 at page 225.",
         "Dynamic lock bytes — NTAG213 at page 40, NTAG215 at page 130, NTAG216 at page 226. Provide per-block write-protection for pages above 15. Three bytes of dynamic lock bits plus one reserved byte.",
         "CFG0 and CFG1 pages — NTAG213 at pages 41–42, NTAG215 at 131–132, NTAG216 at 227–228. CFG0 byte 0 = MIRROR (UID/counter/PWD-AUTH ASCII mirror settings), byte 1 = reserved, byte 2 = MIRROR_PAGE (page where the mirror gets written), byte 3 = AUTH0 (page from which password authentication is required). CFG1 byte 0 = ACCESS (read/write-password protection and counter enable), bytes 1–3 = reserved.",
         "PWD page — NTAG213 at page 43, NTAG215 at 133, NTAG216 at 229. 4 bytes. Holds the 32-bit password for PWD_AUTH. Write-only after personalization; reads return 00000000.",
@@ -65,23 +65,23 @@
     },
     {
       "title": "Command set — 13 commands with hex opcodes",
-      "intro": "The NTAG21x command set fits on an index card, and that minimalism is deliberate: Type-2 tags are meant to be driven by any reader that implements the NFC Forum Type-2 Tag Operation spec. The commands below are listed in the order a typical tap exchanges them — anti-collision first, then capability discovery (GET_VERSION), then reads, writes and optional authentication. Every command takes a single-byte opcode followed by its parameters, and responses are either a data payload or a 4-bit NAK/ACK. Frame timings are governed by the underlying ISO 14443-3 FDT (Frame Delay Time) of 1172/fc (≈86 µs) minimum.",
+      "intro": "The NTAG21x command set fits on an index card, and that minimalism is deliberate: Type-2 tags are meant to be driven by any reader that implements the NFC Forum Type-2 Tag Operation spec. The commands below are listed in the order a typical tap exchanges them. Anti-collision first, then capability discovery (GET_VERSION), then reads, writes and optional authentication. Every command takes a single-byte opcode followed by its parameters, and responses are either a data payload or a 4-bit NAK/ACK. Frame timings are governed by the underlying ISO 14443-3 FDT (Frame Delay Time) of 1172/fc (≈86 µs) minimum.",
       "bullets": [
-        "REQA (0x26) / WUPA (0x52) — ISO 14443-3 entry commands. Put the tag into READY state; anti-collision follows.",
-        "ANTICOLLISION / SELECT (0x93 / 0x95) — standard ISO 14443-3 Type A anti-collision. Returns the 7-byte UID in two cascade levels.",
+        "REQA (0x26) / WUPA (0x52). ISO 14443-3 entry commands. Put the tag into READY state; anti-collision follows.",
+        "ANTICOLLISION / SELECT (0x93 / 0x95). Standard ISO 14443-3 Type A anti-collision. Returns the 7-byte UID in two cascade levels.",
         "HLTA (0x50 00) — halt command. Tag enters HALT state until next RF field rise.",
         "GET_VERSION (0x60) — returns 8 bytes identifying the chip. Byte 6 is the storage size indicator: 0x0F = NTAG213, 0x11 = NTAG215, 0x13 = NTAG216. Byte 3 indicates silicon generation (NTAG21x = 0x04).",
         "READ (0x30 addr) — reads 16 bytes starting at page addr (i.e. pages addr, addr+1, addr+2, addr+3). The most common read command. For higher throughput use FAST_READ.",
-        "FAST_READ (0x3A start end) — reads a contiguous range of pages with a single APDU. Returns (end - start + 1) × 4 bytes. Up to 255 pages per command.",
-        "WRITE (0xA2 addr data) — writes 4 bytes to the single page at addr. If the page is locked or above AUTH0 without prior PWD_AUTH, the tag returns a NAK.",
-        "COMPATIBILITY_WRITE (0xA0 addr) + 16-byte data — legacy Type-1 emulation. Only the first 4 bytes of the 16 are actually written. Kept for backwards compatibility with older NFC Forum T2T readers.",
+        "FAST_READ (0x3A start end). Reads a contiguous range of pages with a single APDU. Returns (end - start + 1) × 4 bytes. Up to 255 pages per command.",
+        "WRITE (0xA2 addr data). Writes 4 bytes to the single page at addr. If the page is locked or above AUTH0 without prior PWD_AUTH, the tag returns a NAK.",
+        "COMPATIBILITY_WRITE (0xA0 addr) + 16-byte data. Legacy Type-1 emulation. Only the first 4 bytes of the 16 are actually written. Kept for backwards compatibility with older NFC Forum T2T readers.",
         "READ_CNT (0x39 00) — returns the 24-bit NFC counter. Incremented by the chip on every successful READ or FAST_READ when CFG1.ACCESS.NFC_CNT_EN is set.",
         "PWD_AUTH (0x1B pwd) — password authentication. Send the 32-bit password; tag returns the 16-bit PACK on success, NAK on failure. Required to access pages ≥ AUTH0 when CFG1.ACCESS.PROT is set.",
         "READ_SIG (0x3C 00) — returns the 32-byte ECDSA originality signature over the UID, signed by NXP's production key. Verify against NXP's published public key to prove the chip is authentic NXP silicon.",
         "NRG (internal) — the tag's RNG is not directly command-accessible; it is used for the counter increment and password lock-out back-off.",
         "Error returns — malformed command returns 0x0 (NAK) or nothing. After 4 consecutive failed PWD_AUTH attempts the tag enters password lock-out and ignores all further PWD_AUTH commands until the RF field is dropped.",
         "ATQA / SAK — anti-collision response is ATQA = 0x0044 (7-byte UID, ISO 14443-3 Type A) and SAK = 0x00 (non-ISO 14443-4, Type-2). Readers use these values to branch to the Type-2 command set rather than the DESFire/ISO-4 command set; misconfigured readers that assume ISO 14443-4 on any 7-byte UID will fail on NTAG21x.",
-        "T=CL frame sizing — the PICC to PCD response for FAST_READ is bounded by FSC (Frame Size for the Card) = 64 bytes default. To read an entire 924-byte NTAG216 a reader either raises FSC via an RATS (not usually supported at Type-2) or chunks the FAST_READ into 10-20 page batches. ACR1252U and OMNIKEY 5022 handle this chunking automatically; embedded drivers often need explicit batching logic."
+        "T=CL frame sizing. The PICC to PCD response for FAST_READ is bounded by FSC (Frame Size for the Card) = 64 bytes default. To read an entire 924-byte NTAG216 a reader either raises FSC via an RATS (not usually supported at Type-2) or chunks the FAST_READ into 10-20 page batches. ACR1252U and OMNIKEY 5022 handle this chunking automatically; embedded drivers often need explicit batching logic."
       ]
     },
     {
@@ -95,26 +95,26 @@
         "Multi-record messages — chain records with MB (Message Begin) on the first and ME (Message End) on the last; intermediates have both flags cleared. Typical pattern: URL record first (for OS URL launch) + optional Text record with human-readable label.",
         "Maximum NDEF sizes — NTAG213 = 137 bytes net (144 user − 7 TLV overhead), NTAG215 = 492 bytes net, NTAG216 = 872 bytes net. Subtract further if locking AUTH0-protected ranges or using ASCII mirror.",
         "External Type URIs — TNF = 0x04 (External Type) carries a reverse-DNS type (e.g. 'proudtek.com:badge') and an arbitrary payload. Used for proprietary app-launch tags; Android AAR (Application Auto-Run) records use this TNF with type 'android.com:pkg' to auto-launch a specific app when the tag is tapped on a device where the app is installed.",
-        "iOS vs Android launch behaviour — iOS Core NFC auto-reads NDEF records on a system-level scan; URL records launch Safari for https:// URIs, other records appear in the Wallet/Notifications bubble. Android launches the default Browser or any app registered for the URI scheme. Review-card vendors always use https:// URLs (prefix 0x04) to maximise iOS launch reliability; proprietary URI schemes will prompt the user on iOS 15+ and fail on locked iPhones."
+        "iOS vs Android launch behaviour. iOS Core NFC auto-reads NDEF records on a system-level scan; URL records launch Safari for https:// URIs, other records appear in the Wallet/Notifications bubble. Android launches the default Browser or any app registered for the URI scheme. Review-card vendors always use https:// URLs (prefix 0x04) to maximise iOS launch reliability; proprietary URI schemes will prompt the user on iOS 15+ and fail on locked iPhones."
       ]
     },
     {
       "title": "ASCII mirror — dynamic URL rewrites without re-programming",
-      "intro": "ASCII mirror is the single feature that distinguishes NTAG21x from vanilla Type-2 silicon and enables per-tap URL uniqueness without cryptography. The chip maintains an internal 24-bit counter (incremented on every READ or FAST_READ) and can splice the counter plus UID into a pre-reserved area of the NDEF URL, rendered as ASCII hex. Backends use this pattern to build tap-count analytics, anti-skim alerts (if the same counter value is observed twice, something is wrong), and personalised landing pages — all from a single encoded payload that never needs to be rewritten once the tag is in the field.",
+      "intro": "ASCII mirror is the single feature that distinguishes NTAG21x from vanilla Type-2 silicon and enables per-tap URL uniqueness without cryptography. The chip maintains an internal 24-bit counter (incremented on every READ or FAST_READ) and can splice the counter plus UID into a pre-reserved area of the NDEF URL, rendered as ASCII hex. Backends use this pattern to build tap-count analytics, anti-skim alerts (if the same counter value is observed twice, something is wrong), and personalised landing pages. All from a single encoded payload that never needs to be rewritten once the tag is in the field.",
       "bullets": [
         "ASCII mirror is the NTAG21x feature that lets the chip rewrite parts of its own NDEF payload on every READ, without any server round trip. It's the same mechanism that turns an otherwise-static NDEF URL into 'https://brand.com/v?uid=04A2B1C2D1E100&ctr=00012F'.",
         "Configure via the CFG0 MIRROR byte. Bits 7–6 = mirror mode: 00 = no mirror, 01 = UID mirror (14 ASCII hex chars), 10 = NFC counter mirror (6 ASCII hex chars), 11 = UID + counter mirror (20 ASCII chars). Bits 5–4 = mirror byte position within MIRROR_PAGE.",
         "The target position is CFG0.MIRROR_PAGE × 4 + CFG0.MIRROR_BYTE. The reader must ensure the NDEF URL template has 14 (or 6, or 20) ASCII 'X' placeholder characters starting at exactly that byte.",
-        "Counter increment — the 24-bit NFC counter increments before the mirror is computed, so the first legitimate read after power-up always returns counter = 000001. This means the counter in a fresh scan is different from what was read during personalization — production verification should skip the first N reads after power-on.",
+        "Counter increment — the 24-bit NFC counter increments before the mirror is computed, so the first legitimate read after power-up always returns counter = 000001. This means the counter in a fresh scan is different from what was read during personalization. Production verification should skip the first N reads after power-on.",
         "PWD-AUTH mirror — mode 11 with AUTH_EN set also includes the PACK in the mirror, giving the backend a way to verify the tag responded correctly to the password challenge. This is the closest Type-2 gets to NTAG424 DNA's SUN without the full AES crypto.",
-        "Mirror is writeable but not retroactively re-configurable — once MIRROR is set to a non-default value in CFG0 it cannot be unset unless CFG0 itself was left unlocked. Production-encoded tags typically lock CFG0.",
-        "Analytics-backend integration pattern — a typical review-card or loyalty setup queries the URL's uid + ctr parameters on every tap, rate-limits on the (uid, ctr) tuple to deduplicate near-simultaneous double reads, and stores the tuple in an append-only event table. BI tools plot counter delta over time per UID to show 'taps per day per location'. Counter-reset anomalies (ctr decreases, or jumps > 1000 in a single day) flag as potential clones.",
+        "Mirror is writeable but not retroactively re-configurable. Once MIRROR is set to a non-default value in CFG0 it cannot be unset unless CFG0 itself was left unlocked. Production-encoded tags typically lock CFG0.",
+        "Analytics-backend integration pattern. A typical review-card or loyalty setup queries the URL's uid + ctr parameters on every tap, rate-limits on the (uid, ctr) tuple to deduplicate near-simultaneous double reads, and stores the tuple in an append-only event table. BI tools plot counter delta over time per UID to show 'taps per day per location'. Counter-reset anomalies (ctr decreases, or jumps > 1000 in a single day) flag as potential clones.",
         "Mirror byte layout — the URL template embeds exactly 14 ASCII hex chars for UID mirror at CFG0.MIRROR_PAGE × 4 + CFG0.MIRROR_BYTE, followed by any separator plus exactly 6 hex chars for counter. Convention is placeholder character 'X', but any placeholder works as long as the reserved range is that exact length. Off-by-one errors in placeholder counting are the single most common personalisation bug."
       ]
     },
     {
       "title": "Password protection and originality signature",
-      "intro": "NTAG21x provides two independent security primitives that together let integrators lock a tag against casual rewriting and prove that the silicon is authentic NXP. Password protection (PWD + PACK + AUTH0) is a 32-bit symmetric secret that gates reads or writes above a configurable page; originality signature (READ_SIG) is an ECDSA-P224 signature over the UID, pre-stored by NXP at wafer test. Neither primitive is a replacement for the full cryptographic tag authentication that NTAG424 DNA offers — PWD is brute-forceable in hours if the lock-out is not enabled, and the originality signature only proves silicon provenance, not payload authenticity. But together they raise the bar enough for most loyalty, promotional and event deployments.",
+      "intro": "NTAG21x provides two independent security primitives that together let integrators lock a tag against casual rewriting and prove that the silicon is authentic NXP. Password protection (PWD + PACK + AUTH0) is a 32-bit symmetric secret that gates reads or writes above a configurable page; originality signature (READ_SIG) is an ECDSA-P224 signature over the UID, pre-stored by NXP at wafer test. Neither primitive is a replacement for the full cryptographic tag authentication that NTAG424 DNA offers. PWD is brute-forceable in hours if the lock-out is not enabled, and the originality signature only proves silicon provenance, not payload authenticity. But together they raise the bar enough for most loyalty, promotional and event deployments.",
       "bullets": [
         "PWD and PACK — 32-bit password + 16-bit Password Acknowledge. Write to the PWD and PACK pages during personalization, then set CFG1.ACCESS.PROT and AUTH0 to the page from which protection starts. Any reader attempting to read/write pages ≥ AUTH0 must first PWD_AUTH.",
         "Lock-out — after a configurable number of failed authentications the tag enters permanent lock-out (CFG1.ACCESS.AUTHLIM). Default: no limit. Set to 1–7 for destructive lock-out on brute-force attempts.",
@@ -122,7 +122,7 @@
         "Signature verification workflow — 1) READ_SIG to obtain the 32 bytes, 2) ANTICOLLISION to obtain the 7-byte UID, 3) ECDSA-verify signature against UID using NXP's public key. Incoming-inspection scripts typically check GET_VERSION byte 3 = 0x04 (NXP silicon) plus a valid signature to reject counterfeits.",
         "Lock-byte caveat — pages 2 and 3 (UID and CC) can never be locked dynamically; static lock bytes in page 2 only protect pages 3–15. Once the CC at page 3 is written, locking the 'lCC' bit in page 2 makes the CC read-only, which is the production default.",
         "Password diversification — never ship a fleet with the same PWD. Derive a per-tag PWD = truncate(HMAC-SHA256(master_key, UID), 4 bytes) and PACK = truncate(HMAC-SHA256(master_key || 0x01, UID), 2 bytes). The master_key stays in the encoding HSM; readers that need to unlock a specific tag first query its UID, then compute PWD on-the-fly. This keeps a single compromised tag from revealing the master secret and makes fleet lock-down trivial to audit.",
-        "Originality-signature verification code — the ECDSA-P224 curve is NIST P-224 (secp224r1). NXP publishes both the public key and test vectors in AN11350. Reader code typically calls a standard TLS library (BoringSSL, mbedTLS, OpenSSL) with the secp224r1 curve preselected; verification takes under 5 ms on modern ARM Cortex-A processors and under 50 ms on ESP32-class MCUs. Failure modes to handle: corrupted SIG bytes (retry READ_SIG once), tag returns all-zero SIG (counterfeit or un-personalised), signature valid but UID does not match reader's anti-collision result (mismatched chip).",
+        "Originality-signature verification code. The ECDSA-P224 curve is NIST P-224 (secp224r1). NXP publishes both the public key and test vectors in AN11350. Reader code typically calls a standard TLS library (BoringSSL, mbedTLS, OpenSSL) with the secp224r1 curve preselected; verification takes under 5 ms on modern ARM Cortex-A processors and under 50 ms on ESP32-class MCUs. Failure modes to handle: corrupted SIG bytes (retry READ_SIG once), tag returns all-zero SIG (counterfeit or un-personalised), signature valid but UID does not match reader's anti-collision result (mismatched chip).",
         "Lock-out semantics — CFG1.ACCESS.AUTHLIM can be set to 1-7 (0 = unlimited). After AUTHLIM consecutive failed PWD_AUTH the tag permanently ignores further PWD_AUTH attempts until the RF field drops. For event wristbands, AUTHLIM = 3 with destructive lock-out turns a lost or stolen tag into a brick if the attendee's security code is wrong three times."
       ]
     },
@@ -130,36 +130,36 @@
       "title": "Commercial deployments and application fit",
       "intro": "NTAG21x silicon ships in billions of units every year because it hits a sweet spot between price, memory, features and tooling. The chip family is specified by default in virtually every consumer NFC deployment where cryptography is not required: tap-to-review cards, promotional tap campaigns, event wristbands, vCard business cards, consumer-IoT pairing labels. Each of those verticals has a preferred variant (213, 215, or 216) dictated by payload size and cost target; the decision tree almost always reduces to 'how many bytes of NDEF does the application need, and what's the BOM target?'",
       "bullets": [
-        "Google Review NFC cards, hotel guest touchpoints, restaurant tabletop prompts — NTAG213 is the default choice. 144 bytes of user memory is enough for a 100-character review URL with UTM parameters and NFC counter mirroring; per-unit cost at volume is under a dime.",
+        "Google Review NFC cards, hotel guest touchpoints, restaurant tabletop prompts. NTAG213 is the default choice. 144 bytes of user memory is enough for a 100-character review URL with UTM parameters and NFC counter mirroring; per-unit cost at volume is under a dime.",
         "NFC business cards — NTAG215 is the sweet spot. 504 bytes of NDEF comfortably holds a full vCard (name, title, multi-line address, phone, email, website) plus a PNG avatar under 250 bytes. NTAG216 is preferred when the card carries a photo or a long bio.",
-        "Event and festival wristbands — NTAG213 for single-use paper/Tyvek wristbands, NTAG215 for reusable silicone wristbands where the operator wants to store a local credential (member number, ticket tier) alongside the URL.",
-        "Brand authentication at low-to-medium risk — NTAG213 with ASCII mirror + NFC counter gives a decent 'tap count anomaly detection' layer. For high-counterfeit-risk goods (luxury, pharmaceuticals) upgrade to NTAG424 DNA for true cryptographic authentication.",
-        "Consumer IoT pairing (Bluetooth speakers, smart plugs) — NTAG215 is common. Enough memory for a pairing-record NDEF (Bluetooth handover) plus a backup URL for setup instructions.",
-        "Amiibo and toys-to-life — NTAG215 specifically, 540 bytes is the Nintendo spec. Do not specify NTAG213 or NTAG216 for amiibo-compatible deployments; the game software bit-checks memory size.",
-        "Healthcare and medical device links — NTAG215 with PWD-AUTH for controlled-access metadata. Low enough cost for disposables; enough memory for device serial, recall flags and calibration dates.",
-        "Social-media and creator-economy tap tags — NTAG213 in silicone rings, NTAG215 in metal cards. Linktree, Popl, Mobilo, V1CE, and similar personal-profile NFC services drive the upper end of the consumer tag market; average ASP USD 8-40 per finished unit reflects the premium packaging rather than the underlying NTAG213 silicon.",
-        "Where NTAG21x is wrong — multi-application enterprise access control (use MIFARE DESFire EV3), cryptographic brand authentication (use NTAG424 DNA), UHF item-level retail (use UCODE 8/9 or Monza R6)."
+        "Event and festival wristbands. NTAG213 for single-use paper/Tyvek wristbands, NTAG215 for reusable silicone wristbands where the operator wants to store a local credential (member number, ticket tier) alongside the URL.",
+        "Brand authentication at low-to-medium risk. NTAG213 with ASCII mirror + NFC counter gives a decent 'tap count anomaly detection' layer. For high-counterfeit-risk goods (luxury, pharmaceuticals) upgrade to NTAG424 DNA for true cryptographic authentication.",
+        "Consumer IoT pairing (Bluetooth speakers, smart plugs). NTAG215 is common. Enough memory for a pairing-record NDEF (Bluetooth handover) plus a backup URL for setup instructions.",
+        "Amiibo and toys-to-life. NTAG215 specifically, 540 bytes is the Nintendo spec. Do not specify NTAG213 or NTAG216 for amiibo-compatible deployments; the game software bit-checks memory size.",
+        "Healthcare and medical device links. NTAG215 with PWD-AUTH for controlled-access metadata. Low enough cost for disposables; enough memory for device serial, recall flags and calibration dates.",
+        "Social-media and creator-economy tap tags. NTAG213 in silicone rings, NTAG215 in metal cards. Linktree, Popl, Mobilo, V1CE, and similar personal-profile NFC services drive the upper end of the consumer tag market; average ASP USD 8-40 per finished unit reflects the premium packaging rather than the underlying NTAG213 silicon.",
+        "Where NTAG21x is wrong. Multi-application enterprise access control (use MIFARE DESFire EV3), cryptographic brand authentication (use NTAG424 DNA), UHF item-level retail (use UCODE 8/9 or Monza R6)."
       ]
     },
     {
       "title": "NXP reference documents and datasheets",
       "intro": "NXP publishes NTAG21x documentation publicly (no NDA), which is a deliberate choice given the chip's role as a commodity NFC interface. The documents listed here cover the chip itself, the originality-signature validation flow, the feature comparison with higher-end NTAG siblings, and the underlying NFC Forum and ISO 14443 standards. Reader-firmware developers reference these documents routinely; integrators designing a new NTAG21x product should read at least the product short data sheet and AN11350 before writing personalisation scripts.",
       "bullets": [
-        "NTAG213 / 215 / 216 Product Short Data Sheet (NXP document 279532, latest rev) — the canonical reference for pin-out, electrical characteristics, memory organization and command set.",
+        "NTAG213 / 215 / 216 Product Short Data Sheet (NXP document 279532, latest rev). The canonical reference for pin-out, electrical characteristics, memory organization and command set.",
         "AN11350 — NTAG21x Originality Signature Validation. Contains the ECDSA-P224 public key in hex, pseudocode for verification, and test vectors.",
         "AN13452 — NTAG family command and feature comparison (NTAG213/215/216 vs. NTAG413 vs. NTAG424 DNA). Invaluable when migrating a design from NTAG21x up to the DNA family.",
         "AN11322 — NTAG21x originality check implementation guide for Android / iOS host apps.",
         "NFC Forum Type-2 Tag Operation Specification v1.2 — the vendor-neutral spec for the command set and TLV framing. NTAG21x is a proper superset.",
         "ISO/IEC 14443-3:2018 — anti-collision and transmission protocol layer. Together with NFC Forum T2T defines everything the reader firmware must implement.",
         "NFC Forum RTD-URI 1.0 — the well-known URI record type definition that specifies the prefix-byte table (0x00-0x23) and the URL encoding rules; used in every well-formed NDEF URL record.",
-        "NXP TagWriter and TagXplorer — NXP's reference desktop/mobile encoding utilities. Both speak the NTAG21x command set natively and are useful sanity tools during early development before in-house encoding software is ready."
+        "NXP TagWriter and TagXplorer. NXP's reference desktop/mobile encoding utilities. Both speak the NTAG21x command set natively and are useful sanity tools during early development before in-house encoding software is ready."
       ]
     },
     {
       "title": "Programming workflow — encode, verify, lock",
-      "intro": "Production encoding of NTAG21x converts a blank or CC-only inlay into a final, tamper-resistant product tag. The workflow below is the same pattern Proud Tek and most high-volume converters follow, whether the end product is a review card, a wristband, or a business card. Each step has a failure mode and a specific recovery — treating the workflow as a reliable assembly-line process rather than a manual operation is what delivers the sub-0.5 % field-defect rates that the review-card and event markets now expect.",
+      "intro": "Production encoding of NTAG21x converts a blank or CC-only inlay into a final, tamper-resistant product tag. The workflow below is the same pattern Proud Tek and most high-volume converters follow, whether the end product is a review card, a wristband, or a business card. Each step has a failure mode and a specific recovery. Treating the workflow as a reliable assembly-line process rather than a manual operation is what delivers the sub-0.5 % field-defect rates that the review-card and event markets now expect.",
       "bullets": [
-        "Step 1 — Anti-collision plus GET_VERSION. Confirm the inlay under the reader returns ATQA = 0x0044, SAK = 0x00, and GET_VERSION byte 3 = 0x04 (NXP silicon) plus byte 6 matching the expected variant (0x0F for 213, 0x11 for 215, 0x13 for 216). Reject inlays that fail any check — they are either counterfeit or damaged.",
+        "Step 1 — Anti-collision plus GET_VERSION. Confirm the inlay under the reader returns ATQA = 0x0044, SAK = 0x00, and GET_VERSION byte 3 = 0x04 (NXP silicon) plus byte 6 matching the expected variant (0x0F for 213, 0x11 for 215, 0x13 for 216). Reject inlays that fail any check. They are either counterfeit or damaged.",
         "Step 2 — READ_SIG plus offline ECDSA-P224 verification. Read the 32-byte originality signature, verify against NXP's published public key (AN11350), and log {UID, SIG, timestamp, operator, batch number} in an append-only database. Rejecting the ~0.01 % of inlays that fail signature verification is what separates a mature line from a hobbyist setup.",
         "Step 3 — Build NDEF TLV. Compose the NDEF message (typically a URL record with RTD-URI prefix 0x04 for https://), pad the URL to include placeholder 'X' characters at the exact byte offset where ASCII mirror will splice UID and counter values. Wrap in TLV: 0x03 | length | NDEF bytes | 0xFE. Pad the remaining user-memory pages with 0x00 so that FAST_READ returns a deterministic pattern.",
         "Step 4 — Write CC plus NDEF using FAST_WRITE-equivalent chunking. Issue WRITE (0xA2) commands page by page starting at page 3 (CC: 0xE1 0x10 size 0x00), then page 4 onwards with the NDEF TLV. Some reader drivers batch into multi-page COMPATIBILITY_WRITE but NTAG21x officially requires single-page WRITE. Verify by FAST_READ of the just-written range and byte-compare.",
@@ -180,22 +180,102 @@
           "NTAG216"
         ],
         "rows": [
-          ["NXP part number", "NT2H1311", "NT2H1511", "NT2H1611"],
-          ["Total memory", "180 bytes", "540 bytes", "924 bytes"],
-          ["User / NDEF memory", "144 bytes", "504 bytes", "888 bytes"],
-          ["Number of 4-byte pages", "45", "135", "231"],
-          ["Operating frequency", "13.56 MHz", "13.56 MHz", "13.56 MHz"],
-          ["Air-interface standard", "ISO/IEC 14443-3 Type A", "ISO/IEC 14443-3 Type A", "ISO/IEC 14443-3 Type A"],
-          ["NFC Forum type", "Type-2", "Type-2", "Type-2"],
-          ["UID length", "7 bytes", "7 bytes", "7 bytes"],
-          ["ASCII mirror", "Yes", "Yes", "Yes"],
-          ["Password protection (PWD+PACK)", "Yes", "Yes", "Yes"],
-          ["NFC counter", "24-bit", "24-bit", "24-bit"],
-          ["Originality signature", "ECDSA-P224", "ECDSA-P224", "ECDSA-P224"],
-          ["Data retention", "≥ 10 years", "≥ 10 years", "≥ 10 years"],
-          ["Endurance (writes)", "100,000 cycles", "100,000 cycles", "100,000 cycles"],
-          ["GET_VERSION byte 6", "0x0F", "0x11", "0x13"],
-          ["Typical use case", "Review/loyalty cards", "Business cards, amiibo", "Rich-media business cards"]
+          [
+            "NXP part number",
+            "NT2H1311",
+            "NT2H1511",
+            "NT2H1611"
+          ],
+          [
+            "Total memory",
+            "180 bytes",
+            "540 bytes",
+            "924 bytes"
+          ],
+          [
+            "User / NDEF memory",
+            "144 bytes",
+            "504 bytes",
+            "888 bytes"
+          ],
+          [
+            "Number of 4-byte pages",
+            "45",
+            "135",
+            "231"
+          ],
+          [
+            "Operating frequency",
+            "13.56 MHz",
+            "13.56 MHz",
+            "13.56 MHz"
+          ],
+          [
+            "Air-interface standard",
+            "ISO/IEC 14443-3 Type A",
+            "ISO/IEC 14443-3 Type A",
+            "ISO/IEC 14443-3 Type A"
+          ],
+          [
+            "NFC Forum type",
+            "Type-2",
+            "Type-2",
+            "Type-2"
+          ],
+          [
+            "UID length",
+            "7 bytes",
+            "7 bytes",
+            "7 bytes"
+          ],
+          [
+            "ASCII mirror",
+            "Yes",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "Password protection (PWD+PACK)",
+            "Yes",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "NFC counter",
+            "24-bit",
+            "24-bit",
+            "24-bit"
+          ],
+          [
+            "Originality signature",
+            "ECDSA-P224",
+            "ECDSA-P224",
+            "ECDSA-P224"
+          ],
+          [
+            "Data retention",
+            "≥ 10 years",
+            "≥ 10 years",
+            "≥ 10 years"
+          ],
+          [
+            "Endurance (writes)",
+            "100,000 cycles",
+            "100,000 cycles",
+            "100,000 cycles"
+          ],
+          [
+            "GET_VERSION byte 6",
+            "0x0F",
+            "0x11",
+            "0x13"
+          ],
+          [
+            "Typical use case",
+            "Review/loyalty cards",
+            "Business cards, amiibo",
+            "Rich-media business cards"
+          ]
         ]
       }
     }
@@ -205,39 +285,81 @@
       "title": "NTAG21x product pages",
       "description": "Proud Tek SKUs built on NTAG213 / NTAG215 / NTAG216 silicon.",
       "links": [
-        { "href": "/products/rfid-labels/ntag213-sticker/", "label": "NTAG213 sticker" },
-        { "href": "/products/rfid-labels/ntag215-label/", "label": "NTAG215 label" },
-        { "href": "/products/rfid-cards/ntag216-card/", "label": "NTAG216 card" },
-        { "href": "/products/rfid-cards/nfc-business-card/", "label": "NFC business card (NTAG215)" },
-        { "href": "/products/rfid-wristbands/nfc-payment-wristband/", "label": "NFC payment wristband" },
-        { "href": "/products/rfid-keyfobs/nfc-epoxy-key-tag/", "label": "NFC epoxy key tag" }
+        {
+          "href": "/products/rfid-labels/ntag213-sticker/",
+          "label": "NTAG213 sticker"
+        },
+        {
+          "href": "/products/rfid-labels/ntag215-label/",
+          "label": "NTAG215 label"
+        },
+        {
+          "href": "/products/rfid-cards/ntag216-card/",
+          "label": "NTAG216 card"
+        },
+        {
+          "href": "/products/rfid-cards/nfc-business-card/",
+          "label": "NFC business card (NTAG215)"
+        },
+        {
+          "href": "/products/rfid-wristbands/nfc-payment-wristband/",
+          "label": "NFC payment wristband"
+        },
+        {
+          "href": "/products/rfid-keyfobs/nfc-epoxy-key-tag/",
+          "label": "NFC epoxy key tag"
+        }
       ]
     },
     {
       "title": "Related comparisons and guides",
       "description": "Deeper dives on NTAG21x programming, NFC standards and chip-family selection.",
       "links": [
-        { "href": "/compare/ntag213-vs-ntag215-vs-ntag216/", "label": "NTAG213 vs 215 vs 216 comparison" },
-        { "href": "/guides/ntag424-dna-sun-cmac-authentication/", "label": "NTAG424 DNA SUN + CMAC guide" },
-        { "href": "/guides/nfc-ndef-format-explained/", "label": "NFC NDEF format explained" },
-        { "href": "/guides/nfc-tag-programming-android-guide/", "label": "NFC tag programming — Android" },
-        { "href": "/guides/nfc-tag-programming-iphone/", "label": "NFC tag programming — iPhone" },
-        { "href": "/guides/iso-14443-explained/", "label": "ISO/IEC 14443 explained" }
+        {
+          "href": "/compare/ntag213-vs-ntag215-vs-ntag216/",
+          "label": "NTAG213 vs 215 vs 216 comparison"
+        },
+        {
+          "href": "/guides/ntag424-dna-sun-cmac-authentication/",
+          "label": "NTAG424 DNA SUN + CMAC guide"
+        },
+        {
+          "href": "/guides/nfc-ndef-format-explained/",
+          "label": "NFC NDEF format explained"
+        },
+        {
+          "href": "/guides/nfc-tag-programming-android-guide/",
+          "label": "NFC tag programming — Android"
+        },
+        {
+          "href": "/guides/nfc-tag-programming-iphone/",
+          "label": "NFC tag programming — iPhone"
+        },
+        {
+          "href": "/guides/iso-14443-explained/",
+          "label": "ISO/IEC 14443 explained"
+        }
       ]
     },
     {
       "title": "Authoritative external references",
       "description": "NXP and NFC Forum documents that define the NTAG21x standard.",
       "links": [
-        { "href": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-labels/ntag-213-215-216:NTAG213_215_216", "label": "NXP NTAG213/215/216 product page" },
-        { "href": "https://nfc-forum.org/our-work/specification-releases/", "label": "NFC Forum Type-2 Tag Operation spec" }
+        {
+          "href": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-labels/ntag-213-215-216:NTAG213_215_216",
+          "label": "NXP NTAG213/215/216 product page"
+        },
+        {
+          "href": "https://nfc-forum.org/our-work/specification-releases/",
+          "label": "NFC Forum Type-2 Tag Operation spec"
+        }
       ]
     }
   ],
   "faq": [
     {
       "question": "Which NTAG21x chip should I specify for a Google review or loyalty card?",
-      "answer": "NTAG213. 144 bytes of NDEF user memory comfortably holds a review URL with UTM parameters (e.g. https://g.page/r/abc?utm_source=table_talker) plus a counter-mirror placeholder, and NTAG213 is the least-expensive chip in the family by a meaningful margin at volume. Only step up to NTAG215 when the payload exceeds ~130 bytes net of TLV overhead — typical signs: multi-line vCards, long URLs with tracking parameters, embedded text records."
+      "answer": "NTAG213. 144 bytes of NDEF user memory comfortably holds a review URL with UTM parameters (e.g. https://g.page/r/abc?utm_source=table_talker) plus a counter-mirror placeholder, and NTAG213 is the least-expensive chip in the family by a meaningful margin at volume. Only step up to NTAG215 when the payload exceeds ~130 bytes net of TLV overhead. Typical signs: multi-line vCards, long URLs with tracking parameters, embedded text records."
     },
     {
       "question": "Can a single reader firmware handle all three NTAG21x chips without modification?",
@@ -245,11 +367,11 @@
     },
     {
       "question": "Is NTAG213 sufficient for anti-counterfeit applications?",
-      "answer": "Only for low-risk categories. NTAG213 offers the ECDSA originality signature (verifies the chip itself is genuine NXP silicon) plus ASCII mirror of UID and counter. Together these give you 'tap-count anomaly detection' — if the same URL is scanned with mismatched counters, something is off. But NTAG21x has no dynamic cryptographic signature over the URL itself, so a counterfeiter who photographs a legitimate scan and replays the URL in a sticker on a counterfeit item will fool any naive verification. High-risk categories (luxury, pharmaceuticals) require NTAG424 DNA with SUN + CMAC."
+      "answer": "Only for low-risk categories. NTAG213 offers the ECDSA originality signature (verifies the chip itself is genuine NXP silicon) plus ASCII mirror of UID and counter. Together these give you 'tap-count anomaly detection'. If the same URL is scanned with mismatched counters, something is off. But NTAG21x has no dynamic cryptographic signature over the URL itself, so a counterfeiter who photographs a legitimate scan and replays the URL in a sticker on a counterfeit item will fool any naive verification. High-risk categories (luxury, pharmaceuticals) require NTAG424 DNA with SUN + CMAC."
     },
     {
       "question": "What is the difference between static lock bytes and dynamic lock bytes?",
-      "answer": "Static lock bytes at page 2 protect pages 3–15 (the bottom of the tag including the CC and the first 13 pages of user NDEF). Dynamic lock bytes, at page 40 on NTAG213, page 130 on NTAG215 and page 226 on NTAG216, protect everything above page 15. Both are one-way — once a lock bit is set it cannot be cleared. Production workflow typically writes the NDEF, verifies, then sets dynamic lock bytes to seal it permanently."
+      "answer": "Static lock bytes at page 2 protect pages 3–15 (the bottom of the tag including the CC and the first 13 pages of user NDEF). Dynamic lock bytes, at page 40 on NTAG213, page 130 on NTAG215 and page 226 on NTAG216, protect everything above page 15. Both are one-way. Once a lock bit is set it cannot be cleared. Production workflow typically writes the NDEF, verifies, then sets dynamic lock bytes to seal it permanently."
     },
     {
       "question": "How do I prove a tag is genuine NTAG21x and not a counterfeit 'NTAG-compatible' chip?",
@@ -257,7 +379,7 @@
     },
     {
       "question": "What is AUTH0 and how do I configure password-protected memory?",
-      "answer": "AUTH0 is the page address from which password authentication is required. If AUTH0 = 0x04, every page from 4 upwards is protected — any READ or WRITE without a prior successful PWD_AUTH returns NAK. Configure by: (1) writing your 32-bit PWD and 16-bit PACK to the PWD and PACK pages, (2) setting CFG1.ACCESS bits to enable protection (protect writes only, or reads and writes), (3) writing the starting page number to CFG0.AUTH0. Then your reader prefaces every protected transaction with PWD_AUTH 0x1B PPPPPPPP and expects the PACK back."
+      "answer": "AUTH0 is the page address from which password authentication is required. If AUTH0 = 0x04, every page from 4 upwards is protected. Any READ or WRITE without a prior successful PWD_AUTH returns NAK. Configure by: (1) writing your 32-bit PWD and 16-bit PACK to the PWD and PACK pages, (2) setting CFG1.ACCESS bits to enable protection (protect writes only, or reads and writes), (3) writing the starting page number to CFG0.AUTH0. Then your reader prefaces every protected transaction with PWD_AUTH 0x1B PPPPPPPP and expects the PACK back."
     },
     {
       "question": "Why does my NFC counter start at 000001 instead of 000000 after personalization?",
@@ -270,7 +392,7 @@
       "url": "https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf",
       "publisher": "NXP Semiconductors",
       "accessedAt": "2026-04-20",
-      "note": "Canonical NTAG 21x short datasheet — authority for the 144 / 504 / 888 byte user-memory sizes, memory map (configuration pages, CFG0/CFG1, PWD/PACK), NFC counter, NDEF message container and the READ / FAST_READ / WRITE / COMPATIBILITY_WRITE / AUTHENTICATE command set."
+      "note": "Canonical NTAG 21x short datasheet. Authority for the 144 / 504 / 888 byte user-memory sizes, memory map (configuration pages, CFG0/CFG1, PWD/PACK), NFC counter, NDEF message container and the READ / FAST_READ / WRITE / COMPATIBILITY_WRITE / AUTHENTICATE command set."
     },
     {
       "label": "NXP NTAG 21x Product Page — NFC Forum Type 2 Tag",
@@ -284,7 +406,7 @@
       "url": "https://www.nxp.com/docs/en/application-note/AN11340.pdf",
       "publisher": "NXP Semiconductors",
       "accessedAt": "2026-04-20",
-      "note": "NXP application note with detailed command flows, NDEF configuration, NFC counter use cases and password-protection setup — directly referenced in this guide's command walkthroughs."
+      "note": "NXP application note with detailed command flows, NDEF configuration, NFC counter use cases and password-protection setup. Directly referenced in this guide's command walkthroughs."
     },
     {
       "label": "NFC Forum — Type 2 Tag Technical Specification",
@@ -299,7 +421,7 @@
       "publisher": "ISO",
       "publishedAt": "2018-07-01",
       "accessedAt": "2026-04-20",
-      "note": "Air-interface specification for Type A anticollision — basis for the REQA / WUPA / SEL / ATQA / SAK activation sequence that readers execute before issuing NTAG commands."
+      "note": "Air-interface specification for Type A anticollision. Basis for the REQA / WUPA / SEL / ATQA / SAK activation sequence that readers execute before issuing NTAG commands."
     },
     {
       "label": "NXP AN11350 — NTAG Anti-Counterfeiting with Originality Signature",
@@ -313,7 +435,7 @@
       "url": "https://developer.android.com/develop/connectivity/nfc/advanced-nfc",
       "publisher": "Google",
       "accessedAt": "2026-04-20",
-      "note": "Android framework reference for the NfcA and MifareUltralight technology classes used to issue low-level NTAG 21x commands from Android applications — cited in the developer-access examples."
+      "note": "Android framework reference for the NfcA and MifareUltralight technology classes used to issue low-level NTAG 21x commands from Android applications. Cited in the developer-access examples."
     }
   ],
   "primaryAction": {
