@@ -196,130 +196,6 @@ body {
    ═══════════════════════════════════════════ */
 .kb-row-layout-wrap { margin-bottom: 20px; }
 
-/* Nested kb-theme-content-width: remove padding that only makes sense at page level */
-.wp-block-kadence-column .kb-theme-content-width {
-  padding-left: 0;
-  padding-right: 0;
-  max-width: none;
-}
-
-/* ═══════════════════════════════════════════
-   Home — "Our Capabilities" stats grid (3×2 card grid)
-   ───────────────────────────────────────────
-   Scope: the Kadence row that wraps the six stat cards (f2a65f-e2) and
-   the 3-col row that lays them out (a63b0a-6e). Each stat card is itself a
-   nested 2-col row whose inline Kadence CSS sets
-   `grid-template-columns: repeat(2, 1fr)` (image | number+label). Without
-   intervention the text side is too narrow, `kb-section-dir-horizontal`
-   flex-rows h2 + p, and "305+" / "Automated Production Lines" end up
-   wrapping letter-by-letter. We keep the Kadence DOM intact and flip
-   each card's 2-col grid into a stacked layout (icon → number → label),
-   centered, with light card styling.
-   ═══════════════════════════════════════════ */
-
-/* Flip each stat card from 2-col (image | text) to stacked (image / text) */
-.kb-row-layout-id_717fc7-48 > .kt-row-column-wrap,
-.kb-row-layout-id_7fea3b-fc > .kt-row-column-wrap,
-.kb-row-layout-id_999b4d-77 > .kt-row-column-wrap,
-.kb-row-layout-id_a51fc7-b7 > .kt-row-column-wrap,
-.kb-row-layout-id_9476db-93 > .kt-row-column-wrap,
-.kb-row-layout-id_09ebce-d2 > .kt-row-column-wrap {
-  grid-template-columns: 1fr !important;
-  justify-items: center !important;
-  row-gap: 6px !important;
-  column-gap: 0 !important;
-  padding: 24px 16px !important;
-  max-width: none !important;
-  margin: 0 !important;
-  height: 100%;
-}
-
-/* Card container visual treatment */
-.kb-row-layout-id_a63b0a-6e .kb-row-layout-wrap {
-  border-radius: 12px;
-  background: #fafaf6;
-  border: 1px solid #e8e5dc;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  height: 100%;
-  margin-bottom: 0;
-}
-.kb-row-layout-id_a63b0a-6e .kb-row-layout-wrap:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px -16px rgba(20, 20, 20, 0.22);
-  border-color: #d9d4c2;
-}
-
-/* Icon: fixed-size square, centered, contained */
-.kb-row-layout-id_f2a65f-e2 figure.wp-block-image {
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.kb-row-layout-id_f2a65f-e2 figure.wp-block-image img {
-  width: 72px;
-  height: 72px;
-  object-fit: contain;
-  max-width: none;
-  border-radius: var(--codex-radius-sm);
-}
-
-/* Override kb-section-dir-horizontal on the text-side column (first 2 cards)
-   so h2 + p stack instead of flex-rowing */
-.kb-row-layout-id_f2a65f-e2 .kb-section-dir-horizontal > .kt-inside-inner-col,
-.kb-row-layout-id_f2a65f-e2 .kb-section-dir-horizontal {
-  display: block;
-  text-align: center;
-}
-
-/* Number: prominent, single-line */
-.kb-row-layout-id_f2a65f-e2 h2.wp-block-heading {
-  font-family: var(--codex-font-heading, "Lora", Georgia, "Times New Roman", serif);
-  font-size: clamp(var(--codex-text-2xl), 2.75vw, 2.75rem);
-  line-height: 1;
-  margin: 4px 0 2px 0;
-  font-weight: var(--codex-weight-bold);
-  text-align: center !important;
-  color: #141414;
-  white-space: nowrap;
-  letter-spacing: -0.01em;
-}
-.kb-row-layout-id_f2a65f-e2 h2.wp-block-heading strong {
-  font-weight: inherit;
-}
-
-/* Label: small, secondary, center-aligned, no forced left */
-.kb-row-layout-id_f2a65f-e2 p {
-  font-size: var(--codex-text-sm-plus);
-  line-height: var(--codex-leading-snug);
-  margin: 0;
-  color: #5a5a5a;
-  text-align: center !important;
-  max-width: 22ch;
-}
-.kb-row-layout-id_f2a65f-e2 p strong {
-  color: #141414;
-  font-weight: var(--codex-weight-semibold);
-}
-
-/* Tighten the outer 3-col grid's gap for a nicer card rhythm */
-.kb-row-layout-id_a63b0a-6e > .kt-row-column-wrap {
-  column-gap: 20px !important;
-  row-gap: 20px !important;
-}
-
-/* Responsive: 3 → 2 → 1 columns */
-@media (max-width: 900px) {
-  .kb-row-layout-id_a63b0a-6e > .kt-row-column-wrap {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-@media (max-width: 480px) {
-  .kb-row-layout-id_a63b0a-6e > .kt-row-column-wrap {
-    grid-template-columns: 1fr !important;
-  }
-}
-
 /* ═══════════════════════════════════════════
    Home — section header decoration icon (rfid_blue.jpg)
    ───────────────────────────────────────────
@@ -345,64 +221,6 @@ figure.wp-block-image:has(img[src*="rfid_blue"]) {
   align-items: center;
 }
 
-/* Header row layouts (icon|heading at 1fr|2fr): tighten to a
-   centered [icon ⟶ heading] pair so the 48px accent sits next
-   to its title instead of floating in a 400px empty column. */
-.kb-row-layout-id_76dae6-de > .kt-row-column-wrap,
-.kb-row-layout-id_ae5786-81 > .kt-row-column-wrap,
-.kb-row-layout-id_33738b-52 > .kt-row-column-wrap {
-  grid-template-columns: auto auto !important;
-  justify-content: center !important;
-  align-items: center !important;
-  column-gap: 20px !important;
-  padding: 40px 0 16px !important;
-}
-.kb-row-layout-id_76dae6-de .kb-section-dir-horizontal > .kt-inside-inner-col,
-.kb-row-layout-id_ae5786-81 .kb-section-dir-horizontal > .kt-inside-inner-col,
-.kb-row-layout-id_33738b-52 .kb-section-dir-horizontal > .kt-inside-inner-col {
-  display: flex !important;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0 !important;
-}
-.kb-row-layout-id_76dae6-de h2.wp-block-heading,
-.kb-row-layout-id_ae5786-81 h2.wp-block-heading,
-.kb-row-layout-id_33738b-52 h2.wp-block-heading {
-  margin: 0;
-  font-size: clamp(var(--codex-text-xl-plus), 3vw, var(--codex-text-3xl));
-  letter-spacing: 0.02em;
-  line-height: 1.1;
-}
-
-/* ═══════════════════════════════════════════
-   Home — "Trusted by Clients Worldwide" + testimonials
-   ───────────────────────────────────────────
-   The wrapping column `kadence-column_1cf711-b4` has
-   `kb-section-dir-horizontal`, which places the heading AND
-   the 3-testimonial carousel on the same flex row. That
-   crushes the carousel to ~300px — cards become ~90px wide
-   and quote text wraps letter-by-letter. Force vertical stack
-   so the carousel can use the full row width, then turn the
-   carousel into a clean static 3-col grid (the snapshot's
-   Splide JS may or may not run; either way we look correct).
-   ═══════════════════════════════════════════ */
-.kadence-column_1cf711-b4.kb-section-dir-horizontal > .kt-inside-inner-col,
-.kadence-column_1cf711-b4 > .kt-inside-inner-col {
-  display: block !important;
-  width: 100%;
-}
-
-/* Section heading — center + airy spacing */
-.kadence-column_f9c71e-2f h3.wp-block-heading {
-  text-align: center;
-  font-family: var(--codex-font-heading, "Lora", Georgia, "Times New Roman", serif);
-  font-size: clamp(var(--codex-text-xl), 2.5vw, var(--codex-text-2xl));
-  font-weight: var(--codex-weight-semibold);
-  color: #141414;
-  margin: 0 auto 32px;
-  max-width: 720px;
-}
-
 /* Static 3-col grid of testimonials.
    `render-snapshot.ts` strips the `kt-blocks-carousel-init` class so
    Kadence's Splide JS never bootstraps this wrapper and the default
@@ -417,148 +235,6 @@ figure.wp-block-image:has(img[src*="rfid_blue"]) {
   padding: 0 !important;
   width: 100%;
 }
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonial-carousel-item {
-  display: block !important;
-  width: 100% !important;
-  min-width: 0;
-}
-
-/* Testimonial card polish */
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-item-wrap {
-  background: #ffffff !important;
-  border: 1px solid #e8e5dc !important;
-  border-radius: 12px !important;
-  padding: 32px 24px !important;
-  text-align: center;
-  min-height: auto !important;
-  max-width: 100% !important;
-  display: flex !important;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  height: 100%;
-  box-shadow: 0 1px 2px rgba(20, 20, 20, 0.04);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-item-wrap:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px -16px rgba(20, 20, 20, 0.22);
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-text-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-}
-
-/* Avatar — circular, 80×80 */
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-media-wrap,
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-media-inner-wrap,
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kadence-testimonial-image-intrisic {
-  width: 80px !important;
-  height: 80px !important;
-  flex: 0 0 80px;
-  margin: 0 auto 4px;
-  padding: 0 !important;
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-image {
-  width: 80px !important;
-  height: 80px !important;
-  border-radius: 50% !important;
-}
-
-/* Title */
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-title-wrap {
-  width: 100%;
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-title {
-  font-family: var(--codex-font-heading, "Lora", Georgia, serif);
-  font-size: var(--codex-text-base);
-  font-weight: var(--codex-weight-semibold);
-  margin: 4px 0 6px !important;
-  color: #141414;
-  text-align: center;
-  line-height: 1.3;
-}
-
-/* Quote body */
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-content-wrap {
-  width: 100%;
-  flex-grow: 1;
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-content {
-  font-size: var(--codex-text-sm-plus);
-  line-height: 1.6;
-  color: #4a4a4a;
-  text-align: center;
-  margin: 0;
-}
-
-/* Author name + location */
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-meta-wrap {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid #efece3;
-  width: 100%;
-  text-align: center;
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-name-wrap,
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-occupation-wrap {
-  text-align: center;
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-name {
-  font-family: var(--codex-font-heading, "Lora", Georgia, serif);
-  font-weight: var(--codex-weight-semibold);
-  color: #141414;
-  font-size: var(--codex-text-base);
-}
-.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-testimonial-occupation {
-  font-size: var(--codex-text-xs-plus);
-  color: #888;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* Responsive: 3 → 2 → 1 */
-@media (max-width: 900px) {
-  .kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonials-inner-wrap > div {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-@media (max-width: 600px) {
-  .kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonials-inner-wrap > div {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* ── WordPress Block Library (missing from static export) ── */
-.wp-block-cover {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 250px;
-}
-.wp-block-cover__background,
-.wp-block-cover__image-background,
-.wp-block-cover__video-background {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: var(--codex-z-base);
-}
-.wp-block-cover__background { z-index: var(--codex-z-base); }
-.wp-block-cover__inner-container {
-  position: relative;
-  z-index: var(--codex-z-raised);
-  width: 100%;
-  padding: 1em;
-}
-.wp-block-cover.is-light .wp-block-cover__inner-container { color: #000; }
 
 /* ── Kadence Testimonials / Splide Carousel fallback ── */
 .splide__track { overflow: visible !important; }
@@ -567,26 +243,6 @@ figure.wp-block-image:has(img[src*="rfid_blue"]) {
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 24px;
 }
-.splide__slide { min-width: 0 !important; width: auto !important; }
-.kt-testimonial-text-wrap { width: 100%; }
-
-/* ── WooCommerce Block Grid (missing from static export) ── */
-.wc-block-grid__products {
-  display: grid;
-  gap: 24px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.has-2-columns .wc-block-grid__products { grid-template-columns: repeat(2, 1fr); }
-.has-3-columns .wc-block-grid__products { grid-template-columns: repeat(3, 1fr); }
-.has-4-columns .wc-block-grid__products { grid-template-columns: repeat(4, 1fr); }
-.has-5-columns .wc-block-grid__products { grid-template-columns: repeat(5, 1fr); }
-@media (max-width: 767px) {
-  .wc-block-grid__products { grid-template-columns: repeat(2, 1fr) !important; }
-}
-.wc-block-grid__product { text-align: center; }
-.wc-block-grid__product-image img { width: 100%; height: auto; }
 
 /* CSS containment: editorial sections are independent paint/layout regions */
 .codex-editorial-section,
@@ -641,41 +297,6 @@ img {
 /* Ensure lazy-loaded images don't cause layout shift */
 img[loading="lazy"] {
   background: #f0eee9;
-}
-
-/* ═══════════════════════════════════════════
-   WordPress Gutenberg Cover Block
-   ═══════════════════════════════════════════ */
-
-.wp-block-cover {
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.wp-block-cover__background {
-  position: absolute;
-  inset: 0;
-  z-index: var(--codex-z-raised);
-}
-
-.wp-block-cover__video-background {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: var(--codex-z-base);
-}
-
-.wp-block-cover__inner-container {
-  position: relative;
-  z-index: var(--codex-z-surface);
-  width: 100%;
-  max-width: var(--global-content-width, 1200px);
-  padding: var(--codex-space-12) var(--codex-space-6);
 }
 
 /* ── Homepage hero bold treatment ── */
@@ -1593,190 +1214,8 @@ a[href="#main"]:focus {
   margin-top: var(--codex-space-2-plus);
 }
 
-/* ═══════════════════════════════════════════
-   Site Header & Navigation Fixes
-   ═══════════════════════════════════════════ */
-
-/* Fix: header overlapping page content when position:absolute */
-.site-header,
-.site-header .site-header-inner-wrap,
-.site-header .site-header-inner-wrap.item-is-fixed,
-.site-header .site-header-inner-wrap.kadence-sticky-header,
-.site-header .site-header-upper-wrap,
-.site-header .site-header-upper-inner-wrap,
-.site-header .site-header-row-container-inner {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: var(--codex-z-dropdown) !important;
-  background: rgba(255, 255, 255, 0.97) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 1px 4px rgba(41, 28, 14, 0.08);
-}
-/* Force consistent nav text color on all scroll states */
-.site-header .site-header-inner-wrap a,
-.site-header .site-header-inner-wrap.item-is-fixed a,
-.site-header .site-header-inner-wrap.kadence-sticky-header a,
-.site-header .main-navigation a,
-.site-header .header-navigation a {
-  color: var(--codex-dark, #2a1f14) !important;
-}
-.site-header .main-navigation a:hover,
-.site-header .header-navigation a:hover {
-  color: var(--codex-gold, #b08d57) !important;
-}
-
-/* ── Desktop: show full nav bar ── */
-@media (min-width: 769px) {
-  /* Hide the mobile header on desktop */
-  .site-mobile-header-wrap {
-    display: none !important;
-  }
-
-  /* Show the desktop header — undo Kadence fixed/sticky transforms */
-  .site-header-wrap {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  .site-header-inner-wrap,
-  .site-header-inner-wrap.item-is-fixed,
-  .site-header-inner-wrap.kadence-sticky-header {
-    position: relative !important;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    transform: none !important;
-    top: auto !important;
-  }
-
-  .site-header-upper-wrap,
-  .site-header-upper-inner-wrap {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  .site-top-header-wrap {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  .site-top-header-wrap .site-header-row-container-inner,
-  .site-top-header-wrap .site-container {
-    display: block !important;
-    width: 100% !important;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--codex-space-6);
-  }
-
-  /* Layout: logo left, nav center-right */
-  .site-top-header-inner-wrap.site-header-row {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 64px;
-    width: 100% !important;
-  }
-
-  .site-header-section {
-    display: flex !important;
-    align-items: center;
-    width: auto !important;
-    flex-shrink: 0;
-  }
-
-  /* Hide empty sections */
-  .site-header-section-left-center:empty,
-  .site-header-section-right-center:empty,
-  .site-header-section-center:empty,
-  .site-header-section:not(:has(*)) {
-    display: none !important;
-  }
-
-  /* Logo */
-  .site-branding .custom-logo {
-    max-height: 38px;
-    width: auto;
-  }
-
-  /* Navigation */
-  #site-navigation {
-    display: flex !important;
-  }
-
-  #site-navigation .primary-menu-container {
-    display: flex !important;
-  }
-
-  #primary-menu {
-    display: flex !important;
-    gap: var(--codex-space-0-5);
-    align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-
-  #primary-menu > li {
-    display: flex !important;
-    align-items: center;
-  }
-
-  #primary-menu > li > a {
-    display: inline-flex;
-    align-items: center;
-    padding: var(--codex-space-2) var(--codex-space-3-plus);
-    font-size: var(--codex-text-sm-plus);
-    font-weight: var(--codex-weight-medium);
-    letter-spacing: 0.01em;
-    color: var(--codex-dark);
-    text-decoration: none;
-    white-space: nowrap;
-    border-radius: var(--codex-radius-sm);
-    transition: color 160ms ease, background 160ms ease;
-  }
-
-  #primary-menu > li > a:hover,
-  #primary-menu > li.current-menu-item > a {
-    color: var(--codex-gold);
-    background: rgba(195, 154, 95, 0.06);
-  }
-
-  /* Dropdown toggle arrow */
-  #primary-menu .dropdown-nav-toggle {
-    display: none;
-  }
-
-  /* Sub-menus hidden for now */
-  #primary-menu .sub-menu {
-    display: none;
-  }
-}
-
 /* ── Mobile: keep hamburger layout ── */
 @media (max-width: 767px) {
-  .site-header-wrap {
-    display: none !important;
-  }
-
-  .site-mobile-header-wrap {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 56px;
-    padding: 0 var(--codex-space-4);
-  }
-
-  .site-mobile-header-wrap .site-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
 
   .mobile-site-branding .custom-logo {
     max-height: 30px;
@@ -1820,45 +1259,10 @@ a[href="#main"]:focus {
   opacity: 1 !important;
 }
 
-/* C2: Contact/archive hero text must be white on dark overlay */
-.entry-hero-layout-standard .hero-container .page-title,
-.entry-hero-layout-standard .hero-container .archive-title,
-.entry-hero-layout-standard .hero-container h1,
-.kt-row-has-bg h1.page-title,
-.kb-row-layout-wrap.kt-row-has-bg h1 {
-  color: #fff !important;
-}
-
 .entry-content > .kb-row-layout-wrap.kt-row-has-bg:first-child p {
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* H4: Hide hero breadcrumb on catalog pages (content area has its own) */
-.entry-hero .kadence-breadcrumbs {
-  display: none;
-}
-
-/* M5: Reduce contact hero dead space */
-.entry-hero.post-archive-hero-section {
-  min-height: auto !important;
-  padding-bottom: var(--codex-space-8) !important;
-}
-
-/* H5: Tighten footer layout, remove dead space */
-.site-footer .site-footer-bottom-section {
-  padding-top: var(--codex-space-6);
-  padding-bottom: var(--codex-space-6);
-}
-
-.site-footer .footer-widget-area .widget {
-  margin-bottom: var(--codex-space-3);
-}
-
-/* ═══════════════════════════════════════════
-   Navigation RFQ Links
-   ═══════════════════════════════════════════ */
-
-#site-navigation .codex-nav-rfq-link,
 #footer-navigation .codex-nav-rfq-link {
   display: inline-flex;
   align-items: center;
@@ -1875,9 +1279,7 @@ a[href="#main"]:focus {
   display: none !important;
 }
 
-#site-navigation .codex-nav-rfq-link:hover,
-#footer-navigation .codex-nav-rfq-link:hover,
-#site-navigation .current-menu-item > .codex-nav-rfq-link {
+#footer-navigation .codex-nav-rfq-link:hover {
   transform: translateY(-1px);
   background: var(--codex-gradient-gold-hover);
   color: var(--codex-dark) !important;
@@ -3890,22 +3292,6 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   display: none;
 }
 
-/* ═══════════════════════════════════════════
-   Contact Page Polish
-   ═══════════════════════════════════════════ */
-
-/* Collapse oversized hero on contact page */
-.entry-hero-container-inner .hero-section-overlay {
-  min-height: auto;
-  padding-top: var(--codex-space-6);
-  padding-bottom: var(--codex-space-6);
-}
-
-.entry-hero-container-inner .hero-section-overlay .entry-hero-container-inner {
-  padding-top: 0;
-  padding-bottom: 0;
-}
-
 /* (Interactive link styles consolidated above) */
 
 /* Jump-nav active state via scroll observer */
@@ -4140,47 +3526,6 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   }
 }
 
-/* WooCommerce block grid — replaces stripped wc-blocks stylesheet */
-.wc-block-grid__products {
-  display: grid;
-  gap: var(--codex-space-6);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.has-4-columns .wc-block-grid__products {
-  grid-template-columns: repeat(4, 1fr);
-}
-.has-3-columns .wc-block-grid__products {
-  grid-template-columns: repeat(3, 1fr);
-}
-.has-2-columns .wc-block-grid__products {
-  grid-template-columns: repeat(2, 1fr);
-}
-.wc-block-grid__product {
-  list-style: none;
-}
-.wc-block-grid__product img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-.wc-block-grid__product-title {
-  margin-top: var(--codex-space-2);
-  font-size: var(--codex-text-base);
-}
-@media (max-width: 767px) {
-  .has-4-columns .wc-block-grid__products {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 480px) {
-  .has-4-columns .wc-block-grid__products,
-  .has-3-columns .wc-block-grid__products {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* ═══════════════════════════════════════════
    Product Catalog Grid
    (Moved from catalog-pages.ts template literal
@@ -4398,9 +3743,6 @@ body.codex-catalog-rail-locked { overflow: hidden; }
 
 /* ── Desktop: show sub-menu on hover / focus-within ── */
 @media (min-width: 768px) {
-  #primary-menu > li.codex-mega-item {
-    position: relative;
-  }
 
   /* Override the blanket ".sub-menu { display: none }" for our items */
   #primary-menu > li.codex-mega-item > .codex-mega-dropdown {
@@ -4415,62 +3757,6 @@ body.codex-catalog-rail-locked { overflow: hidden; }
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 12px;
     box-shadow: 0 12px 40px rgba(41, 28, 14, 0.16);
-  }
-
-  /* Simple (single column) dropdown: Resources */
-  #primary-menu > li.codex-mega-item--simple > .codex-mega-dropdown {
-    left: 0;
-    min-width: 260px;
-    padding: var(--codex-space-2) 0;
-  }
-
-  /* Mega dropdown: Industries, Solutions */
-  #primary-menu > li.codex-mega-item--mega > .codex-mega-dropdown {
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(90vw, 760px);
-  }
-
-  #primary-menu > li.codex-mega-item--solutions > .codex-mega-dropdown {
-    width: min(94vw, 980px);
-  }
-
-  /* Products mega: 6 family columns → 3×2 grid by default, needs extra width. */
-  #primary-menu > li.codex-mega-item--products > .codex-mega-dropdown {
-    width: min(94vw, 880px);
-  }
-
-  /* Show on hover + focus-within */
-  #primary-menu > li.codex-mega-item:hover > .codex-mega-dropdown,
-  #primary-menu > li.codex-mega-item:focus-within > .codex-mega-dropdown {
-    display: block;
-  }
-
-  /* Dropdown arrow — override "display: none" from line 1377 */
-  #primary-menu > li.codex-mega-item .dropdown-nav-toggle {
-    display: inline-flex;
-    align-items: center;
-    margin-left: var(--codex-space-1);
-    transition: transform 160ms ease;
-  }
-  #primary-menu > li.codex-mega-item:hover .dropdown-nav-toggle {
-    transform: rotate(180deg);
-  }
-  #primary-menu > li.codex-mega-item .dropdown-nav-toggle .kadence-svg-icon {
-    width: 12px;
-    height: 12px;
-  }
-
-  /* ── Mega layout: groups as columns (only when open; default is display:none) ── */
-  #primary-menu > li.codex-mega-item--mega:hover > .codex-mega-dropdown,
-  #primary-menu > li.codex-mega-item--mega:focus-within > .codex-mega-dropdown {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--codex-space-5) var(--codex-space-8);
-  }
-  #primary-menu > li.codex-mega-item--solutions:hover > .codex-mega-dropdown,
-  #primary-menu > li.codex-mega-item--solutions:focus-within > .codex-mega-dropdown {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .codex-mega-group {
@@ -4526,15 +3812,6 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   }
   .codex-mega-item--simple .codex-mega-dropdown .codex-mega-list > li > a:hover {
     background: rgba(176, 141, 87, 0.08);
-  }
-}
-
-/* ── Narrower desktop: shrink solutions mega to 3 cols ── */
-@media (min-width: 768px) and (max-width: 1100px) {
-  #primary-menu > li.codex-mega-item--solutions:hover > .codex-mega-dropdown,
-  #primary-menu > li.codex-mega-item--solutions:focus-within > .codex-mega-dropdown {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    width: min(94vw, 820px);
   }
 }
 
