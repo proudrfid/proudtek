@@ -123,28 +123,28 @@
       "bullets": [
         "R700 on Octane IoT-DI (firmware 1.11+). The reader is configured via REST (POST /api/v1/profiles/inventory, GET /api/v1/status) and publishes tag events as JSON to an MQTT or Kafka endpoint. A typical cloud-native deployment: R700 → AWS IoT Core → Lambda → DynamoDB, with no middleware container. The R700 handles edge-filter (duplicate suppression, RSSI threshold, tag-dwell) on-reader before publishing.",
         "FX9600 on Zebra RFID SDK. The reader is configured programmatically from Java / C / .NET code via the SDK; the same SDK drives the RFD40 handheld sled. For an operations team already running Zebra TC-family mobile terminals this is zero added learning curve, and the support contract is already in place.",
-        "Both via LLRP — for vendor-neutral ingests and third-party middleware (Impinj ItemSense, Barco ClickShare-for-RFID, Tego, TagMatiks Cloud, custom LLRP integrations) both readers hand off identical LLRP streams. A middleware built for R700 runs against FX9600 with no code change and vice versa.",
+        "Both via LLRP: for vendor-neutral ingests and third-party middleware (Impinj ItemSense, Barco ClickShare-for-RFID, Tego, TagMatiks Cloud, custom LLRP integrations) both readers hand off identical LLRP streams. A middleware built for R700 runs against FX9600 with no code change and vice versa.",
         "On-reader custom logic. R700 runs container-style IoT apps (Python + limited ML inference on the Cortex-A9); FX9600 runs Java applications (full JVM on-reader). Both let you deploy edge-filter, duplicate-suppression, aggregation and tag-dwell logic on the reader itself. For projects that need real-time ML (anomaly detection, pattern recognition) the R700's more modern compute is the better target; for traditional business-rule filtering either works.",
-        "Python ecosystem — sllurp (LLRP), Impinj OctaneSDK (Python bindings), paho-mqtt for R700 MQTT streams. Zebra does not ship an official Python SDK but sllurp works against FX9600 LLRP identically to R700 LLRP."
+        "Python ecosystem: sllurp (LLRP), Impinj OctaneSDK (Python bindings), paho-mqtt for R700 MQTT streams. Zebra does not ship an official Python SDK but sllurp works against FX9600 LLRP identically to R700 LLRP."
       ]
     },
     {
       "title": "Performance and RF behaviour in practice",
       "bullets": [
-        "Raw read rate — both readers inventory 700-1,200 tags per second in free space at +33 dBm EIRP with Miller-4 and dense-reader mode off. In real dock-door environments with metal and liquid present the effective rate drops to 200-500 tags/s. Differences between R700 and FX9600 are typically <10% and within the variance of antenna placement.",
+        "Raw read rate: both readers inventory 700-1,200 tags per second in free space at +33 dBm EIRP with Miller-4 and dense-reader mode off. In real dock-door environments with metal and liquid present the effective rate drops to 200-500 tags/s. Differences between R700 and FX9600 are typically <10% and within the variance of antenna placement.",
         "Free-space read range. Both readers deliver 8-15 m on a modern Impinj M700 / M800 or UCODE 9 tag with a 9 dBi circularly polarised antenna at +33 dBm. Real-world range in a warehouse is 3-8 m because of multi-path, metal racking and tag-orientation variance. No meaningful range advantage between R700 and FX9600.",
-        "Dense-reader mode — both implement EPC Gen2 dense-reader mode (DRM) with Miller-8 encoding to prevent mutual interference between readers. For a >6-reader array in a single RF zone verify that the LLRP dense-reader parameters are tuned on both. Most default profiles are Miller-4 and will cross-talk.",
-        "Antenna compatibility — the FX9600 has a slightly larger certified-antenna catalogue (Zebra AN520, AN610, AN620, plus third-party Times-7, Laird, MTI). The R700 certified catalogue is smaller but covers the standard Times-7 A5010 / A6034 and Laird S9028 that dominate most deployments.",
-        "Latency — time from tag-in-field to tag-event-published: ~15-30 ms on R700 via MQTT; ~20-40 ms on FX9600 via Zebra RFID SDK. Both are well under the 100 ms budget of most real-time deployments."
+        "Dense-reader mode: both implement EPC Gen2 dense-reader mode (DRM) with Miller-8 encoding to prevent mutual interference between readers. For a >6-reader array in a single RF zone verify that the LLRP dense-reader parameters are tuned on both. Most default profiles are Miller-4 and will cross-talk.",
+        "Antenna compatibility: the FX9600 has a slightly larger certified-antenna catalogue (Zebra AN520, AN610, AN620, plus third-party Times-7, Laird, MTI). The R700 certified catalogue is smaller but covers the standard Times-7 A5010 / A6034 and Laird S9028 that dominate most deployments.",
+        "Latency: time from tag-in-field to tag-event-published: ~15-30 ms on R700 via MQTT; ~20-40 ms on FX9600 via Zebra RFID SDK. Both are well under the 100 ms budget of most real-time deployments."
       ]
     },
     {
       "title": "Operational, support and lifecycle considerations",
       "bullets": [
-        "Firmware support — Impinj typically supports a reader family for 7-8 years after launch; R700 firmware support runs through at least 2028. Zebra's FX9600 was launched 2016 and is still receiving regulatory-compliance firmware updates through 2026 — the FX9600 is late-lifecycle but not end-of-life. For a new deployment expected to run 7-10 years, the R700 has a longer runway.",
-        "Support contracts — Impinj Gold Support and Zebra OneCare are comparably priced (USD 180-300/year per reader for enterprise-tier) and both include firmware updates, phone / web support, and advance-replacement. For multi-site deployments the more common complaint is response-time SLA during firmware regressions; both vendors have occasionally missed their SLA on regression-class issues.",
+        "Firmware support: Impinj typically supports a reader family for 7-8 years after launch; R700 firmware support runs through at least 2028. Zebra's FX9600 was launched 2016 and is still receiving regulatory-compliance firmware updates through 2026 — the FX9600 is late-lifecycle but not end-of-life. For a new deployment expected to run 7-10 years, the R700 has a longer runway.",
+        "Support contracts: Impinj Gold Support and Zebra OneCare are comparably priced (USD 180-300/year per reader for enterprise-tier) and both include firmware updates, phone / web support, and advance-replacement. For multi-site deployments the more common complaint is response-time SLA during firmware regressions; both vendors have occasionally missed their SLA on regression-class issues.",
         "Installed base and talent pool. The FX9600 has a 10-year installed base with a large pool of integrators who know its quirks, on-reader Java app architecture and LLRP dialect. The R700 is 2-3 years younger and has a smaller (but growing rapidly) pool of integrators. For a team hiring from scratch this rarely matters; for a team inheriting an existing integrator relationship the existing skill set is decisive.",
-        "Price sensitivity — at 10-reader scale the per-unit price delta is ~USD 100-200 in FX9600's favor. At 100-reader scale this is USD 10K-20K. Often swamped by differences in site-survey labor, antenna count, PoE switch budget and integration cost, but at very large deployment scales it's a real consideration.",
+        "Price sensitivity: at 10-reader scale the per-unit price delta is ~USD 100-200 in FX9600's favor. At 100-reader scale this is USD 10K-20K. Often swamped by differences in site-survey labor, antenna count, PoE switch budget and integration cost, but at very large deployment scales it's a real consideration.",
         "Accessory and spare-parts ecosystem. Zebra's accessory catalogue (mounts, cables, enclosures, spare Ethernet jacks) is deeper because of the 10-year installed base. Impinj's is narrower but sufficient for the vast majority of deployments. For unusual mechanical-mount requirements FX9600 is the safer pick."
       ]
     },
@@ -241,7 +241,7 @@
     },
     {
       "question": "Is the FX9600 being end-of-lifed soon?",
-      "answer": "Not announced as of Q2 2026. Zebra continues to ship firmware updates and the FX9600 remains in active production. The successor — a next-generation fixed reader in Zebra's roadmap — has been teased at industry events but no product launch date is public. If a deployment is being specified today with a 7-10 year horizon, check with Zebra for their current end-of-sale and end-of-support commitments before closing the spec; for a 3-5 year horizon FX9600 is fine."
+      "answer": "Not announced as of Q2 2026. Zebra continues to ship firmware updates and the FX9600 remains in active production. The successor (a next-generation fixed reader in Zebra's roadmap) has been teased at industry events but no product launch date is public. If a deployment is being specified today with a 7-10 year horizon, check with Zebra for their current end-of-sale and end-of-support commitments before closing the spec; for a 3-5 year horizon FX9600 is fine."
     },
     {
       "question": "How do I pilot both side-by-side before deciding?",
@@ -305,7 +305,7 @@
       "url": "https://www.etsi.org/deliver/etsi_en/302200_302299/302208/",
       "publisher": "European Telecommunications Standards Institute (ETSI)",
       "accessedAt": "2026-04-20",
-      "note": "European harmonized standard — cited for the ETSI-tuned R700 / FX9600 regional firmware variants."
+      "note": "European harmonized standard: cited for the ETSI-tuned R700 / FX9600 regional firmware variants."
     }
   ],
   "primaryAction": {

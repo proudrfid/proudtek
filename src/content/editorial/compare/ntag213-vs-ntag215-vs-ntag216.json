@@ -114,42 +114,42 @@
     {
       "title": "The three chips at a glance",
       "bullets": [
-        "NTAG213 (NT2H13) — the volume chip. 144 bytes of user memory is enough for a single URI NDEF record plus ~70-100 bytes of overhead for NDEF formatting, a short campaign tag, or a NTAG Data Protection password. Shipped by the hundreds of millions annually. This is the default for tap-to-link campaigns, NFC review cards, NFC business cards with a single landing URL, and anti-counterfeit labels using a short serialized URL.",
-        "NTAG215 (NT2H15) — the Amiibo chip. 504 bytes made famous by Nintendo's toys-to-life platform (Amiibo figures use NTAG215 exclusively for the game-state payload). In commercial NFC deployments it's the pick when a single tag holds multiple NDEF records — typically a URI + a vCard + a custom MIME record — or when the tag stores a moderate-length text payload in addition to a URL.",
-        "NTAG216 (NT2H16) — the large-payload chip. 888 bytes for applications where the tag is itself the storage medium rather than just a redirect: NFC-delivered configuration files, small encrypted blobs, multi-field passes and loyalty credentials stored locally, IoT commissioning tags, museum exhibit tags with multi-paragraph content. NTAG216 is over-spec for tap-to-URL.",
-        "Shared hardware features — all three implement the 7-byte UID, Fast Read (0x3A, read multiple pages in one command, cutting phone-tap latency ~30-40%), Originality Signature (ECDSA-based chip-authenticity proof readable via READ_SIG 0x3C), 32-bit password protection with 16-bit PACK acknowledgement, and optional access-counter feature.",
-        "Air interface — ISO 14443-A Parts 1-3 and NFC Forum Type 2 Tag Technical Specification. The chips are readable by every NFC phone shipped since ~2014 and by all commodity NFC reader modules (PN532, PN533, MFRC522 with NFC firmware). Does not implement ISO 14443-4 (T=CL).",
+        "NTAG213 (NT2H13): the volume chip. 144 bytes of user memory is enough for a single URI NDEF record plus ~70-100 bytes of overhead for NDEF formatting, a short campaign tag, or a NTAG Data Protection password. Shipped by the hundreds of millions annually. This is the default for tap-to-link campaigns, NFC review cards, NFC business cards with a single landing URL, and anti-counterfeit labels using a short serialized URL.",
+        "NTAG215 (NT2H15): the Amiibo chip. 504 bytes made famous by Nintendo's toys-to-life platform (Amiibo figures use NTAG215 exclusively for the game-state payload). In commercial NFC deployments it's the pick when a single tag holds multiple NDEF records (typically a URI + a vCard + a custom MIME record) or when the tag stores a moderate-length text payload in addition to a URL.",
+        "NTAG216 (NT2H16): the large-payload chip. 888 bytes for applications where the tag is itself the storage medium rather than just a redirect: NFC-delivered configuration files, small encrypted blobs, multi-field passes and loyalty credentials stored locally, IoT commissioning tags, museum exhibit tags with multi-paragraph content. NTAG216 is over-spec for tap-to-URL.",
+        "Shared hardware features: all three implement the 7-byte UID, Fast Read (0x3A, read multiple pages in one command, cutting phone-tap latency ~30-40%), Originality Signature (ECDSA-based chip-authenticity proof readable via READ_SIG 0x3C), 32-bit password protection with 16-bit PACK acknowledgement, and optional access-counter feature.",
+        "Air interface: ISO 14443-A Parts 1-3 and NFC Forum Type 2 Tag Technical Specification. The chips are readable by every NFC phone shipped since ~2014 and by all commodity NFC reader modules (PN532, PN533, MFRC522 with NFC firmware). Does not implement ISO 14443-4 (T=CL).",
         "For the complete memory map, command set, and Fast Read / Password / SUN command-level details, see the dedicated `/guides/ntag21x-family-memory-map-commands/` reference."
       ]
     },
     {
       "title": "How to size the NDEF payload against the chip",
       "bullets": [
-        "Rule of thumb — a 30-character shortened URL in an NDEF URI record occupies about 40 bytes including the NDEF TLV wrapper. A 60-character unshortened URL occupies about 70 bytes. A single-entry NDEF message with one URI record fits comfortably in NTAG213.",
-        "Multi-record NDEF — two URIs + one Text record runs about 120-180 bytes, which can fit NTAG213 but leaves no headroom. This is the common 'should I go NTAG215' scenario. Yes, if you want any growth margin.",
-        "vCard contact exchange — a basic vCard (name, email, phone, title, organization) is typically 150-250 bytes. NTAG213 fits a minimal vCard but not one with address, photo, or notes. NTAG215 handles full-featured vCards with extra headroom.",
+        "Rule of thumb: a 30-character shortened URL in an NDEF URI record occupies about 40 bytes including the NDEF TLV wrapper. A 60-character unshortened URL occupies about 70 bytes. A single-entry NDEF message with one URI record fits comfortably in NTAG213.",
+        "Multi-record NDEF: two URIs + one Text record runs about 120-180 bytes, which can fit NTAG213 but leaves no headroom. This is the common 'should I go NTAG215' scenario. Yes, if you want any growth margin.",
+        "vCard contact exchange: a basic vCard (name, email, phone, title, organization) is typically 150-250 bytes. NTAG213 fits a minimal vCard but not one with address, photo, or notes. NTAG215 handles full-featured vCards with extra headroom.",
         "Amiibo-style application data. Nintendo Amiibo uses the full 504 bytes of NTAG215 for game state, character data, and training attributes. If your use case resembles 'the chip IS the data, not a pointer to it'. NTAG215 or NTAG216 are correct; NTAG213 is not.",
-        "Campaign + UID serialization — if the campaign encodes a per-tag unique URL (e.g., 'https://yourbrand.link/p/7fa2b9c8...'), the URL typically grows to 50-80 bytes depending on the encoding scheme. This still fits NTAG213 but with less headroom for future URL-length increases.",
+        "Campaign + UID serialization: if the campaign encodes a per-tag unique URL (e.g., 'https://yourbrand.link/p/7fa2b9c8...'), the URL typically grows to 50-80 bytes depending on the encoding scheme. This still fits NTAG213 but with less headroom for future URL-length increases.",
         "Anti-counterfeit SUN (Secure Unique NFC) applications. SUN is specifically an NTAG424 DNA feature, not NTAG21x. If your brand-protection plan uses SUN, pick NTAG424 DNA; NTAG21x cannot cryptographically generate per-read dynamic URLs."
       ]
     },
     {
       "title": "Read performance and Fast Read",
       "bullets": [
-        "NFC tap latency — the phone-side user experience latency is dominated by (1) antenna coupling + session setup (~80 ms), (2) NDEF parse + app-launch (~60-100 ms), and (3) memory read. Memory read for a 40-byte URI NDEF takes ~8 ms on NTAG213 using Fast Read, ~15 ms without Fast Read. Differences between NTAG213 and NTAG216 on the memory-read step are negligible for short payloads (all <30 ms).",
+        "NFC tap latency: the phone-side user experience latency is dominated by (1) antenna coupling + session setup (~80 ms), (2) NDEF parse + app-launch (~60-100 ms), and (3) memory read. Memory read for a 40-byte URI NDEF takes ~8 ms on NTAG213 using Fast Read, ~15 ms without Fast Read. Differences between NTAG213 and NTAG216 on the memory-read step are negligible for short payloads (all <30 ms).",
         "Fast Read command (0x3A). Reads multiple pages in a single reader transaction rather than one page per command. Every NTAG21x chip supports it. Phone-side NFC stacks (iOS and Android) exercise it automatically where supported; no application-level change required.",
         "Bulk read of full NTAG216 memory — about 60-80 ms for all 888 bytes using Fast Read on a typical NFC reader module. This matters for applications that read the full chip contents on tap (config file delivery, loyalty-card stack read); for simple URL-delivery applications the read is always <15 ms regardless of chip size.",
-        "Phone tap UX — iPhone shows the URL-launch notification within ~250-400 ms of tap across all three chips. Android typically launches 150-300 ms. This is primarily driven by the phone's NFC stack latency, not by chip size.",
-        "Write performance — typical NDEF write of a 40-byte URI record takes ~50-80 ms end-to-end (command + EEPROM write + ACK). Bulk writes on NTAG216 for 500-byte payloads take ~400-600 ms. For kiosk-style tag-issuance workflows the NTAG216 write time is noticeable; plan kiosk throughput accordingly."
+        "Phone tap UX: iPhone shows the URL-launch notification within ~250-400 ms of tap across all three chips. Android typically launches 150-300 ms. This is primarily driven by the phone's NFC stack latency, not by chip size.",
+        "Write performance: typical NDEF write of a 40-byte URI record takes ~50-80 ms end-to-end (command + EEPROM write + ACK). Bulk writes on NTAG216 for 500-byte payloads take ~400-600 ms. For kiosk-style tag-issuance workflows the NTAG216 write time is noticeable; plan kiosk throughput accordingly."
       ]
     },
     {
       "title": "Security features and anti-counterfeit",
       "bullets": [
-        "Password + PACK — all three NTAG chips support 32-bit PASSWORD + 16-bit PACK (Password Acknowledge). A configurable page-range can be made password-protected. After authentication the reader can read or write the protected pages; without the password the pages are locked against reads and/or writes depending on configuration.",
+        "Password + PACK: all three NTAG chips support 32-bit PASSWORD + 16-bit PACK (Password Acknowledge). A configurable page-range can be made password-protected. After authentication the reader can read or write the protected pages; without the password the pages are locked against reads and/or writes depending on configuration.",
         "Originality Signature — 32-byte ECDSA signature over the UID, signed by an NXP-private key at manufacture. Readers verify it against the NXP-published public key to confirm genuine NXP silicon. Available via READ_SIG (0x3C) command. This is the industry-standard anti-counterfeit method for NTAG21x.",
         "One-way access counter. Optional 24-bit monotonic counter that increments on every read. Useful for tap-count analytics (how many times this NFC business card has been tapped) and as a weak anti-replay mechanism. Not a cryptographic feature. The counter value is observable by any reader.",
-        "Limitations — NTAG21x does NOT support AES authentication, CMAC, or dynamic URL generation (SUN). For those features use NTAG424 DNA. The NTAG21x password is a shared-secret per batch; leakage compromises the protection for the entire batch.",
+        "Limitations: NTAG21x does NOT support AES authentication, CMAC, or dynamic URL generation (SUN). For those features use NTAG424 DNA. The NTAG21x password is a shared-secret per batch; leakage compromises the protection for the entire batch.",
         "For anti-counterfeit with dynamic verification requirements. Pair NTAG21x with a server-side verification flow (UID whitelist + tap-count check + origin-signature verify) rather than relying on the chip alone. For higher assurance move to NTAG424 DNA with SUN-based cryptographic tap verification; see `/guides/ntag424-dna-sun-cmac-authentication/`."
       ]
     },
@@ -161,7 +161,7 @@
         "Amiibo-style toys-to-life. NTAG215 is mandated by Nintendo's platform. Non-Nintendo toys-to-life or collectible systems have the same size-of-payload motivation.",
         "IoT commissioning and configuration delivery. NTAG216 when the commissioning payload includes credentials, server URLs, and initial-state data that won't fit the smaller chips. For long-lived IoT field credentials requiring crypto renewal, NTAG424 DNA or DESFire is more appropriate.",
         "Museum and exhibit tags. NTAG213 for tap-to-audio-guide with a short URL; NTAG215 / NTAG216 when the exhibit tag stores richer metadata (artist bio summary, acquisition date, related-exhibits list).",
-        "Anti-counterfeit labels — for open-loop ('consumer can verify authenticity via tap') pick NTAG213 with Originality Signature + serialized URL, verify server-side. For higher-assurance requirements pick NTAG424 DNA with SUN.",
+        "Anti-counterfeit labels: for open-loop ('consumer can verify authenticity via tap') pick NTAG213 with Originality Signature + serialized URL, verify server-side. For higher-assurance requirements pick NTAG424 DNA with SUN.",
         "Medical wearables, patient ID, healthcare wristbands. NTAG213 or NTAG215 depending on how much patient metadata is stored locally vs in the HIS. For HIPAA-bounded deployments the metadata usually stays server-side and NTAG213 is enough.",
         "Where NTAG21x is NOT the right choice. Access control requiring AES (use Plus / DESFire), long-range supply chain (use UHF UCODE 9 / Monza R6), library or laundry tag deployments (use ICODE SLIX), secure stored-value wallets (use DESFire EV3)."
       ]
@@ -277,11 +277,11 @@
     },
     {
       "question": "What happens if I need dynamic URLs for anti-counterfeit. Can NTAG21x do that?",
-      "answer": "Not on its own. NTAG21x supports static URL + optional tap counter, which some brands use as a weak anti-counterfeit signal. For true per-tap dynamic URL generation (the SUN — Secure Unique NFC — format), the chip needs to compute a per-read CMAC over an incrementing counter. That's an NTAG424 DNA feature, not NTAG21x. If your anti-counterfeit threat model requires verifiable-per-read URLs, specify NTAG424 DNA."
+      "answer": "Not on its own. NTAG21x supports static URL + optional tap counter, which some brands use as a weak anti-counterfeit signal. For true per-tap dynamic URL generation (the SUN (Secure Unique NFC) format), the chip needs to compute a per-read CMAC over an incrementing counter. That's an NTAG424 DNA feature, not NTAG21x. If your anti-counterfeit threat model requires verifiable-per-read URLs, specify NTAG424 DNA."
     },
     {
       "question": "Can I upgrade a deployed NTAG213 fleet to NTAG215 in the field?",
-      "answer": "No — the chip is fixed at manufacture. 'Upgrade' in this context means reissuing cards on the new chip to the users. If your campaign finds it has outgrown NTAG213, the options are (a) compress the payload via URL shortener and stay on NTAG213, (b) reissue on NTAG215 at next campaign-refresh cycle, or (c) move the data server-side and keep the tag as a short-URL pointer. Option (a) or (c) is usually cheaper."
+      "answer": "No: the chip is fixed at manufacture. 'Upgrade' in this context means reissuing cards on the new chip to the users. If your campaign finds it has outgrown NTAG213, the options are (a) compress the payload via URL shortener and stay on NTAG213, (b) reissue on NTAG215 at next campaign-refresh cycle, or (c) move the data server-side and keep the tag as a short-URL pointer. Option (a) or (c) is usually cheaper."
     }
   ],
   "sources": [

@@ -31,7 +31,7 @@
         "VingCard lock model (Classic, Essence, Signature RFID, Allure, Signature PMS) or a current guest card sample.",
         "Visionline server version and encoder model. Desktop Encoder, Encoder 1100 or Messenger/RF-Net bridge reference.",
         "Chip-family preference — Classic 1K, Plus or DESFire EV2/EV3 — and whether magstripe is still in active issuance.",
-        "Mobile key scope — BLE-only, BLE + NFC (Apple/Google wallet) or card-only — to align the card and credential path."
+        "Mobile key scope (BLE-only, BLE + NFC (Apple/Google wallet) or card-only) to align the card and credential path."
       ]
     },
     {
@@ -72,7 +72,7 @@
   "sections": [
     {
       "title": "VingCard lock generations and their native credentials",
-      "intro": "VingCard — part of ASSA ABLOY Global Solutions — has refreshed its hospitality lock line roughly every four to five years since 2001. The generation on the door dictates which chip family the lock accepts natively and which requires a firmware uplift or a dual-chip card during migration.",
+      "intro": "VingCard (part of ASSA ABLOY Global Solutions) has refreshed its hospitality lock line roughly every four to five years since 2001. The generation on the door dictates which chip family the lock accepts natively and which requires a firmware uplift or a dual-chip card during migration.",
       "paragraphs": [
         "Unlike Saflok, VingCard moved to 13.56 MHz HF RFID relatively early, which means most VingCard estates in active use are RFID-native and not magstripe-only. However, the chip family within that 13.56 MHz envelope varies. Early RFID locks were MIFARE Classic 1K only, while the Signature RFID and Allure generations added DESFire and BLE mobile key.",
         "The table below maps the VingCard generations most commonly found in B2B sample requests to their native credential technology and the encoder configuration that usually ships with them."
@@ -140,10 +140,10 @@
       "title": "Chip families and what VingCard readers actually accept",
       "intro": "VingCard's HF readers are wide-envelope devices that can authenticate several chip families, but the Visionline server configuration and the lock firmware together decide which ones are issued and trusted in production.",
       "bullets": [
-        "MIFARE Classic 1K — the broadest compatibility envelope across VingCard RFID generations. Works on Essence, Signature RFID, Allure and — in fallback mode — Signature PMS. VingCard typically reserves sectors 1–3 for access data, with sector 0 kept as manufacturer block.",
+        "MIFARE Classic 1K — the broadest compatibility envelope across VingCard RFID generations. Works on Essence, Signature RFID, Allure and (in fallback mode) Signature PMS. VingCard typically reserves sectors 1–3 for access data, with sector 0 kept as manufacturer block.",
         "MIFARE Plus (SE / S / X). Accepted by Signature RFID and Allure in SL1 mode on firmware lines from roughly 2015 onwards; SL3 AES-128 is supported on Signature PMS and Novel generations. Most estates deploy Plus only as a transitional step, not as a long-term target.",
         "MIFARE DESFire EV1/EV2/EV3 — native on Signature PMS, Novel and recent Allure firmware. EV1 is being phased out in favour of EV2/EV3 for the AES-128 originality checks and larger key space.",
-        "Magstripe — still supported on some Allure and Signature RFID dual-interface locks; used as a fallback during long migration windows or in mixed estates.",
+        "Magstripe: still supported on some Allure and Signature RFID dual-interface locks; used as a fallback during long migration windows or in mixed estates.",
         "BLE mobile key (Entra SDK). Not a card chip but an app-based credential; binds to the same Visionline reservation. Requires an internet-connected guest device and a Mobile Access-certified lock firmware.",
         "NFC wallet credentials (Apple Wallet, Google Wallet). Emulated DESFire-class credentials presented by a phone to the lock reader; Signature PMS and Novel firmware required."
       ]
@@ -153,22 +153,22 @@
       "intro": "Visionline is the VingCard platform that glues the PMS to the encoder and the lock estate. Card compatibility is never purely about the chip. It is also about whether Visionline is configured to issue that chip in that property.",
       "bullets": [
         "Visionline runs on-premise or in ASSA ABLOY's hosted cloud. Both share the same encoder drivers and card template structure, so a card SKU that works on one deployment type works on the other.",
-        "Desktop Encoder — the most common front-desk unit; USB-attached, PC/SC-class, supports Classic, Plus and DESFire encoding subject to Visionline build.",
+        "Desktop Encoder: the most common front-desk unit; USB-attached, PC/SC-class, supports Classic, Plus and DESFire encoding subject to Visionline build.",
         "Encoder 1100 — current VingCard desktop encoder with broader chip support and firmware-upgradeable modules; recommended for DESFire EV2/EV3 rollouts.",
-        "Messenger / RF-Net — the VingCard online-lock bridge that pushes key updates to locks over an RF mesh; relevant when the estate uses remote key revocation or real-time audit trails.",
-        "Entra SDK — the mobile-key software bridge that lets a hospitality app issue a BLE key from the same Visionline reservation that issues a physical card.",
-        "Firmware-version dependency — DESFire encoding on older Visionline builds was limited to EV1; EV2/EV3 support and AES-128 session keys require a recent Visionline build. Always confirm the Visionline version before ordering DESFire stock."
+        "Messenger / RF-Net: the VingCard online-lock bridge that pushes key updates to locks over an RF mesh; relevant when the estate uses remote key revocation or real-time audit trails.",
+        "Entra SDK: the mobile-key software bridge that lets a hospitality app issue a BLE key from the same Visionline reservation that issues a physical card.",
+        "Firmware-version dependency: DESFire encoding on older Visionline builds was limited to EV1; EV2/EV3 support and AES-128 session keys require a recent Visionline build. Always confirm the Visionline version before ordering DESFire stock."
       ]
     },
     {
       "title": "PMS integration and the Visionline interface",
       "intro": "Visionline sits between the PMS and the encoder. PMS integration is usually a driver-layer question. The card chip does not need to know which PMS is in use, but the driver version determines what it will encode.",
       "bullets": [
-        "Oracle OPERA — the most common VingCard PMS pairing; OPERA 5 and OPERA Cloud both certified against the VingCard Visionline interface.",
-        "Mews — integrated via Mews Connector to Visionline; supports batch encoding for group arrivals where Visionline build and encoder firmware permit.",
+        "Oracle OPERA: the most common VingCard PMS pairing; OPERA 5 and OPERA Cloud both certified against the VingCard Visionline interface.",
+        "Mews: integrated via Mews Connector to Visionline; supports batch encoding for group arrivals where Visionline build and encoder firmware permit.",
         "Protel, Agilysys LMS / rGuest, Hotelogix, Cloudbeds and a long tail of regional PMS platforms have Visionline-certified interfaces. The limiting factor is usually the VingCard-side driver revision rather than the PMS.",
         "Cloud PMS platforms typically require a local Visionline agent on the front-desk PC that bridges the cloud PMS to the USB encoder hardware.",
-        "Batch encoding — Visionline supports batch encoding for group check-ins, which matters for conference hotels and cruise-line check-in scenarios; encoder throughput is typically 1.5–3 seconds per card including the Visionline round-trip."
+        "Batch encoding: Visionline supports batch encoding for group check-ins, which matters for conference hotels and cruise-line check-in scenarios; encoder throughput is typically 1.5–3 seconds per card including the Visionline round-trip."
       ]
     },
     {
@@ -176,10 +176,10 @@
       "intro": "VingCard's Mobile Access layer coexists with physical cards, rather than replacing them. A well-designed compatibility plan accounts for guests who opt out of mobile key, lose phone access or arrive as a group that cannot be individually enrolled.",
       "bullets": [
         "Mobile Access issues a BLE key from Visionline that the guest's hospitality app presents to the lock. The same reservation can also issue a physical card for the primary and any additional guests.",
-        "Entra SDK — the developer-facing SDK that lets a hospitality group embed Mobile Access into its own branded app instead of using the default VingCard app.",
-        "NFC wallet — Apple Wallet and Google Wallet hotel keys are supported on Signature PMS and Novel generations with a Mobile Access-certified firmware; the lock reader must be NFC-capable (not all Allure reader modules are).",
-        "BLE range tuning — a BLE lock key typically unlocks from 30–60 cm; range above 1 m is deliberately suppressed to avoid walking-past false unlocks.",
-        "Fallback card — properties typically keep at least 2–3 physical cards per room in issue stock for guests without a compatible phone, lost-phone recovery and staff access."
+        "Entra SDK: the developer-facing SDK that lets a hospitality group embed Mobile Access into its own branded app instead of using the default VingCard app.",
+        "NFC wallet: Apple Wallet and Google Wallet hotel keys are supported on Signature PMS and Novel generations with a Mobile Access-certified firmware; the lock reader must be NFC-capable (not all Allure reader modules are).",
+        "BLE range tuning: a BLE lock key typically unlocks from 30–60 cm; range above 1 m is deliberately suppressed to avoid walking-past false unlocks.",
+        "Fallback card: properties typically keep at least 2–3 physical cards per room in issue stock for guests without a compatible phone, lost-phone recovery and staff access."
       ]
     },
     {
@@ -187,8 +187,8 @@
       "intro": "VingCard HF readers are tuned for standard ID-1 card stock but the tolerance window is narrower than Saflok. Premium materials should be pilot-validated on the specific lock firmware before a production order.",
       "bullets": [
         "Standard ISO/IEC 7810 ID-1 thickness (0.76 mm ± 0.08 mm) is the safe default for all VingCard lock generations.",
-        "Thicker cards (1.0–1.2 mm) — common for premium PVC, bamboo or wood cards — work reliably on Allure and Signature PMS but can be marginal on early Essence readers.",
-        "Bamboo and wood — acceptable on Allure and newer when the embedded inlay is DESFire EV2/EV3; pilot a production-thickness sample before full rollout.",
+        "Thicker cards (1.0–1.2 mm) (common for premium PVC, bamboo or wood cards) work reliably on Allure and Signature PMS but can be marginal on early Essence readers.",
+        "Bamboo and wood: acceptable on Allure and newer when the embedded inlay is DESFire EV2/EV3; pilot a production-thickness sample before full rollout.",
         "Transparent or frosted PVC. Supported but loses the primary printed branding surface; usually issued as a secondary or staff card rather than primary guest card.",
         "Anti-metal / metal-edge cards. Not recommended; the shielding or metal layer detunes the HF antenna and produces intermittent reads on Essence and Allure generations.",
         "Dual-interface (magstripe + RFID). Adds roughly 0.05 mm to the card stack; within ISO tolerance but should be validated on the target firmware before scaling."
@@ -198,7 +198,7 @@
       "title": "What to validate before scaling a VingCard order",
       "intro": "Most VingCard pilots that get scaled too early run into one of three issues: encoder firmware mismatch, chip-family drift between lock generations, or Mobile Access flow regressions after a Visionline upgrade. A disciplined pilot surfaces all three.",
       "bullets": [
-        "Run a full reservation cycle — issue, extend, replace, cancel — on at least one live PMS reservation per lock generation in scope.",
+        "Run a full reservation cycle (issue, extend, replace, cancel) on at least one live PMS reservation per lock generation in scope.",
         "Exercise the Mobile Access flow on the same reservation if the property plans to issue BLE keys; a card-only pilot will miss the BLE regressions that Visionline upgrades most often introduce.",
         "Log Visionline build, encoder firmware and lock firmware for every tested door and keep the log on file. ASSA ABLOY support will ask for all three when a field issue is reported.",
         "Pilot a 100–200 card first production batch before scaling to the full property; most field failures appear in the first 30 days of live issuance.",
@@ -303,7 +303,7 @@
     },
     {
       "question": "Can a single DESFire EV3 card serve an estate that still has Essence doors?",
-      "answer": "Not cleanly. Essence readers are Classic-native and do not read DESFire in production use. The three practical options are: a Classic-only SKU that covers both Essence and Signature PMS, a dual-chip card (rare), or staging the rollout — Essence rooms on Classic, Signature PMS rooms on DESFire — during the migration window."
+      "answer": "Not cleanly. Essence readers are Classic-native and do not read DESFire in production use. The three practical options are: a Classic-only SKU that covers both Essence and Signature PMS, a dual-chip card (rare), or staging the rollout (Essence rooms on Classic, Signature PMS rooms on DESFire) during the migration window."
     },
     {
       "question": "Does VingCard Mobile Access replace physical cards?",
