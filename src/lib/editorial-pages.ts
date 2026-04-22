@@ -587,20 +587,20 @@ function renderIndustryProductGrid(definition: EditorialDefinition): string {
     const img = editorial?.heroImage ?? wpProduct?.image ?? "";
 
     return `
-      <a href="${escapeAttribute(route)}" class="ind-cat-card">
-        ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" loading="lazy">` : `<div class="ind-cat-card__placeholder"></div>`}
-        <div class="ind-cat-card__body">
+      <a href="${escapeAttribute(route)}" class="codex-industries-cat-card">
+        ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" loading="lazy">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
+        <div class="codex-industries-cat-card__body">
           <h3>${escapeHtml(shortName)}</h3>
-          <span class="ind-cat-card__arrow">&rarr;</span>
+          <span class="codex-industries-cat-card__arrow">&rarr;</span>
         </div>
       </a>`;
   }).join("");
 
   return `
-    <section class="ind-cat-products" aria-label="Products for ${escapeAttribute(category.title)}">
-      <h2 class="ind-cat-products__title">Featured ${escapeHtml(category.title)} Products</h2>
-      <p class="ind-cat-products__sub">Explore our complete range of RFID solutions for ${escapeHtml(category.title.toLowerCase())}.</p>
-      <div class="ind-cat-products__grid">${cards}</div>
+    <section class="codex-industries-cat-products" aria-label="Products for ${escapeAttribute(category.title)}">
+      <h2 class="codex-industries-cat-products__title">Featured ${escapeHtml(category.title)} Products</h2>
+      <p class="codex-industries-cat-products__sub">Explore our complete range of RFID solutions for ${escapeHtml(category.title.toLowerCase())}.</p>
+      <div class="codex-industries-cat-products__grid">${cards}</div>
     </section>`;
 }
 

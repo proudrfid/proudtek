@@ -886,14 +886,14 @@ function renderCatalogMain({
   const categorized = categorizeProductsSync(products);
 
   // Sticky left-side navigator — borrowed styling from the /industries/ page
-  // (`.ind-sidebar` class family). One row per category with icon + label +
+  // (`.codex-industries-sidebar` class family). One row per category with icon + label +
   // product-count pill. Clicking a row smooth-scrolls the matching section.
   const sidebarLinksHtml = categorized
     .map(
-      ({ category, items }) => `<a href="#${category.id}" class="ind-sidebar__link" data-target="${category.id}">
-        <span class="ind-sidebar__emoji">${category.icon}</span>
-        <span class="ind-sidebar__label">${category.label}</span>
-        <span class="ind-sidebar__count" data-cat-count="${category.id}">${items.length}</span>
+      ({ category, items }) => `<a href="#${category.id}" class="codex-industries-sidebar__link" data-target="${category.id}">
+        <span class="codex-industries-sidebar__emoji">${category.icon}</span>
+        <span class="codex-industries-sidebar__label">${category.label}</span>
+        <span class="codex-industries-sidebar__count" data-cat-count="${category.id}">${items.length}</span>
       </a>`,
     )
     .join("");
@@ -971,13 +971,13 @@ function renderCatalogMain({
     <div class="codex-catalog-rail-backdrop" hidden></div>
     <aside id="codex-catalog-rail-panel" class="codex-catalog-rail" aria-label="Product categories">
       <button type="button" class="codex-catalog-rail__close" aria-label="Close categories">✕</button>
-      <nav class="ind-sidebar__nav">
-        <div class="ind-sidebar__title">Product Families</div>
+      <nav class="codex-industries-sidebar__nav">
+        <div class="codex-industries-sidebar__title">Product Families</div>
         ${raw(sidebarLinksHtml)}
       </nav>
       ${raw(hasFilters ? `<div class="codex-catalog-filter" data-total-products="${totalProducts}">
         <div class="codex-catalog-filter__header">
-          <div class="ind-sidebar__title">Filter by spec</div>
+          <div class="codex-industries-sidebar__title">Filter by spec</div>
           <button type="button" class="codex-catalog-filter__clear" hidden>Clear</button>
         </div>
         ${filterPanelHtml}
@@ -1006,7 +1006,7 @@ function renderCatalogMain({
       var toggle = document.querySelector('.codex-catalog-rail-toggle');
       var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
       var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
-      var links = document.querySelectorAll('.codex-catalog-rail .ind-sidebar__link');
+      var links = document.querySelectorAll('.codex-catalog-rail .codex-industries-sidebar__link');
       var sections = document.querySelectorAll('.codex-catalog-content .codex-catalog-category');
       if (!links.length || !sections.length) return;
 
@@ -1071,7 +1071,7 @@ function renderCatalogMain({
       var filterPanel = document.querySelector('.codex-catalog-filter');
       var cards = document.querySelectorAll('.codex-catalog-content li.product');
       var categoryBlocks = document.querySelectorAll('.codex-catalog-content .codex-catalog-category');
-      var countPills = document.querySelectorAll('.ind-sidebar__count[data-cat-count]');
+      var countPills = document.querySelectorAll('.codex-industries-sidebar__count[data-cat-count]');
       var resultCount = document.querySelector('.woocommerce-result-count');
       var emptyState = document.querySelector('.codex-catalog-empty');
       var clearBtn = filterPanel ? filterPanel.querySelector('.codex-catalog-filter__clear') : null;
@@ -1571,20 +1571,20 @@ function buildIndustriesPage(
 
   // Quick-nav pills
   const navPills = INDUSTRY_CATEGORIES.map((cat) =>
-    `<a href="#${cat.id}" class="ind-pill">${cat.emoji} ${cat.title}</a>`
+    `<a href="#${cat.id}" class="codex-industries-pill">${cat.emoji} ${cat.title}</a>`
   ).join("");
 
   // Hero cards grid — each industry as a visual card
   const heroCards = INDUSTRY_CATEGORIES.map((cat) => {
     const count = cat.productRoutes.length;
     return `
-      <a href="#${cat.id}" class="ind-hero-card">
-        <div class="ind-hero-card__img" style="background-image:url('${cat.heroImage}')"></div>
-        <div class="ind-hero-card__body">
-          <span class="ind-hero-card__emoji">${cat.emoji}</span>
-          <h3 class="ind-hero-card__title">${cat.title}</h3>
-          <p class="ind-hero-card__desc">${cat.description}</p>
-          <span class="ind-hero-card__count">${count} products &rarr;</span>
+      <a href="#${cat.id}" class="codex-industries-hero-card">
+        <div class="codex-industries-hero-card__img" style="background-image:url('${cat.heroImage}')"></div>
+        <div class="codex-industries-hero-card__body">
+          <span class="codex-industries-hero-card__emoji">${cat.emoji}</span>
+          <h3 class="codex-industries-hero-card__title">${cat.title}</h3>
+          <p class="codex-industries-hero-card__desc">${cat.description}</p>
+          <span class="codex-industries-hero-card__count">${count} products &rarr;</span>
         </div>
       </a>`;
   }).join("");
@@ -1599,9 +1599,9 @@ function buildIndustriesPage(
       const img = wpProduct?.image;
       const summary = wpProduct?.summary ?? "";
       return `
-        <a href="${route}" class="ind-product-card">
-          ${img ? `<img src="${img}" alt="${escapeAttr(title)}" loading="lazy" width="280" height="200">` : `<div class="ind-product-card__placeholder"></div>`}
-          <div class="ind-product-card__body">
+        <a href="${route}" class="codex-industries-product-card">
+          ${img ? `<img src="${img}" alt="${escapeAttr(title)}" loading="lazy" width="280" height="200">` : `<div class="codex-industries-product-card__placeholder"></div>`}
+          <div class="codex-industries-product-card__body">
             <h4>${title}</h4>
             ${summary ? `<p>${truncateText(cleanText(summary), 100)}</p>` : ""}
           </div>
@@ -1609,52 +1609,52 @@ function buildIndustriesPage(
     }).join("");
 
     return `
-      <section class="ind-section" id="${cat.id}">
-        <div class="ind-section__header">
-          <div class="ind-section__header-text">
-            <span class="ind-section__emoji">${cat.emoji}</span>
+      <section class="codex-industries-section" id="${cat.id}">
+        <div class="codex-industries-section__header">
+          <div class="codex-industries-section__header-text">
+            <span class="codex-industries-section__emoji">${cat.emoji}</span>
             <h2><a href="${cat.href}">${cat.title}</a></h2>
             <p>${cat.description}</p>
           </div>
-          <a href="${cat.href}" class="ind-section__cta">View ${cat.title} solutions &rarr;</a>
+          <a href="${cat.href}" class="codex-industries-section__cta">View ${cat.title} solutions &rarr;</a>
         </div>
-        <div class="ind-product-grid">${productItems}</div>
+        <div class="codex-industries-product-grid">${productItems}</div>
       </section>`;
   }).join("");
 
   // Sidebar navigation
   const sidebarLinks = INDUSTRY_CATEGORIES.map((cat) =>
-    `<a href="#${cat.id}" class="ind-sidebar__link" data-target="${cat.id}">
-      <span class="ind-sidebar__emoji">${cat.emoji}</span>
-      <span class="ind-sidebar__label">${cat.title}</span>
-      <span class="ind-sidebar__count">${cat.productRoutes.length}</span>
+    `<a href="#${cat.id}" class="codex-industries-sidebar__link" data-target="${cat.id}">
+      <span class="codex-industries-sidebar__emoji">${cat.emoji}</span>
+      <span class="codex-industries-sidebar__label">${cat.title}</span>
+      <span class="codex-industries-sidebar__count">${cat.productRoutes.length}</span>
     </a>`
   ).join("");
 
   main.html(`
-    <div class="ind-page">
-      <header class="ind-header">
+    <div class="codex-industries-page">
+      <header class="codex-industries-header">
         <nav class="woocommerce-breadcrumb"><a href="/">Home</a> / Industries</nav>
         <h1>RFID Solutions by Industry</h1>
-        <p class="ind-header__sub">Select your industry to find the right RFID and NFC products. Each solution is tailored to meet sector-specific requirements for tracking, authentication and access control.</p>
+        <p class="codex-industries-header__sub">Select your industry to find the right RFID and NFC products. Each solution is tailored to meet sector-specific requirements for tracking, authentication and access control.</p>
       </header>
-      <div class="ind-layout">
-        <aside class="ind-sidebar">
-          <nav class="ind-sidebar__nav">
-            <div class="ind-sidebar__title">Industries</div>
+      <div class="codex-industries-layout">
+        <aside class="codex-industries-sidebar">
+          <nav class="codex-industries-sidebar__nav">
+            <div class="codex-industries-sidebar__title">Industries</div>
             ${sidebarLinks}
           </nav>
         </aside>
-        <div class="ind-content">
-          <div class="ind-hero-grid">${heroCards}</div>
+        <div class="codex-industries-content">
+          <div class="codex-industries-hero-grid">${heroCards}</div>
           ${sections}
         </div>
       </div>
     </div>
     <script>
     (function(){
-      var links = document.querySelectorAll('.ind-sidebar__link');
-      var sections = document.querySelectorAll('.ind-section');
+      var links = document.querySelectorAll('.codex-industries-sidebar__link');
+      var sections = document.querySelectorAll('.codex-industries-section');
       if (!links.length || !sections.length) return;
       function update(){
         var scrollY = window.scrollY + 120;
