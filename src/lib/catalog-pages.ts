@@ -428,6 +428,24 @@ export async function mergeCatalogPages(siteData: SiteData): Promise<SiteData> {
     );
   }
 
+  // Replace stale WordPress-snapshot paginated entries beyond paginatedProducts.length.
+  // Older WP responded 404 for /products/all/page/N/ (N > totalPages), and those 404
+  // HTML bodies got captured in the snapshot. Without this, pages like /products/all/page/3/
+  // render with the literal WP "404 Not Found" body wrapped in full Product schema.org
+  // markup — terrible for SEO. Redirect them to /products/all/ via meta-refresh, same
+  // pattern as /page/1/.
+  const stalePaginatedRoutes = siteData.pages
+    .map((page) => page.route)
+    .filter((route) => {
+      const match = route.match(/^\/(products\/all|product-category\/products)\/page\/(\d+)\/$/);
+      if (!match) return false;
+      const pageNumber = Number(match[2]);
+      return pageNumber > paginatedProducts.length;
+    });
+  for (const route of stalePaginatedRoutes) {
+    overrides.push(buildCatalogRedirectPage(siteData, template, route, "/products/all/", "Products"));
+  }
+
   const mergedPages = new Map(siteData.pages.map((page) => [page.route, page]));
 
   overrides.forEach((page) => {
