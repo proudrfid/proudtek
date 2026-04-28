@@ -282,41 +282,13 @@ export async function loadEditorialDefinitions(): Promise<EditorialDefinition[]>
  * legacy /products/<cluster>/ stub is already present in siteData.pages.
  */
 const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
-  // Product family pillars
   "/products/rfid-labels/",
   "/products/rfid-tags/",
   "/products/rfid-cards/",
   "/products/rfid-wristbands/",
   "/products/rfid-keyfobs/",
-  // Section roots
   "/industries/",
   "/resources/",
-  // Layer-A removal P1 hubs (added 2026-04-28): without these, the editorial
-  // JSON authored under src/content/editorial/{about,contact,faq,blog,
-  // markets,lp,products/all,compare,compatibility,guides,solutions}.json was
-  // silently dropped and the WP snapshot continued to render. See
-  // LAYER_A_REMOVAL_PLAN.md P1.12.
-  //
-  // P1.15 (2026-04-28): "/" intentionally excluded — the editorial /index.json
-  // exists in repo for future use but the WP snapshot home is the canonical
-  // homepage. Re-adding "/" requires a content review on src/content/editorial/
-  // index.json first.
-  //
-  // P1.16 (2026-04-28): "/products/all/" intentionally excluded — same reason
-  // as "/". The editorial /products/all.json describes a "Filter by chip /
-  // environment" catalog meta-page, but the WP snapshot at /products/all/ is
-  // the actual WooCommerce catalog grid that buyers use. Re-adding requires
-  // a content match against the WP catalog UX first.
-  "/about/",
-  "/contact/",
-  "/faq/",
-  "/blog/",
-  "/markets/",
-  "/lp/",
-  "/compare/",
-  "/compatibility/",
-  "/guides/",
-  "/solutions/",
 ]);
 
 /**
@@ -326,23 +298,17 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
  * pillar rewrite (and therefore lack the left rail). Any pattern listed
  * here forces the editorial JSON to replace the on-disk snapshot.
  *
- * Layer-A removal P1.12 adds patterns for /about/<slug>/, /contact/<slug>/,
- * /markets/<slug>/, /lp/<slug>/, /blog/<slug>/, /compare/<slug>/,
- * /compatibility/<slug>/, /guides/<slug>/ — every editorial JSON in those
- * subtrees was previously rendering the snapshot bodyHtml instead of its
- * own sections (~417 routes affected per the dark-matter audit).
+ * P1.17 (2026-04-28): the wider P1.12 override expansion (8 hub routes +
+ * 8 regex patterns) was reverted after spot-check found the editorial
+ * content didn't match the WP snapshot UX on multiple hubs (home,
+ * /products/all/ and others). The corresponding editorial JSONs under
+ * src/content/editorial/{index,about,contact,faq,blog,markets,lp,
+ * products/all,compare,compatibility,guides,solutions}.json + the 2 wood
+ * SKUs are kept in repo for future re-evaluation but go dark today.
  */
 const EDITORIAL_OVERRIDE_PATTERNS: RegExp[] = [
   /^\/industries\/[^/]+\/$/,
   /^\/solutions\/[^/]+\/$/,
-  /^\/about\/[^/]+\/$/,
-  /^\/contact\/[^/]+\/$/,
-  /^\/markets\/[^/]+\/$/,
-  /^\/lp\/[^/]+\/$/,
-  /^\/blog\/[^/]+\/$/,
-  /^\/compare\/[^/]+\/$/,
-  /^\/compatibility\/[^/]+\/$/,
-  /^\/guides\/[^/]+\/$/,
 ];
 
 function isEditorialOverrideRoute(route: string): boolean {
