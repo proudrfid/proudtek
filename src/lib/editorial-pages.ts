@@ -282,13 +282,33 @@ export async function loadEditorialDefinitions(): Promise<EditorialDefinition[]>
  * legacy /products/<cluster>/ stub is already present in siteData.pages.
  */
 const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
+  // Product family pillars
   "/products/rfid-labels/",
   "/products/rfid-tags/",
   "/products/rfid-cards/",
   "/products/rfid-wristbands/",
   "/products/rfid-keyfobs/",
+  // Section roots
   "/industries/",
   "/resources/",
+  // Layer-A removal P1 hubs (added 2026-04-28): without these, the editorial
+  // JSON authored under src/content/editorial/{index,about,contact,faq,blog,
+  // markets,lp,products/all,compare,compatibility,guides}.json was silently
+  // dropped and the WP snapshot continued to render. See LAYER_A_REMOVAL_PLAN.md
+  // P1.12. compare/compatibility/guides hubs each had editorial JSON in main
+  // (compare.json etc.) but were also dark-matter before this list.
+  "/",
+  "/about/",
+  "/contact/",
+  "/faq/",
+  "/blog/",
+  "/markets/",
+  "/lp/",
+  "/products/all/",
+  "/compare/",
+  "/compatibility/",
+  "/guides/",
+  "/solutions/",
 ]);
 
 /**
@@ -297,10 +317,24 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
  * 15+ /industries/<slug>/ pages whose WP snapshots predate the editorial
  * pillar rewrite (and therefore lack the left rail). Any pattern listed
  * here forces the editorial JSON to replace the on-disk snapshot.
+ *
+ * Layer-A removal P1.12 adds patterns for /about/<slug>/, /contact/<slug>/,
+ * /markets/<slug>/, /lp/<slug>/, /blog/<slug>/, /compare/<slug>/,
+ * /compatibility/<slug>/, /guides/<slug>/ — every editorial JSON in those
+ * subtrees was previously rendering the snapshot bodyHtml instead of its
+ * own sections (~417 routes affected per the dark-matter audit).
  */
 const EDITORIAL_OVERRIDE_PATTERNS: RegExp[] = [
   /^\/industries\/[^/]+\/$/,
   /^\/solutions\/[^/]+\/$/,
+  /^\/about\/[^/]+\/$/,
+  /^\/contact\/[^/]+\/$/,
+  /^\/markets\/[^/]+\/$/,
+  /^\/lp\/[^/]+\/$/,
+  /^\/blog\/[^/]+\/$/,
+  /^\/compare\/[^/]+\/$/,
+  /^\/compatibility\/[^/]+\/$/,
+  /^\/guides\/[^/]+\/$/,
 ];
 
 function isEditorialOverrideRoute(route: string): boolean {
