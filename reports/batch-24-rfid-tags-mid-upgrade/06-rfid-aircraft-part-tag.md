@@ -1,0 +1,20 @@
+# Batch 24 / Page 6 — rfid-aircraft-part-tag
+
+**Route:** `/products/rfid-tags/rfid-aircraft-part-tag/`
+**Upgrade:** MID → DEEP (full rewrite with Blocker C de-identification)
+**Sync:** clean (Zod pass)
+**Inbound:** 5 references
+
+## What changed
+
+- `keywords[6]`: "ATA Spec 2000 Chapter 9-5 flyable RFID", "DO-160G RFID aircraft part tag", "FAA AC 20-162A passive UHF marking", "EASA CM-AS-002 RFID on-board", "Boeing D6-81763 / Airbus A0094T0054 part marking", "high-memory 64 KB MRO lifecycle tag".
+- `brief[]` 9 → 13 fields — adds Chip options (NXP UCODE DNA 3,072-bit + AES-128 per ISO/IEC 29167-10; Fujitsu MB97R803A / MB97R8110 64 KB FRAM; Impinj M775 / M830), Frequency / air interface (860-960 MHz UHF RAIN per EPC C1G2v2.1 / ISO/IEC 18000-63:2015; FCC / ETSI / ARIB regional aligned to ATA Spec 2000 Ch 9-5), Standards & marking method (ATA Spec 2000 Ch. 9 + FAA AC 20-162A + EASA CM-AS-002 Issue 01 + FAA 14 CFR Part 45), Environmental qualification explicit (DO-160G / ED-14G Sections 4 / 5 / 6 / 7 / 8 / 11 / 20 / 22), Construction (ceramic zirconia / alumina or PEEK / PPS high-temp polymer with on-metal antenna tuning; 3M VHB 5952 / 4950 or high-temp epoxy or rivet-bonded stainless), Read range on metal explicit (1-3 / 2-5 / 3-7 m by size + dock-portal 3-5 m 99%+), Data capacity & ATA 2000 elements (mandatory 96-384 bits, optional 2-8 KB, full engineering record 16-64 KB Fujitsu FRAM), Security & counterfeit resistance (UCODE DNA AES-128 per RFC 3394 + SHA-256 digital-thread pedigree hash + ARINC 816 overlay), Compliance framework, Platform integration (IFS Cloud for Aviation + Trax + Ramco Aviation + AMOS Swiss-AS + Sabre Flight Plan Manager + Boeing Insight Accelerator + Airbus Skywise + IBS iMRO + Rusada ENVISION + GE Aerospace + Accelya + SITA + Panasonic Avionics Arc + Thales AVANT + PTC Windchill + Siemens Teamcenter + Aras Innovator + Zebra FX9600 / MC3390xR + Impinj R700 / R780 + Alien ALR-F800 + Keonn AdvanReader).
+- Tag-size SKU extended with Low-profile cabin variant (75 × 20 × 1.2 mm) for seats / IFE / bins.
+- `statBar` on Challenges: ATA Spec 2000 Ch. 9-5 flyable UHF RFID / DO-160G environmental qualification / FAA AC 20-162A airworthiness approval / UCODE DNA AES-128 tag authentication.
+- `comparePanel` on "How Proud Tek solves": commodity on-metal RFID (no DO-160G evidence, 96-bit EPC only, no aerospace fluids / lightning testing, no tag authentication, no OEM EO attach spec) vs Proud Tek ATA Spec 2000 Ch. 9-5 (DO-160G / ED-14G test report Sections 4/5/6/7/8/11/20/22, 96-384 bit mandatory + 2-64 KB optional record, Skydrol / Jet A §11 + lightning §22 + RF §20 data, UCODE DNA AES-128 + SHA-256 digital-thread, Boeing D6-81763 Rev E / Airbus A0094T0054 attach spec).
+- Blocker C — prior "Results" section (15-30 min → 3 min per LRU, TAT compression 1-3 days, 30% EASA/FAA findings → zero, counterfeit detection visual-only → cryptographic, 20-40 min → 2 min fleet-reconciliation across 50-500 aircraft) rewritten as "Deployment patterns integrators follow on ATA Spec 2000 Chapter 9-5 flyable-RFID programmes" with dataHighlight (visual → cryptographic counterfeit-pedigree verification, citing ATA Spec 2000 Ch. 9 Authentication + FAA AC 21-29D SUP) + 4-phase timeline (Weeks 1-4 component scope + engineering-order map → 5-12 First Article + DO-160G test programme → 13-24 pilot line + MRO wiring → Month 7+ fleet scale-out + digital-thread loop).
+- Sources: 10 at 5-field (ATA Spec 2000 Ch. 9, FAA AC 20-162A, EASA CM-AS-002 Issue 01, RTCA DO-160G, SAE AS5678, 14 CFR Part 45, ISO/IEC 18000-63:2015, SAE AS9100D, FAA AC 21-29D SUP, NXP UCODE DNA reference).
+
+## Standards cited
+
+ATA Spec 2000 Chapter 9-5 Passive UHF Flyable RFID Tag · ATA iSpec 2200 · FAA Advisory Circular 20-162A · EASA Certification Memorandum CM-AS-002 Issue 01 · RTCA DO-160G · EUROCAE ED-14G · SAE AS5678 · SAE AS9100D · SAE AS9102 FAI · FAA 14 CFR Part 21 / Part 45 / Part 145 · EASA Part 21 / Part 145 · FAA AC 21-29D SUP · Boeing D6-81763 Rev E · Airbus A0094T0054 · ISO/IEC 18000-63:2015 · ISO/IEC 29167-10 AES-128 · IATA Resolution 753 ULD · GS1 TDS 2.0 / EPCIS 2.0 · AWS D17.1 laser weld.
