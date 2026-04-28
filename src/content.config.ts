@@ -148,7 +148,7 @@ const sourceSchema = z.object({
 
 const editorialSchema = z.object({
   route: z.string(),
-  group: z.enum(["solutions", "compare", "contact", "compatibility", "guides", "blog", "products", "lp", "markets", "about", "resources"]),
+  group: z.enum(["solutions", "compare", "contact", "compatibility", "guides", "blog", "products", "lp", "markets", "about", "resources", "home", "faq"]),
   title: z.string(),
   kicker: z.string(),
   summary: z.string(),

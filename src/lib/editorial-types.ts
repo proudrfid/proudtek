@@ -5,7 +5,7 @@
  * and Astro components can import them without circular dependencies.
  */
 
-export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "lp" | "markets" | "about" | "resources";
+export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "lp" | "markets" | "about" | "resources" | "home" | "faq";
 
 export interface EditorialLink {
   href: string;
@@ -223,7 +223,7 @@ export function isWorkflowSection(title: string): boolean {
 }
 
 export function isSectionRoot(route: string): boolean {
-  return route === "/solutions/" || route === "/compare/" || route === "/compatibility/" || route === "/guides/" || route === "/contact/" || route === "/resources/";
+  return route === "/" || route === "/solutions/" || route === "/compare/" || route === "/compatibility/" || route === "/guides/" || route === "/contact/" || route === "/resources/" || route === "/about/" || route === "/blog/" || route === "/faq/" || route === "/products/all/" || route === "/industries/" || route === "/markets/" || route === "/lp/";
 }
 
 export function resolvePageType(group: EditorialGroup): string {
@@ -235,6 +235,12 @@ export function resolvePageType(group: EditorialGroup): string {
     case "contact": return "contact";
     case "products": return "product";
     case "resources": return "resources";
+    case "home": return "home";
+    case "faq": return "faq";
+    case "about": return "about";
+    case "blog": return "blog";
+    case "markets": return "markets";
+    case "lp": return "lp";
     default: return "";
   }
 }
