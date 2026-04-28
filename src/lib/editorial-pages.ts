@@ -301,13 +301,18 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
   // exists in repo for future use but the WP snapshot home is the canonical
   // homepage. Re-adding "/" requires a content review on src/content/editorial/
   // index.json first.
+  //
+  // P1.16 (2026-04-28): "/products/all/" intentionally excluded — same reason
+  // as "/". The editorial /products/all.json describes a "Filter by chip /
+  // environment" catalog meta-page, but the WP snapshot at /products/all/ is
+  // the actual WooCommerce catalog grid that buyers use. Re-adding requires
+  // a content match against the WP catalog UX first.
   "/about/",
   "/contact/",
   "/faq/",
   "/blog/",
   "/markets/",
   "/lp/",
-  "/products/all/",
   "/compare/",
   "/compatibility/",
   "/guides/",
