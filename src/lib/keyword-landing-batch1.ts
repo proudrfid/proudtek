@@ -830,7 +830,7 @@ export const KEYWORD_LANDING_BATCH1: Array<{
     primaryAction: { href: "/contact/", label: "Request UHF RFID tag quote" },
     secondaryActions: [
       { href: "/products/rfid-labels/impinj-m700-uhf-inlay/", label: "Impinj M700 UHF inlays" },
-      { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "UHF on-metal tags" },
+      { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "UHF anti-metal tags" },
     ],
   },
 

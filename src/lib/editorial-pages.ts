@@ -4,6 +4,7 @@ import { getCollection } from "astro:content";
 import type { SiteData, SnapshotPage } from "./site-data";
 import { loadPageFromDisk } from "./site-data";
 import { INDUSTRY_CATEGORIES } from "./catalog-pages";
+import { getIcon } from "./icons";
 
 export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "resources";
 
@@ -482,6 +483,7 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
       route,
       label: meta.label,
       emoji: meta.emoji,
+      iconSlug: meta.iconSlug,
       summary: def.summary,
       heroImage: def.heroImage ?? "",
     });
@@ -499,8 +501,45 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
       route,
       label: meta.label,
       emoji: meta.emoji,
+      iconSlug: meta.iconSlug,
       summary: def.summary,
       heroImage: def.heroImage ?? "",
+    });
+  }
+
+  /* DS-9 #4 — Bucket _solutionsHubData into SOLUTIONS_RAIL_GROUPS. Each
+     group keeps the SOLUTION_HUB_META display order within its slug list,
+     and any slug not in any group falls into a synthetic "More" tail group
+     so we never silently drop pages from the rail. */
+  _solutionsGroupedHubData.length = 0;
+  const _solutionsBySlug = new Map(_solutionsHubData.map((e) => [e.slug, e] as const));
+  const _claimedSlugs = new Set<string>();
+  for (const groupMeta of SOLUTIONS_RAIL_GROUPS) {
+    const items: HubEntry[] = [];
+    for (const slug of groupMeta.slugs) {
+      const entry = _solutionsBySlug.get(slug);
+      if (!entry) continue;
+      items.push(entry);
+      _claimedSlugs.add(slug);
+    }
+    if (items.length > 0) {
+      _solutionsGroupedHubData.push({
+        groupLabel: groupMeta.groupLabel,
+        groupSlug: groupMeta.groupSlug,
+        emoji: groupMeta.emoji,
+        iconSlug: groupMeta.iconSlug,
+        items,
+      });
+    }
+  }
+  const _orphanItems = _solutionsHubData.filter((e) => !_claimedSlugs.has(e.slug));
+  if (_orphanItems.length > 0) {
+    _solutionsGroupedHubData.push({
+      groupLabel: "More",
+      groupSlug: "more",
+      emoji: "📂",
+      iconSlug: "folder-open",
+      items: _orphanItems,
     });
   }
 
@@ -530,6 +569,7 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
         route: def.route,
         label,
         emoji: groupMeta.emoji,
+        iconSlug: groupMeta.iconSlug,
         summary: def.summary,
         heroImage: def.heroImage ?? "",
       });
@@ -539,24 +579,111 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
       groupLabel: groupMeta.groupLabel,
       groupSlug: groupMeta.groupSlug,
       emoji: groupMeta.emoji,
+      iconSlug: groupMeta.iconSlug,
       items,
     });
   }
 
   // Flat 4-item rail nav for the /resources/ left rail — mirrors the dropdown
-  // menu shown in the global header. Each entry links to the matching group's
-  // anchor on /resources/ (so the rail acts as a TOC for the page body).
+  // menu shown in the global header. Each entry links DIRECTLY to the
+  // matching sub-hub landing page (/blog/, /guides/, /compare/,
+  // /compatibility/) so the rail works as cross-section navigation on every
+  // /blog/<slug>/, /guides/<slug>/ etc. leaf page (not just an in-page TOC
+  // on /resources/). Per user request 2026-04-26.
   _resourcesRailData.length = 0;
   for (const group of _resourcesHubData) {
     _resourcesRailData.push({
       slug: group.groupSlug,
-      route: `/resources/#resources-hub-grid-${group.groupSlug}`,
+      route: `/${group.groupSlug}/`,
       label: `${group.groupLabel} (${group.items.length})`,
       emoji: group.emoji,
+      iconSlug: group.iconSlug,
       summary: "",
       heroImage: "",
     });
   }
+
+  /* ─── Per-hub rail data populators (DS-9 2026-04-26) ─────────────────
+     Build separate rail datasets so /guides/, /compare/, /compatibility/
+     drill into their own subcategories instead of showing the cross-family
+     siblings list. Reuses GROUP rules declared above. */
+
+  /** Helper: bucket leaves under a route prefix into GroupedHubData by
+     applying first-match matcher rules. Unmatched leaves get an "Other"
+     tail group so nothing is silently dropped. */
+  function buildGroupedRail(routePrefix: string, groupRules: HubGroupRule[]): GroupedHubData {
+    const result: GroupedHubData = groupRules.map((g) => ({
+      groupLabel: g.groupLabel,
+      groupSlug: g.groupSlug,
+      emoji: "",
+      iconSlug: g.iconSlug,
+      items: [],
+    }));
+    const otherGroup = {
+      groupLabel: "Other",
+      groupSlug: "other",
+      emoji: "",
+      iconSlug: "folder",
+      items: [] as HubEntry[],
+    };
+    for (const def of EDITORIAL_DEFINITIONS) {
+      if (!def.route.startsWith(routePrefix)) continue;
+      const slugMatch = def.route.match(new RegExp(`^${routePrefix}([^/]+)/$`));
+      if (!slugMatch) continue;
+      const slug = slugMatch[1];
+      // Short label — drop suffix after em-dash / pipe / colon for rail readability.
+      const shortTitle = def.title.split(/—|–|\||:/, 1)[0]?.trim() || def.title;
+      const label = shortTitle.length > 60 ? shortTitle.slice(0, 57).trimEnd() + "…" : shortTitle;
+      const ruleIdx = groupRules.findIndex((g) => g.matcher(slug));
+      const targetGroup = ruleIdx >= 0 ? result[ruleIdx] : otherGroup;
+      targetGroup.items.push({
+        slug,
+        route: def.route,
+        label,
+        emoji: "",
+        iconSlug: targetGroup.iconSlug,
+        summary: def.summary,
+        heroImage: def.heroImage ?? "",
+      });
+    }
+    // Sort items alphabetically inside each group for predictability.
+    for (const g of result) g.items.sort((a, b) => a.label.localeCompare(b.label));
+    otherGroup.items.sort((a, b) => a.label.localeCompare(b.label));
+    // Drop empty groups + append Other tail if it has items.
+    const out: GroupedHubData = result.filter((g) => g.items.length > 0);
+    if (otherGroup.items.length > 0) out.push(otherGroup);
+    return out;
+  }
+
+  // /guides/ — 49 leaves bucketed by topic.
+  _guidesGroupedRailData.length = 0;
+  _guidesGroupedRailData.push(...buildGroupedRail("/guides/", GUIDES_RAIL_GROUPS));
+
+  // /compare/ — 30 leaves bucketed by comparison axis.
+  _compareGroupedRailData.length = 0;
+  _compareGroupedRailData.push(...buildGroupedRail("/compare/", COMPARE_RAIL_GROUPS));
+
+  // /compatibility/ — 7 hotel-lock vendors. Small enough for a flat list,
+  // no grouping needed; each item links to its vendor compatibility page.
+  _compatibilityRailData.length = 0;
+  for (const def of EDITORIAL_DEFINITIONS) {
+    if (!def.route.startsWith("/compatibility/")) continue;
+    const slugMatch = def.route.match(/^\/compatibility\/([^/]+)\/$/);
+    if (!slugMatch) continue;
+    const slug = slugMatch[1];
+    const shortTitle = def.title.split(/—|–|\||:/, 1)[0]?.trim() || def.title;
+    const label = shortTitle.length > 60 ? shortTitle.slice(0, 57).trimEnd() + "…" : shortTitle;
+    _compatibilityRailData.push({
+      slug,
+      route: def.route,
+      label,
+      emoji: "",
+      iconSlug: "key",
+      summary: def.summary,
+      heroImage: def.heroImage ?? "",
+    });
+  }
+  _compatibilityRailData.sort((a, b) => a.label.localeCompare(b.label));
 
   const pages: SnapshotPage[] = [];
   for (const definition of EDITORIAL_DEFINITIONS) {
@@ -637,27 +764,27 @@ const _wpProductImageMap: Map<string, { title: string; image: string }> = new Ma
  * consistency, then add the remaining 12 verticals that exist as editorial
  * pillars but aren't in the homepage rail.
  */
-const INDUSTRY_HUB_META: Array<{ slug: string; label: string; emoji: string }> = [
-  { slug: "hospitality",                      label: "Hospitality",                      emoji: "🏨" },
-  { slug: "retail-apparel",                   label: "Retail & Apparel",                 emoji: "🛍️" },
-  { slug: "brand-protection",                 label: "Brand Protection",                 emoji: "🛡️" },
-  { slug: "events-venues",                    label: "Events & Venues",                  emoji: "🎪" },
-  { slug: "healthcare",                       label: "Healthcare",                       emoji: "🏥" },
-  { slug: "logistics",                        label: "Logistics & Supply Chain",         emoji: "📦" },
-  { slug: "industrial",                       label: "Industrial & Manufacturing",       emoji: "🏭" },
-  { slug: "eu-compliance",                    label: "EU Compliance",                    emoji: "🇪🇺" },
-  { slug: "luxury-brands",                    label: "Luxury Brands",                    emoji: "👜" },
-  { slug: "pharmaceutical",                   label: "Pharmaceutical",                   emoji: "💊" },
-  { slug: "libraries",                        label: "Libraries",                        emoji: "📚" },
-  { slug: "laundry-services",                 label: "Laundry Services",                 emoji: "🧺" },
-  { slug: "education",                        label: "Education",                        emoji: "🎓" },
-  { slug: "fitness",                          label: "Fitness",                          emoji: "💪" },
-  { slug: "agriculture",                      label: "Agriculture",                      emoji: "🌾" },
-  { slug: "automotive-tire-oem",              label: "Automotive & Tire OEM",            emoji: "🚗" },
-  { slug: "aerospace-aviation-mro",           label: "Aerospace & Aviation MRO",         emoji: "✈️" },
-  { slug: "data-center-it-asset-tracking",    label: "Data Center & IT Assets",          emoji: "💻" },
-  { slug: "government-defense-supply-chain",  label: "Government & Defense",             emoji: "🪖" },
-  { slug: "cold-chain-food-traceability",     label: "Cold Chain & Food Traceability",   emoji: "❄️" },
+const INDUSTRY_HUB_META: Array<{ slug: string; label: string; emoji: string; iconSlug: string }> = [
+  { slug: "hospitality",                      label: "Hospitality",                      emoji: "🏨", iconSlug: "hotel" },
+  { slug: "retail-apparel",                   label: "Retail & Apparel",                 emoji: "🛍️", iconSlug: "shopping-bag" },
+  { slug: "brand-protection",                 label: "Brand Protection",                 emoji: "🛡️", iconSlug: "shield" },
+  { slug: "events-venues",                    label: "Events & Venues",                  emoji: "🎪", iconSlug: "tent" },
+  { slug: "healthcare",                       label: "Healthcare",                       emoji: "🏥", iconSlug: "hospital" },
+  { slug: "logistics",                        label: "Logistics & Supply Chain",         emoji: "📦", iconSlug: "package" },
+  { slug: "industrial",                       label: "Industrial & Manufacturing",       emoji: "🏭", iconSlug: "factory" },
+  { slug: "eu-compliance",                    label: "EU Compliance",                    emoji: "🇪🇺", iconSlug: "globe" },
+  { slug: "luxury-brands",                    label: "Luxury Brands",                    emoji: "👜", iconSlug: "handbag" },
+  { slug: "pharmaceutical",                   label: "Pharmaceutical",                   emoji: "💊", iconSlug: "pill" },
+  { slug: "libraries",                        label: "Libraries",                        emoji: "📚", iconSlug: "library" },
+  { slug: "laundry-services",                 label: "Laundry Services",                 emoji: "🧺", iconSlug: "basket" },
+  { slug: "education",                        label: "Education",                        emoji: "🎓", iconSlug: "graduation-cap" },
+  { slug: "fitness",                          label: "Fitness",                          emoji: "💪", iconSlug: "dumbbell" },
+  { slug: "agriculture",                      label: "Agriculture",                      emoji: "🌾", iconSlug: "wheat" },
+  { slug: "automotive-tire-oem",              label: "Automotive & Tire OEM",            emoji: "🚗", iconSlug: "car" },
+  { slug: "aerospace-aviation-mro",           label: "Aerospace & Aviation MRO",         emoji: "✈️", iconSlug: "plane" },
+  { slug: "data-center-it-asset-tracking",    label: "Data Center & IT Assets",          emoji: "💻", iconSlug: "monitor" },
+  { slug: "government-defense-supply-chain",  label: "Government & Defense",             emoji: "🪖", iconSlug: "helmet" },
+  { slug: "cold-chain-food-traceability",     label: "Cold Chain & Food Traceability",   emoji: "❄️", iconSlug: "snowflake" },
 ];
 
 /**
@@ -671,7 +798,7 @@ const INDUSTRY_HUB_META: Array<{ slug: string; label: string; emoji: string }> =
  * `_<section>HubData: HubEntry[]` in buildEditorialPages, and call
  * `renderHubRail` / `renderHubGrid` from `renderEditorialMain`.
  */
-type HubEntry = { slug: string; route: string; label: string; emoji: string; summary: string; heroImage: string };
+type HubEntry = { slug: string; route: string; label: string; emoji: string; iconSlug: string; summary: string; heroImage: string };
 type IndustryHubEntry = HubEntry;
 const _industriesHubData: HubEntry[] = [];
 
@@ -683,48 +810,153 @@ const _industriesHubData: HubEntry[] = [];
  * control → attendance → google review variants) so the rail scans naturally
  * even though it's a flat list.
  */
-const SOLUTION_HUB_META: Array<{ slug: string; label: string; emoji: string }> = [
-  { slug: "hotel-key-cards",                           label: "Hotel Key Cards",                emoji: "🔑" },
-  { slug: "hotel-rfid-access-control",                 label: "Hotel Access Control",           emoji: "🏨" },
-  { slug: "rfid-event-access-control",                 label: "Event Access Control",           emoji: "🎟️" },
-  { slug: "rfid-event-wristbands",                     label: "Event Wristbands",               emoji: "🎫" },
-  { slug: "rfid-race-timing",                          label: "Race Timing",                    emoji: "🏁" },
-  { slug: "rfid-laundry-tags",                         label: "Laundry Tags",                   emoji: "🏷️" },
-  { slug: "rfid-laundry-management",                   label: "Laundry Management",             emoji: "🧺" },
-  { slug: "rfid-laundry-tracking",                     label: "Laundry Tracking",               emoji: "🔁" },
-  { slug: "rfid-patient-tracking",                     label: "Patient Tracking",               emoji: "🏥" },
-  { slug: "rfid-library-management",                   label: "Library Management",             emoji: "📚" },
-  { slug: "nfc-brand-authentication",                  label: "Brand Authentication",           emoji: "🛡️" },
-  { slug: "nfc-luxury-authentication",                 label: "Luxury Authentication",          emoji: "💎" },
-  { slug: "digital-product-passport",                  label: "Digital Product Passport",       emoji: "🇪🇺" },
-  { slug: "nfc-business-card",                         label: "NFC Business Cards",             emoji: "💳" },
-  { slug: "nfc-business-card-programs",                label: "Business Card Programs",         emoji: "🪪" },
-  { slug: "rfid-asset-tracking-labels",                label: "Asset-Tracking Labels",          emoji: "📦" },
-  { slug: "rfid-inventory-tracking",                   label: "Inventory Tracking",             emoji: "📊" },
-  { slug: "rfid-tool-tracking",                        label: "Tool Tracking",                  emoji: "🔧" },
-  { slug: "rfid-warehouse-management",                 label: "Warehouse Management",           emoji: "🏭" },
-  { slug: "rfid-supply-chain-management",              label: "Supply Chain",                   emoji: "🚚" },
-  { slug: "vehicle-rfid-identification",               label: "Vehicle ID",                     emoji: "🚗" },
-  { slug: "rfid-parking-management",                   label: "Parking Management",             emoji: "🅿️" },
-  { slug: "rfid-access-control",                       label: "Access Control",                 emoji: "🚪" },
-  { slug: "rfid-keyfobs-access-control",               label: "Keyfob Access",                  emoji: "🔐" },
-  { slug: "rfid-attendance-system",                    label: "Attendance System",              emoji: "⏱️" },
-  { slug: "rfid-readers-and-encoding",                 label: "Readers & Encoding",             emoji: "📡" },
-  { slug: "google-review-nfc-card",                    label: "Google Review NFC Cards",        emoji: "⭐" },
-  { slug: "google-review-cards-for-restaurants",       label: "Review · Restaurants",           emoji: "🍽️" },
-  { slug: "google-review-cards-for-hotels",            label: "Review · Hotels",                emoji: "🛎️" },
-  { slug: "google-review-cards-for-clinics",           label: "Review · Clinics",               emoji: "🩺" },
-  { slug: "google-review-cards-for-salons-and-spas",   label: "Review · Salons & Spas",         emoji: "💇" },
-  { slug: "google-review-cards-for-retail-stores",     label: "Review · Retail Stores",         emoji: "🛍️" },
-  { slug: "google-review-cards-for-gyms-and-fitness-studios", label: "Review · Gyms & Fitness", emoji: "💪" },
-  { slug: "google-review-cards-for-front-desks",       label: "Review · Front Desks",           emoji: "📋" },
-  { slug: "google-review-cards-for-checkout-counters", label: "Review · Checkout Counters",     emoji: "🧾" },
-  { slug: "google-review-cards-for-tabletop-prompts",  label: "Review · Tabletop Prompts",      emoji: "🍴" },
-  { slug: "google-review-cards-for-pickup-counters",   label: "Review · Pickup Counters",       emoji: "🛒" },
+const SOLUTION_HUB_META: Array<{ slug: string; label: string; emoji: string; iconSlug: string }> = [
+  { slug: "hotel-key-cards",                           label: "Hotel Key Cards",                emoji: "🔑", iconSlug: "key" },
+  { slug: "hotel-rfid-access-control",                 label: "Hotel Access Control",           emoji: "🏨", iconSlug: "hotel" },
+  { slug: "rfid-event-access-control",                 label: "Event Access Control",           emoji: "🎟️", iconSlug: "ticket" },
+  { slug: "rfid-event-wristbands",                     label: "Event Wristbands",               emoji: "🎫", iconSlug: "ticket" },
+  { slug: "rfid-race-timing",                          label: "Race Timing",                    emoji: "🏁", iconSlug: "flag" },
+  { slug: "rfid-laundry-tags",                         label: "Laundry Tags",                   emoji: "🏷️", iconSlug: "tag" },
+  { slug: "rfid-laundry-management",                   label: "Laundry Management",             emoji: "🧺", iconSlug: "basket" },
+  { slug: "rfid-laundry-tracking",                     label: "Laundry Tracking",               emoji: "🔁", iconSlug: "refresh" },
+  { slug: "rfid-patient-tracking",                     label: "Patient Tracking",               emoji: "🏥", iconSlug: "heart-pulse" },
+  { slug: "rfid-library-management",                   label: "Library Management",             emoji: "📚", iconSlug: "library" },
+  { slug: "nfc-brand-authentication",                  label: "Brand Authentication",           emoji: "🛡️", iconSlug: "shield-check" },
+  { slug: "nfc-luxury-authentication",                 label: "Luxury Authentication",          emoji: "💎", iconSlug: "gem" },
+  { slug: "digital-product-passport",                  label: "Digital Product Passport",       emoji: "🇪🇺", iconSlug: "globe" },
+  { slug: "nfc-business-card",                         label: "NFC Business Cards",             emoji: "💳", iconSlug: "credit-card" },
+  { slug: "nfc-business-card-programs",                label: "Business Card Programs",         emoji: "🪪", iconSlug: "id-card" },
+  { slug: "rfid-asset-tracking-labels",                label: "Asset-Tracking Labels",          emoji: "📦", iconSlug: "package" },
+  { slug: "rfid-inventory-tracking",                   label: "Inventory Tracking",             emoji: "📊", iconSlug: "bar-chart" },
+  { slug: "rfid-tool-tracking",                        label: "Tool Tracking",                  emoji: "🔧", iconSlug: "wrench" },
+  { slug: "rfid-warehouse-management",                 label: "Warehouse Management",           emoji: "🏭", iconSlug: "warehouse" },
+  { slug: "rfid-supply-chain-management",              label: "Supply Chain",                   emoji: "🚚", iconSlug: "truck" },
+  { slug: "vehicle-rfid-identification",               label: "Vehicle ID",                     emoji: "🚗", iconSlug: "car" },
+  { slug: "rfid-parking-management",                   label: "Parking Management",             emoji: "🅿️", iconSlug: "parking" },
+  { slug: "rfid-access-control",                       label: "Access Control",                 emoji: "🚪", iconSlug: "door" },
+  { slug: "rfid-keyfobs-access-control",               label: "Keyfob Access",                  emoji: "🔐", iconSlug: "lock" },
+  { slug: "rfid-attendance-system",                    label: "Attendance System",              emoji: "⏱️", iconSlug: "clock" },
+  { slug: "rfid-readers-and-encoding",                 label: "Readers & Encoding",             emoji: "📡", iconSlug: "radio" },
+  { slug: "google-review-nfc-card",                    label: "Google Review NFC Cards",        emoji: "⭐", iconSlug: "star" },
+  { slug: "google-review-cards-for-restaurants",       label: "Review · Restaurants",           emoji: "🍽️", iconSlug: "utensils" },
+  { slug: "google-review-cards-for-hotels",            label: "Review · Hotels",                emoji: "🛎️", iconSlug: "bell" },
+  { slug: "google-review-cards-for-clinics",           label: "Review · Clinics",               emoji: "🩺", iconSlug: "stethoscope" },
+  { slug: "google-review-cards-for-salons-and-spas",   label: "Review · Salons & Spas",         emoji: "💇", iconSlug: "scissors" },
+  { slug: "google-review-cards-for-retail-stores",     label: "Review · Retail Stores",         emoji: "🛍️", iconSlug: "shopping-bag" },
+  { slug: "google-review-cards-for-gyms-and-fitness-studios", label: "Review · Gyms & Fitness", emoji: "💪", iconSlug: "dumbbell" },
+  { slug: "google-review-cards-for-front-desks",       label: "Review · Front Desks",           emoji: "📋", iconSlug: "clipboard" },
+  { slug: "google-review-cards-for-checkout-counters", label: "Review · Checkout Counters",     emoji: "🧾", iconSlug: "receipt" },
+  { slug: "google-review-cards-for-tabletop-prompts",  label: "Review · Tabletop Prompts",      emoji: "🍴", iconSlug: "fork" },
+  { slug: "google-review-cards-for-pickup-counters",   label: "Review · Pickup Counters",       emoji: "🛒", iconSlug: "shopping-cart" },
 ];
 
 /** Solutions hub data — built in buildEditorialPages() (same shape as industries). */
 const _solutionsHubData: HubEntry[] = [];
+
+/* DS-9 #4 (2026-04-26) — Grouped variant for the /solutions/* left rail.
+   Mirrors the SOLUTIONS_MENU groupings used in the global header dropdown
+   (menu-structure.ts). Each entry is a slug → group lookup; the rail
+   builder consumes this map plus _solutionsHubData to render a grouped
+   <renderGroupedHubRail> instead of one flat list of 37 items. */
+const SOLUTIONS_RAIL_GROUPS: Array<{ groupLabel: string; groupSlug: string; emoji: string; iconSlug: string; slugs: string[] }> = [
+  {
+    groupLabel: "Access Control",
+    groupSlug: "access-control",
+    emoji: "🚪",
+    iconSlug: "door",
+    slugs: [
+      "rfid-access-control",
+      "rfid-keyfobs-access-control",
+      "hotel-rfid-access-control",
+      "rfid-attendance-system",
+      "rfid-parking-management",
+      "vehicle-rfid-identification",
+    ],
+  },
+  {
+    groupLabel: "Inventory & Supply Chain",
+    groupSlug: "inventory-supply-chain",
+    emoji: "📦",
+    iconSlug: "package",
+    slugs: [
+      "rfid-inventory-tracking",
+      "rfid-asset-tracking-labels",
+      "rfid-warehouse-management",
+      "rfid-tool-tracking",
+      "rfid-supply-chain-management",
+    ],
+  },
+  {
+    groupLabel: "Hotels & Laundry",
+    groupSlug: "hotels-laundry",
+    emoji: "🏨",
+    iconSlug: "hotel",
+    slugs: [
+      "hotel-key-cards",
+      "rfid-laundry-management",
+      "rfid-laundry-tags",
+      "rfid-laundry-tracking",
+    ],
+  },
+  {
+    groupLabel: "Events & Race",
+    groupSlug: "events-race",
+    emoji: "🎟️",
+    iconSlug: "ticket",
+    slugs: [
+      "rfid-event-wristbands",
+      "rfid-event-access-control",
+      "rfid-race-timing",
+    ],
+  },
+  {
+    groupLabel: "NFC Brand & Auth",
+    groupSlug: "nfc-brand-auth",
+    emoji: "🛡️",
+    iconSlug: "shield-check",
+    slugs: [
+      "nfc-brand-authentication",
+      "nfc-luxury-authentication",
+      "nfc-business-card",
+      "nfc-business-card-programs",
+      "digital-product-passport",
+    ],
+  },
+  {
+    groupLabel: "Google Review Cards",
+    groupSlug: "google-review-cards",
+    emoji: "⭐",
+    iconSlug: "star",
+    slugs: [
+      "google-review-nfc-card",
+      "google-review-cards-for-restaurants",
+      "google-review-cards-for-hotels",
+      "google-review-cards-for-retail-stores",
+      "google-review-cards-for-salons-and-spas",
+      "google-review-cards-for-gyms-and-fitness-studios",
+      "google-review-cards-for-clinics",
+      "google-review-cards-for-front-desks",
+      "google-review-cards-for-checkout-counters",
+      "google-review-cards-for-pickup-counters",
+      "google-review-cards-for-tabletop-prompts",
+    ],
+  },
+  {
+    groupLabel: "Specialty",
+    groupSlug: "specialty",
+    emoji: "🔬",
+    iconSlug: "microscope",
+    slugs: [
+      "rfid-patient-tracking",
+      "rfid-library-management",
+      "rfid-readers-and-encoding",
+    ],
+  },
+];
+
+/** Solutions rail — grouped variant of _solutionsHubData. Built alongside it
+   in buildEditorialPages(). Drives renderGroupedHubRail() for /solutions/* leaf pages. */
+const _solutionsGroupedHubData: GroupedHubData = [];
 
 /**
  * Grouped hub shape — used by sections that aggregate multiple editorial
@@ -736,6 +968,8 @@ type GroupedHubData = Array<{
   groupLabel: string;
   groupSlug: string;
   emoji: string;
+  /** DS-9 icon-replacement: SVG icon name for the group heading. */
+  iconSlug: string;
   items: HubEntry[];
 }>;
 
@@ -748,15 +982,57 @@ type GroupedHubData = Array<{
  * (no per-item curation — there are 170+, and the per-page emoji is replaced
  * by a single group emoji).
  */
-const RESOURCES_GROUP_META: Array<{ groupLabel: string; groupSlug: string; emoji: string; routePrefix: string; editorialGroup: EditorialGroup }> = [
-  { groupLabel: "Blog — Industry Articles",   groupSlug: "blog",          emoji: "📰", routePrefix: "/blog/",          editorialGroup: "blog" },
-  { groupLabel: "Buying Guides",              groupSlug: "guides",        emoji: "📖", routePrefix: "/guides/",        editorialGroup: "guides" },
-  { groupLabel: "Product Comparisons",        groupSlug: "compare",       emoji: "⚖️", routePrefix: "/compare/",       editorialGroup: "compare" },
-  { groupLabel: "Hotel Lock Compatibility",   groupSlug: "compatibility", emoji: "🔌", routePrefix: "/compatibility/", editorialGroup: "compatibility" },
+const RESOURCES_GROUP_META: Array<{ groupLabel: string; groupSlug: string; emoji: string; iconSlug: string; routePrefix: string; editorialGroup: EditorialGroup }> = [
+  { groupLabel: "Blog — Industry Articles",   groupSlug: "blog",          emoji: "📰", iconSlug: "clipboard",   routePrefix: "/blog/",          editorialGroup: "blog" },
+  { groupLabel: "Buying Guides",              groupSlug: "guides",        emoji: "📖", iconSlug: "library",     routePrefix: "/guides/",        editorialGroup: "guides" },
+  { groupLabel: "Product Comparisons",        groupSlug: "compare",       emoji: "⚖️", iconSlug: "layers",      routePrefix: "/compare/",       editorialGroup: "compare" },
+  { groupLabel: "Hotel Lock Compatibility",   groupSlug: "compatibility", emoji: "🔌", iconSlug: "key",         routePrefix: "/compatibility/", editorialGroup: "compatibility" },
 ];
 
 /** Resources hub data — built in buildEditorialPages() (grouped shape). */
 const _resourcesHubData: GroupedHubData = [];
+
+/* ─── Per-hub rail data — DS-9 (2026-04-26) ─────────────────────────────────
+   The flat 4-item Resources rail (`_resourcesRailData`) is still used on
+   `/resources/` itself + on `/blog/*` (the snapshot-driven blog tree). On the
+   three editorial sub-hubs (Buying Guides / Product Comparisons / Hotel Lock
+   Compatibility), users want a rail that drills INTO that hub — its own
+   subcategories — not back out to siblings. These three datasets are built
+   in buildEditorialPages() via slug-pattern matching against each hub's leaf
+   editorial JSONs.
+
+   Grouping rules per hub are declared via `(slug) => boolean` matchers below.
+   First matching group wins, so order of GROUPS arrays matters. Anything
+   that doesn't match any group falls into a synthetic "Other" tail group
+   so we never silently drop pages. */
+
+type HubGroupRule = {
+  groupLabel: string;
+  groupSlug: string;
+  iconSlug: string;
+  matcher: (slug: string) => boolean;
+};
+
+const GUIDES_RAIL_GROUPS: HubGroupRule[] = [
+  { groupLabel: "Google Review Cards", groupSlug: "google-review",        iconSlug: "star",         matcher: (s) => s.startsWith("google-review-") },
+  { groupLabel: "Hotel Key Cards",     groupSlug: "hotel-key-cards",      iconSlug: "key",          matcher: (s) => s.startsWith("hotel-key-card-") },
+  { groupLabel: "Chip Encyclopedias",  groupSlug: "chip-encyclopedias",   iconSlug: "credit-card",  matcher: (s) => /chip-encyclopedia|memory-map|commands-reference|sun-cmac/.test(s) },
+  { groupLabel: "Standards & Encoding", groupSlug: "standards-encoding",  iconSlug: "layers",       matcher: (s) => /^epc-gen2|^gs1-|^iso-|^nfc-ndef|^rain-rfid|^nfc-tag-programming/.test(s) },
+  { groupLabel: "Regulatory & Compliance", groupSlug: "regulatory",       iconSlug: "shield-check", matcher: (s) => /privacy|passport|fda|tagging-mandate|rohs-reach|ce-marking|food-safety/.test(s) },
+  { groupLabel: "Integration & Tools", groupSlug: "integration-tools",    iconSlug: "wrench",       matcher: (s) => /^python-|sap-wms|oracle-netsuite|shopify-inventory|api-guide|reader-writer-selection|iphone-android-compatibility/.test(s) },
+];
+
+const COMPARE_RAIL_GROUPS: HubGroupRule[] = [
+  { groupLabel: "Chip vs Chip",        groupSlug: "chip-vs-chip",         iconSlug: "credit-card",  matcher: (s) => /^mifare-|^ntag\d|^ucode\d|desfire-ev3$/.test(s) },
+  { groupLabel: "Reader vs Reader",    groupSlug: "reader-vs-reader",     iconSlug: "radio",        matcher: (s) => /(acr\d|omnikey|impinj|zebra-fx)/.test(s) },
+  { groupLabel: "Form Factor & Material", groupSlug: "form-factor",       iconSlug: "package",      matcher: (s) => /(keyfob|wristband|sticker|laundry-tag|business-card|hotel-(key-)?card|on-metal)/.test(s) },
+  { groupLabel: "Frequency & Tech",    groupSlug: "frequency-tech",       iconSlug: "radio",        matcher: (s) => /(125khz|13[.-]56mhz|hf-vs-uhf|uhf-vs-hf|active-vs-passive|nfc-vs|rfid-vs-)/.test(s) },
+];
+
+/** Per-hub rail datasets — populated in buildEditorialPages(). */
+const _guidesGroupedRailData: GroupedHubData = [];
+const _compareGroupedRailData: GroupedHubData = [];
+const _compatibilityRailData: HubEntry[] = [];
 
 /**
  * Resources rail nav data — flat 4-item list mirroring the dropdown menu.
@@ -819,7 +1095,7 @@ function renderRelatedIndustriesGrid(definition: EditorialDefinition): string {
   const cards = entries
     .map(
       (cat) => `
-        <a href="${escapeAttribute(cat.href)}" class="codex-related-industry-card">
+        <a href="${escapeAttribute(cat.href)}" class="codex-card codex-card--media codex-related-industry-card">
           ${cat.heroImage ? `<img src="${escapeAttribute(cat.heroImage)}" alt="${escapeAttribute(cat.title)}" loading="lazy" decoding="async">` : ""}
           <div class="codex-related-industry-card__body">
             <span class="codex-related-industry-card__emoji" aria-hidden="true">${escapeHtml(cat.emoji)}</span>
@@ -858,7 +1134,7 @@ function renderIndustryProductGrid(definition: EditorialDefinition): string {
     const img = editorial?.heroImage ?? wpProduct?.image ?? "";
 
     return `
-      <a href="${escapeAttribute(route)}" class="codex-industries-cat-card">
+      <a href="${escapeAttribute(route)}" class="codex-card codex-card--media codex-industries-cat-card">
         ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" loading="lazy">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
         <div class="codex-industries-cat-card__body">
           <h3>${escapeHtml(shortName)}</h3>
@@ -910,7 +1186,7 @@ function renderSolutionProductGrid(definition: EditorialDefinition): string {
     const img = editorial?.heroImage ?? wpProduct?.image ?? "";
 
     return `
-      <a href="${escapeAttribute(route)}" class="codex-industries-cat-card">
+      <a href="${escapeAttribute(route)}" class="codex-card codex-card--media codex-industries-cat-card">
         ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" loading="lazy">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
         <div class="codex-industries-cat-card__body">
           <h3>${escapeHtml(shortName)}</h3>
@@ -945,12 +1221,12 @@ function renderHubRail(items: HubEntry[], currentRoute: string, sectionLabel: st
     .map((entry) => {
       const isActive = entry.route === currentRoute;
       const classAttr = isActive
-        ? "codex-industries-sidebar__link active"
-        : "codex-industries-sidebar__link";
+        ? "codex-industries-rail__link active"
+        : "codex-industries-rail__link";
       const ariaCurrent = isActive ? ' aria-current="page"' : "";
       return `<a href="${escapeAttribute(entry.route)}" class="${classAttr}" data-slug="${escapeAttribute(entry.slug)}"${ariaCurrent}>
-          <span class="codex-industries-sidebar__emoji" aria-hidden="true">${entry.emoji}</span>
-          <span class="codex-industries-sidebar__label">${escapeHtml(entry.label)}</span>
+          <span class="codex-industries-rail__emoji codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</span>
+          <span class="codex-industries-rail__label">${escapeHtml(entry.label)}</span>
         </a>`;
     })
     .join("");
@@ -964,14 +1240,14 @@ function renderHubRail(items: HubEntry[], currentRoute: string, sectionLabel: st
             aria-expanded="false"
             aria-controls="codex-catalog-rail-panel"
             aria-label="Show ${escapeAttribute(lowerSection)}">
-      <span class="codex-catalog-rail-toggle__icon" aria-hidden="true">🗂️</span>
+      <span class="codex-catalog-rail-toggle__icon codex-icon" aria-hidden="true">${getIcon("folder")}</span>
       <span class="codex-catalog-rail-toggle__label">${escapeHtml(sectionLabel)}</span>
     </button>
     <div class="codex-catalog-rail-backdrop" hidden></div>
     <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--${escapeAttribute(railModifier)}" aria-label="${escapeAttribute(sectionLabel)}">
       <button type="button" class="codex-catalog-rail__close" aria-label="Close ${escapeAttribute(lowerSection)}">✕</button>
-      <nav class="codex-industries-sidebar__nav">
-        <div class="codex-industries-sidebar__title">${escapeHtml(sectionLabel)}</div>
+      <nav class="codex-industries-rail__nav">
+        <div class="codex-industries-rail__title">${escapeHtml(sectionLabel)}</div>
         ${links}
       </nav>
     </aside>
@@ -1030,12 +1306,12 @@ function renderHubGrid(items: HubEntry[], sectionLabel: string): string {
   const cards = items
     .map(
       (entry) => `
-        <a href="${escapeAttribute(entry.route)}" class="codex-industries-hub-card">
+        <a href="${escapeAttribute(entry.route)}" class="codex-card codex-card--media codex-industries-hub-card">
           <div class="codex-industries-hub-card__media">
             ${entry.heroImage
               ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" loading="lazy" decoding="async">`
-              : `<div class="codex-industries-hub-card__placeholder" aria-hidden="true">${entry.emoji}</div>`}
-            <span class="codex-industries-hub-card__emoji" aria-hidden="true">${entry.emoji}</span>
+              : `<div class="codex-industries-hub-card__placeholder codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</div>`}
+            <span class="codex-industries-hub-card__emoji codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</span>
           </div>
           <div class="codex-industries-hub-card__body">
             <h3 class="codex-industries-hub-card__title">${escapeHtml(entry.label)}</h3>
@@ -1060,7 +1336,7 @@ function renderHubGrid(items: HubEntry[], sectionLabel: string): string {
 /**
  * Grouped variant of `renderHubRail`. Same drawer/toggle structure (so the
  * mobile interaction + CSS classes match), but each group renders its own
- * labelled `<div class="codex-industries-sidebar__group-title">` header
+ * labelled `<div class="codex-industries-rail__group-title">` header
  * followed by the items belonging to that group. Used by /resources/ to keep
  * Guides / Compare / Compatibility visually distinct in a single rail.
  */
@@ -1075,17 +1351,21 @@ function renderGroupedHubRail(groups: GroupedHubData, currentRoute: string, sect
         .map((entry) => {
           const isActive = entry.route === currentRoute;
           const classAttr = isActive
-            ? "codex-industries-sidebar__link active"
-            : "codex-industries-sidebar__link";
+            ? "codex-industries-rail__link active"
+            : "codex-industries-rail__link";
           const ariaCurrent = isActive ? ' aria-current="page"' : "";
           return `<a href="${escapeAttribute(entry.route)}" class="${classAttr}" data-slug="${escapeAttribute(entry.slug)}"${ariaCurrent}>
-              <span class="codex-industries-sidebar__emoji" aria-hidden="true">${entry.emoji}</span>
-              <span class="codex-industries-sidebar__label">${escapeHtml(entry.label)}</span>
+              <span class="codex-industries-rail__emoji codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</span>
+              <span class="codex-industries-rail__label">${escapeHtml(entry.label)}</span>
             </a>`;
         })
         .join("");
-      return `<div class="codex-industries-sidebar__group">
-          <div class="codex-industries-sidebar__group-title">${escapeHtml(group.groupLabel)} <span class="codex-industries-sidebar__group-count">${group.items.length}</span></div>
+      return `<div class="codex-industries-rail__group">
+          <div class="codex-industries-rail__group-title">
+            <span class="codex-industries-rail__group-icon codex-icon" aria-hidden="true">${getIcon(group.iconSlug)}</span>
+            ${escapeHtml(group.groupLabel)}
+            <span class="codex-industries-rail__group-count">${group.items.length}</span>
+          </div>
           ${links}
         </div>`;
     })
@@ -1100,14 +1380,14 @@ function renderGroupedHubRail(groups: GroupedHubData, currentRoute: string, sect
             aria-expanded="false"
             aria-controls="codex-catalog-rail-panel"
             aria-label="Show ${escapeAttribute(lowerSection)}">
-      <span class="codex-catalog-rail-toggle__icon" aria-hidden="true">🗂️</span>
+      <span class="codex-catalog-rail-toggle__icon codex-icon" aria-hidden="true">${getIcon("folder")}</span>
       <span class="codex-catalog-rail-toggle__label">${escapeHtml(sectionLabel)}</span>
     </button>
     <div class="codex-catalog-rail-backdrop" hidden></div>
     <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--${escapeAttribute(railModifier)} codex-catalog-rail--grouped" aria-label="${escapeAttribute(sectionLabel)}">
       <button type="button" class="codex-catalog-rail__close" aria-label="Close ${escapeAttribute(lowerSection)}">✕</button>
-      <nav class="codex-industries-sidebar__nav">
-        <div class="codex-industries-sidebar__title">${escapeHtml(sectionLabel)}</div>
+      <nav class="codex-industries-rail__nav">
+        <div class="codex-industries-rail__title">${escapeHtml(sectionLabel)}</div>
         ${groupHtml}
       </nav>
     </aside>
@@ -1164,12 +1444,12 @@ function renderGroupedHubGrid(groups: GroupedHubData, sectionLabel: string): str
       const cards = group.items
         .map(
           (entry) => `
-            <a href="${escapeAttribute(entry.route)}" class="codex-industries-hub-card">
+            <a href="${escapeAttribute(entry.route)}" class="codex-card codex-card--media codex-industries-hub-card">
               <div class="codex-industries-hub-card__media">
                 ${entry.heroImage
                   ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" loading="lazy" decoding="async">`
-                  : `<div class="codex-industries-hub-card__placeholder" aria-hidden="true">${entry.emoji}</div>`}
-                <span class="codex-industries-hub-card__emoji" aria-hidden="true">${entry.emoji}</span>
+                  : `<div class="codex-industries-hub-card__placeholder codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</div>`}
+                <span class="codex-industries-hub-card__emoji codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</span>
               </div>
               <div class="codex-industries-hub-card__body">
                 <h3 class="codex-industries-hub-card__title">${escapeHtml(entry.label)}</h3>
@@ -1186,7 +1466,7 @@ function renderGroupedHubGrid(groups: GroupedHubData, sectionLabel: string): str
           ? "Side-by-side picker pages: chip vs chip, frequency band vs band, form-factor vs form-factor — for buyers narrowing a shortlist."
           : "Vendor lock cross-reference: which RFID/NFC card encodes for which OEM lock estate, with chip family + sample-request notes.";
       return `<section class="codex-editorial-section codex-resources-group" id="${escapeAttribute(groupId)}" aria-label="${escapeAttribute(group.groupLabel)}">
-        <h2 class="codex-resources-group__title"><span class="codex-resources-group__emoji" aria-hidden="true">${group.emoji}</span> ${escapeHtml(group.groupLabel)} <span class="codex-resources-group__count">${group.items.length}</span></h2>
+        <h2 class="codex-resources-group__title"><span class="codex-resources-group__emoji codex-icon" aria-hidden="true">${getIcon(group.iconSlug)}</span> ${escapeHtml(group.groupLabel)} <span class="codex-resources-group__count">${group.items.length}</span></h2>
         <p class="codex-editorial-section-intro">${escapeHtml(blurb)}</p>
         <div class="codex-industries-hub-grid__list">
           ${cards}
@@ -1254,9 +1534,9 @@ function renderResourcesCategoryHub(groups: GroupedHubData, sectionLabel: string
         .join("");
 
       return `
-        <article class="codex-resources-category-card" id="${escapeAttribute(groupId)}">
+        <article class="codex-card codex-resources-category-card" id="${escapeAttribute(groupId)}">
           <header class="codex-resources-category-card__header">
-            <span class="codex-resources-category-card__emoji" aria-hidden="true">${group.emoji}</span>
+            <span class="codex-resources-category-card__emoji codex-icon" aria-hidden="true">${getIcon(group.iconSlug)}</span>
             <div class="codex-resources-category-card__heading">
               <h3 class="codex-resources-category-card__title">${escapeHtml(group.groupLabel)}</h3>
               <p class="codex-resources-category-card__count">${group.items.length} ${itemNoun}</p>
@@ -1309,7 +1589,14 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
   // /compatibility/<slug>/ leaf gets only the rail (so visitors can hop
   // back to the resources hub from any leaf).
   const isResourcesHub = definition.route === "/resources/";
-  const isResourcesPage = isResourcesHub || /^\/(?:blog|guides|compare|compatibility)\/[^/]+\/$/.test(definition.route);
+  /* Match `/resources/` itself, the four sub-hub landing pages
+     (`/guides/`, `/compare/`, `/compatibility/`, `/blog/`) AND any of their
+     leaf pages (`/guides/<slug>/` etc). The optional `([^/]+/)?` captures
+     either zero or one path segment after the prefix, so the same regex
+     handles both hub and leaf in one match. Per user 2026-04-26 — the
+     three editorial hub pages (Buying Guides / Product Comparisons /
+     Hotel Lock Compatibility) need the rail just like Blog already has it. */
+  const isResourcesPage = isResourcesHub || /^\/(?:blog|guides|compare|compatibility)\/(?:[^/]+\/)?$/.test(definition.route);
 
   let railHtml = "";
   let hubGridHtml = "";
@@ -1317,19 +1604,33 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
     railHtml = renderHubRail(_industriesHubData, definition.route, "Industries");
     if (isIndustriesHub) hubGridHtml = renderHubGrid(_industriesHubData, "industries");
   } else if (isSolutionsPage) {
-    railHtml = renderHubRail(_solutionsHubData, definition.route, "Solutions");
+    /* DS-9 #4 (2026-04-26) — Switched to grouped rail. The flat 37-item
+       rail was the #4 critical issue from the design-critique pass: no
+       grouping, no current-page highlight, no visual hierarchy → IA
+       failure. renderGroupedHubRail uses the same drawer/toggle CSS so
+       responsive behaviour is unchanged. */
+    railHtml = renderGroupedHubRail(_solutionsGroupedHubData, definition.route, "Solutions");
     if (isSolutionsHub) hubGridHtml = renderHubGrid(_solutionsHubData, "solutions");
   } else if (isResourcesPage) {
-    // Resources rail = the same 4 items as the dropdown menu (Blog, Buying
-    // Guides, Product Comparisons, Hotel Lock Compatibility). Each item is
-    // an in-page anchor link to the matching category card in the body hub.
-    railHtml = renderHubRail(_resourcesRailData, definition.route, "Resources");
-    // Body grid = 4 large category cards (one per group), each with count
-    // badge, sample-item links and a "Browse all N items" CTA pointing to the
-    // category's dedicated landing page (/blog/, /guides/, /compare/,
-    // /compatibility/). The full 176-leaf grid lives on those landing pages,
-    // not here — /resources/ is the category-router level.
-    if (isResourcesHub) hubGridHtml = renderResourcesCategoryHub(_resourcesHubData, "resources");
+    /* DS-9 2026-04-26 — per-hub rail dispatch. /resources/ keeps the
+       cross-family rail (4 sub-hubs); /guides/, /compare/, /compatibility/
+       and their leaves get hub-specific drilldown rails so visitors browse
+       INTO the topic, not back out to siblings. /blog/* keeps the resources
+       rail (it's snapshot-driven; no editorial buckets to group on). */
+    if (isResourcesHub) {
+      railHtml = renderHubRail(_resourcesRailData, definition.route, "Resources");
+      hubGridHtml = renderResourcesCategoryHub(_resourcesHubData, "resources");
+    } else if (definition.route.startsWith("/guides/")) {
+      railHtml = renderGroupedHubRail(_guidesGroupedRailData, definition.route, "Buying Guides");
+    } else if (definition.route.startsWith("/compare/")) {
+      railHtml = renderGroupedHubRail(_compareGroupedRailData, definition.route, "Comparisons");
+    } else if (definition.route.startsWith("/compatibility/")) {
+      railHtml = renderHubRail(_compatibilityRailData, definition.route, "Lock Compatibility");
+    } else {
+      // /blog/* (snapshot-driven) and any future leaves still get the
+      // cross-family Resources rail as a fallback.
+      railHtml = renderHubRail(_resourcesRailData, definition.route, "Resources");
+    }
   }
 
   const contentWrapClass = (isIndustriesPage || isSolutionsPage || isResourcesPage)
@@ -1360,12 +1661,12 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
                   ${definition.heroPoints.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
                 </ul>
                 ${definition.group !== "contact" ? `<div class="codex-hero-cta">
-                  <a class="codex-hero-cta-btn" href="${escapeAttribute(definition.primaryAction.href)}">${escapeHtml(definition.primaryAction.label)}</a>
+                  <a class="codex-hero-cta-btn" data-cta-tier="hero" href="/contact/?intent=samples&amp;route=${escapeAttribute(encodeURIComponent(definition.route))}">Request samples</a>
                   ${(() => {
                     const pillarClusterId = getPillarClusterId(definition.route);
                     if (!pillarClusterId) return "";
                     const label = PILLAR_CLUSTER_LABELS[pillarClusterId];
-                    return `<a class="codex-hero-cta-btn codex-hero-cta-btn--ghost" href="/products/all/#${escapeAttribute(pillarClusterId)}" data-pillar-bridge="${escapeAttribute(pillarClusterId)}">Browse all ${escapeHtml(label)} SKUs →</a>`;
+                    return `<a class="codex-hero-cta-btn codex-hero-cta-btn--ghost" href="/products/all/#${escapeAttribute(pillarClusterId)}" data-pillar-bridge="${escapeAttribute(pillarClusterId)}">Browse all ${escapeHtml(label)} SKUs <span aria-hidden="true">→</span></a>`;
                   })()}
                 </div>
                 <div class="codex-hero-trust-bar">
@@ -1377,9 +1678,24 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
               </div>
               ${
                 illustration
-                  ? `<figure class="codex-editorial-figure">
-                      <img src="${escapeAttribute(illustration.src)}" alt="${escapeAttribute(illustration.alt)}" loading="eager" fetchpriority="high" decoding="async">
-                    </figure>`
+                  // DS-15 Phase 6 #2 + #6 — width/height intrinsics +
+                  // <picture> WebP-first markup. Mirror of
+                  // EditorialPage.astro:222. WebP variants live alongside
+                  // originals in /landing-images/ (built by
+                  // scripts/build-image-variants.py).
+                  ? (() => {
+                      const imgTag = `<img src="${escapeAttribute(illustration.src)}" alt="${escapeAttribute(illustration.alt)}" width="1200" height="675" loading="eager" fetchpriority="high" decoding="async">`;
+                      if (illustration.src.startsWith("/landing-images/")) {
+                        const webp = illustration.src.replace(/\.(jpe?g|png)$/i, ".webp");
+                        return `<figure class="codex-editorial-figure">
+                          <picture>
+                            <source srcset="${escapeAttribute(webp)}" type="image/webp">
+                            ${imgTag}
+                          </picture>
+                        </figure>`;
+                      }
+                      return `<figure class="codex-editorial-figure">${imgTag}</figure>`;
+                    })()
                   : ""
               }
             </section>
@@ -1390,9 +1706,20 @@ function renderEditorialMain(definition: EditorialDefinition, illustration: { sr
             ${renderRelatedIndustriesGrid(definition)}
             ${renderDecisionSnapshot(definition, outline.snapshotId)}
             ${renderJumpNav(outline.jumpLinks)}
-            ${outline.filteredSections.map((section, index) => renderSection(section, outline.sectionLinks[index]?.id ?? "section")).join("")}
+            ${(() => {
+              // DS-10 #2: build a CitationCtx so any `[^N]` markers in section
+              // bodies render as <sup> links into the Sources block. Skipped
+              // when the page has no sources.
+              const citationCtx: CitationCtx | undefined = outline.sourcesId && (definition.sources?.length ?? 0) > 0
+                ? { sourcesId: outline.sourcesId, sourcesCount: definition.sources!.length }
+                : undefined;
+              return outline.filteredSections
+                .map((section, index) => renderSection(section, outline.sectionLinks[index]?.id ?? "section", citationCtx))
+                .join("");
+            })()}
             ${renderResourceGrid(definition.resourceCards, outline.resourcesId)}
             ${definition.faq.length > 0 && outline.faqId ? renderFaq(definition.faq, outline.faqId) : ""}
+            ${outline.sourcesId ? renderSources(definition, outline.sourcesId) : ""}
             ${definition.group !== "contact" ? renderTrustSignals() : ""}
             ${renderInlineRfqForm(definition)}
             ${renderActionBar(definition, outline.nextStepId)}
@@ -1446,7 +1773,16 @@ function renderTrail(definition: EditorialDefinition): string {
   }
 
   if (!isSectionRoot(definition.route)) {
-    links.push({ href: definition.route, label: definition.title });
+    /* DS-9 KPI cleanup (2026-04-26) — Breadcrumbs should show a SHORT
+       page label, not the full SEO title. Many editorial titles carry a
+       chip-spec or compliance suffix after an em-dash / pipe / colon
+       (e.g. "RFID Access Control — HID Seos / DESFire EV3 / OSDP v2.2 /
+       UL 294 / NIST SP 800-116 PACS") which makes the breadcrumb wrap to
+       3+ lines on narrow viewports. Split on the same separators
+       _resourcesHubData already uses, then cap at 60 chars to be safe. */
+    const shortTitle = definition.title.split(/—|–|\||:/, 1)[0]?.trim() || definition.title;
+    const trimmed = shortTitle.length > 60 ? shortTitle.slice(0, 57).trimEnd() + "…" : shortTitle;
+    links.push({ href: definition.route, label: trimmed });
   }
 
   return `<nav class="codex-editorial-trail" aria-label="Breadcrumb">
@@ -1467,6 +1803,7 @@ function buildEditorialOutline(definition: EditorialDefinition): {
   filteredSections: EditorialSection[];
   resourcesId: string;
   faqId: string | null;
+  sourcesId: string | null;
   nextStepId: string;
   jumpLinks: Array<{ id: string; label: string }>;
 } {
@@ -1498,12 +1835,14 @@ function buildEditorialOutline(definition: EditorialDefinition): {
   const sectionLinks = filteredSections.map((section) => ({ id: createId(section.title), label: section.title }));
   const resourcesId = createId("Useful next pages");
   const faqId = definition.faq.length > 0 ? createId("FAQ") : null;
+  const sourcesId = definition.sources && definition.sources.length > 0 ? createId("Sources") : null;
   const nextStepId = createId("Next step");
   const jumpLinks = [
     { id: snapshotId, label: "At a glance" },
     ...sectionLinks,
     { id: resourcesId, label: "Useful next pages" },
     ...(faqId ? [{ id: faqId, label: "FAQ" }] : []),
+    ...(sourcesId ? [{ id: sourcesId, label: "Sources" }] : []),
     { id: nextStepId, label: "Next step" },
   ];
 
@@ -1514,6 +1853,7 @@ function buildEditorialOutline(definition: EditorialDefinition): {
     filteredSections,
     resourcesId,
     faqId,
+    sourcesId,
     nextStepId,
     jumpLinks,
   };
@@ -1549,7 +1889,7 @@ function renderDecisionSnapshot(definition: EditorialDefinition, id: string): st
     <div class="codex-editorial-snapshot-grid">
       ${cards
         .map(
-          (card) => `<article class="codex-editorial-snapshot-card">
+          (card) => `<article class="codex-card codex-editorial-snapshot-card">
             <p class="codex-editorial-answer-label">${escapeHtml(card.label)}</p>
             <p>${escapeHtml(card.text)}</p>
             ${card.link ? `<a class="codex-editorial-snapshot-link" href="${escapeAttribute(card.link.href)}">${escapeHtml(card.link.label)}</a>` : ""}
@@ -1664,12 +2004,50 @@ function truncateEditorialText(value: string, limit: number): string {
   return `${normalized.slice(0, Math.max(0, limit - 1)).trimEnd()}...`;
 }
 
-function renderInlineLinks(text: string): string {
-  // Convert markdown-style [label](url) to HTML links, escape everything else
-  return escapeHtml(text).replace(
+/**
+ * Optional citation context passed through the render pipeline so authors can
+ * use `[^N]` markers in body text to link a contested claim to source #N in
+ * the page's Sources block. DS-10 #2 — turn the sources block from a passive
+ * "credentialing badge" at the page bottom into an active in-read trust
+ * mechanism.
+ */
+type CitationCtx = {
+  sourcesId: string;
+  sourcesCount: number;
+};
+
+function renderInlineLinks(text: string, citations?: CitationCtx): string {
+  // Convert markdown-style [label](url) to HTML links, escape everything else.
+  // Citation markers are rewritten BEFORE escapeHtml so the produced markup
+  // survives. We use a temporary token so the inner HTML is reintroduced after
+  // escaping the surrounding plain text.
+  const CITE_OPEN = "CITEOPEN";
+  const CITE_CLOSE = "CITECLOSE";
+
+  let working = text;
+
+  if (citations && citations.sourcesCount > 0) {
+    working = working.replace(/\[\^(\d+)\]/g, (match, raw) => {
+      const n = Number(raw);
+      if (!Number.isInteger(n) || n < 1 || n > citations.sourcesCount) return match;
+      return `${CITE_OPEN}${n}${CITE_CLOSE}`;
+    });
+  }
+
+  let html = escapeHtml(working).replace(
     /\[([^\]]+)\]\(([^)]+)\)/g,
     (_match, label, url) => `<a href="${escapeAttribute(url)}">${label}</a>`,
   );
+
+  if (citations) {
+    const re = new RegExp(`${CITE_OPEN}(\\d+)${CITE_CLOSE}`, "g");
+    html = html.replace(re, (_match, n) => {
+      const href = `#${citations.sourcesId}-${n}`;
+      return `<sup class="codex-citation"><a href="${escapeAttribute(href)}" aria-label="Citation ${n}, see Sources block">[${n}]</a></sup>`;
+    });
+  }
+
+  return html;
 }
 
 function detectSectionType(title: string): string {
@@ -1681,10 +2059,10 @@ function detectSectionType(title: string): string {
   return "";
 }
 
-function renderSection(section: EditorialSection, id: string): string {
-  const introHtml = section.intro ? `<p class="codex-editorial-section-intro">${renderInlineLinks(section.intro)}</p>` : "";
-  const paragraphsHtml = (section.paragraphs ?? []).map((paragraph) => `<p>${renderInlineLinks(paragraph)}</p>`).join("");
-  const bulletsHtml = renderSectionList(section);
+function renderSection(section: EditorialSection, id: string, citations?: CitationCtx): string {
+  const introHtml = section.intro ? `<p class="codex-editorial-section-intro">${renderInlineLinks(section.intro, citations)}</p>` : "";
+  const paragraphsHtml = (section.paragraphs ?? []).map((paragraph) => `<p>${renderInlineLinks(paragraph, citations)}</p>`).join("");
+  const bulletsHtml = renderSectionList(section, citations);
   const tableHtml = section.table ? renderTable(section.table) : "";
   const imageHtml = section.image
     ? `<figure class="codex-editorial-figure"><img src="${escapeAttribute(section.image.src)}" alt="${escapeAttribute(section.image.alt)}" loading="lazy" decoding="async"></figure>`
@@ -1692,8 +2070,8 @@ function renderSection(section: EditorialSection, id: string): string {
   const calloutHtml = section.callout
     ? `<aside class="codex-editorial-callout">
         <strong>${escapeHtml(section.callout.label)}</strong>
-        <p>${renderInlineLinks(section.callout.text)}</p>
-        ${section.callout.href ? `<a href="${escapeAttribute(section.callout.href)}" class="codex-editorial-callout__link">Learn more →</a>` : ""}
+        <p>${renderInlineLinks(section.callout.text, citations)}</p>
+        ${section.callout.href ? `<a href="${escapeAttribute(section.callout.href)}" class="codex-editorial-callout__link">Learn more <span aria-hidden="true">→</span></a>` : ""}
       </aside>`
     : "";
 
@@ -1711,7 +2089,7 @@ function renderSection(section: EditorialSection, id: string): string {
   </section>`;
 }
 
-function renderSectionList(section: EditorialSection): string {
+function renderSectionList(section: EditorialSection, citations?: CitationCtx): string {
   if (!section.bullets || section.bullets.length === 0) {
     return "";
   }
@@ -1722,14 +2100,14 @@ function renderSectionList(section: EditorialSection): string {
         .map(
           (item, index) => `<li class="codex-editorial-step">
             <span class="codex-editorial-step-index">Step ${index + 1}</span>
-            <div class="codex-editorial-step-copy">${renderInlineLinks(item)}</div>
+            <div class="codex-editorial-step-copy">${renderInlineLinks(item, citations)}</div>
           </li>`,
         )
         .join("")}
     </ol>`;
   }
 
-  return `<ul class="codex-editorial-list">${section.bullets.map((item) => `<li>${renderInlineLinks(item)}</li>`).join("")}</ul>`;
+  return `<ul class="codex-editorial-list">${section.bullets.map((item) => `<li>${renderInlineLinks(item, citations)}</li>`).join("")}</ul>`;
 }
 
 function isWorkflowSection(title: string): boolean {
@@ -1737,12 +2115,36 @@ function isWorkflowSection(title: string): boolean {
 }
 
 function renderBrief(fields: EditorialBriefField[], id: string): string {
-  return `<section class="codex-editorial-section codex-editorial-brief" id="${escapeAttribute(id)}">
+  // DS-10 #3 — collapse Brief into <details> by default. Most evaluators
+  // arriving at a flagship page want spec → CTA, not 4–6 paragraphs of prose.
+  // The body of the Brief stays in the DOM (so search and a11y pick it up)
+  // but is closed on first paint. An inline script in BaseLayout auto-opens
+  // it when the user came from a long-form context (blog / guides / compare /
+  // compatibility) or explicitly requested reading mode via `?reading=true`.
+  //
+  // Read-time estimate: ~80 words/field × 0.4s = rough 30s per field. Capped
+  // at 6 minutes so the label stays believable on long briefs.
+  const wordCount = fields.reduce((sum, field) => {
+    let n = 0;
+    if (field.text) n += field.text.split(/\s+/).length;
+    if (field.items) n += field.items.reduce((s, item) => s + item.split(/\s+/).length, 0);
+    return sum + n;
+  }, 0);
+  const minutes = Math.max(1, Math.min(6, Math.round(wordCount / 220)));
+  const summaryLabel = `Read the full project checklist (~${minutes} min)`;
+
+  return `<section class="codex-editorial-section codex-editorial-brief" id="${escapeAttribute(id)}" data-collapsible-brief>
     <h2>Project checklist</h2>
     <p class="codex-editorial-section-intro">Use this checklist to write a clear first inquiry and shorten the back-and-forth on samples, pricing, or compatibility.</p>
-    <dl class="codex-editorial-brief-grid">
-      ${fields.map((field) => renderBriefField(field)).join("")}
-    </dl>
+    <details class="codex-disclosure codex-editorial-brief-details">
+      <summary class="codex-disclosure__summary">
+        <span class="codex-disclosure__label">${escapeHtml(summaryLabel)}</span>
+        <span class="codex-disclosure__hint" aria-hidden="true">${fields.length} field${fields.length === 1 ? "" : "s"}</span>
+      </summary>
+      <dl class="codex-disclosure__body codex-editorial-brief-grid">
+        ${fields.map((field) => renderBriefField(field)).join("")}
+      </dl>
+    </details>
   </section>`;
 }
 
@@ -1761,7 +2163,7 @@ function renderBriefField(field: EditorialBriefField): string {
         </div>`
       : "";
 
-  return `<div class="codex-editorial-brief-card">
+  return `<div class="codex-card codex-editorial-brief-card">
     <dt>${escapeHtml(field.label)}</dt>
     <dd>
       ${textHtml}
@@ -1771,17 +2173,64 @@ function renderBriefField(field: EditorialBriefField): string {
   </div>`;
 }
 
+/**
+ * Wrap glyph-only cell values (✓ / ✗ / Yes / No / —) in a centered span so
+ * the cell meets WCAG 2.5.5 (44×44 touch target) and the symbol stays
+ * visually centered. The wrapper carries `data-cell-glyph` so CSS can
+ * target it without depending on the literal character. DS-10 #4.
+ */
+function renderTableCellValue(value: string): string {
+  const trimmed = value.trim();
+  // Detect a small set of glyphs that act as semantic icons in compare tables.
+  // We keep the original character on screen but wrap it for hit-target sizing.
+  const glyphMap: Record<string, string> = {
+    "✓": "yes",
+    "✔": "yes",
+    "✗": "no",
+    "✘": "no",
+    "—": "neutral",
+    "–": "neutral",
+    "-": "neutral",
+    "Yes": "yes",
+    "No": "no",
+    "N/A": "neutral",
+    "n/a": "neutral",
+  };
+  const glyphKey = glyphMap[trimmed];
+  if (glyphKey) {
+    const ariaLabel =
+      glyphKey === "yes" ? "Supported" : glyphKey === "no" ? "Not supported" : "Not applicable";
+    return `<span class="codex-cell-glyph" data-cell-glyph="${glyphKey}" aria-label="${ariaLabel}" role="img">${escapeHtml(trimmed)}</span>`;
+  }
+  return escapeHtml(value);
+}
+
 function renderTable(table: EditorialTable): string {
-  const headerHtml = table.columns.map((column) => `<th scope="col">${escapeHtml(column)}</th>`).join("");
+  // DS-10 #4 — sortable column headers + sticky first column.
+  // The first column is row-label (entity being compared); subsequent columns
+  // are data the user might want to sort by. We mark the table data-sortable
+  // and let the inline script in BaseLayout wire click handlers on
+  // <th scope="col">. Initial aria-sort=none on each. The script is a
+  // progressive enhancement — without JS the table reads top-to-bottom as
+  // authored.
+  const headerHtml = table.columns
+    .map(
+      (column, index) =>
+        `<th scope="col" ${index === 0 ? "" : `data-sort-col="${index}" aria-sort="none" tabindex="0" role="columnheader button"`}>` +
+        `<span class="codex-th-label">${escapeHtml(column)}</span>` +
+        `${index === 0 ? "" : `<span class="codex-th-indicator" aria-hidden="true"></span>`}` +
+        `</th>`,
+    )
+    .join("");
   const rowsHtml = table.rows
     .map((row) => {
       const [first, ...rest] = row;
-      return `<tr><th scope="row">${escapeHtml(first)}</th>${rest.map((value) => `<td>${escapeHtml(value)}</td>`).join("")}</tr>`;
+      return `<tr><th scope="row">${escapeHtml(first)}</th>${rest.map((value) => `<td>${renderTableCellValue(value)}</td>`).join("")}</tr>`;
     })
     .join("");
 
-  return `<div class="codex-editorial-table-wrap">
-    <table class="codex-editorial-table">
+  return `<div class="codex-scroll-region codex-editorial-table-wrap" tabindex="0" role="region" aria-label="Comparison table — scroll horizontally to see more columns">
+    <table class="codex-editorial-table" data-sortable="true">
       <thead><tr>${headerHtml}</tr></thead>
       <tbody>${rowsHtml}</tbody>
     </table>
@@ -1789,7 +2238,7 @@ function renderTable(table: EditorialTable): string {
 }
 
 function renderResourceCard(card: EditorialResourceCard): string {
-  return `<section class="codex-editorial-card">
+  return `<section class="codex-card codex-editorial-card">
     <h2>${escapeHtml(card.title)}</h2>
     <p>${escapeHtml(card.description)}</p>
     <div class="codex-editorial-link-list">
@@ -1828,6 +2277,62 @@ function renderFaq(faq: EditorialFaq[], id: string): string {
         )
         .join("")}
     </div>
+  </section>`;
+}
+
+/**
+ * renderSources — mirror of SourceList.astro for the legacy HTML-render
+ * pathway used by snapshot pages via mergeEditorialPages. JSON-LD citation[]
+ * emission for these pages is handled in editorial-authority-ld.ts and is NOT
+ * duplicated here.
+ */
+function renderSources(definition: EditorialDefinition, id: string): string {
+  const sources = definition.sources ?? [];
+  if (sources.length === 0) return "";
+
+  const formatDate = (iso: string | undefined): string | null => {
+    if (!iso) return null;
+    try {
+      const d = new Date(iso.length === 4 ? `${iso}-01-01` : iso);
+      if (Number.isNaN(d.getTime())) return iso;
+      return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+    } catch {
+      return iso;
+    }
+  };
+
+  const displayHost = (url: string): string => {
+    try {
+      return new URL(url).host.replace(/^www\./, "");
+    } catch {
+      return url;
+    }
+  };
+
+  const items = sources
+    .map((src, index) => {
+      const pub = src.publisher ? src.publisher : displayHost(src.url);
+      const published = formatDate(src.publishedAt);
+      const accessed = formatDate(src.accessedAt);
+      const note = src.note ? `<p class="codex-sources-note">${escapeHtml(src.note)}</p>` : "";
+      // DS-10 #2: each <li> gets a stable id (`<sourcesId>-<1-based>`) so an
+      // inline `[^N]` marker can deep-link to it. Also adds tabindex=-1 so a
+      // keyboard user landing here via the sup link gets a focus outline.
+      const itemId = `${id}-${index + 1}`;
+      return `<li id="${escapeAttribute(itemId)}" class="codex-sources-item" tabindex="-1">
+        <span class="codex-sources-num" aria-hidden="true">${index + 1}.</span>
+        <a class="codex-sources-link" href="${escapeAttribute(src.url)}" rel="noopener external" target="_blank">${escapeHtml(src.label)}</a>
+        <span class="codex-sources-meta">
+          <span class="codex-sources-publisher">${escapeHtml(pub)}</span>${published ? ` <span class="codex-sources-date"> · ${escapeHtml(published)}</span>` : ""}${accessed ? ` <span class="codex-sources-accessed"> · accessed ${escapeHtml(accessed)}</span>` : ""}
+        </span>${note}
+      </li>`;
+    })
+    .join("");
+
+  return `<section id="${escapeAttribute(id)}" class="codex-sources" aria-labelledby="${escapeAttribute(id)}-heading">
+    <h2 id="${escapeAttribute(id)}-heading" class="codex-sources-heading">Sources &amp; references</h2>
+    <p class="codex-sources-lead">Primary standards, OEM datasheets and regulatory documents cited by this article. All URLs were verified on the access date shown below.</p>
+    <ol class="codex-sources-list">${items}</ol>
   </section>`;
 }
 
@@ -1892,7 +2397,7 @@ function renderContactChannels(definition: EditorialDefinition): string {
         <span class="codex-editorial-channel__body">
           <span class="codex-editorial-channel__label">Email</span>
           <span class="codex-editorial-channel__value">info@proudtek.com</span>
-          <span class="codex-editorial-channel__hint">Opens prefilled with the ${escapeHtml(definition.kicker.toLowerCase())} brief →</span>
+          <span class="codex-editorial-channel__hint">Opens prefilled with the ${escapeHtml(definition.kicker.toLowerCase())} brief <span aria-hidden="true">→</span></span>
         </span>
       </a>
       <a class="codex-editorial-channel" href="${escapeAttribute(phoneHref)}">
@@ -1916,7 +2421,7 @@ function renderContactChannels(definition: EditorialDefinition): string {
         <span class="codex-editorial-channel__body">
           <span class="codex-editorial-channel__label">Contact form</span>
           <span class="codex-editorial-channel__value">Send a structured brief</span>
-          <span class="codex-editorial-channel__hint">Use the main form on /contact/ →</span>
+          <span class="codex-editorial-channel__hint">Use the main form on /contact/ <span aria-hidden="true">→</span></span>
         </span>
       </a>
     </div>
@@ -1924,23 +2429,68 @@ function renderContactChannels(definition: EditorialDefinition): string {
 }
 
 function renderInlineRfqForm(definition: EditorialDefinition): string {
+  // DS-11 #5a — full a11y rebuild. Each field gets a real <label>, the
+  // placeholder is dropped (placeholders disappear on focus and don't
+  // satisfy WCAG 3.3.2 Labels or Instructions). Required fields are
+  // marked with HTML5 `required` + `aria-required="true"` and linked to a
+  // sibling hint via `aria-describedby`. Each input has an empty error
+  // container with `role="alert" aria-live="polite"` that the form
+  // enhancement script in BaseLayout fills on validation. The form itself
+  // is data-codex-rfq so the script can opt in cleanly.
   const productName = escapeAttribute(definition.title);
+  // Generate a per-form id prefix so multiple forms on the same page (rare
+  // but possible) don't collide on input IDs.
+  const seed = (definition.route || "rfq")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase()
+    .slice(0, 32) || "rfq";
+
+  const field = (name: string, opts: {
+    type: string;
+    label: string;
+    hint: string;
+    required?: boolean;
+    rows?: number;
+    autocomplete?: string;
+    inputmode?: string;
+  }): string => {
+    const id = `codex-rfq-${seed}-${name}`;
+    const hintId = `${id}-hint`;
+    const errId = `${id}-error`;
+    const reqMark = opts.required
+      ? ` <span class="codex-rfq-required" aria-hidden="true">*</span>`
+      : "";
+    const reqAttrs = opts.required ? ` required aria-required="true"` : "";
+    const ac = opts.autocomplete ? ` autocomplete="${opts.autocomplete}"` : "";
+    const im = opts.inputmode ? ` inputmode="${opts.inputmode}"` : "";
+    const control = opts.type === "textarea"
+      ? `<textarea id="${id}" name="${name}" rows="${opts.rows ?? 3}"${reqAttrs} aria-describedby="${hintId} ${errId}"></textarea>`
+      : `<input id="${id}" name="${name}" type="${opts.type}"${reqAttrs} aria-describedby="${hintId} ${errId}"${ac}${im} />`;
+    return `<div class="codex-inline-rfq-field">
+      <label for="${id}" class="codex-inline-rfq-label">${escapeHtml(opts.label)}${reqMark}</label>
+      <span id="${hintId}" class="codex-inline-rfq-hint">${escapeHtml(opts.hint)}</span>
+      ${control}
+      <span id="${errId}" class="codex-inline-rfq-error" role="alert" aria-live="polite"></span>
+    </div>`;
+  };
+
   return `<section class="codex-inline-rfq">
     <h2>Get a Quick Quote</h2>
-    <p>Tell us about your project and we'll respond within one business day.</p>
-    <form action="https://formspree.io/f/xlgorlog" method="POST" class="codex-inline-rfq-form">
+    <p>Tell us about your project and we'll respond within one business day. Fields marked <span class="codex-rfq-required" aria-hidden="true">*</span><span class="codex-sr-only">(asterisk)</span> are required.</p>
+    <form action="https://formspree.io/f/xlgorlog" method="POST" class="codex-inline-rfq-form" data-codex-rfq novalidate>
       <input type="hidden" name="_subject" value="Inquiry: ${productName}" />
       <input type="hidden" name="product" value="${productName}" />
       <div class="codex-inline-rfq-row">
-        <input type="email" name="email" placeholder="Your email *" required />
-        <input type="text" name="company" placeholder="Company name" />
+        ${field("email", { type: "email", label: "Your email", hint: "We'll only use this to reply to your inquiry.", required: true, autocomplete: "email", inputmode: "email" })}
+        ${field("company", { type: "text", label: "Company name", hint: "Optional, but helps us route your inquiry faster.", autocomplete: "organization" })}
       </div>
       <div class="codex-inline-rfq-row">
-        <input type="text" name="quantity" placeholder="Quantity (e.g. 5,000 pcs)" />
-        <input type="text" name="application" placeholder="Application (e.g. hotel, event)" />
+        ${field("quantity", { type: "text", label: "Quantity", hint: "e.g. 5,000 pcs", inputmode: "numeric" })}
+        ${field("application", { type: "text", label: "Application", hint: "e.g. hotel, event, asset tracking" })}
       </div>
-      <textarea name="message" rows="3" placeholder="Additional details (chip preference, timeline, special requirements...)"></textarea>
-      <button type="submit">Send Inquiry</button>
+      ${field("message", { type: "textarea", label: "Additional details", hint: "Chip preference, timeline, special requirements...", rows: 3 })}
+      <button type="submit" class="codex-inline-rfq-submit">Send Inquiry</button>
     </form>
   </section>`;
 }
@@ -1963,7 +2513,7 @@ function renderActionBar(definition: EditorialDefinition, id: string): string {
       <p>${escapeHtml(description)}</p>
     </div>
     <div class="codex-editorial-action-links">
-      <a class="codex-editorial-primary" href="${escapeAttribute(definition.primaryAction.href)}">${escapeHtml(definition.primaryAction.label)}</a>
+      <a class="codex-editorial-primary" data-cta-tier="action" href="${escapeAttribute(buildIntentHref(definition.primaryAction.href, "quote", definition.route))}">${escapeHtml(definition.primaryAction.label)}</a>
       <a class="codex-editorial-secondary" href="${escapeAttribute(mailtoHref)}">✉ Email inquiry directly</a>
       ${definition.secondaryActions
         .map((link) => `<a class="codex-editorial-secondary" href="${escapeAttribute(link.href)}">${escapeHtml(link.label)}</a>`)
@@ -2049,6 +2599,26 @@ function resolvePageType(group: EditorialGroup): string {
 
 function cleanText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Tag a CTA href with `?intent=samples|quote|engineering` so the contact-form
+ * landing page can pre-select the right form variant and analytics can attribute
+ * conversions to a tier (DS-10 #1 — three-tier CTA differentiation).
+ *
+ * Preserves an existing query string and any hash. Skips off-site / mailto / tel
+ * hrefs since intent tagging only makes sense for our own contact route.
+ */
+function buildIntentHref(href: string, intent: "samples" | "quote" | "engineering", route?: string): string {
+  if (!href) return href;
+  if (/^(mailto:|tel:|https?:|\/\/)/i.test(href) && !href.startsWith("/")) return href;
+  const [pathAndQuery, hash = ""] = href.split("#", 2);
+  const [path, existingQuery = ""] = pathAndQuery.split("?", 2);
+  const params = new URLSearchParams(existingQuery);
+  if (!params.has("intent")) params.set("intent", intent);
+  if (route && !params.has("route")) params.set("route", route);
+  const query = params.toString();
+  return `${path}${query ? `?${query}` : ""}${hash ? `#${hash}` : ""}`;
 }
 
 function escapeHtml(value: string): string {

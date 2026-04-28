@@ -103,21 +103,37 @@ export async function buildAuthorityLdForRoute(route: string): Promise<string | 
     url: src.url,
     ...(src.publisher ? { publisher: { "@type": "Organization", name: src.publisher } } : {}),
     ...(src.publishedAt ? { datePublished: src.publishedAt } : {}),
+    ...(src.accessedAt ? { dateAccessed: src.accessedAt } : {}),
+    ...(src.note ? { description: src.note } : {}),
   }));
 
   const hasAuthority = !!authorLd || !!reviewerLd || citationLd.length > 0;
   if (!hasAuthority) return null;
 
+  // Truncate headline to 110 chars per Google Article structured-data guidance.
+  const headline =
+    def.title.length > 110 ? `${def.title.slice(0, 107).trimEnd()}...` : def.title;
+
+  // Stable @id ties this Article entity to the page so Schema.org validators
+  // and Google can dedupe / merge with the seo.ts-emitted Article on routes
+  // where inferPageKind() returns "article" (/solutions, /compare, /guides,
+  // /compatibility, /blog/{slug}, /20XX/...). Both emitters now share the
+  // same canonical Article identity instead of representing two separate ones.
+  const articleId = `${def.route}#article`;
+
   const articleLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: def.title,
+    "@id": articleId,
+    headline,
     description: def.summary,
+    ...(def.heroImage ? { image: def.heroImage } : {}),
     ...(authorLd ? { author: authorLd } : {}),
     ...(reviewerLd ? { reviewedBy: reviewerLd, ...(def.reviewedAt ? { lastReviewed: def.reviewedAt } : {}) } : {}),
     ...(citationLd.length ? { citation: citationLd } : {}),
     ...(def.publishedAt ? { datePublished: def.publishedAt } : {}),
     ...(def.modifiedAt ? { dateModified: def.modifiedAt } : {}),
+    mainEntityOfPage: def.route,
   };
 
   return JSON.stringify(articleLd);

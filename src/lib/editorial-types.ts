@@ -131,6 +131,7 @@ export interface EditorialOutline {
   filteredSections: EditorialSectionData[];
   resourcesId: string;
   faqId: string | null;
+  sourcesId: string | null;
   nextStepId: string;
   jumpLinks: Array<{ id: string; label: string }>;
 }
@@ -163,12 +164,14 @@ export function buildEditorialOutline(definition: EditorialDefinition): Editoria
   const sectionLinks = filteredSections.map((section) => ({ id: createId(section.title), label: section.title }));
   const resourcesId = createId("Useful next pages");
   const faqId = definition.faq.length > 0 ? createId("FAQ") : null;
+  const sourcesId = definition.sources && definition.sources.length > 0 ? createId("Sources") : null;
   const nextStepId = createId("Next step");
   const jumpLinks = [
     { id: snapshotId, label: "At a glance" },
     ...sectionLinks,
     { id: resourcesId, label: "Useful next pages" },
     ...(faqId ? [{ id: faqId, label: "FAQ" }] : []),
+    ...(sourcesId ? [{ id: sourcesId, label: "Sources" }] : []),
     { id: nextStepId, label: "Next step" },
   ];
 
@@ -179,6 +182,7 @@ export function buildEditorialOutline(definition: EditorialDefinition): Editoria
     filteredSections,
     resourcesId,
     faqId,
+    sourcesId,
     nextStepId,
     jumpLinks,
   };

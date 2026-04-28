@@ -156,8 +156,7 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-tags/rfid-epoxy-tag/":                         "/landing-images/rfid-epoxy-tag.jpg",
   // rfid-coin-tag.jpg group
   "/products/rfid-tags/rfid-manhole-cover-tag/":                 "/landing-images/rfid-manhole-cover-tag.jpg",
-  // nfc-anti-metal-sticker.png group
-  "/products/rfid-tags/rfid-on-metal-uhf-tag/":                  "/landing-images/rfid-on-metal-uhf-tag.jpg",
+  // nfc-anti-metal-sticker.png group (merged target — legacy slug retained in case image fallback hits before override rewrite)
   // rfid-ibc-chemical-drum-tag.jpg group
   "/products/rfid-tags/rfid-drum-tag/":                          "/landing-images/rfid-drum-tag.jpg",
   // rfid-guard-tour-tag.jpg group
@@ -926,14 +925,14 @@ function renderCatalogMain({
   const categorized = categorizeProductsSync(products);
 
   // Sticky left-side navigator — borrowed styling from the /industries/ page
-  // (`.codex-industries-sidebar` class family). One row per category with icon + label +
+  // (`.codex-industries-rail` class family). One row per category with icon + label +
   // product-count pill. Clicking a row smooth-scrolls the matching section.
   const sidebarLinksHtml = categorized
     .map(
-      ({ category, items }) => `<a href="#${category.id}" class="codex-industries-sidebar__link" data-target="${category.id}">
-        <span class="codex-industries-sidebar__emoji">${category.icon}</span>
-        <span class="codex-industries-sidebar__label">${category.label}</span>
-        <span class="codex-industries-sidebar__count" data-cat-count="${category.id}">${items.length}</span>
+      ({ category, items }) => `<a href="#${category.id}" class="codex-industries-rail__link" data-target="${category.id}">
+        <span class="codex-industries-rail__emoji">${category.icon}</span>
+        <span class="codex-industries-rail__label">${category.label}</span>
+        <span class="codex-industries-rail__count" data-cat-count="${category.id}">${items.length}</span>
       </a>`,
     )
     .join("");
@@ -1034,13 +1033,13 @@ function renderCatalogMain({
     <div class="codex-catalog-rail-backdrop" hidden></div>
     <aside id="codex-catalog-rail-panel" class="codex-catalog-rail" aria-label="Product categories">
       <button type="button" class="codex-catalog-rail__close" aria-label="Close categories">✕</button>
-      <nav class="codex-industries-sidebar__nav">
-        <div class="codex-industries-sidebar__title">Product Families</div>
+      <nav class="codex-industries-rail__nav">
+        <div class="codex-industries-rail__title">Product Families</div>
         ${raw(sidebarLinksHtml)}
       </nav>
       ${raw(hasFilters ? `<div class="codex-catalog-filter" data-total-products="${totalProducts}">
         <div class="codex-catalog-filter__header">
-          <div class="codex-industries-sidebar__title">Filter by spec</div>
+          <div class="codex-industries-rail__title">Filter by spec</div>
           <button type="button" class="codex-catalog-filter__clear" hidden>Clear</button>
         </div>
         ${filterPanelHtml}
@@ -1069,7 +1068,7 @@ function renderCatalogMain({
       var toggle = document.querySelector('.codex-catalog-rail-toggle');
       var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
       var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
-      var links = document.querySelectorAll('.codex-catalog-rail .codex-industries-sidebar__link');
+      var links = document.querySelectorAll('.codex-catalog-rail .codex-industries-rail__link');
       var sections = document.querySelectorAll('.codex-catalog-content .codex-catalog-category');
       if (!links.length || !sections.length) return;
 
@@ -1134,7 +1133,7 @@ function renderCatalogMain({
       var filterPanel = document.querySelector('.codex-catalog-filter');
       var cards = document.querySelectorAll('.codex-catalog-content li.product');
       var categoryBlocks = document.querySelectorAll('.codex-catalog-content .codex-catalog-category');
-      var countPills = document.querySelectorAll('.codex-industries-sidebar__count[data-cat-count]');
+      var countPills = document.querySelectorAll('.codex-industries-rail__count[data-cat-count]');
       var resultCount = document.querySelector('.woocommerce-result-count');
       var emptyState = document.querySelector('.codex-catalog-empty');
       var clearBtn = filterPanel ? filterPanel.querySelector('.codex-catalog-filter__clear') : null;
@@ -1277,11 +1276,19 @@ function renderProductCard(product: CatalogProduct, featured = false): string {
   const srcset = product.image ? buildSrcset(product.image) : "";
   const loading = featured ? 'loading="eager" fetchpriority="high"' : 'loading="lazy"';
   const sizes = featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw";
-  const imageHtml = product.image
+
+  // DS-15 Phase 6 #6 — WebP-first <picture> wrapper for landing-images/*.
+  // WebPs are 30–55% smaller; matters most on featured (eager) cards
+  // because they ship in the LCP race. Lazy cards still benefit from
+  // smaller bytes on scroll-into-view.
+  const imgTag = product.image
     ? srcset
       ? html`<img src="${product.image}" srcset="${srcset}" sizes="${raw(sizes)}" alt="${product.title}" ${raw(loading)} decoding="async">`
       : html`<img src="${product.image}" alt="${product.title}" ${raw(loading)} decoding="async">`
     : "";
+  const imageHtml = product.image && product.image.startsWith("/landing-images/")
+    ? html`<picture><source srcset="${product.image.replace(/\.(jpe?g|png)$/i, ".webp")}" type="image/webp">${raw(imgTag)}</picture>`
+    : imgTag;
   const summaryHtml = product.summary
     ? html`<p class="codex-catalog-summary">${product.summary}</p>`
     : "";
@@ -1736,7 +1743,6 @@ export const INDUSTRY_CATEGORIES: Array<{
       "/product/car-transponder-chip/",
       "/product/rfid-windshield-tag/",
       "/products/rfid-tags/rfid-anti-metal-tag/",
-      "/products/rfid-tags/rfid-on-metal-uhf-tag/",
       "/products/rfid-tags/rfid-tool-tracking-tag/",
     ],
   },
@@ -1767,7 +1773,6 @@ export const INDUSTRY_CATEGORIES: Array<{
     productRoutes: [
       "/products/rfid-tags/anti-metal-uhf-it-asset-tag/",
       "/products/rfid-tags/rfid-anti-metal-tag/",
-      "/products/rfid-tags/rfid-on-metal-uhf-tag/",
       "/products/rfid-tags/rfid-cable-tie-tag/",
       "/products/rfid-labels/rfid-asset-label/",
       "/products/rfid-readers/handheld-uhf-rfid-reader/",
@@ -1895,10 +1900,10 @@ function buildIndustriesPage(
   // Sidebar navigation — mirrors /products/all/ catalog rail (floating fixed
   // rail on desktop, drawer behind a 🗂️ toggle on narrow viewports).
   const sidebarLinks = INDUSTRY_CATEGORIES.map((cat) =>
-    `<a href="#${cat.id}" class="codex-industries-sidebar__link" data-target="${cat.id}">
-      <span class="codex-industries-sidebar__emoji">${cat.emoji}</span>
-      <span class="codex-industries-sidebar__label">${cat.title}</span>
-      <span class="codex-industries-sidebar__count">${cat.productRoutes.length}</span>
+    `<a href="#${cat.id}" class="codex-industries-rail__link" data-target="${cat.id}">
+      <span class="codex-industries-rail__emoji">${cat.emoji}</span>
+      <span class="codex-industries-rail__label">${cat.title}</span>
+      <span class="codex-industries-rail__count">${cat.productRoutes.length}</span>
     </a>`
   ).join("");
 
@@ -1914,8 +1919,8 @@ function buildIndustriesPage(
     <div class="codex-catalog-rail-backdrop" hidden></div>
     <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--industries" aria-label="Industries">
       <button type="button" class="codex-catalog-rail__close" aria-label="Close industries">✕</button>
-      <nav class="codex-industries-sidebar__nav">
-        <div class="codex-industries-sidebar__title">Industries</div>
+      <nav class="codex-industries-rail__nav">
+        <div class="codex-industries-rail__title">Industries</div>
         ${sidebarLinks}
       </nav>
     </aside>
@@ -1936,7 +1941,7 @@ function buildIndustriesPage(
       var toggle = document.querySelector('.codex-catalog-rail-toggle');
       var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
       var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
-      var links = rail ? rail.querySelectorAll('.codex-industries-sidebar__link') : [];
+      var links = rail ? rail.querySelectorAll('.codex-industries-rail__link') : [];
       var sections = document.querySelectorAll('.codex-industries-section');
       if (!links.length || !sections.length) return;
 

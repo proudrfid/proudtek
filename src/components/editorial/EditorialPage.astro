@@ -219,7 +219,21 @@ const articleLd = hasAuthorityLd
           </div>
           {illustration && (
             <figure class="codex-editorial-figure">
-              <img src={illustration.src} alt={illustration.alt} loading="eager" fetchpriority="high" decoding="async" />
+              {/* DS-15 Phase 6 #2 + #6 — width/height intrinsics give the
+                  browser a 16:9 box reservation from the HTML stream
+                  before CSS parses; <picture>/<source> ships the WebP
+                  variant first (30–55% smaller than JPG sibling) with
+                  graceful JPG fallback for the 3% of browsers without
+                  WebP. WebPs are pre-built by scripts/build-image-variants.py
+                  and live alongside originals in /landing-images/. */}
+              {illustration.src.startsWith("/landing-images/") ? (
+                <picture>
+                  <source srcset={illustration.src.replace(/\.(jpe?g|png)$/i, ".webp")} type="image/webp" />
+                  <img src={illustration.src} alt={illustration.alt} width="1200" height="675" loading="eager" fetchpriority="high" decoding="async" />
+                </picture>
+              ) : (
+                <img src={illustration.src} alt={illustration.alt} width="1200" height="675" loading="eager" fetchpriority="high" decoding="async" />
+              )}
             </figure>
           )}
         </section>
@@ -248,7 +262,7 @@ const articleLd = hasAuthorityLd
           <FaqSection faq={definition.faq} id={outline.faqId} />
         )}
 
-        <SourceList definition={definition} />
+        {outline.sourcesId && <SourceList definition={definition} id={outline.sourcesId} />}
 
         {showTrustSignals && <TrustSignals />}
 

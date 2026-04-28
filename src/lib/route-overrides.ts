@@ -92,6 +92,9 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/product/rfid-silicone-laundry-tag/":     "/products/rfid-tags/rfid-high-temp-silicone-tag/",
   "/product/pps-rfid-laundry-tag/":          "/products/rfid-tags/rfid-pps-laundry-chip/",
 
+  /* Merged SKUs — rfid-on-metal-uhf-tag absorbed into rfid-anti-metal-tag (2026-04-23) */
+  "/products/rfid-tags/rfid-on-metal-uhf-tag/": "/products/rfid-tags/rfid-anti-metal-tag/",
+
   /* Vehicle / windshield */
   "/product/car-transponder-chip/":          "/solutions/vehicle-rfid-identification/",
   "/product/rfid-sticker-on-headlight/":     "/products/rfid-labels/long-range-uhf-windshield-sticker/",

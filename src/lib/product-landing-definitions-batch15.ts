@@ -78,7 +78,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
         title: "Related military & industrial RFID tags",
         description: "Explore other rugged RFID tagging solutions for defense and heavy industry.",
         links: [
-          { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+          { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
           { href: "/products/rfid-tags/rfid-high-temp-silicone-tag/", label: "High-temp silicone tags" },
         ],
       },
@@ -102,7 +102,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
     ],
     primaryAction: { href: "/contact/", label: "Request quote and samples" },
     secondaryActions: [
-      { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+      { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
       { href: "/products/rfid-tags/rfid-anchor-bolt-tag/", label: "Anchor bolt tags" },
     ],
   },
@@ -162,7 +162,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
         description: "Other ruggedized RFID solutions for industrial and infrastructure assets.",
         links: [
           { href: "/products/rfid-tags/rfid-weld-mount-tag/", label: "Weld mount tags" },
-          { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+          { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
         ],
       },
     ],
@@ -315,7 +315,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
         title: "Related metal-mount RFID tags",
         description: "Other RFID solutions designed for metal surface mounting.",
         links: [
-          { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+          { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
           { href: "/products/rfid-tags/rfid-weld-mount-tag/", label: "Weld mount tags" },
         ],
       },
@@ -339,7 +339,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
     ],
     primaryAction: { href: "/contact/", label: "Request quote and samples" },
     secondaryActions: [
-      { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+      { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
       { href: "/products/rfid-tags/rfid-anchor-bolt-tag/", label: "Anchor bolt tags" },
     ],
   },
@@ -470,7 +470,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
         description: "Other secure-mount RFID solutions for demanding environments.",
         links: [
           { href: "/products/rfid-tags/rfid-anchor-bolt-tag/", label: "Anchor bolt tags" },
-          { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+          { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
         ],
       },
     ],
@@ -735,77 +735,14 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
     ],
   },
 
-  // ── 10. RFID On-Metal UHF Tag ─────────────────────────────────────────
-  {
-    route: "/products/rfid-tags/rfid-on-metal-uhf-tag/",
-    group: "products",
-    title: "RFID On-Metal UHF Tag — Metallic Surface Optimized Tag",
-    kicker: "Metal Asset RFID",
-    summary:
-      "RFID on-metal UHF tags are purpose-engineered for direct mounting on steel, aluminum, copper and other metallic surfaces — delivering reliable 2-6 m read range where standard RFID tags fail completely. Available in sizes from 12 mm micro tags to 200 mm long-range tags for IT assets, tools, vehicles, containers and industrial equipment.",
-    heroPoints: [
-      "Metal-optimized antenna — purpose-designed with ferrite isolation layer that uses metal surfaces as a ground plane, actually improving performance on metal versus free air.",
-      "Wide size range — from 12 × 12 mm PCB tags for IT servers to 200 × 30 mm industrial tags for shipping containers, covering every metal asset category.",
-      "2-6 m read range on metal — depending on tag size, enabling walk-by inventory, dock door portals and handheld scanning of metal assets.",
-    ],
-    imageAlt: "RFID on-metal UHF tag mounted on a steel asset surface",
-    heroImage: "/landing-images/industrial.webp",
-    imageSourceRoutes: ["/product/rfid-tag-with-led-light/", "/product/car-transponder-chip/"],
-    sections: [
-      {
-        title: "Why standard RFID tags fail on metal surfaces",
-        bullets: [
-          "Standard UHF RFID tags placed directly on metal surfaces lose 80-95% of read range — a tag that reads at 8 m in free air may read at less than 30 cm on metal, making walk-by inventory and portal reading impossible.",
-          "Metal surfaces reflect and absorb RF energy, detuning the tag antenna and creating impedance mismatch between the chip and antenna — the tag literally cannot harvest enough energy from the reader signal to power on and respond.",
-          "Many organizations discover this problem after purchasing thousands of standard RFID labels and applying them to metal assets — the resulting system failure wastes the tag investment and delays the RFID deployment by months.",
-          "Workarounds such as adhesive foam spacers and standoff brackets are unreliable — spacers compress over time, brackets snag on equipment during handling, and neither approach matches the performance of a purpose-designed on-metal tag.",
-          "IT data centers, manufacturing plants, logistics operations and fleet management all rely heavily on tracking metal assets — servers, tools, containers, vehicles, equipment — making on-metal RFID performance a universal requirement.",
-        ],
-      },
-      {
-        title: "How Proud Tek on-metal UHF tags solve the metal challenge",
-        bullets: [
-          "Purpose-designed antenna with integrated ferrite isolation layer creates a controlled electromagnetic boundary between the tag and metal surface — preventing detuning while using the metal surface as a ground plane that actually enhances radiation efficiency.",
-          "Available in ceramic, PCB, ABS and flexible form factors from 12 × 12 × 3 mm (micro) to 200 × 30 × 5 mm (industrial) — providing the right balance of size, read range and cost for every metal asset category.",
-          "Factory-tuned for on-metal performance with read ranges from 1 m (micro tags) to 6 m (industrial tags) when mounted on steel or aluminum — validated across common metal alloys including carbon steel, stainless steel, aluminum and copper.",
-          "Mounting options include industrial adhesive (3M VHB), screw/rivet holes, magnetic mount and weld-on bracket — adapting to clean room IT environments, outdoor industrial equipment and everything in between.",
-          "Temperature ratings from -40 °C to +230 °C (depending on model) cover server rooms, outdoor assets, autoclaved medical instruments and industrial process equipment.",
-        ],
-      },
-    ],
-    resourceCards: [
-      {
-        title: "Related metal-mount RFID solutions",
-        description: "Other RFID products designed for challenging mounting surfaces.",
-        links: [
-          { href: "/products/rfid-tags/rfid-magnet-mount-tag/", label: "Magnet mount tags" },
-          { href: "/products/rfid-tags/rfid-anchor-bolt-tag/", label: "Anchor bolt tags" },
-        ],
-      },
-    ],
-    faq: [
-      {
-        question: "What read range can I expect on a steel surface?",
-        answer:
-          "Read range depends on tag size. Our micro tags (12-25 mm) achieve 1-2 m on steel. Medium tags (50-80 mm) achieve 3-4 m. Large industrial tags (100-200 mm) achieve 4-6 m. These ranges are measured with a standard 4W ERP reader and circular polarized antenna. In real-world environments with multiple metal objects, expect 70-85% of these lab-measured distances.",
-      },
-      {
-        question: "Does the tag work on aluminum as well as steel?",
-        answer:
-          "Yes. Our on-metal tags are designed to work on all common metals including carbon steel, stainless steel, aluminum, copper and brass. Performance is optimized for steel and aluminum, which are the most common industrial metals. On copper and brass, read range is typically 80-90% of the steel performance due to higher RF losses in these metals.",
-      },
-      {
-        question: "How do I choose the right tag size for my application?",
-        answer:
-          "Choose based on required read range and available mounting space. For IT servers in data centers where space is limited, use 12-25 mm micro tags (1-2 m range). For tools, equipment and containers scanned with handheld readers at 2-3 m, use 50-80 mm medium tags. For dock door portals, vehicle identification and long-range applications, use 100-200 mm industrial tags (4-6 m range). We provide sample kits with multiple sizes for testing in your environment.",
-      },
-    ],
-    primaryAction: { href: "/contact/", label: "Request quote and samples" },
-    secondaryActions: [
-      { href: "/products/rfid-tags/rfid-magnet-mount-tag/", label: "Magnet mount tags" },
-      { href: "/products/rfid-tags/rfid-ammo-can-tag/", label: "Ammo can tags" },
-    ],
-  },
+  // ── 10. RFID On-Metal UHF Tag (MERGED 2026-04-23) ─────────────────────
+  // Absorbed into /products/rfid-tags/rfid-anti-metal-tag/ — see
+  // ROUTE_CANONICAL_OVERRIDES in src/lib/route-overrides.ts. This dormant
+  // batch file is not imported anywhere; block intentionally removed so that
+  // any future re-wiring cannot resurrect the merged route. Unique content
+  // (ground-plane effect, copper/brass 80-90%, 200 mm industrial row) was
+  // folded into the content-collection entry at
+  // src/content/editorial/products/rfid-tags/rfid-anti-metal-tag.json.
 
   // ── 11. RFID High-Temp Silicone Tag ───────────────────────────────────
   {
@@ -860,7 +797,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
         title: "Related high-performance RFID tags",
         description: "Other RFID solutions for demanding environmental conditions.",
         links: [
-          { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+          { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
           { href: "/products/rfid-tags/rfid-valve-tag/", label: "Valve tags" },
         ],
       },
@@ -884,7 +821,7 @@ export const PRODUCT_LANDING_DEFINITIONS_BATCH15: Array<{
     ],
     primaryAction: { href: "/contact/", label: "Request quote and samples" },
     secondaryActions: [
-      { href: "/products/rfid-tags/rfid-on-metal-uhf-tag/", label: "On-metal UHF tags" },
+      { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-metal tags" },
       { href: "/products/rfid-tags/rfid-valve-tag/", label: "Valve tags" },
     ],
   },

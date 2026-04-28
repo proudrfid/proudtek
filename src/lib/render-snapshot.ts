@@ -38,6 +38,32 @@ const UNUSED_HEAD_ASSET_PATTERNS: Array<string | RegExp> = [
   'script[src*="add-to-cart"]',
   'script[src*="woocommerce"]',
   'script[src*="js.cookie"]',
+  // Phase 7 — Kadence JS layer diagnostic (2026-04-27).
+  // Three Kadence runtime scripts confirmed dead via emitter↔consumer
+  // cross-reference (mirror of DS-16 methodology applied to JS):
+  //   1. splide.min — testimonial carousel lib. Built HTML strips
+  //      `.kt-blocks-carousel-init` from testimonial wrappers (this
+  //      file, ~L153) so Splide finds nothing to bootstrap. ~13 KB
+  //      transferred on home only.
+  //   2. kb-splide-init.min — companion init that calls
+  //      querySelectorAll(".wp-block-kadence-advancedgallery
+  //      .kt-blocks-carousel-init") — same stripped class. ~2 KB.
+  //   3. kb-advanced-heading.min — typed-text animation runtime.
+  //      Polls every 125 ms for global `Typed` to exist (it never
+  //      does — Typed.js is not bundled), and even if found, its
+  //      target `.kt-typed-text` selector matches zero elements
+  //      across all built routes. ~0.9 KB × 7 routes + a leaked
+  //      polling interval that runs forever on every visit.
+  // See PHASE-7-KADENCE-JS-DIAGNOSTIC.md for the full audit.
+  'script[src*="splide.min"]',
+  'script[src*="kb-splide-init"]',
+  'script[src*="kb-advanced-heading"]',
+  // Phase 9 — kt-accordion runtime no longer needed. seo.ts
+  // enhanceFaqPage() converts every .wp-block-kadence-accordion to
+  // native <details>/<summary> markup styled as .codex-disclosure.
+  // Native expand/collapse + keyboard semantics come free from the
+  // platform; the 13 KB Kadence runtime is dead weight on /faq/.
+  'script[src*="kt-accordion"]',
 ];
 
 const NOISY_EXTERNAL_HREF_PATTERNS = [
@@ -129,6 +155,13 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
 
   // ── Nav injection: add Industries / Solutions / Resources dropdowns + footer ──
   injectCustomNav($body);
+
+  // ── Active nav state: route-aware highlight (DS-9 #2) ──
+  // The crawled snapshot baked `is-active` / `current-menu-item` onto whatever
+  // page the snapshot was captured from (most often About). Strip stale active
+  // classes site-wide and re-apply them based on the current page.route so the
+  // top nav correctly reflects where the user actually is.
+  markActiveNav($body, page.route);
 
   // ── Page-specific redesigns ──
   if (page.route === "/contact/" || page.route === "/contact") {
@@ -465,6 +498,132 @@ function injectCustomNav($body: ReturnType<typeof load>): void {
   injectFooterSections($body);
 }
 
+// ---------------------------------------------------------------------------
+// Active nav state — DS-9 #2 (2026-04-26)
+// ---------------------------------------------------------------------------
+
+/**
+ * Apply route-aware active state to the top nav after `injectCustomNav` has
+ * rebuilt the dropdown structure.
+ *
+ * Background: the original WP snapshot was crawled from the About page (or the
+ * crawler followed an About link), so every snapshot's `#primary-menu` /
+ * `#mobile-menu` hard-codes `current-menu-item` + `current_page_item` on the
+ * About <li>. That makes ABOUT appear highlighted on every one of the ~470
+ * generated pages. Flagged in the design-critique pass as Critical issue #2.
+ *
+ * Strategy:
+ *   1. Strip every active-state class from all <li>/<a> in #primary-menu and
+ *      #mobile-menu (defensive — covers Kadence + WP variants).
+ *   2. Map the page's route to the correct top-level menu item via prefix
+ *      rules (e.g. /products/* and /product/* both → Products dropdown).
+ *   3. Add `current-menu-item current_page_item codex-active` to the matching
+ *      top-level <li> and `aria-current="page"` to its anchor.
+ *   4. Also mark exact-href sub-menu matches with `aria-current="page"` so
+ *      keyboard / screen-reader users get precise location feedback.
+ *
+ * The Kadence theme CSS rule `.current-menu-item > a` provides the visible
+ * gold underline; we don't need to ship our own CSS for the highlight.
+ */
+function markActiveNav($body: ReturnType<typeof load>, currentRoute: string): void {
+  const ACTIVE_LI_CLASSES = [
+    "current-menu-item",
+    "current_page_item",
+    "current-menu-parent",
+    "current_page_parent",
+    "current-menu-ancestor",
+    "current_page_ancestor",
+    "is-active",
+    "codex-active",
+  ];
+  const ACTIVE_A_CLASSES = ["is-active", "current-menu-item", "codex-active"];
+
+  const normalizePath = (href: string): string =>
+    (href || "")
+      .replace(/^https?:\/\/[^/]+/i, "")
+      .replace(/[?#].*$/, "")
+      .replace(/\/?$/, "/")
+      .toLowerCase();
+
+  const route = normalizePath(currentRoute);
+
+  // Map route prefix → top-level menu href that should be highlighted.
+  // Order matters: most-specific first; first match wins.
+  // The href values mirror PRIMARY_MENU_DROPDOWNS exactly so anchor lookup is
+  // a string-equality test.
+  const TOP_LEVEL_RULES: Array<[RegExp, string]> = [
+    [/^\/products\//, "/products/all/"],
+    [/^\/product\//, "/products/all/"],
+    [/^\/industries\//, "/industries/"],
+    [/^\/solutions\//, "/solutions/"],
+    [
+      /^\/(blog|guides|compare|compatibility|case-studies|faq|resources)\//,
+      "/resources/",
+    ],
+    [/^\/contact\//, "/contact/"],
+    [/^\/about\//, "/about/"],
+  ];
+
+  let activeTopHref: string | null = null;
+  for (const [pattern, href] of TOP_LEVEL_RULES) {
+    if (pattern.test(route)) {
+      activeTopHref = normalizePath(href);
+      break;
+    }
+  }
+  // Home page (/) and any unmatched route fall through with no active item.
+  // The logo serves as the implicit Home link; not highlighting any top-nav
+  // item on the homepage matches the convention used by most B2B sites.
+
+  for (const menuId of ["#primary-menu", "#mobile-menu"]) {
+    const menu = $body(menuId).first();
+    if (!menu.length) continue;
+
+    // 1. Strip stale active state from every li and anchor in this menu.
+    menu.find("li").each((_, li) => {
+      const $li = $body(li);
+      for (const c of ACTIVE_LI_CLASSES) $li.removeClass(c);
+    });
+    menu.find("a").each((_, a) => {
+      const $a = $body(a);
+      for (const c of ACTIVE_A_CLASSES) $a.removeClass(c);
+      $a.removeAttr("aria-current");
+    });
+
+    if (!activeTopHref) continue;
+
+    // 2. Mark the matching top-level <li>.
+    menu.children("li").each((_, li) => {
+      const $li = $body(li);
+      const $anchor = $li.children("a[href]").first();
+      if (!$anchor.length) return;
+      const path = normalizePath($anchor.attr("href") ?? "");
+      if (path === activeTopHref) {
+        $li.addClass("current-menu-item current_page_item codex-active");
+        $anchor.attr("aria-current", "page");
+      }
+    });
+
+    // 3. Mark exact-route sub-menu items so keyboard/AT users get precise
+    //    location feedback inside the open dropdown.
+    menu
+      .find(
+        "ul.sub-menu a[href], ul.codex-mega-list a[href], ul.codex-mobile-group-list a[href]",
+      )
+      .each((_, a) => {
+        const $a = $body(a);
+        const path = normalizePath($a.attr("href") ?? "");
+        if (path === route) {
+          $a.attr("aria-current", "page");
+          const $parentLi = $a.parent("li");
+          if ($parentLi.length) {
+            $parentLi.addClass("current-menu-item codex-active");
+          }
+        }
+      });
+  }
+}
+
 /**
  * Replace the entire legacy footer body with a unified single-layer footer:
  *   1. Brand row: logo + tagline + Request-quote CTA
@@ -637,12 +796,42 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
   </div>
 
   <section class="codex-contact__map" aria-label="Office location">
-    <iframe
-      title="Proud Tek office — Zhantao Building, Longhua District, Shenzhen"
-      src="https://www.google.com/maps?q=Zhantao+Building+Minzhi+Road+Longhua+Shenzhen&output=embed"
-      width="100%" height="360" loading="lazy"
-      referrerpolicy="no-referrer-when-downgrade"
-      style="border:0; display:block;"></iframe>
+    <!--
+      Phase 8 — Click-to-activate Maps embed (was eager-loaded iframe).
+      Lighthouse counted ~370 KB of Google Maps API JS via the iframe's
+      internal page load. Click-to-activate means the map JS only loads
+      on user interaction. Graceful degradation: with JS disabled, the
+      button is an <a> that opens Google Maps in a new tab.
+    -->
+    <div class="codex-contact__map-card" data-codex-map-card>
+      <div class="codex-contact__map-card-body">
+        <span class="codex-contact__map-card-pin" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        </span>
+        <div class="codex-contact__map-card-text">
+          <strong class="codex-contact__map-card-title">Proud Tek office</strong>
+          <span class="codex-contact__map-card-address">Zhantao Building, Minzhi Road, Longhua District, Shenzhen 518131, China</span>
+        </div>
+      </div>
+      <a
+        class="codex-contact__map-card-btn"
+        href="https://www.google.com/maps?q=Zhantao+Building+Minzhi+Road+Longhua+Shenzhen"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-codex-map-show
+      >
+        <span>View interactive map</span>
+        <svg viewBox="0 0 20 20" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 13l6-6M7 7h6v6"/></svg>
+      </a>
+    </div>
+    <template data-codex-map-iframe>
+      <iframe
+        title="Proud Tek office — Zhantao Building, Longhua District, Shenzhen"
+        src="https://www.google.com/maps?q=Zhantao+Building+Minzhi+Road+Longhua+Shenzhen&output=embed"
+        width="100%" height="360" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        style="border:0; display:block;"></iframe>
+    </template>
   </section>
 </div>`;
 

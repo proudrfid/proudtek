@@ -1571,6 +1571,12 @@ function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context: PageC
   $body(".codex-growth-hub").remove();
   $body(".codex-contact-form-brief").remove();
 
+  // DS-15 Phase 6 #3 — Run Kadence-layer a11y fixes on every page.
+  // Empty overlay links + testimonial heading-order ship across
+  // home + about + 17 industry pages via WP block markup in data
+  // fixtures, so the pass is unconditional.
+  enhanceKadenceA11y($body);
+
   if (context.kind === "home") {
     enhanceHomeHero($body);
   }
@@ -1728,6 +1734,74 @@ function enhanceAboutPage($body: CheerioAPI): void {
     .filter((_, element) => /We cooperate with popular brands all over the world/i.test(cleanText($body(element).text())))
     .first()
     .text("Global customer base");
+
+  // DS-15 Phase 6 #5 — strip placeholder social link block.
+  // Lighthouse `crawlable-anchors` flagged 3 anchors with href="https://#"
+  // (Kadence social-link-block scaffolding that was never wired to real
+  // URLs). They contribute nothing to UX or SEO and tank the SEO score
+  // by 8 points. Removing the whole <ul class="wp-block-social-links">
+  // — anchor + parent + sibling icons — fixes the audit. Safe because
+  // /about/ is the only page that ships this block in any data fixture.
+  $body("ul.wp-block-social-links").remove();
+}
+
+/**
+ * DS-15 Phase 6 #3 — Kadence layer a11y fixes.
+ *
+ * Lighthouse baseline (2026-04-27) flagged the WP/Kadence adapter layer
+ * for: empty `.kb-section-link-overlay` links (link-name audit), and
+ * `<h5 class="kt-testimonial-title">` after section `<h4>` (heading-order
+ * audit). Color-contrast violations are fixed in codex.css; this function
+ * handles the structural HTML transforms that need a cheerio pass.
+ *
+ * Runs on every page in normalizeCoreBody — the offending markup ships
+ * via JSON data fixtures across home + about + 17+ industry pages.
+ */
+function enhanceKadenceA11y($body: CheerioAPI): void {
+  // (1) link-name — inject aria-label on empty overlay links from the
+  //     nearest heading inside the same Kadence column.
+  $body("a.kb-section-link-overlay").each((_, element) => {
+    const $link = $body(element);
+    if ($link.attr("aria-label")) return;
+    if (cleanText($link.text()).length > 0) return; // already has visible text
+
+    let label = "";
+    const $col = $link.closest(".wp-block-kadence-column, .kt-inside-inner-col, .kb-row-layout-wrap");
+    if ($col.length) {
+      const heading = $col.find("h1, h2, h3, h4, h5, h6").first();
+      if (heading.length) label = cleanText(heading.text());
+    }
+    if (!label) {
+      // Fallback to href slug as a last-resort label.
+      const href = $link.attr("href") ?? "";
+      const slug = href.split("/").filter(Boolean).pop() ?? "";
+      label = slug.replace(/-/g, " ").trim();
+    }
+    if (label) $link.attr("aria-label", label);
+  });
+
+  // (2) heading-order — demote <h5 class="kt-testimonial-title"> to <p>.
+  //     Testimonial titles aren't sectioning headings; the visual weight
+  //     is preserved by p.kt-testimonial-title styling in codex.css.
+  $body("h5.kt-testimonial-title").each((_, element) => {
+    const $el = $body(element);
+    const html = $el.html() ?? "";
+    const className = $el.attr("class") ?? "";
+    $el.replaceWith(`<p class="${className}">${html}</p>`);
+  });
+
+  // (3) heading-order iter-2 — demote Kadence advanced-heading h6
+  //     blocks to <p>. These are decorative/section-label uses on
+  //     /about/ that emit as <h6> after section <h2> (skipping h3/h4/h5)
+  //     and trigger Lighthouse heading-order. Same pattern as testimonial:
+  //     keep class so existing CSS still applies, drop the heading
+  //     semantic so the audit ignores it.
+  $body("h6.wp-block-kadence-advancedheading, h6[class*='kt-adv-heading']").each((_, element) => {
+    const $el = $body(element);
+    const html = $el.html() ?? "";
+    const className = $el.attr("class") ?? "";
+    $el.replaceWith(`<p class="${className}">${html}</p>`);
+  });
 }
 
 function enhanceFaqPage($body: CheerioAPI): void {
@@ -1754,6 +1828,40 @@ function enhanceFaqPage($body: CheerioAPI): void {
     .filter((_, element) => cleanText($body(element).text()) === "Shipping & Recent Orders")
     .first()
     .text("Shipping and order handling");
+
+  // Phase 9 — Migrate Kadence accordion → .codex-disclosure pattern.
+  // Each `.wp-block-kadence-accordion` becomes a <div class="codex-faq">
+  // with native <details>/<summary> children styled as codex-disclosure.
+  // Eliminates the 13 KB kt-accordion.min.js dependency (stripped by
+  // render-snapshot's UNUSED_HEAD_ASSET_PATTERNS) and unifies accordion
+  // semantics with DS-12 #4A. Browser-native expand/collapse means
+  // keyboard + screen-reader behavior comes free; no JS handler needed.
+  $body(".wp-block-kadence-accordion").each((_, accordion) => {
+    const $accordion = $body(accordion);
+    const items: string[] = [];
+
+    $accordion.find(".wp-block-kadence-pane").each((_, pane) => {
+      const $pane = $body(pane);
+      const question = cleanText($pane.find(".kt-blocks-accordion-title").first().text());
+      const $answerInner = $pane.find(".kt-accordion-panel-inner").first();
+      const answerHtml = ($answerInner.html() ?? "").trim();
+
+      if (!question || !answerHtml) return;
+
+      items.push(
+        `<details class="codex-disclosure codex-faq__item">
+          <summary class="codex-disclosure__summary">
+            <span class="codex-disclosure__label">${escapeXml(question)}</span>
+          </summary>
+          <div class="codex-disclosure__body">${answerHtml}</div>
+        </details>`,
+      );
+    });
+
+    if (items.length > 0) {
+      $accordion.replaceWith(`<div class="codex-faq">${items.join("\n")}</div>`);
+    }
+  });
 }
 
 // Blog-specific hero images (Unsplash, free commercial use)
@@ -1991,10 +2099,10 @@ function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
   const railLinksHtml = BLOG_TOPICS
     .filter((t) => (topicCounts[t.id] ?? 0) > 0)
     .map(
-      (t) => `<a href="#topic-${t.id}" class="codex-industries-sidebar__link" data-topic="${t.id}">
-          <span class="codex-industries-sidebar__emoji">${t.icon}</span>
-          <span class="codex-industries-sidebar__label">${escapeXml(t.label)}</span>
-          <span class="codex-industries-sidebar__count" data-cat-count="${t.id}">${topicCounts[t.id]}</span>
+      (t) => `<a href="#topic-${t.id}" class="codex-industries-rail__link" data-topic="${t.id}">
+          <span class="codex-industries-rail__emoji">${t.icon}</span>
+          <span class="codex-industries-rail__label">${escapeXml(t.label)}</span>
+          <span class="codex-industries-rail__count" data-cat-count="${t.id}">${topicCounts[t.id]}</span>
         </a>`,
     )
     .join("");
@@ -2005,7 +2113,7 @@ function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
   const cardsHtml = allPosts
     .map(
       (post) =>
-        `<a class="codex-blog-grid-card" href="${escapeXml(post.route)}" data-topic="${escapeXml(post.topicId)}" data-kicker="${escapeXml(post.kicker)}">
+        `<a class="codex-card codex-blog-grid-card" href="${escapeXml(post.route)}" data-topic="${escapeXml(post.topicId)}" data-kicker="${escapeXml(post.kicker)}">
           ${post.thumb ? `<img class="codex-blog-grid-card__thumb" src="${escapeXml(post.thumb)}" alt="${escapeXml(post.title)}" loading="lazy" decoding="async" />` : ""}
           <span class="codex-blog-grid-card__tag">${escapeXml(post.kicker)}</span>
           <strong>${escapeXml(post.title)}</strong>
@@ -2030,12 +2138,12 @@ function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
     <div class="codex-catalog-rail-backdrop" hidden></div>
     <aside id="codex-catalog-rail-panel" class="codex-catalog-rail codex-catalog-rail--blog" aria-label="Blog topics">
       <button type="button" class="codex-catalog-rail__close" aria-label="Close topics">✕</button>
-      <nav class="codex-industries-sidebar__nav">
-        <div class="codex-industries-sidebar__title">Topics</div>
-        <a href="#topic-all" class="codex-industries-sidebar__link active" data-topic="all">
-          <span class="codex-industries-sidebar__emoji">📚</span>
-          <span class="codex-industries-sidebar__label">All articles</span>
-          <span class="codex-industries-sidebar__count" data-cat-count="all">${allPosts.length}</span>
+      <nav class="codex-industries-rail__nav">
+        <div class="codex-industries-rail__title">Topics</div>
+        <a href="#topic-all" class="codex-industries-rail__link active" data-topic="all">
+          <span class="codex-industries-rail__emoji">📚</span>
+          <span class="codex-industries-rail__label">All articles</span>
+          <span class="codex-industries-rail__count" data-cat-count="all">${allPosts.length}</span>
         </a>
         ${railLinksHtml}
       </nav>
@@ -2062,7 +2170,7 @@ function injectBlogArticleGrid($body: CheerioAPI, _page?: SnapshotPage): void {
         var toggle = document.querySelector('.codex-catalog-rail-toggle');
         var backdrop = document.querySelector('.codex-catalog-rail-backdrop');
         var closeBtn = rail ? rail.querySelector('.codex-catalog-rail__close') : null;
-        var links = rail ? rail.querySelectorAll('.codex-industries-sidebar__link') : [];
+        var links = rail ? rail.querySelectorAll('.codex-industries-rail__link') : [];
         var cards = document.querySelectorAll('.codex-blog-index .codex-blog-grid-card');
         var emptyState = document.querySelector('.codex-blog-index__empty');
         var emptyClear = emptyState ? emptyState.querySelector('.codex-blog-index__empty-clear') : null;
@@ -2306,6 +2414,47 @@ function enhancePrimaryContactPage($body: CheerioAPI): void {
   if (submitButton.length) {
     submitButton.text("Send Inquiry");
   }
+
+  // DS-11 #5b — Bring the Kadence form up to the same a11y bar as the
+  // editorial inline RFQ. Kadence ships data-required="yes" but no native
+  // HTML5 required, no aria-required, no error containers, and no
+  // aria-describedby. We add all four so screen readers + the inline
+  // form-validation JS in BaseLayout can both work.
+  form.attr("novalidate", "true");
+  form.attr("data-codex-rfq", "");
+  // Each <input> / <textarea> with data-required gets HTML5 required +
+  // aria-required + an error sibling tagged role="alert" aria-live=polite.
+  form.find('[data-required="yes"]').each((_, element) => {
+    const $el = form.find(element);
+    const id = $el.attr("id");
+    if (!id) return;
+    $el.attr("required", "");
+    $el.attr("aria-required", "true");
+    const errId = `${id}-error`;
+    const hintId = `${id}-hint`;
+    // Build aria-describedby: existing values + hint + err.
+    const existing = ($el.attr("aria-describedby") || "").split(/\s+/).filter(Boolean);
+    const merged = Array.from(new Set([...existing, hintId, errId])).join(" ");
+    $el.attr("aria-describedby", merged);
+    // Insert hint + error immediately after the field's wrapper. Kadence wraps
+    // each field in a .kadence-blocks-form-field <div>, so we close the field
+    // by appending these spans inside that wrapper.
+    const fieldWrap = $el.closest(".kadence-blocks-form-field");
+    if (fieldWrap.length) {
+      // Insert a hint only if a label exists and we don't already have one.
+      if (!fieldWrap.find(`#${hintId}`).length) {
+        const labelText = ($el.attr("data-label") || "").toLowerCase();
+        const hintCopy =
+          labelText.includes("email") ? "We'll only use this to reply to your inquiry."
+          : labelText.includes("message") ? "Include application, quantity, environment and timing for the fastest reply."
+          : "This field is required.";
+        fieldWrap.append(`<span id="${hintId}" class="codex-inline-rfq-hint">${hintCopy}</span>`);
+      }
+      if (!fieldWrap.find(`#${errId}`).length) {
+        fieldWrap.append(`<span id="${errId}" class="codex-inline-rfq-error" role="alert" aria-live="polite"></span>`);
+      }
+    }
+  });
 }
 
 function rewriteLegacyInternalLinks($body: CheerioAPI): void {
@@ -2913,6 +3062,9 @@ function resolveFaqEntries($body: CheerioAPI): FaqEntry[] {
     });
   };
 
+  // Legacy fallback — pre-Phase 9 Kadence accordion markup. Most pages
+  // are migrated to <details> via enhanceFaqPage; this stays in case any
+  // un-migrated page still emits the original accordion classes.
   const headers = $body(".kt-blocks-accordion-header").toArray();
   const panels = $body(".kt-accordion-panel").toArray();
 
@@ -2920,7 +3072,10 @@ function resolveFaqEntries($body: CheerioAPI): FaqEntry[] {
     pushEntry($body(header).text(), $body(panels[index] ?? "").text());
   });
 
-  $body(".codex-editorial-faq details, .codex-article-faq details").each((_, element) => {
+  // Native <details>-based FAQ (DS-12 #4A `.codex-disclosure` pattern).
+  // Phase 9 added `.codex-faq` as the FAQ-page wrapper class — extending
+  // the selector here keeps FAQPage JSON-LD working after migration.
+  $body(".codex-editorial-faq details, .codex-article-faq details, .codex-faq details").each((_, element) => {
     const question = $body(element).find("summary").first().text();
     const answer = $body(element).find("p").toArray().map((paragraph) => $body(paragraph).text()).join(" ");
     pushEntry(question, answer);
@@ -3268,9 +3423,18 @@ function renderProductSpecSheet(route: string): string {
     ? `<div class="codex-spec-compat"><strong>Compatibility:</strong> ${escapeXml(sheet.compatibility)}</div>`
     : "";
 
+  // DS-12 #5B (2026-04-27): wrap the spec table in .codex-scroll-region so
+  // it inherits the same overflow + focus-ring + max-height treatment as the
+  // compare table. ARIA: tabindex=0 + role=region + aria-label so keyboard
+  // users can Tab into the region and scroll horizontally on narrow viewports
+  // (the table has 6+ data rows that overflow on mobile <360px). The h2 sits
+  // outside the scroll region so it's always visible.
   return `<section class="codex-product-spec-sheet" aria-label="Technical specifications">
-    <div class="codex-spec-table-wrap">
-      <h2>Technical Specifications</h2>
+    <h2 class="codex-spec-table-heading">Technical Specifications</h2>
+    <div class="codex-scroll-region codex-spec-table-wrap"
+         tabindex="0"
+         role="region"
+         aria-label="Technical specifications table — scroll horizontally on narrow viewports">
       <table class="codex-spec-table">
         <tbody>${specsRows}</tbody>
       </table>
@@ -4414,6 +4578,9 @@ function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Record<str
     entries.push({
       "@context": "https://schema.org",
       "@type": "Article",
+      // Shared @id with editorial-authority-ld so the two emitter paths
+      // describe a single Article entity rather than two duplicates.
+      "@id": `${canonicalPath}#article`,
       headline: context.contentTitle,
       description: context.description,
       image: context.imageGallery.map((entry) => entry.url),
