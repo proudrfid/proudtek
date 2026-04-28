@@ -292,12 +292,15 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
   "/industries/",
   "/resources/",
   // Layer-A removal P1 hubs (added 2026-04-28): without these, the editorial
-  // JSON authored under src/content/editorial/{index,about,contact,faq,blog,
-  // markets,lp,products/all,compare,compatibility,guides}.json was silently
-  // dropped and the WP snapshot continued to render. See LAYER_A_REMOVAL_PLAN.md
-  // P1.12. compare/compatibility/guides hubs each had editorial JSON in main
-  // (compare.json etc.) but were also dark-matter before this list.
-  "/",
+  // JSON authored under src/content/editorial/{about,contact,faq,blog,
+  // markets,lp,products/all,compare,compatibility,guides,solutions}.json was
+  // silently dropped and the WP snapshot continued to render. See
+  // LAYER_A_REMOVAL_PLAN.md P1.12.
+  //
+  // P1.15 (2026-04-28): "/" intentionally excluded — the editorial /index.json
+  // exists in repo for future use but the WP snapshot home is the canonical
+  // homepage. Re-adding "/" requires a content review on src/content/editorial/
+  // index.json first.
   "/about/",
   "/contact/",
   "/faq/",
