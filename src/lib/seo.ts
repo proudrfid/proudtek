@@ -1610,11 +1610,19 @@ function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context: PageC
   }
 
   const supportHtml = "";
-  const trustBarHtml = context.kind === "home" ? renderTrustBar() : "";
+  // P1.14: when the page already rendered through the editorial pipeline
+  // (mergeEditorialPages set codex-editorial-page on <article>), the home
+  // and blog snapshot-era injections (growth hub, trust bar, quote brief,
+  // industry selector) become duplicates that visually break the page.
+  // The editorial render already provides hero + CTA + trust signals via
+  // EditorialPage.astro / renderEditorialMain. Skip the snapshot-era
+  // injections when an editorial body is detected.
+  const isEditorialBody = $body(".codex-editorial-page").length > 0;
+  const trustBarHtml = context.kind === "home" && !isEditorialBody ? renderTrustBar() : "";
   const growthHtml =
-    context.kind === "home"
+    context.kind === "home" && !isEditorialBody
       ? renderHomeGrowthHub() + trustBarHtml
-      : context.kind === "blog" && page.route !== "/blog/"
+      : context.kind === "blog" && page.route !== "/blog/" && !isEditorialBody
         ? renderBlogGrowthHub()
         : "";
   const insertedHtml = [growthHtml, supportHtml].filter(Boolean).join("");
@@ -1623,6 +1631,15 @@ function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context: PageC
   }
 
   if (context.kind === "home") {
+    // P1.14: skip snapshot-era injections when an editorial body has
+    // already been rendered (mergeEditorialPages set codex-editorial-page).
+    // The editorial render handles hero, CTA, trust signals, sections and
+    // resource cards through EditorialPage.astro / renderEditorialMain;
+    // re-injecting the WP growth hub / quote brief produces duplicate hero,
+    // 5× trust bars and a stray industry selector grid.
+    if (isEditorialBody) {
+      return;
+    }
     const heroBlock = $body(".entry-content > .wp-block-cover, .entry-content > .wp-block-group, .entry-content > *").first();
     if (heroBlock.length) {
       heroBlock.after(insertedHtml);
