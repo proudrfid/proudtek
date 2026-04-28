@@ -3,52 +3,368 @@
   "group": "products",
   "title": "EM4100 RFID Cards — 125 kHz Read-Only Proximity Cards",
   "kicker": "Proximity Cards",
-  "summary": "EM4100 (also known as EM4102) is the most widely used 125 kHz read-only RFID chip. A simple, low-cost proximity card that transmits a fixed 40-bit ID number when powered by a reader field. Used globally for basic access control, time-attendance, parking systems and legacy proximity deployments where simplicity and unit cost are the primary selection criteria.",
+  "summary": "The legacy 125 kHz LF proximity chip is the most widely deployed 125 kHz read-only RFID chip — a fixed-ID proximity card with no encryption, designed for simple 'tap-to-open' access control, time and attendance and parking. Use it where unit cost and reader tolerance matter more than anti-cloning security.",
   "heroPoints": [
-    "Read-only 40-bit ID. No encryption, no writing, no complexity; the reader receives the card's unique ID and the access control system makes the decision.",
-    "125 kHz low frequency. Long read range (5-15 cm) with high tolerance for metal, water and body proximity that can attenuate 13.56 MHz signals.",
-    "Lowest cost RFID card available. Ideal for high-volume deployments where tens of thousands of cards are issued annually."
+    "Where brand-standard finish matters, read-only chip — EM4100 transmits a 64-bit frame carrying a 40-bit unique ID every time it enters a 125 kHz reader field — no writable memory, no authentication handshake.",
+    "Long-range, forgiving RF: 125 kHz low-frequency performance tolerates metal, moisture and body proximity better than 13.56 MHz, which is why legacy industrial and parking readers keep using it.",
+    "Lowest per-card cost in the proximity-card category — ideal for high-volume, disposable or facility-wide issuance."
   ],
   "imageAlt": "EM4100 125 kHz proximity card for basic access control",
   "heroImage": "/landing-images/em4100-rfid-card.jpg",
   "imageSourceRoutes": [
-    "/product/blank-rfid-card/",
-    "/product/rfid-key-fob/"
+    "/products/rfid-cards/mifare-classic-1k-card/",
+    "/products/rfid-cards/mifare-desfire-ev3-card/",
+    "/compare/125khz-vs-13.56mhz-rfid/"
   ],
-  "sections": [
+  "keywords": [
+    "EM4100 RFID cards",
+    "125 kHz proximity cards",
+    "EM4102 cards",
+    "read-only RFID cards",
+    "legacy access control cards",
+    "dual-frequency 125 kHz 13.56 MHz cards"
+  ],
+  "brief": [
     {
-      "title": "Where EM4100 cards fit in the RFID card landscape",
-      "bullets": [
-        "Basic door access: apartment buildings, industrial facilities, construction sites and parking garages where the primary requirement is 'tap to open' with no stored data on the card and no encryption requirement.",
-        "Time and attendance: factory floor workers, warehouse staff and construction crews tap their EM4100 card at a time clock; the 40-bit ID links to the employee record in the payroll system.",
-        "Legacy system replacement: millions of 125 kHz readers from manufacturers like HID (ProxPoint, ProxPro), Indala, AWID and Rosslare are deployed globally; EM4100 cards provide a low-cost replacement card for these installed reader bases.",
-        "Disposable event access: trade shows, factory tours and visitor management systems where cards are issued for a single day and may not be returned; the low per-card cost makes disposable use economically viable.",
-        "Parking and vehicle access. Embedded in windshield tags or issued as dashboard cards for barrier gate systems operating at 125 kHz."
+      "label": "LF 125 kHz air-interface (ISO/IEC 18000-2)",
+      "items": [
+        "ISO/IEC 18000-2 RFID at 135 kHz and below — EM4100 / EM4102 operate at 125 kHz LF carrier, license-free worldwide with no spectrum co-ordination overhead.",
+        "Inductive coupling at 125 kHz tolerates metal, moisture, grease and body proximity far better than 13.56 MHz HF inductive coupling.",
+        "No anti-collision — one card in the reader field at a time is the design assumption."
       ]
     },
     {
-      "title": "Proud Tek EM4100 card specifications and options",
+      "label": "Frame format (64-bit Manchester, 40-bit ID)",
+      "items": [
+        "EM4100 emits a 64-bit Manchester-encoded frame: 9-bit header + 10-bit customer/version + 40-bit unique ID + row parity + column parity + stop bit.",
+        "Each tap produces exactly the same frame — there is no rolling counter, no nonce, no handshake.",
+        "40-bit ID space is the operational identifier; customer/version field is often used for factory-code allocation across integrator programmes."
+      ]
+    },
+    {
+      "label": "Read-only architecture (no memory, no auth)",
+      "items": [
+        "No writable memory, no encryption, no challenge-response handshake — cryptographic posture is 'none' by design.",
+        "All access entitlements, expiry, floor permissions, photo lookups and audit logs live in the access-control system database keyed by the ID.",
+        "EM4200 is the functional successor chip — pin-compatible with EM4100 / EM4102 and dominant in current production."
+      ]
+    },
+    {
+      "label": "LF RF characteristics (metal / moisture tolerance)",
+      "items": [
+        "125 kHz wavelength is ~2,400 m; cards operate deep in the near-field inductive regime where metal detuning is manageable.",
+        "Read range 5–15 cm on standard readers; long-range LF readers extend to 60–80 cm for barrier-gate / windshield use.",
+        "Typical LF pass-rate in industrial (greasy / dusty / metal-cage) environments is materially higher than HF in the same conditions."
+      ]
+    },
+    {
+      "label": "Cloning posture (T5577, Flipper Zero)",
+      "items": [
+        "EM4100 clones onto a writable T5577 / ATMEL T55x7 / Hitag chip in <5 seconds with a EUR 20 handheld duplicator or a Proxmark3.",
+        "Flipper Zero reads + emulates EM4100 in the same session — cloning is trivial at consumer-tool cost.",
+        "Accept the cloning posture as given; deploy EM4100 only where the cost of a cloned card is acceptable."
+      ]
+    },
+    {
+      "label": "EM4100 vs HID Prox distinction",
+      "items": [
+        "HID ProxPoint, ProxPro and R10 / R40 readers use HID's proprietary 125 kHz format — not the EM4100 / EM4102 protocol.",
+        "EM4100 cards do NOT open pure HID Prox readers; multi-format readers (many third-party, some HID multiCLASS SE) that explicitly list EM4100 do.",
+        "Always verify EM4100 / EM4102 support against the reader datasheet — 'Prox' on the product sheet is not interchangeable with EM4100."
+      ]
+    },
+    {
+      "label": "Residential + small-business access",
+      "items": [
+        "Apartment-lobby, bike-room, multi-tenant office and small industrial-park access where tenants change often and cards get lost.",
+        "EM4100 keeps card budgets manageable when churn is the dominant cost driver.",
+        "Paired with access-control software that enforces allow-list + expiry at the reader back-end."
+      ]
+    },
+    {
+      "label": "Factory + time-attendance",
+      "items": [
+        "Factory / warehouse / construction time-clock terminals reading the 40-bit ID for payroll integration.",
+        "LF tolerates greasy hands, metal workbenches and forklift cages where HF readers require re-tuning.",
+        "Cloning is a payroll-control problem more than a physical-security problem — handled at the access-control system layer."
+      ]
+    },
+    {
+      "label": "Parking + barrier-gate",
+      "items": [
+        "Windshield tags, dashboard cards and driver fobs read reliably at 5–15 cm on short-range readers, 60–80 cm on long-range LF readers.",
+        "Dirty windshields, mixed-metal parking lane hardware and outdoor moisture all sit inside the LF operating envelope.",
+        "Long-range EM4100 is the default specification for parking-barrier estates worldwide."
+      ]
+    },
+    {
+      "label": "Visitor + contractor + event badges",
+      "items": [
+        "Issue, recycle, lose — the per-card cost absorbs the churn for visitor + contractor + short-lifecycle event programmes.",
+        "Pair with dated-expiry rules in the access-control system rather than relying on card security.",
+        "Clamshell 1.8 mm thick card body is common for this segment — accepts lanyard clip + slot punch."
+      ]
+    },
+    {
+      "label": "Dual-frequency migration cards",
+      "items": [
+        "Combo card carries EM4100 (125 kHz) + MIFARE Classic 1K / NTAG21x (13.56 MHz) in a single body — works on legacy LF doors and new HF doors during multi-year migration.",
+        "Single card estate across both reader generations — no parallel-issuance bureau running during the transition.",
+        "Typical fit for residential portfolios + campus + enterprise sites moving from 125 kHz to 13.56 MHz over a 3–5 year horizon."
+      ]
+    },
+    {
+      "label": "Regulatory + card-body posture",
+      "items": [
+        "Standard CR-80 PVC card body (85.6 × 54 × 0.84 mm) per ISO/IEC 7810 ID-1; ISO/IEC 10373-6 durability test regime.",
+        "RoHS 3 + REACH Annex XVII compliant PVC substrates; batch chip certificates + factory-code + ID-range lists ship with every production lot.",
+        "EM4100 is NOT acceptable where PCI DSS / SOX / HIPAA / government audit references anti-cloning or AES-128 credentials — see the MIFARE migration path."
+      ]
+    }
+  ],
+  "publishedAt": "2026-04-18",
+  "modifiedAt": "2026-03-19",
+  "authorSlug": "editorial-board",
+  "author": "ProudTek Editorial Board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedBy": "Peter Zhang",
+  "reviewedAt": "2026-03-20",
+  "sections": [
+    {
+      "title": "What is an EM4100 card?",
+      "intro": "EM4100 (and the functionally identical EM4102) is a 125 kHz read-only RFID chip originally from EM Microelectronic. When it enters a reader field, it modulates a 64-bit Manchester-encoded frame — a 9-bit header, a 40-bit customer/ID payload, row and column parity bits and a stop bit — and keeps repeating that frame for as long as the field energises the coil.",
+      "paragraphs": [
+        "There is no authentication, no writable memory and no anti-collision; every tap produces exactly the same bits, which is why cloning an EM4100 card onto a writable T5577 chip takes seconds with a €20 handheld duplicator.",
+        "That simplicity is also its strength. For tens of thousands of low-risk reads per day — apartment doors, factory gates, car-park barriers, visitor badges — EM4100 delivers tap-to-open behaviour at the lowest per-card cost of any RFID technology and with the most forgiving RF tolerance in field conditions."
+      ]
+    },
+    {
+      "title": "EM4100 vs HID Prox vs MIFARE Classic vs DESFire EV3",
+      "intro": "This is the comparison that sits behind almost every EM4100 buying decision: should we stay on 125 kHz, and if so, are we actually compatible with our installed reader base?",
+      "table": {
+        "columns": [
+          "Property",
+          "EM4100 / EM4102",
+          "HID Prox (125 kHz)",
+          "MIFARE Classic 1K",
+          "MIFARE DESFire EV3"
+        ],
+        "rows": [
+          [
+            "Frequency",
+            "125 kHz LF",
+            "125 kHz LF",
+            "13.56 MHz HF",
+            "13.56 MHz HF"
+          ],
+          [
+            "Encryption",
+            "None",
+            "None (proprietary format)",
+            "CRYPTO-1 (broken)",
+            "AES-128 mutual auth"
+          ],
+          [
+            "Cloning difficulty",
+            "Trivial (T5577 copy)",
+            "Trivial with matching format reader",
+            "Broken since 2008",
+            "Not feasible today"
+          ],
+          [
+            "Writable memory",
+            "No",
+            "No",
+            "768 bytes user",
+            "Up to 8 KB, multi-app"
+          ],
+          [
+            "Reader interoperability",
+            "EM4100/4102 readers only",
+            "HID-branded or multi-format readers",
+            "ISO 14443-3 Type A readers",
+            "ISO 14443-4 readers + NFC phones"
+          ],
+          [
+            "Best suited for",
+            "Legacy access, disposable IDs",
+            "HID-installed estates",
+            "Low-security closed loop",
+            "Transit, payment, secure access"
+          ]
+        ]
+      },
+      "callout": {
+        "label": "HID Prox is not EM4100",
+        "text": "HID ProxPoint, ProxPro and R10/R40 readers speak HID's proprietary 125 kHz format, not EM4100/EM4102. EM4100 cards will not open a pure HID Prox reader. You need either a multi-format reader (many third-party readers read both) or to match the card technology to the installed reader.",
+        "href": "/compatibility/"
+      }
+    },
+    {
+      "title": "LF resilience vs trivial cloning — the decision pivot",
+      "intro": "Every EM4100 specification decision sits at the intersection of two measurable facts: LF radio survives factory / parking / outdoor conditions that knock HF out of tune, and a €20 duplicator clones the card in under five seconds."
+    },
+    {
+      "title": "Why 125 kHz EM4100 is still shipping in 2026",
+      "intro": "13.56 MHz has been 'the future' of access control for twenty years, yet EM4100 cards still ship in enormous volumes. Four structural reasons keep the installed base alive.",
+      "timeline": {
+        "items": [
+          {
+            "label": "Pre-2005 — Install wave",
+            "text": "Proximity access control goes mainstream. Millions of 125 kHz readers from HID, Indala, AWID, Rosslare and EM Microelectronic are deployed across apartment buildings, offices and industrial sites worldwide."
+          },
+          {
+            "label": "2007–2008 — MIFARE Classic break",
+            "text": "CRYPTO-1 is reverse-engineered and MIFARE Classic is shown to be breakable in minutes. The 'just move to 13.56 MHz' argument loses some of its security edge for facilities that never modelled anti-cloning in the first place."
+          },
+          {
+            "label": "2010s — Dual-frequency cards",
+            "text": "Combo EM4100 + 13.56 MHz cards appear. Facilities start a decade-long phased migration: new readers go HF, but the existing EM4100 readers keep working and keep issuing cheap cards."
+          },
+          {
+            "label": "2020s — Mobile credentials arrive",
+            "text": "Phone-based credentials (HID Mobile Access, MIFARE DESFire on secure element) push new-build sites straight to HF or mobile. But the legacy LF reader bases and parking / industrial niches are where EM4100 still wins on unit cost and RF robustness."
+          },
+          {
+            "label": "2026 — Today + integrator handoff",
+            "text": "EM4100 is the default choice for disposable badges, parking, construction-site access and low-security building entry; upgrade pressure is real only where cloning risk is tangible or where the site needs mobile and NFC credentials. Reference operating practice across residential-apartment-access, factory-time-attendance, parking-barrier-gate, construction-site-entry and contractor-visitor-badge EM4100-125-kHz programmes."
+          }
+        ]
+      }
+    },
+    {
+      "title": "When EM4100 is the right choice, and when it is the wrong choice",
+      "intro": "A clean checklist keeps facilities managers out of the two failure modes we see most often — using EM4100 where cloning matters, or pulling out perfectly good 125 kHz readers for no operational benefit.",
+      "comparePanel": {
+        "beforeHeading": "EM4100 is the right choice when…",
+        "afterHeading": "EM4100 is the wrong choice when…",
+        "before": [
+          "The installed reader base is 125 kHz EM4100/EM4102 and there is no security incident driving replacement.",
+          "The site needs disposable or short-lifecycle badges (visitor, contractor, event) where replacement cost matters more than anti-cloning.",
+          "Environmental conditions favour LF — metal cages, outdoor parking, industrial moisture — where 13.56 MHz readers struggle with tuning.",
+          "Access decisions rely on a reliable back-end system (e.g. checking the ID against a central allow-list), not on the card itself carrying secrets.",
+          "Time-and-attendance is the primary use and the cost of a cloned card is a payroll control problem, not a security breach."
+        ],
+        "after": [
+          "You are specifying new-build readers today; unless there is a specific LF reason, go 13.56 MHz or mobile and save yourself the migration.",
+          "Cloning a card can cause real loss — data centres, pharma vaults, high-value stockrooms, tenant turnover in residential with cash or asset storage.",
+          "You need writable memory on the card (stored value, biometric template, cached entitlements) — EM4100 is read-only.",
+          "The roadmap includes phone-based credentials; LF readers cannot accept NFC or Bluetooth mobile access.",
+          "A regulator or insurer has started asking about audit trails of unique, non-cloneable credentials."
+        ]
+      }
+    },
+    {
+      "title": "Six deployment realities we see with EM4100 programs",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "door",
+            "title": "Residential and small-business access",
+            "text": "Apartment lobbies, bike rooms, multi-tenant offices and small industrial parks where tenants change often and cards get lost — EM4100 keeps card budgets manageable."
+          },
+          {
+            "icon": "clock",
+            "title": "Factory-floor time and attendance",
+            "text": "Workers tap at the clock; the 40-bit ID resolves to an employee record. LF tolerates greasy hands, metal workbenches and forklift cages better than HF."
+          },
+          {
+            "icon": "car",
+            "title": "Parking and barrier gates",
+            "text": "Windshield tags, dashboard cards and driver fobs read reliably at 5 to 15 cm, even through dirty windshields and in mixed-metal parking lane hardware."
+          },
+          {
+            "icon": "visitor",
+            "title": "Visitor, contractor and event badges",
+            "text": "Issue, recycle, lose — the per-card cost absorbs the churn. Pair with dated expiry rules in the access system rather than relying on card security."
+          },
+          {
+            "icon": "layers",
+            "title": "Dual-frequency migration cards",
+            "text": "Combo cards carry both EM4100 and a 13.56 MHz chip in one body, so a single card works during the multi-year transition from legacy LF to HF or mobile."
+          },
+          {
+            "icon": "warn",
+            "title": "Where we refuse EM4100",
+            "text": "We proactively recommend away from EM4100 when the buyer describes a data-centre tenant, an energy substation, a cannabis dispensary vault or any environment where a T5577 clone is a plausible attack."
+          }
+        ]
+      }
+    },
+    {
+      "title": "Reader compatibility cheat sheet",
+      "paragraphs": [
+        "EM4100 cards work with any reader that supports the EM4100 or EM4102 protocol at 125 kHz. They do not work with readers that only support HID Prox (which is a separate proprietary format at the same carrier frequency), Indala, AWID or other vendor-locked LF formats.",
+        "Many modern 125 kHz readers are multi-format and will read EM4100 alongside HID Prox, Indala and others — but this has to be confirmed from the reader datasheet, not assumed. When you send us a reader model number, we verify the EM4100 line on the spec sheet before we confirm compatibility.",
+        "If your reader inventory is mixed, a dual-frequency card body lets you roll one card estate across both the old LF doors and the new 13.56 MHz doors without running parallel issuance programs."
+      ],
+      "image": {
+        "src": "/landing-images/industrial.webp",
+        "alt": "EM4100 125 kHz proximity cards in use on a factory access gate and time-and-attendance terminal"
+      },
+      "layout": "split"
+    },
+    {
+      "title": "Proud Tek EM4100 card options and configuration",
       "bullets": [
-        "Standard CR-80 PVC card body (85.6 × 54 × 0.84 mm) with EM4100 or EM4200 chip and coil antenna. Reads at 5-15 cm on standard 125 kHz readers.",
-        "Clamshell thick card option (1.8 mm) with slot punch for lanyard or clip attachment. Common for industrial environments and visitor badges.",
-        "Custom printing: full-color offset or digital printing with sequential numbering, barcodes, employee photo personalization and overlay lamination.",
-        "Pre-programmed ID ranges. EM4100 chips come factory-programmed with unique IDs; we can supply cards with sequential facility code and card number ranges matching your access control database requirements.",
-        "Dual-frequency combo cards. Embed both EM4100 (125 kHz) and MIFARE Classic 1K (13.56 MHz) in a single card body for phased migration from legacy proximity to modern smart card systems."
+        "Standard CR-80 PVC card body (85.6 × 54 × 0.84 mm) with EM4100 or EM4200 chip and coil antenna. Read range 5 to 15 cm on typical LF readers.",
+        "Thick clamshell cards (1.8 mm) with slot punch for lanyard or clip attachment — common for industrial and visitor use.",
+        "Full-colour offset or digital printing, with sequential card numbering, barcodes, QR codes, employee photos and optional overlay lamination.",
+        "Pre-programmed ID ranges: we supply cards with factory-programmed, sequential facility code and card number ranges aligned to your access control database.",
+        "Dual-frequency combo cards: EM4100 (125 kHz) plus MIFARE Classic 1K or NTAG21x (13.56 MHz) in a single card body for phased LF-to-HF migration."
+      ],
+      "checklist": [
+        "Confirm the reader model accepts EM4100/EM4102 (not just 'Prox') before committing to cards — we will verify against the datasheet on request.",
+        "Specify the ID range policy (customer code + facility code + card number) so duplicates do not slip into the access database.",
+        "Decide now whether cloning is in scope; if it is, dual-frequency cards are cheaper than a later forklift upgrade.",
+        "Plan card lifecycle: EM4100 cards do not expire electronically, so expiry and revocation live entirely in the access control system."
       ]
     }
   ],
   "resourceCards": [
     {
       "title": "Upgrade paths from EM4100",
-      "description": "When you need more security or memory than EM4100 provides.",
+      "description": "When you need more security or memory than EM4100 provides, these 13.56 MHz options are the most common upgrade targets.",
       "links": [
         {
           "href": "/products/rfid-cards/mifare-classic-1k-card/",
           "label": "MIFARE Classic 1K cards"
         },
         {
+          "href": "/products/rfid-cards/mifare-plus-se-card/",
+          "label": "MIFARE Plus SE cards"
+        },
+        {
           "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
           "label": "MIFARE DESFire EV3 cards"
+        }
+      ]
+    },
+    {
+      "title": "Compatibility and compare references",
+      "description": "Confirm reader compatibility and understand the LF-to-HF migration question before you commit to a card type.",
+      "links": [
+        {
+          "href": "/compatibility/",
+          "label": "Reader and lock compatibility database"
+        },
+        {
+          "href": "/compare/125khz-vs-13.56mhz-rfid/",
+          "label": "125 kHz vs 13.56 MHz comparison"
+        }
+      ]
+    },
+    {
+      "title": "Access and time-attendance solutions",
+      "description": "How EM4100 cards fit into broader facility access control and workforce tracking programs.",
+      "links": [
+        {
+          "href": "/solutions/rfid-attendance-system/",
+          "label": "RFID attendance system"
+        },
+        {
+          "href": "/solutions/rfid-access-control/",
+          "label": "RFID access control"
         }
       ]
     }
@@ -56,15 +372,31 @@
   "faq": [
     {
       "question": "Can EM4100 cards be cloned?",
-      "answer": "Yes. EM4100 is a read-only chip with no encryption. The 40-bit ID is transmitted in the clear and can be captured by any 125 kHz reader and written to a writable card (T5577). EM4100 should not be used for high-security applications. If cloning is a concern, upgrade to MIFARE DESFire EV3 (AES-128 encryption) or MIFARE Plus SE."
+      "answer": "Yes, trivially. EM4100 is a read-only chip with no encryption; the 40-bit ID is transmitted in the clear and can be captured by any 125 kHz reader and written to a rewritable T5577 chip in seconds with an inexpensive handheld duplicator. Use EM4100 only where the risk of cloning is acceptable — residential doors, parking, time-and-attendance, visitor badges. For anti-cloning, upgrade to MIFARE DESFire EV3 (AES-128 mutual authentication) or MIFARE Plus SE."
     },
     {
       "question": "Will EM4100 cards work with our HID proximity readers?",
-      "answer": "It depends on the reader model. HID ProxPoint and ProxPro readers use HID's proprietary 125 kHz format, not EM4100. You will need a reader that supports the EM4100/EM4102 protocol. Many third-party 125 kHz readers support both HID Prox and EM4100 formats — check your reader's specifications or contact us with your reader model for compatibility confirmation."
+      "answer": "Only if the reader is a multi-format reader that explicitly lists EM4100 or EM4102 on the datasheet. HID's own ProxPoint, ProxPro and R10/R40 readers use HID's proprietary 125 kHz format, which is not the same as EM4100. Many third-party 125 kHz readers do support both formats. Send us your reader model number and we will verify compatibility line by line."
     },
     {
-      "question": "What is the MOQ and lead time for custom EM4100 cards?",
-      "answer": "Blank white EM4100 cards: MOQ 100, ships from stock in 1-3 business days. Clamshell cards: MOQ 100, from stock. Custom-printed cards: MOQ 200, lead time 10-12 business days from artwork approval. Volume discounts available at 1,000, 5,000 and 10,000+ quantities."
+      "question": "Is EM4100 the same as EM4102?",
+      "answer": "Functionally, yes. EM4100 and EM4102 share the same frame format and protocol at 125 kHz and are interoperable with the same readers. EM4102 is typically the variant sold today; 'EM4100' is used as a generic name for the family and is the search term buyers still use. Our standard EM4100 SKUs ship with EM4102 or EM4200 chips depending on availability and specified bit timing."
+    },
+    {
+      "question": "Should I still buy EM4100 cards in 2026, or go straight to 13.56 MHz?",
+      "answer": "Buy EM4100 if your installed reader base is 125 kHz and you do not have a security or mobile-credential driver pushing migration. If you are specifying new readers today, go 13.56 MHz (MIFARE DESFire EV3 or NTAG424 DNA) so you get anti-cloning and a path to NFC phone credentials. The middle case — you are mid-migration — is what dual-frequency combo cards are for: one card body, both LF and HF chips, works on old and new readers during the transition."
+    },
+    {
+      "question": "Can EM4100 carry any data beyond the ID?",
+      "answer": "No. EM4100 is strictly read-only and transmits only its pre-programmed 40-bit ID inside a fixed 64-bit frame. All access entitlements, expiry, floor permissions, photo lookups, shift records and so on have to live in the access control system's database, keyed by that ID. If you need on-card stored value, biometrics, logs or offline entitlements, you need a memory-carrying chip such as MIFARE Classic, DESFire or NTAG."
+    },
+    {
+      "question": "What is the MOQ and lead time for custom-printed EM4100 cards?",
+      "answer": "Blank white EM4100 cards: MOQ 100, ships from stock in 1 to 3 business days. Clamshell thick cards: MOQ 100, from stock. Custom-printed and pre-encoded cards: MOQ 200, lead time 10 to 12 business days from artwork approval. Volume breaks are available at 1,000, 5,000 and 10,000+ quantities; dual-frequency combo cards typically add 5 to 8 business days."
+    },
+    {
+      "question": "What read range should we expect in the field?",
+      "answer": "Plan for 5 to 15 cm of reliable read distance on a standard reader, measured with the card perpendicular to the reader face. Real-world range depends heavily on the reader's antenna tuning, power and any nearby metal. Wall-mounted readers next to metal door frames typically land at the lower end of that range; open-desk turnstile readers sit near the top. For barrier-gate and windshield applications, use a long-range LF reader paired with a higher-gain card or tag."
     }
   ],
   "primaryAction": {
@@ -73,30 +405,78 @@
   },
   "secondaryActions": [
     {
-      "href": "/product/blank-rfid-card/",
-      "label": "Blank RFID cards"
+      "href": "/products/rfid-cards/mifare-classic-1k-card/",
+      "label": "MIFARE Classic 1K cards"
     },
     {
-      "href": "/product/rfid-key-fob/",
-      "label": "RFID key fobs"
+      "href": "/solutions/rfid-access-control/",
+      "label": "Facility access control"
+    },
+    {
+      "href": "/compare/125khz-vs-13.56mhz-rfid/",
+      "label": "125 kHz vs 13.56 MHz"
+    }
+  ],
+  "sources": [
+    {
+      "label": "EM Microelectronic — EM4100 datasheet",
+      "url": "https://www.emmicroelectronic.com/product/lf-read-only-contactless-identification-devices/em4100",
+      "publisher": "EM Microelectronic",
+      "publishedAt": "2016-01-01",
+      "accessedAt": "2026-04-24",
+      "note": "Official datasheet defining the 64-bit Manchester frame format and 125 kHz carrier envelope."
+    },
+    {
+      "label": "EM Microelectronic — EM4102 / EM4200 RFID IC family",
+      "url": "https://www.emmicroelectronic.com/products/rfid-nfc-ics",
+      "publisher": "EM Microelectronic",
+      "publishedAt": "2020-06-01",
+      "accessedAt": "2026-04-24",
+      "note": "Successor chip family — EM4200 is pin-compatible with EM4100 and dominant in current production."
+    },
+    {
+      "label": "ISO/IEC 18000-2:2009 — RFID at 135 kHz and below",
+      "url": "https://www.iso.org/standard/46146.html",
+      "publisher": "ISO",
+      "publishedAt": "2009-07-01",
+      "accessedAt": "2026-04-24",
+      "note": "LF RFID air-interface standard covering the 125 kHz band in which EM4100 operates."
+    },
+    {
+      "label": "ISO/IEC 7810:2019 — Identification cards, physical characteristics (ID-1 / CR80)",
+      "url": "https://www.iso.org/standard/70483.html",
+      "publisher": "ISO",
+      "publishedAt": "2019-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "CR80 physical card dimensions (85.60 × 53.98 × 0.76 mm) for the EM4100 card body."
+    },
+    {
+      "label": "ISO/IEC 10373-6:2020 — ID card test methods, proximity cards",
+      "url": "https://www.iso.org/standard/77902.html",
+      "publisher": "ISO",
+      "publishedAt": "2020-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "Durability + electrical test methods applied to LF proximity cards at the issuance bureau."
+    },
+    {
+      "label": "HID Global — Prox card technology overview",
+      "url": "https://www.hidglobal.com/products/cards-and-credentials/hid-prox",
+      "publisher": "HID Global",
+      "publishedAt": "2022-03-01",
+      "accessedAt": "2026-04-24",
+      "note": "HID Prox proprietary 125 kHz format — distinct from EM4100 / EM4102, the commonest compatibility confusion on LF specifications."
     }
   ],
   "relatedIndustries": [
-    "events-venues",
     "education",
     "logistics",
-    "industrial"
+    "industrial",
+    "events-venues"
   ],
   "chipFamilies": [
-    "mifare-classic",
-    "mifare-desfire",
-    "mifare-plus",
     "em-tk5"
   ],
   "envFamilies": [
     "embed"
-  ],
-  "authorSlug": "editorial-board",
-  "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-22"
+  ]
 }

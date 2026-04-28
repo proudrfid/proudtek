@@ -1,64 +1,389 @@
 {
   "route": "/products/rfid-cards/mifare-classic-1k-card/",
   "group": "products",
-  "title": "MIFARE Classic 1K Cards — Bulk NFC Access Control Cards",
+  "title": "MIFARE Classic 1K Cards — Bulk 13.56 MHz Access Cards",
   "kicker": "Access Cards",
-  "summary": "MIFARE Classic 1K cards remain the most widely deployed contactless smart card in the world (over 1 billion cards issued) used for building access control, time-attendance, event ticketing and basic loyalty systems. Their 1 KB EEPROM, 16-sector memory structure and low per-unit cost make them the default choice for high-volume deployments where basic authentication meets the security requirement.",
+  "summary": "The legacy 13.56 MHz access-control chip is NXP's original ISO/IEC 14443-3 Type A contactless smart card (13.56 MHz, 1 KB EEPROM, 16 sectors × 4 blocks) and still the highest-volume HF credential in circulation worldwide. It is the right specification for legacy-reader-compatible, low-value, high-volume issuance — gym memberships, event badges, time-attendance and budget hotel keys. Where universal reader compatibility and the lowest per-card cost in the MIFARE family outrank the need for modern AES-128 cryptography.",
   "heroPoints": [
-    "Universal reader compatibility: works with virtually every 13.56 MHz access control reader installed in the last 20 years.",
-    "1 KB memory with 16 sectors — each sector independently key-protected for multi-purpose use (access + time-attendance + cafeteria).",
-    "Lowest per-card cost in the MIFARE family. Ideal for high-volume issuance where thousands of cards are deployed annually."
+    "Universal MIFARE Classic reader compatibility — works with every 13.56 MHz ISO/IEC 14443-3 Type A reader deployed in the last two decades, with no firmware change or reader upgrade.",
+    "1 KB EEPROM, 16 sectors × 4 blocks — each sector independently key-protected, supporting basic multi-application use (access + canteen + parking) without migrating to DESFire.",
+    "The lowest per-card cost in the MIFARE family at volume; ideal for high-volume issuance where the credential is disposable, replaceable or covers a low-value authorisation."
   ],
-  "imageAlt": "MIFARE Classic 1K white PVC cards stacked for bulk access control deployment",
+  "imageAlt": "Stack of blank MIFARE Classic 1K 13.56 MHz PVC cards ready for bulk access control and event issuance",
   "heroImage": "/landing-images/mifare-classic-1k-card.jpg",
   "imageSourceRoutes": [
-    "/product/blank-rfid-card/",
-    "/product/hotel-key-cards/"
+    "/products/rfid-cards/mifare-plus-se-card/",
+    "/products/rfid-cards/mifare-desfire-ev3-card/",
+    "/compatibility/saflok-hotel-key-cards/"
   ],
+  "keywords": [
+    "MIFARE Classic 1K",
+    "13.56 MHz access card",
+    "CRYPTO-1 card",
+    "legacy MIFARE card",
+    "hotel key card",
+    "event badge card"
+  ],
+  "brief": [
+    {
+      "label": "Air-interface + CR80 envelope",
+      "items": [
+        "ISO/IEC 14443-1/-2/-3 Type A at 13.56 MHz — 106 kbit/s bit-rate with anticollision per Type A cascade level 1.",
+        "ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) physical card body; ISO/IEC 10373-6 durability test regime.",
+        "Launched by Philips Semiconductors (now NXP) in 1997 — oldest contactless smart card specification still in wide active issuance."
+      ]
+    },
+    {
+      "label": "Memory architecture (1 KB / 16 sectors)",
+      "items": [
+        "1 KB EEPROM organised as 16 sectors × 4 blocks × 16 bytes; block 0 of sector 0 is the read-only manufacturer block (UID + manufacturer data).",
+        "Trailer block of each sector holds Key A, Key B and access-condition bits that govern read/write on the three data blocks.",
+        "NXP MF1S503x product family — the MF1ICS50 die is the canonical Classic 1K reference implementation."
+      ]
+    },
+    {
+      "label": "CRYPTO-1 cipher (historical posture)",
+      "items": [
+        "Proprietary 48-bit stream cipher designed by Philips in the mid-1990s; public reverse-engineering published at 24C3 (Nohl & Plötz, 2007).",
+        "Full cryptanalysis by Garcia et al. (ESORICS 2008) — dark-side + nested attacks recover sector keys in seconds on modest hardware.",
+        "CRYPTO-1 should not be trusted as a security boundary for any new deployment — specify Plus SE or DESFire EV3 where cloning is a realistic threat."
+      ]
+    },
+    {
+      "label": "Key A / Key B per-sector access conditions",
+      "items": [
+        "Each sector carries two independent 48-bit keys; access-condition bits determine which key authorises each block operation.",
+        "Sector model supports basic multi-application use (access + canteen + parking) under separate key ownership without migrating to DESFire.",
+        "Sector-key slots map 1:1 onto MIFARE Plus SE SL1 keys — the mechanical basis for the phased Plus SE upgrade path."
+      ]
+    },
+    {
+      "label": "MIFARE Application Directory (MAD)",
+      "items": [
+        "MAD v1 (sector 0) and MAD v2 (sector 16) provide a canonical directory of sector → application mapping for multi-application issuance.",
+        "Application identifiers register with the MIFARE Application Directory registry — enables cross-issuer sector-allocation consistency.",
+        "Access control + time-attendance + loyalty applications have canonical MAD AIDs documented in the NXP Classic 1K functional specification."
+      ]
+    },
+    {
+      "label": "Universal reader compatibility",
+      "items": [
+        "Every MIFARE-capable reader deployed in the last two decades reads Classic 1K natively — HID, SALTO, ASSA ABLOY, dormakaba, Suprema, ZKTeco, Rosslare.",
+        "Every major card-printer platform (Zebra ZXP Series 7/8, Evolis Primacy, Matica XID, Fargo HDP5000) supports inline Classic encoding.",
+        "iOS Core NFC exposes Classic UID only; Android MifareClassic API exposes sector data under known keys."
+      ]
+    },
+    {
+      "label": "Low-value / high-volume issuance economics",
+      "items": [
+        "Lowest per-card BOM cost in the MIFARE family at 10 k+ volume — the reason Classic is still specified where credentials are disposable.",
+        "CR80 4-colour offset print + overlay lamination + inline Classic encoding pipeline runs at 1,200–1,800 cards/hour on standard bureau equipment.",
+        "Volume discount tiers apply at 1 k / 5 k / 10 k / 50 k — the economic floor against which Plus SE and DESFire are compared on TCO."
+      ]
+    },
+    {
+      "label": "Gym, fitness + events deployment",
+      "items": [
+        "Gym membership + locker token issuance where the credential is re-issued on cancel and the threat of cloning is low-cost-per-event.",
+        "Multi-day event and conference badges with session-access sectors — disposable after the event, replacement cost covered in the entry fee.",
+        "Loyalty + gift card issuance where a low-value balance or sequential member ID lives on the card."
+      ]
+    },
+    {
+      "label": "Budget hospitality deployment",
+      "items": [
+        "Classic-compatible hotel key cards for properties running legacy MIFARE Classic generations of Saflok, VingCard, SALTO, Onity locks.",
+        "Combi cards co-laminate Classic inlay with ISO/IEC 7811-2 HiCo 2750 Oe / LoCo 300 Oe magstripe for properties with mixed door fleets.",
+        "Natural migration pivot to Plus SE or DESFire when the property refreshes locks — the card body stays the same, the chip specification changes."
+      ]
+    },
+    {
+      "label": "Time-attendance + loyalty",
+      "items": [
+        "Factory, warehouse and construction time-clock terminals reading Classic UID for payroll integration — often UID-only with server-side validation.",
+        "Library membership + school / college campus estates that already invested in Classic-only readers — Plus SE + DESFire are the phased upgrades.",
+        "Server-side credential-check pattern (UID + back-end validation) is safer than trusting data stored in Classic sectors under CRYPTO-1."
+      ]
+    },
+    {
+      "label": "Migration path (Plus SE / DESFire)",
+      "items": [
+        "MIFARE Plus SE drops in on Classic readers at Security Level 1, upgrades to AES-128 at Security Level 3 after reader firmware update.",
+        "MIFARE DESFire EV3 provides AES-128 file-system architecture + EAL5+ certification for new deployments with no Classic reader debt.",
+        "NTAG 424 DNA TT is the path where the credential also needs smartphone-readable tamper-evident brand authentication."
+      ]
+    },
+    {
+      "label": "Regulatory + card-body posture",
+      "items": [
+        "RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process.",
+        "Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists ship with every production lot.",
+        "Classic 1K is NOT suitable where PCI DSS, SOX, HIPAA, SOC 2 or government procurement references AES-128 / EAL4+ as the credential baseline."
+      ]
+    }
+  ],
+  "publishedAt": "2026-04-18",
+  "modifiedAt": "2026-02-21",
+  "authorSlug": "peter-zhang",
+  "author": "ProudTek Editorial Board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedBy": "Peter Zhang",
+  "reviewedAt": "2026-02-22",
   "sections": [
     {
-      "title": "Why MIFARE Classic 1K remains the volume leader for access control cards",
-      "bullets": [
-        "Installed reader base: hundreds of millions of MIFARE Classic-compatible readers are deployed globally in office buildings, factories, universities, hotels and parking structures; replacing this reader infrastructure to adopt a newer chip standard costs 10-50x more than the cards themselves.",
-        "Procurement simplicity: facility managers and integrators can specify 'MIFARE Classic 1K' and every card supplier, reader manufacturer and access control software vendor understands exactly what is needed; no compatibility ambiguity.",
-        "Cost per card at scale. MIFARE Classic 1K cards in volumes of 5,000+ are the most cost-effective 13.56 MHz smart card available, typically 40-60% less expensive than DESFire EV3 cards.",
-        "Sufficient security for many deployments. While MIFARE Classic's Crypto-1 cipher has known vulnerabilities, many deployments (gym memberships, hotel rooms, event badges, time-attendance) do not face targeted cloning threats and benefit more from low cost and universal compatibility.",
-        "Multi-sector capability: the 16 sectors can be assigned to different applications (sector 1 for building access, sector 2 for parking, sector 3 for cafeteria) with independent keys, enabling basic multi-application use without upgrading to DESFire."
-      ]
+      "title": "What is MIFARE Classic 1K, and where does it still fit?",
+      "intro": "MIFARE Classic 1K is a 13.56 MHz ISO/IEC 14443-3 Type A smart card launched by Philips Semiconductors (now NXP) in 1997 and still the most widely issued contactless credential on earth. It remains the right specification when the threat model is low-value and the existing reader base is Classic-capable — not as a new-deployment security baseline.",
+      "paragraphs": [
+        "The chip's 1 KB EEPROM is organised into 16 sectors of 4 blocks each. Each sector has two independent keys (A and B) and configurable access conditions, so a single card can carry access authorisation in sector 1, a canteen balance in sector 2 and a parking counter in sector 3 under separate key ownership. That sector model is the reason Classic is still specified — legacy reader systems, time-attendance terminals and hotel locks all understand it natively.",
+        "The elephant in the room is CRYPTO-1: the proprietary stream cipher Classic authenticates with has been publicly broken since 2008, and a Classic card can be cloned in seconds with a Proxmark, ChameleonMini or Flipper Zero. For any new deployment where the credential protects a high-value asset (data-centre access, banking, government ID, enterprise that audits under PCI/SOX), Classic should not be the answer. The migration path is MIFARE Plus SE (AES-128, backward-compatible on Classic readers) or MIFARE DESFire EV3 (AES-128 file system on modern readers)."
+      ],
+      "statBar": {
+        "items": [
+          {
+            "value": "1 KB",
+            "label": "EEPROM (16 sectors × 4 blocks × 16 bytes)"
+          },
+          {
+            "value": "13.56 MHz",
+            "label": "ISO/IEC 14443-3 Type A"
+          },
+          {
+            "value": "CRYPTO-1",
+            "label": "Cipher (publicly broken since 2008)"
+          },
+          {
+            "value": "~10 B",
+            "label": "Cumulative MIFARE ICs shipped by NXP"
+          }
+        ]
+      }
     },
     {
-      "title": "Proud Tek MIFARE Classic 1K card options and services",
-      "bullets": [
-        "Custom printing: full-color offset printing (CMYK + spot colors), employee photo personalization, sequential numbering, barcode/QR encoding, and overlay lamination (matte or gloss) for professional-grade ID cards.",
-        "Pre-encoded sectors: we write your access control data, sector keys and MAD (MIFARE Application Directory) during manufacturing so cards arrive ready for immediate issuance with no on-site encoding.",
-        "Card body options: standard PVC (0.84 mm), composite PVC/PET for improved durability, and thin-card (0.5 mm) for clamshell holder compatibility; all CR-80 format (85.6 × 54 mm).",
-        "Magnetic stripe and dual-technology. Add HiCo magnetic stripe for legacy mag-stripe readers, or embed a second chip (125 kHz EM4100 or HID proximity) for phased migration from 125 kHz to 13.56 MHz.",
-        "Volume pricing: tiered pricing from 200 to 100,000+ cards with dedicated production slots for orders above 10,000; repeat orders receive stored artwork and encoding templates for faster turnaround."
-      ]
+      "title": "Classic 1K vs Plus SE vs DESFire EV3 — when to pick which",
+      "intro": "The three MIFARE families sit at distinct security / cost / migration points. Use this matrix to position Classic 1K against its modern replacements before the specification is locked.",
+      "table": {
+        "columns": [
+          "Question",
+          "MIFARE Classic 1K",
+          "MIFARE Plus SE",
+          "MIFARE DESFire EV3"
+        ],
+        "rows": [
+          [
+            "Per-card cost at 10k+",
+            "Lowest in the MIFARE family",
+            "Modestly above Classic",
+            "Above Plus SE"
+          ],
+          [
+            "Cryptography",
+            "CRYPTO-1 (broken since 2008)",
+            "CRYPTO-1 (SL1) → AES-128 (SL3)",
+            "AES-128, 3DES, SDM (native)"
+          ],
+          [
+            "Reader upgrade needed?",
+            "No — works on any MIFARE reader",
+            "No for SL1; firmware update for SL3",
+            "Yes — DESFire-capable reader firmware"
+          ],
+          [
+            "Multi-application architecture",
+            "16 sectors, shared key space",
+            "16 sectors, AES-128 in SL3",
+            "Up to 28 firewalled applications"
+          ],
+          [
+            "Typical fit",
+            "Low-value, high-volume legacy issuance",
+            "Phased AES migration on Classic readers",
+            "New transit, campus, enterprise, government"
+          ]
+        ]
+      }
     },
     {
-      "title": "Typical applications",
+      "title": "Volume vs threat — the economic decision pivot",
+      "intro": "The single procurement question for Classic 1K is whether high-volume unit economics outweighs a public cloning attack. The figures below are the pivot point.",
+      "dataHighlight": {
+        "value": "~10 B vs <60 s",
+        "heading": "~10 billion cumulative MIFARE ICs shipped by NXP since 1994 — and a USD 30 Flipper Zero clones a MIFARE Classic 1K card in under 60 seconds",
+        "text": "NXP has publicly referenced more than 10 billion cumulative MIFARE integrated circuits shipped since the platform launched in 1994 — no other contactless smart-card family approaches that installed base. Classic 1K is the highest-volume member of the family, which is why it remains the lowest per-card BOM cost at scale. The counter-weight is cryptographic: CRYPTO-1 was publicly reverse-engineered at 24C3 (Nohl & Plötz, 2007) and fully dismantled by Garcia et al. (ESORICS 2008); today a consumer-grade USD 30 Flipper Zero recovers sector keys and writes a cloned Classic card in under 60 seconds. The procurement decision is therefore whether the credential protects something worth cloning — gym membership, event badge, loyalty card, time-attendance terminal: Classic still fits; any credential covered by PCI DSS / SOX / HIPAA / government procurement: migrate to MIFARE Plus SE or DESFire EV3.",
+        "source": "NXP MIFARE family cumulative-shipment press archive; Nohl & Plötz 24C3 (2007); Garcia et al. ESORICS 2008 dismantling; consumer-grade Flipper Zero FZS-1 hardware capability (2024)."
+      }
+    },
+    {
+      "title": "The CRYPTO-1 break and what it means for your deployment",
+      "intro": "Classic's security status is not speculation — it is 18 years of published attacks. The timeline below is the context procurement and audit teams will expect to see acknowledged.",
+      "timeline": {
+        "items": [
+          {
+            "label": "1997 · MIFARE Classic launches",
+            "text": "Philips Semiconductors (now NXP) introduces the Classic 1K chip with the proprietary CRYPTO-1 stream cipher; it becomes the dominant 13.56 MHz credential of the 2000s."
+          },
+          {
+            "label": "2008 · CRYPTO-1 reversed",
+            "text": "Researchers at Radboud University and Ruhr-Universität Bochum publish full cryptanalysis of CRYPTO-1; the dark-side and nested attacks recover sector keys in seconds."
+          },
+          {
+            "label": "2011 · Commodity tooling arrives",
+            "text": "Proxmark and MFCUK / MFOC attack tools become publicly available, moving the attack from academic to script-kiddie territory."
+          },
+          {
+            "label": "2018 · NXP publishes migration guidance",
+            "text": "NXP formally recommends MIFARE Plus or DESFire for new high-security deployments and positions Classic for low-value issuance only."
+          },
+          {
+            "label": "2024–2026 · Flipper Zero era + integrator handoff",
+            "text": "Consumer-grade devices (Flipper Zero, ChameleonMini) clone a Classic card in under a minute. Classic should not be specified where physical cloning is a threat. How experienced teams run gym-membership-issuance, event-badge-programme, budget-hospitality-keycard, time-attendance-terminal and loyalty-card-fleet MIFARE-Classic-1K programmes."
+          }
+        ]
+      }
+    },
+    {
+      "title": "Do / don't — common Classic 1K specification mistakes",
+      "intro": "Classic is still a valid choice for the right use case. The mistakes below are what get flagged on the first procurement audit.",
+      "comparePanel": {
+        "beforeHeading": "Don't",
+        "afterHeading": "Do",
+        "before": [
+          "Specify MIFARE Classic 1K for a new data-centre or government-facility access credential.",
+          "Leave default transport keys (FFFFFFFFFFFF) unchanged — any third party with a USB reader can read and overwrite the card.",
+          "Store any secret (PIN, balance, serial) in clear in a Classic sector and rely on CRYPTO-1 to protect it.",
+          "Rip-and-replace the entire reader estate to upgrade Classic — the reader-firmware cost dwarfs the card cost."
+        ],
+        "after": [
+          "Use Classic 1K for gym membership, low-value event access and low-risk time-attendance, where the credential is disposable and the threat is low.",
+          "Program unique sector keys per issuance lot and lock access conditions before the cards leave the factory.",
+          "Pair Classic with a server-side credential check (UID plus back-end validation) rather than trusting data stored on the card.",
+          "Migrate to MIFARE Plus SE on the existing Classic reader base (Security Level 1 today, Security Level 3 AES-128 as reader firmware is updated)."
+        ]
+      }
+    },
+    {
+      "title": "Six deployments where Classic 1K still wins on total cost",
+      "intro": "Where the combination of universal reader compatibility, sector-based multi-use and lowest per-card cost beats AES-128 on total cost of ownership.",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "🏋️",
+            "title": "Gym & fitness",
+            "text": "Member cards and locker tokens where the credential is re-issued on cancel and the threat of cloning is low."
+          },
+          {
+            "icon": "🎟️",
+            "title": "Event & conference",
+            "text": "Multi-day badges with session access sectors — disposable after the event, with replacement cost covered in the entry fee."
+          },
+          {
+            "icon": "🏨",
+            "title": "Budget hospitality",
+            "text": "Classic-compatible hotel key cards for properties still running MIFARE Classic Saflok, VingCard or Onity locks in legacy generations."
+          },
+          {
+            "icon": "🕐",
+            "title": "Time-attendance",
+            "text": "Factory, warehouse and construction time clocks reading the Classic UID for payroll integration."
+          },
+          {
+            "icon": "🎁",
+            "title": "Loyalty & gift",
+            "text": "Printed loyalty cards encoded with a low-value balance or sequential member ID."
+          },
+          {
+            "icon": "🏫",
+            "title": "Campus legacy",
+            "text": "School and college estates already invested in Classic-only readers; Plus SE and DESFire are the phased migration."
+          }
+        ]
+      }
+    },
+    {
+      "title": "Reader, lock and printer compatibility",
+      "intro": "Because Classic 1K is the oldest HF smart card in wide circulation, almost every MIFARE-capable reader and card printer in the world accepts it. Here is the compatibility surface that matters on a specification.",
       "bullets": [
-        "Office building access: door, elevator and turnstile control using sector-based authentication with existing MIFARE Classic readers.",
-        "Hotel key cards: guest room access, minibar charges and check-out encoded on a card that costs a fraction of DESFire alternatives.",
-        "Time and attendance: employees tap in/out at terminals; the card's UID or encoded employee ID links to payroll systems.",
-        "Event and conference badges. Print attendee information and encode session access rights for a multi-day event at low per-badge cost.",
-        "Gym and recreation centers. Member access cards with optional stored-value sectors for vending machines and equipment rental."
+        "Access control readers: HID iCLASS SE, HID Signo, ASSA ABLOY Aperio, SALTO, dormakaba, Suprema, ZKTeco, Rosslare — all read Classic 1K natively.",
+        "Hotel lock systems: compatible with MIFARE Classic generations of [Saflok](/compatibility/saflok-hotel-key-cards/), [VingCard](/compatibility/vingcard-hotel-key-cards/), [SALTO](/compatibility/salto-hotel-key-cards/) and [Onity](/compatibility/onity-hotel-key-cards/) — see per-brand compatibility pages for exact lock-generation notes.",
+        "Card printers: Zebra ZXP Series 7/8, Evolis Primacy, Matica XID, Fargo HDP5000 — all include Classic encoding options for in-line personalisation.",
+        "Mobile SDKs: iOS Core NFC reads Classic UID only; Android NFC reads Classic UID and, with the MifareClassic API, sector data under known keys.",
+        "Library, transit and payment systems still using Classic — see the [complete MIFARE guide](/blog/what-is-mifare-complete-guide/) for platform-level context."
+      ],
+      "image": {
+        "src": "/landing-images/hospitality.jpg",
+        "alt": "Hotel reception desk using a MIFARE Classic-compatible encoder to personalise guest key cards at check-in"
+      }
+    },
+    {
+      "title": "When Classic no longer fits — the migration path",
+      "intro": "Classic becomes the wrong answer the moment (a) the credential protects something worth cloning, or (b) a procurement audit references AES-128 / EAL5+. The supported migration paths from Proud Tek's catalogue are:",
+      "bullets": [
+        "[MIFARE Plus SE](/products/rfid-cards/mifare-plus-se-card/) — drop-in on existing Classic readers in Security Level 1, AES-128 in Security Level 3 once reader firmware is updated. Zero card-side disruption.",
+        "[MIFARE DESFire EV3](/products/rfid-cards/mifare-desfire-ev3-card/) — full AES-128 file system, 28 firewalled applications, EAL5+ certification. Requires DESFire-capable readers.",
+        "[NTAG 424 DNA TT](/products/rfid-cards/ntag424-dna-tt-card/) — when the credential also needs a smartphone-readable, tamper-evident brand-authentication layer (luxury goods, warranty).",
+        "Review [Plus EV2 vs DESFire EV3](/compare/mifare-plus-ev2-vs-desfire-ev3/) and [Classic vs Plus vs DESFire for hotel locks](/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/) before locking the migration roadmap."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "Related RFID card products",
-      "description": "Explore other card options for access control.",
+      "title": "Related card SKUs",
+      "description": "Other MIFARE family options from Proud Tek for the same CR80 card body.",
       "links": [
+        {
+          "href": "/products/rfid-cards/mifare-plus-se-card/",
+          "label": "MIFARE Plus SE cards"
+        },
         {
           "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
           "label": "MIFARE DESFire EV3 cards"
         },
         {
+          "href": "/products/rfid-cards/mifare-ultralight-c-card/",
+          "label": "MIFARE Ultralight C cards"
+        },
+        {
           "href": "/products/rfid-cards/em4100-rfid-card/",
           "label": "EM4100 125 kHz cards"
+        }
+      ]
+    },
+    {
+      "title": "Hotel lock compatibility",
+      "description": "Per-brand guidance on MIFARE Classic compatibility for major hotel lock platforms.",
+      "links": [
+        {
+          "href": "/compatibility/saflok-hotel-key-cards/",
+          "label": "Saflok hotel key cards"
+        },
+        {
+          "href": "/compatibility/vingcard-hotel-key-cards/",
+          "label": "VingCard hotel key cards"
+        },
+        {
+          "href": "/compatibility/salto-hotel-key-cards/",
+          "label": "SALTO hotel key cards"
+        },
+        {
+          "href": "/compatibility/onity-hotel-key-cards/",
+          "label": "Onity hotel key cards"
+        }
+      ]
+    },
+    {
+      "title": "Background reading",
+      "description": "Context on MIFARE family selection and the Classic 1K security posture.",
+      "links": [
+        {
+          "href": "/blog/what-is-mifare-complete-guide/",
+          "label": "What is MIFARE — the complete guide"
+        },
+        {
+          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
+          "label": "Classic vs Plus vs DESFire for hotel locks"
+        },
+        {
+          "href": "/guides/hotel-key-card-encoding/",
+          "label": "Hotel key card encoding guide"
         }
       ]
     }
@@ -66,29 +391,123 @@
   "faq": [
     {
       "question": "Is MIFARE Classic 1K still secure enough for building access?",
-      "answer": "MIFARE Classic's Crypto-1 encryption has known vulnerabilities. The keys can be extracted with specialized tools. For low-risk environments (gym, hotel, office without high-value assets), Classic remains practical because the threat of targeted card cloning is low. For high-security environments (data centers, government, financial), we recommend upgrading to MIFARE DESFire EV3 or MIFARE Plus SE, which offer AES-128 encryption while remaining compatible with most modern readers."
+      "answer": "For a high-value building — data centre, finance, government, any site with a PCI / SOX / HIPAA audit — no. The CRYPTO-1 cipher has been fully broken since 2008 and a Classic card can be cloned in under a minute with a consumer-grade Proxmark or Flipper Zero. For a low-value environment where the cost of cloning a card is lower than the cost of the credential itself — gym, hotel, low-risk office — Classic 1K is still a defensible specification. The decision rule: threat model, not brand preference. If cloning is a realistic threat, migrate to MIFARE Plus SE (AES on your current readers) or DESFire EV3 (AES on new readers)."
+    },
+    {
+      "question": "Can MIFARE Classic 1K cards be cloned?",
+      "answer": "Yes, trivially. The CRYPTO-1 stream cipher was cryptographically broken in 2008 by researchers at Radboud University and Ruhr-Universität Bochum, and the attacks (dark-side, nested authentication, MFCUK/MFOC) are now packaged into consumer devices. A modern Flipper Zero or ChameleonMini will recover the sector keys and write a clone card to a writable Classic chip in seconds. If cloning is a risk, specify MIFARE Plus SE or MIFARE DESFire EV3 — both use AES-128 with diversified keys and have no public attack path."
     },
     {
       "question": "Can you print employee photos on MIFARE Classic 1K cards?",
-      "answer": "Yes. We offer two approaches: (1) digital printing for variable data including employee photos, names and ID numbers. Ideal for orders where each card is unique; (2) offset printing for the common design elements (logo, background, text) combined with digital overprinting for the variable data. Both methods include overlay lamination to protect the printed surface."
+      "answer": "Yes. Proud Tek supports two approaches. Digital printing (Evolis / Matica / Fargo / Zebra) for variable data — employee photo, name, ID number, barcode — where each card is unique. Offset printing for the common design elements (logo, background, text) combined with digital overprinting for the variable data, which is more cost-effective above 2,000 cards. Both methods include overlay lamination to protect the printed surface, and Classic sector keys and data can be written inline with the print pass."
     },
     {
-      "question": "What is the minimum order quantity and lead time?",
-      "answer": "Blank white MIFARE Classic 1K cards: MOQ 100, ships from stock in 2-3 business days. Custom-printed cards: MOQ 200, lead time 10-15 business days from artwork approval. Pre-encoded cards with sector keys and access data: add 2-3 business days to the custom-printed lead time."
+      "question": "What is the difference between MIFARE Classic 1K and 4K?",
+      "answer": "MIFARE Classic 1K has 1 KB EEPROM organised as 16 sectors × 4 blocks × 16 bytes. MIFARE Classic 4K has 4 KB organised as 32 sectors of 4 blocks plus 8 sectors of 16 blocks — more storage for applications carrying photo, biometric template or larger stored-value records. Both share CRYPTO-1 and the same reader compatibility surface; 1K is the volume leader for basic access and 4K is specified when the card needs to carry more than a few hundred bytes per application."
+    },
+    {
+      "question": "Can we mix Classic 1K and Plus SE cards on the same reader estate?",
+      "answer": "Yes. MIFARE Plus SE in Security Level 1 is wire-compatible with Classic 1K on any MIFARE reader, so a phased issuance works naturally. Issue Plus SE cards instead of Classic 1K going forward; existing Classic cards continue to function; once the reader firmware is updated to support Plus SE Security Level 3 (AES-128), new issuances run at AES. This is the lowest-disruption AES-128 migration path for organisations with large Classic reader estates — see the MIFARE Plus SE page for the full phased-upgrade timeline."
+    },
+    {
+      "question": "What is the MOQ and lead time for MIFARE Classic 1K cards?",
+      "answer": "Blank white cards ship from stock at a 100-piece minimum in 2–3 business days. Custom 4-colour printed cards with overlay lamination require a 200-piece minimum and 10–15 business days from artwork approval. Pre-encoded cards with sector keys, MAD (MIFARE Application Directory) and access-control data loaded in-factory add 2–3 business days. Repeat orders reuse stored artwork and encoding templates for faster turnaround; volume discounts apply at 1,000, 5,000 and 10,000-piece tiers."
+    },
+    {
+      "question": "Do Classic 1K cards support NFC tap-to-URL on a smartphone?",
+      "answer": "Not natively — the Classic 1K memory layout is not NDEF-compatible and iPhones expose only the UID for Classic over Core NFC. Android can read Classic sector data through the MifareClassic API when the sector keys are known, but that is not a URL-opening consumer experience. For smartphone tap-to-URL you need an NFC Forum Type 2, 4 or 5 tag — NTAG213 / 215 / 216 (Type 2) for simple URLs, or NTAG 424 DNA / MIFARE DESFire EV3 (Type 4) for secure, dynamic URLs."
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP MIFARE Classic 1K (MF1ICS50 / MF1S503x) product page",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-classic/standard-performance-mifare-classic-1k:MF1S503x",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2018-03-01",
+      "accessedAt": "2026-04-24",
+      "note": "Official product brief covering Classic 1K memory, air interface and recommended migration guidance."
+    },
+    {
+      "label": "NXP MF1ICS50 functional specification (MIFARE Application Directory)",
+      "url": "https://www.nxp.com/docs/en/application-note/AN103787.pdf",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2011-04-01",
+      "accessedAt": "2026-04-24",
+      "note": "MAD v1 / v2 application-directory structure used in multi-application Classic issuance."
+    },
+    {
+      "label": "ISO/IEC 14443-3:2018 — Proximity cards, Type A initialisation and anticollision",
+      "url": "https://www.iso.org/standard/73598.html",
+      "publisher": "ISO",
+      "publishedAt": "2018-04-01",
+      "accessedAt": "2026-04-24",
+      "note": "Type A air-interface standard that MIFARE Classic 1K implements."
+    },
+    {
+      "label": "Nohl & Plötz — 'MIFARE: little security, despite obscurity' (24C3, 2007)",
+      "url": "https://events.ccc.de/congress/2007/Fahrplan/events/2378.en.html",
+      "publisher": "Chaos Computer Club",
+      "publishedAt": "2007-12-27",
+      "accessedAt": "2026-04-24",
+      "note": "First public reverse-engineering of the CRYPTO-1 cipher used in MIFARE Classic."
+    },
+    {
+      "label": "Garcia et al. — 'Dismantling MIFARE Classic' (ESORICS 2008)",
+      "url": "https://www.cs.ru.nl/~flaviog/publications/Dismantling.Mifare.pdf",
+      "publisher": "Radboud University / ESORICS 2008",
+      "publishedAt": "2008-10-06",
+      "accessedAt": "2026-04-24",
+      "note": "Full cryptanalysis establishing key recovery in seconds — the reference citation for Classic's broken security posture."
+    },
+    {
+      "label": "de Koning Gans et al. — 'A Practical Attack on the MIFARE Classic' (CARDIS 2008)",
+      "url": "https://www.cs.ru.nl/~flaviog/publications/Attack.MIFARE.pdf",
+      "publisher": "Radboud University / CARDIS 2008",
+      "publishedAt": "2008-09-08",
+      "accessedAt": "2026-04-24",
+      "note": "Practical dark-side attack demonstrating key recovery from a single sector without prior knowledge."
+    },
+    {
+      "label": "ISO/IEC 7810:2019 — Identification cards, physical characteristics (ID-1 / CR80)",
+      "url": "https://www.iso.org/standard/70483.html",
+      "publisher": "ISO",
+      "publishedAt": "2019-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "CR80 physical card dimensions (85.60 × 53.98 × 0.76 mm)."
+    },
+    {
+      "label": "ISO/IEC 7811-2:2018 — Magnetic stripe on identification cards (HiCo / LoCo)",
+      "url": "https://www.iso.org/standard/73600.html",
+      "publisher": "ISO",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-24",
+      "note": "Magstripe standard referenced for Classic + magstripe combi cards in budget hospitality."
+    },
+    {
+      "label": "ISO/IEC 10373-6:2020 — ID card test methods, proximity cards",
+      "url": "https://www.iso.org/standard/77902.html",
+      "publisher": "ISO",
+      "publishedAt": "2020-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "Durability and electrical test methods applied to Classic 1K card bodies at the issuance bureau."
     }
   ],
   "primaryAction": {
     "href": "/contact/",
-    "label": "Request quote and samples"
+    "label": "Request Classic 1K samples & quote"
   },
   "secondaryActions": [
     {
-      "href": "/product/blank-rfid-card/",
-      "label": "Blank RFID cards"
+      "href": "/products/rfid-cards/mifare-plus-se-card/",
+      "label": "MIFARE Plus SE cards"
     },
     {
       "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
       "label": "DESFire EV3 cards"
+    },
+    {
+      "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
+      "label": "Classic vs Plus vs DESFire (hotel)"
     }
   ],
   "relatedIndustries": [
@@ -99,11 +518,8 @@
   ],
   "chipFamilies": [
     "mifare-classic",
-    "mifare-desfire",
     "mifare-plus",
+    "mifare-desfire",
     "em-tk5"
-  ],
-  "authorSlug": "editorial-board",
-  "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-22"
+  ]
 }

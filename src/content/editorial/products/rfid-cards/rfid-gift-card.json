@@ -15,6 +15,102 @@
     "/product/nfc-business-card/",
     "/product/blank-rfid-card/"
   ],
+  "keywords": [
+    "RFID gift card",
+    "NFC gift card",
+    "contactless gift card",
+    "stored-value RFID card",
+    "NFC tap-to-redeem gift card",
+    "reloadable NFC gift card"
+  ],
+  "brief": [
+    {
+      "label": "Card body and form factor",
+      "items": [
+        "ISO/IEC 7810 ID-1 (85.60 × 53.98 × 0.76 mm) is the retail-POS standard; rack-friendly fit into every display unit, wallet and envelope already in the store.",
+        "Die-cut non-ID-1 shapes (circle, bottle silhouette, product cut-out) available for premium seasonal ranges; require bespoke tooling and do not fit ID-1 racks."
+      ]
+    },
+    {
+      "label": "Gift-card market context",
+      "items": [
+        "Global gift-card market tracked by Mercator Advisory Group / PYMNTS / NRF; U.S. alone tops USD 170 B annually, with Europe close behind under the EU Gift Card Directive framework.",
+        "Breakage (unredeemed balance) runs 6–12 % across U.S. retail and is reported under ASC 606 / IFRS 15 revenue-recognition rules — the structural margin of the programme."
+      ]
+    },
+    {
+      "label": "Chip selection by programme tier",
+      "items": [
+        "NTAG213 (144 B) — URL-based balance lookup for low-stakes retail and café programmes; the cheapest credible NFC gift card.",
+        "NTAG216 (888 B) — room for a promo payload plus the balance-URL; the default for mid-market retail.",
+        "MIFARE Classic 1K — sector-based balance storage for legacy POS stacks that read sectors directly (not recommended for new builds).",
+        "MIFARE DESFire EV3 — AES-128 encrypted stored-value for high-volume or high-value programmes; keeps the server the source of truth but authenticates every tap."
+      ]
+    },
+    {
+      "label": "Activation and anti-theft",
+      "items": [
+        "Cards ship deactivated with zero balance; activation at POS (barcode-scan + PIN-reveal) prevents theft of pre-loaded inventory from the display rack.",
+        "Scratch-off PIN panel over a 4-digit or 6-digit activation PIN is the in-store standard; some programmes print the PIN as a VOID-on-lift overlay instead."
+      ]
+    },
+    {
+      "label": "Fraud posture — NFC vs mag-stripe",
+      "items": [
+        "Magnetic-stripe gift cards are routinely skimmed off-rack with handheld readers; criminals clone the stripe and drain the balance after activation.",
+        "NFC cards carry a unique chip UID that a skimmer cannot replay against the POS; DESFire EV3 + AES-128 key diversification (AN10922) raises the bar to cryptographic attack."
+      ]
+    },
+    {
+      "label": "Digital overlay — tap-to-balance",
+      "items": [
+        "NDEF URI record programmed to `https://brand.example.com/gc?uid={uid}` opens the balance page on a stock iPhone (iOS 12+ Background Tag Reading) or Android phone without app install.",
+        "Apple Wallet Passes and Google Wallet generic passes can mirror the physical card, but physical card still sells as a gift (the wallet overlay is not a substitute for the giftable object)."
+      ]
+    },
+    {
+      "label": "Premium finishing — the gift ambience",
+      "items": [
+        "Hot-foil stamping (gold / silver / copper / holographic), embossing and spot-UV varnish on ISO/IEC 7810 ID-1 PVC is the standard gift-aesthetic stack.",
+        "Card carrier / hanger / envelope / magnetic-closure box are ordered with the card and sequenced on the packing line so the unit walks out as a giftable SKU."
+      ]
+    },
+    {
+      "label": "Regulatory stack — Europe",
+      "items": [
+        "EU PSD2 (Directive (EU) 2015/2366) defines the 'limited-network' exemption under which most retailer-issued closed-loop gift cards operate without becoming e-money.",
+        "EU Consumer Rights Directive 2011/83/EU requires clear pre-contractual disclosure of expiry and fees on retailer gift cards."
+      ]
+    },
+    {
+      "label": "Regulatory stack — United States",
+      "items": [
+        "U.S. CARD Act 2009 (Title IV of the Credit CARD Act, §402) prohibits expiry inside 5 years and restricts dormancy fees on retail gift cards; state-level escheatment rules layer on top.",
+        "U.S. state escheat rules (Delaware, California, New York) trigger unclaimed-property reporting on dormant balances — operational tax cost the programme owner carries."
+      ]
+    },
+    {
+      "label": "POS and back-end integration",
+      "items": [
+        "Back-end gift-card processors (InComm, Blackhawk Network, Givex, CashStar, PayPoint) expose activation / redemption APIs that the POS calls on each tap.",
+        "In-store reader (HID Omnikey 5127CK, Feig CPR40, ACS ACR1252) sits on the POS lane and passes UID to the processor; latency target < 500 ms round-trip."
+      ]
+    },
+    {
+      "label": "Reloadable / multi-visit programmes",
+      "items": [
+        "Reloadable NFC gift cards turn a one-time gift into a repeat-visit prepaid tool — the processor toggles a 'reloadable' flag on the card record; the chip itself does not change.",
+        "Reload channels: POS top-up, e-commerce reload page, and (for wallet-provisioned mirror passes) in-app top-up via Apple Pay / Google Pay."
+      ]
+    },
+    {
+      "label": "Production workflow and lead time",
+      "items": [
+        "Artwork → pre-press proof → plate / RIP → offset (MOQ 500) or UV digital (MOQ 100) → lamination → punch → chip encoding (UID registration + NDEF URL) → scratch panel → optional packaging.",
+        "Lead time 12–15 business days; + 3–5 days for foil / emboss / die-cut; free samples after artwork lock."
+      ]
+    }
+  ],
   "sections": [
     {
       "title": "Why businesses upgrade to NFC gift cards from magnetic stripe",
@@ -27,6 +123,59 @@
       ]
     },
     {
+      "title": "Gift-card programme at a glance",
+      "statBar": {
+        "items": [
+          {
+            "value": "USD 170 B+",
+            "label": "U.S. gift-card market (NRF / Mercator Advisory)"
+          },
+          {
+            "value": "6–12 %",
+            "label": "Breakage rate (unredeemed balance)"
+          },
+          {
+            "value": "5 years",
+            "label": "CARD Act minimum expiry (U.S.)"
+          },
+          {
+            "value": "< 500 ms",
+            "label": "Tap → processor round-trip target"
+          }
+        ]
+      }
+    },
+    {
+      "title": "NFC vs magnetic-stripe vs barcode gift cards",
+      "comparePanel": {
+        "beforeHeading": "NFC gift card (NTAG216 / DESFire EV3)",
+        "afterHeading": "vs magnetic-stripe and barcode gift cards",
+        "before": [
+          "Tap-to-redeem; reliable on first attempt; no mechanical wear on stripe or barcode.",
+          "Unique chip UID; DESFire EV3 adds AES-128 and per-card key diversification.",
+          "Opens a balance landing page on a stock phone — omnichannel loop with no app install.",
+          "Premium-finish friendly: foil, emboss, spot-UV; the card is kept as a gift object.",
+          "Higher unit cost (USD 0.30–2.50); the fraud and experience lift usually pays back."
+        ],
+        "after": [
+          "Magnetic-stripe: cheapest per unit (USD 0.10–0.30) but routinely skimmed off the rack — documented industry-wide attack pattern.",
+          "Barcode / QR: cheap and paper-capable, but photo-capture-clonable and sensitive to print wear and wrinkling.",
+          "Mag-stripe / barcode carries no phone-tap affordance; omnichannel loop needs a separate printed URL or QR.",
+          "Both feel like disposable ephemera; the gifting ambience has to be rebuilt in packaging.",
+          "Regulatory stack (CARD Act / PSD2) is identical — the stored-value framework is independent of read interface."
+        ]
+      }
+    },
+    {
+      "title": "Breakage — the economics every programme owner reads first",
+      "dataHighlight": {
+        "value": "6–12 %",
+        "heading": "Unredeemed-balance breakage as structural programme margin",
+        "text": "6 to 12 % of gift-card dollars are never redeemed (NRF / Mercator / CEB analysts). This breakage is recognised as revenue under ASC 606 / IFRS 15 once the customer's right to redeem expires or the card balance is deemed improbable of being drawn down. For a USD 10 M annual programme, that is USD 600 k–1.2 M of structural margin — funds the premium-finish card, the processor fees and the fraud-control stack with room to spare. NFC cards do not mechanically change breakage, but the tap-to-balance-page loop tends to reduce breakage slightly (recipients discover and redeem balances they would otherwise forget), which is a feature most retailers want in the long run.",
+        "source": "NRF annual gift-card outlook + Mercator Advisory Group gift-card market report + ASC 606 / IFRS 15 revenue recognition guidance"
+      }
+    },
+    {
       "title": "Proud Tek RFID gift card solutions",
       "bullets": [
         "Chip options: NTAG213 (URL link to balance page), NTAG216 (on-card stored data), MIFARE Classic 1K (sector-based balance storage) or MIFARE DESFire EV3 (AES-secured balance for high-value programs).",
@@ -35,6 +184,127 @@
         "Activation integration: cards ship deactivated with zero balance; your POS activates the card and loads the initial balance at the time of sale, preventing theft of pre-loaded inventory.",
         "Variable data: sequential card numbers, unique QR codes, scratch-off PIN panels and pre-programmed NFC URLs printed on each card for individual tracking and online balance management."
       ]
+    },
+    {
+      "title": "Milestones in gift-card programmes and the RFID transition",
+      "timeline": {
+        "items": [
+          {
+            "label": "1994 — Blockbuster closed-loop gift card",
+            "text": "Mag-stripe closed-loop gift cards become the modern retail standard; the form factor and rack display unchanged for 30 years."
+          },
+          {
+            "label": "2009 — U.S. CARD Act",
+            "text": "Title IV of the Credit CARD Act locks in 5-year minimum expiry and restricts dormancy fees on gift cards; the contractual baseline for every U.S. programme."
+          },
+          {
+            "label": "2015 — EU PSD2",
+            "text": "Directive (EU) 2015/2366 defines the limited-network exemption, the exit ramp that keeps retailer gift cards out of e-money regulation in the EU."
+          },
+          {
+            "label": "2018 — iOS 12 Background Tag Reading",
+            "text": "iPhone XS / 11 read NFC NDEF tags in the background without app install; tap-to-balance-page becomes a credible mass-market UX."
+          },
+          {
+            "label": "2020 — Apple Wallet + Google Wallet generic passes",
+            "text": "Digital wallet mirror passes become standard; physical gift card keeps the gift ambience, wallet pass keeps the redemption convenience."
+          },
+          {
+            "label": "2022 — Dual-interface gift cards",
+            "text": "Retailers add NFC chip + preserved mag-stripe + barcode to catch every POS generation in one card; transitional pattern while mag-stripe racks retire."
+          },
+          {
+            "label": "2024 — NTAG424 DNA SUN anti-counterfeit",
+            "text": "Authenticated tap (dynamic URL + AES signature) reaches gift-card price points; the premium-tier anti-fraud option for high-value stored-value."
+          },
+          {
+            "label": "2026 — Today",
+            "text": "Proud Tek ships custom-printed NFC gift cards with chip encoding, scratch-PIN, packaging and POS-integration sequencing. Field-reference patterns drawn from retail-holiday-gift, hospitality-stored-value, restaurant-chain-gift, corporate-rewards-bulk and e-gift-redemption-card gift-card programmes."
+          }
+        ]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "label": "ISO/IEC 7810:2019 — Identification cards — Physical characteristics",
+      "url": "https://www.iso.org/standard/70483.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2019-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "ID-1 form factor (85.60 × 53.98 × 0.76 mm) that every retail gift-card rack is built around."
+    },
+    {
+      "label": "ISO/IEC 14443-1:2018 — Proximity cards at 13.56 MHz",
+      "url": "https://www.iso.org/standard/70170.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-24",
+      "note": "Operating frequency, modulation and anti-collision protocol for NFC tap-to-redeem gift cards."
+    },
+    {
+      "label": "NXP NTAG 213/215/216 product data sheet",
+      "url": "https://www.nxp.com/products/NTAG213_215_216",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2022-06-01",
+      "accessedAt": "2026-04-24",
+      "note": "Memory sizes (144 / 504 / 888 bytes) and UID framework underpinning most NFC gift cards."
+    },
+    {
+      "label": "NXP MIFARE DESFire EV3 product data sheet (MF3D(H)x3)",
+      "url": "https://www.nxp.com/products/MIFARE-DESFire-EV3",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2020-09-01",
+      "accessedAt": "2026-04-24",
+      "note": "AES-128 + per-card key diversification chip for premium high-value stored-value programmes."
+    },
+    {
+      "label": "U.S. Credit CARD Act of 2009 — Title IV (Gift Cards)",
+      "url": "https://www.congress.gov/bill/111th-congress/house-bill/627",
+      "publisher": "U.S. Congress",
+      "publishedAt": "2009-05-22",
+      "accessedAt": "2026-04-24",
+      "note": "Federal 5-year minimum expiry and dormancy-fee restriction framework for U.S. retail gift cards."
+    },
+    {
+      "label": "EU Directive (EU) 2015/2366 — PSD2 (limited-network exemption)",
+      "url": "https://eur-lex.europa.eu/eli/dir/2015/2366/oj",
+      "publisher": "European Union",
+      "publishedAt": "2015-12-23",
+      "accessedAt": "2026-04-24",
+      "note": "Closed-loop / limited-network exemption that keeps retailer gift cards out of e-money licensing in the EU."
+    },
+    {
+      "label": "National Retail Federation — Annual Gift Card Spending Survey",
+      "url": "https://nrf.com/topics/holiday-and-seasonal-trends",
+      "publisher": "National Retail Federation",
+      "publishedAt": "2024-11-01",
+      "accessedAt": "2026-04-24",
+      "note": "U.S. gift-card market sizing (USD 170 B+) and holiday-season spending benchmarks."
+    },
+    {
+      "label": "FASB ASC 606 — Revenue from Contracts with Customers",
+      "url": "https://asc.fasb.org/topic/606",
+      "publisher": "Financial Accounting Standards Board",
+      "publishedAt": "2014-05-28",
+      "accessedAt": "2026-04-24",
+      "note": "Revenue-recognition standard that governs how gift-card breakage is booked on U.S. GAAP financial statements."
+    },
+    {
+      "label": "IFRS 15 — Revenue from Contracts with Customers",
+      "url": "https://www.ifrs.org/issued-standards/list-of-standards/ifrs-15-revenue-from-contracts-with-customers/",
+      "publisher": "IFRS Foundation",
+      "publishedAt": "2014-05-28",
+      "accessedAt": "2026-04-24",
+      "note": "International equivalent of ASC 606 governing gift-card breakage revenue recognition outside U.S. GAAP."
+    },
+    {
+      "label": "NFC Forum — NDEF 1.0 and URI Record Type Definition",
+      "url": "https://nfc-forum.org/our-work/specifications-and-application-documents/",
+      "publisher": "NFC Forum",
+      "publishedAt": "2023-10-01",
+      "accessedAt": "2026-04-24",
+      "note": "URI record framework for tap-to-balance-page omnichannel gift-card landing pages."
     }
   ],
   "resourceCards": [
@@ -92,5 +362,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-22"
+  "reviewedAt": "2026-01-29"
 }

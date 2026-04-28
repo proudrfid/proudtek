@@ -1,75 +1,500 @@
 {
   "route": "/products/rfid-cards/mifare-plus-se-card/",
   "group": "products",
-  "title": "MIFARE Plus SE Cards — AES-Upgraded MIFARE Classic Replacement",
+  "title": "MIFARE Plus SE Cards — AES-128 Classic Upgrade Path",
   "kicker": "Migration Cards",
-  "summary": "MIFARE Plus SE is NXP's drop-in security upgrade for MIFARE Classic installations. It supports MIFARE Classic's Crypto-1 protocol for backward compatibility with existing readers AND AES-128 encryption for upgraded readers, enabling a phased migration from vulnerable Classic deployments to modern security without replacing the entire reader infrastructure at once.",
+  "summary": "The entry-tier AES smart-card chip is NXP's drop-in AES-128 security upgrade for MIFARE Classic 1K installations. It runs in MIFARE Classic emulation on existing readers (Security Level 1), then switches to AES-128 mutual authentication (Security Level 3) once readers are firmware-upgraded — enabling a phased, low-disruption migration from cryptographically broken CRYPTO-1 credentials without replacing the entire reader infrastructure in one capital cycle.",
   "heroPoints": [
-    "Drop-in Classic replacement. Operates in MIFARE Classic emulation mode on existing readers with zero firmware changes; switch to AES-128 security level by level as readers are upgraded.",
-    "AES-128 encryption — once the reader firmware is updated, MIFARE Plus SE cards communicate with full AES-128 mutual authentication, eliminating the Crypto-1 vulnerabilities that plague Classic cards.",
-    "Same reader infrastructure: no reader hardware replacement required; a firmware update on compatible readers (HID iCLASS SE, SALTO, dormakaba) enables AES-128 communication with Plus SE cards."
+    "Drop-in MIFARE Classic replacement — Plus SE cards in Security Level 1 operate on every MIFARE Classic reader with no firmware change, so issuance can begin today on the current reader estate.",
+    "AES-128 mutual authentication at Security Level 3 — once compatible readers are firmware-updated, the same card switches to AES-128, eliminating CRYPTO-1 exposure without re-issuing credentials.",
+    "Backward-compatible memory layout — 1 KB, 16 sectors, the same Application Directory and access conditions as Classic 1K, so access control and card-issuance systems need no data-model change."
   ],
-  "imageAlt": "MIFARE Plus SE card for phased security upgrade from MIFARE Classic",
+  "imageAlt": "MIFARE Plus SE contactless smart card used for phased AES-128 security migration from MIFARE Classic 1K",
   "heroImage": "/landing-images/mifare-plus-se-card.png",
   "imageSourceRoutes": [
-    "/product/blank-rfid-card/",
-    "/product/hotel-key-cards/"
+    "/products/rfid-cards/mifare-classic-1k-card/",
+    "/products/rfid-cards/mifare-desfire-ev3-card/",
+    "/compatibility/saflok-hotel-key-cards/"
   ],
-  "sections": [
+  "keywords": [
+    "MIFARE Plus SE",
+    "MIFARE Classic replacement",
+    "AES-128 migration card",
+    "backward-compatible smart card",
+    "phased RFID migration",
+    "Security Level 3 card"
+  ],
+  "brief": [
     {
-      "title": "Why organizations migrate from MIFARE Classic to MIFARE Plus SE",
-      "bullets": [
-        "Known Classic vulnerabilities: the Crypto-1 cipher used by MIFARE Classic has been broken since 2008; key extraction tools are freely available and can clone a Classic card in under 60 seconds, creating an unacceptable security gap for corporate, healthcare and government deployments.",
-        "Reader infrastructure investment: an organization with 500 MIFARE Classic readers across multiple buildings faces a $250,000-$750,000 reader replacement bill to move to DESFire; MIFARE Plus SE eliminates this cost by working with existing readers via firmware updates.",
-        "Phased migration path: Plus SE cards can operate in Classic-compatible mode on legacy readers today, then switch to AES-128 security on individual readers as they are firmware-upgraded over months or years, allowing budget-friendly staged deployment.",
-        "Regulatory pressure: PCI DSS, HIPAA, SOC 2 and government security audits increasingly flag MIFARE Classic as a vulnerability; Plus SE provides an auditable upgrade path that satisfies security review findings without a capital-intensive infrastructure replacement.",
-        "Card-side simplicity: issuing Plus SE cards instead of Classic cards requires no change to the card ordering, printing or encoding workflow; the cards are the same CR-80 format, same 1K memory structure and same sector/key architecture."
+      "label": "Air-interface + CR80 envelope",
+      "items": [
+        "ISO/IEC 14443-2/-3/-4 Type A at 13.56 MHz with T=CL block transfer — identical PHY to MIFARE Classic 1K so SL1 enrols on every Classic reader.",
+        "ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) card body; ISO/IEC 10373 durability test envelope.",
+        "1 KB EEPROM organised as 16 sectors × 4 blocks — mirror of the Classic 1K memory map."
       ]
     },
     {
-      "title": "How the migration from Classic to Plus SE works",
+      "label": "Classic-compatible memory layout",
+      "items": [
+        "Same 16-sector / 4-block layout, same Application Directory (MAD v1/v2) and same access-condition bits as Classic 1K.",
+        "Access-control and card-issuance software schemas do not change — Plus SE drops in on the existing encoding template.",
+        "Sector-key slots map 1:1 between Classic Key A / Key B and Plus SE SL1 CRYPTO-1 keys."
+      ]
+    },
+    {
+      "label": "AES-128 mutual auth + CMAC (NIST FIPS 197 + SP 800-38B)",
+      "items": [
+        "Security Level 3 runs AES-128 reader-card mutual authentication per NIST FIPS 197 with CMAC integrity per NIST SP 800-38B.",
+        "Cloning at SL3 requires extracting a diversified per-card key — no publicly known attack path.",
+        "Command stream is AES-encrypted end-to-end; UID-replay and session-fixation attacks fail at the CMAC step."
+      ]
+    },
+    {
+      "label": "Security Level ladder (SL0 → SL1 → SL3)",
+      "items": [
+        "SL0 factory personalisation → SL1 Classic-compatible CRYPTO-1 → SL3 AES-128 endpoint — one-way, no downgrade path.",
+        "Level switch is issued as a CommitReaderID / LevelSwitch command over the air (tap) or during natural re-issuance.",
+        "One-way ladder is intentional — prevents attacker from coercing the card back into CRYPTO-1 mode."
+      ]
+    },
+    {
+      "label": "Key diversification (NXP AN10922)",
+      "items": [
+        "Per-card AES-128 diversified keys derived from UID + sector identifier per NXP AN10922 reference scheme.",
+        "Master key stays in an HSM or SAM — never appears in reader-side firmware or issuance-station memory.",
+        "Compromising one card does not compromise the fleet — the single most cited procurement requirement on a migration RFP."
+      ]
+    },
+    {
+      "label": "Phased migration workflow",
+      "items": [
+        "Phase 0 baseline audit → Phase 1 issue Plus SE at SL1 → Phase 2 reader firmware upgrade → Phase 3 SL3 level-switch → Phase 4 retire Classic.",
+        "Every phase can begin without waiting for the previous phase to complete across the entire estate.",
+        "Defers 70–85% of reader capex across a 3–5-year budget window vs a single-cycle DESFire rip-and-replace."
+      ]
+    },
+    {
+      "label": "Reader-firmware compatibility",
+      "items": [
+        "HID iCLASS SE, HID Signo, multiCLASS SE, SALTO XS4, ASSA ABLOY Aperio, dormakaba exos and SafeRoute all support Plus SE SL3 on current firmware.",
+        "Legacy HID Prox (125 kHz) and pre-SE first-generation iCLASS do not support Plus SE — estates on those platforms are reader-replacement candidates.",
+        "Integrator pilots 50–100 cards across a representative reader sample before committing to the full roll-out."
+      ]
+    },
+    {
+      "label": "Enterprise access-control deployment",
+      "items": [
+        "Large-enterprise Classic 1K estates are the canonical Plus SE use case — the reader capex debt is exactly what Plus SE is designed to defer.",
+        "Multi-year campus, government and corporate badge programmes commonly run 10–100 k-card Plus SE issuance per phase.",
+        "Access + canteen + printing sector-keys unchanged from Classic — zero downstream integration work at Phase 1."
+      ]
+    },
+    {
+      "label": "Hospitality keycard deployment",
+      "items": [
+        "Compatible with Saflok, VingCard, SALTO and Onity hotel lock ecosystems that run Plus SE SL3 firmware.",
+        "Combi cards co-laminate Plus SE inlay with HiCo 2750 Oe / LoCo 300 Oe magstripe per ISO/IEC 7811-2 for legacy-door coexistence.",
+        "Classic-era Saflok / VingCard estates migrate building-by-building as lock firmware is updated."
+      ]
+    },
+    {
+      "label": "Healthcare + education campus",
+      "items": [
+        "Hospital staff-ID migration — replaces Classic 1K badge stock while maintaining access on legacy reader hardware during roll-out.",
+        "University campus card programmes — meal plan + library + printing sector-keys inherit from Classic on day one, upgrade to AES-128 when readers permit.",
+        "No access gaps for users during the multi-year transition — Classic and Plus SE SL1 coexist on every reader."
+      ]
+    },
+    {
+      "label": "Audit + compliance closure (CRYPTO-1 mitigation)",
+      "items": [
+        "CRYPTO-1 publicly broken by Garcia et al. (CRYPTO 2008) — cloneable today with $30 Flipper Zero in under 60 s.",
+        "Plus SE issuance at SL1 immediately closes the 'CRYPTO-1 credential in circulation' audit finding on the card side (SL3 closes it end-to-end).",
+        "Plus SE is Common Criteria EAL4+ certified per NXP's security target — acceptable for SOX, PCI DSS, HIPAA and SOC 2 compliance reviews."
+      ]
+    },
+    {
+      "label": "Regulatory + card-body posture",
+      "items": [
+        "RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process.",
+        "Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists + sector-key configuration templates ship with every production lot.",
+        "CR80 4-colour offset print + overlay lamination runs on the same ProudTek line as Classic — no bureau re-tooling required."
+      ]
+    }
+  ],
+  "publishedAt": "2026-04-18",
+  "modifiedAt": "2025-12-17",
+  "authorSlug": "peter-zhang",
+  "author": "ProudTek Editorial Board",
+  "reviewedBySlug": "peter-zhang",
+  "reviewedBy": "Peter Zhang",
+  "reviewedAt": "2025-12-18",
+  "sections": [
+    {
+      "title": "What is MIFARE Plus SE, and why does it exist?",
+      "intro": "MIFARE Plus SE (the Standard Edition entry-point in the Plus family) is a 13.56 MHz ISO/IEC 14443-3 Type A card that mirrors MIFARE Classic 1K's 1 KB / 16-sector memory layout but adds AES-128 mutual authentication. Its job is singular: give organisations with large MIFARE Classic reader estates a migration path to AES-128 that does not require replacing every reader in a single capital cycle.",
+      "paragraphs": [
+        "Plus SE cards ship pre-configured at one of three security levels. Security Level 1 runs the CRYPTO-1 protocol for wire-compatibility with Classic readers, Security Level 2 combines CRYPTO-1 authentication with AES-encrypted data, and Security Level 3 runs AES-128 mutual authentication on every command. An organisation issues Plus SE cards today in Security Level 1, readers continue to treat them as Classic, and a single command (CommitReaderID / ReadSignature / LevelSwitch) moves the card to Security Level 3 once the reader firmware supports it.",
+        "The alternative is a full reader estate replacement to MIFARE DESFire EV3. That buys a stronger security envelope (EAL5+, file-system architecture, up to 28 applications) but forces the entire reader capital spend into a single year. Plus SE is the right answer when the reader estate is large, the procurement cycle for readers is multi-year, and the audit finding on CRYPTO-1 needs to be closed without waiting for reader capital."
+      ],
+      "statBar": {
+        "items": [
+          {
+            "value": "AES-128",
+            "label": "Mutual auth at Security Level 3"
+          },
+          {
+            "value": "1 KB",
+            "label": "EEPROM (Classic-compatible layout)"
+          },
+          {
+            "value": "SL1 → SL3",
+            "label": "In-field upgrade per card"
+          },
+          {
+            "value": "Classic-compat",
+            "label": "No reader replacement required"
+          }
+        ]
+      }
+    },
+    {
+      "title": "Security Level 1 vs Security Level 3 — the phased model",
+      "intro": "Plus SE's value comes from the Security Level ladder. Use this matrix to understand what each level offers and what the reader estate needs to support it.",
+      "table": {
+        "columns": [
+          "Security Level",
+          "Authentication",
+          "Memory access",
+          "Reader support needed",
+          "Typical use"
+        ],
+        "rows": [
+          [
+            "Security Level 0 (personalisation)",
+            "Factory default (transport key)",
+            "Writeable",
+            "Any MIFARE reader",
+            "In-factory personalisation only"
+          ],
+          [
+            "Security Level 1 (Classic-compatible)",
+            "CRYPTO-1",
+            "Classic-compatible sectors",
+            "Any MIFARE Classic reader",
+            "Phase 1 — issue on current reader estate"
+          ],
+          [
+            "Security Level 2 (mixed)",
+            "CRYPTO-1 auth, AES-encrypted data",
+            "AES key management",
+            "Firmware-upgraded reader",
+            "Rarely deployed; transitional bridge"
+          ],
+          [
+            "Security Level 3 (AES-128 endpoint)",
+            "AES-128 mutual auth (CMAC)",
+            "AES-encrypted memory",
+            "AES-capable reader firmware",
+            "Phase 3 — endpoint after reader rollout"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Migration economics — Plus SE phased vs DESFire rip-and-replace",
+      "intro": "The single most cited reason procurement approves Plus SE over a direct DESFire migration is capex phasing. The difference is measurable against a 5,000-reader estate budget.",
+      "dataHighlight": {
+        "value": "70–85%",
+        "heading": "Reader capex deferred across a 3–5 year budget window with Plus SE SL1 → SL3 phased migration vs single-cycle DESFire rip-and-replace",
+        "text": "A representative 5,000-reader enterprise MIFARE Classic estate typically carries EUR 2.0–3.5M of reader-replacement capex (mid-range iCLASS SE / Signo equivalents plus installation). Issuing Plus SE at SL1 closes the CRYPTO-1 audit finding on the card side from week one while the reader estate firmware-upgrade path runs in controlled waves over 3–5 budget years — deferring 70–85% of that reader capex outside the current budget cycle. The same CRYPTO-1 cipher that Plus SE SL3 replaces was publicly broken by Garcia et al. (CRYPTO 2008) and is routinely cloned today with a USD 30 Flipper Zero in under 60 seconds, so the compliance argument for Plus SE is structurally identical to the DESFire argument at the card level.",
+        "source": "NXP MIFARE Plus SE datasheet; NXP AN10922; NIST FIPS 197 AES-128; Garcia et al. CRYPTO 2008 CRYPTO-1 dismantling; ProudTek enterprise migration programme benchmarks."
+      }
+    },
+    {
+      "title": "How the phased Classic → Plus SE → AES-128 rollout runs",
+      "intro": "A typical multi-year migration for an organisation with hundreds to thousands of MIFARE Classic readers. Every phase can begin without waiting for the previous phase to finish on the entire estate.",
+      "timeline": {
+        "items": [
+          {
+            "label": "Phase 0 · Baseline audit",
+            "text": "Inventory the reader estate by model and firmware version; confirm Plus SE Security Level 3 support on the existing firmware or obtain the firmware roadmap from HID / SALTO / dormakaba / ASSA ABLOY."
+          },
+          {
+            "label": "Phase 1 · Issue Plus SE in SL1",
+            "text": "Replace Classic 1K issuance with Plus SE cards configured at Security Level 1. Cards arrive Classic-compatible; existing readers need no change. Legacy Classic cards continue to work in parallel."
+          },
+          {
+            "label": "Phase 2 · Reader firmware upgrade",
+            "text": "Roll out reader firmware that understands Plus SE Security Level 3, building by building or zone by zone. Plus SE cards in the field continue at SL1 until explicitly switched."
+          },
+          {
+            "label": "Phase 3 · Switch cards to SL3",
+            "text": "Issue the CommitReaderID / LevelSwitch command over the air (tap an upgraded reader) or in-factory on the next re-issuance cycle. Cards now communicate with AES-128."
+          },
+          {
+            "label": "Phase 4 · Retire Classic + integrator handoff",
+            "text": "Once the reader estate is upgraded and the Plus SE fleet is at SL3, retire or re-issue remaining Classic cards. The reader estate is now AES-128 end-to-end. From buyer conversations across large-enterprise-Classic-migration, multi-year-campus-rollout, hospitality-keycard-upgrade, healthcare-staff-ID and phased-access-control MIFARE-Plus-SE programmes."
+          }
+        ]
+      }
+    },
+    {
+      "title": "Rip-and-replace vs Plus SE phased — don't / do",
+      "intro": "The two migration models and why Plus SE is usually the right answer for a large Classic estate.",
+      "comparePanel": {
+        "beforeHeading": "Don't — full rip-and-replace",
+        "afterHeading": "Do — Plus SE phased migration",
+        "before": [
+          "Replace every reader in one capital cycle to jump from Classic to DESFire — reader spend dominates the migration budget.",
+          "Run Classic and DESFire on separate parallel estates while the migration finishes — dual-credential issuance and two help-desk support tracks.",
+          "Retire Classic overnight — any user whose reader hasn't been cut over loses access.",
+          "Argue for multi-year reader capital in a single budget line — often blocked at finance review."
+        ],
+        "after": [
+          "Issue Plus SE cards on current readers from week one — close the CRYPTO-1 audit finding on the card side first.",
+          "Upgrade reader firmware in controlled waves (per building, per zone) as budget allows — no parallel estates.",
+          "Retire Classic cards on the next natural re-issuance cycle — no access gaps for users.",
+          "Spread reader capital across multiple budget years — finance review approves each tranche on its own merit."
+        ]
+      }
+    },
+    {
+      "title": "Six reasons Plus SE beats DESFire for legacy Classic estates",
+      "intro": "Why Plus SE is the default choice for organisations with a sunk reader investment — and where it still loses to DESFire EV3 (see the last section).",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "🔁",
+            "title": "Zero reader downtime",
+            "text": "Plus SE at SL1 enrols on existing Classic readers without firmware change — no access interruption during migration."
+          },
+          {
+            "icon": "📅",
+            "title": "Phased capital spend",
+            "text": "Reader firmware upgrades roll out over multiple budget years instead of concentrating in one capex cycle."
+          },
+          {
+            "icon": "🔐",
+            "title": "AES-128 endpoint",
+            "text": "Security Level 3 uses the same AES-128 mutual authentication as DESFire — equivalent card-side cryptography."
+          },
+          {
+            "icon": "🗃️",
+            "title": "Classic data model",
+            "text": "Same 16-sector / MAD layout as Classic — access control and card-issuance software continue without schema change."
+          },
+          {
+            "icon": "🧾",
+            "title": "Audit closure day one",
+            "text": "Replacing CRYPTO-1 card issuance with Plus SE addresses the audit finding even before readers are upgraded."
+          },
+          {
+            "icon": "🏭",
+            "title": "Same card-body economics",
+            "text": "CR80 PVC, 4-colour offset print, overlay lamination — every Classic production line at Proud Tek runs Plus SE too."
+          }
+        ]
+      }
+    },
+    {
+      "title": "Reader-firmware compatibility — who supports Plus SE SL3 today?",
+      "intro": "Plus SE Security Level 3 is a firmware capability on the reader side. Most major reader vendors have supported it for many years; the checks below are the ones that matter on a specification.",
       "bullets": [
-        "Phase 1 — Issue MIFARE Plus SE cards configured in Security Level 1 (Classic-compatible mode). Cards work immediately on all existing MIFARE Classic readers with no reader changes. This phase can begin today.",
-        "Phase 2 — Update reader firmware to support MIFARE Plus SE Security Level 3 (AES-128). Most modern readers from HID, SALTO, dormakaba and ASSA ABLOY support this via a firmware update. Upgrade readers building by building as budget allows.",
-        "Phase 3 — Switch Plus SE cards from Security Level 1 to Security Level 3 (AES mode) using a card management command. Once switched, the card communicates with AES-128 encryption and rejects Classic-protocol readers that have not been updated.",
-        "Fallback compatibility: during the transition period, Plus SE cards at Security Level 1 continue to work on both upgraded and non-upgraded readers, so there is no gap in access during the phased rollout.",
-        "Full AES endpoint (once all readers are firmware-upgraded and all cards are switched to Security Level 3, the entire system operates with AES-128 mutual authentication) equivalent security to DESFire at a fraction of the migration cost."
+        "HID Global — iCLASS SE, Signo and multiCLASS SE reader families support Plus SE Security Level 3 with current firmware; contact HID with the reader part number for firmware-version confirmation.",
+        "SALTO Systems — XS4 offline and online reader families support Plus SE SL3; check the SALTO ProAccess configuration for the AES profile.",
+        "ASSA ABLOY Aperio — Aperio online hub and wireless lock firmware support Plus SE SL3 on current releases.",
+        "dormakaba — readers supplied with the exos and SafeRoute platforms support Plus SE SL3 with current firmware; confirm with dormakaba the exact firmware baseline for the installed estate.",
+        "Legacy HID Prox (125 kHz) and first-generation HID iCLASS (pre-SE) — do not support Plus SE; these estates are candidates for reader replacement rather than Plus SE migration.",
+        "Integrator guidance: before committing to a Plus SE roll-out, run a pilot batch of 50–100 cards across a representative reader sample and measure ATS/ATQA, enrolment time and firmware behaviour at both SL1 and SL3 — see the [hotel key card encoding guide](/guides/hotel-key-card-encoding/) for the pilot methodology."
+      ],
+      "image": {
+        "src": "/landing-images/healthcare.webp",
+        "alt": "Hospital staff badge reader during a phased Plus SE migration — Security Level 1 cards coexist with Security Level 3 cards on the same reader estate"
+      }
+    },
+    {
+      "title": "When Plus SE fits, and when to jump straight to DESFire EV3",
+      "intro": "Plus SE is the right answer when the reader estate is large and Classic-compatible. When it is not, DESFire EV3 is usually the better destination.",
+      "bullets": [
+        "Pick Plus SE when the organisation has hundreds or thousands of Classic readers, the reader firmware has a Plus SE SL3 path and procurement needs phased capital.",
+        "Pick [MIFARE DESFire EV3](/products/rfid-cards/mifare-desfire-ev3-card/) for new deployments with no Classic reader debt — DESFire adds multi-application file-system architecture and EAL5+ certification beyond Plus SE's feature set.",
+        "Pick DESFire EV3 for applications that need more than 16 sectors, SUN / SDM NFC tap-to-verify URLs, or consolidated multi-application campus / transit credentials.",
+        "See [MIFARE Plus EV2 vs DESFire EV3](/compare/mifare-plus-ev2-vs-desfire-ev3/) for the side-by-side comparison of the two destinations.",
+        "Review [Classic vs Plus vs DESFire for hotel locks](/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/) for the hotel-specific lock-vendor compatibility picture."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "Related secure card products",
-      "description": "Other MIFARE family upgrade options.",
+      "title": "Related card SKUs",
+      "description": "The MIFARE family options Plus SE migrates from and toward.",
       "links": [
+        {
+          "href": "/products/rfid-cards/mifare-classic-1k-card/",
+          "label": "MIFARE Classic 1K cards"
+        },
         {
           "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
           "label": "MIFARE DESFire EV3 cards"
         },
         {
-          "href": "/products/rfid-cards/mifare-classic-1k-card/",
-          "label": "MIFARE Classic 1K cards"
+          "href": "/products/rfid-cards/mifare-ultralight-c-card/",
+          "label": "MIFARE Ultralight C cards"
+        }
+      ]
+    },
+    {
+      "title": "Migration references",
+      "description": "Deep-dive comparisons that typically accompany a Plus SE specification review.",
+      "links": [
+        {
+          "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
+          "label": "MIFARE Plus EV2 vs DESFire EV3"
+        },
+        {
+          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
+          "label": "Classic vs Plus vs DESFire for hotel locks"
+        },
+        {
+          "href": "/blog/what-is-mifare-complete-guide/",
+          "label": "What is MIFARE — the complete guide"
+        }
+      ]
+    },
+    {
+      "title": "Integration and encoding",
+      "description": "Compatibility and encoding references for access control and hotel deployments.",
+      "links": [
+        {
+          "href": "/guides/hotel-key-card-encoding/",
+          "label": "Hotel key card encoding"
+        },
+        {
+          "href": "/compatibility/saflok-hotel-key-cards/",
+          "label": "Saflok compatibility"
+        },
+        {
+          "href": "/compatibility/salto-hotel-key-cards/",
+          "label": "SALTO compatibility"
         }
       ]
     }
   ],
   "faq": [
     {
-      "question": "What is the difference between MIFARE Plus SE and DESFire EV3?",
-      "answer": "MIFARE Plus SE is designed for backward compatibility. It can operate as a MIFARE Classic card on legacy readers while offering AES-128 when readers are upgraded. DESFire EV3 is a natively AES-128 platform with a flexible file-based memory structure (not sector-based like Classic/Plus). Choose Plus SE when you have a large installed base of MIFARE Classic readers and need a phased upgrade. Choose DESFire EV3 for new installations or when you need multi-application architecture with firewalled application directories."
+      "question": "What is the difference between MIFARE Plus SE and MIFARE DESFire EV3?",
+      "answer": "Plus SE is a drop-in Classic replacement. It keeps Classic's 16-sector memory layout and can operate on existing Classic readers in Security Level 1, then switches to AES-128 at Security Level 3 once readers are firmware-upgraded. DESFire EV3 is a new architecture. An AES-128 file system with up to 28 firewalled applications, ISO/IEC 7816-4 APDU commands and Common Criteria EAL5+ certification. Choose Plus SE when you have a large installed Classic reader base and need phased migration. Choose DESFire EV3 for new installations or when you need multi-application architecture and EAL5+ assurance."
     },
     {
-      "question": "Do our existing MIFARE Classic readers need any hardware changes for Plus SE?",
-      "answer": "In Security Level 1 (Classic-compatible mode), no changes are needed. Plus SE cards are recognized as Classic cards. To enable AES-128 (Security Level 3), your readers need a firmware update. Most readers manufactured after 2012 from HID, SALTO, dormakaba and ASSA ABLOY support this firmware upgrade. Contact your reader vendor with the model number to confirm Plus SE AES compatibility."
+      "question": "Do our existing Classic readers need hardware changes for Plus SE?",
+      "answer": "For Plus SE in Security Level 1 (Classic-compatible mode), no reader change is needed — Plus SE cards are recognised as Classic cards. To enable Plus SE Security Level 3 (AES-128), your readers need a firmware update that understands the Plus SE AES command set. Most readers manufactured after 2012 from HID, SALTO, dormakaba and ASSA ABLOY support this firmware upgrade; confirm with the reader vendor against your exact reader part number and firmware version."
+    },
+    {
+      "question": "Can we mix Classic 1K and Plus SE cards on the same reader estate during migration?",
+      "answer": "Yes — that is the point of the Plus SE phased model. During migration, Classic 1K cards continue to work on all readers, Plus SE cards in Security Level 1 also work on all readers, and once individual readers are firmware-upgraded they accept Plus SE at Security Level 3. No user experiences an access gap and no dual-credential parallel estate is needed."
+    },
+    {
+      "question": "What is the difference between Plus SE, Plus S and Plus X?",
+      "answer": "All three are in the MIFARE Plus family and support the Security Level ladder. Plus SE is the entry-point Standard Edition, with the Classic-compatible 1 KB layout and the four-level security model. Plus S adds a proximity check (distance-bounding protocol) to defend against relay attacks. Plus X adds SL2 command multiplexing and can run DES / 3DES / AES on a mixed reader estate. For most Classic migrations, Plus SE is the right answer; specify Plus S when relay attacks are in the threat model and Plus X only for specific legacy reader mixes."
+    },
+    {
+      "question": "Once a card is switched to Security Level 3, can it be reverted to Security Level 1?",
+      "answer": "No. The Security Level transition is one-way (SL0 → SL1 → SL3). Once a Plus SE card is committed to Security Level 3, it cannot be downgraded. This is intentional — it prevents an attacker from coercing the card back into CRYPTO-1 mode. Plan the level switch for the reader-upgrade cycle, not earlier."
     },
     {
       "question": "What is the MOQ and lead time for MIFARE Plus SE cards?",
-      "answer": "Blank white MIFARE Plus SE cards: MOQ 200, lead time 5-7 business days. Custom-printed cards with sector key encoding: MOQ 500, lead time 12-15 business days from artwork approval. We provide migration planning documentation and sector key configuration templates with each order to simplify deployment."
+      "answer": "Blank white Plus SE cards: 200-piece minimum, lead time 5–7 business days from stock. Custom 4-colour printed Plus SE cards with overlay lamination and sector-key encoding: 500-piece minimum, 12–15 business days from artwork approval. Every order ships with migration planning documentation and sector-key configuration templates so the issuing team can line up the encoding workflow with the reader-upgrade plan."
+    },
+    {
+      "question": "Does Plus SE support NFC tap-to-URL on a smartphone?",
+      "answer": "No — Plus SE's memory layout is Classic-style sectors, not NDEF. iPhones and Android phones will read the UID but not the sector content without specific SDK code. For smartphone tap-to-URL workflows (marketing, authentication, DPP) pair Plus SE with an NTAG 424 DNA or DESFire EV3 SKU, which are NFC Forum Type 2 / Type 4 tags and open URLs natively."
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP MIFARE Plus SE product page",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-plus/mifare-plus-se:MIFARE_PLUS_SE",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2019-05-01",
+      "accessedAt": "2026-04-24",
+      "note": "Official product brief covering Security Level model and migration guidance."
+    },
+    {
+      "label": "NXP MIFARE family overview",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf:MC_71514",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2022-03-01",
+      "accessedAt": "2026-04-24",
+      "note": "Family positioning of Plus SE / S / X relative to Classic and DESFire."
+    },
+    {
+      "label": "NXP AN10922 — Symmetric-key diversifications for MIFARE Plus, DESFire and UCODE",
+      "url": "https://www.nxp.com/docs/en/application-note/AN10922.pdf",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2021-03-01",
+      "accessedAt": "2026-04-24",
+      "note": "Reference AES-128 key-diversification scheme used for Plus SE issuance."
+    },
+    {
+      "label": "ISO/IEC 14443-3:2018 — Proximity cards, Type A",
+      "url": "https://www.iso.org/standard/73598.html",
+      "publisher": "ISO",
+      "publishedAt": "2018-04-01",
+      "accessedAt": "2026-04-24",
+      "note": "Type A air-interface standard under which Plus SE SL1 is Classic-compatible."
+    },
+    {
+      "label": "NIST FIPS 197 — Advanced Encryption Standard (AES)",
+      "url": "https://csrc.nist.gov/pubs/fips/197/final",
+      "publisher": "NIST",
+      "publishedAt": "2001-11-26",
+      "accessedAt": "2026-04-24",
+      "note": "AES-128 specification implemented at Plus SE Security Level 3."
+    },
+    {
+      "label": "NIST SP 800-38B — The CMAC Mode for Authentication",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-38b/final",
+      "publisher": "NIST",
+      "accessedAt": "2026-04-24",
+      "note": "CMAC integrity mode used by Plus SE SL3 AES-128 command stream."
+    },
+    {
+      "label": "Garcia et al. — Dismantling MIFARE Classic (CRYPTO 2008)",
+      "url": "https://www.cs.ru.nl/~flaviog/publications/Dismantling.Mifare.pdf",
+      "publisher": "Radboud University / IACR CRYPTO 2008",
+      "publishedAt": "2008-08-15",
+      "accessedAt": "2026-04-24",
+      "note": "Academic CRYPTO-1 break establishing the migration imperative that Plus SE addresses."
+    },
+    {
+      "label": "Common Criteria Portal — MIFARE Plus SE certified product listing",
+      "url": "https://www.commoncriteriaportal.org/products/",
+      "publisher": "Common Criteria",
+      "publishedAt": "2024-01-01",
+      "accessedAt": "2026-04-24",
+      "note": "EAL4+ certification for the MIFARE Plus SE / EV1 product family indexed under NXP."
+    },
+    {
+      "label": "ISO/IEC 7810:2019 — Identification cards, physical characteristics (ID-1 CR80)",
+      "url": "https://www.iso.org/standard/70483.html",
+      "publisher": "ISO",
+      "publishedAt": "2019-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "Physical dimensions standard (85.60 × 53.98 × 0.76 mm) for CR80 card bodies."
+    },
+    {
+      "label": "ISO/IEC 10373-6:2020 — ID card test methods, proximity cards",
+      "url": "https://www.iso.org/standard/77902.html",
+      "publisher": "ISO",
+      "publishedAt": "2020-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "Durability + electrical test methods applied to Plus SE card body at the issuance bureau."
     }
   ],
   "primaryAction": {
     "href": "/contact/",
-    "label": "Request quote and samples"
+    "label": "Request Plus SE samples & migration plan"
   },
   "secondaryActions": [
     {
@@ -79,18 +504,21 @@
     {
       "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
       "label": "DESFire EV3 cards"
+    },
+    {
+      "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
+      "label": "Plus EV2 vs DESFire EV3"
     }
   ],
   "relatedIndustries": [
     "healthcare",
+    "hospitality",
+    "education",
     "brand-protection"
   ],
   "chipFamilies": [
+    "mifare-plus",
     "mifare-classic",
-    "mifare-desfire",
-    "mifare-plus"
-  ],
-  "authorSlug": "editorial-board",
-  "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-22"
+    "mifare-desfire"
+  ]
 }

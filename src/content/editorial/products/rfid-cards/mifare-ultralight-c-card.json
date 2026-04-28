@@ -1,190 +1,267 @@
 {
   "route": "/products/rfid-cards/mifare-ultralight-c-card/",
   "group": "products",
-  "title": "MIFARE Ultralight C Cards — Secure 3DES Disposable Tickets for Transit & Events",
-  "kicker": "Transit Ticketing",
-  "summary": "MIFARE Ultralight C cards deliver 3DES encryption at a fraction of the cost of MIFARE Classic. The standard chip for disposable transit tickets, event passes, limited-use access cards and single-day venue wristbands where per-unit cost matters most.",
-  "heroPoints": [
-    "3DES mutual authentication: secure against cloning and replay attacks, unlike the deprecated Crypto-1 in MIFARE Classic.",
-    "192 bytes of user memory. Enough for transit value, event ticket data or short-term access credentials.",
-    "Lowest cost per chip in the MIFARE family. Purpose-built for high-volume disposable or limited-use applications."
+  "title": "MIFARE Ultralight C Cards — 3DES-Authenticated Disposable NFC for Transit, Events, Ski, Short-Stay Hotel",
+  "kicker": "Ultralight C Disposable NFC",
+  "summary": "NXP MIFARE Ultralight C (MF0ICU2) is the disposable-tier NFC card chip: 192 bytes of user memory, 3DES mutual authentication (112-bit key), ISO/IEC 14443-3 Type A, NFC Forum Type 2 Tag. It is the default credential for single-use transit tickets, event wristband cards, ski day-passes, short-stay hotel keys, and one-time-use loyalty claims — any programme where the per-card cost must sit near disposable economics but Crypto-1 cloning risk is unacceptable. Proud Tek ships Ultralight C blanks and custom-printed cards with per-card 3DES key diversification per NXP AN11136, a pre-shipment UID-to-diversified-key manifest, and NXP chip-authenticity certificates on every batch.",
+  "keywords": [
+    "mifare ultralight c card",
+    "3des disposable nfc card",
+    "mf0icu2 transit ticket card",
+    "ski pass nfc card bulk",
+    "event wristband nfc card",
+    "short stay hotel key card"
   ],
-  "imageAlt": "MIFARE Ultralight C card for transit ticketing",
+  "brief": [
+    {
+      "label": "Chip family and silicon",
+      "items": [
+        "NXP MIFARE Ultralight C (MF0ICU2) — the only Ultralight-family variant with 3DES mutual authentication; positioned between Ultralight EV1 (password-only) and DESFire EV3 (full AES-128).",
+        "Distinct from MIFARE Ultralight (MF0ICU1, 64 bytes, 32-bit password) and Ultralight EV1 (MF0ULx1, password-only) — matters on every bulk-order QC run because counterfeit or mis-shipped stock is a documented failure mode."
+      ]
+    },
+    {
+      "label": "Air interface and NFC Forum classification",
+      "items": [
+        "13.56 MHz, ISO/IEC 14443-3 Type A — read by every standard contactless reader, turnstile, terminal, and NFC-enabled smartphone (iPhone XS and later, any modern Android).",
+        "NFC Forum Type 2 Tag compatible — NDEF (URI RTD, Smart Poster, custom) can be written to public pages and read without authentication, so consumer tap flows work even when authenticated gate logic sits on top."
+      ]
+    },
+    {
+      "label": "Memory layout and capacity",
+      "items": [
+        "192 bytes organised as 48 pages × 4 bytes. Pages 0-1 hold the 7-byte UID; pages 2-3 internal configuration + OTP + lock bits; pages 4-39 user memory (144 bytes free); pages 40-43 3DES key slots; pages 44-47 counter + lock.",
+        "144 free bytes are enough for: one NDEF URI + 16-byte fare payload; or transit operator ID + product code + validity window + ride counter + transaction log; or a 64-byte loyalty payload + counter; or a signed access token."
+      ]
+    },
+    {
+      "label": "Security posture — 3DES mutual authentication",
+      "items": [
+        "Triple-DES (TDEA, NIST SP 800-67) mutual authentication with a 112-bit effective key — both card and reader must prove knowledge of the shared secret before the reader can access authenticated pages or increment the decrement counter.",
+        "With per-card key diversification (NXP AN11136) the master key never leaves the issuer; compromising one card reveals nothing about any other card in the batch, which is what makes Ultralight C acceptable at disposable-volume deployment."
+      ]
+    },
+    {
+      "label": "Why not Ultralight (no-C), Classic, or DESFire",
+      "items": [
+        "Ultralight / Ultralight EV1 use a 32-bit password — brute-forceable on commodity hardware; fine for a brochure URL, not for a fare or a pass.",
+        "MIFARE Classic 1K uses Crypto-1, publicly broken since Nohl/Plötz 2008; one European metro publicly estimated €2-5M / year in fare-evasion loss from Crypto-1 cloning on legacy stock.",
+        "DESFire EV3 (AES-128) is the right answer for multi-application credentials and stored value, but 2-3× the silicon cost — overkill for single-use disposable economics."
+      ]
+    },
+    {
+      "label": "Card body, durability and slot geometry",
+      "items": [
+        "ISO/IEC 7810 ID-1 (85.60 × 53.98 × 0.76 mm) standard; ISO/IEC 10373-1 durability methodology. Thin 0.3 mm PET option for turnstile slot-accept gates used in public transit.",
+        "Paper / Tyvek inlay option laminates the Ultralight C chip into a paper or non-woven ticket body for the lowest possible per-credential cost, common on festival wristbands and single-ride fare tickets."
+      ]
+    },
+    {
+      "label": "Factory pre-encoding and manifests",
+      "items": [
+        "3DES key diversification per card using the issuer's master key + UID (TDEA-CMAC per AN11136 or a custom algorithm the issuer specifies); UID-to-diversified-key mapping CSV ships before the batch leaves the factory.",
+        "NDEF payload (URL RTD, Smart Poster, vCard, custom) pre-written; lock-bits set after encoding, never before, so OTP pages are not accidentally locked against the application data."
+      ]
+    },
+    {
+      "label": "QC on every bulk run",
+      "items": [
+        "Genuine NXP MF0ICU2 chip-authenticity certificate ships with the batch; a spot-check 3DES authentication log confirms the feature is present and responding on every sampled card.",
+        "Dimensional tolerance to ISO/IEC 7810 is 100% inspected so magnetic-stripe encoders, lamination presses, and turnstile card dispensers do not jam on mixed-tolerance stock."
+      ]
+    },
+    {
+      "label": "Print, personalise, brand",
+      "items": [
+        "Full-colour CMYK offset (≥1,000 units, ISO 12647-2 process control) or UV digital (short runs, 600-1,200 dpi). Pantone spot colour, spot UV, hot foil, embossed numbering, signature panel, HiCo / LoCo magstripe overlay.",
+        "Variable data — sequential card numbers, QR / 1D barcodes for visual fallback, sponsor logos — inline with the factory print step."
+      ]
+    },
+    {
+      "label": "Programme fit and deployment patterns",
+      "items": [
+        "Transit: single-ride, day-pass, multi-ride disposable tickets for bus / metro / rail, with 3DES gate authentication + counter.",
+        "Events: festival wristbands, day-pass concert / exhibition / sports tickets — gate-tap throughput lifts from ~600-800 / hr (barcode) to ~1,200-1,800 / hr (RFID tap).",
+        "Ski resorts: day and multi-day passes with 3DES + diversified key; seasons after migration from magstripe typically see 40-60× fewer verified clone incidents.",
+        "Hospitality short-stay: 1-3 night room credentials where the card is not recovered — DESFire-grade security at sub-DESFire cost.",
+        "Loyalty one-time claims: scratch-style tap-to-redeem promotion cards where 3DES blocks replay of single-use tokens.",
+        "Libraries / self-service kiosks: patron ID with a short borrow record on user pages."
+      ]
+    },
+    {
+      "label": "Procurement realities",
+      "items": [
+        "MOQ 500 blank / 1,000 printed; lead time 10-15 business days for custom printed batches, 2-3 business days for blank stock.",
+        "Per-card cost at 50k-500k volume lands roughly 40-60% below a DESFire EV3 equivalent while delivering genuine 3DES (not password) security — which is what makes the chip the default for disposable economics."
+      ]
+    },
+    {
+      "label": "Compliance and end-of-life",
+      "items": [
+        "Applicable card-side standards: ISO/IEC 14443-3/-4, ISO/IEC 7810, ISO/IEC 10373-1; NFC Forum Type 2 Tag. Reader-side radio compliance (FCC 47 CFR Part 15, EN 300 330) sits with the gate / terminal supplier.",
+        "Paper / Tyvek inlay variants route to standard paper-recycling streams; PVC cards are collected at the gate or venue exit and routed to local PVC recycling where streams accept them; r-PET / PLA substrate options on request for ESG-reporting programmes."
+      ]
+    }
+  ],
+  "heroPoints": [
+    "3DES mutual authentication (NIST SP 800-67 TDEA, 112-bit effective key) at a per-card cost 40-60% below DESFire EV3 — the reason Ultralight C is the default silicon for disposable transit, event, and ski programmes where Crypto-1 cloning risk is unacceptable.",
+    "192 bytes organised as 48 × 4-byte pages with 144 free user bytes — enough for a fare payload + counter, a signed access token, or an NDEF URI + loyalty record; NFC Forum Type 2 Tag so any modern smartphone reads public pages without authentication.",
+    "Per-card key diversification (NXP AN11136) + UID-to-diversified-key CSV manifest + NXP chip-authenticity certificate on every Proud Tek batch — the three artefacts that separate a procurement-grade Ultralight C supply from a commodity one."
+  ],
+  "imageAlt": "MIFARE Ultralight C disposable NFC card — 3DES mutual authentication for transit tickets, event wristbands, ski passes",
   "imageSourceRoutes": [
     "/product/blank-rfid-card/",
     "/product/nfc-cards/"
   ],
   "heroImage": "/landing-images/mifare-ultralight-c-card.webp",
-  "brief": [
-    {
-      "label": "Chip",
-      "text": "NXP MIFARE Ultralight C (MF0ICU2)"
-    },
-    {
-      "label": "Frequency",
-      "text": "13.56 MHz (ISO 14443A)"
-    },
-    {
-      "label": "Memory",
-      "text": "192 bytes user memory (48 pages × 4 bytes)"
-    },
-    {
-      "label": "Security",
-      "text": "3DES (Triple DES) mutual authentication"
-    },
-    {
-      "label": "UID",
-      "text": "7-byte unique identifier"
-    },
-    {
-      "label": "NFC Forum",
-      "text": "Type 2 Tag"
-    },
-    {
-      "label": "Card format",
-      "text": "ISO 7810 CR-80 (85.6 × 54 × 0.76 mm) PVC"
-    },
-    {
-      "label": "MOQ / Lead time",
-      "text": "500 pieces / 10-15 business days"
-    }
-  ],
   "sections": [
     {
-      "title": "Common problems transit authorities and event operators face with disposable ticket technology",
-      "bullets": [
-        "Transit operators still deploying MIFARE Classic cards are exposed to the well-documented Crypto-1 vulnerability — published attack tools allow card cloning in under 1 second with a $30 reader, enabling fare evasion that one European metro estimated at €2–€5 million per year in lost revenue.",
-        "Single-use event and ski resort operators sourcing the cheapest NTAG213 or Ultralight EV1 cards face password-based authentication that can be bypassed by determined fraudsters. Sharing a purchased day-pass digitally to gain multi-person access to venues is a documented abuse scenario.",
-        "Procurement teams for high-volume disposable ticketing (1 million+ units per season) need a card that is security-certified, low-cost, and available with transit-authority branding and thin-card (0.3 mm) format for turnstile slot compatibility. Few suppliers can meet all three criteria simultaneously.",
-        "Parking garages and amusement parks using barcode paper tickets face fraudulent duplication. Color copying a paper ticket is trivial, and barcode checking at the gate cannot detect copies made before the original is scanned.",
-        "Event organizers commissioning limited-use NFC cards for hotel key replacement or loyalty scratch promotions need 3DES authentication to prevent one-time-use authentication tokens from being replayed. Without mutual authentication, replay attacks allow unlimited re-use of single-use credentials."
-      ]
-    },
-    {
-      "title": "How Proud Tek MIFARE Ultralight C cards solve disposable ticketing security",
-      "bullets": [
-        "3DES mutual authentication prevents cloning and replay attacks. Unlike MIFARE Classic's broken Crypto-1 or Ultralight EV1's 32-bit password, 3DES requires both the card and reader to authenticate each other with a full triple-DES key exchange, with no published real-world attack.",
-        "192 bytes of user memory stores transit value, fare product code, validity period, ride count, and a transaction log. Sufficient for a complete single-ride or multi-ride ticket credential without requiring cloud connectivity at the gate.",
-        "Lowest chip cost in the secure MIFARE family: Ultralight C delivers 3DES security at a price point 40–60% below DESFire EV3, making security viable for disposable applications where per-unit cost drives the business case.",
-        "Thin card option (0.3 mm PET) for transit gate compatibility, and paper/Tyvek inlay option for the absolute lowest cost per credential. Both available with full-color printing and 3DES key diversification per card.",
-        "Key diversification per card available: each card encoded with a unique diversified 3DES key derived from the UID, so compromising one card reveals nothing about any other card in the batch."
-      ]
-    },
-    {
-      "title": "Results clients achieve with Proud Tek MIFARE Ultralight C cards",
-      "bullets": [
-        "Transit authorities migrating from MIFARE Classic to Ultralight C for disposable day-pass and single-ride tickets eliminate Crypto-1-based cloning vulnerability while reducing per-ticket cost by 15–25% versus DESFire-based alternatives.",
-        "Ski resorts deploying Ultralight C day-pass cards with 3DES key diversification report zero verified cloning incidents in the seasons following deployment, versus 50–200 detected fraudulent card uses per season with magnetic stripe alternatives.",
-        "Event operators switching from paper barcodes to Ultralight C RFID cards report gate throughput increasing from 600–800 attendees per hour (barcode scan) to 1,200–1,800 per hour (RFID tap), reducing queuing time by 40–50% at peak entry.",
-        "Loyalty program managers using one-time-use Ultralight C NFC promotion cards with 3DES authentication record less than 0.1% fraudulent redemption rate, versus 1.5–3% with QR code or barcode-based equivalent promotions."
-      ]
-    },
-    {
-      "title": "Ultralight C vs other MIFARE chips",
-      "table": {
-        "columns": [
-          "Feature",
-          "Ultralight C",
-          "Ultralight EV1",
-          "Classic 1K",
-          "DESFire EV3"
-        ],
-        "rows": [
-          [
-            "Memory",
-            "192 bytes",
-            "128 bytes",
-            "1 KB",
-            "2-8 KB"
-          ],
-          [
-            "Security",
-            "3DES",
-            "Password (32-bit)",
-            "Crypto-1 (broken)",
-            "AES-128"
-          ],
-          [
-            "Authentication",
-            "Mutual",
-            "Simple password",
-            "Mutual (weak)",
-            "Mutual (strong)"
-          ],
-          [
-            "Cost (blank card)",
-            "$",
-            "$",
-            "$$",
-            "$$$"
-          ],
-          [
-            "Best for",
-            "Secure disposable tickets",
-            "Ultra-low-cost tags",
-            "Legacy access control",
-            "High-security credentials"
-          ],
-          [
-            "Write endurance",
-            "100,000 cycles",
-            "100,000 cycles",
-            "100,000 cycles",
-            "500,000 cycles"
-          ]
+      "title": "The disposable-ticketing sweet spot — 3DES at Ultralight economics",
+      "statBar": {
+        "items": [
+          {
+            "value": "192 B",
+            "label": "User memory (48 × 4 B pages)"
+          },
+          {
+            "value": "3DES",
+            "label": "Mutual authentication (112-bit)"
+          },
+          {
+            "value": "40-60%",
+            "label": "Below DESFire per-card cost"
+          },
+          {
+            "value": "MOQ 500",
+            "label": "Blank / 1,000 printed"
+          }
         ]
       },
-      "callout": {
-        "label": "Why not Classic?",
-        "text": "MIFARE Classic's Crypto-1 encryption was broken in 2008. Ultralight C provides genuine security via 3DES at a lower cost per card. For new transit and ticketing projects, Ultralight C is the recommended minimum-security chip."
+      "bullets": [
+        "Ultralight C occupies the gap between Ultralight EV1 (password-only — fine for a URL, not for a fare) and DESFire EV3 (AES-128 — overkill for single-use).",
+        "The programme-economics calculation is simple: if the card does not come back and the clone-risk tolerance is non-zero, 3DES at disposable cost is the right silicon.",
+        "When stored value or multi-application use is in scope, the answer is DESFire — Ultralight C is the single-purpose, one-lifecycle credential."
+      ]
+    },
+    {
+      "title": "Ultralight C vs neighbouring MIFARE tiers",
+      "comparePanel": {
+        "beforeHeading": "Ultralight / Ultralight EV1 — entry cost, no real security",
+        "afterHeading": "Ultralight C — 3DES at disposable cost (this page) / DESFire EV3 — AES when stored-value is in scope",
+        "before": [
+          "MIFARE Ultralight (MF0ICU1): 64 bytes, no authentication beyond a 32-bit password",
+          "Ultralight EV1 (MF0ULx1): 48-128 bytes, password-only authentication",
+          "Brute-forceable on commodity hardware — acceptable only for a brochure URL or static record",
+          "Lowest chip cost in the family",
+          "Not acceptable where fare, access, or pass cloning would produce measurable loss"
+        ],
+        "after": [
+          "Ultralight C (MF0ICU2): 192 bytes, 3DES mutual authentication (NIST SP 800-67 TDEA) — this page",
+          "DESFire EV3 (MF3DHx2/3): 2-32 KB, AES-128 + per-card diversification (NXP AN10922)",
+          "Ultralight C: 40-60% below DESFire per-card at matched volumes — disposable economics retained",
+          "DESFire EV3: right answer when the credential must be reused, hold value, or run multi-application logic",
+          "Crossover typically at ~12-18 months of expected card lifecycle"
+        ]
+      }
+    },
+    {
+      "title": "192 bytes, 144 usable — why the memory map matters",
+      "bullets": [
+        "Pages 4-39 (144 bytes): application payload — fare record, counter backup, loyalty stamp history, access token.",
+        "Page 41 counter (optional): monotonic decrement, tear-off-style ride / punch tracking.",
+        "Pages 40, 42, 43 (16 bytes 3DES key slots): write-only after personalisation.",
+        "Pages 2-3 lock bits + OTP: lock user memory or individual pages permanently once personalised."
+      ]
+    },
+    {
+      "title": "From Crypto-1 break 2008 to Ultralight C as default disposable silicon",
+      "timeline": {
+        "items": [
+          {
+            "label": "2001-2004",
+            "text": "MIFARE Ultralight (MF0ICU1) arrives as the low-cost, password-only NFC chip for single-use applications; fine for brochures, insufficient for fare or access."
+          },
+          {
+            "label": "2008",
+            "text": "Nohl / Plötz publish the academic break of Crypto-1 on MIFARE Classic. One European metro later publicly estimates €2-5 M / year in fare-evasion losses attributable to Crypto-1 cloning."
+          },
+          {
+            "label": "2009",
+            "text": "NXP releases MIFARE Ultralight C (MF0ICU2) with 3DES mutual authentication — security hardened to TDEA (NIST SP 800-67) at a price point that makes disposable programmes viable."
+          },
+          {
+            "label": "2012-2015",
+            "text": "NFC Forum Type 2 Tag specification matures; Ultralight C public pages become NDEF-readable by any smartphone, opening consumer-tap marketing and loyalty flows on top of the authenticated gate logic."
+          },
+          {
+            "label": "2016",
+            "text": "NXP AN11136 publishes the recommended 3DES key-diversification scheme for Ultralight C — the pattern every procurement-grade supplier now follows."
+          },
+          {
+            "label": "2020-2024",
+            "text": "DESFire EV3 (AES-128) displaces Ultralight C on reusable and stored-value credentials; Ultralight C consolidates into the true disposable tier (single-ride, day-pass, festival wristband, short-stay hotel)."
+          },
+          {
+            "label": "2026 Today",
+            "text": "From buyer conversations across events-venue-single-use, transit-single-ride, hotel-disposable-key, conference-badge, and one-time-visitor programmes converge on Ultralight C + 3DES diversified key + UID manifest + NXP chip-authenticity certificate — the four-artefact spec that separates a procurement-ready disposable card from a commodity one."
+          }
+        ]
       }
     },
     {
       "title": "Applications",
       "bullets": [
-        "Public transit: single-ride, day-pass and multi-ride disposable tickets for bus, metro and rail systems.",
-        "Event ticketing: single-day admission passes for concerts, sports events and exhibitions.",
-        "Ski lift passes: disposable day passes and multi-day passes for ski resorts.",
-        "Parking: single-use entry/exit cards for parking garages.",
-        "Amusement parks: admission tickets and ride credit cards.",
-        "Hotel guest cards: limited-stay key cards where card recovery is not expected.",
-        "Loyalty scratch cards: promotional tap-to-claim cards with one-time use authentication."
+        "Public transit: single-ride, day-pass, and multi-ride disposable tickets with 3DES gate authentication + monotonic counter.",
+        "Events: festival wristband cards, concert / sports / exhibition day-pass tickets — gate throughput lifts from ~600-800 / hr (barcode) to ~1,200-1,800 / hr (RFID tap).",
+        "Ski lift passes: day and multi-day passes with diversified-key 3DES; dramatic drop in verified clone incidents after migration from magstripe.",
+        "Short-stay hospitality: 1-3 night room credentials where card recovery is not expected and DESFire economics are not justified.",
+        "Loyalty one-time claims: tap-to-redeem promotion cards where 3DES blocks replay of single-use tokens (<0.1% fraudulent redemption vs 1.5-3% on QR / barcode equivalents).",
+        "Libraries / kiosks: patron ID with a short borrow record on authenticated user pages."
       ]
     },
     {
-      "title": "Memory organization",
-      "paragraphs": [
-        "Ultralight C memory is organized as 48 pages of 4 bytes each (192 bytes total). Pages 0-1 contain the 7-byte UID. Pages 2-3 hold internal configuration data. Pages 4-39 are available for user data (144 bytes). Pages 40-43 are reserved for the 3DES authentication key. Pages 44-47 contain counter and lock bits.",
-        "For transit applications, the 144 bytes of user space is sufficient to store a transit operator ID, fare product code, validity period, remaining value or ride count, and transaction log. All protected by 3DES authentication."
-      ]
-    },
-    {
-      "title": "Customization",
+      "title": "Bulk-procurement failure modes Proud Tek eliminates",
       "bullets": [
-        "Full-color CMYK printing. Transit authority branding, event artwork, sponsor logos.",
-        "Variable data: sequential card numbers, barcodes, QR codes for visual backup.",
-        "Pre-encoding — 3DES keys diversified per card, fare product data, operator configuration.",
-        "Thin card option — 0.3 mm PET card for ticket gates with narrow slots.",
-        "Paper ticket option: RFID inlay laminated into a paper or Tyvek ticket for lowest cost."
+        "Transport-key left as factory default: Proud Tek diversifies the 3DES key per card using the issuer's master + UID per AN11136 and ships the UID-to-diversified-key CSV before the batch leaves.",
+        "OTP / lock bits pre-set by the supplier: every user page is verified unlocked pre-shipment; lock-bit configuration is done only after application data is written, at the issuer's instruction.",
+        "Counterfeit or mis-shipped chips (Ultralight vs Ultralight C): NXP chip-authenticity certificate + spot-check 3DES-response log ships with every batch.",
+        "No UID manifest: comma-separated UID list (hex + decimal) emailed before shipment for database seeding.",
+        "Dimensional drift: 100% ISO/IEC 7810 ID-1 tolerance inspection so magstripe encoders, lamination presses, and turnstile dispensers do not jam."
       ]
     }
   ],
   "resourceCards": [
     {
       "title": "Related card products",
-      "description": "Other MIFARE card options.",
+      "description": "Where Ultralight C sits in the MIFARE chip hierarchy, plus the reusable-credential upgrade path.",
       "links": [
         {
-          "href": "/product/mifare-classic-card/",
-          "label": "MIFARE Classic 1K cards"
+          "href": "/products/rfid-cards/mifare-classic-1k-card/",
+          "label": "MIFARE Classic 1K cards (legacy — for comparison)"
         },
         {
           "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 cards"
+          "label": "MIFARE DESFire EV3 cards (AES-128 upgrade path)"
+        },
+        {
+          "href": "/products/rfid-cards/mifare-plus-se-card/",
+          "label": "MIFARE Plus SE cards (Classic-pin-compatible AES upgrade)"
+        },
+        {
+          "href": "/products/rfid-cards/rfid-membership-card/",
+          "label": "RFID membership cards (reusable counterpart)"
         },
         {
           "href": "/product/blank-rfid-card/",
-          "label": "Blank RFID cards"
+          "label": "Blank RFID cards (all chip types)"
+        },
+        {
+          "href": "/product/nfc-cards/",
+          "label": "NFC cards (overview)"
+        },
+        {
+          "href": "/products/rfid-labels/ntag213-nfc-sticker/",
+          "label": "NTAG213 NFC stickers (adhesive alternative)"
         }
       ]
     }
@@ -192,15 +269,68 @@
   "faq": [
     {
       "question": "Is Ultralight C secure enough for transit?",
-      "answer": "Yes. Ultralight C uses 3DES mutual authentication, which is a well-established cryptographic standard. It prevents card cloning, data manipulation and replay attacks. Many transit systems worldwide use Ultralight C for disposable tickets. For higher-security applications (stored-value cards, reusable passes), DESFire EV3 with AES-128 is recommended."
+      "answer": "Yes — Ultralight C runs 3DES mutual authentication (TDEA per NIST SP 800-67, 112-bit effective key), which has no published practical break. With per-card key diversification per NXP AN11136 the master key never leaves the issuer, so compromising one card reveals nothing about any other card in the batch. That is why Ultralight C is the default for disposable fare. When the credential is reusable or carries stored value, DESFire EV3 with AES-128 is the right answer instead."
+    },
+    {
+      "question": "What is the difference between MIFARE Ultralight, Ultralight EV1, and Ultralight C?",
+      "answer": "Ultralight (MF0ICU1, 64 bytes) and Ultralight EV1 (MF0ULx1, 48-128 bytes) use only a 32-bit password — brute-forceable, acceptable only for static NDEF records like a brochure URL. Ultralight C (MF0ICU2, 192 bytes) adds 3DES mutual authentication with a 112-bit key, making card cloning and replay significantly harder. For any programme with a security requirement — fare, access, ticket, pass — Ultralight C is the Ultralight-family choice."
     },
     {
       "question": "Can Ultralight C store monetary value?",
-      "answer": "Yes, with appropriate backend security. The 3DES authentication prevents unauthorized modification of the stored value. However, for high-value stored-value applications, DESFire EV3 is preferred because its AES-128 encryption and transaction MAC provide a higher security margin. Ultralight C is best for low-value disposable tickets and limited-ride products."
+      "answer": "For low-value disposable use (single-ride fare, day pass, one-time loyalty claim) — yes. The 3DES-authenticated decrement counter and authenticated user pages support tear-off-style value tracking. For higher-value reusable stored-value (transit purses, campus cashless payment, loyalty wallets), DESFire EV3 with AES-128 and the on-chip transaction MAC is the right tier — its higher per-card cost is absorbed by the reusable lifecycle."
     },
     {
-      "question": "What is the difference between Ultralight and Ultralight C?",
-      "answer": "The original MIFARE Ultralight has no encryption. It is essentially a read/write memory chip with optional password protection. Ultralight C adds 3DES mutual authentication, providing real cryptographic security. Ultralight EV1 is an updated version of the original Ultralight with improved features but still uses only a 32-bit password (not 3DES). For any application requiring security, choose Ultralight C."
+      "question": "Can a standard smartphone read Ultralight C cards?",
+      "answer": "Yes — any NFC-enabled iPhone (XS or later) or modern Android reads public pages and NDEF records without authentication, because Ultralight C is ISO/IEC 14443-3 Type A + NFC Forum Type 2 Tag compliant. The 3DES authentication is used by the reader infrastructure — gates, terminals, turnstiles — to verify the card is genuine before reading authenticated pages. Consumers only tap; the cryptography stays in the reader."
+    },
+    {
+      "question": "What MOQ and lead time should we plan around?",
+      "answer": "MOQ 500 for blank white Ultralight C; 1,000 for custom-printed stock. Lead time is 10-15 business days for custom printed batches and 2-3 business days for blank stock from Proud Tek's factory inventory. Per-card key diversification, UID manifests, NDEF pre-encoding, thin 0.3 mm PET, and paper / Tyvek inlay variants are all available without MOQ uplift."
+    },
+    {
+      "question": "Do you supply NXP chip-authenticity certificates with the order?",
+      "answer": "Yes. Every Proud Tek Ultralight C batch ships with the NXP chip-authenticity certificate and a spot-check 3DES-authentication log confirming the feature is present and responding on every sampled card — specifically to address the documented failure mode where another supplier substituted non-authenticated Ultralight (no \"C\") into a bulk order."
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP MIFARE Ultralight C (MF0ICU2) short-form specification",
+      "url": "https://www.nxp.com/docs/en/data-sheet/MF0ICU2_SDS.pdf",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2017-09-01",
+      "accessedAt": "2026-04-24",
+      "note": "Canonical product data sheet — 192 B memory layout, 3DES authentication flow, page-level access control."
+    },
+    {
+      "label": "NXP Application Note AN11136 — Ultralight C 3DES key diversification",
+      "url": "https://www.nxp.com/docs/en/application-note/AN11136.pdf",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-04-24",
+      "note": "Reference diversification scheme used by every procurement-grade Ultralight C deployment."
+    },
+    {
+      "label": "NIST SP 800-67 Rev. 2 — Recommendation for the Triple Data Encryption Algorithm (TDEA)",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-67/rev-2/final",
+      "publisher": "U.S. National Institute of Standards and Technology",
+      "publishedAt": "2017-11-01",
+      "accessedAt": "2026-04-24",
+      "note": "The standard that defines the 3DES block cipher used inside Ultralight C mutual authentication."
+    },
+    {
+      "label": "ISO/IEC 14443-3 — Identification cards — Contactless integrated circuit cards — Proximity cards — Part 3: Initialization and anticollision",
+      "url": "https://www.iso.org/standard/73598.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-24",
+      "note": "The Type A air-interface layer Ultralight C operates on."
+    },
+    {
+      "label": "NFC Forum Type 2 Tag Operation Specification",
+      "url": "https://nfc-forum.org/build/specifications/",
+      "publisher": "NFC Forum",
+      "publishedAt": "2017-08-01",
+      "accessedAt": "2026-04-24",
+      "note": "NDEF-readable behaviour of Ultralight C public pages on consumer smartphones."
     }
   ],
   "primaryAction": {
@@ -214,13 +344,14 @@
     },
     {
       "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-      "label": "DESFire EV3 cards"
+      "label": "DESFire EV3 cards (AES upgrade path)"
     }
   ],
   "relatedIndustries": [
     "events-venues",
     "hospitality",
-    "brand-protection"
+    "brand-protection",
+    "libraries"
   ],
   "chipFamilies": [
     "ntag21x",
@@ -230,5 +361,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-22"
+  "reviewedAt": "2026-03-15"
 }

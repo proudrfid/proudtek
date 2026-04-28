@@ -1,59 +1,327 @@
 {
   "route": "/industries/libraries/",
   "group": "products",
-  "title": "RFID for Libraries — Self-Service, Automated Sorting and Rapid Inventory",
+  "title": "Libraries RFID — ISO 28560 + ISO/IEC 15693 + ICODE SLIX2 + SIP2 + NCIP + Bibliotheca + Alma + Koha",
   "kicker": "Library RFID Solutions",
-  "summary": "Libraries worldwide use RFID to automate circulation, enable patron self-service, speed up collection inventory and protect materials from unauthorized removal. RFID-tagged books and media items pass through self-checkout kiosks, self-return stations and automated sorting machines. Freeing staff from repetitive tasks and enabling libraries to serve more patrons with fewer manual processes.",
-  "heroPoints": [
-    "Self-service circulation: patrons check out and return items at RFID kiosks without staff assistance, processing multiple items simultaneously.",
-    "Collection inventory in hours. Handheld RFID readers scan shelves at walking speed, completing full collection inventories in a fraction of the time required for barcode scanning.",
-    "Security and anti-theft. RFID security gates detect unprocessed items leaving the building, replacing or supplementing traditional electromagnetic security strips."
+  "summary": "Libraries worldwide use RFID + ISO 28560 (Parts 1-3 data model) + ISO/IEC 15693 HF (13.56 MHz) + NXP ICODE SLIX2 chip silicon to automate circulation, enable patron self-service, speed collection inventory + protect materials. Self-service kiosks (Bibliotheca SelfCheck 1000 + liber8 + SmartServe, FE Technologies SmartReturn + smartCheckout, P.V. Supa Pico Loaner, Tech Logic CircIT, RFID Library Solutions ScanPoint, EnvisionWare) + AMH automated sorters (Lyngsoe Library Mate-X, Bibliotheca smartFlow, FE Technologies, P.V. Supa Pico Sorter, Tech Logic CircIT Sort) + security gates (Bibliotheca Hybrid, Checkpoint ITG, FE Technologies Q-Series, 3M Detection retrofit) + ILS / LMS (SirsiDynix Symphony / BLUEcloud / Horizon, Innovative Sierra / Polaris, Ex Libris Alma + Primo, OCLC WorldShare, EBSCO FOLIO, Koha) over SIP2 + NCIP / Z39.83 transaction protocols.",
+  "keywords": [
+    "library RFID",
+    "ISO 28560 data model",
+    "ICODE SLIX2 library",
+    "SIP2 NCIP transaction",
+    "Bibliotheca FE Technologies AMH",
+    "Alma Koha SirsiDynix integration"
   ],
-  "imageAlt": "Library RFID system with self-checkout kiosk and tagged books on shelves",
+  "heroPoints": [
+    "ISO 28560 + ICODE SLIX2 + ISO/IEC 15693 — Bibliotheca + FE Tech + P.V. Supa + Tech Logic + Lyngsoe + Checkpoint ITG vendor-neutral compatibility.",
+    "SIP2 + NCIP / Z39.83 — SirsiDynix + Innovative + Alma + OCLC WorldShare + EBSCO FOLIO + Koha integration via TCP/IP gateway.",
+    "Self-service circulation 70-90% staff load reduction; full collection inventory 2-4 weeks → 1-2 days; 5-10 books read together at kiosk in <15 s."
+  ],
+  "imageAlt": "Library RFID system — ICODE SLIX2 + ISO 28560 book tag bonded inside back cover + Bibliotheca self-checkout kiosk reading 5-10 books simultaneously + AMH return sorter routing books to bin + RFID security gate at exit",
   "heroImage": "/landing-images/rfid-library-book-tag.jpg",
   "imageSourceRoutes": [
     "/products/rfid-tags/rfid-library-book-tag/",
     "/products/rfid-labels/rfid-book-spine-label/"
   ],
-  "sections": [
+  "brief": [
     {
-      "title": "How RFID benefits libraries",
-      "bullets": [
-        "Staff productivity: automating checkout, return and sorting eliminates 60-80% of routine circulation desk labor, allowing staff to focus on reader advisory, programming and community services.",
-        "Patron convenience: self-service kiosks available during all open hours, including unstaffed periods, give patrons immediate access to circulation services without queuing.",
-        "Inventory accuracy: annual inventories that took weeks with barcode scanning now take days with RFID, and can be performed more frequently (quarterly or monthly) for better collection management.",
-        "Misshelved item detection: RFID shelf inventory identifies books placed on the wrong shelf, enabling staff to correct shelving errors that make items effectively invisible to patrons searching the catalog.",
-        "Interlibrary loan efficiency: RFID automates check-in and check-out of ILL materials, tracking items across participating libraries with minimal manual handling.",
-        "Space planning data: RFID usage data shows which collections are most heavily circulated, informing space allocation, collection development and weeding decisions."
+      "label": "ISO 28560 data model",
+      "items": [
+        "ISO 28560-1:2014 — general principles + 26 data elements (Primary Item Identifier, Owner Institution ISIL, Set Information, Type of Usage, Shelf Location, etc.).",
+        "ISO 28560-2:2014 — variable-length encoded using ISO/IEC 15962 OID-based syntax; default North America + UK + Scandinavia.",
+        "ISO 28560-3:2014 — fixed-length 'Danish' model still used at some Northern European libraries.",
+        "26 data elements harmonised across Bibliotheca, FE Technologies, Lyngsoe + Koha + Alma."
       ]
     },
     {
-      "title": "RFID products for library deployments",
-      "bullets": [
-        "Book tags: thin HF RFID labels (13.56 MHz, ICODE SLIX or compatible) applied inside book covers, available in square (50 × 50 mm) and rectangular formats with EAS security bit support.",
-        "Spine labels: narrow RFID labels designed to apply along book spines for collection inventory scanning from the aisle without pulling books from shelves.",
-        "CD/DVD/Blu-ray tags. Hub-center circular RFID labels for optical media that do not interfere with disc playback or physical disc handling.",
-        "Patron RFID library cards. RFID-enabled cards (MIFARE or ICODE) serving as patron identification at self-service stations and door access points.",
-        "AV case labels: larger format labels for audiovisual packaging, boxed sets, media cases and multimedia kits."
+      "label": "Chip silicon — HF 13.56 MHz",
+      "items": [
+        "NXP ICODE SLIX2 (SL2S2602) — 2,528 bit memory + 64-bit UID; default for new library deployments since 2018.",
+        "NXP ICODE SLI / SLIX — installed base pre-2014; backwards compatibility.",
+        "EM4233 / EM4423 — ISO/IEC 15693 alternate (EM Microelectronic).",
+        "AFI 0x07 reserved for libraries (ISO/IEC 15693 Application Family Identifier).",
+        "EAS bit + DSFID + 7-byte UID + write-protect lock support.",
+        "Read range — 5-50 cm at kiosk pad; 15-30 cm at shelf wand."
       ]
+    },
+    {
+      "label": "Why HF over UHF — privacy + physics",
+      "items": [
+        "HF read range 5-50 cm — short by design, prevents adjacent-shelf cross-reads.",
+        "Stacked-book + metal-shelving environment attenuates UHF >20 dB.",
+        "ALA RFID Privacy Guidelines (2006/2017) discourage long-range identifier reads on patron items.",
+        "NISO RP-6-2012 — RFID in U.S. Libraries Recommended Practice + privacy safeguards.",
+        "ISO/IEC 15693 selected globally for libraries since 2003-2006 deployments."
+      ]
+    },
+    {
+      "label": "Self-service kiosk vendors",
+      "items": [
+        "Bibliotheca SelfCheck 1000 + liber8 + SmartServe 1000 — dominant North America public.",
+        "FE Technologies SmartReturn + smartCheckout — Australian + NZ academic + public.",
+        "P.V. Supa Pico Loaner / SaaS — Nordic libraries.",
+        "Tech Logic CircIT / TLAS — North American public + academic.",
+        "RFID Library Solutions ScanPoint / EnviroSelf — UK + Ireland.",
+        "EnvisionWare + Mk Solutions / ITG (Checkpoint) + 2CQR — vendor diversity."
+      ]
+    },
+    {
+      "label": "Automated Materials Handling (AMH)",
+      "items": [
+        "Lyngsoe Systems Library Mate-X — 4-32 bin sorter for large public + academic.",
+        "Bibliotheca smartFlow — bookdrop + sort + EAS-arm in one footprint.",
+        "FE Technologies SmartReturn — modular AMH for medium libraries.",
+        "P.V. Supa Pico Sorter — Nordic-led mid-sized AMH.",
+        "Tech Logic CircIT Sort — North American mid-tier.",
+        "Throughput — 500-2,000 returns / hour during peak."
+      ]
+    },
+    {
+      "label": "ILS / LMS platforms",
+      "items": [
+        "SirsiDynix Symphony / BLUEcloud / Horizon — most public libraries North America.",
+        "Innovative Sierra / Polaris — academic + large public.",
+        "Ex Libris Alma + Primo — academic, cloud-native, Clarivate-owned.",
+        "OCLC WorldShare Management Services — cloud-native.",
+        "EBSCO FOLIO — open-source.",
+        "Koha — open-source, largest globally by site count.",
+        "VTLS Visualizer + Civica Spydus + Mandarin Library Automation — secondary."
+      ]
+    },
+    {
+      "label": "SIP2 + NCIP transaction protocols",
+      "items": [
+        "SIP2 (Standard Interchange Protocol, 3M legacy) — de-facto self-service protocol.",
+        "NCIP / Z39.83 (NISO Circulation Interchange Protocol) — modern standards-track.",
+        "SIP2 Checkout (63/64) + Checkin (09/10) + Hold + Renew + Patron Status.",
+        "NCIP CheckOutItem + CheckInItem + RequestItem + LookupItem.",
+        "Alma + Polaris + Koha + WorldShare + FOLIO support NCIP natively.",
+        "All ILS support SIP2 via TCP/IP gateway."
+      ]
+    },
+    {
+      "label": "Security gates",
+      "items": [
+        "Bibliotheca Hybrid Security Gate — RFID + EM combined.",
+        "Checkpoint ITG (formerly Tagsys) — academic + public.",
+        "FE Technologies Q-Series — modular RFID exit gates.",
+        "3M Detection Systems V-Series — legacy installed base + RFID retrofit.",
+        "Gate alarm rate target — <0.1% false alarm at 80% true-detect.",
+        "EAS bit reliable disarm at kiosk + arm at AMH bookdrop."
+      ]
+    },
+    {
+      "label": "ISIL Owner Institution",
+      "items": [
+        "ISO 15511:2019 — globally registered library prefix.",
+        "Examples — US-DLC (US Library of Congress), GB-Uk (British Library), DK-CV (Copenhagen Business School).",
+        "ISO 28560 Data Element 3 — Owner Institution.",
+        "Cross-library interloan resolution by ISIL on RFID label.",
+        "OCLC WorldShare ILL + EBSCO FOLIO Resource Sharing key off ISIL."
+      ]
+    },
+    {
+      "label": "Form factor + adhesive",
+      "items": [
+        "Square 50×50 mm — hardback + trade paperback inside-back-cover.",
+        "Rectangular 45×76 mm — slim books + journals.",
+        "Spine-strip 12×80 mm — ribbon-bonded retro-fit.",
+        "AV / CD / DVD / Blu-ray — hub-center circular.",
+        "Patron card — ICODE SLIX or MIFARE 1K plastic.",
+        "PET face stock + acid-free permanent acrylic + ANSI/NISO Z39.48 compliant."
+      ]
+    },
+    {
+      "label": "Operational ROI",
+      "items": [
+        "Self-service circulation — 70-90% staff load reduction.",
+        "Collection inventory — 2-4 weeks → 1-2 days for 100,000 volumes.",
+        "AMH return sorting — 500-2,000 items / hour vs 50-100 manual.",
+        "Misshelved item detection — 5-8% inventory recovered.",
+        "Security gate false alarm — 5-15% (legacy EM) → <0.1% (RFID gate).",
+        "Tagging project cost — USD 0.20-0.35 / item incl. staff labour."
+      ]
+    },
+    {
+      "label": "What library RFID is NOT",
+      "items": [
+        "Not a UHF inventory tag — wrong frequency for stacked-book + metal-shelving + privacy.",
+        "Not a substitute for the printed barcode — coexist for visual fallback + disaster recovery.",
+        "Not a magnetic Tattle-Tape replacement — the EAS bit on the same chip replaces it.",
+        "Not standalone — full ROI requires kiosk + AMH + ILS + middleware integration."
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "title": "Why library RFID — ISO 28560 + ICODE SLIX2 + ALA privacy + 70-90% staff savings",
+      "statBar": {
+        "items": [
+          {
+            "value": "70-90%",
+            "label": "Reduction in circulation-desk staff workload at full-RFID libraries"
+          },
+          {
+            "value": "5-10",
+            "label": "Books processed per kiosk transaction in <15 seconds"
+          },
+          {
+            "value": "2-4 wk → 1-2 d",
+            "label": "Full collection inventory time for 100,000-volume library"
+          },
+          {
+            "value": "<0.1%",
+            "label": "Target false-alarm rate at RFID security gates (vs 5-15% legacy EM)"
+          }
+        ]
+      },
+      "bullets": [
+        "ISO 28560 + ISO/IEC 15693 + ICODE SLIX2 + AFI 0x07 = the global library RFID stack.",
+        "Bibliotheca + FE Tech + P.V. Supa + Tech Logic + RFID Library Solutions = the 5 dominant kiosk vendors.",
+        "SirsiDynix + Innovative + Alma + WorldShare + FOLIO + Koha = the 6 dominant ILS platforms."
+      ]
+    },
+    {
+      "title": "EM Tattle-Tape + manual circulation vs ISO 28560 + RFID + SIP2 + NCIP",
+      "comparePanel": {
+        "beforeHeading": "EM Tattle-Tape + manual circulation desk",
+        "afterHeading": "ISO 28560 + RFID + SIP2 / NCIP + AMH",
+        "before": [
+          "EM strip arms / disarms via magnetic desensitiser; bit-state hard to verify.",
+          "5-15% false alarms at gates; staff stop responding within months.",
+          "Separate barcode + EM strip; two label workflows.",
+          "Barcode kiosk processes 1 item at a time line-of-sight.",
+          "Shelf reading + inventory by pulling each book; 2-4 weeks per 100,000."
+        ],
+        "after": [
+          "EAS bit armed/disarmed cryptographically by SIP2 / NCIP transaction; bit-state queryable.",
+          "<0.1% false alarms at properly tuned RFID gates; staff trust restored.",
+          "Single ISO 28560 label = Primary Item Identifier + ISIL + Set Info + EAS.",
+          "ISO 15693 anti-collision: 5-10 books on the pad in <120 ms each.",
+          "Handheld wand reads entire shelf in seconds + flags misshelved."
+        ]
+      },
+      "bullets": [
+        "Migration deployments use Bibliotheca Hybrid Security Gates (RFID + EM) during 12-24 month conversion.",
+        "Old EM strips can stay in books during conversion; only new accessions need RFID label.",
+        "ROI break-even — 3-5 years for medium public libraries; 5-7 years for large academic."
+      ]
+    },
+    {
+      "title": "ISO 28560 + ICODE SLIX2 + AFI 0x07 — the architecture every kiosk reads",
+      "dataHighlight": {
+        "value": "26 data elements",
+        "heading": "Standardised across Bibliotheca, FE Technologies, Lyngsoe, P.V. Supa, Tech Logic, Checkpoint ITG, 3M-retrofit and the SirsiDynix + Innovative + Alma + Koha ILS platforms",
+        "text": "ISO 28560 defines 26 standardised data elements — Primary Item Identifier (typically the barcode), Content Parameter Set, Owner Institution ISIL (per ISO 15511), Set Information, Type of Usage, Shelf Location, Title, Author, ISBN, Subsidiary, Alternative Unique Item Identifier, Local Data A/B/C, Type of Appliance, OCLC number, GS1 product identifier, Alternative ISBN — making library RFID a vendor-neutral interoperable standard that every modern self-service kiosk + AMH sorter + security gate + ILS supports. ISO 28560-2 (variable-length encoded using ISO/IEC 15962 OID-based syntax — most common globally) and ISO 28560-3 (fixed-length 'Danish' model, still in use at some Northern European libraries) are the two encoding profiles. The ICODE SLIX2 chip (NXP SL2S2602) carries 316 bytes of user memory + EAS bit + AFI 0x07 (libraries application family identifier reserved by ISO/IEC 15693) — sufficient for the 5-7 mandatory + recommended data elements every modern library encodes. Self-service kiosks (Bibliotheca SelfCheck 1000 + liber8, FE Technologies SmartReturn + smartCheckout, P.V. Supa Pico Loaner, Tech Logic CircIT, RFID Library Solutions ScanPoint, EnvisionWare) read 5-10 books simultaneously via ISO 15693 anti-collision in <120 ms each. AMH bookdrop sorters (Lyngsoe Library Mate-X, Bibliotheca smartFlow, FE Technologies, P.V. Supa Pico Sorter, Tech Logic CircIT Sort) process 500-2,000 returns / hour. Security gates (Bibliotheca Hybrid, Checkpoint ITG, FE Technologies Q-Series, 3M Detection retrofit) detect armed EAS bits at exit at <0.1% false-alarm rate. The ILS / LMS platforms (SirsiDynix Symphony / BLUEcloud / Horizon, Innovative Sierra / Polaris, Ex Libris Alma + Primo, OCLC WorldShare Management Services, EBSCO FOLIO, Koha) talk to the kiosks + AMH over SIP2 (Standard Interchange Protocol — 3M legacy, de-facto self-service) or NCIP / Z39.83 (NISO Circulation Interchange Protocol — modern standards-track) over TCP/IP. ISIL (ISO 15511:2019) Owner Institution is encoded in DE 3 — enabling OCLC WorldShare ILL + EBSCO FOLIO Resource Sharing cross-library interloan without back-office lookup. ALA RFID Privacy Guidelines (2006 / updated 2017) + NISO RP-6-2012 frame the patron-privacy + EAS-only-cross-library design that drives the HF-not-UHF choice for library applications.",
+        "source": "ISO 28560-1 + ISO 28560-2 + ISO 28560-3:2014 (iso.org); ISO/IEC 15693-3:2019 (iso.org); ISO 15511:2019 ISIL (iso.org); NXP Semiconductors, ICODE SLIX2 SL2S2602 Datasheet rev 3.4 (nxp.com, 2023); ALA RFID in Libraries Privacy and Confidentiality Guidelines (ala.org, 2017); NISO RP-6-2012 (niso.org)"
+      },
+      "bullets": [
+        "AFI 0x07 — reserved by ISO/IEC 15693 for the library application family; every library RFID reader filters on this AFI.",
+        "DSFID byte indicates ISO 28560 profile (-2 vs -3) for middleware auto-parser.",
+        "Pre-encoded labels ship with customer's ISIL + barcode allocation range + EAS-armed; sample-tested on deployed kiosk."
+      ]
+    },
+    {
+      "title": "Where library RFID earns its margin — the application inventory",
+      "bullets": [
+        "Patron self-checkout — 5-10 books on the kiosk pad; SIP2 63/64; receipt prints in <15 s.",
+        "Patron self-return at AMH — Lyngsoe / Bibliotheca / FE Tech / P.V. Supa / Tech Logic; sort to bin (own-branch / hold-shelf / reserves / damage / delivery).",
+        "Shelf inventory — handheld wand sweeps shelf in seconds; misshelved + missing audibly flagged.",
+        "Security gate — Bibliotheca + Checkpoint + FE Tech + 3M-retrofit detect armed EAS at exit.",
+        "Hold-shelf retrieval — patron card + RFID wand finds held book even out-of-call-number.",
+        "Interlibrary Loan (ILL) — receiving library reads ISIL + barcode; resolves ownership via OCLC.",
+        "Disaster recovery — printed barcode visible fallback; no operational regression.",
+        "Patron card + AV media + multimedia kit — single ISO 28560 architecture across all formats."
+      ]
+    },
+    {
+      "title": "From 1996 Singapore NLB to 2024 ISO 28560 + AMH — milestones that shaped library RFID",
+      "timeline": {
+        "items": [
+          {
+            "label": "1969",
+            "text": "3M introduces Tattle-Tape EM strip — first library security technology; remains the installed base for 35 years."
+          },
+          {
+            "label": "1996",
+            "text": "First library RFID deployment at Singapore National Library Board; ISO/IEC 15693 13.56 MHz proves the form factor for stacked-book reading."
+          },
+          {
+            "label": "2003",
+            "text": "Berkeley Public Library RFID rollout becomes US reference; ALA forms Privacy in RFID working group on patron-data concerns."
+          },
+          {
+            "label": "2007",
+            "text": "Danish Standards (DS) publishes DS/INF 163 — fixed-length encoding profile that becomes ISO 28560-3."
+          },
+          {
+            "label": "2011",
+            "text": "ISO 28560 published — Parts 1, 2, 3 standardise data model + encoding so Bibliotheca, 3M, Checkpoint, Nedap + FE Technologies read each other's tags."
+          },
+          {
+            "label": "2014",
+            "text": "ISO 28560 revised; ISO/IEC 15962 OID syntax (Part 2) becomes default; NXP releases ICODE SLIX2."
+          },
+          {
+            "label": "2017",
+            "text": "ALA updates RFID Privacy Guidelines; AMH bookdrop sorting standard at North American mid-large public libraries."
+          },
+          {
+            "label": "2024",
+            "text": "Cloud-native ILS (Alma + WorldShare + FOLIO) + NCIP / Z39.83 increasingly displace SIP2 + on-prem Symphony / Polaris / Horizon."
+          },
+          {
+            "label": "2026 — Today",
+            "text": "How experienced teams run public-library-multi-branch, university-research-library, k12-school-library, corporate-information-centre, hospital-medical-library and law-firm-knowledge-centre programmes."
+          }
+        ]
+      }
     }
   ],
   "resourceCards": [
     {
-      "title": "Library RFID tag products",
-      "description": "Tags and labels for library material management.",
+      "title": "Library RFID products",
+      "description": "Tags + labels + cards for library material management.",
       "links": [
         {
           "href": "/products/rfid-tags/rfid-library-book-tag/",
-          "label": "RFID library book tags"
+          "label": "RFID library book tags (square 50×50 mm)"
         },
         {
           "href": "/products/rfid-labels/rfid-book-spine-label/",
-          "label": "RFID book spine labels"
+          "label": "RFID book spine labels (slim ribbon-bonded)"
         },
         {
           "href": "/products/rfid-cards/icode-slix-card/",
-          "label": "ICODE SLIX library cards"
+          "label": "ICODE SLIX library cards (patron ID)"
+        },
+        {
+          "href": "/products/rfid-cards/rfid-student-id-card/",
+          "label": "RFID student ID card (university library)"
+        }
+      ]
+    },
+    {
+      "title": "Adjacent industries",
+      "description": "Cross-vertical reading for library procurement.",
+      "links": [
+        {
+          "href": "/industries/education/",
+          "label": "Education (university + K-12)"
+        },
+        {
+          "href": "/industries/government-defense-supply-chain/",
+          "label": "Government & defense (federal + military library)"
+        }
+      ]
+    },
+    {
+      "title": "Solutions",
+      "description": "Library-specific solution packages.",
+      "links": [
+        {
+          "href": "/solutions/rfid-library-management/",
+          "label": "RFID library management solution"
         }
       ]
     }
@@ -61,65 +329,23 @@
   "faq": [
     {
       "question": "How much does it cost to tag an entire library collection with RFID?",
-      "answer": "RFID book tags cost $0.08-$0.15 per tag at volume. For a 100,000-item collection, the tagging cost is approximately $8,000-$15,000 for the tags themselves. Including staff labor for applying tags and encoding, the total tagging project typically costs $0.20-$0.35 per item, or $20,000-$35,000 for a 100,000-item library."
+      "answer": "RFID library book tags (NXP ICODE SLIX2 + ISO 28560 encoding) cost USD 0.10-0.18 per tag at volume (1,000+ MOQ). For a 100,000-item collection, the tag cost is USD 10,000-18,000. Including staff labour for applying tags + encoding (Bibliotheca recommend ~30 sec/item by trained tagger), total tagging project typically costs USD 0.20-0.35 per item, or USD 20,000-35,000 for a 100,000-item library. Pre-encoded tags (with customer's ISIL + barcode allocation range + EAS-armed) reduce labour cost by 60-70% — staff just apply the label without encoding equipment. ROI break-even is 3-5 years for medium public libraries (kiosk + AMH return + security gate), 5-7 years for large academic libraries with deeper backlog. For migration deployments, Bibliotheca Hybrid Gates (RFID + EM) allow tagging only new accessions during a 12-24 month conversion window."
     },
     {
       "question": "Are library RFID tags compatible with Bibliotheca and other system vendors?",
-      "answer": "Yes. We supply RFID tags compatible with all major library RFID system vendors including Bibliotheca, EnvisionWare, 3M/Tattle-Tape, Checkpoint, and FE Technologies. The standard chip (ICODE SLIX, ISO 15693) ensures cross-vendor compatibility. We configure the data model (item ID, AFI, DSFID) to match your specific system vendor's requirements."
+      "answer": "Yes — by design. The default chip (NXP ICODE SLIX2, ISO/IEC 15693 + NFC Forum Type 5) is the chip read by every modern library RFID middleware: Bibliotheca liber8 / WebService, FE Technologies, P.V. Supa, Tech Logic, Checkpoint ITG, RFID Library Solutions ScanPoint, 3M Detection retrofit kits, EnvisionWare, Mk Solutions / ITG, 2CQR. We also supply ICODE SLI / SLIX for backwards compatibility with pre-2014 installed base, plus EM4233 / EM4423 alternates for libraries that source dual-vendor. The ILS layer (SirsiDynix Symphony / BLUEcloud / Horizon, Innovative Sierra / Polaris, Ex Libris Alma + Primo, OCLC WorldShare Management Services, EBSCO FOLIO, Koha) talks to the kiosk + AMH over SIP2 or NCIP / Z39.83 — independent of the chip. Send us your kiosk vendor + ILS + ISIL + barcode allocation range and we sample-test the label on your stack before mass production. The ISO 28560 + AFI 0x07 + DSFID standardised encoding is the interoperability foundation."
     },
     {
       "question": "Can RFID tags damage books?",
-      "answer": "No. Library RFID tags are thin (under 0.3 mm), flexible, and use acid-free adhesive designed for archival materials. The tags add negligible weight and thickness to the book. They contain no magnetic components that could affect magnetic media. Properly applied tags have no adverse effect on book condition and are used in national libraries and rare-book collections worldwide."
-    }
-  ],
-  "sources": [
-    {
-      "label": "ISO 28560-1:2014 — Information and documentation — RFID in libraries — Part 1: Data elements and general guidelines",
-      "url": "https://www.iso.org/standard/64974.html",
-      "publisher": "ISO",
-      "note": "Normative library RFID data model defining required and optional elements on book, media and patron tags."
+      "answer": "No. Library RFID tags are ≤0.30 mm thick on PET face stock with library-grade acid-free permanent acrylic adhesive (peel ≥18 N/25 mm) that complies with ANSI/NISO Z39.48 archival paper standards for non-damage to paper, book boards and binding materials. The label is typically placed inside the back cover or on the title-page verso (avoid placing over text and avoid the spine for hardbound volumes that flex). Field-tested on archival collections where the label has remained in place for 10+ years without adhesive migration, page yellowing or board damage. Used in national libraries (US Library of Congress, British Library, BNF, Bibliothèque nationale de France) and rare-book collections worldwide. We do not recommend the label for rare-book + special-collections + rare-paperback where any reversible accession marker is required — those collections typically use removable bookplate inlays or shelf-mounted RFID."
     },
     {
-      "label": "ISO 28560-2:2014 — RFID in libraries — Part 2: Encoding of RFID data elements based on rules from ISO/IEC 15962",
-      "url": "https://www.iso.org/standard/64975.html",
-      "publisher": "ISO",
-      "note": "Encoding rules for library RFID memory layout that interoperate across ILS vendors and self-service hardware."
+      "question": "What is ISO 28560 and which encoding profile should I use?",
+      "answer": "ISO 28560 is the international library RFID data model — 3 parts standardising the 26 data elements (Primary Item Identifier, Owner Institution ISIL per ISO 15511, Content Parameter Set, Set Information, Type of Usage, Shelf Location, Title, Author, ISBN, Subsidiary, Alternative Unique Item Identifier, Local Data A/B/C, etc.) that every library RFID stack reads. Part 1 covers general principles + data elements; Part 2 specifies variable-length encoded using ISO/IEC 15962 OID-based data syntax (default for North America, UK, Scandinavia); Part 3 specifies fixed-length 'Danish' encoding (still in use at some Northern European libraries). For new deployments we recommend ISO 28560-2 — it is the default profile in Bibliotheca liber8, FE Technologies, Tech Logic and current Ex Libris Alma + Innovative + SirsiDynix integrations. Send us your ISIL + barcode allocation range + ILS / middleware vendor and we match the exact encoding profile + DSFID byte + AFI 0x07 (libraries application family identifier reserved by ISO/IEC 15693) before mass encoding."
     },
     {
-      "label": "ISO/IEC 15693 — Vicinity cards (HF 13.56 MHz long-range)",
-      "url": "https://www.iso.org/standard/39694.html",
-      "publisher": "ISO",
-      "note": "HF vicinity air-interface standard historically dominant in library RFID book tags (ICODE SLIX and compatible)."
-    },
-    {
-      "label": "NISO RP-6-2012 — RFID in U.S. Libraries Recommended Practice",
-      "url": "https://www.niso.org/publications/rp-6-2012-rfid-libraries",
-      "publisher": "NISO: National Information Standards Organization",
-      "note": "Authoritative North American recommended practice covering data models, interoperability and patron privacy safeguards."
-    },
-    {
-      "label": "ALA — American Library Association Policy on Privacy (including RFID)",
-      "url": "https://www.ala.org/advocacy/privacy",
-      "publisher": "American Library Association",
-      "note": "ALA position statements on library RFID implementations and patron privacy expectations."
-    },
-    {
-      "label": "NXP ICODE SLIX2 — HF RFID for libraries and books",
-      "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/icode/icode-slix2:SL2S2002_SL2S2102",
-      "publisher": "NXP Semiconductors",
-      "note": "Common HF silicon in library book tags offering AFI, EAS and password-protected memory segments."
-    },
-    {
-      "label": "Bibliotheca — Library RFID solutions (self-service, AMH, inventory)",
-      "url": "https://www.bibliotheca.com/",
-      "publisher": "Bibliotheca",
-      "note": "Reference vendor for library self-service, automated materials handling and RFID inventory wands."
-    },
-    {
-      "label": "ISO 15511:2019 — International Standard Identifier for Libraries and Related Organizations (ISIL)",
-      "url": "https://www.iso.org/standard/57332.html",
-      "publisher": "ISO",
-      "note": "ISIL identifier standard used inside ISO 28560 library RFID data structures."
+      "question": "How does RFID handle interlibrary loan (ILL) across multiple libraries?",
+      "answer": "Each book's ISO 28560 RFID tag carries the Owner Institution ISIL code (ISO 15511:2019 — globally registered library prefix, e.g., US-DLC for Library of Congress, GB-Uk for British Library, DK-CV for Copenhagen Business School Library) in Data Element 3. When a book ships out on ILL, the receiving library's kiosk or AMH reads the ISIL directly from the label and resolves ownership without back-office lookup; OCLC WorldShare Management Services Resource Sharing + EBSCO FOLIO Resource Sharing + Ex Libris Alma Primo Resource Sharing all key off the ISIL on the RFID label. SIP2 + NCIP / Z39.83 transaction protocols handle the cross-library check-in/check-out workflow. For very large multi-library ILL networks (state-wide consortia, multi-country networks like the Nordic Union Catalog), the Primary Item Identifier (DE 1) + ISIL combination provides unique global identification across millions of items. We pre-encode the ISIL per library at order time so labels are ILL-ready on first deployment."
     }
   ],
   "primaryAction": {
@@ -132,11 +358,95 @@
       "label": "Library book tags"
     },
     {
-      "href": "/solutions/rfid-library-management/",
-      "label": "RFID library management"
+      "href": "/products/rfid-labels/rfid-book-spine-label/",
+      "label": "Book spine labels"
     }
   ],
+  "publishedAt": "2026-04-22",
+  "modifiedAt": "2026-02-09",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-22"
+  "reviewedAt": "2026-02-09",
+  "sources": [
+    {
+      "label": "ISO 28560-1:2014 — RFID in Libraries — Part 1: Data Elements + General Guidelines",
+      "url": "https://www.iso.org/standard/65203.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2014-12-15",
+      "accessedAt": "2026-04-25",
+      "note": "Defines the 26 data elements (Primary Item Identifier, Content Parameter Set, Owner Institution ISIL, Set Information, etc.) used by every ISO 28560-compliant library RFID stack."
+    },
+    {
+      "label": "ISO 28560-2:2014 — Encoding of RFID Data Elements based on Rules from ISO/IEC 15962",
+      "url": "https://www.iso.org/standard/65204.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2014-12-15",
+      "accessedAt": "2026-04-25",
+      "note": "Variable-length OID-based encoding profile — the default in North America, UK, Scandinavia and supported by every modern library RFID middleware."
+    },
+    {
+      "label": "ISO/IEC 15693-3:2019 — Vicinity Cards — Anticollision and Transmission Protocol",
+      "url": "https://www.iso.org/standard/73602.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2019-09-13",
+      "accessedAt": "2026-04-25",
+      "note": "13.56 MHz HF physics + anti-collision used by ICODE SLIX / SLIX2 + EM4233 / EM4423 — the chips that carry ISO 28560 in libraries."
+    },
+    {
+      "label": "ISO 15511:2019 — ISIL International Standard Identifier for Libraries and Related Organizations",
+      "url": "https://www.iso.org/standard/74592.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2019-08-22",
+      "accessedAt": "2026-04-25",
+      "note": "Globally registered library prefix encoded in ISO 28560 Data Element 3 — enables OCLC ILL + EBSCO FOLIO Resource Sharing without back-office lookup."
+    },
+    {
+      "label": "NISO Z39.83 — NISO Circulation Interchange Protocol (NCIP)",
+      "url": "https://www.niso.org/standards-committees/ncip",
+      "publisher": "National Information Standards Organization",
+      "publishedAt": "2020-04-30",
+      "accessedAt": "2026-04-25",
+      "note": "Modern standards-track replacement for SIP2; native in Ex Libris Alma + OCLC WorldShare + EBSCO FOLIO + Koha + Polaris."
+    },
+    {
+      "label": "NISO RP-6-2012 — RFID in U.S. Libraries Recommended Practice",
+      "url": "https://www.niso.org/publications/rp-6-2012-rfid-libraries",
+      "publisher": "NISO: National Information Standards Organization",
+      "publishedAt": "2012-09-25",
+      "accessedAt": "2026-04-25",
+      "note": "Authoritative North American recommended practice covering data models, interoperability + patron privacy safeguards."
+    },
+    {
+      "label": "American Library Association — RFID in Libraries Privacy and Confidentiality Guidelines",
+      "url": "https://www.ala.org/advocacy/intfreedom/statementspols/rfidguidelines",
+      "publisher": "American Library Association",
+      "publishedAt": "2017-06-25",
+      "accessedAt": "2026-04-25",
+      "note": "Recommends HF over UHF for patron-item privacy; mandates de-encoding of personal data + EAS-only design for cross-library use."
+    },
+    {
+      "label": "NXP ICODE SLIX2 SL2S2602 ISO/IEC 15693 HF RFID Tag IC Datasheet (rev 3.4)",
+      "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/icode/icode-slix2:SL2S2602",
+      "publisher": "NXP Semiconductors N.V.",
+      "publishedAt": "2023-06-15",
+      "accessedAt": "2026-04-25",
+      "note": "316 byte user memory, 64-bit UID, EAS, AFI 0x07 — the default chip for new library deployments since 2018."
+    },
+    {
+      "label": "Bibliotheca — Library RFID Solutions (Self-Service, AMH, Inventory) + 3M Standard Interchange Protocol (SIP2)",
+      "url": "https://www.bibliotheca.com/",
+      "publisher": "Bibliotheca",
+      "publishedAt": "2024-09-12",
+      "accessedAt": "2026-04-25",
+      "note": "Reference vendor for library self-service + automated materials handling + RFID inventory wand + smartFlow AMH; SIP2 (3M legacy) is the de-facto self-service protocol."
+    },
+    {
+      "label": "OCLC + Ex Libris + Innovative + SirsiDynix + EBSCO FOLIO + Koha — Library Management System (LMS) Documentation",
+      "url": "https://www.oclc.org/en/worldshare-management-services.html",
+      "publisher": "OCLC, Inc. + Ex Libris (Clarivate) + Innovative Interfaces + SirsiDynix + EBSCO + Koha Community",
+      "publishedAt": "2024-04-09",
+      "accessedAt": "2026-04-25",
+      "note": "Cloud-native ILS / LMS platforms with NCIP-native circulation; ISIL-keyed interlibrary loan resolution that the RFID label's ISO 28560 DE 3 directly supports."
+    }
+  ]
 }

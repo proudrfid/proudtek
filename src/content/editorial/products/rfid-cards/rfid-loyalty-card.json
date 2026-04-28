@@ -15,6 +15,102 @@
     "/product/nfc-business-card/",
     "/product/blank-rfid-card/"
   ],
+  "keywords": [
+    "RFID loyalty card",
+    "NFC loyalty card",
+    "tap-to-earn loyalty card",
+    "custom printed NFC reward card",
+    "contactless loyalty programme card",
+    "NTAG213 loyalty card"
+  ],
+  "brief": [
+    {
+      "label": "Card body and form factor",
+      "items": [
+        "ISO/IEC 7810 ID-1 (85.60 × 53.98 × 0.76 mm) PVC is the retail-wallet default; fits every existing loyalty-card rack, slot and wallet divider.",
+        "Die-cut keytag (30 × 55 mm) and half-card (ISO 7810 ID-2 shortened) options for keyring attachment or wallet-depth constraints."
+      ]
+    },
+    {
+      "label": "Loyalty-programme market context",
+      "items": [
+        "Global loyalty-programme membership tracked by Bond Brand Loyalty and Forrester; U.S. adults belong to ~16 loyalty programmes on average but are active in only ~7.",
+        "Active-use rate and visit-lift are the metrics programme owners report against, not enrolment — a card that stays in the wallet is the structural win."
+      ]
+    },
+    {
+      "label": "Chip selection aligned to loyalty data model",
+      "items": [
+        "NTAG213 (144 B) — URL / UID-based member lookup for SMB and mid-market; the cheapest credible NFC loyalty card.",
+        "NTAG216 (888 B) — NDEF multi-record payload where a welcome promo + member-ID URL is useful on first tap.",
+        "MIFARE Classic 1K — 16-sector memory for multi-merchant mall / plaza loyalty programmes where sector-per-merchant separation is valued.",
+        "MIFARE DESFire EV3 — AES-128 per-card key diversification where member-credit or prepaid balance is stacked onto the loyalty card."
+      ]
+    },
+    {
+      "label": "Tap-to-earn POS flow",
+      "items": [
+        "Customer taps loyalty card on NFC reader at the POS; UID read in < 100 ms and passed to the loyalty engine (Yotpo, Annex Cloud, Smile.io, Voucherify, Loyalty Lion, custom).",
+        "Loyalty engine resolves UID → member record → applies points, tier, basket-promo, birthday reward; POS prints receipt within the normal transaction envelope."
+      ]
+    },
+    {
+      "label": "Digital overlay — tap on phone",
+      "items": [
+        "NDEF URI record `https://brand.example.com/loyalty?m={uid}` opens the member dashboard on a stock iPhone (iOS 12+ Background Tag Reading) or Android phone — no app install.",
+        "Apple Wallet Passes and Google Wallet loyalty cards can mirror the physical card with barcode + latest balance; physical card keeps the wallet-slot presence."
+      ]
+    },
+    {
+      "label": "Dual-interface — NFC + barcode",
+      "items": [
+        "Printed 1D (Code 128) or 2D (QR) barcode on the card as a fallback for POS lanes still waiting on NFC hardware; the same member-ID is encoded both ways.",
+        "Barcode print-quality target: ISO/IEC 15416 grade A/B so handheld / in-counter scanners read reliably on first pass."
+      ]
+    },
+    {
+      "label": "Anti-fraud posture",
+      "items": [
+        "Unique chip UID (NTAG 7-byte / MIFARE 4-byte) replaces trivially-clonable punch cards and printed barcodes; UID replay is detectable server-side.",
+        "NTAG213 32-bit password protection or DESFire EV3 AES-128 raises the bar to cryptographic attack for premium / high-reward programmes."
+      ]
+    },
+    {
+      "label": "Data-protection posture — GDPR and equivalents",
+      "items": [
+        "GDPR (EU) 2016/679 Art. 6 lawful-basis analysis: loyalty runs on consent (Art. 6(1)(a)) or contract (Art. 6(1)(b)) depending on how the programme terms are written.",
+        "Member right-of-access (Art. 15), erasure (Art. 17) and portability (Art. 20) must be supported in the loyalty-engine back-end; card is purely a UID carrier."
+      ]
+    },
+    {
+      "label": "PCI-DSS scope where payment is stacked",
+      "items": [
+        "If the loyalty card also carries a stored-value balance or is linked to a payment credential, PCI-DSS v4.0 scope applies to the back-end and POS integration path — not to the card itself.",
+        "Pure loyalty-only UID cards are out of PCI-DSS scope; the card becomes in-scope only when payment data is linked."
+      ]
+    },
+    {
+      "label": "Premium finishing and wallet retention",
+      "items": [
+        "Spot UV, metallic foil (gold / silver / holographic), soft-touch lamination and embossed card numbers earn wallet-slot residency versus the trivially-replaced paper punch card.",
+        "Transparent and frosted-PVC options are gaining share in premium-retail / beauty / fashion programmes for a differentiated shelf-appeal versus commodity PVC."
+      ]
+    },
+    {
+      "label": "Programme lifecycle — issuance, tiering, suspension",
+      "items": [
+        "Issuance: POS-activated at first purchase; POS issues physical card + seeds member record. Tiering: back-end rule engine updates tier; card UID stays the same.",
+        "Suspension / replacement: back-end flags UID as revoked; customer gets a new card with new UID mapped to the same member record."
+      ]
+    },
+    {
+      "label": "Production flow and lead time",
+      "items": [
+        "Artwork → proof → offset print (MOQ 500) or UV digital (MOQ 100) with variable-data QR → lamination → punch → NTAG / MIFARE encoding (UID registration + optional NDEF URL).",
+        "Standard lead time 10–12 business days; rush 7-day turnaround available for promotional launches; free samples after artwork lock."
+      ]
+    }
+  ],
   "sections": [
     {
       "title": "Why retailers choose NFC loyalty cards over app-only programs",
@@ -27,6 +123,59 @@
       ]
     },
     {
+      "title": "Loyalty card at a glance",
+      "statBar": {
+        "items": [
+          {
+            "value": "~16 / 7",
+            "label": "Average U.S. enrolments vs active (Bond / Forrester)"
+          },
+          {
+            "value": "< 100 ms",
+            "label": "UID read latency at the POS reader"
+          },
+          {
+            "value": "MOQ 500 / 100",
+            "label": "Offset run / UV digital short run"
+          },
+          {
+            "value": "GDPR Art. 6",
+            "label": "Lawful-basis framework for member data"
+          }
+        ]
+      }
+    },
+    {
+      "title": "NFC loyalty card vs barcode / paper punch / app-only loyalty",
+      "comparePanel": {
+        "beforeHeading": "NFC loyalty card (NTAG213 or dual NFC+barcode)",
+        "afterHeading": "vs barcode-only card, paper punch card and app-only loyalty",
+        "before": [
+          "Tap-to-earn < 1 second; no line-delay from scanner alignment or app navigation.",
+          "Unique chip UID — member identity cannot be cloned by photocopying or photographing.",
+          "Phone-tap opens the member dashboard without any app install; hybrid physical + digital by default.",
+          "Wallet-slot resident; premium finishing stack makes the card a brand asset, not a throwaway.",
+          "Unit cost USD 0.25–1.50; premium finishes add 10–30 %."
+        ],
+        "after": [
+          "Barcode-only cards: cheap and universal but photo-copiable and sensitive to print wear / wrinkling; scanner alignment adds 5–10 seconds.",
+          "Paper punch cards: trivially counterfeited by photocopier; no analytics; the programme lives in ink stains on the card.",
+          "App-only loyalty: 75 % of downloads are abandoned; customers without smartphones or without the specific app are shut out.",
+          "Wallet / app-pass overlay: useful mirror, but the physical card still earns the wallet-slot presence the brand wants.",
+          "All three lag NFC on fraud resistance, checkout speed and wallet presence simultaneously."
+        ]
+      }
+    },
+    {
+      "title": "Active-use gap — why the card matters more than the enrolment",
+      "dataHighlight": {
+        "value": "~7 of 16",
+        "heading": "Average U.S. consumer is enrolled in ~16 loyalty programmes but active in only ~7",
+        "text": "Bond Brand Loyalty and Forrester research consistently shows U.S. adults enrol in roughly 16 loyalty programmes and actively use about 7. The gap is dominated by wallet-slot presence and redemption friction. A well-designed NFC loyalty card that is physically in the customer's wallet, taps cleanly at the POS and opens a member-dashboard page on phone-tap is significantly more likely to stay in the active-7 than a paper card or an app that demands onboarding and attention. This is the structural reason retailers keep investing in premium physical cards even while building wallet and app layers alongside them — the card carries the programme through the moments the phone or app cannot.",
+        "source": "Bond Brand Loyalty — Loyalty Report annual series + Forrester loyalty-programme benchmarks"
+      }
+    },
+    {
       "title": "Proud Tek RFID loyalty card options",
       "bullets": [
         "Chip options: NTAG213 (most popular for loyalty; 144 bytes, URL-capable for hybrid physical+digital programs), NTAG216 (888 bytes for on-card point storage), MIFARE Classic 1K (16 sectors for multi-merchant loyalty programs).",
@@ -35,6 +184,126 @@
         "Variable data: sequential card numbers, unique QR codes linking to individual customer profiles and pre-programmed NDEF URLs that open the customer's loyalty dashboard when tapped on a phone.",
         "Fast turnaround for seasonal campaigns — 10-12 business day production on orders of 1,000-10,000 cards; rush 7-day turnaround available for promotional launches."
       ]
+    },
+    {
+      "title": "Milestones in loyalty-card technology",
+      "timeline": {
+        "items": [
+          {
+            "label": "1896 — S&H Green Stamps",
+            "text": "Stamp-based loyalty launches in the U.S.; the modern consumer loyalty programme's direct ancestor."
+          },
+          {
+            "label": "1981 — American Airlines AAdvantage",
+            "text": "First modern database-backed loyalty programme; loyalty becomes a systems problem, not just a stamp book."
+          },
+          {
+            "label": "1995 — Tesco Clubcard",
+            "text": "Barcoded plastic loyalty card at supermarket scale; the form factor every grocery and pharmacy programme still issues."
+          },
+          {
+            "label": "2008 — Starbucks Rewards launch",
+            "text": "Mobile / app loyalty goes mainstream; paper and punch cards begin their retreat."
+          },
+          {
+            "label": "2015 — Apple Wallet generic passes",
+            "text": "Wallet-pass loyalty cards let programmes ride on iOS / Android passes alongside physical cards."
+          },
+          {
+            "label": "2018 — iOS 12 Background Tag Reading",
+            "text": "Stock iPhone reads NDEF tags in the background without app install; tap-to-member-dashboard becomes mass-market UX."
+          },
+          {
+            "label": "2020–2022 — NFC-first loyalty rollouts",
+            "text": "McDonald's, Pret A Manger and several grocery chains shift to NFC + barcode dual-interface loyalty cards to cut POS-line latency."
+          },
+          {
+            "label": "2026 — Today",
+            "text": "Proud Tek ships custom-printed NFC loyalty cards with chip encoding, dual-interface barcode and wallet-pass-mirroring URL programmed per card. From buyer conversations across retail-chain-rewards, coffee-chain-visit-frequency, pharmacy-membership, cinema-loyalty and grocery-co-op loyalty-card programmes."
+          }
+        ]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "label": "ISO/IEC 7810:2019 — Identification cards — Physical characteristics",
+      "url": "https://www.iso.org/standard/70483.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2019-12-01",
+      "accessedAt": "2026-04-24",
+      "note": "ID-1 form factor (85.60 × 53.98 × 0.76 mm) for wallet-resident loyalty cards."
+    },
+    {
+      "label": "ISO/IEC 14443-1:2018 — Proximity cards at 13.56 MHz",
+      "url": "https://www.iso.org/standard/70170.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2018-07-01",
+      "accessedAt": "2026-04-24",
+      "note": "Operating frequency and anti-collision protocol for tap-to-earn POS readers."
+    },
+    {
+      "label": "ISO/IEC 15416:2016 — Bar code print quality test specification",
+      "url": "https://www.iso.org/standard/65577.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2016-07-01",
+      "accessedAt": "2026-04-24",
+      "note": "Grade A/B requirement for printed 1D/2D barcode fallback on dual-interface loyalty cards."
+    },
+    {
+      "label": "NXP NTAG 213/215/216 product data sheet",
+      "url": "https://www.nxp.com/products/NTAG213_215_216",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2022-06-01",
+      "accessedAt": "2026-04-24",
+      "note": "Memory sizes and 32-bit password protection underpinning most NFC loyalty cards."
+    },
+    {
+      "label": "NXP MIFARE Classic 1K product data sheet (MF1ICS50)",
+      "url": "https://www.nxp.com/products/MIFARE-Classic",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2020-01-01",
+      "accessedAt": "2026-04-24",
+      "note": "16-sector memory model used for multi-merchant mall / plaza loyalty programmes."
+    },
+    {
+      "label": "NFC Forum — NDEF 1.0 and URI Record Type Definition",
+      "url": "https://nfc-forum.org/our-work/specifications-and-application-documents/",
+      "publisher": "NFC Forum",
+      "publishedAt": "2023-10-01",
+      "accessedAt": "2026-04-24",
+      "note": "URI record framework for tap-to-member-dashboard landing pages."
+    },
+    {
+      "label": "EU General Data Protection Regulation (Regulation (EU) 2016/679)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+      "publisher": "European Union",
+      "publishedAt": "2016-04-27",
+      "note": "Art. 6 lawful-basis, Art. 15 right-of-access, Art. 17 erasure, Art. 20 portability framework for loyalty-member data."
+    },
+    {
+      "label": "PCI-DSS v4.0 — Payment Card Industry Data Security Standard",
+      "url": "https://www.pcisecuritystandards.org/document_library/",
+      "publisher": "PCI Security Standards Council",
+      "publishedAt": "2022-03-31",
+      "accessedAt": "2026-04-24",
+      "note": "Scope framework that applies when loyalty stacks a stored-value or payment-linked balance."
+    },
+    {
+      "label": "Bond Brand Loyalty — The Loyalty Report (annual)",
+      "url": "https://info.bondbrandloyalty.com/the-loyalty-report",
+      "publisher": "Bond Brand Loyalty",
+      "publishedAt": "2024-11-01",
+      "accessedAt": "2026-04-24",
+      "note": "Source of the ~16 enrolments vs ~7 active benchmark used across the U.S. loyalty industry."
+    },
+    {
+      "label": "Apple Developer — Wallet Passes",
+      "url": "https://developer.apple.com/wallet/",
+      "publisher": "Apple",
+      "publishedAt": "2024-06-01",
+      "accessedAt": "2026-04-24",
+      "note": "Reference for the Wallet loyalty-pass overlay that mirrors a physical NFC loyalty card."
     }
   ],
   "resourceCards": [
@@ -91,5 +360,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-22"
+  "reviewedAt": "2026-01-22"
 }
