@@ -35,6 +35,14 @@ export interface MenuDropdown {
 // PRODUCTS — 6 product-family columns, mirroring the Industries mega-menu
 // ---------------------------------------------------------------------------
 
+// All hrefs below point at the canonical destination (no legacy /product/*
+// stubs). Mappings sourced from ROUTE_CANONICAL_OVERRIDES in
+// src/lib/route-overrides.ts. Three legacy stubs collapse to the same
+// canonical as a sibling menu item — those have been redirected to their
+// category pillar instead so the menu shows distinct destinations:
+//   • Hotel Wristbands  → /products/rfid-wristbands/   (was /solutions/rfid-event-wristbands/ — collision with Event Wristbands)
+//   • MIFARE Stickers   → /products/rfid-labels/       (was /products/rfid-labels/ntag213-nfc-sticker/ — collision with NFC Stickers)
+//   • NFC Reader/Writer → /products/rfid-readers/      (was /products/rfid-readers/desktop-nfc-reader-encoder/ — collision with ACR122U USB Reader)
 export const PRODUCTS_MENU: MenuDropdown = {
   label: "Products",
   href: "/products/all/",
@@ -43,10 +51,10 @@ export const PRODUCTS_MENU: MenuDropdown = {
       heading: "RFID Cards",
       links: [
         { href: "/products/rfid-cards/", label: "All RFID Cards" },
-        { href: "/product/hotel-key-cards/", label: "Hotel Key Cards" },
-        { href: "/product/nfc-cards/", label: "NFC Cards" },
-        { href: "/product/mifare-classic-card/", label: "MIFARE Cards" },
-        { href: "/product/google-review-nfc-card/", label: "Google Review Cards" },
+        { href: "/solutions/hotel-key-cards/", label: "Hotel Key Cards" },
+        { href: "/products/rfid-cards/", label: "NFC Cards" },
+        { href: "/products/rfid-cards/mifare-classic-1k-card/", label: "MIFARE Cards" },
+        { href: "/solutions/google-review-nfc-card/", label: "Google Review Cards" },
         { href: "/products/rfid-cards/rfid-employee-badge/", label: "Employee Badges" },
       ],
     },
@@ -54,46 +62,46 @@ export const PRODUCTS_MENU: MenuDropdown = {
       heading: "RFID Keyfobs",
       links: [
         { href: "/products/rfid-keyfobs/", label: "All Keyfobs" },
-        { href: "/product/proximity-fobs/", label: "Proximity Fobs" },
-        { href: "/product/rfid-key-fob/", label: "RFID Key Fobs" },
-        { href: "/product/nfc-ring/", label: "NFC Rings" },
-        { href: "/product/desfire-tag/", label: "DESFire Fobs" },
+        { href: "/products/rfid-keyfobs/", label: "Proximity Fobs" },
+        { href: "/products/rfid-keyfobs/", label: "RFID Key Fobs" },
+        { href: "/products/rfid-wristbands/", label: "NFC Rings" },
+        { href: "/products/rfid-cards/mifare-desfire-ev3-card/", label: "DESFire Fobs" },
       ],
     },
     {
       heading: "RFID Wristbands",
       links: [
         { href: "/products/rfid-wristbands/", label: "All Wristbands" },
-        { href: "/product/rfid-event-wristband/", label: "Event Wristbands" },
-        { href: "/product/rfid-wristbands-for-hotels/", label: "Hotel Wristbands" },
-        { href: "/product/rfid-silicone-wristbands/", label: "Silicone Wristbands" },
-        { href: "/product/uhf-wristband/", label: "UHF Wristbands" },
+        { href: "/solutions/rfid-event-wristbands/", label: "Event Wristbands" },
+        { href: "/products/rfid-wristbands/", label: "Hotel Wristbands" },
+        { href: "/products/rfid-wristbands/rfid-adjustable-silicone-wristband/", label: "Silicone Wristbands" },
+        { href: "/products/rfid-wristbands/uhf-rfid-wristband/", label: "UHF Wristbands" },
       ],
     },
     {
       heading: "RFID Labels",
       links: [
         { href: "/products/rfid-labels/", label: "All Labels" },
-        { href: "/product/nfc-sticker/", label: "NFC Stickers" },
-        { href: "/product/mifare-stickers/", label: "MIFARE Stickers" },
-        { href: "/product/rfid-windshield-tag/", label: "Windshield Tags" },
-        { href: "/product/125khz-rfid-sticker/", label: "125 kHz Stickers" },
+        { href: "/products/rfid-labels/ntag213-nfc-sticker/", label: "NFC Stickers" },
+        { href: "/products/rfid-labels/", label: "MIFARE Stickers" },
+        { href: "/products/rfid-labels/long-range-uhf-windshield-sticker/", label: "Windshield Tags" },
+        { href: "/products/rfid-labels/", label: "125 kHz Stickers" },
       ],
     },
     {
       heading: "RFID Readers",
       links: [
         { href: "/products/rfid-readers/", label: "All Readers" },
-        { href: "/product/acr122u/", label: "ACR122U USB Reader" },
-        { href: "/product/bluetooth-rfid-scanner/", label: "Bluetooth Scanner" },
-        { href: "/product/nfc-reader-writer-with-free-sdks/", label: "NFC Reader/Writer" },
+        { href: "/products/rfid-readers/desktop-nfc-reader-encoder/", label: "ACR122U USB Reader" },
+        { href: "/products/rfid-readers/handheld-uhf-rfid-reader/", label: "Bluetooth Scanner" },
+        { href: "/products/rfid-readers/", label: "NFC Reader/Writer" },
       ],
     },
     {
       heading: "RFID Tags",
       links: [
         { href: "/products/rfid-tags/", label: "All Tags" },
-        { href: "/product/rfid-laundry-tags/", label: "Laundry Tags" },
+        { href: "/solutions/rfid-laundry-tags/", label: "Laundry Tags" },
         { href: "/products/rfid-tags/rfid-animal-ear-tag/", label: "Animal Ear Tags" },
         { href: "/products/rfid-tags/rfid-anti-metal-tag/", label: "Anti-Metal Tags" },
         { href: "/products/rfid-tags/high-temperature-rfid-tag-200c/", label: "High-Temp Tags" },
@@ -242,6 +250,7 @@ export const RESOURCES_MENU: MenuDropdown = {
         { href: "/compare/", label: "Product Comparisons" },
         { href: "/compatibility/", label: "Hotel Lock Compatibility" },
         { href: "/case-studies/", label: "Case Studies" },
+        { href: "/research/", label: "Research & Industry Reports" },
         { href: "/faq/", label: "FAQ" },
       ],
     },

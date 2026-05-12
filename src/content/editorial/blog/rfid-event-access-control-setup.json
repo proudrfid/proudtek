@@ -17,7 +17,7 @@
   ],
   "sections": [
     {
-      "title": "System architecture overview",
+      "title": "What is system architecture?",
       "intro": "An RFID event access control system consists of four layers: credentials (wristbands or badges), readers (at gates and zone boundaries), a controller network (connecting readers to the server) and the access control software (managing permissions and logging events).",
       "image": {
         "src": "/blog-images/event-access.jpg",
@@ -39,7 +39,7 @@
       }
     },
     {
-      "title": "Hardware planning and gate layout",
+      "title": "How do hardware planning and gate layout work?",
       "intro": "The number and placement of RFID readers determines throughput capacity and coverage. Under-provisioning readers creates bottlenecks; over-provisioning wastes budget. Use attendee arrival modeling to size the system correctly.",
       "table": {
         "columns": [
@@ -82,18 +82,18 @@
       }
     },
     {
-      "title": "Credential encoding and registration workflow",
+      "title": "How do credential encoding and registration workflows work?",
       "intro": "Access permissions must be written to each RFID wristband before the attendee arrives at the gate. The encoding can happen at fulfillment (mail-out), at on-site registration or at the gate itself.",
       "bullets": [
         "Pre-event fulfillment encoding: Wristbands are encoded and mailed to attendees with their tickets. This eliminates on-site registration queues but requires accurate attendee data at time of shipment.",
         "On-site registration: Attendees present their ticket (digital or print), are issued a wristband and the access permissions are encoded in real time using a desktop reader connected to the registration system.",
         "Self-service kiosk encoding: Attendees scan their ticket barcode at a kiosk, which dispenses and encodes an RFID wristband automatically. Reduces staffing needs but requires reliable kiosk hardware.",
         "Gate-side encoding: A last-resort option where encoding happens at the gate reader itself. This is the slowest method and should only be used for day-of ticket upgrades or VIP additions.",
-        "Encoding data format: Typically includes attendee UID, ticket type code, access zone bitmask and event date. MIFARE DESFire stores this in an encrypted application file; MIFARE Classic uses dedicated sectors."
+        "Encoding data format: Typically includes attendee UID, ticket type code, access zone bitmask and event date. MIFARE DESFire stores this in an encrypted application file; [MIFARE Classic](/guides/mifare-classic-1k-4k-chip-encyclopedia/) uses dedicated sectors."
       ]
     },
     {
-      "title": "Real-time monitoring and capacity management",
+      "title": "How do you manage real-time monitoring and capacity?",
       "intro": "One of the most valuable features of RFID access control is real-time zone occupancy data. Every gate tap generates a timestamped event that feeds into a monitoring dashboard visible to event operations and safety teams.",
       "bullets": [
         "Occupancy counters: Bi-directional readers at zone boundaries count taps in and out, providing real-time zone population figures.",
@@ -104,7 +104,7 @@
       ]
     },
     {
-      "title": "Post-event analytics and reporting",
+      "title": "How do post-event analytics and reporting work?",
       "intro": "RFID access data collected during the event provides valuable analytics for future event planning, sponsor reporting and operational improvement.",
       "bullets": [
         "Arrival curve analysis: Identify peak arrival times to optimize gate staffing and opening schedules for future events.",
@@ -112,6 +112,28 @@
         "Attendee journey mapping: Reconstruct anonymized movement patterns across zones to understand how attendees navigate the venue.",
         "VIP utilization: Measure actual VIP area usage rates to justify premium ticket pricing and right-size VIP zones.",
         "Re-entry rates: Track how often attendees leave and re-enter the venue to inform parking, shuttle and re-entry gate planning."
+      ]
+    },
+    {
+      "title": "What benchmarks should guide reader sizing and read-rate targets?",
+      "intro": "Reader sizing and read-rate targets are the two numbers that most directly determine whether your gate operations succeed. Industry deployments at major festivals provide concrete benchmarks worth designing against.",
+      "bullets": [
+        "Read-rate target at gate: aim for >99.7% read reliability at peak ingress, the published benchmark used at Coachella, Lollapalooza and Tomorrowland. Below 99% you start to see visible 'tap-twice' delays that cascade into queue backups; below 95% the gate experience falls apart.",
+        "Reader gate validation latency: <300 ms from tap to accept/reject light. UHF Gen2v2 anti-collision protocols can read 100+ tags per second; the bottleneck is almost always the server lookup, not the chip read. Local UID whitelist caches at each reader bring this under 100 ms.",
+        "Throughput planning: 15-20 attendees per minute per HF tap lane is the planning standard; UHF walk-through portals can hit 30-50/min/lane but require strict zone-tuning to avoid over-reads. For a 25,000-attendee festival arriving in a 90-minute window, that's a peak rate of ~280/min — meaning 14-18 HF lanes or 6-10 UHF portals.",
+        "Industry case data: a 25,000+ guest, three-day festival published by Get Systems segmented zones into VIP, GA, backstage and vendor-only with capacity alerts at each — automated alerts trigger when a specific zone approaches its safe occupancy ceiling, providing a defensible safety story for permitting authorities.",
+        "Coachella's RFID infrastructure budget exceeds $2M annually for the access-and-cashless stack. Mid-scale events should benchmark per-attendee infrastructure cost ($8-15 per attendee for a 25K event is the typical range) rather than copy the absolute number."
+      ]
+    },
+    {
+      "title": "What gate-setup mistakes cause the most queue meltdowns?",
+      "intro": "Most gate failures at events are not RFID problems — they are setup choices made before doors open. These five mistakes account for the majority of public 'long line' complaints attributed to access control.",
+      "bullets": [
+        "No gate dry-run with production wristbands: ordering wristbands and only testing at the gate on the morning of doors leaves zero time to fix encoding bugs or reader miscalibration. Run a full gate dry-run with at least 200 production wristbands and the actual server stack 7-10 days before doors.",
+        "Single-WAN dependency for the validation server: events that route every gate read to a cloud server over a single 4G modem lose the entire gate when a tower congests. Always have a wired primary + cellular failover, plus offline-mode caching at each reader (a reader cached with the morning's whitelist can keep operating for 30+ minutes during a network outage).",
+        "Under-provisioning re-entry lanes: events focus reader budget on entry but forget that re-entry can be 30-40% of total taps over a multi-day event. Plan re-entry capacity at 50% of entry capacity, dedicated lanes (not shared with first-time entry), with bi-directional readers at zone boundaries.",
+        "Wristband encoding done at registration desk instead of pre-fulfillment: on-site encoding takes 15-30 seconds per attendee and turns a 90-minute arrival window into a 3-hour queue. Pre-encode at the factory or shipping fulfillment center; reserve on-site encoding only for walk-up sales and replacement wristbands.",
+        "No zone-occupancy capacity alerts: real-time occupancy is the highest-leverage analytics use of RFID, but only if alert thresholds (80%, 90%, 100% of permit capacity) are wired to actual operational responses (close zone, redirect to overflow, dispatch crowd-management staff). Build the alert table with the fire marshal during permitting, not the day before."
       ]
     }
   ],
@@ -161,10 +183,18 @@
     {
       "question": "How do I handle VIP upgrades on the day of the event?",
       "answer": "At a help desk or VIP registration point, staff use a desktop reader to update the access zone permissions on the attendee's existing wristband. With MIFARE DESFire, this is a write operation to the access application that takes 1-2 seconds. The attendee keeps their original wristband."
+    },
+    {
+      "question": "Should I use HF tap or UHF walk-through portals at gates?",
+      "answer": "HF tap (the 'wave your wrist at the reader' model) is the default — well-understood by attendees, deterministic gate behavior, low false-accept risk. UHF walk-through portals can hit higher throughput (30-50/min/lane) but require careful zone tuning to avoid reading wristbands of attendees who are merely passing by. Best practice for large events: HF tap at primary entry gates (where deterministic single-credential reads matter), UHF portals at exit/re-entry counters and zone boundaries (where bulk passive counting is the goal)."
+    },
+    {
+      "question": "How do I plan capacity alerts that satisfy the fire marshal?",
+      "answer": "Build the alert thresholds during the permitting process with the fire marshal in the room. Typical thresholds are 80% (notify zone supervisor + dispatch additional crowd-management staff), 90% (close inbound entry to that zone, redirect to overflow), 100% (lock the zone until counted occupancy drops below 90%). The RFID system should publish a real-time occupancy dashboard the fire marshal or local authority can view live during the event — that visibility is often the difference between a 'permitted' and 'denied' application for high-density events."
     }
   ],
   "primaryAction": {
-    "href": "/contact/event-access-control/",
+    "href": "/contact/event-rfid/",
     "label": "Plan your access control setup"
   },
   "secondaryActions": [
@@ -179,5 +209,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-02-02"
+  "reviewedAt": "2026-05-09"
 }

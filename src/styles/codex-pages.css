@@ -1,0 +1,1269 @@
+/* ═══════════════════════════════════════════
+   Home — section header decoration icon (rfid_blue.jpg)
+   ───────────────────────────────────────────
+   Decorative 55×55 accent used next to section headings
+   (NEW IN, BEST COLLECTION, MORE SKUs, CERTIFICATIONS,
+   VALUABLE PARTNERS, EASY PROCESS). Without a width cap,
+   the global `img { max-width: 100% }` stretches it to the
+   full column width — that's the giant cyan square.
+   ═══════════════════════════════════════════ */
+img[src*="rfid_blue"] {
+  width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  object-fit: contain !important;
+  border-radius: 4px;
+  display: inline-block;
+}
+/* Keep the figure wrapper from adding extra gutter */
+figure.wp-block-image:has(img[src*="rfid_blue"]) {
+  margin: 0 !important;
+  display: inline-flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Static 3-col grid of testimonials.
+   `render-snapshot.ts` strips the `kt-blocks-carousel-init` class so
+   Kadence's Splide JS never bootstraps this wrapper and the default
+   `:not(.splide-initialized) .kt-blocks-testimonial-carousel-item { display: none }`
+   rule no longer applies (items 2 & 3 stay visible). The former carousel
+   container survives as the single direct <div> child of
+   `.kt-blocks-testimonials-inner-wrap` — we grid-ify that. */
+.kt-blocks-testimonials-wrap_a4d6e5-42 .kt-blocks-testimonials-inner-wrap > div {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 24px !important;
+  padding: 0 !important;
+  width: 100%;
+}
+
+/* ── Kadence Testimonials / Splide Carousel fallback ── */
+.splide__track { overflow: visible !important; }
+.splide__list {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+/* DS-15 Phase 6 #3 — Kadence testimonial a11y contrast.
+   Kadence default leaves .kt-testimonial-name + occupation styling at
+   subtle gray that fails 4.5:1 on the testimonial card background.
+   Pin to design tokens so contrast is deterministic.
+   Also pin .kt-testimonial-title (formerly <h5>) typography after
+   the post-processor in seo.ts demotes it to a <p> for heading-order
+   compliance. */
+.kt-testimonial-name {
+  /* DS-15 Phase 6 #3 + iter-2 — !important required because Kadence
+     ships a deeper-specificity rule (.kt-testimonial-meta-wrap
+     .kt-testimonial-name { color: var(--global-palette5) }) that wins
+     the cascade against bare-class selectors. */
+  color: var(--codex-text) !important;
+  font-weight: var(--codex-weight-semibold, 600);
+}
+.kt-testimonial-occupation {
+  color: var(--codex-text-muted) !important;
+}
+
+/* DS-15 Phase 6 #3 iter-2 — Kadence "pale" theme color override.
+   Advanced-heading blocks (h2–h6.wp-block-kadence-advancedheading) can
+   ship the .has-theme-pale-color class which paints text in a tan/cream
+   that fails 4.5:1 on white. Force to standard text token regardless
+   of theme palette. */
+.wp-block-kadence-advancedheading.has-theme-pale-color,
+.wp-block-kadence-advancedheading[class*="has-theme-pale"] {
+  color: var(--codex-text) !important;
+}
+p.kt-testimonial-title {
+  /* Match the visual weight the demoted <h5> used to provide. */
+  font-size: var(--codex-text-base);
+  font-weight: var(--codex-weight-bold, 700);
+  color: var(--codex-text-strong);
+  margin: 0 0 var(--codex-space-2-plus);
+}
+
+/* DS-15 Phase 6 #3 + iter-2 — Kadence form submit button. !important
+   on color/background because Kadence's own button rule has higher
+   specificity (.wp-block-kadence-form .kb-form .kb-forms-submit) than
+   the bare-class selector here. */
+.kb-forms-submit {
+  color: var(--codex-text-strong, #1a1a1a) !important;
+  background: var(--codex-gold, #c39a5f) !important;
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: var(--codex-weight-semibold, 600);
+  cursor: pointer;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+.kb-forms-submit:hover,
+.kb-forms-submit:focus-visible {
+  filter: brightness(1.06);
+}
+
+/* ═══════════════════════════════════════════
+   WooCommerce handpicked-products grid fallback
+   ───────────────────────────────────────────
+   The "MORE SKUs" / "BEST COLLECTION" rows on the home page use the
+   WooCommerce <wc-block-grid> markup with `has-4-columns`, but the
+   matching WooCommerce stylesheet is stripped from the static build,
+   so each <li> defaults to display:list-item and stacks vertically
+   with massive whitespace on the right. Re-implement the grid here.
+   ═══════════════════════════════════════════ */
+.wc-block-grid__products {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(var(--wc-grid-cols, 4), minmax(0, 1fr));
+  gap: 24px;
+}
+
+.wc-block-grid.has-1-columns .wc-block-grid__products { --wc-grid-cols: 1; }
+.wc-block-grid.has-2-columns .wc-block-grid__products { --wc-grid-cols: 2; }
+.wc-block-grid.has-3-columns .wc-block-grid__products { --wc-grid-cols: 3; }
+.wc-block-grid.has-4-columns .wc-block-grid__products { --wc-grid-cols: 4; }
+.wc-block-grid.has-5-columns .wc-block-grid__products { --wc-grid-cols: 5; }
+.wc-block-grid.has-6-columns .wc-block-grid__products { --wc-grid-cols: 6; }
+
+.wc-block-grid__products > .wc-block-grid__product {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.wc-block-grid__products > .wc-block-grid__product:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.wc-block-grid__product-link {
+  display: block;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.wc-block-grid__product-link img {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  display: block;
+  background: #fafafa;
+  transition: transform 240ms ease;
+}
+
+.wc-block-grid__products > .wc-block-grid__product:hover .wc-block-grid__product-link img {
+  transform: scale(1.04);
+}
+
+.wc-block-grid__product .product-details {
+  padding: 14px 14px 18px;
+  text-align: center;
+}
+
+.wc-block-grid__product-title-link {
+  text-decoration: none !important;
+}
+
+.wc-block-grid__product-title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--codex-text, #291c0e) !important;
+  margin: 0;
+}
+
+.wc-block-grid__product-title-link:hover .wc-block-grid__product-title,
+.wc-block-grid__product-title-link:focus .wc-block-grid__product-title {
+  color: var(--codex-gold, #c39a5f) !important;
+}
+
+@media (max-width: 1024px) {
+  .wc-block-grid.has-4-columns .wc-block-grid__products,
+  .wc-block-grid.has-5-columns .wc-block-grid__products,
+  .wc-block-grid.has-6-columns .wc-block-grid__products {
+    --wc-grid-cols: 3;
+  }
+}
+
+@media (max-width: 720px) {
+  .wc-block-grid.has-3-columns .wc-block-grid__products,
+  .wc-block-grid.has-4-columns .wc-block-grid__products,
+  .wc-block-grid.has-5-columns .wc-block-grid__products,
+  .wc-block-grid.has-6-columns .wc-block-grid__products {
+    --wc-grid-cols: 2;
+  }
+}
+
+@media (max-width: 420px) {
+  .wc-block-grid__products {
+    --wc-grid-cols: 1 !important;
+  }
+}
+
+/* Belt-and-braces: cap the rfid_blue decorative icon even when the
+   selector chain is overridden by inline width/height attributes. */
+figure.wp-block-image:has(img[src*="rfid_blue"]),
+.wp-block-image:has(img[src*="rfid_blue"]) {
+  width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+  flex: 0 0 48px !important;
+}
+figure.wp-block-image > img[src*="rfid_blue"] {
+  width: 48px !important;
+  max-width: 48px !important;
+  height: 48px !important;
+}
+
+/* ═══════════════════════════════════════════
+   Contact page — clean two-column redesign
+   ═══════════════════════════════════════════ */
+
+.codex-contact {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--codex-space-12, 64px) var(--codex-space-5, 24px) var(--codex-space-10, 48px);
+  color: var(--codex-text, #291c0e);
+}
+
+.codex-contact__hero {
+  text-align: center;
+  margin-bottom: var(--codex-space-10, 48px);
+}
+
+.codex-contact__eyebrow {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--codex-gold, #c39a5f);
+}
+
+.codex-contact__title {
+  font-family: var(--codex-font-heading, "Lora", serif);
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.18;
+  margin: 0 0 16px;
+  color: var(--codex-text, #291c0e);
+  letter-spacing: -0.01em;
+}
+
+.codex-contact__lede {
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.66);
+}
+
+.codex-contact__h2 {
+  font-family: var(--codex-font-heading, "Lora", serif);
+  font-size: 22px;
+  line-height: 1.25;
+  margin: 0 0 18px;
+  color: var(--codex-text, #291c0e);
+}
+
+/* ── Two-column grid ── */
+.codex-contact__grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 880px) {
+  .codex-contact__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Side: contact channels card ── */
+.codex-contact__side {
+  position: sticky;
+  top: 96px;
+}
+
+@media (max-width: 880px) {
+  .codex-contact__side {
+    position: static;
+  }
+}
+
+.codex-contact__channels {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 28px 26px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.04);
+}
+
+.codex-contact__channel {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  text-decoration: none !important;
+  color: inherit !important;
+  transition: background 160ms ease, padding 160ms ease;
+}
+
+.codex-contact__channel:first-of-type {
+  border-top: 0;
+  padding-top: 4px;
+}
+
+.codex-contact__channel:not(.codex-contact__channel--static):hover,
+.codex-contact__channel:not(.codex-contact__channel--static):focus {
+  background: rgba(212, 167, 85, 0.06);
+  padding-left: 6px;
+}
+
+.codex-contact__icon {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(212, 167, 85, 0.12);
+  color: var(--codex-gold, #c39a5f);
+}
+
+.codex-contact__channel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.codex-contact__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.48);
+}
+
+.codex-contact__value {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--codex-text, #291c0e);
+  word-break: break-word;
+}
+
+.codex-contact__hours {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+/* ── Form card ── */
+.codex-contact__form-card {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 36px 36px 32px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 560px) {
+  .codex-contact__form-card { padding: 26px 22px; }
+}
+
+.codex-contact__form-lede {
+  margin: 0 0 24px;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(0, 0, 0, 0.65);
+}
+
+/* Re-skin the legacy Kadence form fields without changing names/IDs. */
+.codex-contact__form-card .kb-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 16px;
+}
+
+.codex-contact__form-card .kadence-blocks-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.codex-contact__form-card .kb-field-desk-width-100 { grid-column: 1 / -1; }
+.codex-contact__form-card .kb-field-desk-width-50  { grid-column: span 1; }
+
+@media (max-width: 560px) {
+  .codex-contact__form-card .kb-form { grid-template-columns: 1fr; }
+  .codex-contact__form-card .kb-field-desk-width-50 { grid-column: 1 / -1; }
+}
+
+.codex-contact__form-card label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.78);
+  letter-spacing: 0.01em;
+}
+
+.codex-contact__form-card label .required { color: #d92d20; margin-left: 2px; }
+
+.codex-contact__form-card input.kb-field,
+.codex-contact__form-card textarea.kb-field {
+  width: 100%;
+  padding: 11px 14px;
+  font-size: 14.5px;
+  line-height: 1.4;
+  font-family: inherit;
+  color: var(--codex-text, #291c0e);
+  background: #fafafa;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.codex-contact__form-card textarea.kb-field {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.codex-contact__form-card input.kb-field:focus,
+.codex-contact__form-card textarea.kb-field:focus {
+  outline: none;
+  border-color: var(--codex-gold, #c39a5f);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(212, 167, 85, 0.18);
+}
+
+.codex-contact__form-card .kadence-blocks-field.verify { display: none !important; }
+
+.codex-contact__form-card .kb-submit-field {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+.codex-contact__form-card .kb-forms-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--codex-text-strong, #1a1a1a);
+  background: var(--codex-gold, #c39a5f);
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.codex-contact__form-card .kb-forms-submit:hover,
+.codex-contact__form-card .kb-forms-submit:focus {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+/* ── Map ── */
+.codex-contact__map {
+  margin-top: 40px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.04);
+}
+
+.codex-contact__map iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+
+/* Phase 8 — click-to-activate Maps placeholder card.
+   Saves ~370 KB of Google Maps JS until the user opts in.
+   The placeholder is a styled address card with a CTA; click → JS in
+   BaseLayout.astro replaces it with the real iframe (template inside
+   the same .codex-contact__map section). Without JS, the CTA is an
+   <a> link that opens Google Maps in a new tab. */
+.codex-contact__map-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-5, 20px);
+  padding: var(--codex-space-7, 28px) var(--codex-space-6, 24px);
+  background:
+    linear-gradient(135deg, rgba(195, 154, 95, 0.06) 0%, rgba(35, 100, 160, 0.04) 100%),
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 32px),
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.04) 0 1px, transparent 1px 32px);
+  background-color: #fafafa;
+}
+.codex-contact__map-card-body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--codex-space-4, 16px);
+}
+.codex-contact__map-card-pin {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--codex-gradient-gold, var(--codex-gold, #c39a5f));
+  color: var(--codex-text-strong, #1a1a1a);
+}
+.codex-contact__map-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.codex-contact__map-card-title {
+  font-size: var(--codex-text-base, 1rem);
+  font-weight: var(--codex-weight-bold, 700);
+  color: var(--codex-text);
+}
+.codex-contact__map-card-address {
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+  color: var(--codex-text-muted);
+  line-height: var(--codex-leading-normal, 1.5);
+}
+.codex-contact__map-card-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  min-height: 44px; /* touch target */
+  border-radius: 999px;
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text-strong, #1a1a1a);
+  background: var(--codex-gold, #c39a5f);
+  text-decoration: none;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+.codex-contact__map-card-btn:hover,
+.codex-contact__map-card-btn:focus-visible {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+.codex-contact__map-card-btn:focus-visible {
+  outline: 2px solid var(--codex-text-strong, #1a1a1a);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .codex-contact__map-card-btn:hover,
+  .codex-contact__map-card-btn:focus-visible {
+    transform: none;
+  }
+}
+
+/* CSS containment: editorial sections are independent paint/layout regions */
+.codex-editorial-section,
+.codex-editorial-card,
+.codex-editorial-action-bar,
+.codex-editorial-hero,
+.codex-editorial-jump-nav {
+  contain: layout style;
+}
+
+/* Defer rendering of off-screen editorial sections (only when already visible — avoids conflict with scroll reveal) */
+.codex-editorial-section.is-visible,
+.codex-editorial-card.is-visible {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 300px;
+}
+
+/* Guard against long unbreakable strings */
+.codex-editorial-page,
+.codex-editorial-hero-copy,
+.codex-editorial-section,
+.codex-editorial-card,
+.codex-editorial-action-bar,
+.codex-editorial-snapshot-card,
+.codex-editorial-brief-card,
+.codex-editorial-step-copy,
+.codex-editorial-answer,
+.codex-product-support,
+.codex-product-cta,
+.codex-article-support,
+.codex-collection-support,
+.codex-growth-hub,
+.codex-legacy-redirect {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Flex/grid children must allow shrinking */
+.codex-editorial-hero-copy,
+.codex-editorial-step-copy,
+.codex-growth-hub__card,
+.codex-editorial-snapshot-card {
+  min-width: 0;
+}
+
+/* Images should never exceed container */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Ensure lazy-loaded images don't cause layout shift */
+img[loading="lazy"] {
+  background: #f0eee9;
+}
+
+/* ── Homepage hero bold treatment ── */
+.entry-content > .wp-block-cover:first-child {
+  min-height: clamp(420px, 56vh, 680px);
+}
+
+.entry-content > .wp-block-cover:first-child .wp-block-cover__background {
+  background: linear-gradient(
+    165deg,
+    rgba(41, 28, 14, 0.82) 0%,
+    rgba(41, 28, 14, 0.55) 50%,
+    rgba(41, 28, 14, 0.35) 100%
+  ) !important;
+}
+
+.entry-content > .wp-block-cover:first-child h1 {
+  font-size: clamp(var(--codex-text-2xl), var(--codex-text-md-plus) + 3.2vw, 3.6rem);
+  font-weight: var(--codex-weight-extrabold);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #fff !important;
+  max-width: 680px;
+  margin: 0 0 var(--codex-space-2-plus);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.25);
+}
+
+.entry-content > .wp-block-cover:first-child p {
+  font-size: clamp(var(--codex-text-base), var(--codex-text-sm-plus) + 0.6vw, var(--codex-text-lg-plus));
+  color: rgba(255, 255, 255, 0.88) !important;
+  max-width: 520px;
+  margin: 0 0 var(--codex-space-7);
+  line-height: var(--codex-leading-normal);
+}
+
+.entry-content > .wp-block-cover:first-child .kb-buttons-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-3);
+}
+
+.entry-content > .wp-block-cover:first-child .kb-button {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--codex-space-3-plus) var(--codex-space-7);
+  font-size: var(--codex-text-sm-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.entry-content > .wp-block-cover:first-child .kb-button:first-child {
+  background: var(--codex-gradient-gold);
+  color: var(--codex-dark) !important;
+  box-shadow: 0 4px 16px rgba(195, 154, 95, 0.35);
+}
+
+.entry-content > .wp-block-cover:first-child .kb-button:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(195, 154, 95, 0.45);
+}
+
+.entry-content > .wp-block-cover:first-child .kb-button:nth-child(2) {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.entry-content > .wp-block-cover:first-child .kb-button:nth-child(2):hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+  .entry-content > .wp-block-cover:first-child .wp-block-cover__inner-container {
+    padding: var(--codex-space-8) var(--codex-space-5);
+  }
+  .entry-content > .wp-block-cover:first-child .kb-buttons-wrap {
+    flex-direction: column;
+  }
+  .entry-content > .wp-block-cover:first-child .kb-button {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   About Page Header
+   ═══════════════════════════════════════════ */
+
+.codex-about-header {
+  position: relative;
+  z-index: var(--codex-z-raised);
+  max-width: 720px;
+  margin: 0 auto var(--codex-space-6);
+  padding: var(--codex-space-10) var(--codex-space-6) var(--codex-space-8);
+  text-align: center;
+}
+
+.codex-about-header h1 {
+  margin: 0 0 var(--codex-space-3);
+  color: var(--codex-text) !important;
+  font-size: clamp(var(--codex-text-xl-plus), 4vw, 2.6rem);
+  font-weight: var(--codex-weight-extrabold);
+  line-height: 1.15;
+}
+
+.codex-about-header p {
+  margin: 0;
+  color: var(--codex-text-muted) !important;
+  font-size: var(--codex-text-base);
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════
+   Quote Brief — Redesigned CTA Section
+   ═══════════════════════════════════════════ */
+
+.codex-quote-brief {
+  margin: var(--codex-space-10) 0;
+  padding: 2px;
+  border-radius: var(--codex-radius-card-xl);
+  background: linear-gradient(135deg, rgba(195, 154, 95, 0.4), rgba(41, 28, 14, 0.15), rgba(195, 154, 95, 0.25));
+}
+
+.codex-quote-brief__inner {
+  display: grid;
+  gap: var(--codex-space-8);
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: center;
+  padding: var(--codex-space-10) var(--codex-space-10);
+  border-radius: calc(var(--codex-radius-card-xl) - 2px);
+  background: linear-gradient(160deg, #faf8f4 0%, #fff 40%, #faf8f4 100%);
+}
+
+.codex-quote-brief__eyebrow {
+  margin: 0 0 var(--codex-space-2);
+  color: var(--codex-gold-muted);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.codex-quote-brief__copy h2 {
+  margin: 0 0 var(--codex-space-2-plus);
+  color: var(--codex-text);
+  font-size: clamp(var(--codex-text-lg-plus), 3vw, var(--codex-text-xl-plus));
+  line-height: var(--codex-leading-tight);
+}
+
+.codex-quote-brief__copy > p:not(.codex-quote-brief__eyebrow) {
+  margin: 0 0 var(--codex-space-6);
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.6;
+}
+
+.codex-quote-brief__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-3);
+}
+
+.codex-quote-brief__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  padding: var(--codex-space-2-plus) 1.4rem;
+  border: 1px solid var(--codex-border);
+  border-radius: var(--codex-radius-pill);
+  background: #fff;
+  color: var(--codex-text);
+  font-size: var(--codex-text-sm-plus);
+  font-weight: var(--codex-weight-semibold);
+  text-decoration: none;
+  transition: var(--codex-transition), background-color 160ms ease, border-color 160ms ease;
+}
+
+.codex-quote-brief__btn--primary {
+  border-color: transparent;
+  background: var(--codex-gradient-dark);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(41, 28, 14, 0.18);
+}
+
+.codex-quote-brief__btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(41, 28, 14, 0.12);
+}
+
+.codex-quote-brief__btn--primary:hover {
+  box-shadow: 0 12px 28px rgba(41, 28, 14, 0.22);
+}
+
+.codex-quote-brief__checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.codex-quote-brief__item {
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-3-plus);
+  padding: var(--codex-space-3-plus) var(--codex-space-4);
+  border-bottom: 1px solid var(--codex-border-light);
+  color: var(--codex-text);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.45;
+}
+
+.codex-quote-brief__item:first-child {
+  border-top: 1px solid var(--codex-border-light);
+}
+
+.codex-quote-brief__item:last-child {
+  border-bottom: none;
+}
+
+.codex-quote-brief__step-label {
+  padding: 0 var(--codex-space-4) var(--codex-space-2);
+  color: var(--codex-gold-muted);
+  font-size: var(--codex-text-2xs);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.codex-quote-brief__icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--codex-space-9);
+  height: var(--codex-space-9);
+  border-radius: 10px;
+  background: rgba(195, 154, 95, 0.08);
+  color: var(--codex-gold-muted);
+}
+
+.codex-quote-brief__icon svg {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .codex-quote-brief__inner {
+    grid-template-columns: 1fr;
+    padding: var(--codex-space-6);
+  }
+}
+
+.codex-growth-hub__action {
+  min-height: 2.9rem;
+  border: 1px solid var(--codex-border);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--codex-text);
+}
+
+/* ═══════════════════════════════════════════
+   Industry Selector (Homepage)
+   ═══════════════════════════════════════════ */
+
+.codex-industry-selector {
+  margin: var(--codex-space-10) auto;
+  padding: 0 var(--codex-space-6);
+  max-width: 1200px;
+}
+
+.codex-industry-selector__header {
+  text-align: center;
+  margin-bottom: var(--codex-space-8);
+}
+
+.codex-industry-selector__header h2 {
+  margin: 0 0 var(--codex-space-2);
+  font-size: var(--codex-text-xl-plus);
+  color: var(--codex-text);
+}
+
+.codex-industry-selector__header p {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-base);
+}
+
+.codex-industry-selector__grid {
+  display: grid;
+  gap: var(--codex-space-5);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.codex-industry-selector__card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding: 1.4rem var(--codex-space-6-plus);
+  border: 1px solid rgba(41, 28, 14, 0.08);
+  border-left: 4px solid var(--accent, var(--codex-gold));
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  text-decoration: none;
+  transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+}
+
+.codex-industry-selector__card:hover {
+  /* DS-9 KPI cleanup (2026-04-26) — Boosted hover lift from 3px → 6px,
+     shadow opacity 0.10 → 0.18, plus a warm bg tint and thicker
+     left-edge accent. Original lift was too subtle to feel responsive
+     when scanning the 4-card grid. */
+  transform: translateY(-6px);
+  box-shadow: 0 18px 36px rgba(41, 28, 14, 0.18), 0 4px 10px rgba(195, 154, 95, 0.12);
+  border-color: var(--accent, var(--codex-gold));
+  border-left-width: 6px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 246, 241, 0.96));
+}
+
+/* Tap feedback on touch devices — undo the lift on press for tactile feel. */
+.codex-industry-selector__card:active {
+  transform: translateY(-2px);
+  transition: transform 80ms ease;
+}
+
+.codex-industry-selector__eyebrow {
+  display: block;
+  margin-bottom: var(--codex-space-1-plus);
+  /* DS-15 Phase 6 #3 — dropped per-card --accent color binding because
+     the gold accent #c39a5f on white was 2.44:1 (failing AA at 4.5:1).
+     Card differentiation continues via the border-left accent stripe in
+     .codex-industry-selector__card; the eyebrow text now uses muted text
+     token (#4f4f4f, 8.59:1 on white, AAA). */
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-xs);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.codex-industry-selector__card strong {
+  display: block;
+  margin-bottom: var(--codex-space-1-plus);
+  color: var(--codex-text);
+  font-size: var(--codex-text-base);
+}
+
+.codex-industry-selector__card span:nth-child(3) {
+  display: block;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: var(--codex-leading-normal);
+  flex: 1;
+}
+
+.codex-industry-selector__arrow {
+  display: block;
+  margin-top: var(--codex-space-3);
+  color: var(--accent, var(--codex-gold));
+  font-size: var(--codex-text-base-plus);
+  font-weight: var(--codex-weight-semibold);
+  transition: transform 160ms ease;
+}
+
+.codex-industry-selector__card:hover .codex-industry-selector__arrow {
+  transform: translateX(4px);
+}
+
+.codex-industry-selector__compare {
+  margin-top: var(--codex-space-6);
+  padding: var(--codex-space-4) var(--codex-space-5);
+  border-radius: 12px;
+  background: rgba(248, 246, 241, 0.7);
+  text-align: center;
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.8;
+}
+
+.codex-industry-selector__compare span {
+  display: block;
+  color: var(--codex-text-muted);
+  font-weight: var(--codex-weight-medium);
+  margin-bottom: var(--codex-space-1);
+}
+
+.codex-industry-selector__compare a {
+  color: var(--codex-gold-muted);
+  text-decoration: none;
+  font-weight: var(--codex-weight-medium);
+  transition: color 160ms ease;
+}
+
+.codex-industry-selector__compare a:hover {
+  color: var(--codex-gold);
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .codex-industry-selector__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .codex-industry-selector__header h2 {
+    font-size: var(--codex-text-lg-plus);
+  }
+
+  .codex-industry-selector {
+    padding: 0 var(--codex-space-4);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Trust Bar
+   ═══════════════════════════════════════════ */
+
+.codex-trust-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--codex-space-6);
+  margin: var(--codex-space-8) 0;
+  padding: var(--codex-space-5) var(--codex-space-6);
+  border: 1px solid var(--codex-border-light);
+  border-radius: var(--codex-radius-card);
+  background: #fff;
+}
+
+.codex-trust-bar__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--codex-space-0-5);
+  min-width: 120px;
+}
+
+/* DS-9 KPI cleanup (2026-04-26) — Trust-bar number weight upgrade.
+   Original used `--codex-text-md-plus` (~18px) for the headline number,
+   which was barely larger than the label (~13px). Eye-tracking on a B2B
+   trust strip needs the number to be the visual anchor: Lora 32px bold
+   gives 2.5× contrast over the 13px Inter label and reads as data, not
+   a header. Letter-spacing tighter on the headline binds the number +
+   suffix into one mark ("10+", "500+", "ISO 9001"). */
+.codex-trust-bar__item strong {
+  color: var(--codex-text);
+  font-family: var(--codex-font-heading, "Lora", Georgia, serif);
+  font-size: var(--codex-text-2xl);          /* 32px */
+  font-weight: var(--codex-weight-bold, 700);
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.codex-trust-bar__item span {
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-xs-plus);     /* 12.8px */
+  font-weight: var(--codex-weight-medium, 500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: var(--codex-space-1);
+}
+
+@media (max-width: 767px) {
+  .codex-trust-bar {
+    gap: var(--codex-space-4);
+    padding: var(--codex-space-4);
+  }
+
+  .codex-trust-bar__item {
+    min-width: calc(50% - var(--codex-space-4));
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Contact RFQ Form
+   ═══════════════════════════════════════════ */
+
+#contact-rfq-form {
+  scroll-margin-top: 7rem;
+}
+
+#contact-rfq-form .kb-text-style-field::placeholder {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* ═══════════════════════════════════════════
+   Legacy Redirect Page
+   ═══════════════════════════════════════════ */
+
+.codex-legacy-redirect-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--codex-space-8) var(--codex-space-4);
+  background:
+    radial-gradient(circle at top left, var(--codex-border-gold), transparent 26%),
+    linear-gradient(180deg, var(--codex-bg-warm), rgba(255, 255, 255, 1));
+}
+
+.codex-legacy-redirect {
+  width: min(720px, 100%);
+  padding: var(--codex-space-6);
+  border: 1px solid var(--codex-border);
+  border-radius: var(--codex-radius-card-xl);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 42px rgba(41, 28, 14, 0.08);
+}
+
+.codex-legacy-redirect h1 {
+  margin: 0 0 var(--codex-space-3);
+  color: var(--codex-text);
+}
+
+.codex-legacy-redirect__lead,
+.codex-legacy-redirect__meta,
+.codex-legacy-redirect p:last-of-type {
+  color: var(--codex-text-muted);
+}
+
+.codex-legacy-redirect__details {
+  margin: var(--codex-space-4) 0;
+  display: grid;
+  gap: var(--codex-space-3-plus);
+}
+
+.codex-legacy-redirect__details div {
+  padding: var(--codex-space-3-plus) var(--codex-space-4);
+  border-radius: var(--codex-radius-card);
+  background: var(--codex-bg-warm);
+  border: 1px solid var(--codex-border-light);
+}
+
+.codex-legacy-redirect__details dt {
+  margin: 0 0 var(--codex-space-1);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--codex-gold);
+}
+
+.codex-legacy-redirect__details dd {
+  margin: 0;
+  word-break: break-word;
+  color: var(--codex-text);
+}
+
+.codex-legacy-redirect__action {
+  font-weight: var(--codex-weight-bold);
+}
+
+.codex-legacy-redirect__action--primary {
+  color: #fff;
+  background: var(--codex-gradient-dark);
+  border-color: transparent;
+  box-shadow: 0 12px 26px rgba(41, 28, 14, 0.14);
+}
+
+/* ═══════════════════════════════════════════
+   Homepage hero contrast + CTA hierarchy — DS-9 #5 (2026-04-26)
+   ═══════════════════════════════════════════
+   The home hero uses a Kadence cover block with a busy industrial-machinery
+   video background. The default `has-background-dim-40` overlay leaves the
+   white "Custom RFID and NFC Manufacturing for Global Buyers" headline
+   floating on metal-highlight reflections — local contrast dips below WCAG
+   AA in the brightest ~30% of the video frame.
+
+   Two-pronged fix:
+     1. Strengthen the dim with a top-down gradient that's lighter at the
+        top (so the video still reads) and darker at the bottom where the
+        headline + CTAs sit.
+     2. Add `text-shadow` as a belt-and-braces backstop in case Kadence
+        regenerates its own inline cover-block CSS that wins the cascade.
+
+   CTA hierarchy:
+     - Primary "Request Quote" (gold filled) gets size bump + drop shadow
+       to win the eye.
+     - Secondary "Request Samples" gets a ghost-button treatment so it
+       reads as supportive, not equally-weighted.
+*/
+body.home .wp-block-cover.is-light .wp-block-cover__background.has-background-dim {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.30) 0%,
+    rgba(0, 0, 0, 0.45) 50%,
+    rgba(0, 0, 0, 0.70) 100%
+  ) !important;
+  opacity: 1 !important;
+}
+
+body.home .wp-block-cover.is-light h1,
+body.home .wp-block-cover.is-light h2 {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+body.home .wp-block-cover.is-light p {
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+/* Primary CTA — first button inside the hero kb-buttons-wrap. */
+body.home .wp-block-cover.is-light .kb-buttons-wrap > a:first-child {
+  font-size: 1.05rem;
+  font-weight: var(--codex-weight-bold, 700);
+  padding-block: var(--codex-space-3, 0.75rem);
+  padding-inline: var(--codex-space-6, 1.5rem);
+  box-shadow: 0 8px 24px rgba(195, 154, 95, 0.35), 0 2px 6px rgba(0, 0, 0, 0.18);
+  letter-spacing: 0.02em;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+body.home .wp-block-cover.is-light .kb-buttons-wrap > a:first-child:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(195, 154, 95, 0.5), 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Secondary CTA — second button reads as ghost / supportive. */
+body.home .wp-block-cover.is-light .kb-buttons-wrap > a:nth-child(2) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+  color: #ffffff !important;
+  font-weight: var(--codex-weight-medium, 500);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  transition: background 200ms ease;
+}
+
+body.home .wp-block-cover.is-light .kb-buttons-wrap > a:nth-child(2):hover {
+  background: rgba(255, 255, 255, 0.18) !important;
+  background-color: rgba(255, 255, 255, 0.18) !important;
+}
+

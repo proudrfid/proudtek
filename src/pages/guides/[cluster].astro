@@ -1,0 +1,211 @@
+---
+/**
+ * Cluster hub page for /guides/{cluster}/.
+ *
+ * Renders 7 cluster overview pages (one per entry in GUIDE_CLUSTERS):
+ *   /guides/google-review-cards/
+ *   /guides/hotel-keycards/
+ *   /guides/chip-encyclopedias/
+ *   /guides/standards-encoding/
+ *   /guides/compliance-regulatory/
+ *   /guides/integration-tools/
+ *   /guides/buying-reference/
+ *
+ * Architecture note (debt:editorial-pages decoupling):
+ * This is the FIRST editorial-style page in the codebase rendered as a
+ * native .astro component (instead of through editorial-pages.ts string
+ * concat). It pioneers the path-3 component pattern. See
+ * docs/architecture/editorial-rendering-debt.md.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { GUIDE_CLUSTERS } from "../../data/guide-clusters";
+import type { GuideCluster } from "../../data/guide-clusters";
+import type { PageSeoData } from "../../lib/seo";
+import { buildGuideClustersRailHtml } from "../../lib/seo/guides-rail";
+import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { getPageByRoute } from "../../lib/site-data";
+
+interface Props {
+  cluster: GuideCluster;
+}
+
+const SITE_ORIGIN = "https://www.proudtek.com";
+
+function buildClusterSeo(cluster: GuideCluster, count: number): PageSeoData {
+  const route = `/guides/${cluster.id}/`;
+  const canonicalUrl = `${SITE_ORIGIN}${route}`;
+  const title = cluster.seoTitle;
+
+  const breadcrumbLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN + "/" },
+      { "@type": "ListItem", position: 2, name: "Resources", item: SITE_ORIGIN + "/resources/" },
+      { "@type": "ListItem", position: 3, name: "Buying Guides", item: SITE_ORIGIN + "/guides/" },
+      { "@type": "ListItem", position: 4, name: cluster.label, item: canonicalUrl },
+    ],
+  });
+
+  const collectionLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": canonicalUrl,
+    name: cluster.label,
+    description: cluster.description,
+    url: canonicalUrl,
+    isPartOf: { "@type": "WebSite", name: "Proud Tek", url: SITE_ORIGIN + "/" },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: count,
+      itemListElement: cluster.slugs.map((slug, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        url: `${SITE_ORIGIN}/guides/${slug}/`,
+      })),
+    },
+  });
+
+  return {
+    htmlAttrs: { lang: "en" },
+    bodyAttrs: { class: "page-cluster-hub" },
+    headHtml: "",
+    bodyHtml: "",
+    kind: "core",
+    contentTitle: cluster.label,
+    title,
+    description: cluster.description,
+    canonicalUrl,
+    robots: "index, follow",
+    indexable: true,
+    jsonLd: [breadcrumbLd, collectionLd],
+    imageUrl: "",
+    imageAlt: `${cluster.label} buyer's guides — Proud Tek`,
+    imageGallery: [],
+    faqEntries: [],
+    procurementFields: [],
+    collectionSummary: [],
+    collectionGuidanceFields: [],
+    collectionRelatedPages: [],
+    collectionSourceLinks: [],
+    coreSummary: cluster.pillars,
+    coreGuidanceFields: [],
+    coreRelatedPages: [],
+    coreSourceLinks: [],
+    articleSummary: [],
+    articleGuidanceFields: [],
+    articleRelatedPages: [],
+    articleSourceLinks: [],
+    productRelatedPages: [],
+    productSourceLinks: [],
+    ogType: "website",
+    articleMeta: null,
+  };
+}
+
+export async function getStaticPaths() {
+  return GUIDE_CLUSTERS.map((cluster) => ({
+    params: { cluster: cluster.id },
+    props: { cluster },
+  }));
+}
+
+const { cluster } = Astro.props as Props;
+
+// Pull every guide entry once and filter to this cluster.
+const allEditorial = await getCollection("editorial");
+const guidesById = new Map<string, ReturnType<typeof Object>>();
+for (const entry of allEditorial) {
+  // entry.id looks like "guides/some-slug" — strip the prefix.
+  const m = entry.id.match(/^guides\/(.+)$/);
+  if (m) guidesById.set(m[1], entry.data);
+}
+
+// Order matches cluster.slugs (curator-controlled). Skip any slug whose
+// JSON went missing — defensive.
+const clusterGuides = cluster.slugs
+  .map((slug) => ({ slug, data: guidesById.get(slug) }))
+  .filter((x): x is { slug: string; data: any } => Boolean(x.data));
+
+const seo = buildClusterSeo(cluster, clusterGuides.length);
+const railHtml = buildGuideClustersRailHtml(cluster.id);
+
+// Pull the WP site header + footer chrome from a donor snapshot so cluster
+// hubs render with the same masthead + footer every other page has. See
+// src/lib/seo/snapshot-chrome.ts for the rationale.
+//
+// Donor priority: /guides/ if it exists (was synthesized from
+// guides.json), then /resources/, then /about/ as a safe floor. After the
+// guides.json pillar was deleted (audit priority #4) the first lookup
+// returns undefined; /about/ is always present so the chain terminates.
+const currentRoute = `/guides/${cluster.id}/`;
+const donorPage =
+  (await getPageByRoute("/guides/")) ||
+  (await getPageByRoute("/resources/")) ||
+  (await getPageByRoute("/about/"));
+if (!donorPage) {
+  throw new Error(
+    "[cluster].astro: no chrome donor snapshot (/guides/, /resources/, /about/ all missing)",
+  );
+}
+const chrome = extractChromeFromSnapshot(donorPage, currentRoute);
+// Merge donor htmlAttrs/bodyAttrs into seo so <html lang=…> and <body class=…>
+// match the rest of the site (Kadence layout classes, transparent-header, etc.).
+seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
+seo.bodyAttrs = {
+  ...chrome.bodyAttrs,
+  ...seo.bodyAttrs,
+  // Preserve our own page class on top of the donor's
+  class: [chrome.bodyAttrs.class, seo.bodyAttrs.class].filter(Boolean).join(" "),
+};
+// Inject the donor's <head> (WP Kadence stylesheets, font links, theme CSS)
+// so the site header / mega-menu / footer markup actually renders styled.
+// Without this, the bare HTML shows giant unstyled logo + plain-text menu.
+seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
+---
+
+<BaseLayout seo={seo}>
+  {/* WP site header + #wrapper / #inner-wrap / #primary / .content-container
+      opening — extracted from the /guides/ snapshot, so the masthead nav
+      matches every other page. */}
+  <Fragment set:html={chrome.beforeMainHtml} />
+
+  <main id="main" class="site-main" role="main">
+    {/* Left rail (same shape as /blog/ + /guides/) */}
+    <Fragment set:html={railHtml} />
+
+    {/* Mirror /blog/ hub layout exactly: .codex-blog-index .codex-blog-index--with-rail
+        wrapper with simple header (H1 + 1-line description) + flat 3-col grid. */}
+    <section class="codex-blog-index codex-blog-index--with-rail" aria-label={`${cluster.label} guides`}>
+      <div class="codex-blog-index__header">
+        <h1>{cluster.icon} {cluster.label}</h1>
+        <p>{clusterGuides.length} guides — {cluster.description}</p>
+      </div>
+      <div class="codex-blog-index__grid">
+        {clusterGuides.map(({ slug, data }) => (
+          <a class="codex-card codex-blog-grid-card" href={`/guides/${slug}/`}>
+            {data.heroImage && (
+              <img
+                class="codex-blog-grid-card__thumb"
+                src={data.heroImage}
+                alt={data.imageAlt || data.title}
+                width="1200"
+                height="675"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+            <span class="codex-blog-grid-card__tag">{data.kicker || cluster.label}</span>
+            <strong>{data.title}</strong>
+            <p>{data.summary}</p>
+            <span class="codex-blog-grid-card__cta">Read guide →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  {/* WP footer + closing of #wrapper / #inner-wrap / #primary / .content-container */}
+  <Fragment set:html={chrome.afterMainHtml} />
+</BaseLayout>

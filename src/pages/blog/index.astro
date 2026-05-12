@@ -1,0 +1,246 @@
+---
+/**
+ * /blog/ — engineering blog hub.
+ *
+ * Native .astro hub matching /compare/ and /guides/. Reads the editorial
+ * collection (group === "blog"), classifies each post into one of the
+ * BLOG_TOPICS (a small taxonomy over hand-written kickers), and renders:
+ *   - Left rail with topic navigation (buildBlogTopicsRailHtml)
+ *   - .codex-blog-index header (H1 + one-line count description)
+ *   - Single flat 3-column grid of every blog card
+ *   - Inline filter script (rail link click → hide non-matching cards)
+ *
+ * Replaces the previous WP-snapshot rendering of /blog/ via
+ * `injectBlogArticleGrid` in src/lib/seo/blog-body.ts (now dead code,
+ * intentionally not deleted yet — see note at the function definition).
+ *
+ * Individual blog posts (/blog/{slug}/) are unaffected — they still
+ * render through [...slug].astro + the editorial pipeline.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import {
+  BLOG_TOPICS,
+  classifyBlogKicker,
+  getBlogThumbnails,
+} from "../../data/blog-topics";
+import type { PageSeoData } from "../../lib/seo";
+import { buildBlogTopicsRailHtml, initBlogDefinitions } from "../../lib/seo/blog-body";
+import { buildRailFilterScript } from "../../lib/seo/rail";
+import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { getPageByRoute } from "../../lib/site-data";
+import { truncateText } from "../../lib/seo/utils";
+
+const SITE_ORIGIN = "https://www.proudtek.com";
+const ROUTE = "/blog/";
+const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
+
+// ── Pull every blog editorial entry ──
+// Filter rules mirror initBlogDefinitions() in src/lib/seo/blog-body.ts:
+//   - skip _unused/
+//   - require group === "blog"
+//   - skip the pillar itself (/blog/ → that's this page)
+const allEditorial = await getCollection("editorial");
+const blogEntries = allEditorial
+  .filter(
+    (e) =>
+      !e.id.startsWith("_unused/") &&
+      e.data.group === "blog" &&
+      e.data.route !== "/blog/",
+  )
+  .map((e) => {
+    const kicker = e.data.kicker || "RFID Technology";
+    return {
+      route: e.data.route,
+      title: e.data.title,
+      summary: e.data.summary,
+      kicker,
+      topicId: classifyBlogKicker(kicker),
+      heroImage: e.data.heroImage ?? "",
+    };
+  });
+
+// Display order: rail order first (BLOG_TOPICS order), then editorial-collection
+// order within each topic. Same shape used by injectBlogArticleGrid before the
+// migration, so the rendered card order doesn't change.
+const topicOrder = new Map<string, number>(
+  BLOG_TOPICS.map((t, idx) => [t.id, idx]),
+);
+blogEntries.sort((a, b) => {
+  const ai = topicOrder.get(a.topicId) ?? Number.MAX_SAFE_INTEGER;
+  const bi = topicOrder.get(b.topicId) ?? Number.MAX_SAFE_INTEGER;
+  return ai - bi;
+});
+
+const thumbMap = getBlogThumbnails();
+const allPosts = blogEntries.map((post) => ({
+  ...post,
+  thumb: post.heroImage || thumbMap[post.route] || "",
+}));
+
+const TOTAL_POSTS = allPosts.length;
+
+// ── Build SEO ──
+const breadcrumbLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN + "/" },
+    { "@type": "ListItem", position: 2, name: "Resources", item: SITE_ORIGIN + "/resources/" },
+    { "@type": "ListItem", position: 3, name: "Blog", item: CANONICAL_URL },
+  ],
+});
+
+const collectionLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "@id": CANONICAL_URL,
+  name: "Proud Tek Engineering Blog",
+  description: `${TOTAL_POSTS} technical posts on RFID, NFC, smart cards, encoding workflows, and compliance — written by the Proud Tek engineering team.`,
+  url: CANONICAL_URL,
+  isPartOf: { "@type": "WebSite", name: "Proud Tek", url: SITE_ORIGIN + "/" },
+  blogPost: allPosts.map((p) => ({
+    "@type": "BlogPosting",
+    url: `${SITE_ORIGIN}${p.route}`,
+    headline: p.title,
+  })),
+});
+
+const seo: PageSeoData = {
+  htmlAttrs: { lang: "en" },
+  bodyAttrs: { class: "page-blog-hub" },
+  headHtml: "",
+  bodyHtml: "",
+  kind: "core",
+  contentTitle: "RFID & NFC Knowledge Base",
+  title: `Proud Tek Engineering Blog — ${TOTAL_POSTS} Technical Posts on RFID, NFC & Smart Cards`,
+  description: `Browse all ${TOTAL_POSTS} Proud Tek engineering blog posts — chip-family selection, reader compatibility, encoding workflows, compliance, and deployment edge cases.`,
+  canonicalUrl: CANONICAL_URL,
+  robots: "index, follow",
+  indexable: true,
+  jsonLd: [breadcrumbLd, collectionLd],
+  imageUrl: "",
+  imageAlt: "Proud Tek engineering blog — RFID and NFC technical notes",
+  imageGallery: [],
+  faqEntries: [],
+  procurementFields: [],
+  collectionSummary: [],
+  collectionGuidanceFields: [],
+  collectionRelatedPages: [],
+  collectionSourceLinks: [],
+  coreSummary: [
+    `${TOTAL_POSTS} technical posts organized into ${BLOG_TOPICS.length} topics`,
+    "Chip-family deep dives, reader compatibility, encoding, and compliance",
+    "Written by the Proud Tek engineering team, reviewed against current spec sheets",
+  ],
+  coreGuidanceFields: [],
+  coreRelatedPages: [],
+  coreSourceLinks: [],
+  articleSummary: [],
+  articleGuidanceFields: [],
+  articleRelatedPages: [],
+  articleSourceLinks: [],
+  productRelatedPages: [],
+  productSourceLinks: [],
+  ogType: "website",
+  articleMeta: null,
+};
+
+// ── WP chrome donor ──
+// Prefer the /blog/ snapshot (which still exists in site-meta.json) so the
+// masthead + footer match what users see today. Fall back to /resources/
+// and /about/ for safety.
+const donorPage =
+  (await getPageByRoute("/blog/")) ||
+  (await getPageByRoute("/resources/")) ||
+  (await getPageByRoute("/about/"));
+if (!donorPage) {
+  throw new Error(
+    "blog/index.astro: no chrome donor snapshot (/blog/, /resources/, /about/ all missing)",
+  );
+}
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
+seo.bodyAttrs = {
+  ...chrome.bodyAttrs,
+  ...seo.bodyAttrs,
+  class: [chrome.bodyAttrs.class, seo.bodyAttrs.class].filter(Boolean).join(" "),
+};
+seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
+
+// Pre-load the blog defs cache so buildBlogTopicsRailHtml works. The cache
+// is normally populated by initBlogDefinitions() called from site-data.ts;
+// it's idempotent so calling it again here is safe and avoids ordering
+// surprises when the hub is rendered before site-data has touched things.
+await initBlogDefinitions();
+
+const railHtml = buildBlogTopicsRailHtml({ hrefPrefix: "", activeTopicId: undefined });
+const filterScript = buildRailFilterScript({
+  filterMode: "in-place",
+  hubAnchorId: "topic-all",
+  hubPath: "/blog/",
+});
+
+/**
+ * Compare hub used `shortenCardTitle` to strip the SEO subtitle after an
+ * em-dash; blog posts are written tighter so we don't apply that here — but
+ * we still truncate the summary so the card height stays in the same rhythm.
+ */
+---
+
+<BaseLayout seo={seo}>
+  <Fragment set:html={chrome.beforeMainHtml} />
+
+  <main id="main" class="site-main" role="main">
+    <Fragment set:html={railHtml} />
+
+    <section
+      class="codex-blog-index codex-blog-index--with-rail"
+      id="topic-all"
+      aria-label="Blog articles"
+    >
+      <div class="codex-blog-index__header">
+        <h1>RFID &amp; NFC Knowledge Base</h1>
+        <p>
+          {TOTAL_POSTS} technical guides for procurement teams evaluating RFID cards, tags, labels,
+          readers, keyfobs and wristbands.
+        </p>
+      </div>
+      <div class="codex-blog-index__grid">
+        {allPosts.map((post) => (
+          <a
+            class="codex-card codex-blog-grid-card"
+            href={post.route}
+            data-rail-key={post.topicId}
+            data-kicker={post.kicker}
+          >
+            {post.thumb && (
+              <img
+                class="codex-blog-grid-card__thumb"
+                src={post.thumb}
+                alt={post.title}
+                width="1200"
+                height="675"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+            <span class="codex-blog-grid-card__tag">{post.kicker}</span>
+            <strong>{post.title}</strong>
+            <p>{truncateText(post.summary, 120)}</p>
+            <span class="codex-blog-grid-card__cta">Read guide →</span>
+          </a>
+        ))}
+      </div>
+      <div class="codex-blog-index__empty" hidden>
+        <div class="codex-blog-index__empty-icon" aria-hidden="true">🔍</div>
+        <h3>No articles in this topic yet</h3>
+        <p>Try another topic, or view all articles.</p>
+        <button type="button" class="codex-blog-index__empty-clear">Show all articles</button>
+      </div>
+      <script is:inline set:html={filterScript} />
+    </section>
+  </main>
+
+  <Fragment set:html={chrome.afterMainHtml} />
+</BaseLayout>

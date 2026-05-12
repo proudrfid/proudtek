@@ -1,23 +1,39 @@
 ---
 /**
- * Grid of resource link cards.
- * Replaces renderResourceGrid() from editorial-pages.ts.
+ * "Useful next pages" — grid of resource cards at the bottom of every page.
+ *
+ * Shadow component (Stage 2). Mirrors `renderResourceGrid(cards, id)` in
+ * editorial-pages.ts (~line 2172).
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialResourceCard[]
  */
-import type { EditorialResourceCard } from "../../lib/editorial-types";
 import ResourceCard from "./ResourceCard.astro";
 
+interface ResourceLink {
+  href: string;
+  label: string;
+  description?: string;
+}
+
+interface ResourceCardData {
+  title: string;
+  description: string;
+  links: ResourceLink[];
+}
+
 interface Props {
-  cards: EditorialResourceCard[];
+  cards: ResourceCardData[];
   id: string;
 }
 
 const { cards, id } = Astro.props;
 ---
-
 <section class="codex-editorial-section codex-editorial-resource-shell" id={id}>
   <h2>Useful next pages</h2>
   <p class="codex-editorial-section-intro">Use these linked product, guide and comparison pages to keep the next click specific and practical.</p>
   <div class="codex-editorial-resource-grid">
-    {cards.map((card) => <ResourceCard card={card} />)}
+    {cards.map((card) => (
+      <ResourceCard card={card} />
+    ))}
   </div>
 </section>

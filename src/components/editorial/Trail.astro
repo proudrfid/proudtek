@@ -1,0 +1,94 @@
+---
+/**
+ * Breadcrumb navigation — Home / Section / [Current page].
+ *
+ * Shadow component (Stage 2). Mirrors `renderTrail(definition)` in
+ * editorial-pages.ts (~line 1686).
+ *
+ * Route-based parent resolution preserved verbatim from the TS version:
+ *   - /products/<cluster>/ routes → cluster pillar parent
+ *   - /industries/* → Industries
+ *   - solutions / compare / compatibility / guides / blog → resources hub
+ *     with anchor
+ *   - resources → just Resources crumb (already a section root)
+ *   - everything else → Contact (fallback)
+ *
+ * For non-section-root routes the page title is shortened: split on
+ * em-dash / en-dash / pipe / colon, take the first segment, cap at 60 chars
+ * with ellipsis. DS-9 KPI cleanup behavior.
+ */
+import type { EditorialDefinition, EditorialLink } from "../../lib/editorial-types";
+import { isBreadcrumbSectionRoot } from "../../lib/editorial-pages";
+import { rewriteContactHref } from "../../lib/editorial-shadow-normalizers";
+
+interface Props {
+  definition: EditorialDefinition;
+}
+
+const { definition } = Astro.props;
+
+const links: EditorialLink[] = [{ href: "/", label: "Home" }];
+
+if (definition.route.startsWith("/products/rfid-cards/")) {
+  links.push({ href: "/products/rfid-cards/", label: "RFID Cards" });
+} else if (definition.route.startsWith("/products/rfid-labels/")) {
+  links.push({ href: "/products/rfid-labels/", label: "RFID Labels" });
+} else if (definition.route.startsWith("/products/rfid-tags/")) {
+  links.push({ href: "/products/rfid-tags/", label: "RFID Tags" });
+} else if (definition.route.startsWith("/industries/")) {
+  links.push({ href: "/industries/", label: "Industries" });
+} else if (definition.route.startsWith("/products/rfid-wristbands/")) {
+  links.push({ href: "/products/rfid-wristbands/", label: "RFID Wristbands" });
+} else if (definition.route.startsWith("/products/rfid-keyfobs/")) {
+  links.push({ href: "/products/rfid-keyfobs/", label: "RFID Keyfobs" });
+} else if (definition.route.startsWith("/products/")) {
+  links.push({ href: "/products/all/", label: "Products" });
+} else if (definition.group === "solutions") {
+  links.push({ href: "/solutions/", label: "Solutions" });
+} else if (definition.group === "compare") {
+  links.push({ href: "/resources/", label: "Resources" });
+  links.push({ href: "/resources/#resources-hub-grid-compare", label: "Product Comparisons" });
+} else if (definition.group === "compatibility") {
+  links.push({ href: "/resources/", label: "Resources" });
+  links.push({ href: "/resources/#resources-hub-grid-compatibility", label: "Hotel Lock Compatibility" });
+} else if (definition.group === "guides") {
+  links.push({ href: "/resources/", label: "Resources" });
+  links.push({ href: "/resources/#resources-hub-grid-guides", label: "Buying Guides" });
+} else if (definition.group === "blog") {
+  links.push({ href: "/resources/", label: "Resources" });
+  links.push({ href: "/resources/#resources-hub-grid-blog", label: "Blog — Industry Articles" });
+} else if (definition.group === "resources") {
+  links.push({ href: "/resources/", label: "Resources" });
+} else {
+  links.push({ href: "/contact/", label: "Contact" });
+}
+
+if (!isBreadcrumbSectionRoot(definition.route)) {
+  const shortTitle = definition.title.split(/—|–|\||:/, 1)[0]?.trim() || definition.title;
+  const trimmed = shortTitle.length > 60 ? shortTitle.slice(0, 57).trimEnd() + "…" : shortTitle;
+  links.push({ href: definition.route, label: trimmed });
+}
+
+// Stage 3 shadow normalizer (sprint 1): the legacy cheerio post-process
+// rewrites `a[href="/contact/"]` anywhere inside entry-content — including
+// the breadcrumb Contact fallback emitted above for routes that don't fit
+// a more specific parent (compare/guides/products/industries/etc fall into
+// their own branches, but lp/* routes hit this fallback). Apply the same
+// rewrite at render time so the trail crumb's href matches production.
+const routedLinks = links.map((link) => ({
+  ...link,
+  href: rewriteContactHref(link.href, definition.route, definition.title),
+}));
+---
+<nav class="codex-editorial-trail" aria-label="Breadcrumb">
+  {routedLinks.map((link, index) => (
+    <>
+      {index === routedLinks.length - 1 ? (
+        <span aria-current="page">{link.label}</span>
+      ) : (
+        <a href={link.href}>{link.label}</a>
+      )}
+      {index < routedLinks.length - 1 && <span>/</span>}
+    </>
+  ))}
+</nav>

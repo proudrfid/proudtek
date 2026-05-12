@@ -1,0 +1,45 @@
+---
+/**
+ * Editorial section variant — before/after comparison panel.
+ *
+ * Shadow component (Stage 2). Mirrors the inline expression in
+ * editorial-pages.ts around `const comparePanelHtml = section.comparePanel ? ... : ""`.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["comparePanel"]
+ *   beforeHeading?: string     // defaults to "Before"
+ *   afterHeading?:  string     // defaults to "After"
+ *   before: string[]           // items support inline markdown + citations
+ *   after:  string[]
+ */
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface Props {
+  beforeHeading?: string;
+  afterHeading?: string;
+  before: string[];
+  after: string[];
+  citations?: CitationCtx;
+}
+
+const { beforeHeading, afterHeading, before, after, citations } = Astro.props;
+const beforeLabel = beforeHeading ?? "Before";
+const afterLabel = afterHeading ?? "After";
+---
+<div class="codex-editorial-compare" role="group" aria-label="Before vs after comparison">
+  <div class="codex-editorial-compare__col codex-editorial-compare__col--before">
+    <h3>{beforeLabel}</h3>
+    <ul class="codex-editorial-list">
+      {before.map((item) => (
+        <li set:html={renderInlineLinks(item, citations)} />
+      ))}
+    </ul>
+  </div>
+  <div class="codex-editorial-compare__col codex-editorial-compare__col--after">
+    <h3>{afterLabel}</h3>
+    <ul class="codex-editorial-list">
+      {after.map((item) => (
+        <li set:html={renderInlineLinks(item, citations)} />
+      ))}
+    </ul>
+  </div>
+</div>

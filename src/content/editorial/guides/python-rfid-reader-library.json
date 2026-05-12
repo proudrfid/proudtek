@@ -5,8 +5,8 @@
   "kicker": "Python RFID Library Guide",
   "summary": "A Python developer's guide to the RFID reader library ecosystem. Nfcpy for NFC/HF reading and writing with PC/SC and USB readers, sllurp for LLRP-based UHF fixed-reader integration, pyscard for smart-card APDU communication, MFRC522 and PN532 libraries for Raspberry Pi and microcontroller-scale projects, libnfc Python bindings for low-level NFC control, and vendor-specific Python SDKs (python-mercuryapi, Impinj Octane bindings, Chainway Android Python bridges). This page covers the full Python RFID landscape with code patterns, reader hardware compatibility, tag-chip selection for prototyping and the Proud Tek sample kits sized for Python developers, researchers and makers.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2025-11-30",
-  "reviewedAt": "2025-12-04",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -22,8 +22,8 @@
     "The Python RFID library choice is driven by three questions. What frequency/standard is the programme (125 kHz LF, 13.56 MHz HF/NFC, 860-960 MHz UHF), what reader hardware is available (USB NFC reader, SPI RFID module, LLRP fixed reader, vendor-specific device) and what is the use case (prototyping, research, production integration, edge-device deployment). Matching the library to those three dimensions keeps the project on a short ramp rather than fighting platform mismatches.",
     "Proud Tek supplies Python-developer-friendly sample kits and production-scale tags across the full ecosystem. NTAG 213/215/216 NFC stickers for nfcpy and pyscard development, MIFARE Classic 1K/4K and DESFire EV3 cards for access-control prototyping, ISO 15693 (ICODE SLIX) tags for industrial research, and UHF RFID inlays with Impinj Monza and M700/M750/M800 chips for sllurp and vendor-SDK development. Sample kits ship with TID-to-EPC mapping CSVs and chip-family documentation ready to import into Python applications."
   ],
-  "imageAlt": "Python RFID development setup with ACR122U USB NFC reader reading NTAG sticker and Raspberry Pi MFRC522 module",
-  "heroImage": "/landing-images/ntag213-nfc-sticker.jpg",
+  "imageAlt": "Circuit board with RFID reader chip — Python RFID library nfcpy/sllurp/pyscard ecosystem reference",
+  "heroImage": "/blog-images/circuit-board.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/ntag213-nfc-sticker/",
     "/products/rfid-labels/uhf-rfid-inlay/"
@@ -39,7 +39,7 @@
         "NDEF record handling: nfcpy ships a companion `ndeflib` package providing Python classes for the major NDEF record types (URI, Text, Smart Poster, vCard, Wi-Fi Simple Configuration, Bluetooth Simple Pairing). Building an NDEF message is a matter of composing record objects and assigning to `tag.ndef.records`, which triggers the write on session close.",
         "nfcpy limitations: doesn't provide direct MIFARE Classic Crypto1 access (use pyscard or libnfc for MIFARE Classic); may require specific udev rules on Linux to give the user access to USB readers without root; some NFC Forum Type 4 tags require careful APDU sequencing which nfcpy partially abstracts. For advanced MIFARE DESFire work, pyscard or custom APDU libraries are usually preferable.",
         "Common use cases: consumer NFC app prototyping (build a custom URL/vCard programmer for your Google Review or business card programme), NDEF content validation (batch-scan programmed tags to verify encoding), research projects (signal analysis, Tag Forum compliance testing), classroom teaching and maker projects. Pairs especially well with Proud Tek NTAG 213/215/216 stickers as the cheap, universally compatible tag target.",
-        "Python version and platform support. Nfcpy officially supports Python 3.7+ (older 3.5/3.6 compatibility was dropped in nfcpy 1.0); pinning `nfcpy>=1.0,<2.0` in requirements.txt is the current convention. Linux is the best-supported platform; macOS works with libusb installed via Homebrew; Windows requires Zadig to install WinUSB drivers for the NFC reader (driver replacement is required to bypass the built-in ACS/Sony driver). Docker containers need `--device=/dev/bus/usb` passthrough and the matching udev rules on the host.",
+        "Python version and platform support. nfcpy 1.0 dropped Python 2 and ships under EUPL on GitHub; the latest documented release as of May 2026 is `1.0.4` per nfcpy.readthedocs.io. Pin `nfcpy>=1.0,<2.0` in requirements.txt; the companion `ndeflib` package is installed automatically. Linux is the best-supported platform; macOS works with libusb installed via Homebrew; Windows requires Zadig to install WinUSB drivers for the NFC reader (driver replacement is required to bypass the built-in ACS/Sony driver). Docker containers need `--device=/dev/bus/usb` passthrough and the matching udev rules on the host.",
         "Integration with Flask/FastAPI webhooks. A common deployment pattern wraps nfcpy in a systemd service that posts tag reads to an internal HTTP endpoint. Example: nfcpy on-connect callback calls `requests.post('http://localhost:8000/rfid/event', json={'uid': tag.identifier.hex(), 'ndef': [str(r) for r in tag.ndef.records]})`, and a FastAPI backend receives the event and routes to downstream systems. Keeps reader I/O isolated from business logic and gives Ops a clean service boundary."
       ]
     },
@@ -77,8 +77,8 @@
         "Chainway handheld Android-Python bridges. Chainway UHF handheld readers run Android with Java/Kotlin SDKs. For Python projects on handhelds, developers typically use pyjnius or similar bridges to invoke the Chainway Java SDK from Python running on the handheld. Alternatively, the handheld can publish tag events over TCP/WebSocket to a Python server.",
         "Serial UHF readers: budget Chinese UHF readers (Chafon, Yanzeo, JLT) use proprietary serial command protocols over USB or RS-232. Community Python libraries (`uhf-rfid`, `chafon-reader-python`) abstract these protocols; pyserial handles the raw serial layer. Useful for low-cost UHF prototyping but with limited feature depth compared to LLRP-based readers.",
         "REST/MQTT UHF integration. Modern smart readers (Impinj R700/R720, Zebra FXR90 with recent firmware) publish tag events over MQTT and expose configuration via REST. Python integration uses paho-mqtt for MQTT subscription and requests for REST configuration, bypassing LLRP entirely. This is the preferred pattern for cloud-native UHF RFID architectures in 2024-2026.",
-        "RAIN Alliance RF-Control API. Emerging in 2025 as a standardized HTTPS+OAuth2 control surface for UHF readers (succeeding LLRP for cloud-native deployments). Early adopters include Impinj R-series firmware 3.0+ and Zebra FXR90 firmware 3.1+. Python clients use `httpx` or `requests` for the REST layer and `websockets` for event streaming. Still evolving: pin to a specific reader firmware version if targeting RF-Control in production before the spec stabilizes (target GA: Q4 2026 per RAIN Alliance roadmap).",
-        "Performance envelope: sllurp on a modern x86 server sustains 3,000-6,000 tag reads per second per reader before the Python GIL becomes the bottleneck. For higher throughput, split reader callbacks into a C extension (Cython) or move tag filtering to the reader (ROSpec `C1G2TagInventoryMask`) so Python only sees unique, filtered reads. Impinj's ItemSense and Zebra's FX Connect do reader-side filtering; RAIN Alliance RF-Control exposes similar capabilities as a standard."
+        "RAIN Communication Interface (RCI). The RAIN Alliance maintains the RAIN Communication Interface Guideline as a vendor-neutral simplified-command surface for RAIN UHF readers. The current published version is RCI v4 (released under Apache License 2.0 on the RAIN Alliance site), with crypto and sensor support and multi-tag detection added; v5 is in active development. RCI is positioned as a complement to LLRP rather than a replacement and is implemented in Python today via reader-vendor SDKs that wrap RCI behind their own clients (JADAK, others). Treat any 'RCI is the new LLRP' marketing claim sceptically and verify which RCI version a specific reader firmware actually implements before committing to it as the primary control plane.",
+        "Performance envelope: sllurp on a modern x86 server sustains 3,000-6,000 tag reads per second per reader before the Python GIL becomes the bottleneck. For higher throughput, split reader callbacks into a C extension (Cython) or move tag filtering to the reader (ROSpec `C1G2TagInventoryMask`) so Python only sees unique, filtered reads. Impinj's ItemSense and Zebra's FX Connect do reader-side filtering; RAIN Alliance RCI exposes similar capabilities as a vendor-neutral guideline."
       ]
     },
     {
@@ -112,7 +112,7 @@
       "bullets": [
         "nfcpy: NDEF read (tag UID + URL record): `import nfc; import ndef; def on_connect(tag): print('UID:', tag.identifier.hex()); if tag.ndef: [print(r) for r in tag.ndef.records]; return True; with nfc.ContactlessFrontend('usb') as clf: clf.connect(rdwr={'on-connect': on_connect})`. Run it, tap an NTAG, the script prints the UID and any NDEF records. Swap `'usb'` for `'tty:/dev/ttyUSB0'` for serial readers.",
         "nfcpy: NDEF URL write: `import nfc; import ndef; def on_connect(tag): record = ndef.UriRecord('https://proudtek.com/tag/abc123'); tag.ndef.records = [record]; print('Written'); return True; with nfc.ContactlessFrontend('usb') as clf: clf.connect(rdwr={'on-connect': on_connect})`. Tap a writable NTAG; the on_connect callback assigns a new record list which nfcpy writes on session close.",
-        "sllurp: stream tag reads from an LLRP reader: `from sllurp.llrp import LLRPReaderConfig, LLRPReaderClient; config = LLRPReaderConfig({'antennas':[1,2,3,4],'tx_power':0,'report_every_n_tags':1,'tag_content_selector':{'EnableROSpecID':True,'EnableAntennaID':True,'EnablePeakRSSI':True,'EnableFirstSeenTimestamp':True}}); client = LLRPReaderClient('192.168.1.50', 5084, config); client.add_tag_report_callback(lambda reader, tags: [print(t['EPC-96'].hex(), t['PeakRSSI']) for t in tags]); client.connect()`. Point at your Impinj or Zebra reader; tag reads stream to the callback.",
+        "sllurp: stream tag reads from an LLRP reader: `from sllurp.llrp import LLRPReaderConfig, LLRPReaderClient, LLRP_DEFAULT_PORT; config = LLRPReaderConfig({'antennas':[1,2,3,4],'tx_power':0,'report_every_n_tags':1,'tag_content_selector':{'EnableROSpecID':False,'EnableSpecIndex':False,'EnableInventoryParameterSpecID':False,'EnableAntennaID':True,'EnableChannelIndex':False,'EnablePeakRSSI':True,'EnableFirstSeenTimestamp':True,'EnableLastSeenTimestamp':True,'EnableTagSeenCount':True,'EnableAccessSpecID':False}}); client = LLRPReaderClient('192.168.1.50', LLRP_DEFAULT_PORT, config); client.add_tag_report_callback(lambda reader, tags: [print(t['EPC-96'].hex(), t['PeakRSSI']) for t in tags]); client.connect()`. The keys above are exactly the ones documented in the sllurp README; TID and User-memory reads require a separate AccessSpec C1G2Read OpSpec, not a tag_content_selector flag.",
         "pyscard: MIFARE DESFire Select Application APDU: `from smartcard.System import readers; r = readers()[0].createConnection(); r.connect(); SELECT_AID = [0x90, 0x5A, 0x00, 0x00, 0x03, 0x33, 0x22, 0x11, 0x00]; resp, sw1, sw2 = r.transmit(SELECT_AID); print(f'{sw1:02X}{sw2:02X}', bytes(resp).hex()); assert (sw1, sw2) == (0x91, 0x00)`. Status word 0x9100 confirms the application selected; further APDUs (AuthenticateEV2First 0x71, ReadData 0xAD) follow the same pattern.",
         "pyscard: MIFARE Classic read block 4 with default key: `AUTH = [0xFF, 0x86, 0x00, 0x00, 0x05, 0x01, 0x00, 0x04, 0x60, 0x00]; LOAD_KEY = [0xFF, 0x82, 0x00, 0x00, 0x06] + [0xFF]*6; READ = [0xFF, 0xB0, 0x00, 0x04, 0x10]; r.transmit(LOAD_KEY); r.transmit(AUTH); data, sw1, sw2 = r.transmit(READ); print(bytes(data).hex())`. ACR122U pseudo-APDU set. Other readers use slightly different command prefixes.",
         "MFRC522 on Raspberry Pi. Read UID: `from mfrc522 import SimpleMFRC522; reader = SimpleMFRC522(); id, text = reader.read(); print('UID:', id, 'Text:', text)`. Wire MFRC522 module: SDA→GPIO8(CE0), SCK→GPIO11, MOSI→GPIO10, MISO→GPIO9, IRQ→unused, GND→GND, RST→GPIO25, 3.3V→3.3V. Enable SPI in raspi-config; install with `pip install mfrc522 spidev RPi.GPIO`.",
@@ -242,18 +242,25 @@
       "note": "Canonical Python wrapper around PC/SC for APDU-level smart card and contactless access cited throughout the pyscard sections."
     },
     {
-      "label": "nfcpy — NFC Python module",
+      "label": "nfcpy — NFC Python module (current release 1.0.4)",
       "url": "https://nfcpy.readthedocs.io/",
       "publisher": "nfcpy project",
-      "accessedAt": "2026-04-20",
-      "note": "Primary docs for the NFC Forum Type 1–5 tag operations shown in the NDEF/URI examples."
+      "accessedAt": "2026-05-10",
+      "note": "Primary docs for the NFC Forum Type 1–5 tag operations shown in the NDEF/URI examples. Latest documented release as of May 2026 is 1.0.4."
     },
     {
-      "label": "sllurp — Python LLRP client library",
+      "label": "sllurp — Python LLRP client library (README and API)",
       "url": "https://github.com/sllurp/sllurp",
       "publisher": "sllurp (GitHub)",
-      "accessedAt": "2026-04-20",
-      "note": "Open-source Python LLRP client cited for Impinj/Zebra/Alien fixed UHF reader integration."
+      "accessedAt": "2026-05-10",
+      "note": "Open-source Python LLRP client cited for Impinj/Zebra fixed UHF reader integration. Authority for the exact tag_content_selector key set used in the code snippets and for the LLRPReaderClient.connect() / join() / disconnect() lifecycle pattern."
+    },
+    {
+      "label": "RAIN Alliance — RAIN Communication Interface Guideline (RCI v4)",
+      "url": "https://rainrfid.org/wp-content/uploads/2019/04/RAIN-RFID-RCI-v2.pdf",
+      "publisher": "RAIN Alliance",
+      "accessedAt": "2026-05-10",
+      "note": "Vendor-neutral simplified-command guideline for RAIN UHF readers. Current published version is v4 under Apache License 2.0; v5 in development. Replaces the earlier draft 'RF-Control API' framing."
     },
     {
       "label": "PC/SC Workgroup — Interoperability Specifications",

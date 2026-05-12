@@ -5,8 +5,8 @@
   "kicker": "NFC Programming Android",
   "summary": "A comprehensive guide to NFC tag programming on Android. Covering App Store apps for code-free tag writing, the android.nfc framework for developers, tag dispatch and intent filter patterns, NDEF message construction, foreground dispatch for dedicated scanner apps, Host-based Card Emulation (HCE), MIFARE Classic and DESFire programming, Tasker automation and the Android-versus-iPhone capability delta. This page serves both non-technical users who need to program NFC stickers and cards with their Android phone and Android developers integrating NFC into custom apps.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2025-12-26",
-  "reviewedAt": "2025-12-27",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -22,8 +22,8 @@
     "Android NFC programming splits into two tracks that serve different users. A consumer track where free Play Store apps (NFC Tools, NXP TagWriter, TagInfo, TagMo) let anyone program NFC tags without coding, and a developer track where the android.nfc API lets developers build custom apps with tag dispatch filters, foreground intent handling, advanced chip-family access (MIFARE Classic Crypto1 authentication, DESFire AES sessions, NTAG 424 DNA SUN verification) and HCE integration with transit/loyalty/access-control backends.",
     "Proud Tek supplies Android-tested NFC products across the NFC Forum Type 1-5 range — NTAG 213/215/216 for general-purpose programmes, NTAG 424 DNA for authentication, MIFARE Classic 1K/4K for legacy access control, MIFARE DESFire EV1/EV2/EV3 for modern encrypted access, MIFARE Ultralight C / EV1 for memory-optimized deployments, and ISO 15693 (ICODE SLIX) for industrial programmes. All tags are supplied blank, unlocked, ready for Android programming, with chip-family documentation including MIFARE key defaults and Android-developer-specific notes."
   ],
-  "imageAlt": "Android phone programming NFC sticker tag with NDEF URL record using android.nfc API",
-  "heroImage": "/landing-images/ntag213-nfc-sticker.jpg",
+  "imageAlt": "Android smartphone tapping NFC tag — android.nfc API and NDEF writing programming reference",
+  "heroImage": "/blog-images/smartphone-nfc.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/ntag213-nfc-sticker/",
     "/products/rfid-labels/ntag216-nfc-sticker/"
@@ -79,6 +79,7 @@
         "Foreground dispatch: for apps in the foreground (e.g., a dedicated scanner app), `NfcAdapter.enableForegroundDispatch()` captures all NFC events regardless of tag dispatch rules, routing them back to the app's `onNewIntent()` handler. Use this for dedicated NFC scanner apps where the user expects all NFC interactions to be handled by the current app.",
         "Writing NDEF to a tag. Retrieve the Ndef object from the tag, connect (`ndef.connect()`), build an NdefMessage, call `ndef.writeNdefMessage(message)`, close the connection. Error paths handle tag-out-of-range, read-only tags, insufficient memory and unsupported tag types. Production apps wrap this in retry logic with user-friendly error messaging and async handling via Kotlin coroutines.",
         "Android 14+ refinements: Android 14 added refined NFC reader mode APIs (`NfcAdapter.enableReaderMode()` with polling options), improved handling of multiple tags in the field, and cleaner lifecycle semantics. Legacy code written against Android 5-10 APIs continues to work, but new projects should use the reader-mode APIs for cleaner tag discovery control.",
+        "Android 16 / 17 changes — important for new builds. Per Google's developer documentation: (1) Android 16 routes NFC tags carrying http:// or https:// URI records through `ACTION_VIEW` instead of `ACTION_NDEF_DISCOVERED`, so apps that previously matched on NDEF intent filters for web URLs need to add an `<intent-filter>` for `ACTION_VIEW` with their domain (or rely on Android App Links). (2) Android 16 introduced an NFC tag-scan allowlist UI: on first NFC intent, the user is asked to allow the app to be launched by NFC. Use `NfcAdapter.isTagIntentAllowed()` to check, and `NfcAdapter.ACTION_CHANGE_TAG_INTENT_PREFERENCE` to prompt the user again. The control sits at Settings > Apps > Special app access > Launch via NFC. (3) Android 17 (API level 37) deprecates `ACTION_TAG_DISCOVERED` in favour of `ACTION_NDEF_DISCOVERED` / `ACTION_TECH_DISCOVERED`. (4) Apps targeting SDK > Build.VERSION_CODES.BAKLAVA must protect their NFC-receiving activities with `android:permission=\"android.permission.DISPATCH_NFC_MESSAGE\"` so only the NFC system service can dispatch intents to them; stopped apps no longer receive NFC intents.",
         "Permissions and manifest declaration. NFC apps must declare `<uses-permission android:name=\"android.permission.NFC\" />` and `<uses-feature android:name=\"android.hardware.nfc\" android:required=\"true\" />` in AndroidManifest.xml. The permission is normal-level (granted at install without user prompt). The feature declaration prevents installation on NFC-less devices when uploaded to the Play Store with `android:required=\"true\"`; set to `false` if the app has graceful fallback for non-NFC devices.",
         "Coroutine-safe tag operations. Modern Kotlin codebases wrap `ndef.connect()`, `ndef.writeNdefMessage()` and `ndef.close()` inside `withContext(Dispatchers.IO) { ... }` to keep the main thread responsive. A tag write typically completes in 50-200 ms; on slower phones or with large NDEF payloads it can exceed 500 ms, which is enough to cause ANR dialogs if run on the main thread. Always dispatch to IO and surface a cancellable progress indicator to the user."
       ]
@@ -220,6 +221,10 @@
       "answer": "HCE (Android 4.4+) lets an Android app emulate an NFC contactless card to an external NFC reader. The phone behaves like an ISO 14443 Type A or ISO 14443-4 card, receiving APDU commands from the reader and responding with emulated-card data. HCE is the foundation for Google Pay (payment card emulation), countless branded transit apps (e.g., BART, Beijing Yikatong), loyalty and membership apps (Starbucks, gym cards), and access-control apps (corporate badge emulation). HCE-F (Android 7+) adds FeliCa emulation for Japanese transit cards. For enterprise programmes requiring HCE, the development pattern is a HostApduService that handles reader APDU commands and optionally leverages the device's Secure Element (where available) for hardware-backed key storage."
     },
     {
+      "question": "What changed for NFC apps in Android 16 and Android 17?",
+      "answer": "Three significant behavioural changes per Google's developer documentation. First, Android 16 routes NFC tags carrying http:// or https:// URI records through `ACTION_VIEW` rather than `ACTION_NDEF_DISCOVERED`. Apps that previously matched on web URLs in their NDEF intent filter need to add an `ACTION_VIEW` filter for their domain or rely on Android App Links. Second, Android 16 introduced a per-app NFC tag-scan allowlist; on the first NFC intent the user is asked to allow the app to launch via NFC, and apps can query `NfcAdapter.isTagIntentAllowed()` or trigger `ACTION_CHANGE_TAG_INTENT_PREFERENCE` to re-prompt. The control lives at Settings > Apps > Special app access > Launch via NFC. Third, Android 17 (API 37) deprecates `ACTION_TAG_DISCOVERED` (use NDEF or TECH variants instead), and apps targeting the new SDK level must protect NFC-receiving activities with the new `android.permission.DISPATCH_NFC_MESSAGE` permission so only the NFC system service can dispatch intents to them. Stopped apps no longer receive NFC intents at all. Migrate filters and manifests early so existing programmes don't break when users update their OS."
+    },
+    {
       "question": "What NFC chip should I choose for my Android programme?",
       "answer": "For consumer NDEF programmes (URL redirects, business cards, Wi-Fi sharing, Google Review cards, restaurant menus), NTAG 213 is the default. Cheap, Android-universal, and fits short URLs. For longer content, step up to NTAG 215 (504 bytes) or NTAG 216 (888 bytes). For authentication or tamper-evident programmes, NTAG 424 DNA with SUN messaging. For legacy access control, MIFARE Classic 1K; for new high-security access control, MIFARE DESFire EV3 with AES-128. For industrial and pharmaceutical programmes needing longer read range, ISO 15693 (ICODE SLIX). For cross-platform iPhone and Android programmes, stick to NTAG-family or DESFire chips since those work on both platforms; avoid MIFARE Classic where iPhone reach matters."
     }
@@ -229,8 +234,8 @@
       "label": "Android Developers — NFC Basics (Action Dispatch, NDEF Reading)",
       "url": "https://developer.android.com/develop/connectivity/nfc/nfc",
       "publisher": "Google",
-      "accessedAt": "2026-04-20",
-      "note": "The foundational Android NFC developer documentation covering NfcAdapter, intent-filter dispatch (ACTION_NDEF_DISCOVERED, ACTION_TECH_DISCOVERED, ACTION_TAG_DISCOVERED), foreground dispatch, reader mode and NDEF ingestion. Referenced throughout the guide for the Android stack overview."
+      "accessedAt": "2026-05-10",
+      "note": "Foundational Android NFC developer documentation. Authority for the Android 16 ACTION_VIEW dispatch change for http/https URI tags, the Android 16 NFC tag-scan allowlist (NfcAdapter.isTagIntentAllowed and ACTION_CHANGE_TAG_INTENT_PREFERENCE), and the Android 17 (API 37) deprecation of ACTION_TAG_DISCOVERED plus the new android.permission.DISPATCH_NFC_MESSAGE requirement."
     },
     {
       "label": "Android Developers — NFC Advanced Topics (Tech classes, MIFARE, ISO-DEP)",

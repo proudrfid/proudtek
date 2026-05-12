@@ -112,7 +112,7 @@ function buildArchiveBodyHtml(
 
 function renderEntryCard(entry: { route: string; title: string; image: string; summary: string }): string {
   const imageHtml = entry.image
-    ? html`<a class="codex-case-study-card__media" href="${entry.route}"><img src="${entry.image}" alt="${entry.title}" loading="lazy" decoding="async"></a>`
+    ? html`<a class="codex-case-study-card__media" href="${entry.route}"><img src="${entry.image}" alt="${entry.title}" width="1200" height="675" loading="lazy" decoding="async"></a>`
     : "";
 
   return html`

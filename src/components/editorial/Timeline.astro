@@ -1,0 +1,37 @@
+---
+/**
+ * Editorial section variant — ordered timeline / phases.
+ *
+ * Shadow component (Stage 2). Mirrors the inline expression in
+ * editorial-pages.ts around `const timelineHtml = section.timeline?.items?.length ? ... : ""`.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["timeline"]
+ *   items: Array<{ label: string; text: string }>
+ *
+ * `label` is plain text (auto-escape via {expression}); `text` carries
+ * inline markdown + citation markers and routes through renderInlineLinks.
+ */
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface TimelineItem {
+  label: string;
+  text: string;
+}
+
+interface Props {
+  items: TimelineItem[];
+  citations?: CitationCtx;
+}
+
+const { items, citations } = Astro.props;
+---
+{items.length > 0 && (
+  <ol class="codex-editorial-timeline">
+    {items.map((item) => (
+      <li class="codex-editorial-timeline__item">
+        <span class="codex-editorial-timeline__label">{item.label}</span>
+        <p class="codex-editorial-timeline__text" set:html={renderInlineLinks(item.text, citations)} />
+      </li>
+    ))}
+  </ol>
+)}

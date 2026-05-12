@@ -1,498 +1,327 @@
 {
   "route": "/solutions/hotel-rfid-access-control/",
   "group": "solutions",
-  "title": "Hotel RFID Access Control — VingCard / Saflok / Salto / ONITY + PMS + Mobile Key Programme View",
+  "title": "Hotel RFID Access Control (2026): Whole-Property Programme — Guest Rooms, BOH, Elevator Destination Dispatch (KONE / Otis / Schindler PORT), Parking, Amenities, Aliro 1.0, CVE Timeline (Saflok 2024, Vingcard 2018, SALTO 2019, Onity 2012)",
   "kicker": "Hospitality Solution",
-  "summary": "On most hospitality rollouts, hotel RFID access-control programmes hinge on three decisions: which credential format fits the guest journey (card / wristband / mobile key / mixed), which chip family matches the lock estate (MIFARE Classic / Plus EV2 / DESFire EV2/EV3 across ASSA ABLOY VingCard, dormakaba Saflok, Salto SVN/KS, ONITY HT22i/Advance, MIWA Lock, Häfele Dialock, Be-Tech and Allegion CISA), and how the encoder + PMS pipeline (Oracle OPERA, Mews, Cloudbeds, Sabre SynXis, Apaleo) issues keys at scale. This page is the integrated lock + credential + PMS + mobile-access operating view that pairs with the SKU-level /solutions/hotel-key-cards/ procurement guide.",
+  "summary": "Procurement-grade whole-property hotel access-control reference for hospitality + serviced-apartment + cruise procurement teams designing the complete access programme — not just guest-room cards. Covers per-zone reader / credential decisions (room door / club floor / BOH / IT-vault / elevator lobby / elevator car / parking gate / pool / spa / gym / conference rooms / executive lounge), elevator destination dispatch integration with KONE Destination + Otis Compass + Schindler PORT + Mitsubishi DOAS + Hitachi DFRS, the four-vendor CVE timeline (Onity HT 2012 Brocious, Vingcard Vision 2018 F-Secure, SALTO ProAccess SPACE 2019 CVE cluster, Saflok 2024 Unsaflok CVE-2024-29916), Aliro 1.0 (CSA, February 2026 release) unified Apple / Google / Samsung digital-key standard, OSDP v2 Secure Channel migration from legacy Wiegand, PCI DSS v4.0 15-minute session timeout, GDPR access-log retention, ADA / ICC ANSI A117.1 §308–309 reader-mount-height 34–48 inches AFF, and CapEx framing by 100 / 500 / 2,000-key property profile.",
   "keywords": [
-    "Hotel RFID access control",
-    "VingCard / Saflok / Salto / ONITY",
-    "Hotel PMS encoder integration",
-    "Mobile key BLE / NFC",
-    "MIFARE Plus EV2 / DESFire EV3 hotel",
-    "Hospitality lock estate refresh"
+    "Hotel access control system",
+    "Hotel RFID elevator destination dispatch",
+    "Aliro 1.0 hotel digital key standard",
+    "Saflok Vingcard SALTO Onity CVE timeline",
+    "OSDP Secure Channel hospitality"
   ],
   "heroPoints": [
-    "Choose cards, wristbands or a mixed program based on guest flow and property type.",
-    "Confirm lock, encoder and PMS compatibility before discussing artwork or premium finishes.",
-    "Package sample requests around property count, card volume and rollout timing."
+    "Design the whole property as one access system, not seven silos. Guest room + BOH + elevator + parking + pool + gym + conference + executive lounge each need a per-zone decision (reader class, credential, factor) but the credential itself should resolve to one card on the guest's lanyard.",
+    "Elevator destination dispatch (KONE Destination, Otis Compass, Schindler PORT, Mitsubishi DOAS) is now the operational standard for tower hotels. RFID lobby readers assign destination cars before the guest enters; in-car readers gate club-floor access. Plan reader siting against the elevator-vendor's integration spec.",
+    "Aliro 1.0 (CSA released February 2026) unifies Apple Wallet, Google Wallet and Samsung Wallet digital-key implementations into a single standard. Most hotel access-control pages still describe vendor-specific BLE-app or Apple-Wallet-only flows; the 2026 procurement baseline is Aliro-ready.",
+    "Cross-vendor CVE timeline matters for procurement: Onity HT (Brocious, 2012, port-shield + firmware fix), Vingcard Vision (F-Secure 2018, ~140,000 hotels affected, patched), SALTO ProAccess SPACE 2019 (CVE-2019-19457/19458/19459/19460, fixed in 5.6), Saflok 2024 (CVE-2024-29916 Unsaflok, ~36% remediated at disclosure). Every multi-vendor estate should map remediation status by lock platform.",
+    "OSDP v2 Secure Channel (AES-128) is replacing Wiegand 1970s plain-text on new builds. Plan reader migration alongside any RFID refresh — Wiegand on a remediated Saflok system still leaves the reader-to-controller wire as the weakest link."
   ],
-  "imageAlt": "Hotel RFID key card planning",
+  "imageAlt": "Hotel whole-property RFID access control — guest room + elevator destination dispatch + BOH + parking + amenity zones with multi-credential reader heads",
+  "heroImage": "/landing-images/ppc-hotel-key-cards.jpg",
   "imageSourceRoutes": [
-    "/product/hotel-key-cards/",
-    "/product/rfid-wristbands-for-hotels/"
+    "/products/rfid-cards/rfid-card-assa-abloy-compatible/",
+    "/products/rfid-keyfobs/",
+    "/products/rfid-readers/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-04-26",
+  "modifiedAt": "2026-05-11",
   "brief": [
     {
-      "label": "Where this programme view fits",
+      "label": "Audience",
       "items": [
-        "Hotel groups planning a multi-property lock-estate refresh across 5–500 properties.",
-        "Independent hotels evaluating a first-time RFID lock + credential + PMS rollout.",
-        "Resorts mixing room-key cards with amenity-access wristbands for pool / spa / kids-club.",
-        "Brand-managed properties (Marriott / Hilton / IHG / Hyatt / Wyndham) integrating Mobile Access into existing card programme.",
-        "Boutique / lifestyle hotels selecting Salto KS or Mews Marketplace cloud-first stack."
+        "Hotel CIO / IT / operations teams designing whole-property access (not just guest-room cards).",
+        "Serviced apartments + cruise + resort + casino procurement designing multi-zone credential programmes.",
+        "Branded chains running multi-property standardisation across mixed-vendor lock estates.",
+        "Hospitality programmes preparing for Aliro 1.0 unified digital-key + OSDP Secure Channel reader migrations."
       ]
     },
     {
-      "label": "Lock-estate map — eight platforms supplied",
+      "label": "Decision sequence",
       "items": [
-        "ASSA ABLOY VingCard / VISIONLINE / Signature RFID + Mobile Access (BLE / NFC) — Marriott / Hilton / IHG default OEM.",
-        "dormakaba Saflok Quantum + Confidant RFID + RT Plus + Oracode + Saflok Messenger LENS — Hyatt / Wyndham / Choice OEM.",
-        "Salto Systems SVN + KS (Keys-as-a-Service) + JustIN Mobile + XS4 — boutique / lifestyle / serviced apartment.",
-        "ONITY HT22i / Advance / Trillium ZigBee / DirectKey BLE — DoubleTree / Hampton / Embassy Suites / Hilton select-service.",
-        "MIWA Lock 6AT / EAT / DTRT-iCS / DTFL — APAC / Japan dominant.",
-        "Häfele Dialock + Tag-it HF-I + LE/FT/FH/DT — European boutique + serviced apartment.",
-        "Be-Tech eGuard / B-Lite / B-Free + Kaba Confidant / Atlas + Kaba 2533 — legacy + APAC mid-tier.",
-        "Allegion CISA eSIGNO / Schlage LE/NDE BLE + ENGAGE — limited-service brands."
+        "Per-zone reader-class decision: HF 13.56 MHz (ISO/IEC 14443A; MIFARE DESFire EV3 AES-128) for doors + amenity-zone gates; UHF 860–960 MHz (up to ~5 m read range) for parking and EV charger access.",
+        "Credential format: physical card + BLE mobile (Apple Wallet / Google Wallet via Aliro 1.0) + (optional) BLE keyfob for staff zones.",
+        "Lock vendor: Saflok / Vingcard / SALTO / Onity / MIWA / Häfele Dialock / Be-Tech — each maps to per-vendor compatibility guide.",
+        "Elevator destination dispatch integration: KONE Destination / Otis Compass / Schindler PORT / Mitsubishi DOAS / Hitachi DFRS.",
+        "PMS integration: Oracle OPERA Cloud roomKeysOutbound / Mews / Apaleo / Cloudbeds / Sabre SynXis.",
+        "Compliance overlay: PCI DSS v4.0 (15-min timeout); GDPR access-log retention; ADA reader-mount height; ISO/IEC 27001 A.7 + A.9."
       ]
     },
     {
-      "label": "PMS + encoder + mobile-key pipeline",
+      "label": "Vendor compatibility map",
       "items": [
-        "Oracle OPERA Cloud / OPERA 5 + OPERA Vendor Interface (OVI / OWS) — full-service hotel PMS dominant.",
-        "Mews PMS + Mews Marketplace lock connectors (VingCard / Salto KS / Saflok / Häfele Dialock / Be-Tech / MIWA).",
-        "Cloudbeds + SiteMinder + Hotel-Spider channel-manager-fed front-desk encoder driver.",
-        "Sabre SynXis CRS + Property Hub for global brand reservations into encoding queue.",
-        "Apaleo open API + Hotelistic + Stayntouch + RoomRaccoon — independent + lifestyle PMS heads with Salto KS / Mobile Access cloud connectors.",
-        "Mobile-key SDKs: ASSA ABLOY Mobile Access, Salto JustIN Mobile, Saflok Mobile Access (LENS), ONITY DirectKey + Apple Wallet hotel keys (Hyatt / Hilton / Marriott pilots)."
+        "Saflok (dormakaba) — Quantum IV / RT, Messenger LENS, Quantum Plus / Pixel; CVE-2024-29916 firmware remediation status. See /compatibility/saflok-hotel-key-cards/.",
+        "Vingcard (ASSA ABLOY) — Classic / Essence / Signature / Allure / Flex; Vision (2018 CVE) → Visionline → Vostio. See /compatibility/vingcard-hotel-key-cards/.",
+        "SALTO Systems — XS4 family + Neo Cylinder; 2019 ProAccess SPACE CVE cluster (fixed in 5.6). See /compatibility/salto-hotel-key-cards/.",
+        "Onity (Honeywell BA, planned Automation spin-off H2 2026) — HT / ADVANCE / integra / Trillium; 2012 Brocious. See /compatibility/onity-hotel-key-cards/.",
+        "MIWA — ALV2 / ALV3 / V3HTM + FeliCa IDm (Japan). See /compatibility/miwa-hotel-key-cards/.",
+        "Häfele Dialock — DT + WT + FT + EFL / LL; single-credential door + furniture + locker. See /compatibility/hafele-dialock-hotel-key-cards/.",
+        "Be-Tech — BASE / SHADOW / VISUAL / GUARDIAN. See /compatibility/be-tech-hotel-key-cards/."
       ]
     },
     {
-      "label": "Format mix decision — cards vs wristbands vs mobile",
-      "items": [
-        "Card-only baseline — full-service / business hotels, conference properties, urban estates with frequent room-only stays.",
-        "Wristband-led — all-inclusive resorts, water parks, family resorts, festival hotels with cashless amenity flow.",
-        "Mixed (cards + wristbands) — large resort + spa + pool + kids-club estates where credentialing differs by area.",
-        "Mobile-primary, plastic backup — Marriott Bonvoy / Hilton Honors / IHG One Rewards branded properties on converted lock firmware.",
-        "Card + magstripe co-layer — properties with legacy parking / locker / F&B POS still on magstripe."
-      ]
-    },
-    {
-      "label": "Chip-family decision per lock platform",
-      "items": [
-        "MIFARE Classic 1K — VingCard pre-2015, Saflok Quantum legacy, ONITY HT22i, MIWA legacy estates. Crypto-1 broken since 2008; recommended for replacement during refresh.",
-        "MIFARE Plus EV1/EV2 (SL3) — VingCard mid-generation, Saflok migration, ONITY post-2018, Be-Tech/Kaba migration. AES-128 with Classic backwards compatibility.",
-        "MIFARE DESFire EV2/EV3 — VingCard Signature RFID, Saflok Confidant RFID + current Quantum, Salto SVN/KS, MIWA DTRT-iCS, Häfele Dialock current, CISA eSIGNO. AES-128 mutual auth, 2026 baseline.",
-        "HID iCLASS Seos — Salto SVN multi-credential reader, Allegion Schlage LE/NDE; corporate badge crossover.",
-        "BLE / NFC mobile credential — issued via HID Origo / Salto JustIN / Saflok LENS / ONITY DirectKey / Apple Wallet pass; consumed by mobile-enabled lock firmware."
-      ]
-    },
-    {
-      "label": "Brand-standard programme reference",
-      "items": [
-        "Marriott Bonvoy: Mobile Access mandatory across full-service + select-service brands by 2025; lock-firmware refresh synchronised across portfolio.",
-        "Hilton Honors: Digital Key (BLE) at 80%+ US owned + managed properties; plastic-card backup at non-converted firmware.",
-        "IHG One Rewards: Mobile Key on Salto KS at boutique brands (Kimpton, Hotel Indigo, voco) + ASSA ABLOY at Holiday Inn / Crowne Plaza.",
-        "Hyatt World of Hyatt: Saflok Mobile Access + LENS + Apple Wallet hotel keys pilot.",
-        "Wyndham Rewards + Choice Privileges: Saflok Messenger LENS estate-wide.",
-        "Independent + lifestyle: Salto KS Mobile (Mews / Apaleo / Stayntouch) preferred for cloud-native ops."
-      ]
-    },
-    {
-      "label": "Encoding lifecycle and key rotation",
-      "items": [
-        "Per-stay encoding: card written at check-in, expires at check-out — standard for transient hotels.",
-        "Permanent staff: programmer-card MIFARE Plus EV2 with role-based access to back-of-house, housekeeping, F&B, engineering.",
-        "Master / emergency: GM / security manager custody log + quarterly rotation per AHLA / brand-standard policy.",
-        "Lost-card hot-list: synchronised across online doors via gateway; standalone doors invalidate at next master-key recurrence.",
-        "Re-issue rate: 8–12% benchmark per stay (lost / damaged / missed-return).",
-        "Pre-personalised supply: facility code + cardholder ID range encoded at factory before despatch — common for fast-opening properties."
-      ]
-    },
-    {
-      "label": "Operations + analytics + audit",
-      "items": [
-        "PMS audit log integration: every door read posts to PMS for guest-experience + ops analytics.",
-        "Lost-key replacement workflow: front-desk re-encodes from PMS guest record without re-creating reservation.",
-        "Housekeeping correlation: door-open events correlate to room-attendance patterns for service-level scorecards.",
-        "Security incident workflow: master-key compromise triggers immediate online-door rotation + standalone-door advance-master cascade.",
-        "GDPR / CCPA: cardholder data does not enter lock estate; encoder log retention typically 90 days standalone, longer when synchronised to PMS."
-      ]
-    },
-    {
-      "label": "Compliance + safety + accessibility framework",
-      "items": [
-        "ADA 2010 — door operating force ≤5 lbf, reader mounting height 15–48″ for accessibility.",
-        "NFPA 101 Life Safety Code — fail-safe egress for all electronically locked doors.",
-        "AHLA brand-standard book — master-key rotation, lost-card replacement, audit log retention 1–3 years per brand.",
-        "ISO/IEC 14443 (HF 13.56 MHz) + ISO/IEC 7810 (ID-1 dimensions) — credential air interface and physical baseline.",
-        "ESPR (EU 2022/2380 draft) — hospitality giveaway item material disclosure obligations from 2027.",
-        "PCI-DSS SAQ-A scope avoidance — keep PMS payment tokenisation separate from key-encoding workflow."
-      ]
-    },
-    {
-      "label": "Programme economics + TCO",
-      "items": [
-        "Per-card BOM: $0.50–$1.50 PVC + MIFARE Plus EV2 at 5k+ qty; $1.50–$4.00 DESFire EV3; eco-PLA / wood-veneer 2–4× baseline.",
-        "Lost-card replacement: 8–12% per stay × $0.50–$3 BOM = $0.04–$0.36 per stay re-issue cost.",
-        "Lock hardware refresh: 7–10 year cycle; OSDP v2.2 / Mobile-Access-ready firmware mandatory for new build.",
-        "Mobile-key adoption uplift: 30–60% Bonvoy / Honors guests opt in; reduces front-desk queue time by 1–3 minutes per check-in.",
-        "Encoder + driver software: brand-licensed; typical $500–$2,000 per property per year SMA on top of PMS contract.",
-        "ROI levers: front-desk labour, lost-card cost, security-incident reduction, brand-standard compliance audit pass rate."
-      ]
-    },
-    {
-      "label": "What this solution is NOT — adjacent scope clarifiers",
-      "items": [
-        "NOT a SKU-level hotel key card procurement guide — see /solutions/hotel-key-cards/ for chip / material / encoding / sample planning.",
-        "NOT an enterprise PACS programme — see /solutions/rfid-access-control/ for OSDP v2.2 + Genetec / Lenel S2 / Honeywell PACS corporate offices.",
-        "NOT a parking / vehicle gate solution — see /solutions/rfid-parking-management/ + /solutions/vehicle-rfid-identification/ for UHF Gen2v2 hands-free vehicle access.",
-        "NOT an event / festival wristband programme — see /solutions/rfid-event-access-control/ + /solutions/rfid-event-wristbands/.",
-        "NOT a hotel back-of-house RTLS / housekeeping programme — covered separately under hospitality industry landing.",
-        "NOT a guest-review prompt programme — see /solutions/google-review-cards-for-hotels/."
+      "label": "Direct catalogue links",
+      "links": [
+        {"href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/", "label": "ASSA ABLOY-compatible hotel key cards"},
+        {"href": "/products/rfid-keyfobs/", "label": "RFID keyfobs (staff zones)"},
+        {"href": "/products/rfid-readers/", "label": "RFID readers"},
+        {"href": "/products/rfid-wristbands/", "label": "RFID wristbands (resort all-inclusive)"},
+        {"href": "/solutions/hotel-key-cards/", "label": "Hotel key cards (SKU procurement guide)"},
+        {"href": "/compatibility/", "label": "All 7 vendor compatibility guides"}
       ]
     }
   ],
   "sections": [
     {
-      "title": "Where hotel RFID projects usually start",
-      "intro": "Most hospitality buyers already know whether they are replacing an existing card program or launching a new guest credential. The friction usually comes from compatibility and guest-experience tradeoffs.",
-      "statBar": {
-        "items": [
-          {
-            "value": "8 platforms",
-            "label": "Major hotel-lock estates supplied"
-          },
-          {
-            "value": "AES-128",
-            "label": "DESFire EV3 / Plus SL3 baseline"
-          },
-          {
-            "value": "30–60 %",
-            "label": "Mobile-key opt-in (branded properties)"
-          },
-          {
-            "value": "≤90 days",
-            "label": "Master-key rotation cadence"
-          }
-        ]
-      },
-      "bullets": [
-        "Branded room key cards for hotels, resorts and serviced apartments.",
-        "Wristband-based access for pools, spas, lockers or family-friendly properties.",
-        "Mixed programs where cards handle rooms and wristbands cover amenity access.",
-        "Premium variants using wood, recycled or specialty card materials for brand positioning."
-      ],
-      "comparePanel": {
-        "beforeHeading": "Estate-fragmented card-only programme (legacy)",
-        "afterHeading": "Integrated card + mobile + PMS programme (2026 baseline)",
-        "before": [
-          "Each property procures key cards independently — no chip-family standardisation across estate.",
-          "MIFARE Classic 1K legacy — Crypto-1 broken since 2008; replacement deferred indefinitely.",
-          "Plastic-only credential — no Mobile Access / digital key; full-time front-desk queue at peak check-in.",
-          "Lost-card workflow paper-based — no PMS audit log integration; replacement creates re-keyed reservation.",
-          "Master-key rotation ad-hoc; no quarterly cadence; security-incident response slow.",
-          "Encoder + driver software fragmentation — different SOP per property, training overhead high."
-        ],
-        "after": [
-          "Estate-wide chip-family standardisation on MIFARE Plus EV2 SL3 or DESFire EV3 — single SKU programme reduces SKU sprawl.",
-          "AES-128 mutual auth with Originality Signature — no public crack as of 2026; meets brand-standard cryptographic policy.",
-          "Plastic + Mobile Access dual issuance — guests opt into BLE / NFC key, plastic remains for non-app guests.",
-          "Lost-card workflow PMS-integrated — front-desk re-encode from guest record; audit log captures every issue + revoke.",
-          "Quarterly master-key rotation per AHLA / brand-standard policy; standalone-door cascade automated.",
-          "Single estate-wide encoder + driver SOP — training overhead drops; new-property opening accelerated."
-        ]
-      }
-    },
-    {
-      "title": "Cards vs wristbands in hospitality",
-      "intro": "Cards remain the default for broad room-key use. Wristbands become attractive when the property wants better amenity flow, fewer lost credentials or more guest segmentation.",
+      "title": "Whole-property zone matrix — guest room, BOH, elevator, parking, amenity, conference",
+      "intro": "A hospitality access programme is at least seven distinct zones with different reader-class, credential-factor and policy requirements. The matrix below maps each zone to its operational baseline; single-vendor lock-PR pages never publish this comprehensively because each vendor focuses on the zones they sell into.",
       "table": {
-        "columns": [
-          "Format",
-          "Best fit",
-          "Strengths",
-          "Watch-outs"
-        ],
+        "columns": ["Zone", "Reader class", "Credential", "ADA mount", "Notes"],
         "rows": [
-          [
-            "Hotel key cards",
-            "Standard room access",
-            "Low friction, familiar, easy to brand",
-            "Guests can misplace them and wet environments reduce convenience"
-          ],
-          [
-            "RFID hotel wristbands",
-            "Resorts, spas and family properties",
-            "Hands-free use, harder to lose, easy guest grouping",
-            "Sizing, material choice and lock compatibility matter earlier"
-          ],
-          [
-            "Mixed program",
-            "Properties with multiple guest journeys",
-            "Lets rooms and amenities use separate credential logic",
-            "Needs a cleaner issuance and inventory process"
-          ],
-          [
-            "Mobile key (BLE / NFC)",
-            "Branded chains with converted firmware",
-            "Zero physical inventory, instant issue / revoke, brand-app engagement",
-            "Requires lock-firmware compatibility + guest app adoption"
-          ]
+          ["Guest room door", "HF 13.56 MHz (ISO/IEC 14443A)", "MIFARE Plus EV2 SL3 or DESFire EV3", "Lock face height per fixture", "Primary guest credential."],
+          ["Club / executive floor", "HF 13.56 MHz (in-car elevator reader)", "Same card + elevator profile", "In-car reader 34–48″ AFF", "Card unlocks elevator floor button."],
+          ["BOH / staff-only doors", "HF 13.56 MHz + optional PIN keypad", "Staff card (separate site key)", "34–48″ AFF", "Higher-trust zone; PIN + card multifactor common."],
+          ["IT vault / payment-processing room", "HF + biometric reader", "Staff card + finger/face (multifactor)", "34–48″ AFF", "PCI DSS-driven; logged access; 15-min session timeout."],
+          ["Loading dock / receiving", "HF or UHF (long-range vehicle tag)", "Vendor / supplier card", "Adjacent to roll-up door", "Often tracks delivery vehicle by UHF tag."],
+          ["Elevator lobby (destination dispatch)", "HF 13.56 MHz on KONE/Otis/Schindler PORT terminal", "Same guest card", "Terminal-vendor spec", "Reader assigns destination car before entry."],
+          ["Parking gate", "UHF 860–960 MHz (up to 5 m read range)", "Vehicle windshield tag or card-in-holder", "Lane-side post", "Long-range gate trigger."],
+          ["EV charger", "HF + RFID for billing", "Same guest card", "ADA + EV charger code", "Tied to room-charge billing flow."],
+          ["Pool / spa", "HF 13.56 MHz", "Same guest card (amenity profile)", "Waterproof reader; lockable height", "Often time-limited (resort hours)."],
+          ["Gym / fitness", "HF 13.56 MHz", "Same guest card", "34–48″ AFF; 24/7 access policy", "Self-service hours."],
+          ["Kids' club / club floor lounge", "HF + photo-ID verification", "Card + opt-in registration", "Adult-supervised access", "Liability + safeguarding policy."],
+          ["Conference rooms / ballroom", "HF 13.56 MHz + temporary site keys", "Event-issued temporary card", "Event-temp signage height", "Often paired with event registration system."],
+          ["Executive lounge", "HF 13.56 MHz", "Same guest card (elite profile)", "34–48″ AFF", "Tier-based access; PMS-driven eligibility."]
         ]
-      },
-      "dataHighlight": {
-        "value": "8 platforms",
-        "heading": "Hotel-lock estate coverage in 2026 baseline programme",
-        "text": "ASSA ABLOY VingCard, dormakaba Saflok, Salto Systems, ONITY (Carrier), MIWA Lock, Häfele Dialock, Be-Tech (Kaba), and Allegion CISA — eight major hotel-lock platforms supplied across MIFARE Classic legacy, MIFARE Plus EV1/EV2 transitional and MIFARE DESFire EV2/EV3 enterprise tiers. Brand-standard programmes (Marriott Bonvoy / Hilton Honors / IHG / Hyatt / Wyndham) overlay Mobile Access via HID Origo / Salto JustIN / Saflok LENS / ONITY DirectKey. PMS integration through Oracle OPERA, Mews, Cloudbeds, Sabre SynXis, Apaleo. Master-key rotation runs ≤90-day cadence per AHLA / brand-standard policy; mobile-key adoption hits 30–60% on branded properties post-launch. Annual lost-card re-issue rate benchmarks at 8–12% per stay."
       }
     },
     {
-      "title": "Inputs that make hotel sampling faster",
-      "intro": "If you already have a current room key, a lock model photo or a chip requirement, the project can usually move from general inquiry to a realistic sample shortlist much faster.",
+      "title": "Elevator destination dispatch integration — KONE, Otis, Schindler PORT, Mitsubishi, Hitachi",
+      "intro": "Modern tower hotels rely on destination-dispatch elevator control rather than traditional up/down call buttons. The guest presents a credential at a lobby terminal; the system assigns an elevator car and shows the destination floor before the guest enters. RFID lobby readers + in-car readers integrate with the elevator vendor's destination-dispatch back-end. The first commercial destination dispatch system was Schindler Miconic 10 (1992); current systems are functionally similar but with much deeper RFID integration.",
       "bullets": [
-        "Current lock platform, encoder or PMS environment.",
-        "Card-only, wristband-only or mixed credential plan.",
-        "Material, finish, magstripe, numbering or RFID encoding requirements.",
-        "Property count, pilot quantity and launch schedule."
-      ],
-      "timeline": {
-        "items": [
-          {
-            "label": "Week 1 — Estate audit + reference capture",
-            "text": "Walk every property's front-desk + critical doors, log lock brand + model + firmware version (VingCard Signature RFID vs Allure vs Classic; Saflok Quantum vs Confidant; Salto SVN vs KS; ONITY HT22i vs Advance vs DirectKey). Capture front-desk encoder model + driver version + PMS name + version. Send a current guest-card reference plus lock photo for chip-family confirmation."
-          },
-          {
-            "label": "Week 2 — Chip + sector layout lock-in",
-            "text": "Confirm chip family per lock platform across estate. Sign NDA for sector-layout / key-block disclosure on pre-encoded path; or confirm blank-card path with on-site encoder. Decide magstripe co-layer requirement based on legacy reader survey (parking, lockers, gym, F&B POS)."
-          },
-          {
-            "label": "Week 3 — Format mix + material selection",
-            "text": "Cards vs wristbands vs mobile-primary mix per property type. Material: standard PVC vs eco PLA vs FSC wood vs metal hybrid. CMYK / spot UV / foil / metallic-ink artwork constraints + brand-standard compliance."
-          },
-          {
-            "label": "Week 4 — Compatibility sample 50–100 cards per platform",
-            "text": "Produce per-platform sample on confirmed chip + sector layout. Validate read at one room door + one elevator + one online door + one standalone door + (if applicable) parking gate / gym / F&B reader. Sign-off triggers full production."
-          },
-          {
-            "label": "Week 5–8 — Production wave 1 + estate-wide despatch",
-            "text": "Brand-standard artwork sign-off in parallel. Production wave 1 covers initial inventory (typically 6–8 months of stay-volume). Pre-encoded cards include facility code + lock-platform key block; blank cards ship without encoded data. Air or sea freight per opening timeline; receiving-side QC: visual inspection + 5% batch read-test + serialised audit-log capture."
-          },
-          {
-            "label": "Month 3 — Mobile Access rollout for early-adopter cohort",
-            "text": "Enable HID Mobile Access / Salto JustIN / Saflok LENS / ONITY DirectKey for Bonvoy / Honors / IHG / Hyatt frequent-guest cohort. Validate Apple Wallet hotel keys for properties with Apple-Wallet-Verified lock fleet. Plastic remains primary; phone is opt-in complement."
-          },
-          {
-            "label": "Quarter 2 onward — Master-key rotation + audit cadence",
-            "text": "Quarterly master-key rotation per AHLA / brand-standard policy. Lost-card hot-list synchronised via online-door gateway; standalone doors cascade master-key updates. Annual brand-standard audit + chip-family review for lock-platform changes."
-          },
-          {
-            "label": "Year 2+ — Operate, refresh and chip-family migration",
-            "text": "Field-reference operating notes — hospitality, luxury-brands, brand-protection, education and healthcare programmes — annual reorder cycle synchronised to brand-standard refresh; eco-material adoption review against Green Key / EarthCheck / LEED criteria; mobile-access fleet conversion target 80%+ guest opt-in by Year 3; lock-platform refresh on 7–10 year capital cycle aligned with property renovation calendar."
-          }
+        "**KONE Destination** — RFID lobby reader writes destination request to KONE elevator back-end via TCP/IP integration. The reader can be HF 13.56 MHz contactless (most common for hospitality) or BLE mobile credential. Integration spec published by KONE; integration testing typically runs 2–3 weeks per property.",
+        "**Otis Compass / Compass360** — Otis's destination dispatch family. Compass uses lobby touchscreen + RFID; Compass360 adds mobile-credential support via Otis's eView mobile platform.",
+        "**Schindler PORT** — Schindler PORT (formerly Miconic 10) is the world's first destination-dispatch system (1992). Modern Schindler PORT terminals accept RFID hospitality credentials and Schindler's PORT 4D BLE mobile credential.",
+        "**Mitsubishi DOAS (Destination Oriented Allocation System)** — common in Asian tower hotels. RFID lobby reader + in-car reader integration; Mitsubishi DOAS-Net protocol.",
+        "**Hitachi DFRS / FIBEE** — Hitachi's destination-dispatch family; common in Japanese hospitality estates. Integration with MIWA hotel lock credentials is a common pairing in Japan-domestic deployments.",
+        "**Architecture pattern** — most hotels run a single RFID credential type (e.g., MIFARE DESFire EV3) that opens both the guest room door (via the lock-vendor reader) and triggers elevator destination dispatch (via the elevator-vendor lobby reader). The credential authenticates to both vendors' back-ends through a shared PMS integration.",
+        "**Test plan** — pilot the elevator destination dispatch credential round-trip end-to-end before scaling. Mismatch between the lock-vendor encoder writing the credential and the elevator-vendor lobby reader reading it is the #1 failure mode. Both vendors need to confirm credential format support."
+      ]
+    },
+    {
+      "title": "Aliro 1.0 — unified Apple / Google / Samsung wallet digital key standard",
+      "intro": "Aliro 1.0 was published by the Connectivity Standards Alliance (CSA) in February 2026 as the unified standard for digital keys in mobile wallets across Apple, Google and Samsung. Before Aliro, every hotel-lock vendor implemented Apple Wallet, Google Wallet and BLE mobile keys via vendor-specific app integrations. Aliro standardises the credential format, the BLE / NFC / UWB transport, and the over-the-air credential delivery so that a single credential issued through the hotel's PMS can be delivered to any wallet platform without vendor-specific code.",
+      "bullets": [
+        "**Why Aliro matters in 2026** — eliminates vendor-specific BLE app sprawl. A hotel chain with mixed Vingcard / Saflok / SALTO / Onity lock estates can issue one Aliro-compliant digital key from the PMS that works on Apple Wallet, Google Wallet, Samsung Wallet, and any first-party lock-vendor app.",
+        "**Transport layers** — Aliro supports NFC (existing physical-card tap experience), BLE (proximity unlock with no tap required), and UWB (Ultra-Wideband for precise proximity gating in high-end deployments).",
+        "**Apple alignment** — Apple HCE NFC in apps (iOS 17.4 EEA-only feature, expected wider rollout) aligns with Aliro 1.0 transport.",
+        "**Lock-vendor readiness** — Vingcard, Saflok, SALTO, Onity have all signalled Aliro support roadmap. Properties planning a 2026–2027 access refresh should specify Aliro-readiness in vendor RFPs.",
+        "**Physical card co-existence** — Aliro mobile keys complement, not replace, physical cards. ADA accessibility, mobile-device failures, walk-in guests without the property app, and front-desk override scenarios still require the physical card baseline. Plan a parallel card programme that uses the same RFID chip family.",
+        "**Procurement window** — 2026 is the vendor-selection and pilot year. 2027 is full-line rollout. 2028+ is the operational baseline with both Aliro mobile keys and physical cards in production."
+      ]
+    },
+    {
+      "title": "Security update — four-vendor CVE timeline",
+      "intro": "Every major hotel-lock platform has had a public security disclosure of meaningful scale. Procurement teams running multi-vendor estates need to map remediation status across all four vendors, because the weakest-link CVE determines the property's actual access-control security posture. The table below is the comparative view that no single vendor will publish on their own product pages.",
+      "table": {
+        "columns": ["Disclosure", "Year", "CVE / advisory", "Affected scope", "Remediation"],
+        "rows": [
+          ["Onity HT-series Brocious", "2012", "No public CVE assigned", "Hundreds of thousands of HT-series locks globally", "Port-shield kit + Torx + paid firmware update. Properties that never participated are still exposed."],
+          ["Vingcard Vision F-Secure / Tuominen + Hirvonen \"InsecureKeys\"", "2018", "F-Secure SA-20180424-0", "~140,000 hotels / 42,000 facilities / 166 countries (Vision back-end only — NOT Visionline)", "Patch shipped February 2018. Visionline + Vostio Access Management are not affected."],
+          ["SALTO ProAccess SPACE", "2019", "CVE-2019-19457 (stored XSS), 19458 (path traversal), 19459 (arbitrary file write / RCE), 19460 (web-server-as-SYSTEM)", "ProAccess SPACE ≤ 5.5 installations", "Fix delivered in ProAccess SPACE 5.6."],
+          ["Saflok Unsaflok (Wouters + Carroll)", "2024", "CVE-2024-29916", "3+ million doors at 13,000+ properties in 131 countries", "Door-controller firmware update started November 2023. ~36% remediated at disclosure (March 2024)."]
         ]
+      },
+      "paragraphs": [
+        "For multi-vendor estates: confirm remediation status with each vendor's service for every door in scope before scaling new card stock or running any access-control audit. A property with patched Saflok + unpatched Onity HT is only as secure as the unpatched Onity HT zone. Schedule cross-vendor remediation as a single workstream rather than per-vendor sequencing.",
+        "Separately, the **MIFARE Classic Crypto-1 cipher** is publicly broken across all hotel-lock vendors. New estates should standardise on MIFARE DESFire EV3 with AES-128 authenticated sessions; existing Classic estates should sequence DESFire EV3 migration windows. See `/solutions/hotel-key-cards/` for the card-stock procurement decision."
+      ],
+      "callout": {
+        "label": "Procurement checklist",
+        "text": "Before scaling card stock in 2026: confirm CVE-2024-29916 remediation status on every Saflok door; confirm Visionline / Vostio (not Vision) on every Vingcard estate; confirm ProAccess SPACE / SALTO Space build ≥ 5.6 on every SALTO estate; confirm Onity HT-series port-shield + firmware status on every Onity HT door. Cross-link from each /compatibility/{vendor}/ page.",
+        "href": "/compatibility/"
       }
+    },
+    {
+      "title": "OSDP Secure Channel — replacing Wiegand on new builds",
+      "intro": "The 1970s Wiegand reader-to-controller protocol is plain text, unencrypted and easily cloneable by a tap-on-wire attack. OSDP (Open Supervised Device Protocol) v2 with Secure Channel adds AES-128 mutual authentication between reader and controller. On a 2026 access refresh, replacing Wiegand readers with OSDP-v2-capable readers closes the wire-side attack surface that even a remediated lock + DESFire EV3 card stack leaves open.",
+      "bullets": [
+        "**Wiegand vulnerability** — the reader sends card data to the controller in plain text over a two-wire interface. A tap-on-wire attack between reader and controller captures every credential without ever touching a card. Even when the chip is DESFire EV3 and the lock firmware is fully remediated, Wiegand on the back end is the weak link.",
+        "**OSDP v2 Secure Channel** — adds AES-128 mutual authentication between reader and controller. The reader and controller exchange a session key at start-of-session; all subsequent traffic is encrypted. Tap-on-wire attacks become useless.",
+        "**Migration strategy** — most properties on a Wiegand-based reader infrastructure can migrate to OSDP without changing the lock itself by replacing the reader head. New-construction hospitality projects should specify OSDP v2 + Secure Channel as the default; legacy estates should phase OSDP migration during the next access-control refresh cycle.",
+        "**SIA standards body** — Security Industry Association maintains the OSDP standard. SIA has published \"There Is a Hole in the Boat\" (November 2021) calling Wiegand insecure and recommending OSDP migration across the access-control industry.",
+        "**Dual-protocol readers** — many current readers support both Wiegand (legacy controller compatibility) and OSDP (forward-compatible). Procure these on a 2026 refresh so the property can migrate to OSDP back-ends without touching readers a second time."
+      ]
+    },
+    {
+      "title": "PMS integration — Oracle OPERA Cloud, Mews, Apaleo, Cloudbeds, Sabre SynXis",
+      "intro": "The PMS connector decides whether an access-control programme operates as a single property-wide system or as a federation of vendor silos. Oracle OPERA Cloud's `roomKeysOutbound` action enum is the de-facto standard PMS integration interface across major hotel-lock vendors; each lock vendor exposes its own local encoding agent that bridges the cloud PMS to USB / Ethernet encoder hardware.",
+      "bullets": [
+        "**Oracle OPERA Cloud** — integrate via `roomKeysOutbound` configuration with GUESTKEY_GENERIC outbound type. Supported actions: New / Duplicate / One-shot / Read / Delete key. Same shape across major hotel-lock vendor connectors. OPERA 5 (on-premise) supported via legacy serial interface.",
+        "**Mews** — Mews Open API integrates with Saflok, Vingcard, SALTO, Onity, Häfele Dialock and MIWA per published partner integrations. Requires vendor-specific connector (Saflok HMS, Dialock HMS, etc.) co-installed on front-desk PC.",
+        "**Apaleo** — listed as integration partner across Vingcard VConnect, Häfele Dialock, SALTO and others. Common for cloud-native independent and small-chain operators.",
+        "**Cloudbeds** — listed on Vingcard VConnect; documented integration with Saflok, SALTO and others.",
+        "**Sabre SynXis** — integration with hotel-lock vendors typically runs through SynXis Property Hub or SynXis Central Reservations connector to the lock-vendor back-end.",
+        "**Multi-property chain operations** — chains running multiple PMS deployments across properties standardise on the lock-vendor side (one connector per vendor) rather than the PMS side. Mixed PMS estates use the lock-vendor's back-end as the integration anchor."
+      ]
+    },
+    {
+      "title": "CapEx + OpEx framing — 100-key vs 500-key vs 2,000-key property",
+      "intro": "Whole-property RFID access-control programmes have a well-understood cost shape. The table below gives indicative ranges for three property profiles; actual quotes vary by reader-class mix, encoder count, mobile-credential rollout scope and lock-vendor choice.",
+      "table": {
+        "columns": ["Cost driver", "100-key boutique", "500-key full-service", "2,000-key resort / convention"],
+        "rows": [
+          ["Per-door hardware + install (baseline)", "$1,700–2,500", "$1,500–2,200 (density discount)", "$1,200–1,800 (volume discount)"],
+          ["Front-desk encoder hardware", "$3,000–8,000 (1 encoder)", "$8,000–20,000 (2–3 encoders)", "$20,000–50,000 (4–8 encoders)"],
+          ["Back-end software (cloud SaaS)", "$3.50–15/door/month", "$3.50–15/door/month", "$3.50–15/door/month"],
+          ["Elevator destination dispatch RFID integration", "n/a (low-rise)", "$15,000–40,000 per elevator bank", "$30,000–80,000 per bank × multiple banks"],
+          ["Parking gate RFID (UHF)", "$5,000–15,000", "$15,000–40,000", "$40,000–120,000"],
+          ["Amenity-zone readers (pool / gym / spa / etc.)", "$8,000–20,000", "$20,000–60,000", "$60,000–200,000"],
+          ["Annual maintenance / replacement", "$300–800/door/year", "$300–800/door/year", "$300–800/door/year"],
+          ["Mobile-key Aliro rollout (one-time)", "$10,000–30,000", "$30,000–80,000", "$80,000–200,000"]
+        ]
+      },
+      "bullets": [
+        "**Density discount** — per-door hardware + install cost drops roughly $200–500 per door at 70+ door scale due to amortised mobilisation and installer-day economics.",
+        "**Cloud-SaaS pricing** — typical $3.50–15 per door per month range covers Saflok Ambiance, Vingcard Vostio, SALTO KS at chain-negotiation tier. Property-by-property pricing tends higher.",
+        "**Mobile-key Aliro CapEx** — one-time integration with the PMS + lock-vendor mobile-credential back-end. After rollout, ongoing cost is bundled in the SaaS subscription.",
+        "**Annual maintenance** — typically 5–10% of per-door hardware cost for routine maintenance, battery replacement, firmware updates and warranty servicing.",
+        "**ROI consideration** — modern access-control hardware has 7–10-year service life. Total cost of ownership over 7 years amortises to ~$300–400 per door per year all-in."
+      ]
+    },
+    {
+      "title": "Compliance overlay — PCI DSS v4.0, GDPR, ADA, ISO/IEC 27001",
+      "intro": "Hospitality access control crosses four compliance regimes that intersect at specific control points. Treat the compliance layer as a procurement gate, not a post-hoc audit.",
+      "bullets": [
+        "**PCI DSS v4.0** — triggered when amenity / POS spend flows through the PMS that issues access credentials. Named control of relevance: 15-minute idle session timeout (the only PCI DSS control with a specific time value). Reader-to-controller traffic on OSDP Secure Channel satisfies the encryption-in-transit requirement.",
+        "**GDPR (EU 2016/679)** — access logs are personal data when tied to guest identity. Article 32 mandates appropriate technical / organisational measures including retention limits; typical retention is 30–90 days for routine guest access, longer for staff and BOH zones. Document the retention policy in the privacy notice.",
+        "**ADA / ICC ANSI A117.1** — §308–309 specify operable-parts reach range 34–48 inches AFF (Above Finished Floor) for forward-reach and side-reach scenarios. Reader-mount height needs to fall in this range on all guest-accessible doors. The U.S. Access Board Chapter 4 also covers maneuvering-clearance overlap rules for door hardware.",
+        "**ISO/IEC 27001 / 27002** — Annex A controls A.7 (physical entry) and A.9 (access control) apply to the property's information-security management system. Hospitality chains pursuing ISO 27001 certification need documented procedures for credential issuance, revocation, periodic review and audit-log retention.",
+        "**CCPA (California Consumer Privacy Act)** — applies to California-resident guest access data. Similar controller / processor framework to GDPR.",
+        "**Industry-specific** — PCI DSS v4.0 is the only major framework with a specific named time-value (15-min idle timeout); ISO 27001 + GDPR are framework-level. Document the named PCI value in supplier RFP responses to distinguish from generic \"compliance-friendly\" claims."
+      ]
+    },
+    {
+      "title": "Pilot validation checklist — whole-property test plan",
+      "intro": "A whole-property access-control pilot should exercise every zone, every reader class, every credential factor, every integration partner, and every compliance gate before scaling. Scaling without complete pilot validation produces predictable expensive retrofits.",
+      "bullets": [
+        "**Per-zone validation** — test the credential on at least one door / reader from every zone in the matrix above. Mismatch between zones (e.g., room-door reader accepts DESFire EV3 but pool-area reader is still Classic-only) is the #1 cross-zone failure mode.",
+        "**Elevator destination dispatch end-to-end** — validate the round-trip from PMS → lock-vendor encoder → elevator-vendor lobby reader → car assignment → in-car reader (for club-floor gating). Both lock vendor and elevator vendor need to confirm credential format compatibility.",
+        "**CVE remediation confirmation** — for every lock vendor in scope, confirm remediation status with vendor service. Saflok CVE-2024-29916, Vingcard Vision 2018, SALTO 2019 cluster, Onity HT 2012 each need explicit confirmation.",
+        "**Aliro mobile credential** — pilot the Apple Wallet + Google Wallet + Samsung Wallet credential delivery flow if mobile keys are in scope. Confirm BLE proximity behaviour at expected reader sites.",
+        "**OSDP v2 Secure Channel validation** — if migrating from Wiegand, confirm OSDP Secure Channel handshake on each reader-controller pairing.",
+        "**PCI DSS / GDPR / ADA compliance** — exercise the 15-minute idle timeout; verify reader-mount height with tape measure (not eyeball); confirm access-log retention is set per policy.",
+        "**100-200 credential pilot batch** — produce a pilot batch of 100–200 cards (or BLE credentials) and exercise full PMS round-trip (issue / extend / replace / cancel) on live reservations before scaling to full property."
+      ]
     }
   ],
   "resourceCards": [
     {
-      "title": "Best-fit products",
-      "description": "Start with the main hospitality credential formats already present in the catalog.",
+      "title": "Access-control catalogue + adjacent solutions",
+      "description": "Card SKUs, keyfobs, wristbands and reader products for the whole-property programme.",
       "links": [
-        {
-          "href": "/product/hotel-key-cards/",
-          "label": "Hotel key cards"
-        },
-        {
-          "href": "/product/rfid-wristbands-for-hotels/",
-          "label": "RFID wristbands for hotels"
-        },
-        {
-          "href": "/product/printed-rfid-cards/",
-          "label": "Printed RFID cards"
-        },
-        {
-          "href": "/products/rfid-cards/mifare-plus-se-card/",
-          "label": "MIFARE Plus SE card (transitional AES)"
-        },
-        {
-          "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 card (enterprise AES-128)"
-        },
-        {
-          "href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/",
-          "label": "ASSA ABLOY-compatible card (VingCard / Saflok fit)"
-        }
+        {"href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/", "label": "ASSA ABLOY-compatible hotel cards"},
+        {"href": "/products/rfid-keyfobs/", "label": "RFID keyfobs (staff zones)"},
+        {"href": "/products/rfid-readers/", "label": "RFID readers"},
+        {"href": "/products/rfid-wristbands/", "label": "RFID wristbands (all-inclusive resort)"},
+        {"href": "/solutions/hotel-key-cards/", "label": "Hotel key cards (SKU procurement)"},
+        {"href": "/solutions/rfid-keyfobs-access-control/", "label": "RFID keyfob access control"}
       ]
     },
     {
-      "title": "Adjacent solutions — companion programmes",
-      "description": "Solutions paired with the integrated hotel access programme.",
+      "title": "Vendor compatibility guides",
+      "description": "Per-vendor compatibility detail for the seven major hotel-lock platforms.",
       "links": [
-        {
-          "href": "/solutions/hotel-key-cards/",
-          "label": "Hotel key cards — SKU-level procurement guide"
-        },
-        {
-          "href": "/solutions/rfid-access-control/",
-          "label": "RFID access control — corporate / back-of-house PACS"
-        },
-        {
-          "href": "/solutions/rfid-event-access-control/",
-          "label": "RFID event access control — meetings / conferences / banquets"
-        },
-        {
-          "href": "/solutions/google-review-cards-for-hotels/",
-          "label": "Google Review NFC cards for hotels"
-        }
+        {"href": "/compatibility/saflok-hotel-key-cards/", "label": "Saflok compatibility"},
+        {"href": "/compatibility/vingcard-hotel-key-cards/", "label": "Vingcard compatibility"},
+        {"href": "/compatibility/salto-hotel-key-cards/", "label": "SALTO compatibility"},
+        {"href": "/compatibility/onity-hotel-key-cards/", "label": "Onity compatibility"},
+        {"href": "/compatibility/miwa-hotel-key-cards/", "label": "MIWA compatibility"},
+        {"href": "/compatibility/hafele-dialock-hotel-key-cards/", "label": "Häfele Dialock compatibility"},
+        {"href": "/compatibility/be-tech-hotel-key-cards/", "label": "Be-Tech compatibility"}
       ]
     },
     {
-      "title": "Industry + compatibility + compare",
-      "description": "Use the industry landing, lock-compatibility pages and chip compares to tighten the first decision.",
+      "title": "Related editorial",
+      "description": "Background reading on hotel access-control architecture.",
       "links": [
-        {
-          "href": "/industries/hospitality/",
-          "label": "Hospitality industry landing"
-        },
-        {
-          "href": "/compatibility/",
-          "label": "All hotel-lock compatibility pages"
-        },
-        {
-          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
-          "label": "MIFARE Classic vs Plus vs DESFire for hotel locks"
-        },
-        {
-          "href": "/compare/hotel-key-cards-vs-hotel-wristbands/",
-          "label": "Compare hotel cards vs wristbands"
-        },
-        {
-          "href": "/2024/12/25/rfid-hotel-key-card/",
-          "label": "Hotel RFID key card guide"
-        },
-        {
-          "href": "/faq/",
-          "label": "Sample lead times + minimums"
-        }
+        {"href": "/blog/how-hotel-rfid-key-cards-work/", "label": "How hotel RFID key cards work"},
+        {"href": "/blog/hotel-key-card-encoding-explained/", "label": "Hotel key card encoding explained"},
+        {"href": "/blog/rfid-elevator-floor-access/", "label": "RFID elevator floor access"},
+        {"href": "/blog/nfc-door-locks-rfid-cards/", "label": "NFC door locks & RFID cards"}
       ]
     }
   ],
   "faq": [
     {
-      "question": "When should a hotel keep cards instead of switching to wristbands?",
-      "answer": "Card-first programs still make sense for most room-key deployments, especially where guests expect a familiar form factor and amenity access is limited."
+      "question": "How do I design a hotel access-control system across all the zones in a whole property?",
+      "answer": "Map every zone to a reader-class + credential-factor combination. The matrix above lists 13 typical zones (guest room, club floor, BOH, IT vault, loading dock, elevator lobby, parking gate, EV charger, pool, gym, kids' club, conference rooms, executive lounge) with the recommended reader class (HF 13.56 MHz for doors and amenity zones; UHF 860–960 MHz for parking and EV charger long-range) and the credential factor (card-only, card + PIN, card + biometric for IT vault). One physical card should resolve to all the zones the guest is entitled to use; PMS-driven profiles control which zones the card opens. Plan the elevator destination dispatch integration as a separate workstream because it crosses two vendors (lock + elevator)."
     },
     {
-      "question": "Can hotels run cards and wristbands together?",
-      "answer": "Yes. Mixed programs are common when guest rooms use cards while pools, gyms or VIP amenities use wristbands."
+      "question": "How does RFID elevator destination dispatch work?",
+      "answer": "Most modern tower hotels run destination-dispatch elevator control: the guest presents an RFID credential at a lobby terminal (KONE Destination, Otis Compass, Schindler PORT, Mitsubishi DOAS, Hitachi DFRS). The terminal reads the card, queries the destination floor from the PMS via the lock-vendor back-end, assigns an elevator car, and displays the car letter / number to the guest. The guest walks to the assigned car; some systems also have an in-car reader for club-floor gating where only the elevator stops at certain floors are allowed without a credential. Schindler PORT (originally Miconic 10, 1992) is the world's first destination-dispatch system; modern systems are functionally similar but with deeper RFID and BLE mobile-credential integration. Integration testing typically runs 2–3 weeks per property; both lock vendor and elevator vendor need to confirm credential format compatibility."
     },
     {
-      "question": "What speeds up a hotel RFID quote?",
-      "answer": "Sharing the current lock estate, chip requirement, preferred credential format and target sample quantity removes most early back-and-forth."
+      "question": "What is Aliro 1.0 and when should we plan for it?",
+      "answer": "Aliro 1.0 is the Connectivity Standards Alliance (CSA) unified standard for digital keys in mobile wallets across Apple, Google and Samsung, released February 2026. Before Aliro, every hotel-lock vendor implemented Apple Wallet, Google Wallet and BLE mobile keys via vendor-specific app integrations. Aliro standardises the credential format and the BLE / NFC / UWB transport so one credential issued through the hotel PMS works on every wallet platform. Vingcard, Saflok, SALTO and Onity have all signalled Aliro support roadmaps. 2026 is the vendor-selection / pilot year; 2027 is full-line rollout; 2028 is operational baseline. Physical cards remain the baseline for ADA / mobile-device-failure / walk-in-without-app scenarios."
     },
     {
-      "question": "How does Mobile Access (Apple Wallet hotel keys, BLE digital key) fit alongside plastic cards?",
-      "answer": "Mobile Access is opt-in for the guest, complementary to plastic. Guests with the brand app (Marriott Bonvoy / Hilton Honors / IHG One Rewards / World of Hyatt) and an iOS/Android device with compatible firmware can choose to use phone-as-key. Plastic remains the issued credential at check-in for guests who don't opt in. Properties need lock firmware that supports the relevant SDK (HID Mobile Access via Origo, Salto JustIN, Saflok LENS, ONITY DirectKey)."
+      "question": "Should we worry about CVE-2024-29916 (Saflok) and the Vingcard / SALTO / Onity CVEs in a 2026 procurement?",
+      "answer": "Yes — every major hotel-lock platform has had a public security disclosure of meaningful scale. Saflok CVE-2024-29916 (March 2024) affected 3+ million doors at 13,000+ properties in 131 countries; remediation requires a door-controller firmware update that dormakaba began shipping November 2023. Roughly 36% were remediated by disclosure. Vingcard Vision 2018 F-Secure disclosure (~140,000 hotels; patched Feb 2018; Visionline and Vostio NOT affected). SALTO ProAccess SPACE 2019 CVE cluster (CVE-2019-19457/19458/19459/19460; fixed in 5.6). Onity HT 2012 Brocious (no formal CVE; port-shield + firmware kit). For multi-vendor estates, the weakest-link CVE determines the property's actual security posture — map remediation status across every vendor before adding card stock or running an audit."
     },
     {
-      "question": "What master-key rotation cadence does the brand-standard policy require?",
-      "answer": "Most brand-standard books mandate ≤90-day master-key rotation, with immediate rotation on security-incident detection. The PMS-integrated encoder handles online-door propagation; standalone doors cascade through advance-master programming during housekeeping rounds."
+      "question": "What is OSDP v2 Secure Channel and why does it matter for hotel access control?",
+      "answer": "OSDP (Open Supervised Device Protocol) v2 with Secure Channel replaces the 1970s Wiegand plain-text reader-to-controller protocol with AES-128 mutual authentication. Wiegand is plain text on the wire between reader and controller — a tap-on-wire attack captures every credential without ever touching a card. Even a remediated lock running DESFire EV3 cards is only as secure as the Wiegand wire. OSDP Secure Channel encrypts the reader-controller exchange and closes this attack surface. New-construction projects should specify OSDP v2 + Secure Channel as the default; legacy estates should phase OSDP migration during the next access-control refresh. Dual-protocol readers support both Wiegand (legacy controllers) and OSDP (forward-compatible)."
+    },
+    {
+      "question": "What ADA / accessibility constraints apply to hotel reader siting?",
+      "answer": "ICC ANSI A117.1 §308 (forward reach) and §309 (side reach) specify operable-parts reach range 34–48 inches AFF (Above Finished Floor). Reader-mount height on guest-accessible doors needs to fall in this range. The U.S. Access Board Chapter 4 covers maneuvering-clearance overlap rules for door hardware. For lock-face readers (typical hotel guest room), the reader is integrated into the lock fixture and follows the lock-vendor's published mounting spec. For wall-mounted readers (elevator lobby, BOH, amenity zones), the 34–48-inch AFF range is the procurement target; document this in the supplier RFP response."
+    },
+    {
+      "question": "How does PCI DSS v4.0 affect a hotel access-control programme?",
+      "answer": "PCI DSS v4.0 is triggered when amenity / POS spend flows through the PMS that issues access credentials. The named control of operational relevance is the 15-minute idle session timeout — the only PCI DSS control with a specific named time value. Reader-to-controller traffic on OSDP Secure Channel satisfies the encryption-in-transit requirement; access logs must be retained per PCI logging policy. Document the named 15-minute value in supplier RFP responses to distinguish from generic compliance claims. For properties where PMS spend tracking is fully decoupled from access-credential issuance, PCI DSS scope may be reduced; consult the property's QSA on scoping."
+    },
+    {
+      "question": "What is the typical CapEx for whole-property access control across 100 / 500 / 2,000 keys?",
+      "answer": "Per-door hardware + install runs $1,700–2,500 per door at 100-key boutique scale; $1,500–2,200 per door at 500-key full-service (density discount); $1,200–1,800 per door at 2,000-key resort / convention (volume discount). Front-desk encoder hardware: $3,000–8,000 (1 encoder, 100-key) to $20,000–50,000 (4–8 encoders, 2,000-key). Back-end cloud SaaS: $3.50–15 per door per month. Elevator destination dispatch integration: $15,000–40,000 per elevator bank. Parking gate UHF: $5,000–120,000 depending on scale. Amenity-zone readers: $8,000–200,000. Annual maintenance: $300–800 per door per year. Mobile-key Aliro rollout one-time: $10,000–200,000. Total cost of ownership over 7-year service life amortises to ~$300–400 per door per year all-in."
+    },
+    {
+      "question": "How do we handle a mixed-vendor lock estate (Saflok + Vingcard + SALTO across multiple properties)?",
+      "answer": "Three patterns work. (1) Single-credential-across-vendors — issue one MIFARE Plus EV2 SL3 or MIFARE DESFire EV3 SKU that reads on every vendor's current reader heads. Limit: older Vingcard E100 / C100 readers don't accept DESFire EV3, so this works only when all vendors are on current reader-types. (2) Per-vendor card stock with PMS as the integration anchor — issue Vingcard SKU for Vingcard properties, Saflok SKU for Saflok properties, SALTO SKU for SALTO properties, all managed through one chain-level PMS connector. Higher card-stock complexity but maximum compatibility. (3) Aliro mobile credential as the unifier — once Aliro 1.0 is rolled out across all vendors in 2026–2028, the same mobile credential works on every vendor's reader. This is the medium-term path for chains with three-plus vendor estates."
     }
+  ],
+  "primaryAction": {"href": "/contact/hotel-rfid/", "label": "Get a whole-property access control plan"},
+  "secondaryActions": [
+    {"href": "/compatibility/", "label": "Browse vendor compatibility guides"},
+    {"href": "/solutions/hotel-key-cards/", "label": "Hotel key cards (SKU procurement)"},
+    {"href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "Compare chip families"},
+    {"href": "/contact/", "label": "General contact"}
   ],
   "sources": [
-    {
-      "label": "ISO/IEC 14443:2018 — Proximity cards (HF 13.56 MHz)",
-      "url": "https://www.iso.org/standard/73599.html",
-      "publisher": "ISO",
-      "publishedAt": "2018-09",
-      "accessedAt": "2026-04-26",
-      "note": "HF air interface governing hotel-lock MIFARE / DESFire credentials across all major lock estates."
-    },
-    {
-      "label": "ISO/IEC 7810:2019 — Identification cards — Physical characteristics",
-      "url": "https://www.iso.org/standard/70483.html",
-      "publisher": "ISO",
-      "publishedAt": "2019-03",
-      "accessedAt": "2026-04-26",
-      "note": "Baseline CR80 dimensions and durability specs for hotel key cards."
-    },
-    {
-      "label": "NXP MIFARE DESFire EV3 product brief",
-      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-desfire/mifare-desfire-ev3:MIFARE-DESFIRE-EV3",
-      "publisher": "NXP Semiconductors",
-      "publishedAt": "2020-09",
-      "accessedAt": "2026-04-26",
-      "note": "AES-128 secure HF credential specified by modern hotel-lock vendors for new build and retrofit estates."
-    },
-    {
-      "label": "NXP MIFARE Plus EV2 product brief",
-      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-plus/mifare-plus-ev2:MIFARE-PLUS-EV2",
-      "publisher": "NXP Semiconductors",
-      "publishedAt": "2020-04",
-      "accessedAt": "2026-04-26",
-      "note": "Migration silicon between MIFARE Classic and DESFire — common in retrofit hotel estates running SL1/SL3 dual mode."
-    },
-    {
-      "label": "ASSA ABLOY Global Solutions — Hospitality (VingCard, Mobile Access, Signature RFID)",
-      "url": "https://www.assaabloyglobalsolutions.com/en/hospitality",
-      "publisher": "ASSA ABLOY Global Solutions",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Leading hotel-lock ecosystem covering RFID cards, wristbands, mobile credentials and PMS integrations."
-    },
-    {
-      "label": "Salto Systems — Hospitality access (SVN, KS, JustIN Mobile)",
-      "url": "https://saltosystems.com/en/solutions/hospitality/",
-      "publisher": "Salto Systems",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Major hotel-lock platform reference for cloud-first independent + lifestyle hotels and serviced apartments."
-    },
-    {
-      "label": "dormakaba — Hospitality access (Saflok Quantum, Confidant RFID, LENS)",
-      "url": "https://www.dormakaba.com/us-en/solutions/markets/hotels",
-      "publisher": "dormakaba",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Major hotel-lock vendor ecosystem including Saflok and Confidant RFID families — Hyatt / Wyndham / Choice OEM."
-    },
-    {
-      "label": "ONITY — Hotel locks and DirectKey mobile",
-      "url": "https://www.onity.com/products/hotel-locks/",
-      "publisher": "ONITY (Carrier)",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Major hospitality-lock OEM with HT22i / Advance / Trillium portfolios + DirectKey BLE mobile-access SDK."
-    },
-    {
-      "label": "Oracle Hospitality — OPERA Cloud + OPERA Vendor Interface (OVI) for door locks",
-      "url": "https://www.oracle.com/hospitality/hotel-property-management/",
-      "publisher": "Oracle",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Dominant full-service hotel PMS with OVI / OWS interfaces to ASSA ABLOY VingCard, dormakaba Saflok, Salto, ONITY and MIWA encoder drivers."
-    },
-    {
-      "label": "HTNG — Hotel Technology Next Generation (Lock/PMS Integration specifications)",
-      "url": "https://www.htng.org/",
-      "publisher": "Hotel Technology Next Generation",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Industry consortium publishing lock + PMS integration interface specs adopted across major hotel-lock OEMs and PMS vendors."
-    }
+    {"label": "CVE-2024-29916 — NIST NVD (Unsaflok)", "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-29916", "publisher": "NIST NVD", "publishedAt": "2024-03", "accessedAt": "2026-05-11", "note": "Saflok master-key forgery vulnerability — 3M+ doors, 131 countries; ~36% remediated at disclosure."},
+    {"label": "Unsaflok researcher disclosure site", "url": "https://unsaflok.com/", "publisher": "Wouters / Carroll et al.", "publishedAt": "2024-03-21", "accessedAt": "2026-05-11", "note": "Primary technical disclosure. November 2023 firmware fix rollout."},
+    {"label": "Wired — Hackers Found a Way to Open Any of 3 Million Hotel Keycard Locks", "url": "https://www.wired.com/story/saflok-hotel-lock-unsaflok-hack-technique/", "publisher": "Wired (Andy Greenberg)", "publishedAt": "2024-03-21", "accessedAt": "2026-05-11", "note": "General-press authority for Unsaflok scale figures."},
+    {"label": "Wired — One-Minute Attack Let Hackers Spoof Hotel Master Keys (Vingcard Vision)", "url": "https://www.wired.com/story/one-minute-attack-let-hackers-spoof-hotel-master-keys/", "publisher": "Wired", "publishedAt": "2018-04", "accessedAt": "2026-05-11", "note": "F-Secure Vingcard Vision disclosure — 140,000 hotels affected."},
+    {"label": "Schneier on Security — Vingcard Vision security vulnerability", "url": "https://www.schneier.com/blog/archives/2018/04/security_vulner_14.html", "publisher": "Bruce Schneier", "publishedAt": "2018-04", "accessedAt": "2026-05-11", "note": "Independent expert analysis of the Vision attack."},
+    {"label": "CVE-2019-19457 — NIST NVD (SALTO ProAccess SPACE)", "url": "https://nvd.nist.gov/vuln/detail/CVE-2019-19457", "publisher": "NIST NVD", "publishedAt": "2019-12", "accessedAt": "2026-05-11", "note": "Stored XSS in ProAccess SPACE ≤ 5.5 — fixed in 5.6."},
+    {"label": "SEC Consult — SALTO ProAccess SPACE advisory", "url": "https://sec-consult.com/vulnerability-lab/advisory/multiple-critical-vulnerabilities-in-salto-proaccess-space/", "publisher": "SEC Consult", "publishedAt": "2019-12-02", "accessedAt": "2026-05-11", "note": "All four SALTO CVEs in one disclosure."},
+    {"label": "Cody Brocious — DEF CON 20 talk (Onity HT-series, 2012)", "url": "https://media.defcon.org/DEF%20CON%2020/DEF%20CON%2020%20presentations/", "publisher": "DEF CON", "publishedAt": "2012-07", "accessedAt": "2026-05-11", "note": "Original Onity HT-series disclosure — no public CVE assigned."},
+    {"label": "Aliro 1.0 specification release (MacRumors coverage)", "url": "https://www.macrumors.com/2026/02/26/aliro-specification-released/", "publisher": "MacRumors", "publishedAt": "2026-02-26", "accessedAt": "2026-05-11", "note": "Aliro 1.0 CSA release — unified Apple / Google / Samsung digital-key standard."},
+    {"label": "CSA Aliro working group", "url": "https://csa-iot.org/all-solutions/aliro/", "publisher": "Connectivity Standards Alliance", "accessedAt": "2026-05-11", "note": "Authoritative Aliro programme reference."},
+    {"label": "Schindler PORT destination dispatch (elevator)", "url": "https://www.schindler.com/en/elevators/destination-control/port-elevator.html", "publisher": "Schindler", "accessedAt": "2026-05-11", "note": "World's first destination-dispatch system (Miconic 10, 1992); current PORT terminals accept RFID hospitality credentials."},
+    {"label": "Otis Compass destination dispatch", "url": "https://www.otis.com/en/us/products-services/products/dispatching", "publisher": "Otis Elevator Company", "accessedAt": "2026-05-11", "note": "Compass / Compass360 family with RFID + mobile credential support."},
+    {"label": "KONE Destination control system", "url": "https://www.kone.com/en/products-and-services/destination-control-system/", "publisher": "KONE", "accessedAt": "2026-05-11", "note": "KONE Destination integrates with hotel RFID lobby readers via TCP/IP."},
+    {"label": "AMAG Elevator Destination Dispatch whitepaper", "url": "https://www.amag.com/wp-content/uploads/2023/12/AMAG-1520_WhitePapers_ElevatorDispatch_v1.pdf", "publisher": "AMAG / Allied Universal", "publishedAt": "2023-12", "accessedAt": "2026-05-11", "note": "Multi-vendor (KONE / Otis / Schindler) destination dispatch integration architecture."},
+    {"label": "Destination dispatch — Wikipedia", "url": "https://en.wikipedia.org/wiki/Destination_dispatch", "publisher": "Wikipedia", "accessedAt": "2026-05-11", "note": "Industry timeline — Miconic 10 (1992), Compass / Polaris (2005)."},
+    {"label": "SIA — Open Supervised Device Protocol (OSDP) page", "url": "https://www.securityindustry.org/industry-standards/open-supervised-device-protocol/", "publisher": "Security Industry Association", "accessedAt": "2026-05-11", "note": "OSDP v2 AES-128 Secure Channel reference."},
+    {"label": "SIA — There Is a Hole in the Boat (Wiegand → OSDP migration)", "url": "https://www.securityindustry.org/2021/11/09/there-is-a-hole-in-the-boat-why-access-control-professionals-need-to-move-from-wiegand-to-osdp/", "publisher": "Security Industry Association", "publishedAt": "2021-11-09", "accessedAt": "2026-05-11", "note": "Industry-body case for migrating away from Wiegand to OSDP Secure Channel."},
+    {"label": "NIST SP 800-116 Rev 1 — PIV Credential Use in Facility PACS", "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-116r1.pdf", "publisher": "NIST", "publishedAt": "2018-06", "accessedAt": "2026-05-11", "note": "Reference framework for physical access-control credential design."},
+    {"label": "U.S. Access Board — Chapter 4 (Entrances, Doors, and Gates)", "url": "https://www.access-board.gov/ada/guides/chapter-4-entrances-doors-and-gates/", "publisher": "U.S. Access Board", "accessedAt": "2026-05-11", "note": "ADA reach-range and maneuvering-clearance requirements for hotel reader mounting."},
+    {"label": "Oracle OPERA Cloud roomKeysOutbound configuration", "url": "https://docs.oracle.com/en/industries/hospitality/integration-platform/psrko/c_configurations.htm", "publisher": "Oracle", "accessedAt": "2026-05-11", "note": "GUESTKEY_GENERIC outbound type with New / Duplicate / One-shot / Read / Delete action enum."},
+    {"label": "Apple Developer — HCE NFC in apps", "url": "https://developer.apple.com/support/hce-transactions-in-apps/", "publisher": "Apple", "accessedAt": "2026-05-11", "note": "iOS HCE NFC support for hotel-key applications."},
+    {"label": "CNBC — Apple and Google Wallets want to make hotel room key cards obsolete", "url": "https://www.cnbc.com/2024/09/01/apple-and-google-wallets-want-to-make-hotel-room-key-card-obsolete-.html", "publisher": "CNBC", "publishedAt": "2024-09-01", "accessedAt": "2026-05-11", "note": "Mainstream press validation of the mobile-wallet hotel-key trend."}
   ],
-  "primaryAction": {
-    "href": "/contact/hotel-rfid/",
-    "label": "Request hotel RFID guidance"
-  },
-  "secondaryActions": [
-    {
-      "href": "/products/rfid-cards/",
-      "label": "Browse RFID cards"
-    },
-    {
-      "href": "/products/rfid-wristbands/",
-      "label": "Browse RFID wristbands"
-    },
-    {
-      "href": "/compare/hotel-key-cards-vs-hotel-wristbands/",
-      "label": "Compare formats"
-    }
-  ],
-  "authorSlug": "peter-zhang",
+  "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-26"
+  "reviewedAt": "2026-05-11"
 }

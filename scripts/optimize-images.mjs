@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Optimize large images in dist-restored/ by:
+ * Optimize large images in dist/ by:
  * 1. Converting PNG → WebP (with PNG fallback retained)
  * 2. Re-compressing large JPEGs (quality 80)
  * 3. Updating HTML img src/srcset references to prefer WebP
@@ -16,7 +16,7 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const sharp = require("sharp");
 
-const DIST = path.join(process.cwd(), "dist-restored");
+const DIST = path.join(process.cwd(), "dist");
 const SIZE_THRESHOLD = 200 * 1024; // Only optimize files > 200 KB
 const JPEG_QUALITY = 80;
 const WEBP_QUALITY = 80;

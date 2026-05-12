@@ -1,0 +1,125 @@
+---
+/**
+ * Editorial page hero — kicker + title + Quick Answer summary + hero points
+ * + CTA bar (with optional pillar-bridge ghost button) + trust bar +
+ * `<picture>` WebP-first illustration.
+ *
+ * Shadow component (Stage 2). Mirrors the inline hero expression in
+ * `renderEditorialMain()` (~line 1605) — the most complex variant in the
+ * page composer.
+ *
+ * Branching:
+ *   - `group === "contact"` → suppress CTA + trust bar (contact pages have
+ *     their own ContactChannels block)
+ *   - `getPillarClusterId(route)` returns a cluster id → emit ghost CTA
+ *     linking to `/products/all/#<cluster>` with `data-pillar-bridge`
+ *   - illustration source starts with `/landing-images/` → emit `<picture>`
+ *     with WebP `<source>` ahead of the original `<img>` (DS-15 Phase 6
+ *     #2 + #6 — WebP-first markup mirror)
+ *   - illustration absent → suppress figure entirely
+ */
+import type { EditorialDefinition } from "../../lib/editorial-types";
+import { resolvePageType, renderInlineLinks } from "../../lib/editorial-types";
+import { getPillarClusterId, PILLAR_CLUSTER_LABELS } from "../../lib/editorial-pages";
+import { resolveHeroAltOverride } from "../../lib/editorial-shadow-normalizers";
+
+interface Illustration {
+  src: string;
+  alt: string;
+}
+
+interface Props {
+  definition: EditorialDefinition;
+  illustration: Illustration | null;
+}
+
+const { definition, illustration } = Astro.props;
+
+const pageType = resolvePageType(definition.group);
+const isContact = definition.group === "contact";
+const samplesHref = `/contact/?intent=samples&route=${encodeURIComponent(definition.route)}`;
+const pillarClusterId = getPillarClusterId(definition.route);
+const pillarLabel = pillarClusterId ? PILLAR_CLUSTER_LABELS[pillarClusterId] : null;
+
+const isLandingImage = illustration?.src.startsWith("/landing-images/") ?? false;
+const webpSrc = illustration && isLandingImage
+  ? illustration.src.replace(/\.(jpe?g|png)$/i, ".webp")
+  : null;
+
+// Stage 3 shadow normalizer (sprint 1): mirror normalize-body.ts's
+// `PAGE_IMAGE_OVERRIDES` alt-only rewrite. If the route has an entry AND
+// its url matches our illustration src (relative or absolute form), use
+// the override's alt. The src is NOT changed — legacy behavior preserved.
+const heroAlt = illustration
+  ? resolveHeroAltOverride(definition.route, illustration.src) ?? illustration.alt
+  : null;
+
+// Run summary through renderInlineLinks so any contextual link injection
+// (Stage 3 sprint 1, applied by `preProcessContextualLinks` at the page
+// composer level) materializes as an `<a>` tag. Plain summary text without
+// markdown links round-trips unchanged through the escape pass.
+const summaryHtml = renderInlineLinks(definition.summary);
+---
+<section class="codex-editorial-hero" data-page-type={pageType}>
+  <div class="codex-editorial-hero-copy">
+    <p class="codex-editorial-kicker">{definition.kicker}</p>
+    <h1>{definition.title}</h1>
+    <div class="codex-editorial-answer" aria-label="Quick answer">
+      <p class="codex-editorial-answer-label">Quick answer</p>
+      <p class="codex-editorial-summary" set:html={summaryHtml} />
+    </div>
+    <ul class="codex-editorial-points">
+      {definition.heroPoints.map((item) => <li>{item}</li>)}
+    </ul>
+    {!isContact && (
+      <>
+        <div class="codex-hero-cta">
+          <a class="codex-hero-cta-btn" data-cta-tier="hero" href={samplesHref}>Request samples</a>
+          {pillarClusterId && pillarLabel && (
+            <a
+              class="codex-hero-cta-btn codex-hero-cta-btn--ghost"
+              href={`/products/all/#${pillarClusterId}`}
+              data-pillar-bridge={pillarClusterId}
+            >Browse all {pillarLabel} SKUs <span aria-hidden="true">→</span></a>
+          )}
+        </div>
+        <div class="codex-hero-trust-bar">
+          <span><strong>10+</strong> Years</span>
+          <span><strong>ISO 9001</strong></span>
+          <span><strong>500+</strong> Clients</span>
+          <span><strong>50+</strong> Countries</span>
+        </div>
+      </>
+    )}
+  </div>
+  {illustration && (
+    isLandingImage && webpSrc ? (
+      <figure class="codex-editorial-figure">
+        <picture>
+          <source srcset={webpSrc} type="image/webp" />
+          <img
+            src={illustration.src}
+            alt={heroAlt ?? illustration.alt}
+            width="1200"
+            height="675"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </picture>
+      </figure>
+    ) : (
+      <figure class="codex-editorial-figure">
+        <img
+          src={illustration.src}
+          alt={heroAlt ?? illustration.alt}
+          width="1200"
+          height="675"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </figure>
+    )
+  )}
+</section>

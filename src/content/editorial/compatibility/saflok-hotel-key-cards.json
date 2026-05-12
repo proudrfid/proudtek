@@ -1,15 +1,26 @@
 {
   "route": "/compatibility/saflok-hotel-key-cards/",
   "group": "compatibility",
-  "title": "Saflok Hotel Key Cards Compatibility Guide",
+  "title": "Saflok Hotel Key Cards Compatibility Guide (2026): Lock Generations, Encoders, Chip Families, CVE-2024-29916",
   "kicker": "Compatibility Guide",
-  "summary": "A technical compatibility guide for dormakaba Saflok hotel lock estates. Covering lock generations (Quantum IV, Quantum RT, Confidant RFID, MT RFID, Messenger LENS, Quantum Plus), chip families per generation, the Saflok System 6000 / Ambiance encoding stack, PMS integration points and the field failure modes that most often derail a Saflok card refresh.",
+  "summary": "Procurement-grade compatibility reference for dormakaba Saflok hotel lock estates. Maps the seven lock generations (MT, Confidant, Quantum IV / RT, Messenger LENS, Quantum Plus, Quantum Pixel) to the chip families they accept, walks the System 6000 → Ambiance encoder migration, covers Mobile Access via LEGIC Connect, and details the field firmware remediation for CVE-2024-29916 (the 2024 “Unsaflok” disclosure). Written for hotel procurement and IT teams shortlisting Saflok-compatible card stock.",
   "heroPoints": [
-    "Identify the lock generation and firmware line before specifying a card chip. Saflok spans magstripe, MIFARE Classic and DESFire estates.",
-    "Match the encoder (System 6000, Ambiance, Messenger LENS front-desk unit) to the target chip family rather than the other way around.",
-    "Prove opening behaviour, re-encode flow and replacement logic on the real lock estate before scaling artwork or premium materials."
+    "Identify the Saflok generation and door-controller firmware before specifying a chip. Quantum IV is MIFARE Classic-native; Quantum Plus and Pixel are DESFire EV3-native; Messenger LENS sits in between.",
+    "Match the front-desk encoder hardware (RFID Encoder Gen II model 75720 replaces the Gen I 74750) and the back-end platform (System 6000 vs Ambiance) to the chip family, not the other way around.",
+    "Confirm the property is on the post-Nov-2023 firmware line that remediates CVE-2024-29916 before high-value access zones rely on Saflok. The fix is a controller firmware update, not a card swap.",
+    "Prove opening behaviour and a full PMS re-encode cycle on a live reservation before scaling artwork, premium materials or DESFire EV3 across a mixed-generation estate."
   ],
+  "keywords": [
+    "Saflok hotel key card compatibility",
+    "dormakaba Saflok lock generations",
+    "Saflok System 6000 Ambiance encoder",
+    "Saflok MIFARE Classic DESFire EV3",
+    "CVE-2024-29916 Unsaflok remediation"
+  ],
+  "publishedAt": "2026-03-14",
+  "modifiedAt": "2026-05-11",
   "imageAlt": "dormakaba Saflok hotel key card compatibility. Quantum and Messenger LENS locks with RFID guest card",
+  "heroImage": "/landing-images/mifare-classic-plus-desfire-hotel-chip-compare.jpg",
   "imageSourceRoutes": [
     "/product/hotel-key-cards/",
     "/product/printed-rfid-cards/",
@@ -50,7 +61,7 @@
           "label": "Hotel key cards"
         },
         {
-          "href": "/products/rfid-cards/mifare-desfire-ev3-cards/",
+          "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
           "label": "MIFARE DESFire EV3 cards"
         },
         {
@@ -82,50 +93,65 @@
           "Era",
           "Native credential",
           "Typical encoder",
+          "Door thickness range",
           "Notes"
         ],
         "rows": [
           [
             "MT magstripe",
             "1990s–2005",
-            "ISO 7811 Track 1/2/3 magstripe",
+            "ISO/IEC 7811 Track 1/2/3 magstripe",
             "Saflok MT encoder",
-            "Legacy estate; magstripe only, often still in use in budget properties"
+            "1 3/4″–2 1/8″ (44.5–53.9 mm)",
+            "Legacy estate; magstripe only. Still common in older budget properties."
           ],
           [
             "Confidant RFID",
             "2005–2012",
             "MIFARE Classic 1K (13.56 MHz)",
-            "Saflok System 6000 encoder",
-            "First widely deployed RFID generation; sector 0 reserved, Saflok sectors typically 1–2"
+            "Saflok System 6000",
+            "1 3/4″–2 1/8″ (44.5–53.9 mm)",
+            "First widely deployed Saflok RFID generation. Sector 0 reserved; Saflok writes typically to sectors 1–2."
           ],
           [
             "MT RFID / Quantum IV",
             "2009–2016",
             "MIFARE Classic 1K; optional magstripe combo",
-            "System 6000 encoder",
-            "Dual-interface common; magstripe often retained as fallback during migration"
+            "System 6000",
+            "1 3/4″–2 1/8″ (44.5–53.9 mm)",
+            "Dual-interface common; magstripe often retained as fallback during migration."
           ],
           [
-            "Quantum RT",
+            "Quantum RT (Retrofit)",
             "2014–2020",
             "MIFARE Classic 1K or Plus (SL1 compatibility)",
             "System 6000 or Ambiance",
-            "Some firmware lines accept Plus SL1 backwards-compatible mode"
+            "1 3/4″–2 1/8″ (44.5–53.9 mm)",
+            "Some firmware lines accept MIFARE Plus in SL1 backwards-compatible mode."
           ],
           [
             "Messenger LENS",
             "2016–",
             "MIFARE Classic 1K or DESFire EV1/EV2",
             "Messenger LENS front-desk + Ambiance",
-            "Supports online/offline hybrid; BLE mobile-key extension available"
+            "1 3/4″–2 1/8″ (44.5–53.9 mm)",
+            "Online/offline hybrid with two-way wireless reporting (alerts to email/SMS). BLE mobile-key extension available via Mobile Access Solutions."
           ],
           [
-            "Quantum Plus / Saflok series 8",
+            "Quantum Plus / Saflok Series 8",
             "2019–",
-            "MIFARE DESFire EV2/EV3; optional Classic fallback",
-            "Ambiance + Messenger LENS",
-            "Current generation; DESFire native with AES-128 authenticated sessions"
+            "MIFARE DESFire EV2/EV3; MIFARE Plus EV2; MIFARE Ultralight C; optional Classic fallback",
+            "Ambiance + Messenger LENS, RFID Encoder Gen II (model 75720)",
+            "1 3/4″–2 1/8″ (44.5–53.9 mm)",
+            "DESFire-native with AES-128 authenticated sessions. EV3 ships in EV2/EV1 backward-compatible default; can be downgraded operationally."
+          ],
+          [
+            "Quantum Pixel",
+            "2023–",
+            "MIFARE DESFire EV3 + BLE mobile credential",
+            "Ambiance + RFID Encoder Gen II",
+            "1 3/8″–3.0″ (35–76 mm) — widest door-thickness range in the series",
+            "BLE-equipped and digital-wallet ready (Apple Wallet / Google Wallet). Modular two-piece design described as the current Saflok flagship by dormakaba."
           ]
         ]
       },
@@ -152,13 +178,49 @@
     },
     {
       "title": "System 6000, Ambiance and Messenger LENS — the encoder stack",
-      "intro": "Saflok has used three generations of front-desk encoder stack, and the chip-family support of the card must align with the encoder, not just the lock. Ordering DESFire stock for a property that still runs a System 6000 encoder produces silent encoding failures even if the doors themselves would accept DESFire.",
+      "intro": "Saflok has used three generations of front-desk encoder stack. The chip-family support of the card must align with the encoder, not just the lock. Ordering DESFire stock for a property that still runs an early System 6000 encoder produces silent encoding failures even when the doors themselves would accept DESFire.",
       "bullets": [
-        "Saflok System 6000 — the longest-serving Saflok PMS/encoder platform. Runs on Windows Server, drives desktop encoders via serial or USB-to-serial adapters, and natively supports MIFARE Classic 1K encoding. DESFire encoding on System 6000 requires a specific encoder firmware version; most estates on System 6000 should specify Classic cards.",
-        "Ambiance: dormakaba's newer hospitality back-end. Runs under Windows and supports MIFARE Classic, Plus and DESFire EV1/EV2/EV3 encoding via PC/SC-class encoders. Ambiance is the platform most properties migrate to when they introduce Quantum Plus locks.",
-        "Messenger LENS: the online/offline hybrid platform used on Messenger LENS locks. Combines BLE, Wi-Fi, ZigBee and NFC into one credential orchestration layer; encodes both physical cards and BLE mobile keys from the same reservation.",
-        "Saflok desktop encoder models include the RCU (legacy serial), the USB RCU and the current Ambiance-era USB reader/encoder; all three are PC/SC compliant on recent firmware lines.",
-        "Encoder firmware (not PMS version) is the limiting factor for DESFire support on System 6000 installs. Firmware should be verified with dormakaba service before ordering DESFire stock."
+        "Saflok System 6000 — the longest-serving Saflok PMS/encoder platform. Runs on Windows Server, drives desktop encoders via serial or USB-to-serial adapters, and natively supports MIFARE Classic 1K encoding. dormakaba now lists System 6000 under its legacy-products catalog and offers a migration path to Ambiance. DESFire encoding on System 6000 requires a specific encoder firmware revision; most estates still on System 6000 should specify Classic cards.",
+        "Ambiance — dormakaba's current hospitality back-end. Runs under Windows and supports MIFARE Classic 1K, MIFARE Plus EV2 and MIFARE DESFire EV1/EV2/EV3 encoding via PC/SC-class encoders. Originally announced at HITEC for global availability to System 6000 users. The Aava mobile tablet companion (paired with Ambiance) supports curbside check-in and group-issuance workflows.",
+        "Messenger LENS — the online/offline hybrid platform that pairs with Messenger LENS locks. Combines BLE, Wi-Fi and NFC into a credential orchestration layer; encodes physical cards and BLE mobile keys from the same reservation.",
+        "Encoder hardware lifecycle: the desktop RFID Encoder Gen II (dormakaba model 75720) supersedes the Gen I 74750. Gen II is PC/SC compliant, supports USB (5 V) or PoE power, exposes a TCP/IP interface, and is rated for MIFARE Ultralight C, MIFARE Plus EV2 and MIFARE DESFire EV3 over ISO/IEC 14443 Type A.",
+        "Encoder firmware (not PMS version) is the most common limiting factor for DESFire support on legacy installs. Verify the encoder firmware revision with dormakaba service before ordering DESFire EV2/EV3 stock."
+      ],
+      "table": {
+        "columns": [
+          "Encoder model",
+          "Generation",
+          "Interface",
+          "Chip support (factory firmware)",
+          "Typical platform pairing"
+        ],
+        "rows": [
+          [
+            "Saflok 74750",
+            "RFID Encoder Gen I (superseded)",
+            "USB",
+            "MIFARE Classic 1K, MIFARE Plus (SL1)",
+            "System 6000"
+          ],
+          [
+            "Saflok 75720",
+            "RFID Encoder Gen II (current)",
+            "USB 5 V or PoE, TCP/IP",
+            "MIFARE Ultralight C, MIFARE Plus EV2, MIFARE DESFire EV3",
+            "Ambiance, Messenger LENS"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Mobile Access — LEGIC Connect, BLE and digital wallets",
+      "intro": "Recent Saflok generations (Messenger LENS, Quantum Plus, Quantum Pixel) issue mobile credentials in addition to physical cards. The mobile track is a separate procurement decision from card stock; this section exists so card buyers can flag mobile-track dependencies before they become surprises.",
+      "bullets": [
+        "Saflok Mobile Access Solutions is dormakaba's umbrella programme for BLE mobile keys. Credential delivery uses LEGIC Connect as the secure provisioning backbone; the lock-side keystore is managed by Ambiance or Messenger LENS.",
+        "Quantum Pixel is the dormakaba flagship marketed with explicit Apple Wallet and Google Wallet compatibility, alongside BLE mobile keys and physical Classic/DESFire cards in the same estate.",
+        "HID Origo is not natively integrated into Saflok at the time of writing. Properties wanting HID Mobile Access on dormakaba locks should expect a separate integration project rather than a drop-in.",
+        "The OpenKey mobile-key platform was deployed across AMResorts properties on dormakaba locks (announced 2018) and continues as one of the established third-party mobile-key integrations for Saflok estates.",
+        "Mobile-only properties still need a physical card stock for backup issuance: ADA accessibility, mobile-device failures, walk-in guests without the property app, and front-desk operational overrides all require a card-stack baseline."
       ]
     },
     {
@@ -175,6 +237,20 @@
         "label": "PMS driver reminder",
         "text": "A card sample rarely fails because of the chip itself. More often the PMS driver and encoder firmware are out of sync. Confirm both versions before sending a new sample batch.",
         "href": "/guides/hotel-key-card-encoding/"
+      }
+    },
+    {
+      "title": "Security update — Unsaflok / CVE-2024-29916",
+      "intro": "In March 2024 a research team led by Lennert Wouters (KU Leuven COSIC) and Ian Carroll publicly disclosed a key-derivation weakness affecting Saflok lock firmware lines built on MIFARE Classic. The disclosure is tracked as CVE-2024-29916 and was branded “Unsaflok”. Every Saflok procurement conversation in 2025–2026 now opens with this question, so card-stock buyers should understand exactly what changed.",
+      "paragraphs": [
+        "The vulnerability lies in dormakaba's proprietary key-derivation function (KDF) for some Saflok MIFARE Classic sectors: the KDF used only the card's Unique IDentifier (UID) as input, so an attacker who could read a single legitimate card could forge a write-pair that reprogrammed the lock's internal state and then opened any door at the property. The attack uses two MIFARE Classic write-capable cards (or a Flipper Zero-class tool) and completes in seconds.",
+        "Affected lock platforms reported by the researchers include Saflok System 6000 and Ambiance estates running Confidant, RT, Saffire, Saflok MT and Quantum-series controllers. Across roughly three million doors at 13,000+ properties in 131 countries, the original research disclosure (Sept 2022 to dormakaba, public March 2024) cited an estimated 36% of locks remediated by the time of disclosure. dormakaba began shipping a remediating firmware update in November 2023; the remediation is a door-controller firmware change plus, where applicable, an encoder/back-end update — not a card swap.",
+        "For card procurement: ordering new card stock does not by itself mitigate the issue, but choosing the right card family does interact with the remediation timeline. New estates standardising on MIFARE DESFire EV3 with AES-128 authenticated sessions sidestep the Classic KDF surface entirely. Mixed estates still on Classic should sequence the firmware rollout ahead of bulk card refresh so the post-fix card writes happen against remediated controllers."
+      ],
+      "callout": {
+        "label": "Procurement checklist",
+        "text": "Before scaling card orders on a Saflok estate in 2026: (1) confirm with dormakaba service that all door controllers are on the post-Nov-2023 firmware line that remediates CVE-2024-29916; (2) if any controllers remain on legacy firmware, sequence those upgrades first; (3) for new estates, prefer DESFire EV3 on Quantum Plus or Quantum Pixel hardware to leave the affected Classic surface behind entirely.",
+        "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/"
       }
     },
     {
@@ -227,7 +303,7 @@
           "label": "MIFARE Classic 1K card"
         },
         {
-          "href": "/products/rfid-cards/mifare-desfire-ev3-cards/",
+          "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
           "label": "MIFARE DESFire EV3 card"
         },
         {
@@ -325,8 +401,16 @@
       "answer": "Most properties order a dual-interface card that carries both a Track 2 / Track 3 magstripe and a MIFARE Classic 1K inlay for the migration period. Every guest gets a card that works on both old and new doors, which removes the operational complexity of two card stocks at the front desk. Dual-interface encoding adds roughly 200 ms per card but is well within check-in queue tolerance."
     },
     {
-      "question": "Is the 2024 Saflok vulnerability still a concern for new card orders?",
-      "answer": "The vulnerability disclosed in 2024 affected the key derivation in certain Saflok lock firmware lines and has been addressed by dormakaba with a field firmware update. The remediation is a door-controller firmware change, not a card change. A new card order does not by itself mitigate or expose the issue. Properties should confirm with dormakaba service that the installed firmware is on the remediated line before relying on Saflok for high-value access zones."
+      "question": "Is the 2024 Saflok vulnerability (Unsaflok / CVE-2024-29916) still a concern for new card orders in 2026?",
+      "answer": "CVE-2024-29916 was disclosed in March 2024 by researchers at KU Leuven COSIC and an independent collaborator. It affected the proprietary key-derivation function used on certain Saflok MIFARE Classic sectors and allowed an attacker with two MIFARE Classic write cards to open any door at an affected property in seconds. The fix is a door-controller firmware update plus where applicable an encoder/back-end update, not a card swap; dormakaba began rolling it out in November 2023. By March 2024 the researchers estimated 36% of locks were remediated. A new card order does not by itself mitigate or expose the issue. Properties should confirm with dormakaba service that every door controller is on the post-Nov-2023 remediated firmware before relying on Saflok for high-value access zones; new estates can sidestep the affected Classic surface entirely by standardising on MIFARE DESFire EV3 on Quantum Plus or Quantum Pixel hardware."
+    },
+    {
+      "question": "What is the difference between the RFID Encoder Gen I and Gen II?",
+      "answer": "The Gen II RFID encoder (dormakaba model 75720) supersedes the Gen I (74750). Gen II adds support for MIFARE Ultralight C, MIFARE Plus EV2 and MIFARE DESFire EV3 alongside Classic, exposes USB (5 V) or PoE power and a TCP/IP interface, and is PC/SC compliant. Gen I is limited to Classic and Plus SL1 on most firmware lines. If a property is on Ambiance or Messenger LENS and plans to issue DESFire EV3 cards, the encoder should be a Gen II 75720; ordering DESFire stock for a Gen I encoder produces silent write failures."
+    },
+    {
+      "question": "Does MIFARE DESFire EV3 still work on a lock controller that expects EV2 or EV1?",
+      "answer": "Yes in most cases. NXP ships DESFire EV3 in a backward-compatible default configuration where it can be addressed as EV2 or EV1; this is documented in NXP's MF3D(H)x3 datasheet and discussed in the NXP community. On Saflok, this means an EV3 card SKU can serve a Messenger LENS estate that was originally specified for EV2, provided the encoder firmware supports the EV3 family identifier. Validate the round-trip on a small sample before committing to bulk orders, especially on older Messenger LENS firmware lines."
     }
   ],
   "primaryAction": {
@@ -351,7 +435,150 @@
       "label": "General contact details"
     }
   ],
+  "sources": [
+    {
+      "label": "CVE-2024-29916 — National Vulnerability Database",
+      "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-29916",
+      "publisher": "NIST National Vulnerability Database",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Official CVE identifier and CVSS score for the Unsaflok vulnerability."
+    },
+    {
+      "label": "Unsaflok researcher disclosure site",
+      "url": "https://unsaflok.com/",
+      "publisher": "Lennert Wouters, Ian Carroll et al.",
+      "publishedAt": "2024-03-21",
+      "accessedAt": "2026-05-11",
+      "note": "Primary technical disclosure. Source for affected lock platform list, KDF-from-UID attack description, Nov 2023 fix rollout start, ~36% remediation estimate at disclosure, and ~3 million doors / 13,000+ properties / 131 countries scale figures."
+    },
+    {
+      "label": "GitHub Advisory GHSA-3qv4-jm22-wqx7",
+      "url": "https://github.com/advisories/GHSA-3qv4-jm22-wqx7",
+      "publisher": "GitHub Security Advisory Database",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Secondary advisory mirror of CVE-2024-29916."
+    },
+    {
+      "label": "Wired — Hackers Found a Way to Open Any of 3 Million Hotel Keycard Locks",
+      "url": "https://www.wired.com/story/saflok-hotel-lock-unsaflok-hack-technique/",
+      "publisher": "Condé Nast / Wired",
+      "publishedAt": "2024-03-21",
+      "accessedAt": "2026-05-11",
+      "note": "General-press authority coverage of the Unsaflok disclosure."
+    },
+    {
+      "label": "KU Leuven COSIC — Hackers found a way to open any of 3 million hotel keycard locks",
+      "url": "https://www.esat.kuleuven.be/cosic/news/hackers-found-a-way-to-open-any-of-3-million-hotel-keycard-locks-in-seconds/",
+      "publisher": "KU Leuven COSIC research group",
+      "publishedAt": "2024-03",
+      "accessedAt": "2026-05-11",
+      "note": "Academic affiliation for lead researcher Lennert Wouters."
+    },
+    {
+      "label": "DEF CON 32 — Unsaflok: Hacking millions of hotel locks (talk)",
+      "url": "https://www.youtube.com/watch?v=4cx0RUV7i0s",
+      "publisher": "DEF CON",
+      "publishedAt": "2024-08",
+      "accessedAt": "2026-05-11",
+      "note": "Conference talk with full technical disclosure timeline."
+    },
+    {
+      "label": "dormakaba Saflok RFID Encoder Gen II — product page",
+      "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/peripherals/rfid-encoder-gen-ii--dk_77100",
+      "publisher": "dormakaba",
+      "accessedAt": "2026-05-11",
+      "note": "Authoritative reference for Gen II encoder model 75720 supporting MIFARE Ultralight C / MIFARE Plus EV2 / MIFARE DESFire EV3 over ISO/IEC 14443 Type A; USB 5 V or PoE; TCP/IP interface."
+    },
+    {
+      "label": "dormakaba Saflok Quantum RFID — product page",
+      "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/electronic-hotel-locks/quantum-rfid--ka_117755",
+      "publisher": "dormakaba",
+      "accessedAt": "2026-05-11",
+      "note": "Quantum series modular two-piece design; supports keycards, fobs, wristbands, mobile credentials and digital wallets."
+    },
+    {
+      "label": "dormakaba Saflok Quantum Pixel — product page",
+      "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/electronic-hotel-locks/saflok-quantum-pixel--ka_500091",
+      "publisher": "dormakaba",
+      "accessedAt": "2026-05-11",
+      "note": "Quantum Pixel BLE-equipped flagship; door-thickness range 1 3/8″ to 3.0″ (35–76 mm); Apple Wallet and Google Wallet compatibility."
+    },
+    {
+      "label": "dormakaba Saflok MT RFID — product page",
+      "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/electronic-hotel-locks/saflok-mt-rfid--ka_117771",
+      "publisher": "dormakaba",
+      "accessedAt": "2026-05-11",
+      "note": "MT RFID supports NFC, RFID, BLE; pairs with System 6000, Messenger LENS online wireless and DeskLinc front desk."
+    },
+    {
+      "label": "dormakaba Saflok System 6000 — legacy products",
+      "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/lodging-systems-legacy-products/saflok-system-6000--ka_117731",
+      "publisher": "dormakaba",
+      "accessedAt": "2026-05-11",
+      "note": "System 6000 designated as a legacy product on dormakaba's current catalog; documented migration path to Ambiance."
+    },
+    {
+      "label": "dormakaba Saflok Messenger LENS — legacy products",
+      "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/lodging-systems-legacy-products/saflok-messenger-lens--ka_117719",
+      "publisher": "dormakaba",
+      "accessedAt": "2026-05-11",
+      "note": "Two-way wireless online lock management with alerts to email/SMS."
+    },
+    {
+      "label": "dormakaba Saflok QuantumIV — datasheet (rev 01/2020)",
+      "url": "https://cie-group.com/media/upload/files/1658410837_m3676-quantumiv-final-0120-pdf.pdf",
+      "publisher": "dormakaba (mirrored by CIE Group distributor)",
+      "publishedAt": "2020-01",
+      "accessedAt": "2026-05-11",
+      "note": "QuantumIV mortise dimensions, 1″ throw deadbolt and 5/8″ dead-locking latch, BHMA/ANSI Grade 1 certification, Messenger LENS Ready."
+    },
+    {
+      "label": "Hotel Management — dormakaba introduces Ambiance",
+      "url": "https://www.hotelmanagement.net/tech/dormakaba-introduces-ambiance-mobile-tablet-keycard",
+      "publisher": "Questex / Hotel Management Magazine",
+      "accessedAt": "2026-05-11",
+      "note": "Ambiance launch context including the Aava mobile tablet companion for curbside encoding."
+    },
+    {
+      "label": "Clock Software — dormakaba Saflok 6000 / Ambiance integration KB",
+      "url": "https://support.clock-software.com/en/support/solutions/articles/9000213350-dormakaba-saflok-6000-ambiance-",
+      "publisher": "Clock Software",
+      "accessedAt": "2026-05-11",
+      "note": "Third-party PMS-integration view of both Saflok back-end stacks."
+    },
+    {
+      "label": "NXP MIFARE DESFire EV3 datasheet (MF3D(H)x3)",
+      "url": "https://www.nxp.com/docs/en/data-sheet/MF3D_H_X3_SDS.pdf",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-05-11",
+      "note": "DESFire EV3 air interface (ISO/IEC 14443-4), AES-128 authenticated sessions, EV2/EV1 backward-compatible default configuration."
+    },
+    {
+      "label": "NXP MIFARE Classic EV1 1K datasheet (MF1S50YYX_V1)",
+      "url": "https://www.nxp.com/docs/en/data-sheet/MF1S50YYX_V1.pdf",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-05-11",
+      "note": "MIFARE Classic 1K sector/block layout that underpins the historical Saflok credential write model."
+    },
+    {
+      "label": "NXP Community — DESFire EV2/EV3 backward compatibility",
+      "url": "https://community.nxp.com/t5/Smart-Cards-and-Secure-Element/DESFire-EV2-EV3-backward-compatibility/m-p/1622580",
+      "publisher": "NXP",
+      "accessedAt": "2026-05-11",
+      "note": "Confirms EV3 default-configuration behaviour as EV2/EV1 for backward-compatible integrations."
+    },
+    {
+      "label": "OpenKey × dormakaba — AMResorts partnership",
+      "url": "https://www.openkey.co/2018/01/30/dormakaba-and-openkey-partner-for-mobile-access-at-amresorts/",
+      "publisher": "OpenKey",
+      "publishedAt": "2018-01-30",
+      "accessedAt": "2026-05-11",
+      "note": "Established precedent for third-party mobile-key integration on dormakaba locks."
+    }
+  ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-03-14"
+  "reviewedAt": "2026-05-11"
 }

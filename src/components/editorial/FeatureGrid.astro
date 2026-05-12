@@ -1,0 +1,39 @@
+---
+/**
+ * Editorial section variant — 3-up feature grid with icon + title + text.
+ *
+ * Shadow component (Stage 2). Mirrors the inline expression in
+ * editorial-pages.ts around `const featureGridHtml = section.featureGrid?.features?.length ? ... : ""`.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["featureGrid"]
+ *   features: Array<{ icon: string; title: string; text: string }>
+ *
+ * Delegates icon rendering to FeatureIcon.astro (path-vs-glyph branching).
+ */
+import FeatureIcon from "./FeatureIcon.astro";
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface Feature {
+  icon: string;
+  title: string;
+  text: string;
+}
+
+interface Props {
+  features: Feature[];
+  citations?: CitationCtx;
+}
+
+const { features, citations } = Astro.props;
+---
+{features.length > 0 && (
+  <div class="codex-editorial-feature-grid">
+    {features.map((feature) => (
+      <article class="codex-editorial-feature">
+        <FeatureIcon icon={feature.icon} />
+        <h3 class="codex-editorial-feature__title">{feature.title}</h3>
+        <p class="codex-editorial-feature__text" set:html={renderInlineLinks(feature.text, citations)} />
+      </article>
+    ))}
+  </div>
+)}

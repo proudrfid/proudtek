@@ -1,0 +1,38 @@
+---
+/**
+ * Sub-component of FeatureGrid — icon cell that branches on input shape.
+ *
+ * Path-form icons (absolute URL, relative ./, https:// http://, data:image/)
+ * render as <img>; everything else renders as <span> for the emoji / glyph /
+ * short-text legacy form. Detection logic mirrors the inline expression in
+ * editorial-pages.ts featureGrid branch (around lines ~1920-1935).
+ *
+ * Stage 2 shadow component.
+ */
+interface Props {
+  icon: string;
+}
+
+const { icon } = Astro.props;
+const trimmed = icon.trim();
+const isPath =
+  trimmed.startsWith("/") ||
+  trimmed.startsWith("./") ||
+  trimmed.startsWith("https://") ||
+  trimmed.startsWith("http://") ||
+  trimmed.startsWith("data:image/");
+---
+{isPath ? (
+  <img
+    class="codex-editorial-feature__icon codex-editorial-feature__icon--svg"
+    src={trimmed}
+    alt=""
+    loading="lazy"
+    decoding="async"
+    width="48"
+    height="48"
+    aria-hidden="true"
+  />
+) : (
+  <span class="codex-editorial-feature__icon" aria-hidden="true">{icon}</span>
+)}

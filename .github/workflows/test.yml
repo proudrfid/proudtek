@@ -1,0 +1,36 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint (path-4 guardrail)
+        run: npm run lint
+
+      - name: Vitest (snapshot + unit tests)
+        run: npm run test
+
+      - name: Astro build (no Lighthouse — keep CI fast)
+        run: npm run build
+        env:
+          ASTRO_TELEMETRY_DISABLED: "1"

@@ -18,14 +18,14 @@
   ],
   "sections": [
     {
-      "title": "125 kHz RFID chip landscape",
+      "title": "What does the 125 kHz RFID chip landscape look like?",
       "intro": "The 125 kHz frequency band was the foundation of proximity-based identification from the 1990s through the early 2010s. Despite the security advantages of 13.56 MHz smart cards, 125 kHz systems remain in active production across access control, animal identification, industrial asset tracking and time-and-attendance applications due to installed-base inertia and lower per-tag cost.",
       "image": {
         "src": "/blog-images/chip-125khz.jpg",
         "alt": "EM4100 and T5577 125 kHz RFID access control cards"
       },
       "paragraphs": [
-        "EM Microelectronic's EM4100 (also sold as EM4102) and Atmel's T5577 (now Microchip ATA5577) are the two most common 125 kHz chips in the B2B channel. They serve fundamentally different roles: EM4100 is a fixed-code transponder for simple identification, while T5577 is a programmable transponder that can store custom data and emulate multiple legacy chip formats."
+        "EM Microelectronic's [EM4100](/guides/em4100-em4305-t5577-lf-chip-encyclopedia/) (also sold as EM4102) and Atmel's T5577 (now Microchip ATA5577) are the two most common 125 kHz chips in the B2B channel. They serve fundamentally different roles: EM4100 is a fixed-code transponder for simple identification, while T5577 is a programmable transponder that can store custom data and emulate multiple legacy chip formats."
       ],
       "callout": {
         "label": "Migration path",
@@ -34,7 +34,7 @@
       }
     },
     {
-      "title": "Technical comparison: EM4100 vs T5577",
+      "title": "How do technical compare?",
       "intro": "The table below summarizes the key technical differences between the two chips across memory, modulation, security and application suitability.",
       "table": {
         "columns": [
@@ -92,7 +92,7 @@
       }
     },
     {
-      "title": "Memory architecture and data format",
+      "title": "How do memory architecture and data format work?",
       "intro": "Understanding the internal memory layout of each chip clarifies what data can be stored, modified and protected.",
       "paragraphs": [
         "EM4100 has a fixed 64-bit data stream transmitted continuously: 9 header bits (all ones), 40 data bits organized as 10 rows of 4 data bits plus 1 row-parity bit, 4 column-parity bits and 1 stop bit. There is no user-writable area. The ID is laser-programmed at the factory and cannot be changed.",
@@ -105,7 +105,7 @@
       ]
     },
     {
-      "title": "Security analysis and cloning risks",
+      "title": "How secure is it against cloning?",
       "intro": "Both EM4100 and T5577 are fundamentally insecure by modern standards. Any attacker with a $20 Proxmark or similar 125 kHz reader/writer can capture and duplicate the transmitted ID in seconds.",
       "bullets": [
         "EM4100 cloning requires only reading the 40-bit ID from the original card and writing it to a T5577 blank configured in EM4100 emulation mode.",
@@ -115,13 +115,35 @@
       ]
     },
     {
-      "title": "Migration paths from 125 kHz to 13.56 MHz",
+      "title": "How do you migrate from 125 kHz to 13.56 MHz?",
       "intro": "For organizations with large 125 kHz installed bases, migration is typically phased. Dual-frequency readers and multi-technology cards ease the transition without a forklift replacement of all existing infrastructure.",
       "bullets": [
-        "Dual-frequency cards embed both a 125 kHz chip (EM4100 or T5577) and a 13.56 MHz chip (MIFARE Classic, DESFire or iCLASS) in a single card body.",
+        "Dual-frequency cards embed both a 125 kHz chip (EM4100 or T5577) and a 13.56 MHz chip ([MIFARE Classic](/guides/mifare-classic-1k-4k-chip-encyclopedia/), DESFire or iCLASS) in a single card body.",
         "Dual-frequency readers detect and process both 125 kHz and 13.56 MHz cards, allowing old and new credentials to coexist during the migration window.",
         "Migration timelines of 12–24 months are typical for mid-size enterprises with 500–5 000 cardholders.",
         "T5577 cards can serve as interim credentials during migration because they can be reprogrammed to match multiple legacy reader formats across the facility."
+      ]
+    },
+    {
+      "title": "Why a $25 Proxmark trivially clones EM4100 and T5577 in the field",
+      "intro": "Both chips were designed in an era where no consumer-grade transceiver existed for 125 kHz. That assumption no longer holds. Off-the-shelf hardware such as the Proxmark3 RDV4, Flipper Zero, ChameleonMini, iCopy-X and even mass-market Chinese 'RFID copier' duplicators (sub-$25 on Amazon and AliExpress) can read an EM4100 ID in under one second and write it to a T5577 blank in another two. Security teams need to understand the workflow to plan credible mitigations.",
+      "bullets": [
+        "Read phase — A nearby attacker sweeps the badge area at coffee-shop or elevator distance (5-15 cm with a stock antenna; up to 60 cm with an extended-range loop). The Proxmark `lf em 410x reader` command captures the 40-bit UID in one inductive cycle and stores it in onboard flash — no physical contact, no log entry on the panel side, no reader alarm.",
+        "Decode phase — The captured 64-bit frame (9 header bits + 40 UID bits + parity + 1 stop) is human-readable hex. Tools like Proxmark client, Iceman fork firmware, and the Flipper Zero 'lfrfid' app print the EM4100 UID in the same canonical format that downstream access control panels (HID Edge, Mercury MR52, S2 NetBox) accept on Wiegand-26.",
+        "Write phase — The attacker drops a $0.40 T5577 blank on the writer pad. The Proxmark `lf em 410x clone` (or `lf t55 wipe; lf em 410x_write`) sets T5577 block 0 configuration to EM4100 emulation (RF/64 Manchester, 40-bit data) and burns the captured UID into blocks 1-2. The cloned card is bit-identical to the original on every reader.",
+        "Counter-measures that actually work — Replace the credential, not just the reader: deploy MIFARE DESFire EV3 (AES-128 + EAL5+) or HID Seos (AES-128 + Diffie-Hellman ECC + SIO wrapper) on dual-frequency cards so the existing 125 kHz reader population can be retired in waves. Until then, switch panels to OSDP v2 Secure Channel so the wire protocol can no longer be replayed even if the credential is sniffed.",
+        "Defense in depth that does not work — Adding a 32-bit T5577 write password protects only future writes; the broadcast UID stays in the clear. Embossed photo IDs, holograms and tamper labels do nothing against electronic cloning. CCTV at readers helps forensics but never prevents the first incident."
+      ]
+    },
+    {
+      "title": "Procurement decision framework for 125 kHz buyers in 2026",
+      "intro": "Despite 15 years of warnings, 125 kHz cards still ship in volume because installed-base inertia is real. The right purchase is the one that minimizes total cost of ownership while keeping a credible upgrade path open — not the cheapest sticker price. Use this framework when ordering replacement stock or refreshing a legacy site.",
+      "bullets": [
+        "Choose EM4100 only when — The application has zero security model (animal ID per ISO 11784/11785, time-and-attendance with photo verification, asset tags inside locked cabinets) and unit cost is the sole purchase criterion. Volume EM4100 PVC cards land at $0.08-$0.15 in 1K+ quantities; clamshell badges $0.18-$0.30; epoxy keyfobs $0.20-$0.40 per unit DDP from China.",
+        "Choose T5577 (or compatible ATA5577 / EM4305) when — You need to consolidate multiple legacy reader formats (HID Prox 26-bit, Indala 27-bit, AWID, Kantech ioProx) onto one card SKU, run an interim phase during a 12-24 month migration to 13.56 MHz, or maintain a reservist stock for facilities you cannot upgrade in this budget cycle. T5577 PVC card cost runs $0.25-$0.50 in 1K volume.",
+        "Skip 125 kHz entirely when — The site has any access-controlled space holding cash, regulated data, controlled substances, weapons, hazardous chemicals, or critical infrastructure. Specify dual-frequency cards (T5577 + DESFire EV3 or T5577 + iCLASS Seos) so that the 125 kHz side handles legacy doors and the 13.56 MHz side handles the upgraded readers as panels and headends are replaced in parallel.",
+        "Vendor and chip-revision diligence — EM4100 originals are EM Microelectronic; second-source clones include Atmel TK4100, EM4102, and various unbranded 'EM-compatible' Chinese ICs. Quality varies; insist on factory test reports for read distance and bit-error rate. T5577 has been Microchip-owned since the Atmel acquisition; the legitimate part is Microchip ATA5577C. Watch for relabelled 'T5577' that are actually EM4305 (different command set, no HID Prox emulation).",
+        "Logistics and lead time — A 10K-card EM4100 PVC order with custom artwork ships in 7-12 working days from a Shenzhen converter, $300-$800 plate fee one-time, EXW $0.10/card, DDP USA $0.13/card with sea freight. T5577 typically adds 2-3 days for chip lot allocation and runs $0.05-$0.10 per card premium over EM4100."
       ]
     }
   ],
@@ -149,6 +171,22 @@
           "label": "EM4305 cards"
         }
       ]
+    },
+    {
+      "title": "125 kHz chip technical references",
+      "description": "Vendor datasheets and authoritative tutorials for EM4100, T5577 and 125 kHz cloning research.",
+      "links": [
+        {
+          "href": "https://ww1.microchip.com/downloads/en/devicedoc/atmel-9187-rfid-ata5577c_datasheet.pdf",
+          "label": "Microchip ATA5577C datasheet (T5577 successor part)",
+          "description": "Official 330-bit EEPROM layout, configuration block format, password protection mechanics."
+        },
+        {
+          "href": "https://www.emmicroelectronic.com/sites/default/files/products/datasheets/4100-ds.pdf",
+          "label": "EM Microelectronic EM4100 datasheet",
+          "description": "Original 64-bit Manchester frame, parity layout, RF/64 modulation specification."
+        }
+      ]
     }
   ],
   "faq": [
@@ -167,10 +205,18 @@
     {
       "question": "Can T5577 cards be locked to prevent reprogramming?",
       "answer": "T5577 supports a 32-bit password that must be provided before write commands are accepted. However, this password is transmitted unencrypted over the air and can be captured with a sniffer. True tamper-proof locking is not possible with 125 kHz technology."
+    },
+    {
+      "question": "If we standardize on T5577 for all new orders, can we drop EM4100 from our supply chain?",
+      "answer": "Yes — T5577 in EM4100 emulation mode is bit-identical to a real EM4100 from the reader's perspective, so you can phase out the older SKU without changing readers or panels. The only economic question is unit cost: a T5577 PVC card runs $0.25-$0.50 versus $0.08-$0.15 for EM4100 in 1K-10K quantities, so consolidating saves logistics overhead but raises material spend roughly 2-3×. Most buyers consolidate when their site count exceeds 3-5 facilities or when they want a single SKU that can be reprogrammed in the field for one-off replacements."
+    },
+    {
+      "question": "How does T5577 compare with EM4305 for our use case?",
+      "answer": "Both are programmable 125 kHz chips, but they target different scenarios. T5577 (Microchip ATA5577) is the multi-format emulator: it can mimic EM4100, HID Prox 26-bit, Indala, AWID, FDX-B and similar legacy formats by changing its block 0 configuration word, which makes it the workhorse for access-control consolidation. EM4305 has a richer command set with 32-bit password, anti-collision, and a true write-after-read protocol, which makes it preferred for animal ID applications under ISO 11784/11785 FDX-B and for industrial asset tags where the data payload changes over the asset's life. For pure access control consolidation, default to T5577; for animal husbandry or mutable-data industrial tagging, default to EM4305."
     }
   ],
   "primaryAction": {
-    "href": "/contact/125khz-cards/",
+    "href": "/contact/access-control-keyfobs/",
     "label": "Order 125 kHz card samples"
   },
   "secondaryActions": [
@@ -185,5 +231,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-01-18"
+  "reviewedAt": "2026-05-10"
 }

@@ -1,496 +1,292 @@
 {
   "route": "/solutions/nfc-business-card-programs/",
   "group": "solutions",
-  "title": "NFC Business Card Programs — Multi-Cohort Enterprise Rollout (HR / Marketing / Sales / CRM Sync)",
+  "title": "NFC Business Card Programs (2026): Enterprise Rollout — HR Onboarding via SCIM, Salesforce / HubSpot Lead Sync, Multi-Cohort Governance, Aliro 1.0, SaaS Lock-In Risk (Linq Sunset Lessons)",
   "kicker": "NFC Solution",
-  "summary": "On most enterprise rollouts, NFC business card programmes combine mobile compatibility, material choice, per-cohort campaign design and back-office governance into a single multi-cohort operating model. The right card is the one that fits the target phones (iPhone XS+ background tag reading + Android NDEF dispatch), the brand feel (PVC / metal / FSC wood / eco PLA / transparent PETG) and the redirect-or-profile workflow you actually plan to maintain across HR onboarding feeds, marketing-campaign URL rotation, CRM lead-capture sync (HubSpot / Salesforce / Pipedrive) and brand-standard governance.",
+  "summary": "Procurement-grade enterprise NFC business card programme guide for 100+ employee rollouts. Complements /solutions/nfc-business-card/ (solo and small-team buyer's guide) with the multi-cohort enterprise architecture — HR onboarding flows via SCIM provisioning to NFC card URL routing, marketing-campaign URL rotation without re-issuing cards, Salesforce / HubSpot / Pipedrive lead-capture integration, brand-standard governance across regions and divisions, and the SaaS-platform-extinction risk that the January 2025 Linq sunset crystallised for procurement teams. Covers the four-cohort rollout architecture (executive / sales / customer-success / general workforce), URL routing patterns (per-user GS1 Digital Link, stable redirect URLs on company domain, no-SaaS-lock-in), GDPR Article 28 controller / processor framework for lead-capture data residency, and the offboarding workflow that revokes departing-employee URLs without reprinting cards.",
   "keywords": [
-    "NFC business card programme",
-    "Enterprise NFC card rollout",
-    "Multi-cohort team programme",
-    "HR onboarding feed integration",
-    "HiHello / Popl / Mobilo / Linq",
-    "NFC card CRM sync"
+    "NFC business card enterprise rollout",
+    "SCIM provisioning NFC card URL",
+    "Salesforce HubSpot lead sync NFC",
+    "Linq sunset SaaS lock-in risk",
+    "multi-cohort NFC governance"
   ],
   "heroPoints": [
-    "Confirm the mobile and redirect workflow before debating premium finishes.",
-    "Choose the material around brand feel, durability and production constraints.",
-    "Treat the card as part of a lead-capture or contact-sharing system, not just a printed object."
+    "Plan the routing layer before the cards. A stable redirect URL on the company domain (`https://yourcompany.com/contact/{employee-slug}`) survives platform-extinction, employee turnover, campaign rotation and brand-refresh without reprinting cards. SaaS platforms (Linq, Popl, V1CE, Mobilo, Wave, Blinq) lock the URL to their domain — Linq's January 2025 sunset crystallised the risk.",
+    "SCIM provisioning to NFC card URLs is the enterprise standard. HR system (Workday, BambooHR, Successfactors) → SCIM provisioning to identity provider (Okta, Azure AD) → URL routing rule on company domain. New hire: card pre-encoded with `{employee-slug}`; URL routes to active contact card. Offboarding: SCIM de-provisioning automatically revokes the URL (302 to generic company contact page).",
+    "Four-cohort rollout pattern: executive (metal card + NTAG 424 DNA SUN; vCard + Apple Wallet pass), sales (premium PVC + NTAG215 / 216 + CRM lead-capture integration), customer-success (standard PVC + NTAG213 + appointment-booking URL), general workforce (recycled PVC + NTAG213 + company directory entry).",
+    "CRM lead-capture integration: tap → company-domain landing page → vCard download + lead-form auto-populate → Salesforce / HubSpot / Pipedrive API call to create lead record. Per-tap analytics on the company-side domain provide attribution without third-party SaaS subscription.",
+    "GDPR Article 28 framework: company is data controller for lead-capture data; any SaaS routing platform is processor and needs a Data Processing Agreement. Self-hosted URL on company domain eliminates the processor relationship; PII stays inside existing GDPR / CCPA compliance perimeter."
   ],
-  "imageAlt": "NFC business card planning",
+  "imageAlt": "Enterprise NFC business card programme — executive metal cards, sales PVC cards, customer-success cards, general workforce recycled-PVC cards with NTAG chips",
+  "heroImage": "/landing-images/ppc-nfc-business-cards.jpg",
   "imageSourceRoutes": [
-    "/product/nfc-business-card/",
-    "/product/metal-nfc-card/",
-    "/product/wooden-rfid-card/"
+    "/products/rfid-cards/nfc-card-custom-printing/",
+    "/products/rfid-cards/rfid-metal-business-card/",
+    "/products/rfid-cards/wooden-nfc-business-card-engraved/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-04-26",
+  "modifiedAt": "2026-05-11",
   "brief": [
     {
-      "label": "Programme cohort definition",
+      "label": "Audience",
       "items": [
-        "Tier-1 executives + leadership: metal NFC cards with NTAG 215, hand-personalised name + title engraving, single-supplier brand-standard finish.",
-        "Sales + business development: PVC NFC cards with NTAG213 + per-cardholder LinkedIn / vCard / Calendly URL.",
-        "Customer success + account management: PVC NFC cards with HiHello / Popl / Mobilo platform integration + CRM auto-sync.",
-        "Field marketing + events: branded NFC cards with rotating UTM-tracked campaign URLs.",
-        "All-staff baseline: optional PVC NFC card opt-in for staff who request it (most enterprises run 30–60% adoption).",
-        "Recruiting / talent acquisition: cohort-specific cards routing to careers-page + ATS integration (Greenhouse / Lever / Workday Recruiting)."
+        "Enterprise IT + HR teams running 100+ employee NFC card rollouts.",
+        "Marketing operations + brand standards teams designing multi-cohort programmes.",
+        "Sales operations + RevOps teams integrating NFC cards with CRM lead-capture flows.",
+        "Compliance + privacy teams reviewing data-residency + DPA + offboarding workflows."
       ]
     },
     {
-      "label": "Chip + form factor matrix",
+      "label": "Decision sequence",
       "items": [
-        "NTAG213 (144 B) — covers 90%+ rollouts; URL or basic vCard payload; lowest cost.",
-        "NTAG215 (504 B) — vCard with photo + LinkedIn QR fallback; mid-tier executive cards.",
-        "NTAG216 (888 B) — multi-record NDEF for combined vCard + URL + Calendly + tel:; rare.",
-        "NTAG 424 DNA — anti-clone executive / luxury-cohort cards with SUN authentication.",
-        "Standard PVC ID-1 0.76 mm — 90% of programme volume; cheapest baseline.",
-        "Premium frosted / brushed PVC — visual upgrade without metal cost premium.",
-        "Stainless steel etched + PVD-coated black / gold / rose-gold — executive cohort.",
-        "FSC wood-veneer (cherry / walnut / bamboo / maple) — boutique / sustainability-led cohorts.",
-        "Eco PLA / recycled rPVC — ESG procurement programmes; B-Corp / 1% for the Planet.",
-        "Transparent PETG — premium clear card; reveals NFC inlay aesthetically."
+        "Cohort segmentation: executive / sales / customer-success / general workforce. Define material + chip tier per cohort.",
+        "URL routing layer: stable redirect URL on company domain (recommended) vs SaaS routing (Linq, Popl, V1CE, Mobilo, Wave, Blinq) vs hybrid.",
+        "Identity integration: HR system (Workday, BambooHR) → SCIM → IdP (Okta, Azure AD) → URL routing rule.",
+        "CRM lead-capture: Salesforce / HubSpot / Pipedrive / Marketo integration via REST API.",
+        "Brand governance: artwork standards, multi-language vCard, regional variations, brand-refresh process.",
+        "Compliance: GDPR Article 28 controller/processor; CCPA; SOC 2 (lead-capture data); offboarding revocation workflow."
       ]
     },
     {
-      "label": "Tap destination strategy per cohort",
-      "items": [
-        "vCard 4.0 / 3.0 (.vcf) — adds contact directly to phone address book; iPhone Contacts + Google Contacts + Outlook compatible.",
-        "Personal landing page (Linktree / Beacons / Bento / Stan / Carrd / Squarespace / WordPress) — full bio + social + portfolio + booking link.",
-        "Branded digital business card platforms — HiHello, Popl, Mobilo, Linq, Blinq, Tap2Hi, Wave, V1CE — include CRM-export and analytics.",
-        "Direct LinkedIn profile URL — simplest path; counts page views in LinkedIn Profile Analytics for Premium users.",
-        "Custom microsite with UTM tracking — for marketing-led campaigns with attribution requirements.",
-        "Calendar booking link (Calendly / SavvyCal / Cal.com / HubSpot Meetings) — direct route from tap to booked meeting.",
-        "vCard + landing-page hybrid — first prompts vCard download, then redirects to landing page for richer content."
-      ]
-    },
-    {
-      "label": "HR onboarding feed integration",
-      "items": [
-        "Workday HCM — new-hire trigger event creates NFC card production order with employee data feed.",
-        "SAP SuccessFactors — same trigger; integration via SAP Cloud Platform Integration / API.",
-        "BambooHR + Rippling + Gusto + Justworks — small / mid SMB platforms with webhook-based NFC card order.",
-        "Microsoft Dynamics 365 HR + Oracle HCM Cloud — large enterprise full-suite integration.",
-        "Greenhouse + Lever + Workday Recruiting — pre-onboarding card prep so new hire receives card on day one.",
-        "Off-boarding workflow: HR termination triggers card-deactivation (rewritable URL pointed to expiry page) without physical recall."
-      ]
-    },
-    {
-      "label": "Per-card personalisation production workflow",
-      "items": [
-        "Spreadsheet input: name + title + email + phone + LinkedIn URL + landing-page slug per cardholder, signed off by HR / marketing lead.",
-        "Production-stage encoding: each card written with NDEF URI record specific to that holder; serialised QC log per card.",
-        "Card-back personalisation: name + title + email + phone laser-engraved (metal / wood) or CMYK printed (PVC).",
-        "Bulk re-encoding: rewritable NTAG213 means HR / marketing rotate URLs for any cardholder using free NFC Tools app at no cost.",
-        "Lock policy: lock NDEF page (one-way) only when permanent campaign URL is preferred — cannot be re-encoded after.",
-        "Welcome packet: card + onboarding card + 5-minute video for new hires on tap-to-share workflow."
-      ]
-    },
-    {
-      "label": "CRM sync + lead-capture integration",
-      "items": [
-        "HubSpot — landing page form submit creates Contact + Deal in pipeline; UTM source = card holder slug.",
-        "Salesforce — Web-to-Lead form + Marketing Cloud Journey Builder for tap-recipient nurture.",
-        "Pipedrive + Copper + Close + Freshsales — SMB CRM integrations via Zapier / Make / native webhook.",
-        "LinkedIn Sales Navigator — tap-to-LinkedIn-profile path; counted in InMail credits + outreach attribution.",
-        "Microsoft Dynamics 365 Sales — for enterprise sales teams; tap event creates Contact + Account.",
-        "Per-card-holder UTM: enables individual rep accountability for tap-driven pipeline contribution."
-      ]
-    },
-    {
-      "label": "Brand-standard + governance",
-      "items": [
-        "Brand-standard book: card-design templates locked in Figma / Adobe XD; BU-level customisation forbidden.",
-        "Approval workflow: marketing → brand → HR → procurement gating before any card produced.",
-        "URL governance: single owner (typically marketing ops) controls landing-page templates + UTM taxonomy.",
-        "Rotation cadence: 12–18 month brand refresh triggers reorder; mid-cycle URL rotation supported via rewritable NTAG213.",
-        "Replacement budget: 5–10% per year for damaged / lost cards; held by HR or facilities.",
-        "Annual audit: card inventory reconciliation against active employee roster; off-boarded cards deactivated."
-      ]
-    },
-    {
-      "label": "Smartphone + reader compatibility",
-      "items": [
-        "iPhone XS / 11 / SE2 / 12 / 13 / 14 / 15 / 16 (iOS 14+): background tag reading enabled by default; tap top of phone → URL banner → tap to open.",
-        "iPhone 7 / 8 / X (iOS 11–13): NFC reading requires opening Camera or NFC Tools app — recommend NTAG213 with fallback.",
-        "Android (API 19+): native NDEF dispatch handler opens URL automatically on tap. Pixel + Galaxy + OnePlus + Xiaomi + Oppo + Vivo + Huawei all supported.",
-        "Apple Vision Pro and Apple Watch — NFC for Apple Pay only, not Type 2 Tag URL dispatch.",
-        "Foldables (Galaxy Z Fold / Flip + Pixel Fold) — NFC antenna typically on outer panel; orientation matters.",
-        "Read range typically 0–4 cm iPhone, 0–6 cm Android; metal-card antenna placement validated for iPhone."
-      ]
-    },
-    {
-      "label": "Privacy + compliance considerations",
-      "items": [
-        "GDPR Article 6/13/14 (EU/EEA) — landing pages capturing email / phone of recipient must publish privacy notice + lawful-basis statement.",
-        "CCPA + CPRA (California) — opt-out and 'Do Not Sell My Personal Information' link required if landing page enables ad tracking.",
-        "PIPEDA (Canada), LGPD (Brazil), POPIA (South Africa), DPDP Act (India) — region-specific obligations stack on landing-page form design.",
-        "vCard delivery — no data leaves the cardholder side; no PII collection from recipient; lowest-privacy-burden option.",
-        "Analytics minimisation — UTM tags + first-party analytics (Plausible, Fathom) avoid third-party cookie + IDFA / GAID exposure.",
-        "Internal data: cardholder URL ownership lifecycle handled via HR off-boarding policy + internal data-handling SOP."
-      ]
-    },
-    {
-      "label": "Programme economics + ROI",
-      "items": [
-        "Per-card BOM: PVC + NTAG213 ≈ $2–$5 at 50–200 qty; ≈ $1–$3 at 500+; metal etched + NTAG215 ≈ $15–$35 at 50–100; wood-veneer + NTAG215 ≈ $10–$20.",
-        "Replacement / lost-card rate: 5–10% per year for daily-carry cards; metal cards retained longer due to perceived value.",
-        "Reorder cycle: 12–18 months typical for team programmes; brand refresh trigger.",
-        "Subscription platform cost (HiHello / Popl / Mobilo / Linq Premium): typically $5–$15 / user / month — adds CRM sync, analytics, on-demand URL editing.",
-        "ROI calculation: $50–$150 per qualified-lead value × incremental connection rate × team size justifies $20–$50 per card BOM in B2B sales contexts.",
-        "Total programme cost: typically $20–$80 per cardholder per year all-in (card + platform + replacements)."
-      ]
-    },
-    {
-      "label": "What this solution is NOT — adjacent scope",
-      "items": [
-        "NOT a single-card product specification — see /solutions/nfc-business-card/ for chip / material / per-card decision guide.",
-        "NOT a brand-protection programme — see /solutions/nfc-brand-authentication/ for NTAG 424 DNA SUN luxury authentication.",
-        "NOT a hotel guest-key programme — see /solutions/hotel-key-cards/ for MIFARE Plus / DESFire room credentials.",
-        "NOT a Google Review prompt programme — see /solutions/google-review-cards-for-restaurants/ and sister pages.",
-        "NOT a generic enterprise PACS programme — see /solutions/rfid-access-control/ for OSDP v2.2 corporate access.",
-        "NOT a single-product NFC business card SKU — see /products/rfid-cards/nfc-card-custom-printing/ for the catalog SKU page."
+      "label": "Direct catalogue + reference links",
+      "links": [
+        {"href": "/products/rfid-cards/nfc-card-custom-printing/", "label": "NFC card custom printing"},
+        {"href": "/products/rfid-cards/rfid-metal-business-card/", "label": "Metal NFC business card"},
+        {"href": "/products/rfid-cards/wooden-nfc-business-card-engraved/", "label": "Wooden engraved NFC card"},
+        {"href": "/products/rfid-cards/rfid-bamboo-card/", "label": "Bamboo NFC card (FSC)"},
+        {"href": "/solutions/nfc-business-card/", "label": "NFC business cards (solo / small team)"},
+        {"href": "/compare/metal-vs-wood-vs-pvc-nfc-business-cards/", "label": "Metal vs wood vs PVC comparison"},
+        {"href": "/compare/ntag213-vs-ntag215-vs-ntag216/", "label": "NTAG213 vs 215 vs 216"},
+        {"href": "/blog/metal-nfc-cards-business-networking/", "label": "Metal NFC cards for business networking"}
       ]
     }
   ],
   "sections": [
     {
-      "title": "What good NFC card briefs usually contain",
-      "intro": "The strongest NFC business card projects define who will use the card, what the tap should open and how much premium finish the brand actually needs.",
-      "statBar": {
-        "items": [
-          {
-            "value": "iPhone XS+",
-            "label": "Background tag reading"
-          },
-          {
-            "value": "NTAG213",
-            "label": "144 B baseline silicon"
-          },
-          {
-            "value": "$2–$5",
-            "label": "PVC card BOM at 50–200 qty"
-          },
-          {
-            "value": "5–10 %",
-            "label": "Annual replacement rate"
-          }
-        ]
-      },
-      "bullets": [
-        "Sales teams rolling out digital business cards across multiple staff members.",
-        "Premium hospitality or brand programs using NFC for contact-sharing or guest engagement.",
-        "Campaigns that combine NFC with QR, printed branding or review-generation flows.",
-        "Projects comparing PVC, metal, wood or eco materials for different user groups."
+      "title": "Enterprise NFC card programmes — what changed after the Linq sunset (January 2025)",
+      "intro": "Procurement teams running 100+ employee NFC card programmes face a different risk profile than solo or small-team buyers. The dominant risk in 2026 is platform-extinction — the January 2025 Linq sunset (Linq exited the digital-card business and pivoted to AI messaging APIs) left enterprise customers with a deteriorating routing layer that they couldn't fix without re-issuing cards across their entire workforce.",
+      "paragraphs": [
+        "**Why enterprise is more exposed than solo.** A solo NFC card user whose SaaS platform sunsets reorders one card from a different vendor in 10 minutes. An enterprise with 500 sales reps has to: (1) procure replacement cards from a new vendor (typically 3-4 week lead time including artwork + pre-encoding), (2) coordinate distribution to 500 employees across global offices, (3) update CRM lead-capture integration to the new vendor's API, (4) communicate the change to existing prospects who have the old card already saved. Total cost in time + lost lead capture during transition is typically 5-10× the original card programme cost.",
+        "**The fix is in the URL routing layer, not the chip.** An enterprise programme where each card encodes `https://yourcompany.com/contact/{employee-slug}` is platform-extinction-immune — the URL routes server-side via the company's own web server. If a SaaS engagement layer is in use, the company can swap providers without touching the cards. If no SaaS is needed, the cards work indefinitely.",
+        "**SCIM provisioning closes the loop.** HR system → SCIM → IdP (Okta, Azure AD) → URL routing rule. New hire on Day 1: card encoded with `{employee-slug}` works immediately because the routing rule was created when SCIM provisioned the user. Offboarding: SCIM de-provisioning removes the routing rule; URL returns 410 Gone or redirects to a generic company contact page. No physical card recovery needed.",
+        "**The procurement consequence:** OEM-direct cards pointing at the company's own domain + SCIM-automated URL provisioning is the 2026 enterprise standard. SaaS routing platforms remain valid for solo + small-team programmes (where the lock-in cost is small); for 100+ employee rollouts the OEM-direct + self-hosted-URL pattern is the safer architecture."
       ],
-      "comparePanel": {
-        "beforeHeading": "Single-cohort flat NFC card programme",
-        "afterHeading": "Multi-cohort enterprise NFC card programme",
-        "before": [
-          "All staff issued the same PVC NFC card with same chip + same finish.",
-          "Per-card URL set manually; HR / marketing has no oversight.",
-          "No CRM sync; tap leads vanish into individual rep's notebook.",
-          "No off-boarding workflow; departed-employee cards remain active.",
-          "Reorder triggered ad-hoc; no inventory governance.",
-          "No brand-standard book; design drift across BUs."
-        ],
-        "after": [
-          "Cohort-specific specs: executives = metal, sales = PVC, field = branded campaign cards.",
-          "Per-cardholder URL encoded at production from HR feed; brand-standard locked.",
-          "Tap → CRM auto-sync (HubSpot / Salesforce / Pipedrive) per UTM = cardholder slug.",
-          "Off-boarding triggers URL-rewrite to expiry page; no physical card recall needed.",
-          "12–18 month reorder cycle synced to brand-refresh + new-hire cohort batches.",
-          "Brand-standard book in Figma / Adobe XD; BU customisation gated through brand approval."
-        ]
+      "callout": {
+        "label": "Enterprise routing principle",
+        "text": "Every NFC card encoded at the converter ships with the SAME stable URL pattern (`https://yourcompany.com/contact/{slug}`). The slug-to-employee mapping lives on the company's web server, not on the card. Re-issuing cards is never necessary for employee changes, offboarding, marketing campaign rotation, or brand refresh — server-side routing handles it.",
+        "href": "/solutions/nfc-business-card/"
       }
     },
     {
-      "title": "Material choice changes the program, not just the look",
-      "intro": "Premium materials can improve brand perception, but they also affect lead time, thickness, print approach and how the card fits the target user.",
+      "title": "Four-cohort rollout architecture — executive, sales, customer-success, general workforce",
+      "intro": "Enterprise NFC card programmes typically segment the workforce into four cohorts with different card materials, chip families, and engagement workflows. The matrix below is the cost-effective default; specific industries adjust (e.g., legal firms might run only executive + general cohorts; sales-led tech companies might expand the sales cohort and skip customer-success).",
       "table": {
-        "columns": [
-          "Material",
-          "Best fit",
-          "Strengths",
-          "Watch-outs"
-        ],
+        "columns": ["Cohort", "Material + chip", "Cost / card", "Engagement layer"],
         "rows": [
-          [
-            "PVC or standard smart-card stock",
-            "Broad team rollouts",
-            "Simple, scalable and familiar",
-            "Less differentiated for premium branding"
-          ],
-          [
-            "Metal NFC cards",
-            "Premium executive or luxury programs",
-            "High perceived value and strong visual impact",
-            "Need tighter control over construction and finish"
-          ],
-          [
-            "Wood or eco cards",
-            "Sustainability-led or boutique brand positioning",
-            "Distinctive feel and stronger sustainability story",
-            "Material consistency and finish choice matter more"
-          ]
+          ["Executive (C-suite, VP, board)", "Metal + ferrite + NTAG 424 DNA SUN", "$25–$55", "vCard + Apple Wallet pass + scheduled-meeting booking link"],
+          ["Sales (account executives, BD, partners)", "Premium PVC or FSC wood + NTAG 215/216", "$3–$10", "CRM lead-capture integration (Salesforce / HubSpot); event-campaign URL rotation"],
+          ["Customer-success (CSM, support, onboarding)", "Standard PVC + NTAG 213", "$1.50–$3", "Appointment-booking URL + support ticket creation"],
+          ["General workforce (engineering, ops, etc.)", "Recycled PVC (GRS) + NTAG 213", "$2–$4", "Company directory entry + LinkedIn URL"]
         ]
       },
-      "dataHighlight": {
-        "value": "$20–$80",
-        "heading": "Per-cardholder annual programme cost — multi-cohort baseline",
-        "text": "A typical enterprise NFC business card programme runs $20–$80 per cardholder per year all-in: $5–$15 for the card itself (amortised over 12–18 month reorder cycle), $5–$15 / user / month for platform subscription (HiHello / Popl / Mobilo / Linq Premium with CRM sync + analytics), and $5–$25 reserve for the 5–10% annual replacement rate. Multi-cohort programmes split BOM by tier — executives at $15–$35 metal etched cards, sales / BD at $2–$5 PVC, field marketing at $1–$3 campaign-rotation cards. Per-cohort UTM tracking + CRM auto-sync (HubSpot / Salesforce / Pipedrive) feeds rep-level pipeline contribution metrics back to sales ops, while HR onboarding feeds (Workday / SuccessFactors / BambooHR / Rippling) trigger card production at new-hire events without manual procurement intervention."
-      }
+      "bullets": [
+        "**Material tier signals seniority** — executive metal cards carry brand and personal positioning; sales premium PVC + wood cards carry brand-personal balance; customer-success and general workforce cards carry primarily functional value.",
+        "**Chip tier follows engagement complexity** — NTAG 213 (144B) for URL-only redirect; NTAG 215/216 for embedded vCard payload; NTAG 424 DNA SUN for executive anti-clone authentication.",
+        "**MOQ at enterprise scale** — typical 100-employee rollout buys 500–1,000 cards (2× quantity buffer for replacements, lost cards, marketing campaign rotation). At MOQ 1,000+ supplier negotiation tier cost drops 30-50% vs MOQ 100.",
+        "**Brand standards** — each cohort gets a distinct artwork variation (metal + brand mark for executive; full-colour CMYK with employee name for sales; cleaner / lighter brand for customer-success; standard for general). Centralised brand-standards review approves each cohort's artwork once; per-employee customisation happens via the URL routing layer, not the printed card.",
+        "**Re-issuance cadence** — typical re-order annually: 10–20% of cards (replacements, lost / damaged, new hires, role changes). Plan re-order into the recurring marketing budget."
+      ]
     },
     {
-      "title": "Useful inputs before requesting samples",
-      "intro": "A practical sample brief should cover both the physical card and the digital action behind the tap.",
+      "title": "URL routing — stable redirect URL on company domain, SCIM-provisioned",
+      "intro": "The architectural decision that determines enterprise programme success: where does the URL on the card point to. Three patterns exist; the recommended pattern for 100+ employee rollouts is the stable-redirect-on-company-domain pattern.",
       "bullets": [
-        "Target phones, preferred chip family and whether the URL should be editable.",
-        "Card material, finish, thickness and visual direction.",
-        "Need for QR codes, numbering, gift packaging or team-level personalization.",
-        "Pilot quantity, approval timeline and who will manage redirects after launch."
-      ],
-      "timeline": {
-        "items": [
-          {
-            "label": "Week 1 — Cohort scoping + brand-standard alignment",
-            "text": "Define cohorts (executive / sales / customer success / field marketing / all-staff opt-in / recruiting). Lock brand-standard book in Figma / Adobe XD with template per cohort. Identify HR feed source (Workday / SuccessFactors / BambooHR / Rippling) + ATS (Greenhouse / Lever)."
-          },
-          {
-            "label": "Week 2 — Tap destination + CRM sync architecture",
-            "text": "Decide tap destination per cohort: vCard / LinkedIn URL / branded platform (HiHello / Popl / Mobilo / Linq) / custom landing page / Calendly. Architect CRM sync (HubSpot / Salesforce / Pipedrive / MS Dynamics) with per-cardholder UTM taxonomy."
-          },
-          {
-            "label": "Week 3 — Chip + material + cohort spec lock-in",
-            "text": "NTAG213 baseline; NTAG215 for executives with vCard + photo; NTAG 424 DNA for anti-clone. Materials: PVC for 90% volume, metal for executives, FSC wood for sustainability cohort, eco PLA / rPVC for ESG. CMYK + spot UV + foil + laser-engrave finish per cohort."
-          },
-          {
-            "label": "Week 4 — Pilot 50–100 cards + smartphone validation",
-            "text": "Produce sample run for representative cohort (one executive + 5 sales + 3 marketing + 2 customer success). Validate iPhone XS / 14 / 15 / 16 + Pixel / Galaxy / OnePlus tap behaviour. Confirm CRM sync works end-to-end with test contact."
-          },
-          {
-            "label": "Week 5–8 — Production wave 1 + per-card encoding",
-            "text": "Pull HR feed for active employees in scope. Production wave 1 covers full active roster + 10% buffer. Per-card NDEF URI encoded at production; serialised QC log per card. Lock NDEF page only for permanent campaign cards."
-          },
-          {
-            "label": "Week 9–10 — Despatch + onboarding rollout",
-            "text": "Distribute cards to corporate address (single bulk shipment) or home addresses (distributed). Cardholder onboarding: 5-minute video + landing-page setup checklist + how-to-tap demo (iPhone top-edge / Android centre-back orientation). Capture LinkedIn URL ownership + GA4 access for analytics."
-          },
-          {
-            "label": "Month 3 — Analytics review + cohort optimisation",
-            "text": "Per-card landing-page views + downstream conversions tracked. Cohort comparison: which cohort generates highest tap-to-conversion rate? Optimise tap destinations per cohort based on actual buyer-journey data. Re-stock signal at 60-day inventory threshold."
-          },
-          {
-            "label": "Quarter 2 onward — Operate + reorder cycle",
-            "text": "Programme references draw from luxury-brands, hospitality, brand-protection, education and healthcare estates — annual brand refresh triggers reorder cycle; rewritable URL rotation for campaign-specific cohorts (Q1 sales kick-off / Q3 trade-show / Q4 holiday); platform subscription review (HiHello / Popl / Mobilo / Linq Premium / Wave / V1CE) for CRM sync + analytics; chip-family upgrade to NTAG 424 DNA for executive / VIP cohort; off-boarding workflow validates HR-termination → URL-rewrite-to-expiry."
-          }
+        "**Pattern 1 — Static URL on company domain (recommended).** Each card encoded with `https://yourcompany.com/contact/{employee-slug}` at the converter. URL never changes after card production. Server-side redirect rule maps `{employee-slug}` → current contact page / vCard / lead-capture form. Survives any vendor pivot, marketing-campaign rotation, brand refresh, employee role change.",
+        "**Pattern 2 — SaaS routing platform.** Each card encoded with `https://linq.app/{employee-id}` (or Popl, V1CE, Mobilo, Wave, Blinq). Convenient turnkey but lock-in risk realised at Linq's January 2025 sunset. SaaS pricing $6.99–15.99 / user / month for full features = $17K–38K / year at 200-employee scale in perpetuity.",
+        "**Pattern 3 — Hybrid.** Card encoded with company-domain URL; redirect routes through self-hosted analytics endpoint (Plausible, Matomo) before resolving to the SaaS engagement layer. Captures analytics on company side; keeps SaaS turnkey for non-mission-critical engagement features.",
+        "**SCIM provisioning** — System for Cross-Domain Identity Management (SCIM 2.0; RFC 7643 + 7644) is the open standard for automated user provisioning. Pattern: HR system (Workday, BambooHR, ADP, Successfactors) writes user creation/update/deletion events to IdP (Okta, Azure AD) via SCIM API. IdP writes URL routing rule on company web server.",
+        "**New-hire workflow** — Day 0: HR creates user in Workday. SCIM triggers Okta provisioning. URL routing rule created (`{slug}` → `{employee-id}` → contact page). NFC card already encoded with `{slug}` works on Day 1.",
+        "**Offboarding workflow** — HR deactivates user in Workday. SCIM triggers Okta de-provisioning. URL routing rule removed; `https://yourcompany.com/contact/{slug}` returns 410 Gone or redirects to generic company contact page. No physical card recovery needed; the card simply stops resolving."
+      ]
+    },
+    {
+      "title": "CRM lead-capture integration — Salesforce, HubSpot, Pipedrive, Marketo",
+      "intro": "Enterprise NFC card programmes typically tie into the CRM that owns lead-capture workflows. The tap → lead-form auto-populate → CRM API call is the standard integration pattern.",
+      "bullets": [
+        "**Salesforce** — REST API + Sales Cloud lead creation. Pattern: NFC tap → company landing page with employee-pre-populated lead form → form submit triggers Salesforce REST API call creating Lead record with `Owner = {employee_salesforce_id}`. Per-tap analytics via Salesforce reports.",
+        "**HubSpot** — Smart Forms + Workflows. Pattern: NFC tap → HubSpot-hosted or company-hosted landing page → smart form submit → HubSpot CRM Lead created with `HubSpot Owner = {employee_hubspot_id}` and automatic workflow trigger.",
+        "**Pipedrive** — REST API + activity automation. Pattern: NFC tap → company landing page → form submit → Pipedrive REST API creates Deal in pipeline assigned to `{employee_pipedrive_user_id}`.",
+        "**Marketo** — landing page + program enrollment. Pattern: NFC tap → Marketo-hosted landing page → form submit → Marketo Lead + Program enrollment.",
+        "**Microsoft Dynamics 365 Sales** — analogous REST API integration; common in Microsoft-shop enterprises.",
+        "**Multi-region routing** — international sales teams need region-specific routing (US sales → North America Salesforce instance; EU sales → EMEA Salesforce instance with EU data residency). The company-domain URL routing layer handles the regional split server-side; cards don't need to be region-specific.",
+        "**Lead-capture form fields** — minimal fields convert better. Typical: name, email, company, phone (optional). Per-tap source attribution (event ID, campaign ID, employee ID) automatically populated server-side without prompting the user."
+      ]
+    },
+    {
+      "title": "Marketing-campaign URL rotation — same cards, different destinations",
+      "intro": "Enterprise programmes typically rotate NFC card destinations multiple times per year for event campaigns, product launches, partner programmes. The stable-redirect pattern lets cards rotate without physical re-issuance.",
+      "bullets": [
+        "**Conference / event mode** — during Dreamforce, HIMSS, NRF, RSAC the sales team's NFC card redirects to a conference-specific landing page (`/event/dreamforce-2026/{employee-slug}`). After the event, redirect rolls back to the standard contact page. Same physical card; different landing.",
+        "**Product launch campaign** — during a new product launch, the entire sales team's cards redirect to a product-specific landing page with embedded demo request. Run for 4–8 weeks; revert to standard.",
+        "**Partner / co-marketing campaign** — joint go-to-market with a partner (e.g., AWS, Microsoft) routes cards to a co-branded landing page during the partnership window.",
+        "**A/B testing** — different cohorts route to different landing variants; conversion data informs the standard landing page redesign.",
+        "**Server-side analytics** — every redirect captures campaign ID, employee ID, tap timestamp, device class, downstream click-through. Per-employee performance metrics for sales-operations dashboards.",
+        "**Brand-refresh transition** — during brand-refresh windows (typically every 3–5 years), redirects can roll out new brand artwork on the landing page while old-brand cards continue to function. Eliminates urgency to re-issue cards during brand transitions."
+      ]
+    },
+    {
+      "title": "GDPR / CCPA / SOC 2 — data residency and DPA framework",
+      "intro": "Enterprise lead-capture flows cross GDPR Article 28 controller/processor lines, CCPA processor-disclosure obligations, and SOC 2 audit scope. The architectural choice (self-hosted URL vs SaaS routing) determines which obligations apply.",
+      "bullets": [
+        "**GDPR Article 28** — company is data controller for lead data captured via NFC card. Any SaaS routing platform is processor; needs a Data Processing Agreement, sub-processor list audit, data residency commitment. Self-hosted URL eliminates the processor relationship entirely.",
+        "**CCPA controller/processor framework** — similar shape for California-resident lead data. Self-hosted URL eliminates CCPA processor-disclosure obligations.",
+        "**SOC 2 audit scope** — if NFC card programme touches lead-capture systems in SOC 2 scope, the routing layer falls inside scope. Self-hosted URL on company domain keeps the routing layer inside existing SOC 2 boundary; SaaS routing adds a vendor in the audit-trail.",
+        "**Data residency** — EU sales teams' lead data typically needs to land in EU-region Salesforce / HubSpot / first-party DB. Company-domain URL routing layer enforces region routing server-side (`/contact-eu/{slug}` for EU staff).",
+        "**Cookie / consent** — landing page that captures lead data typically requires GDPR cookie consent. Standard integrations with OneTrust, TrustArc, Cookiebot apply.",
+        "**Right-to-erasure** — GDPR Article 17 right to be forgotten applies to lead data captured via NFC card. CRM + landing-page database must support DSAR (Data Subject Access Request) and erasure workflows.",
+        "**Offboarding evidence** — for compliance audit, document that departing employee's card URL was revoked within X business days of offboarding (typical 1-3 days). Server-log evidence ties offboarding event to URL routing rule removal."
+      ]
+    },
+    {
+      "title": "Aliro 1.0 + mobile wallet integration",
+      "intro": "Aliro 1.0 (CSA released February 2026) introduces unified digital-key + business-card standards across Apple, Google and Samsung wallets. Enterprise NFC card programmes can pair physical cards with mobile-wallet digital business cards as an overlay.",
+      "bullets": [
+        "**Apple Wallet contact pass** — executive + sales cohorts often pair physical card with Apple Wallet contact pass. The wallet pass is provisioned via the company's MDM (Jamf, Intune, Kandji) or sent via email link.",
+        "**Google Wallet contact pass** — analogous for Android. Provisioned similarly via MDM.",
+        "**Samsung Wallet** — Samsung-specific pass integration; relevant in markets with high Samsung share (Korea, parts of Asia).",
+        "**Aliro 1.0 unification** — Aliro published February 2026 by CSA unifies the implementation pattern across the three wallet platforms. Enterprise programmes planning 2026–2028 rollouts should specify Aliro-readiness in vendor selection.",
+        "**Hybrid pattern** — physical card stays the brand-presentation moment (tactile, gift-able, memorable); wallet pass provides backup + always-on contact-share for tap-to-share between phones (without needing the physical card).",
+        "**ProTip** — the wallet pass URL can be the same `https://yourcompany.com/contact/{slug}` URL as the physical card. Server-side routing detects the User-Agent and serves different responses (vCard for direct browser; wallet pass installer for wallet-specific access)."
+      ]
+    },
+    {
+      "title": "Pricing and MOQ at enterprise scale",
+      "intro": "Enterprise programmes typically aggregate cross-cohort volume to hit better per-card pricing. The table below assumes a 200-employee programme with four cohorts.",
+      "table": {
+        "columns": ["Cohort", "Quantity (200-employee programme)", "Cost / card", "Cohort total"],
+        "rows": [
+          ["Executive (10–20 people)", "30–50 cards (incl. spares)", "$25–$55", "$1,000–$2,500"],
+          ["Sales (50–80 people)", "100–200 cards", "$3–$10", "$500–$2,000"],
+          ["Customer-success (30–50 people)", "60–120 cards", "$1.50–$3", "$200–$400"],
+          ["General workforce (80–120 people)", "150–300 cards", "$2–$4", "$400–$1,200"],
+          ["Total programme", "340–670 cards", "—", "$2,100–$6,100"],
+          ["Add Apple Wallet / Google Wallet pass infrastructure (one-time)", "—", "—", "$2K–$10K setup"],
+          ["Add SCIM provisioning integration (engineering)", "—", "—", "$5K–$30K"],
+          ["Add CRM lead-capture integration (engineering)", "—", "—", "$10K–$50K"],
+          ["Add company-domain URL routing infrastructure", "—", "—", "$1K–$5K / year hosting"],
+          ["Ongoing annual replacement / re-order", "—", "—", "10-20% of programme cost"]
         ]
-      }
+      },
+      "bullets": [
+        "**Programme TCO over 3 years** — typical $15K–$50K for the 200-employee programme above; vs $50K–$120K for SaaS routing alternative ($15K–$40K / year × 3). Self-hosted ROI within 1 year.",
+        "**Sample lead time** — 5–10 working days for paper / PVC sample cards; 10–15 working days for metal / hardwood samples; 15–20 working days for NTAG 424 DNA SUN samples (requires AES key provisioning).",
+        "**Production lead time** — 3–4 weeks for PVC at MOQ 500; 4–5 weeks for metal / hardwood; 5–6 weeks for NTAG 424 DNA SUN at MOQ 200.",
+        "**Re-issue cadence** — plan annual 10–20% re-issue for new hires, lost cards, role changes. Reduce friction with always-stock-on-hand of standard cohort cards."
+      ]
     }
   ],
   "resourceCards": [
     {
-      "title": "Best-fit products",
-      "description": "Use the product routes below to compare common NFC card directions.",
+      "title": "NFC card products",
+      "description": "Material + chip combinations for enterprise rollouts.",
       "links": [
-        {
-          "href": "/product/nfc-business-card/",
-          "label": "NFC business card"
-        },
-        {
-          "href": "/product/metal-nfc-card/",
-          "label": "Metal NFC card"
-        },
-        {
-          "href": "/product/wooden-rfid-card/",
-          "label": "Wooden RFID card"
-        },
-        {
-          "href": "/product/eco_rfid_card/",
-          "label": "Eco RFID card"
-        },
-        {
-          "href": "/products/rfid-cards/nfc-card-custom-printing/",
-          "label": "Custom-printed NFC card"
-        },
-        {
-          "href": "/products/rfid-cards/rfid-metal-business-card/",
-          "label": "Metal business card SKU"
-        },
-        {
-          "href": "/products/rfid-cards/wooden-nfc-business-card-engraved/",
-          "label": "Wooden NFC business card (engraved)"
-        }
+        {"href": "/products/rfid-cards/nfc-card-custom-printing/", "label": "NFC card custom printing (PVC)"},
+        {"href": "/products/rfid-cards/rfid-metal-business-card/", "label": "Metal NFC business card"},
+        {"href": "/products/rfid-cards/wooden-nfc-business-card-engraved/", "label": "Wooden engraved NFC card"},
+        {"href": "/products/rfid-cards/rfid-bamboo-card/", "label": "Bamboo NFC card (FSC)"}
       ]
     },
     {
-      "title": "Adjacent solutions + compares",
-      "description": "Companion solution pages for chip, material and audience decisions.",
+      "title": "Related solutions",
+      "description": "Solo / small-team sibling + adjacent NFC programmes.",
       "links": [
-        {
-          "href": "/solutions/nfc-business-card/",
-          "label": "NFC business card — single-card buyer guide"
-        },
-        {
-          "href": "/solutions/nfc-brand-authentication/",
-          "label": "NFC brand authentication"
-        },
-        {
-          "href": "/solutions/nfc-luxury-authentication/",
-          "label": "NFC luxury authentication"
-        },
-        {
-          "href": "/compare/metal-vs-wood-vs-pvc-nfc-business-cards/",
-          "label": "Compare NFC card materials"
-        },
-        {
-          "href": "/compare/ntag213-vs-ntag215-vs-ntag216/",
-          "label": "NTAG213 / 215 / 216 chip compare"
-        }
+        {"href": "/solutions/nfc-business-card/", "label": "NFC business cards (solo / small team)"},
+        {"href": "/solutions/nfc-brand-authentication/", "label": "NFC brand authentication"}
       ]
     },
     {
-      "title": "Related pages",
-      "description": "The comparison and guide pages help turn a visual preference into a deployment-ready shortlist.",
+      "title": "Side-by-side comparisons",
+      "description": "Material + chip selection deep-dives.",
       "links": [
-        {
-          "href": "/2024/12/24/rfid-wooden-card/",
-          "label": "Read the wooden card guide"
-        },
-        {
-          "href": "/product/google-review-nfc-card/",
-          "label": "See Google review NFC card"
-        },
-        {
-          "href": "/blog/nfc-business-cards-guide/",
-          "label": "NFC business cards complete guide"
-        }
+        {"href": "/compare/metal-vs-wood-vs-pvc-nfc-business-cards/", "label": "Metal vs wood vs PVC NFC cards"},
+        {"href": "/compare/ntag213-vs-ntag215-vs-ntag216/", "label": "NTAG213 vs 215 vs 216"}
+      ]
+    },
+    {
+      "title": "Related editorial",
+      "description": "Background reading.",
+      "links": [
+        {"href": "/blog/nfc-business-cards-guide/", "label": "NFC business cards buyer's guide"},
+        {"href": "/blog/metal-nfc-cards-business-networking/", "label": "Metal NFC cards for business networking"},
+        {"href": "/blog/wooden-nfc-cards-eco-branding/", "label": "Wooden NFC cards for eco branding"}
       ]
     }
   ],
   "faq": [
     {
-      "question": "Should NFC business card projects choose material before chip?",
-      "answer": "No. Mobile compatibility and the digital workflow should be confirmed first, then the material can be chosen around brand and production goals."
+      "question": "Why did Linq sunset and what does it mean for our 200-employee NFC card programme?",
+      "answer": "Linq exited the digital business-card business in January 2025 and pivoted to AI messaging APIs. Customers whose cards pointed at Linq-controlled URLs lost the routing layer; replacement required re-issuing physical cards across the entire workforce. The procurement lesson for enterprise programmes: every SaaS routing platform is one strategic pivot from orphaning your card inventory. Mitigation: encode cards with `https://yourcompany.com/contact/{slug}` (your own domain) and route server-side. If Linq, Popl or any SaaS partner pivots, you swap routing logic without touching cards."
     },
     {
-      "question": "Are metal or wood cards always better than PVC?",
-      "answer": "Only when the brand benefit justifies the cost, finish and production tradeoffs. Standard PVC still fits many broad team rollouts."
+      "question": "How does SCIM provisioning to NFC card URLs work in practice?",
+      "answer": "Three-tier flow: (1) HR system (Workday, BambooHR, ADP) creates employee record. (2) SCIM (System for Cross-Domain Identity Management, RFC 7643 + 7644) provisions the employee to your identity provider (Okta, Azure AD) with attributes like email, role, region. (3) IdP triggers a URL routing rule creation on your web server (e.g., maps `{employee-slug}` → `{employee-id}` → contact page). NFC cards are pre-printed with `{slug}` patterns; first day on the job the card already works. Offboarding: SCIM de-provisioning removes the routing rule; URL returns 410 Gone."
     },
     {
-      "question": "What information makes NFC card sampling faster?",
-      "answer": "Target phones, redirect requirements, material preference and the size of the initial rollout are usually the most useful early inputs."
+      "question": "Should we use SaaS routing (Linq, Popl, V1CE) or self-host the URL?",
+      "answer": "For 100+ employee programmes, self-host on the company domain. SaaS routing pricing ($6.99–$15.99 per user per month for full features) at 200-employee scale runs $17K–$38K / year in perpetuity — and carries platform-extinction risk per the Linq sunset. Self-hosted routing infrastructure costs $1K–$5K / year hosting + one-time $5K–$30K engineering integration. Payback within 1 year vs SaaS. SaaS still makes sense for solo or sub-10-person programmes where the lock-in cost is small and time-to-market matters more than long-term TCO."
     },
     {
-      "question": "How does a multi-cohort programme split chip choices?",
-      "answer": "Most programmes use NTAG213 (144 B) for the bulk of staff (90% of volume), upgrade to NTAG215 (504 B) for executives or anyone needing a vCard with photo, and reserve NTAG 424 DNA for VIP / luxury cohorts where anti-clone authentication matters. The rewritable nature of NTAG21x means HR / marketing can rotate URLs without reissue, while NTAG 424 DNA SUN signs each tap cryptographically for tamper-evident applications."
+      "question": "How do we integrate with Salesforce / HubSpot for lead capture?",
+      "answer": "Standard REST API integration pattern. Customer taps NFC card → lands on company-domain landing page with employee-pre-populated lead form → form submit triggers REST API call to Salesforce (Lead create) / HubSpot (Lead create + workflow) / Pipedrive (Deal create) / Marketo (Lead + Program). Server-side automatic attribution: campaign ID, employee ID, tap timestamp, device class. Per-employee performance metrics for sales-operations dashboards. Engineering cost typically $10K–$50K for the full integration build."
     },
     {
-      "question": "How do you handle off-boarding when an employee leaves?",
-      "answer": "The simplest path is to re-encode the cardholder's NDEF URI to point to a generic 'employee no longer with the company' redirect page. Because NTAG213 is rewritable, this can be done remotely via the cardholder's own NFC Tools app instructions, or centrally via NFC desktop encoder. Physical card recall is not required. The HR off-boarding webhook (Workday / SuccessFactors / BambooHR) triggers the URL rotation automatically."
+      "question": "How do we offboard a departing employee's NFC card without recovering the physical card?",
+      "answer": "Routing-layer revocation. SCIM de-provisioning from HR system → IdP removes URL routing rule on company domain → URL returns 410 Gone or redirects to generic company contact page. The physical card continues to exist but no longer resolves to a working contact. Some companies route departing employees to a 'team contact' page instead of 410 (`{slug}` → `https://yourcompany.com/contact/team-sales/`). Document the revocation workflow in offboarding policy + retain server logs as compliance evidence."
+    },
+    {
+      "question": "Can we run campaign URL rotation without re-issuing cards?",
+      "answer": "Yes — that's the core operational advantage of stable-redirect-on-company-domain. During a Dreamforce / HIMSS / partner-launch campaign, redirect rule changes serve a campaign-specific landing page (`/event/{event-id}/{employee-slug}`). After the campaign, redirect rolls back to the standard contact page. Same physical card; different landing. A/B testing different landing variants is similarly trivial at the redirect-rule layer. Brand-refresh transitions handled the same way — new landing artwork, old physical cards continue to function."
+    },
+    {
+      "question": "What's the GDPR / DPA requirement when SaaS routing is in scope?",
+      "answer": "Company is data controller for lead data captured via NFC card; SaaS routing platform is processor. GDPR Article 28 requires DPA (Data Processing Agreement), sub-processor list audit, data-residency commitment, and standard contractual clauses for international data transfer. Self-hosted URL on company domain eliminates the processor relationship entirely — PII stays inside the existing GDPR / CCPA compliance perimeter. For enterprise programmes operating under SOC 2 audit, this also matters: self-hosted routing keeps the routing layer inside existing SOC 2 boundary instead of adding a vendor in the audit trail."
+    },
+    {
+      "question": "Should executives get NTAG 424 DNA SUN cards?",
+      "answer": "Worth it. NTAG 424 DNA SUN provides AES-128 CMAC per-tap unique URL signing; server-side validation detects clones in real time. For C-suite + board cards (high-value relationships, anti-impersonation concerns) the $20–30 cost premium per chip vs NTAG 213 pays back on the trust signal alone. Pair NTAG 424 DNA SUN chip with metal card body + Apple Wallet pass for the premium executive cohort. For sales / customer-success / general workforce, NTAG 213 / 215 is sufficient — anti-clone concerns are typically not material for these cohorts."
     }
+  ],
+  "primaryAction": {"href": "/contact/", "label": "Get an enterprise NFC programme plan"},
+  "secondaryActions": [
+    {"href": "/solutions/nfc-business-card/", "label": "Solo / small-team NFC cards"},
+    {"href": "/compare/metal-vs-wood-vs-pvc-nfc-business-cards/", "label": "Compare materials"},
+    {"href": "/blog/nfc-business-cards-guide/", "label": "NFC card buyer's guide"},
+    {"href": "/contact/", "label": "General contact"}
   ],
   "sources": [
-    {
-      "label": "NFC Forum — Type 2 / Type 4 Tag and NDEF technical specifications",
-      "url": "https://nfc-forum.org/our-work/specification-releases/",
-      "publisher": "NFC Forum",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Governs tap-to-launch and NDEF URI / vCard behaviour across iPhone XS+ and Android NDEF dispatch on enterprise NFC business-card programmes."
-    },
-    {
-      "label": "Apple Developer — Core NFC background tag reading (iOS)",
-      "url": "https://developer.apple.com/documentation/corenfc",
-      "publisher": "Apple Inc.",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "iPhone-side behaviour for vCard, URL and tel: NDEF records in NFC business-card programmes since iPhone XS / iOS 13."
-    },
-    {
-      "label": "Android Developers — NFC basics + NDEF dispatch",
-      "url": "https://developer.android.com/develop/connectivity/nfc/nfc",
-      "publisher": "Google LLC",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Android NDEF dispatch behaviour for NFC business cards deployed across mixed Pixel / Galaxy / OnePlus / Xiaomi device fleets."
-    },
-    {
-      "label": "NXP NTAG 213/215/216 product family brief",
-      "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-and-labels/ntag213-ntag215-ntag216-nfc-forum-type-2-tag-compliant-ic-with-144-504-888-bytes-user-memory:NTAG213_215_216",
-      "publisher": "NXP Semiconductors",
-      "publishedAt": "2018-08",
-      "accessedAt": "2026-04-26",
-      "note": "Primary NFC silicon used in corporate NFC business-card programmes — NTAG213 baseline, NTAG215 for vCard with photo."
-    },
-    {
-      "label": "NXP NTAG 424 DNA — tamper-evident / SUN authentication NFC IC",
-      "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-and-labels/ntag-424-dna-ntag-424-dna-tagtamper:NTAG424DNA",
-      "publisher": "NXP Semiconductors",
-      "publishedAt": "2020",
-      "accessedAt": "2026-04-26",
-      "note": "Secure NFC silicon for executive / VIP NFC cards with SUN-message + CMAC authentication."
-    },
-    {
-      "label": "ISO/IEC 7810:2019 — Identification cards, physical characteristics (CR80 / ID-1)",
-      "url": "https://www.iso.org/standard/70483.html",
-      "publisher": "ISO",
-      "publishedAt": "2019-03",
-      "accessedAt": "2026-04-26",
-      "note": "CR80 / ID-1 form-factor standard for NFC business cards programmed at corporate scale."
-    },
-    {
-      "label": "ISO/IEC 14443:2018 — Proximity cards (Parts 1–4)",
-      "url": "https://www.iso.org/standard/73599.html",
-      "publisher": "ISO",
-      "publishedAt": "2018-09",
-      "accessedAt": "2026-04-26",
-      "note": "HF proximity air-interface underlying NFC business cards across vendors and device ecosystems."
-    },
-    {
-      "label": "vCard 4.0 — RFC 6350",
-      "url": "https://datatracker.ietf.org/doc/html/rfc6350",
-      "publisher": "IETF",
-      "publishedAt": "2011-08",
-      "accessedAt": "2026-04-26",
-      "note": "vCard 4.0 specification used as the standard contact-file payload for NFC business-card tap-to-save flows on iPhone and Android."
-    },
-    {
-      "label": "GDPR — Regulation (EU) 2016/679 (Articles 6, 13, 14)",
-      "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
-      "publisher": "Publications Office of the European Union",
-      "publishedAt": "2016-04",
-      "accessedAt": "2026-04-26",
-      "note": "EU/EEA data-protection rules governing lead-capture landing pages behind NFC business-card URLs."
-    },
-    {
-      "label": "California Consumer Privacy Act (CCPA) and CPRA amendments",
-      "url": "https://oag.ca.gov/privacy/ccpa",
-      "publisher": "California Office of the Attorney General",
-      "publishedAt": "2023-01",
-      "accessedAt": "2026-04-26",
-      "note": "California privacy framework requiring 'Do Not Sell My Personal Information' link and opt-out workflows on landing pages capturing lead data from NFC tap."
-    }
+    {"label": "NXP NTAG213 / 215 / 216 datasheet", "url": "https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "Chip-family reference."},
+    {"label": "NXP NTAG 424 DNA datasheet (NT4H2421Gx)", "url": "https://www.nxp.com/docs/en/data-sheet/NT4H2421Gx.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "Executive-cohort chip with AES-128 SUN authentication."},
+    {"label": "IETF RFC 7643 — System for Cross-Domain Identity Management (SCIM): Core Schema", "url": "https://datatracker.ietf.org/doc/html/rfc7643", "publisher": "IETF", "publishedAt": "2015", "accessedAt": "2026-05-11", "note": "SCIM 2.0 core schema for HR-to-IdP provisioning."},
+    {"label": "IETF RFC 7644 — SCIM Protocol", "url": "https://datatracker.ietf.org/doc/html/rfc7644", "publisher": "IETF", "publishedAt": "2015", "accessedAt": "2026-05-11", "note": "SCIM 2.0 protocol specification."},
+    {"label": "Okta SCIM provisioning documentation", "url": "https://developer.okta.com/docs/concepts/scim/", "publisher": "Okta", "accessedAt": "2026-05-11", "note": "Reference SCIM-to-IdP integration pattern."},
+    {"label": "Azure AD SCIM provisioning", "url": "https://learn.microsoft.com/en-us/azure/active-directory/app-provisioning/use-scim-to-provision-users-and-groups", "publisher": "Microsoft", "accessedAt": "2026-05-11", "note": "Microsoft IdP SCIM integration pattern."},
+    {"label": "Salesforce REST API Lead create", "url": "https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_sobject_create.htm", "publisher": "Salesforce", "accessedAt": "2026-05-11", "note": "Reference API for CRM lead-capture integration."},
+    {"label": "HubSpot Smart Forms + Workflows", "url": "https://knowledge.hubspot.com/forms/create-and-customize-forms", "publisher": "HubSpot", "accessedAt": "2026-05-11", "note": "HubSpot CRM integration pattern."},
+    {"label": "Pipedrive REST API", "url": "https://developers.pipedrive.com/docs/api/v1", "publisher": "Pipedrive", "accessedAt": "2026-05-11", "note": "Pipedrive Deal + Activity API reference."},
+    {"label": "Marketo Landing Page + Forms documentation", "url": "https://nation.marketo.com/", "publisher": "Adobe Marketo Engage", "accessedAt": "2026-05-11", "note": "Marketo integration pattern."},
+    {"label": "Apple Developer — Wallet Passes", "url": "https://developer.apple.com/documentation/walletpasses", "publisher": "Apple", "accessedAt": "2026-05-11", "note": "Apple Wallet contact-pass provisioning reference."},
+    {"label": "Google Wallet API documentation", "url": "https://developers.google.com/wallet", "publisher": "Google", "accessedAt": "2026-05-11", "note": "Google Wallet pass provisioning reference."},
+    {"label": "Aliro 1.0 specification release (CSA, February 2026)", "url": "https://csa-iot.org/all-solutions/aliro/", "publisher": "Connectivity Standards Alliance", "publishedAt": "2026-02", "accessedAt": "2026-05-11", "note": "Unified digital-key / business-card standard across Apple / Google / Samsung wallets."},
+    {"label": "IETF RFC 6350 — vCard 4.0 specification", "url": "https://datatracker.ietf.org/doc/html/rfc6350", "publisher": "IETF", "publishedAt": "2011", "accessedAt": "2026-05-11", "note": "vCard 4.0 with multi-language LANG parameter + UTF-8 encoding."},
+    {"label": "GDPR Article 28 (EUR-Lex)", "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj", "publisher": "EU / EUR-Lex", "publishedAt": "2016", "accessedAt": "2026-05-11", "note": "Controller / processor framework for SaaS-routing DPA negotiation."},
+    {"label": "California CCPA / CPRA Cal. Civ. Code §1798.100 et seq.", "url": "https://oag.ca.gov/privacy/ccpa", "publisher": "California Office of the Attorney General", "accessedAt": "2026-05-11", "note": "California consumer privacy framework for lead-capture data."},
+    {"label": "AICPA SOC 2 reference", "url": "https://www.aicpa-cima.com/topic/audit-assurance/audit-and-assurance-greater-than-soc-2", "publisher": "AICPA", "accessedAt": "2026-05-11", "note": "SOC 2 audit framework for enterprise routing-layer scope."},
+    {"label": "Apple Developer — Adding Support for Background Tag Reading", "url": "https://developer.apple.com/documentation/corenfc/adding-support-for-background-tag-reading", "publisher": "Apple", "accessedAt": "2026-05-11", "note": "iPhone XS+ background tag reading reference."},
+    {"label": "FSC chain-of-custody (FSC-STD-40-004)", "url": "https://fsc.org/en/chain-of-custody", "publisher": "Forest Stewardship Council", "accessedAt": "2026-05-11", "note": "Wood + bamboo card sustainability certification."},
+    {"label": "Global Recycled Standard (GRS)", "url": "https://www.scsglobalservices.com/services/global-recycled-standard", "publisher": "Textile Exchange / SCS Global Services", "accessedAt": "2026-05-11", "note": "Recycled PVC ≥50% post-consumer recycled content claim."}
   ],
-  "primaryAction": {
-    "href": "/contact/nfc-branding-cards/",
-    "label": "Request NFC card guidance"
-  },
-  "secondaryActions": [
-    {
-      "href": "/compare/metal-vs-wood-vs-pvc-nfc-business-cards/",
-      "label": "Compare materials"
-    },
-    {
-      "href": "/products/rfid-cards/",
-      "label": "Browse RFID cards"
-    },
-    {
-      "href": "/faq/",
-      "label": "Review compatibility FAQ"
-    }
-  ],
-  "authorSlug": "peter-zhang",
+  "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-26"
+  "reviewedAt": "2026-05-11"
 }

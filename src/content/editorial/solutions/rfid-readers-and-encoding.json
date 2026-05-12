@@ -18,6 +18,7 @@
     "The best pilot validates drivers, SDK behavior and card handling together, not in separate steps."
   ],
   "imageAlt": "RFID reader and encoding workflow",
+  "heroImage": "/landing-images/rfid-handheld-reader-scanner.jpg",
   "imageSourceRoutes": [
     "/product/acr122u/",
     "/product/nfc-reader-writer-with-free-sdks/",
@@ -194,7 +195,7 @@
     }
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-04-26",
+  "modifiedAt": "2026-05-11",
   "sections": [
     {
       "title": "Where this solution page fits",
@@ -295,6 +296,115 @@
           }
         ]
       }
+    },
+    {
+      "title": "Reader form-factor decision tree — fixed / handheld / USB encoder / integrated",
+      "bullets": [
+        "Fixed reader — mounted at portal / conveyor / shelf / dock door / gate. Typical 4-port + multi-antenna; PoE+ or PoE++ power; Linux + LLRP + REST API. Use cases: dock-door portal, retail-store loss-prevention, inventory shelf, library gate, parking lane. Vendors: Impinj R700 + R510 + R420, Zebra FX9600 + FX7500, Honeywell IF61 + IH40, Alien ALR-9900+. Cost $1.5K-$5K per unit.",
+        "Handheld reader — gun-grip Android device with integrated UHF + barcode + camera. Use cases: warehouse picking, retail audit, inventory walk, MRO tool tracking, healthcare clinician handheld. Vendors: Zebra MC3300xR + RFD40 + RFD8500, Honeywell CT60-XP + CN80, TSL 1128 / 1166, Chainway C72. Cost $1.5K-$3.5K per unit.",
+        "Smartphone sled — clip-on UHF reader attached to iPhone or Android via BLE; smaller form factor than dedicated handheld. Use cases: direct-store-delivery, field-service audit, contractor walk. Vendors: Zebra RFD90, TSL 1153 + 1166, U-Grok-It. Cost $1.5K-$3K per unit.",
+        "Desktop / USB encoder — connected to PC via USB; encode + verify single tag at a time. Use cases: card issuance, kiosk encoding, lab development, sample-encoding for tag testing. Vendors: ACS ACR122U (most popular for NFC dev), HID Omnikey 5022 + 5427 + 5022CL, Identiv uTrust SmartFold, Plus-ID iCard. Cost $50-$300 per unit.",
+        "Integrated reader — embedded inside the device that needs to read tags. Use cases: hotel-lock electronics + door, ATM + kiosk card reader, smart-shelf, vending machine, point-of-sale. Vendors: HID OMNIKEY 5022CL / 5421 ProxPro II, Elatec TWN4 multi-tech reader. Cost embedded per device.",
+        "Pocket / mobile-app reader — smartphone-native NFC reading (no hardware sled); works on iPhone iOS 13+ and most Android phones. Use cases: tap-to-verify access, brand-authentication, marketing tap-to-pay, low-volume audit. Free (uses existing smartphone).",
+        "RFID + camera hybrid — combines UHF reader with overhead camera for visual verification + identification. Vendors: KEONN Advan Box + AdvanShelf NF; Avery Dennison atma.io ConnectedSensors. Used in retail apparel smart fitting room + shelf-edge inventory.",
+        "Automatic + walk-up portal — multi-antenna gantry covering corridor or doorway, often combined with people-counter + camera. Used at corporate access + library exit + retail-store loss-prevention.",
+        "Active reader — for active RFID (with-battery) chips at 433MHz + 915MHz + 2.4GHz. Use cases: real-time location systems (RTLS) for asset + staff tracking; cold-chain temperature logger pairing. Vendors: Stanley AeroScout, CenTrak, Zebra MotionWorks.",
+        "Form-factor decision — start with workflow + reader-target distance + power + connectivity environment; pick form factor; then pick chipset; then pick vendor + SKU; pilot before bulk procurement.",
+        "Multi-form-factor stack — typical mid-large deployment has 2-3 form factors: fixed portal at receiving + handheld for picking + USB encoder at desk. SKU consolidation across form factors yields procurement leverage."
+      ]
+    },
+    {
+      "title": "Air interface decision — LF 125 kHz / HF 13.56 MHz / UHF 860-960 MHz / NFC",
+      "bullets": [
+        "LF (Low Frequency, 125 kHz, ISO 11784/11785, ISO/IEC 14223) — inductively coupled; read range <10 cm; no cryptography on basic chips (EM4100, HID Prox); slow data rate; works through water + tissue + non-metallic surfaces. Use cases: animal ID + livestock + pet microchip, legacy access control proximity, automotive key-fob immobiliser.",
+        "HF (High Frequency, 13.56 MHz, ISO/IEC 14443 + 15693) — inductively coupled; read range up to 1.5m at high power; supports cryptography (MIFARE Classic Crypto-1 broken, DESFire EV3 AES-128 secure, Plus AES-128 staged); medium data rate; standard NFC band. Use cases: access control card + key fob, hotel key, transit card, library tag (ISO 28560), payment card (ISO 14443-A), passport (ICAO 9303).",
+        "UHF (Ultra High Frequency, 860-960 MHz, ISO/IEC 18000-63 Gen2v2 = RAIN RFID) — backscatter; read range 1-15m typical; long-range applications; reads through cardboard + plastic + non-conductive; degraded by water + metal (use anti-metal tags). Standard data rate. Use cases: supply chain + retail item-level + dock-door portal + race timing + vehicle access + asset tracking.",
+        "NFC (Near Field Communication, 13.56 MHz subset of HF) — restricted to short range <10cm; ISO/IEC 14443 + ISO/IEC 18092 + NFC Forum tag types 1-5; supports smartphone tap. Use cases: tap-to-pay, brand authentication, marketing tap-to-page, business card, fitness tracker.",
+        "Active RFID (433MHz + 915MHz + 2.4GHz with battery) — long-range (up to 100m) + active beacon; suitable for real-time location (RTLS) + temperature logger + tamper-seal. Use cases: cold-chain logger, equipment RTLS, infant security (Stanley Hugs).",
+        "BLE (Bluetooth Low Energy, 2.4GHz, IEEE 802.15.4) — pairing-based; smartphone-native; range 10-30m. Use cases: mobile access credential, asset RTLS, retail beacon, fitness wearable.",
+        "UWB (Ultra-Wideband, 3.1-10.6 GHz, IEEE 802.15.4z) — high-precision location (sub-meter); newer in commercial RTLS; common in operating-room + ER throughput optimisation (CenTrak), Apple AirTag, Samsung SmartTag+.",
+        "Hybrid LF+HF dual-frequency — single card with both EM4100/HID Prox + MIFARE for legacy + modern migration; common in building-access estates mid-migration. ~$1.80-$3.50 unit.",
+        "Hybrid HF+UHF dual-frequency — single tag with both 14443 + Gen2v2; rare but used in special-collection library + retail-apparel + hospitality where multi-protocol reader fleet exists.",
+        "Decision matrix — security-critical short-range (door, payment, transit) → HF DESFire EV3 / Seos; long-range item-level (supply chain, retail, race, vehicle) → UHF Gen2v2; smartphone-tap consumer-facing (NFC business card, brand auth) → NFC (HF subset); legacy estate maintenance → LF EM4100/HID Prox until refresh; high-precision RTLS → UWB or active RFID.",
+        "Regional regulatory split — UHF 902-928 MHz in US/Americas (FCC Part 15.247), 865.6-867.6 MHz in EU/UK (ETSI EN 302 208), 920-925 MHz in Japan (MIC), 920.5-924.5 MHz in Australia (ACMA); requires regional reader SKU or multi-region tuneable reader. HF is global at 13.56 MHz."
+      ]
+    },
+    {
+      "title": "Major reader vendors — Impinj / Zebra / Honeywell / Alien / ACS / HID / Identiv",
+      "bullets": [
+        "Impinj — US-listed (NASDAQ:PI), the dominant pure-play RAIN RFID company; chip + reader + software stack. Flagship readers: R700 (4-port high-perf), R510 (2-port mid-range), R420 (legacy 4-port). Chip: Monza R6 + R6-P + M700 series + M730 + M750 + M770 + M800. Reader-management: ItemSense + ItemTest. Strong in retail apparel + supply chain + race timing.",
+        "Zebra Technologies — US-listed (NASDAQ:ZBRA), broad enterprise mobility + RFID + barcode. Fixed: FX9600 + FX7500. Handheld: MC3300xR + RFD40 + RFD8500 + RFD90 (smartphone sled). Reader management: Savanna + MotionWorks. Strong in warehouse + retail + healthcare.",
+        "Honeywell — IF61 fixed + IH40 fixed + CT60-XP + CN80 handheld; strong in commercial + industrial + healthcare. Often paired with Honeywell Pro-Watch PACS for combined access + RFID.",
+        "Alien Technology — US-headquartered, legacy UHF reader specialist; ALR-9900+ fixed + Alien Higgs chip series. Older installed base; declining new-deal share but service-and-support footprint remains.",
+        "Chainway — Chinese mid-tier handheld UHF reader vendor; C72 + C71 + C66 handheld with Android + UHF; lower cost than Zebra/Honeywell, common in budget-conscious deployments.",
+        "TSL (Technology Solutions UK) — UK-based handheld UHF sled specialist; TSL 1128 + 1166 + 1153 + 1191 attach to iPhone/Android phones via BLE.",
+        "ACS (Advanced Card Systems, HK) — most popular USB NFC reader/encoder; ACR122U at $30-$50 is the dev-favourite. ACR1252U + ACR1281U for production NFC.",
+        "HID Global (now Carrier) — premium-tier reader vendor; Signo + multiCLASS SE + OMNIKEY 5022 + 5427 + 5421 + 5921 for HF; HID Mobile Access for BLE/NFC mobile. Strong in enterprise PACS + federal.",
+        "Identiv — US-listed; uTrust readers (uTrust 4710F desktop, uTrust SmartFold portable, uTrust Sense IoT for industrial). Strong in federal + government + healthcare contactless smart-card reading.",
+        "Plus-ID + iCard — Asian vendors with mid-volume contactless reader portfolio.",
+        "Elatec — German specialist for embedded multi-tech reader (TWN4); used inside hotel locks + access control terminals + multi-credential systems.",
+        "Iteris (formerly TransCore) — toll + parking specialist; Encompass 4/6 + ELYO multi-protocol readers for 6C + IAG + eGo + 5.9GHz DSRC.",
+        "Kapsch TrafficCom — Austrian toll specialist; IRT IRC roadside readers + on-board OBU devices.",
+        "Procurement reality — most mid-large deployments standardise on Impinj fixed + Zebra handheld + ACS USB combination; this trio covers 80%+ of use cases at competitive pricing + broad SI partner network."
+      ]
+    },
+    {
+      "title": "SDK + driver ecosystem — LLRP / PCSC / JNI / NDEF / OSDP / PyScard",
+      "bullets": [
+        "LLRP (Low Level Reader Protocol, EPCglobal) — vendor-neutral protocol for fixed UHF reader control; supported by Impinj + Zebra + Honeywell + Alien + many others. Application sends LLRP commands to configure reader + receive tag-read events.",
+        "Vendor-specific SDK — Impinj Octane Reader SDK (C# + Java + Python), Zebra RFID SDK (.NET + Java + iOS + Android), Honeywell RFID SDK, Alien RFID SDK. Higher-level abstraction than raw LLRP; faster development.",
+        "PCSC (Personal Computer / Smart Card, ISO 7816-4) — desktop / USB reader protocol for contactless smart cards (DESFire EV3, Seos, MIFARE Classic). Available on Windows + macOS + Linux via WinSCard + PCSCLite.",
+        "PyScard — Python PCSC binding for desktop reader development; ACS ACR122U + HID Omnikey + Identiv uTrust accessible via PyScard.",
+        "JNI (Java Native Interface) — for Java applications calling PCSC native libraries; legacy enterprise integration.",
+        "libnfc + libfreefare — Linux open-source NFC stack for low-level chip interaction; useful for development + custom encoding workflows.",
+        "NDEF (NFC Data Exchange Format) — standard data format for NFC tap content (URL, text, vCard, Wi-Fi, smart-poster). NFC Forum maintains specifications.",
+        "OSDP (Open Supervised Device Protocol v2.2, SIA + IEC 60839-11-5) — reader-to-panel communication for access control replacing legacy Wiegand; AES-128 Secure Channel + bidirectional + tamper detection + firmware OTA. Required for new access-control deployments.",
+        "Wiegand — legacy reader-to-panel protocol (1974); unidirectional + unencrypted; vulnerable to ESPKey wire-tap. Being replaced by OSDP industry-wide.",
+        "REST API — modern fixed reader + reader-management platforms (Impinj ItemSense, Zebra Savanna, Honeywell Connected, KEONN Advan) expose REST + JSON for cloud integration.",
+        "MQTT / Kafka — high-throughput streaming event delivery from reader fleet to cloud / on-prem broker for retail + supply chain.",
+        "EPCIS 2.0 (ISO/IEC 19987:2021) — event-data sharing standard for trading-partner visibility; reader fleet → middleware → EPCIS broker → trading partner / regulator.",
+        "SIP2 + NCIP — library-specific protocols for kiosk → ILS integration.",
+        "Mobile credential SDK — HID Mobile Access SDK + Apple Wallet + Google Wallet for BLE/NFC mobile credential issuance + reader-side validation.",
+        "Development workflow — start with vendor evaluation kit (Impinj Speedway dev kit + Zebra MC3300xR + ACS ACR122U + a sample tag set) → write proof-of-concept against vendor SDK → migrate to LLRP or REST API for production where vendor-portability matters."
+      ]
+    },
+    {
+      "title": "Frequency band + regional regulation — FCC / ETSI / IC / MIC / ACMA / ANATEL",
+      "bullets": [
+        "US + Americas — FCC Part 15.247 (902-928 MHz, max 36 dBm EIRP / 4W ERP) for UHF; Part 15.225 (13.56 MHz HF). Region 2 ITU.",
+        "EU + UK + Norway + Switzerland — ETSI EN 302 208 V3.3 (865.6-867.6 MHz, max 2W ERP); CE-marking required for sale in EU. Region 1 ITU.",
+        "UK post-Brexit — Ofcom IR 2030 mirrors ETSI EN 302 208 but UKCA-marking required for UK market.",
+        "Canada — IC (Innovation, Science and Economic Development Canada, formerly Industry Canada) RSS-247 + RSS-Gen for UHF; harmonised with FCC + own certification.",
+        "Japan — MIC (Ministry of Internal Affairs and Communications) Article 2 of Radio Law; 916.7-923.5 MHz for UHF, 2W ERP.",
+        "Australia + NZ — ACMA (Australian Communications and Media Authority) Class Licence; 920-926 MHz UHF.",
+        "Brazil + South America — ANATEL (Agência Nacional de Telecomunicações) for Brazil, similar regional regulators elsewhere; 902-907.5 MHz + 915-928 MHz for UHF.",
+        "China — SRRC (State Radio Regulatory Commission, now CCC under SAC) 920.5-924.5 MHz for UHF.",
+        "India — WPC (Wireless Planning and Coordination Wing, MoC) 865-867 MHz for UHF (similar to EU); license-exempt at 4W ERP.",
+        "GCC + MENA — varies by country; UAE TDRA, Saudi CITC, Egypt NTRA each have their own UHF allocations broadly aligned with EU or US bands.",
+        "South Korea — RRA (Radio Research Agency, KCC) 917-920.8 MHz for UHF.",
+        "HF 13.56 MHz — globally harmonised under ITU Radio Regulations Article 5; no regional licensing required; same 4W EIRP cap across most regions.",
+        "Multi-region reader — Impinj R700 + Zebra FX9600 + Honeywell IF61 ship multi-region SKUs (FCC + ETSI + Japan + Australia + China + Korea + India) selectable by software firmware setting. Single global tag SKU works across regions due to broad chip frequency response.",
+        "Tag chip cross-region compatibility — Impinj Monza R6-P + NXP UCODE 9 + Alien Higgs work at all major UHF allocations 860-960 MHz; cross-region deployment doesn't require chip variant.",
+        "Conformity assessment — for reader hardware, regional certification (FCC ID, CE mark + DoC, IC, MIC TELEC, ACMA, etc.) is per-product per-region; SI integrator may need to verify before deployment.",
+        "Spectrum interference + dense-reader environments — large warehouse + retail + airport may have 10-100 readers running simultaneously; LBT (Listen Before Talk in EU) + DRM (Dense Reader Mode in Gen2v2) coordinate spectrum. Site survey + reader power tuning during commissioning is essential."
+      ]
+    },
+    {
+      "title": "Use case matrix + pilot validation workflow",
+      "bullets": [
+        "Use case — supply chain inbound / outbound portal: fixed UHF reader (Impinj R700 + 4 antennas) + EPCIS 2.0 broker (atma.io, TraceLink, IBM Sterling); target 99%+ first-read on tagged carton + pallet. SI partner typical.",
+        "Use case — retail apparel store: fixed shelf reader (Impinj R510 + KEONN A8060 ceiling-mount + smart-shelf overhead arrays) + handheld for cycle count + loss-prevention EAS gate. Target 99%+ inventory accuracy; loss-prevention 60-80% reduction.",
+        "Use case — hotel guest key issuance: USB encoder (ACS ACR122U + HID Omnikey 5022CL) at front-desk PC + PMS integration (Oracle OPERA OVI + Mews + Cloudbeds + Apaleo); MIFARE Plus / DESFire EV2/EV3 key card.",
+        "Use case — corporate PACS + attendance: HID Signo + Mercury LP-1502/2500 panel + OSDP v2.2 + DESFire EV3 / Seos card.",
+        "Use case — library self-check + AMH: Bibliotheca / EnvisionWare / Tech Logic kiosk with embedded ICODE SLIX2 reader + SIP2/NCIP to ILS.",
+        "Use case — race timing: Impinj R420 / R510 + specialist ChronoTrack / MYLAPS / Race|Result decoder + mat antenna + cloud platform.",
+        "Use case — vehicle parking + tolling: 6C-compatible fixed reader (TransCore Encompass / Kapsch IRT / Impinj R700) + Skidata / Amano / T2 Systems platform + UHF windshield label.",
+        "Use case — hospital patient tracking: handheld (Zebra MC3300xR-HC + Honeywell CT60-HC) + RTLS (Stanley AeroScout, CenTrak) + HL7 FHIR integration with Epic / Cerner / MEDITECH.",
+        "Use case — laundry tunnel reader: Impinj R700 + specialist Positek RTR + Lavetech reader + tunnel-finisher integration with Kannegiesser + Jensen + Milnor.",
+        "Pilot workflow — Stage 0: define use case + read-target + power + connectivity + integration. Stage 1: vendor evaluation kit + 100-sample tags + 1-2 weeks bench testing. Stage 2: small-scale pilot (10-20 readers + 1-2K tags) for 4-8 weeks operational validation. Stage 3: scale-up procurement + multi-site rollout + reader fleet management deployment. Stage 4: operate + audit + 5-7 year refresh cycle.",
+        "Pilot exit criteria — 99%+ read accuracy at target read distance; integration to host platform validated end-to-end; operating runbook documented; chargeback / loss-prevention / compliance evidence demonstrated; reader fleet management dashboard live.",
+        "Procurement leverage — standardise on 2-3 reader form factors covering 90% of use cases; multi-year volume commitment 10-20% discount; bundled vendor + SI services + reader-management 10-15% vs separate procurement; cross-deployment SKU consolidation enables multi-million-dollar tag procurement at 15-25% discount."
+      ]
     }
   ],
   "resourceCards": [
@@ -355,6 +465,22 @@
     {
       "question": "Why do reader projects stall so often after purchase?",
       "answer": "They often stall because teams choose hardware before defining the software environment, the real credential set and the operating workflow the reader must support."
+    },
+    {
+      "question": "Fixed vs handheld vs USB encoder — which form factor for what use case?",
+      "answer": "Match the form factor to the workflow. Fixed reader (mounted at portal / dock door / shelf / conveyor / gate): unattended high-volume reading; vendors Impinj R700 + Zebra FX9600 + Honeywell IF61 + Alien ALR-9900+; cost $1.5K-$5K. Handheld (gun-grip Android UHF + barcode + camera): warehouse picking + retail audit + inventory walk; vendors Zebra MC3300xR + RFD40 + Honeywell CT60-XP + TSL 1128/1166 + Chainway C72; cost $1.5K-$3.5K. Smartphone sled (clip-on BLE-attached UHF): direct-store-delivery + field-service; vendors Zebra RFD90 + TSL 1153 + U-Grok-It; cost $1.5K-$3K. USB encoder (single-tag desktop): card issuance + kiosk encoding + sample testing; vendors ACS ACR122U + HID Omnikey 5022/5427 + Identiv uTrust; cost $50-$300. Integrated reader (embedded inside device): hotel lock + ATM + kiosk + POS; embedded per device. Most mid-large deployments use 2-3 form factors covering 90% of use cases."
+    },
+    {
+      "question": "Which air interface should we pick — LF / HF / UHF / NFC / BLE / UWB?",
+      "answer": "Match the interface to the read distance + security + smartphone-compatibility + environment. Security-critical short-range (door, payment, transit, hotel key, library): HF DESFire EV3 / iCLASS Seos / ICODE SLIX2 (13.56 MHz). Long-range item-level (supply chain, retail apparel, race timing, parking, vehicle, yard, asset): UHF Gen2v2 (860-960 MHz). Smartphone-tap consumer-facing (NFC business card, brand authentication, marketing): NFC (HF subset). Mobile credential + asset RTLS via existing Wi-Fi: BLE (2.4GHz). High-precision sub-meter location: UWB (3.1-10.6 GHz). Legacy estate maintenance: LF EM4100 / HID Prox (125 kHz) until refresh. Active long-range with battery (cold chain temperature logger, infant security): active 433MHz / 915MHz / 2.4GHz. Regional regulatory variation only matters for UHF (FCC 902-928 vs ETSI 865-867 etc.); HF + NFC are globally harmonised."
+    },
+    {
+      "question": "Which protocol — LLRP / vendor SDK / PCSC / REST API / OSDP?",
+      "answer": "Depends on form factor + integration depth. Fixed UHF readers: LLRP (vendor-neutral, supported by Impinj + Zebra + Honeywell + Alien) for portability; vendor-specific SDK (Impinj Octane, Zebra RFID SDK, Honeywell RFID SDK) for faster development with higher-level abstractions; REST API for cloud/modern integration. Desktop USB readers: PCSC (Personal Computer / Smart Card, ISO 7816-4) is the standard cross-platform protocol; PyScard for Python; libnfc + libfreefare for low-level on Linux. Access control readers: OSDP v2.2 (SIA + IEC 60839-11-5) is the new standard replacing legacy Wiegand, with AES-128 Secure Channel + bidirectional + firmware OTA. Mobile credential: HID Mobile Access SDK + Apple Wallet + Google Wallet SDK. High-throughput streaming: MQTT or Kafka for fleet event delivery to broker. Trading-partner visibility: EPCIS 2.0 (ISO/IEC 19987:2021). Library: SIP2 + NCIP. Start with vendor evaluation kit + SDK for proof-of-concept; migrate to LLRP or REST API for production where vendor-portability matters."
+    },
+    {
+      "question": "How do we handle multi-region deployment — FCC / ETSI / IC / MIC?",
+      "answer": "UHF requires regional reader SKU or multi-region tuneable firmware setting. US/Americas: FCC Part 15.247 (902-928 MHz, max 36 dBm EIRP / 4W ERP). EU/UK: ETSI EN 302 208 (865.6-867.6 MHz, max 2W ERP); CE/UKCA marking required. Canada: IC RSS-247 harmonised with FCC. Japan: MIC Article 2 (916.7-923.5 MHz, 2W ERP). Australia/NZ: ACMA Class Licence (920-926 MHz). Brazil: ANATEL (902-907.5 + 915-928 MHz). China: SRRC (920.5-924.5 MHz). India: WPC (865-867 MHz). South Korea: RRA (917-920.8 MHz). Major reader OEMs (Impinj R700 + Zebra FX9600 + Honeywell IF61) ship multi-region SKUs selectable via firmware setting. Tag chip cross-region compatibility: Impinj Monza R6-P + NXP UCODE 9 + Alien Higgs all work at all major UHF allocations 860-960 MHz, so a single global tag SKU is feasible. HF 13.56 MHz is globally harmonised — no regional issue. Dense-reader environments (large warehouse + airport) need LBT (EU Listen Before Talk) + DRM (Gen2v2 Dense Reader Mode) configuration during site commissioning."
     }
   ],
   "sources": [
@@ -363,7 +489,7 @@
       "url": "https://www.iso.org/standard/63675.html",
       "publisher": "ISO",
       "publishedAt": "2015-03",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "UHF Gen2 air-interface specification reader vendors must implement for RFID encoding and inventory reads."
     },
     {
@@ -371,7 +497,7 @@
       "url": "https://www.iso.org/standard/73599.html",
       "publisher": "ISO",
       "publishedAt": "2018-09",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "HF proximity air-interface specification implemented by desktop encoders, card-readers and mobile encoders."
     },
     {
@@ -379,7 +505,7 @@
       "url": "https://www.iso.org/standard/39694.html",
       "publisher": "ISO",
       "publishedAt": "2009",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "HF vicinity air-interface specification implemented by library, laundry and long-range HF encoders."
     },
     {
@@ -387,7 +513,7 @@
       "url": "https://www.gs1.org/standards/epc-rfid/tds",
       "publisher": "GS1",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Canonical EPC encoding scheme reference for SGTIN, GIAI and GRAI encoding on UHF readers."
     },
     {
@@ -395,7 +521,7 @@
       "url": "https://www.gs1.org/standards/epc-rfid/llrp/1-1-0",
       "publisher": "GS1",
       "publishedAt": "2010",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Reader-to-host protocol that governs integration of UHF RFID readers and encoders into middleware."
     },
     {
@@ -403,7 +529,7 @@
       "url": "https://www.gs1.org/standards/epcis",
       "publisher": "GS1",
       "publishedAt": "2021",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Event-sharing standard for downstream visibility from RFID reader fleet to ITAM / EAM / ERP / WMS."
     },
     {
@@ -411,7 +537,7 @@
       "url": "https://www.impinj.com/products/readers/impinj-r700",
       "publisher": "Impinj, Inc.",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Flagship fixed UHF reader cited across RFID reader-and-encoding deployments — Octane SDK + IRT + ItemSense fleet management."
     },
     {
@@ -419,7 +545,7 @@
       "url": "https://www.zebra.com/us/en/products/rfid/rfid-readers/fx9600.html",
       "publisher": "Zebra Technologies",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "High-performance fixed UHF reader cited in warehouse and inventory encoding stations — DataWedge + RFID3 SDK."
     },
     {
@@ -427,7 +553,7 @@
       "url": "https://www.acs.com.hk/en/products/3/acr122u-usb-nfc-reader/",
       "publisher": "Advanced Card Systems",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Reference HF desktop encoders used to program NTAG, MIFARE Classic, DESFire and ICODE cards via PC/SC + libnfc."
     },
     {
@@ -435,8 +561,96 @@
       "url": "https://www.securityindustry.org/industry-standards/open-supervised-device-protocol/",
       "publisher": "Security Industry Association",
       "publishedAt": "2020-12",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Reader-to-PACS panel RS-485 protocol with AES-128 Secure Channel — replaces Wiegand on access-control reader-to-controller bus."
+    },
+    {
+      "label": "ETSI EN 302 208 V3.3.0 — EU UHF RFID equipment",
+      "url": "https://www.etsi.org/standards/get-standards",
+      "publisher": "European Telecommunications Standards Institute",
+      "publishedAt": "2020",
+      "accessedAt": "2026-05-11",
+      "note": "EU 865.6-867.6 MHz UHF allocation; max 2W ERP; CE-marking + UKCA-marking conformity assessment required."
+    },
+    {
+      "label": "FCC Part 15.247 — US unlicensed UHF",
+      "url": "https://www.ecfr.gov/current/title-47/chapter-I/subchapter-A/part-15/subpart-C/section-15.247",
+      "publisher": "U.S. Federal Communications Commission",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "US 902-928 MHz UHF allocation; max 36 dBm EIRP / 4W ERP."
+    },
+    {
+      "label": "HID Global — OMNIKEY + Signo + multiCLASS SE reader portfolio",
+      "url": "https://www.hidglobal.com/products/readers",
+      "publisher": "HID Global (Carrier)",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Enterprise PACS reader portfolio for combined access control + attendance; HID Mobile Access (Origo) for BLE/NFC mobile credential."
+    },
+    {
+      "label": "Identiv — uTrust readers + Sense IoT",
+      "url": "https://www.identiv.com/products/physical-access",
+      "publisher": "Identiv, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "US-listed contactless smart-card reader vendor; uTrust 4710F + SmartFold + Sense IoT for federal + government + healthcare."
+    },
+    {
+      "label": "TSL — Technology Solutions UK handheld UHF",
+      "url": "https://www.tsl.com/",
+      "publisher": "Technology Solutions UK Ltd",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "UK-based handheld UHF sled specialist; 1128 + 1166 + 1153 + 1191 attach to iPhone/Android via BLE for field-service + audit applications."
+    },
+    {
+      "label": "Chainway — handheld UHF + barcode + camera",
+      "url": "https://www.chainway.net/",
+      "publisher": "Shenzhen Chainway Information Technology",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Chinese mid-tier handheld UHF + Android specialist; C72 + C71 + C66 lower-cost alternative to Zebra/Honeywell for budget deployments."
+    },
+    {
+      "label": "Honeywell IF61 + IH40 fixed UHF + CT60-XP handheld",
+      "url": "https://www.honeywellaidc.com/products/rfid",
+      "publisher": "Honeywell International Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Enterprise mobility + RFID portfolio for commercial + industrial + healthcare; combined with Honeywell Pro-Watch PACS."
+    },
+    {
+      "label": "KEONN — smart shelf + ceiling-mount UHF antennas",
+      "url": "https://keonn.com/",
+      "publisher": "KEONN Technologies",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Specialist UHF antenna + smart-shelf reader for retail apparel + cosmetics + pharma stockroom + smart fitting room."
+    },
+    {
+      "label": "EPCglobal LLRP v1.1 — Low Level Reader Protocol",
+      "url": "https://www.gs1.org/standards/epc-rfid/llrp",
+      "publisher": "GS1 (EPCglobal)",
+      "publishedAt": "2010",
+      "accessedAt": "2026-05-11",
+      "note": "Vendor-neutral protocol for fixed UHF reader control supported by Impinj + Zebra + Honeywell + Alien + others."
+    },
+    {
+      "label": "NFC Forum — NDEF + Type Tag specifications",
+      "url": "https://nfc-forum.org/our-work/specification-releases/",
+      "publisher": "NFC Forum",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "NDEF data format + NFC Type 1-5 tag specifications + reader-writer profiles; underlying standards for smartphone-native NFC tap interaction."
+    },
+    {
+      "label": "ITU Radio Regulations Article 5 — global radio frequency allocations",
+      "url": "https://www.itu.int/pub/R-REG-RR/",
+      "publisher": "International Telecommunication Union",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Global radio frequency allocation framework underlying regional UHF + HF + NFC + BLE + UWB regulatory regimes."
     }
   ],
   "primaryAction": {
@@ -459,5 +673,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-26"
+  "reviewedAt": "2026-05-11"
 }

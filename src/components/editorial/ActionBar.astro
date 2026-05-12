@@ -1,28 +1,62 @@
 ---
 /**
- * "Next step" CTA bar with mailto and secondary links.
- * Replaces renderActionBar() from editorial-pages.ts.
+ * Bottom-of-page "Next step" action bar.
+ *
+ * Shadow component (Stage 2). Mirrors `renderActionBar(definition, id)` in
+ * editorial-pages.ts (~line 2413).
+ *
+ * Heading and description switch on `group === "contact"`. The primary CTA
+ * href routes through `buildIntentHref` (intent=quote) for analytics
+ * attribution per DS-10 #1.
  */
-import type { EditorialDefinition } from "../../lib/editorial-types";
+import type { EditorialDefinition, EditorialLink, EditorialGroup } from "../../lib/editorial-types";
+import { buildIntentHref } from "../../lib/editorial-pages";
+import { rewriteContactHref } from "../../lib/editorial-shadow-normalizers";
 
 interface Props {
-  definition: EditorialDefinition;
+  group: EditorialGroup;
+  title: string;
+  route: string;
+  primaryAction: EditorialLink;
+  secondaryActions: EditorialLink[];
   id: string;
 }
 
-const { definition, id } = Astro.props;
+const { group, title, route, primaryAction, secondaryActions, id } = Astro.props;
 
-const heading = definition.group === "contact" ? "Send your project details" : "Ready to discuss your project?";
-const description =
-  definition.group === "contact"
-    ? "The main button opens a prefilled email for this route. Use it if the project already fits, or keep reviewing the linked product and reference pages first."
-    : "Use the contact route when you are ready for pricing, samples, or compatibility help, or continue into the linked product and comparison pages below.";
+// Stage 3 shadow normalizer (sprint 1): mirror normalize-body.ts's
+// `a[href="/contact/"]` rewrite. The legacy cheerio selector matches
+// only BARE `/contact/` hrefs (no query string), so:
+//
+//   - The PRIMARY CTA is routed through `buildIntentHref` below, which
+//     appends `?intent=quote&route=...` BEFORE the legacy cheerio pass
+//     runs. By the time cheerio scans the DOM, the primary anchor's href
+//     is `/contact/?intent=quote&...` — not a bare match, no rewrite. So
+//     the shadow must NOT rewrite the primary href either; the only
+//     transformation is buildIntentHref. Over-rewriting here would emit
+//     `/contact/<routed>/?intent=quote...`, which the legacy pipeline
+//     never produces and would break the parity diff.
+//
+//   - SECONDARY actions are rendered with their bare href intact, so the
+//     cheerio rewrite DOES match them. Apply the rewrite here.
+const secondaryActionsRouted = secondaryActions.map((link) => ({
+  ...link,
+  href: rewriteContactHref(link.href, route, title),
+}));
 
-const mailtoSubject = encodeURIComponent(`Inquiry: ${definition.title}`);
-const mailtoBody = encodeURIComponent(`Hi Proud Tek,\n\nI'm interested in: ${definition.title}\n\nProject details:\n- Application:\n- Chip / frequency requirement:\n- Quantity:\n- Target date:\n\nPlease advise on next steps.\n\nThanks`);
+const isContact = group === "contact";
+const heading = isContact ? "Send your project details" : "Ready to discuss your project?";
+const description = isContact
+  ? "The main button opens a prefilled email for this route. Use it if the project already fits, or keep reviewing the linked product and reference pages first."
+  : "Use the contact route when you are ready for pricing, samples, or compatibility help, or continue into the linked product and comparison pages below.";
+
+const mailtoSubject = encodeURIComponent(`Inquiry: ${title}`);
+const mailtoBody = encodeURIComponent(
+  `Hi Proud Tek,\n\nI'm interested in: ${title}\n\nProject details:\n- Application:\n- Chip / frequency requirement:\n- Quantity:\n- Target date:\n\nPlease advise on next steps.\n\nThanks`,
+);
 const mailtoHref = `mailto:info@proudtek.com?subject=${mailtoSubject}&body=${mailtoBody}`;
+const primaryHref = buildIntentHref(primaryAction.href, "quote", route);
 ---
-
 <section class="codex-editorial-action-bar" id={id}>
   <div>
     <p class="codex-editorial-kicker">Next step</p>
@@ -30,9 +64,9 @@ const mailtoHref = `mailto:info@proudtek.com?subject=${mailtoSubject}&body=${mai
     <p>{description}</p>
   </div>
   <div class="codex-editorial-action-links">
-    <a class="codex-editorial-primary" href={definition.primaryAction.href}>{definition.primaryAction.label}</a>
-    <a class="codex-editorial-secondary" href={mailtoHref}>&check; Email inquiry directly</a>
-    {definition.secondaryActions.map((link) => (
+    <a class="codex-editorial-primary" data-cta-tier="action" href={primaryHref}>{primaryAction.label}</a>
+    <a class="codex-editorial-secondary" href={mailtoHref}>✉ Email inquiry directly</a>
+    {secondaryActionsRouted.map((link) => (
       <a class="codex-editorial-secondary" href={link.href}>{link.label}</a>
     ))}
   </div>

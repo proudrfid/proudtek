@@ -2,15 +2,15 @@
   "route": "/guides/ucode-8-uhf-chip-encyclopedia/",
   "group": "guides",
   "title": "NXP UCODE 8 — UHF Chip Technical Encyclopedia (Memory, Commands, Cost Profile, Deployment)",
-  "kicker": "UCODE 8 / SL3S1203 / SL3S1213 Reference",
+  "kicker": "UCODE 8 / SL3S1205 / SL3S1215 Reference",
   "summary": "UCODE 8 (NXP SL3S1203 / SL3S1213) has been the cost-of-gravity UHF inlay chip since its 2017 launch. Shipping in billions of units per year, it powers the majority of promotional, event, single-use and cost-sensitive UHF deployments still converting today. This encyclopedia documents UCODE 8's memory layout, EPC Gen2 v2 command support, sensitivity envelope, the UCODE 8 versus UCODE 8m distinction, and the specific deployment classes where UCODE 8 remains the correct choice in 2026 even as UCODE 9 takes the sensitivity crown.",
   "heroPoints": [
     "Industry cost anchor: UCODE 8 is the reference chip against which every other UHF chip's price is benchmarked. At strap-volume orders (100M+ units) the per-unit chip cost is approximately half a US cent, the finished dry-inlay converts at roughly US$0.025-0.040 depending on antenna substrate, and a standard Dogbone wet-inlay label lands in the US$0.045-0.065 range. That pricing envelope is the only silicon that works economically for billion-unit-per-year promotional, transit-ticket and supply-chain programs where the marginal cost of a tag has to clear a hurdle of a fraction of a cent per read event.",
     "EPC Gen2 v2 support — Untraceable and Authenticate commands are present (though simpler than UCODE 9), providing forward compatibility with EU retail privacy requirements (Gen2 v2 Section 6.3.2.5 Untraceable and Section 6.3.2.10 short-form Authenticate) at the cost-optimized end of the market. That means UCODE 8 is the lowest-cost silicon in production today that a retailer can legally deploy under the GDPR-aligned interpretation of the EU retail RFID industrial framework recommended by the European RFID Research Centre for item-level clothing.",
-    "Two variants: UCODE 8 (SL3S1203, 128-bit EPC memory, no user memory) and UCODE 8m (SL3S1213, 96-bit EPC + 32-bit user memory). Both are factory-interchangeable from a reader perspective (the TID model-ID bits differ (0x070 vs 0x050) but the air-interface behavior is identical for Query, ACK and Read commands) so the variant decision is driven purely by whether the application needs the 32 bits of user memory. A third variant, UCODE 8xm (SL3S1215), adds 128 bits of user memory but sees limited converter adoption; applications with that memory footprint typically jump directly to UCODE 9xm for the sensitivity uplift."
+    "Two main variants per the NXP SL3S1205_15 product data sheet: UCODE 8 (SL3S1205, 128-bit EPC memory, no user memory) and UCODE 8m (SL3S1215, 96-bit EPC + 32-bit user memory). Both are factory-interchangeable from a reader perspective (the air-interface behavior is identical for Query, ACK and Read commands) so the variant decision is driven purely by whether the application needs the 32 bits of user memory. NXP's official read sensitivity for both variants is -23 dBm (per SL3S1205_15 Rev. 3.6 datasheet, Dec 2021), with -18 dBm write sensitivity."
   ],
-  "imageAlt": "NXP UCODE 8 UHF chip on reference dipole antenna",
-  "heroImage": "/landing-images/impinj-m730-uhf-inlay.jpg",
+  "imageAlt": "UHF RFID inlay representative — NXP UCODE 8 chip technical encyclopedia",
+  "heroImage": "/landing-images/impinj-m800-uhf-inlay.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/impinj-m730-uhf-inlay/",
     "/products/rfid-labels/nfc-anti-metal-sticker/"
@@ -18,37 +18,36 @@
   "keywords": [
     "NXP UCODE 8",
     "UCODE 8 memory map",
-    "SL3S1203",
-    "SL3S1213",
+    "SL3S1205",
+    "SL3S1215",
     "UCODE 8m",
     "EPC Gen2 v2",
     "UHF RFID retail cost",
     "UCODE 8 sensitivity"
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2026-02-02",
+  "modifiedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-02-05",
+  "reviewedAt": "2026-05-10",
   "sections": [
     {
       "title": "Family and part numbers",
       "bullets": [
-        "UCODE 8 — NXP part number SL3S1203. 128-bit EPC, no user memory, 32-bit Kill password, 32-bit Access password, 96-bit factory-unique TID. Optimized for applications where the EPC itself carries all the identity information (SGTIN-96, SGTIN-128, SSCC-96, GIAI-96) and no additional item-specific data needs to live on the tag. The 128-bit EPC bank is the distinguishing feature versus the -m variant and suits retailers who use non-standard proprietary encoding beyond the GS1 96-bit family.",
-        "UCODE 8m — NXP part number SL3S1213. 96-bit EPC plus 32 bits of user memory, same 32-bit passwords and 96-bit unique TID. Same chip architecture and sensitivity. Literally the same silicon die, per NXP's data sheet, with the memory partition configured differently at manufacturing. The added 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01) provide space for a backup serial, a factory lot code, a care-instruction index, an authentication password salt, or a hospitality-chain laundry-cycle counter.",
-        "UCODE 8xm — NXP part number SL3S1215. Extended variant with 96-bit EPC plus 128 bits of user memory (eight 16-bit words). Less common in production and less widely stocked by major inlay converters (Smartrac/Avery Dennison/Arizon), partly because the ~15% cost premium over SL3S1213 narrows the economic case; where UCODE 8xm's memory is called for, projects often jump directly to UCODE 9xm for sensitivity reasons.",
+        "UCODE 8 — NXP part number SL3S1205 (per the SL3S1205_15 Rev. 3.6 product data sheet, December 2021). 128-bit EPC, no user memory, 32-bit Kill password, 32-bit Access password, 96-bit factory-unique TID. Optimized for applications where the EPC itself carries all the identity information (SGTIN-96, SGTIN-198, SSCC-96, GIAI-96) and no additional item-specific data needs to live on the tag. The 128-bit EPC bank is the distinguishing feature versus the -m variant and suits retailers who use non-standard proprietary encoding beyond the GS1 96-bit family.",
+        "UCODE 8m — NXP part number SL3S1215. 96-bit EPC plus 32 bits of user memory, same 32-bit passwords and 96-bit unique TID. Same silicon family and sensitivity envelope per NXP's combined SL3S1205_15 datasheet, with the memory partition configured differently at manufacturing. The added 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01) provide space for a backup serial, a factory lot code, a care-instruction index, an authentication password salt, or a hospitality-chain laundry-cycle counter.",
         "Strap and inlay availability. UCODE 8 has been shipped on flip-chip straps and wire-bond strapped formats by every major inlay vendor (Smartrac / Avery Dennison / Arizon / Neology / SATO / Identiv / Beontag) in a full range of standard reference-design antennas: the Avery AD-Dogbone (U8 variant), AD-Frog 3D, AD-383u7 apparel inlay, AD-Minute small-format, the Smartrac DogBone, Miniweb, and ShortDipole, the Arizon AZ-9629 / AZ-9654, and the Beontag PaperTag. For most of these antennas a UCODE 9 drop-in variant now exists, but converters maintain UCODE 8 SKUs indefinitely for the cost-sensitive programs still ordering billions of units per year.",
         "Operating temperature — -40 °C to +85 °C normal range per the NXP short data sheet, with peak 125 °C permitted for short excursions (minutes, not hours — typical specification is 30 minutes cumulative over the chip's life). Not suitable for tire-cure (where Monza R6-P is the reference choice with sustained 200 °C compatibility for 40 minutes), sustained autoclave at 134 °C for 18 minutes, or Pirelli/Michelin-class tire-pressure internal tags where ambient exceeds 100 °C for extended periods.",
-        "Counterfeit watch: authentic UCODE 8 returns TID = 0xE28011xxx where E28011 = EPC class identifier (E2) + NXP mask designer ID (0x801 equivalent encoding) with model-ID bits indicating UCODE 8 (0x070 for SL3S1203, 0x050 for SL3S1213, 0x0A0 for SL3S1215). Clones marketed as 'UCODE 8 compatible' (most commonly produced by unauthorized Chinese fabs) often present with a zero or randomized model ID, an incorrect mask-designer segment, or a non-unique TID serial (revealed by scanning 500+ tags and finding repeats). Incoming inspection should script-verify the full 96-bit TID pattern and cross-reference against NXP's published mask-ID registry (publicly available via the NXP Community TID Registry page)."
+        "Counterfeit watch: authentic UCODE 8 returns TID with EPC class identifier 0xE2 in bits 00-07 plus NXP mask designer prefix 0x801 in bits 08-19, followed by an NXP model-ID field. Clones marketed as 'UCODE 8 compatible' (most commonly produced by unauthorized Chinese fabs) often present with a zero or randomized model ID, an incorrect mask-designer segment, or a non-unique TID serial (revealed by scanning 500+ tags and finding repeats). Incoming inspection should script-verify the full 96-bit TID pattern against the NXP SL3S1205_15 datasheet's TID structure section and cross-reference any model-ID claims against NXP's publicly published TID model assignments. The most common counterfeit pattern in 2024-2025 is UCODE 7 silicon (SL3S1204) re-marked or relabeled as UCODE 8."
       ]
     },
     {
       "title": "Memory architecture",
       "bullets": [
         "Four standard EPC Gen2 memory banks, addressed per ISO/IEC 18000-63 Section 6.3.2.1.2. Bank 00 = Reserved (kill and access passwords, 32 bits each). Bank 01 = EPC bank (Stored PC + EPC + optional Stored CRC). Bank 10 = TID bank. Bank 11 = User memory bank. Bank selection is via the 2-bit MemBank field in the Read, Write, BlockWrite, BlockErase, BlockPermalock and BlockReadEx commands.",
-        "EPC memory bank 01 — structure is Stored CRC-16 (bits 0-15) + Stored PC (bits 16-31) + EPC (bits 32+). On UCODE 8 (SL3S1203), the EPC segment is extended to 128 bits (total bank size 160 bits), making it suitable for longer identifiers without dipping into other banks. On UCODE 8m (SL3S1213), 96 bits standard EPC (total bank size 128 bits). The PC word's Length field (bits 21-15) indicates the actual EPC length to the reader at Query time.",
+        "EPC memory bank 01 — structure is Stored CRC-16 (bits 0-15) + Stored PC (bits 16-31) + EPC (bits 32+). On UCODE 8 (SL3S1205), the EPC segment is up to 128 bits (total bank size 160 bits), making it suitable for longer identifiers without dipping into other banks. On UCODE 8m (SL3S1215), 96 bits standard EPC (total bank size 128 bits). The PC word's Length field (bits 21-15) indicates the actual EPC length to the reader at Query time.",
         "TID memory bank 10 — 96 bits read-only, factory-programmed, cannot be altered post-manufacturing. Structure: bits 0-15 = TID allocation class identifier (0xE280 for EPC Gen2 v2 Class 1 with user memory), bits 16-27 = NXP mask-designer and model-ID field, bits 28-95 = per-chip unique 64-bit serial number. Uniqueness across the entire UCODE 8 population is guaranteed by the manufacturing process and documented in NXP AN11734; the TID is the anchor used for Authenticate challenges and cloning detection.",
-        "User memory bank 11 — 0 bits on SL3S1203 (bank does not exist; writes fail with Gen2 error code 0x00 = 'non-existent memory location'), 32 bits on SL3S1213, 128 bits on SL3S1215. The user memory is always aligned at bit 0 of bank 11 and addressable in 16-bit words (word 0x00 and word 0x01 on SL3S1213, words 0x00 through 0x07 on SL3S1215). File-based segmentation per Gen2 v2 File Open is not supported on SL3S1203; SL3S1213 exposes one File (ID 0x00) covering the full 32 bits.",
+        "User memory bank 11 — 0 bits on SL3S1205 (bank does not exist; writes fail with Gen2 error code 'non-existent memory location'), 32 bits on SL3S1215. The user memory on SL3S1215 is aligned at bit 0 of bank 11 and addressable in 16-bit words (word 0x00 and word 0x01). File-based segmentation per Gen2 v2 File Open is not supported on SL3S1205; SL3S1215 exposes one File (ID 0x00) covering the full 32 bits.",
         "Kill and Access passwords — 32 bits each, factory default all-zeros, writeable in bank 00 (addresses 0x00-0x1F for Kill, 0x20-0x3F for Access) by a Gen2 Write or BlockWrite command after a successful Req_RN / Access exchange. Once the Access password is non-zero and the Access Password Lock bit is set, subsequent password reads return all-zeros to protect against interrogator-side harvesting. Kill is one-shot: once successfully Killed, the chip is permanently inactive and cannot be recovered.",
         "Write endurance — 100,000 writes per location per the short data sheet, which under a typical retail use case (one encoding event and zero field rewrites) is effectively infinite; for laundry-cycle applications writing a counter every cycle, the bound becomes visible at roughly 5-7 year life depending on wash frequency. Data retention ≥ 10 years at 55 °C (per NXP data sheet Figure 8 Arrhenius curve) and ≥ 20 years at 25 °C, enabling passive archival applications where the tag may not be read for over a decade between events."
       ]
@@ -68,9 +67,9 @@
     {
       "title": "Read sensitivity and read-range expectations",
       "bullets": [
-        "Forward-link sensitivity -19 dBm (reference inlay, free-air, ISO/IEC 18046-3 conditions, test setup per NXP AN11734 Section 4.3). About 5 dB less sensitive than UCODE 9 (-24 dBm) and 2-3 dB less than Monza R6 (-22 dBm) and Impinj M730 (-22.5 dBm). The 5 dB gap translates to roughly a sqrt(10^0.5)=1.78× shorter theoretical read range; in practice field measurements typically show 15-25% shorter range on reference inlays because of antenna efficiency differences.",
-        "Backscatter sensitivity -15 dBm. Again the practical limit is set by the reader, not the chip, for all but the longest-range deployments; UCODE 8 keeps up with any commercial reader (Impinj R700/R2000/Xspan, Zebra FX9600, Alien ALR-F800) at typical retail and logistics distances. UCODE 9's -22 dBm backscatter sensitivity advantage becomes measurable only at ranges beyond 6-7 m from the reader antenna.",
-        "Practical read range: ~6-8 m on a reference dipole inlay (e.g., Avery AD-Dogbone U8) at 30 dBm (1 W ERP) reader output on a 6 dBi circular-polarized antenna, in free-air over dry cardboard. Shorter than UCODE 9 (typically 9-12 m on the same antenna setup) and Monza R6 (typically 8-10 m), but adequate for the applications UCODE 8 is typically used in (POS item-level at <1 m, event wristbands at <2 m, promotional inserts at <3 m, dock-door portals at <5 m).",
+        "Forward-link (read) sensitivity -23 dBm per NXP SL3S1205_15 Rev. 3.6 datasheet (reference inlay, free-air conditions). About 1 dB less sensitive than UCODE 9 (-24 dBm per SL3S1206 Rev. 3.5 datasheet) and at parity with Impinj M730 (-24 dBm per the M700 series datasheet v6.4). The earlier published UCODE 8 figures of -22 to -22.5 dBm reflect interim data sheet revisions; the current production specification is -23 dBm.",
+        "Write sensitivity -18 dBm. The practical limit for write operations is set by the reader, not the chip, for all but the longest-range deployments; UCODE 8 keeps up with any commercial reader (Impinj R700/R2000/Xspan, Zebra FX9600, Alien ALR-F800) at typical retail and logistics distances. The marginal performance gap between UCODE 8 and UCODE 9 becomes measurable only at ranges beyond 8 m from the reader antenna.",
+        "Practical read range: ~8-10 m on a reference dipole inlay (e.g., Avery AD-Dogbone U8) at 30 dBm (1 W ERP) reader output on a 6 dBi circular-polarized antenna, in free-air over dry cardboard. Approximately 1-2 m short of UCODE 9 (typically 10-12 m on the same antenna setup) and at parity with Monza R6 (-22.1 dBm read sensitivity per the IPJ-W1700-K00 datasheet), adequate for the applications UCODE 8 is typically used in (POS item-level at <1 m, event wristbands at <2 m, promotional inserts at <3 m, dock-door portals at <5 m).",
         "Temperature sensitivity: stable from -40 °C to +85 °C; beyond 85 °C the forward-link sensitivity degrades approximately 0.05 dB per degree C per NXP's high-temperature characterization report. Below -40 °C the chip continues to function in most fabs but is out of warranted specification. Not a concern for retail or indoor-industrial deployments; becomes a factor only for outdoor yard-tracking in arid climates where tag surface temperature can exceed 85 °C in direct sun.",
         "Antenna match: chip impedance at 915 MHz is approximately 11-j120 ohms (real part 11, imaginary part -120 ohms, capacitive). Most commercial UCODE 8 dipoles target an antenna impedance of 11+j120 (conjugate match) for maximum power transfer. The majority of reference inlay designs in circulation are tuned for UCODE 8's impedance rather than UCODE 9's (which is ~11-j200 ohms at 915 MHz — meaningfully different), which is why drop-in substituting UCODE 9 silicon onto an antenna designed for UCODE 8 almost always requires antenna retuning.",
         "Frequency response across the global RAIN bands. Characterized across 860-960 MHz by NXP; peak sensitivity is at ~915 MHz (FCC and ETSI). Within the ETSI 865-868 MHz band the sensitivity degrades by roughly 0.5-1.0 dB versus the FCC 902-928 MHz band because the reference antenna is typically tuned to 915 MHz; inlay converters selling into pure-EU programs occasionally offer an ETSI-tuned variant with retuned antenna to close that gap."
@@ -90,9 +89,9 @@
     {
       "title": "UCODE 8 vs UCODE 8m vs UCODE 9 selection",
       "bullets": [
-        "Need extra memory for a serialized backup? — UCODE 8m (SL3S1213) with 32 bits user memory. Most common for hospitality/linen applications that serialize items at the wash cycle and want a backup on-tag beyond the central database. A typical encoding uses 16 bits for a wash-cycle counter and 16 bits for a garment-class code. Also the default choice for rental-equipment programs that need a minimal on-tag record when the back-office database is temporarily unreachable.",
-        "Need longer EPC (128-bit SGTIN-198 truncated or similar)? — UCODE 8 (SL3S1203) with 128-bit EPC. Less common in mainstream retail; most retailers use 96-bit SGTIN-96 or SSCC-96 encodings. SL3S1203 shows up for defense/aerospace programs using custom 128-bit proprietary identifiers, and for some pharmaceutical track-and-trace programs encoding full GTIN plus expiry plus lot code in the EPC bank.",
-        "Need best-in-class sensitivity for POS portal performance? — UCODE 9 (SL3S4011). UCODE 8's ~5 dB forward-link sensitivity gap becomes material at POS gate distances, where the difference between 95% first-pass read and 99% first-pass read determines whether the POS clerk has to manually scan missed items. Typical retailer rule-of-thumb: at <US$0.15/item chip-cost-neutral threshold, specify UCODE 9; at >US$0.15 economic sensitivity, specify UCODE 8m.",
+        "Need extra memory for a serialized backup? — UCODE 8m (SL3S1215) with 32 bits user memory. Most common for hospitality/linen applications that serialize items at the wash cycle and want a backup on-tag beyond the central database. A typical encoding uses 16 bits for a wash-cycle counter and 16 bits for a garment-class code. Also the default choice for rental-equipment programs that need a minimal on-tag record when the back-office database is temporarily unreachable.",
+        "Need longer EPC (128-bit SGTIN-198 truncated or similar)? — UCODE 8 (SL3S1205) with 128-bit EPC. Less common in mainstream retail; most retailers use 96-bit SGTIN-96 or SSCC-96 encodings. SL3S1205 shows up for defense/aerospace programs using custom 128-bit proprietary identifiers, and for some pharmaceutical track-and-trace programs encoding full GTIN plus expiry plus lot code in the EPC bank.",
+        "Need best-in-class sensitivity for POS portal performance? — UCODE 9 (SL3S1206) at -24 dBm forward-link sensitivity. The 1 dB advantage over UCODE 8 plus stronger anti-tear and Self-Adjust features can move a portal from 97% to 99% first-pass read in marginal RF environments. Typical retailer rule-of-thumb: at <US$0.15/item chip-cost-neutral threshold, specify UCODE 9; at >US$0.15 economic sensitivity, specify UCODE 8m. For maximum-memory industrial deployments use UCODE 9xm (SL3S1005, up to 752 bits user memory) or UCODE 9xe (SL3S1216, extended EPC up to 448 bits).",
         "Need Untraceable / Authenticate for EU retail privacy? — both UCODE 8m and UCODE 9 support it. Either works under the CEN CWA 16924 recommendation. If no other driver, UCODE 8m is the cost-optimal choice; if the retailer also wants the stronger crypto suite 0x00 02 and range-reduction privacy mode, upgrade to UCODE 9.",
         "Need high-temperature tolerance? — neither UCODE 8 nor UCODE 9 is suitable for sustained operation beyond 85 °C. Specify Monza R6-P (for tire-cure at 200 °C/40 min), Alien Higgs-EC / Higgs-9 (industrial temperature), or a UHF chip specifically rated for automotive/industrial temperature ranges. UCODE 8 is acceptable only for brief 125 °C excursions (total lifetime exposure <30 minutes cumulative).",
         "Need cost parity with the lowest-possible chip in market? — UCODE 8 SL3S1203 is still typically the global cost floor in 2026, with EM Microelectronic's em|echo series and Alien Higgs-3 closing the gap by a fraction of a cent but not displacing UCODE 8 for most converter supply agreements. Multi-source is straightforward: UCODE 8 / Higgs-3 / Monza R6 are all drop-in on a properly-tuned wide-band reference antenna at a small performance penalty."
@@ -101,8 +100,7 @@
     {
       "title": "NXP reference documents",
       "bullets": [
-        "UCODE 8 SL3S1203 / SL3S1213 Product Short Data Sheet (doc ID SL3S1203_1213_SDS, rev 3.x, 2023). Memory organization, command set, sensitivity characterization across 860-960 MHz, electrical characteristics tables, package information.",
-        "UCODE 8 SL3S1215 Data Sheet (doc ID SL3S1215_DS). For the UCODE 8xm extended-memory variant where needed; covers the additional 96 bits of user-memory addressing and File Open mechanism.",
+        "UCODE 8/8m SL3S1205_15 Product Data Sheet (doc ID SL3S1205_15, Rev. 3.6, 2 December 2021). Memory organization, command set, sensitivity characterization across 860-960 MHz, electrical characteristics tables, package information. Available at nxp.com/docs/en/data-sheet/SL3S1205_15.pdf.",
         "AN11734 — UCODE 8 personalization guide. EPC encoding examples (SGTIN-96, SGTIN-128, SSCC-96, GIAI-96), TID-based serialization workflow, password management flow, recommended Lock command sequence for tamper protection.",
         "AN12126 — UCODE 8 privacy features: Untraceable and short-form Authenticate command sequences with test vectors, recommended POS integration flow for EU retail privacy compliance.",
         "GS1 EPC Gen2 v2.1 Air Interface Protocol (Release 2.1, August 2015 with errata through 2023). The specification UCODE 8 implements. UCODE 8 was one of the first v2-compliant chips to reach cost-sensitive retail volume, and GS1's v2 conformance program listed it at launch.",
@@ -129,8 +127,8 @@
       "table": {
         "columns": [
           "Parameter",
-          "UCODE 8 (SL3S1203)",
-          "UCODE 8m (SL3S1213)"
+          "UCODE 8 (SL3S1205)",
+          "UCODE 8m (SL3S1215)"
         ],
         "rows": [
           [
@@ -165,13 +163,13 @@
           ],
           [
             "Forward-link sensitivity",
-            "-19 dBm",
-            "-19 dBm"
+            "-23 dBm",
+            "-23 dBm"
           ],
           [
-            "Backscatter sensitivity",
-            "-15 dBm",
-            "-15 dBm"
+            "Write sensitivity",
+            "-18 dBm",
+            "-18 dBm"
           ],
           [
             "Untraceable support",
@@ -214,14 +212,9 @@
             "100,000 cycles"
           ],
           [
-            "TID model ID",
-            "0x070",
-            "0x050"
-          ],
-          [
             "Typical unit cost (at strap volume)",
             "Lowest in class",
-            "~10% premium over SL3S1203"
+            "~10% premium over SL3S1205"
           ]
         ]
       }
@@ -293,8 +286,8 @@
       "description": "NXP, GS1 and ISO documents that define UCODE 8.",
       "links": [
         {
-          "href": "https://www.nxp.com/products/rfid-nfc/ucode-and-label-ics/ucode-8:SL3S1203_1213",
-          "label": "NXP UCODE 8 product page"
+          "href": "https://www.nxp.com/products/rfid-nfc/ucode-rain-rfid-uhf/ucode-8-8m:SL3S1205-15",
+          "label": "NXP UCODE 8/8m product page"
         },
         {
           "href": "https://www.gs1.org/standards/epc-rfid/tds",
@@ -306,11 +299,11 @@
   "faq": [
     {
       "question": "Should I specify UCODE 8 or UCODE 9 for a new retail deployment?",
-      "answer": "UCODE 9 for new deployments at any meaningful scale where POS portal performance matters. The sensitivity upgrade (~5 dB forward-link, ~7 dB backscatter) pays back in portal read-rate improvement. Typically 3-5 percentage points of first-pass read, which compounds to a 40-60% reduction in manual-rescan events at the POS. Operationally, that time saving is worth far more than the ~30% per-chip cost premium on any SKU above roughly US$0.15 retail. UCODE 8 remains appropriate for billion-unit promotional and single-use programs (conference badges, disposable transit tickets, event wristbands, festival access) where the tag is discarded quickly, the read environment is controlled, and per-unit cost dominates the economics. That cohort is still where the majority of UCODE 8 silicon ships in 2026. A common hybrid strategy: UCODE 9 for apparel and durables, UCODE 8m for promotional and packaging tertiary, both deployed under the same EPC encoding scheme so the back-end software is chip-agnostic."
+      "answer": "UCODE 9 for new deployments at any meaningful scale where POS portal performance matters. The sensitivity upgrade (~1 dB forward-link improvement from -23 dBm to -24 dBm, plus better Self-Adjust tuning and the range-reduction Untraceable submode) pays back in portal read-rate improvement, typically 1-3 percentage points of first-pass read in marginal RF environments. Operationally, that time saving is worth far more than the typical per-chip cost premium on any SKU above roughly US$0.15 retail. UCODE 8 remains appropriate for billion-unit promotional and single-use programs (conference badges, disposable transit tickets, event wristbands, festival access) where the tag is discarded quickly, the read environment is controlled, and per-unit cost dominates the economics. That cohort is still where the majority of UCODE 8 silicon ships in 2026. A common hybrid strategy: UCODE 9 for apparel and durables, UCODE 8m for promotional and packaging tertiary, both deployed under the same EPC encoding scheme so the back-end software is chip-agnostic."
     },
     {
       "question": "What is the difference between UCODE 8 (SL3S1203) and UCODE 8m (SL3S1213)?",
-      "answer": "User memory. SL3S1203 has a 128-bit EPC with no user memory. Maximum encoding flexibility at the expense of on-tag item-specific data. SL3S1213 has a 96-bit EPC plus 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01), which is the more common choice for applications that want a backup serial, a factory lot code, or item-level metadata on the tag itself. Typical usage is 16 bits for a wash-cycle or maintenance counter and 16 bits for a class/category identifier. Both chips have identical sensitivity (-19 dBm forward-link), temperature envelope (-40 °C to +85 °C), command support (Untraceable / short-form Authenticate / File Open with one FileID) and anti-collision performance; the only functional differences are the memory partition and the TID model ID (0x070 vs 0x050), which are both reader-transparent for standard EPC Gen2 operations. Price delta is typically 5-10% at strap volume."
+      "answer": "User memory. SL3S1205 has a 128-bit EPC with no user memory: maximum encoding flexibility at the expense of on-tag item-specific data. SL3S1215 has a 96-bit EPC plus 32 bits of user memory (two 16-bit words at bank 11 addresses 0x00 and 0x01), which is the more common choice for applications that want a backup serial, a factory lot code, or item-level metadata on the tag itself. Typical usage is 16 bits for a wash-cycle or maintenance counter and 16 bits for a class/category identifier. Both chips have identical sensitivity (-23 dBm forward-link, -18 dBm write per the SL3S1205_15 datasheet), temperature envelope (-40 °C to +85 °C), command support (Untraceable / short-form Authenticate / File Open with one FileID) and anti-collision performance; the only functional difference reader-side is the memory partition. Price delta is typically 5-10% at strap volume."
     },
     {
       "question": "Can UCODE 8 be used for EU retail deployments that require privacy compliance?",
@@ -318,7 +311,7 @@
     },
     {
       "question": "How do I detect counterfeit chips being sold as UCODE 8?",
-      "answer": "Read the full 96-bit TID. Authentic UCODE 8 returns: first 16 bits = 0xE280 (EPC class identifier + NXP mask designer ID), next 12 bits = 0x070 (SL3S1203) or 0x050 (SL3S1213) mask IDs, remaining 68 bits = per-chip unique serial (12-bit XTID class plus 56-bit unique serial on Gen2 v2 chips). Chinese-OEM clones marketed as 'UCODE 8 compatible' frequently return an incorrect model ID (0x000 or a randomized value), an incorrect mask-designer field, or non-unique TID serials revealed by scanning 500+ tags and finding repeat serials within a single lot. Incoming-inspection scripts should: (1) verify the 16-bit class identifier = 0xE280, (2) verify the model-ID field matches 0x070 or 0x050 from the NXP registry, (3) sample 200-500 tags per incoming lot and confirm all serials are unique, (4) cross-validate with the converter's supply-chain audit documents showing NXP strap receipt. Most serious counterfeit issues historically trace to smaller converters bidding on very high-volume jobs at sub-market pricing; maintain chip-level authenticity clauses in master purchase agreements with penalty terms for TID mismatches."
+      "answer": "Read the full 96-bit TID. Authentic UCODE 8 returns: first 8 bits = 0xE2 (EPC class identifier per Gen2 v2), next 12 bits = 0x801 (NXP mask designer prefix), then a 12-bit NXP model-ID field, with the remaining bits forming the per-chip unique serial. Chinese-OEM clones marketed as 'UCODE 8 compatible' frequently return an incorrect model ID, an incorrect mask-designer field, or non-unique TID serials revealed by scanning 500+ tags and finding repeat serials within a single lot. The most common counterfeit pattern in 2024-2025 is UCODE 7 silicon (SL3S1204) re-marked as UCODE 8. Incoming-inspection scripts should: (1) verify the 8-bit class identifier = 0xE2, (2) verify the mask-designer field matches the NXP-registered prefix, (3) verify the model-ID field per the NXP SL3S1205_15 datasheet's TID structure section, (4) sample 200-500 tags per incoming lot and confirm all serials are unique, (5) cross-validate with the converter's supply-chain audit documents showing authorised NXP strap receipt. Most serious counterfeit issues historically trace to smaller converters bidding on very high-volume jobs at sub-market pricing; maintain chip-level authenticity clauses in master purchase agreements with penalty terms for TID mismatches."
     },
     {
       "question": "Does UCODE 8 work on metal surfaces?",
@@ -326,27 +319,27 @@
     },
     {
       "question": "What is the longest EPC I can encode on UCODE 8 (SL3S1203)?",
-      "answer": "128 bits, which accommodates SGTIN-96 (96 bits), SSCC-96 (96 bits), GIAI-96 (96 bits), GRAI-96 (96 bits), SGTIN-198 truncated forms (variable up to 140 bits, practically limited to 128 on SL3S1203), or a custom 128-bit company-private encoding (used in defense, aerospace and certain pharmaceutical track-and-trace deployments). The 128-bit EPC bank lets you encode longer identifiers than the 96-bit-only variants without dipping into user memory (which SL3S1203 doesn't have). For deployments that need both a long EPC and user memory (e.g., GIAI-202 plus a maintenance log), UCODE 8xm (SL3S1215 — 96-bit EPC + 128 bits user memory) or UCODE 9xm is typically the correct choice. Note that the Gen2 PC word's 5-bit Length field encodes EPC length in 16-bit words up to 31 words (496 bits), so the chip-level 128-bit limit is the binding constraint on SL3S1203, not the protocol."
+      "answer": "128 bits, which accommodates SGTIN-96 (96 bits), SSCC-96 (96 bits), GIAI-96 (96 bits), GRAI-96 (96 bits), SGTIN-198 truncated forms (variable up to 140 bits, practically limited to 128 on SL3S1205), or a custom 128-bit company-private encoding (used in defense, aerospace and certain pharmaceutical track-and-trace deployments). The 128-bit EPC bank lets you encode longer identifiers than the 96-bit-only variant without dipping into user memory (which SL3S1205 doesn't have). For deployments that need both a long EPC and user memory (e.g., GIAI-202 plus a maintenance log), UCODE 9xm (SL3S1005 — supports up to 752 bits user memory in three configurable allocations) is typically the correct choice. Note that the Gen2 PC word's 5-bit Length field encodes EPC length in 16-bit words up to 31 words (496 bits), so the chip-level 128-bit limit is the binding constraint on SL3S1205, not the protocol."
     },
     {
       "question": "Is UCODE 8 still in production, or has NXP EOL'd it?",
-      "answer": "Still in full production in 2026 with no EOL announcement. UCODE 8 ships in volumes measured in tens of billions of units per year globally (NXP's 2024 UHF RFID silicon revenue commentary identified UCODE 8 as still the single largest volume product in the UCODE family despite UCODE 9 gaining share on new high-value deployments) and NXP has informally signaled continued production through at least 2028 based on converter-side product-lifecycle discussions. UCODE 9 (SL3S4011, launched 2020) is the successor for high-sensitivity applications but does not displace UCODE 8 at the cost-optimized end of the market. EOL concerns should focus on older products (UCODE 7, UCODE G2X) rather than UCODE 8; converters routinely offer UCODE 8 and UCODE 9 on the same reference antenna family as drop-in alternatives, giving buyers flexibility to move between them based on price and performance tradeoffs."
+      "answer": "Still in full production in 2026 with no EOL announcement. UCODE 8 ships in volumes measured in tens of billions of units per year globally (NXP's 2024 UHF RFID silicon revenue commentary identified UCODE 8 as still the single largest volume product in the UCODE family despite UCODE 9 gaining share on new high-value deployments) and NXP has informally signaled continued production through at least 2028 based on converter-side product-lifecycle discussions. UCODE 9 (SL3S1206, launched 2020) is the successor for high-sensitivity applications but does not displace UCODE 8 at the cost-optimized end of the market. EOL concerns should focus on older products (UCODE 7 SL3S1204, UCODE G2iL/G2iL+ SL3S1203_1213, UCODE G2XM/G2XL) rather than UCODE 8; converters routinely offer UCODE 8 and UCODE 9 on the same reference antenna family as drop-in alternatives, giving buyers flexibility to move between them based on price and performance tradeoffs."
     }
   ],
   "sources": [
     {
-      "label": "NXP UCODE 8 and UCODE 8m Product Page (SL3S1204)",
-      "url": "https://www.nxp.com/products/rfid-nfc/ucode-rain-rfid-products/ucode-8-and-ucode-8m-rfid-ic:SL3S1204",
+      "label": "NXP UCODE 8 / 8m Product Page (SL3S1205-15)",
+      "url": "https://www.nxp.com/products/rfid-nfc/ucode-rain-rfid-uhf/ucode-8-8m:SL3S1205-15",
       "publisher": "NXP Semiconductors",
-      "accessedAt": "2026-04-20",
-      "note": "Canonical NXP product page for UCODE 8 / 8m — authority for the -22.2 dBm read sensitivity, 96-bit / 128-bit EPC memory variants, and the Self-Adjust / Brand Protection feature set referenced throughout the encyclopedia."
+      "accessedAt": "2026-05-10",
+      "note": "Canonical NXP product page for UCODE 8 / 8m — authority for the -23 dBm read sensitivity, 96-bit / 128-bit EPC memory variants, and the Self-Adjust / Brand Protection feature set referenced throughout the encyclopedia. (Note: SL3S1204 is UCODE 7, not UCODE 8.)"
     },
     {
-      "label": "NXP UCODE 8 Short Data Sheet (SL3S1204)",
-      "url": "https://www.nxp.com/docs/en/data-sheet/SL3S1204.pdf",
+      "label": "NXP SL3S1205_15 UCODE 8/8m Product Data Sheet, Rev. 3.6 (2 December 2021)",
+      "url": "https://www.nxp.com/docs/en/data-sheet/SL3S1205_15.pdf",
       "publisher": "NXP Semiconductors",
-      "accessedAt": "2026-04-20",
-      "note": "Short datasheet: authority for electrical characteristics, memory bank layout, supported Gen2 commands and lock structure used in the chip-specification tables."
+      "accessedAt": "2026-05-10",
+      "note": "Authoritative datasheet specifying the -23 dBm read / -18 dBm write sensitivity, electrical characteristics, memory bank layout (128-bit EPC on SL3S1205, 96-bit EPC + 32-bit user on SL3S1215), supported EPC Gen2 v2 commands and lock structure used in the chip-specification tables."
     },
     {
       "label": "NXP AN11809 — UCODE 8 Features and Hints",

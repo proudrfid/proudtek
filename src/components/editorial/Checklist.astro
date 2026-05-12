@@ -1,0 +1,31 @@
+---
+/**
+ * Editorial section variant — verifiable-checkbox list.
+ *
+ * Shadow component (Stage 2). Mirrors the inline expression in
+ * editorial-pages.ts around `const checklistHtml = section.checklist?.length ? ... : ""`.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["checklist"]: string[]
+ *
+ * Each item is a string that may carry inline markdown links or `[^N]`
+ * citation markers — both go through renderInlineLinks before set:html.
+ */
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface Props {
+  items: string[];
+  citations?: CitationCtx;
+}
+
+const { items, citations } = Astro.props;
+---
+{items.length > 0 && (
+  <ul class="codex-editorial-checklist" role="list">
+    {items.map((item) => (
+      <li class="codex-editorial-checklist__item">
+        <span class="codex-editorial-checklist__mark" aria-hidden="true">✓</span>
+        <span class="codex-editorial-checklist__text" set:html={renderInlineLinks(item, citations)} />
+      </li>
+    ))}
+  </ul>
+)}

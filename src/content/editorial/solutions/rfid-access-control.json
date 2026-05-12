@@ -147,7 +147,7 @@
     "/products/rfid-keyfobs/rfid-abs-keyfob/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-02-28",
+  "modifiedAt": "2026-05-11",
   "sections": [
     {
       "title": "RFID credentials for access control systems",
@@ -246,6 +246,104 @@
           }
         ]
       }
+    },
+    {
+      "title": "Credential silicon deep-dive — four security tiers explained",
+      "bullets": [
+        "Tier-1 (125 kHz LF) — EM4100 / EM4102 / HID Prox 26-bit H10301 / HID ProxII / Indala / Casi-Rusco / AWID / Keri PSK / KeriPRX: simple LF inductive coupling at 125 kHz, ISO 11784/11785 lineage, 64-bit manufacturer ID + 26-bit Wiegand facility code. No cryptography. Cloneable in <60 seconds with $30 Proxmark3 RDV4 / Proxmark Easy / Flipper Zero / Iceman fork. Retained only for legacy maintenance — every NIST SP 800-116 Rev 1 audit flags LF as a deficiency for sensitive areas.",
+        "Tier-2 (13.56 MHz HF Classic) — NXP MIFARE Classic 1K / 4K (S50 / S70 silicon): ISO/IEC 14443-A air interface, 1KB or 4KB EEPROM partitioned into sectors with Crypto-1 stream-cipher 48-bit keys. Crypto-1 academically broken in 2008 (Garcia, de Koning Gans, Verdult — Radboud University Nijmegen) — sector keys recoverable in <1 minute via nested + darkside + hardnested attacks (mfoc, mfcuk, hardnested). Still widely installed but recommended for replacement during next refresh cycle.",
+        "Tier-3 transitional (13.56 MHz HF AES) — NXP MIFARE Plus EV1 / EV2 (X / SE / S variants): backwards-compatible MIFARE Classic emulation mode + AES-128 SL3 mode. SL3 (security level 3) provides AES mutual authentication while SL1 keeps Crypto-1 compatibility so legacy readers still read the card during migration. Common procurement pattern for organisations doing reader refresh without forklift swap.",
+        "Tier-4 enterprise (13.56 MHz HF AES + file-based) — NXP MIFARE DESFire EV2 / EV3 (D40 → D41 → D81 silicon): ISO/IEC 14443-A + ISO/IEC 7816-4 file-based application directory (up to 28 apps × 32 files per app). AES-128 mutual authentication, 3DES legacy mode, Secure Messaging EV2, Random UID, Originality Signature. EV3 adds Transaction Timer + SUN message + Proximity Check (timing-based relay-attack defence). No public cryptographic break as of 2026.",
+        "Tier-4 alternative — HID iCLASS Seos: HID's proprietary AES-128 file-format-agnostic credential, runs on Seos silicon (Infineon SLE 78). Same trust level as DESFire EV3, programmed via HID Origo or HID-managed encoding services. Backwards-compatible with iCLASS legacy (Pico / Standard / SE) on dual-tech multiCLASS SE readers. Federal PIV-Auth / PKI-CAK / PKI-AUTH compliant.",
+        "Tier-4 alternative — LEGIC advant: Swiss vendor (Kaba Group), 13.56 MHz file-based credential, AES-128 + 3DES, common in European corporate / hotel / leisure deployments. LEGIC Connect platform manages credential lifecycle.",
+        "Newer entrant — NTAG 424 DNA (NFC Type 4, AES-CMAC SUN message): consumer-grade NFC tag with cryptographic per-tap signing — used for brand-protection and tap-to-verify access in low-volume executive / VIP applications. NOT a direct DESFire EV3 substitute for high-throughput PACS doors.",
+        "Newer entrant — Apple Wallet / Google Wallet credential: phone secure-element-backed, provisioned via HID Origo / Salto JustIN / Allegion Mobile / LEGIC Connect. Sit cryptographically at Tier-4 AES-128 equivalent but require Apple-Wallet-Verified or Google-Wallet-compatible reader fleet."
+      ]
+    },
+    {
+      "title": "PACS head-end integration — Genetec / Lenel / Honeywell / C·CURE / AMAG / Bosch / Gallagher",
+      "bullets": [
+        "Genetec Synergis (Security Center) — Quebec-based unified platform combining Synergis access + Omnicast video + AutoVu ALPR + Mission Control + KiwiVision analytics. Native support for HID multiCLASS SE / Signo / iCLASS Seos, Mercury LP-1502 / LP-2500 / LP-4502 panels, ISONAS Pure IP. OSDP v2.2 + Wiegand + AES Mobile Credentials (HID Origo). Federation across multi-site for global enterprise. Genetec Cloud Link bridge for partial-cloud hybrid.",
+        "Lenel S2 NetBox / OnGuard — now owned by Carrier (HID Global was separate before being merged into Carrier Global in 2024); long-time Fortune-500 enterprise + federal + healthcare default. OnGuard runs on Windows Server, supports Mercury LP / Lenel LNL-X / LNL-3300 panels, deeply integrated with video (Milestone XProtect, Genetec Omnicast). NetBox is the SMB-mid-market product. Lenel Mobile Credential via BlueDiamond app + LNL-Wave readers.",
+        "Honeywell Pro-Watch + WIN-PAK — Honeywell Building Technologies platform; Pro-Watch is enterprise-tier (Windows Server + SQL), WIN-PAK is SMB. Pro-Watch supports PW6K1IC / PW5K2 panels + HID readers + Honeywell IFP readers. WIN-PAK supports Honeywell NetAXS / NetAXS-123 panels. Both integrate Honeywell MAXPRO VMS / Pro-Watch Mobile.",
+        "Software House C·CURE 9000 — Tyco / Johnson Controls global enterprise PACS; runs on Windows Server, supports iSTAR Ultra / iSTAR Edge / iSTAR Pro panels + HID readers. Deep video integration to American Dynamics victor VMS + exacqVision (Tyco-owned). C·CURE Go Reader for mobile credential reading.",
+        "AMAG Symmetry — Allied Universal-owned (formerly G4S), strong in transportation + utilities + UK government. Symmetry supports EN-2DBC panels + HID + AMAG M2150 readers. Symmetry Visitor Management + Symmetry CONNECT for mobile + Symmetry GUEST for guest workflows.",
+        "Bosch Access Easy / AMS / BIS — Bosch Building Technologies platform; AMS (Access Management System) is the modern enterprise tier, replacing legacy APE / Access Professional Edition. BIS (Building Integration System) unifies access + fire + intrusion + video. Bosch AMC2 / AMC IP controllers + Bosch + HID readers.",
+        "Gallagher Command Centre — New Zealand-based vendor strong in critical infrastructure, prisons, mining, government. Gallagher Controller 6000 panels + Gallagher T-series + HID readers. Deep perimeter-intrusion-detection integration (Gallagher Class 4 / Class 5 fence systems). Gallagher Mobile Connect for mobile credential.",
+        "Mid-market + cloud-first: Brivo (cloud-only, SMB + property-management), Openpath (now Avigilon Alta after Motorola acquisition, cloud + on-prem hybrid), Kisi (NYC-based, SMB), Verkada (cloud + video unified), Feenics (now Honeywell Pro-Watch Cloud), ProdataKey (PDK, integrator-friendly cloud), DMP Entré (panels-up SMB).",
+        "Federal-specific: requires FICAM-approved PACS + FIPS 201-2 / -3 PIV credentials + GSA Approved Products List (APL) panels + readers. Genetec, Lenel and AMAG all maintain APL listings; Software House C·CURE has GSA-PACS APL approval."
+      ]
+    },
+    {
+      "title": "OSDP v2.2 migration from Wiegand — why and how",
+      "bullets": [
+        "Wiegand legacy — 1974 vintage protocol, two-wire (D0 + D1) open-collector 5–12 V, unidirectional reader → panel. Standard formats: H10301 26-bit, H10302 37-bit, HID Corporate 1000 35-bit. No encryption, no tamper detection, no firmware update path. ESPKey wire-tap device (~$200) captures every credential read at the panel-side wiring.",
+        "OSDP v2.2 — SIA OSDP-2020, IEC 60839-11-5:2020 international mirror, RS-485 multi-drop (up to 32 readers per home-run), bidirectional messaging, AES-128 Secure Channel between reader + panel, large card formats up to 2048 bits (vs Wiegand's 64-bit practical limit). Supports tamper events, firmware OTA, biometric template push, LED + buzzer + ICMP-style ping.",
+        "OSDP Verified programme — SIA certifies readers + panels for v2.2 conformance via independent lab test (UL / Intertek). Verified product list at sia.org/osdp — procurement starting point. Major verified vendors: HID Signo + Mercury LP + ISONAS Pure IP + Allegion AD-Series + Identiv uTrust + Farpointe Pyramid.",
+        "Migration playbook — Phase 1: audit Wiegand runs + identify ESPKey-exposed segments (typically inside ceiling plenum at panel side). Phase 2: replace 32-bit + larger Wiegand readers with OSDP-Verified dual-output (Wiegand + OSDP) so existing panels keep working. Phase 3: replace panels with Mercury LP-series / HID VertX V1000 / ISONAS during normal refresh — switch readers to OSDP-only output. Phase 4: enable AES Secure Channel with rotated install-key per OSDP IS-Key Distribution best practice (don't ship default 0x00 keys).",
+        "Cabling — Wiegand: 18 AWG 6-conductor + drain, max ~500 ft per run. OSDP: 22 AWG twisted-pair shielded RS-485 (Belden 1502R or equiv), max ~4000 ft per home-run with 32-reader fanout. Existing Wiegand cabling reuse: 6-cond cable can carry OSDP on the 2 unused pairs with terminator at each end; PoE separate.",
+        "Power — Wiegand readers draw 50–150 mA at 12V; OSDP readers slightly higher (100–250 mA) for the radio + microcontroller. Most installations use PoE+ (802.3at) to the panel and 12V loop power to readers. PoE++ (802.3bt) for biometric readers (HID Signo Bio, Suprema FaceStation).",
+        "Common pitfalls — Forgetting to rotate install-key from factory default (most common audit finding); mixing OSDP v1.x (no Secure Channel) readers with v2.2 panels; running unshielded RS-485 next to PoE cabling (induced noise); termination resistor missing at far end of bus (signal reflection)."
+      ]
+    },
+    {
+      "title": "Mobile credentials — HID Origo / Apple Wallet / Aliro 1.0 unified standard",
+      "bullets": [
+        "HID Mobile Access (HID Origo cloud platform) — issued via HID Origo to iOS + Android via HID Mobile App; consumed by HID Signo + iCLASS SE multiCLASS + OMNIKEY 5427CK readers with BLE + NFC. SEOS-over-BLE proprietary protocol — strongest installed-base in enterprise mobile credential as of 2026.",
+        "Salto JustIN Mobile — Spanish hotel + access vendor; BLE proprietary protocol with Salto SVN / KS data-on-card / data-on-network architecture. Common in hospitality + multi-family residential.",
+        "Allegion Mobile Access / Schlage Mobile — pairs to ENGAGE-enabled wireless locks (Schlage NDE / LE / Control / XE360) over BLE. Common in K-12 + higher-ed.",
+        "LEGIC Connect — Swiss platform managing BLE / NFC credentials across LEGIC advant readers; common in European corporate + leisure.",
+        "Apple Wallet employee badge — corporate program available since 2022 (Apple ID + Apple Business Manager), consumed by Apple-Wallet-Verified readers (HID Signo, Schlage, LEGIC, Salto, dormakaba, ASSA ABLOY, Kastle). Student-ID equivalent for higher-ed since 2018 (Duke, Johns Hopkins, U. Alabama, Temple, Vanderbilt + 30+ campuses by 2026). NFC + Apple Pay-style express-mode (Face ID not required for tap).",
+        "Google Wallet pass — Android secure-element NFC, supported by Pixel + Samsung Galaxy + Xiaomi devices with Trusted Execution Environment. HID Origo extended Google Wallet support 2024+.",
+        "Aliro 1.0 — Connectivity Standards Alliance (CSA, formerly Zigbee Alliance) February 2026 unified standard for mobile access. Members: Apple, Google, Samsung, Aqara, Lockly + access-control: HID, ASSA ABLOY, Allegion, dormakaba. Aim: one credential format that any reader from any vendor can authenticate without proprietary cloud handshake. 2026 status: standard published, first Aliro-certified products expected H2 2026. Major impact: ends the vendor-cloud lock-in pattern (HID Origo / Salto JustIN / Allegion Mobile) by mid-2027.",
+        "Plastic credential persistence — 2026 reality: mobile credential is opt-in for executive + IT + facilities + frequent-visitor cohorts (~10–25% of population). Plastic remains primary for: industrial / construction (no phone on body), healthcare patient (sterile / wash protocol), education K-12 (phone restriction policy), short-term visitor / contractor (no enrollment time), hospitality guest (Apple Wallet hotel keys still <2% of stays as of 2026)."
+      ]
+    },
+    {
+      "title": "Anti-cloning threat model + operational defences",
+      "bullets": [
+        "Threat — LF 125 kHz cloning: Proxmark3 RDV4 / Iceman + Flipper Zero / ChameleonMini reads EM4100 / HID Prox / Indala / Casi-Rusco / AWID / Keri raw card data in <60 seconds; writes to T5577 or replays via Flipper. Defence: migrate to HF DESFire EV3 / Seos; deploy LF + HF dual-tech readers during migration; monitor PACS for unusual access patterns (same credential at two distant doors within window).",
+        "Threat — MIFARE Classic Crypto-1 break (2008+): mfoc nested attack recovers sector keys in 1–5 min with known key on one sector; mfcuk darkside attack works without any known key. Cloning to MIFARE Classic blank cards or magic UID cards is trivial. Defence: migrate to DESFire EV3 / Seos / Plus SL3; if Classic must remain, use UID-only mode (treat Classic as a Tier-1 surrogate, not as cryptographic credential).",
+        "Threat — Wiegand wire-tap (ESPKey): ~$200 device clipped to D0 / D1 wires at panel side captures every credential read in plain text; later replay via Proxmark or Flipper. Defence: replace Wiegand with OSDP v2.2 Secure Channel; harden physical wire runs in metal conduit; tamper-detection on reader back-box.",
+        "Threat — Relay attack on HF cards: ProxGrind ChameleonUltra + relay-pair extends DESFire / Seos read range across the building (one attacker at the credential, second at the reader). Defence: Proximity Check (DESFire EV3 / Seos) measures RF timing; PACS rule: require recent biometric / PIN at high-security doors; geo-fence credential to specific reader zones.",
+        "Threat — Sequential CSN harvest: brute-force collect CSN / UID values from a credential population (visible even without authentication on most chips). Defence: enable Random UID (DESFire / Seos) so every transaction returns a different UID; PACS handles cardholder-ID lookup via encrypted file access.",
+        "Threat — Lost / stolen credential: rates 8–15% annual in white-collar workforce. Defence: hot-list propagation to all readers within 1 minute (Genetec / Lenel / Honeywell support this natively); automated revocation tied to HR offboarding feed (Workday / SuccessFactors); self-service kiosk for damaged-card replacement reduces helpdesk load.",
+        "Threat — Insider credential abuse: legitimate cardholder propping doors, sharing badge with non-employees, or accessing zones outside role. Defence: PACS analytics rules (door-prop alarm >30s, tailgating detection via Optex / Boon Edam), role-based access reviewed quarterly against HR-feed, two-person rule at high-security zones (data-center cage, narcotics safe).",
+        "Threat — Reader / panel firmware compromise: rare but documented (CISA advisories on HID Aero / Mercury / Allegion). Defence: keep reader + panel firmware current via OSDP OTA; subscribe to vendor PSIRT (HID PSIRT, Allegion PSIRT); air-gap PACS server from internet where possible; monitor outbound traffic from PACS subnet.",
+        "Threat — Cloud PACS account takeover (Brivo / Openpath / Kisi / Verkada): credential theft via phishing or MFA bypass. Defence: enforce FIDO2 / WebAuthn for admin access; SSO with conditional access (Okta / Azure AD); separate admin role from cardholder enrolment role; audit log retention 12+ months."
+      ]
+    },
+    {
+      "title": "Compliance + standards — UL 294 / NIST SP 800-116 / FIPS 201 / NDAA 889",
+      "bullets": [
+        "UL 294 (8th edition, 2023) — Standard for Access Control System Units; North American baseline for access control hardware. Three performance levels (Level I–IV) covering attack resistance, line-security, endurance. Most enterprise PACS panels + readers ship at Level IV. Required for AHJ approval in most US jurisdictions; AHJ may also require UL 1076 (proprietary alarm units) or UL 681 (installation).",
+        "UL 1610 / UL 2050 — for federal SCIF / closed-area applications where access control is integrated with intrusion alarm; UL 2050 explicitly covers National Industrial Security Systems (DoD-spec).",
+        "NIST SP 800-116 Rev 1 (2018) — Guidelines for the Use of PIV Credentials in Facility Access; defines PKI-CAK / PKI-AUTH / BIO / BIO-A transactions for federal PIV in PACS. High-assurance areas require PKI-AUTH (PIN + biometric + PKI signature) — drives Seos / DESFire AES-128 baseline + PIV middleware (ActivClient, 90Meter).",
+        "FIPS 201-3 (2022) — Personal Identity Verification (PIV) of Federal Employees and Contractors; mandates credential format + cryptographic baseline + lifecycle. Companion: FIPS 140-3 (cryptographic module validation), required for HSM behind issuance.",
+        "FICAM (Federal Identity, Credential and Access Management) — GSA-managed Approved Products List (APL) of PACS, readers, panels, middleware. Federal procurement must be from APL.",
+        "NDAA Section 889 (2018, effective 13 August 2020) — Federal Acquisition Regulation 52.204-25 bars federal purchase + use of products containing Huawei, ZTE, Hytera, Hikvision, Dahua components. Major impact on RFID reader supply chain — some chip suppliers source from banned vendors. Procurement teams require NDAA-compliant attestation from reader OEMs (HID, Allegion, Mercury Security publish public attestations).",
+        "TAA (Trade Agreements Act) — federal procurement must be products made in TAA-designated countries (US + EU + Japan + Israel + several others; China + Russia + Iran + N. Korea + Cuba + Syria excluded). Affects card body printing, lamination, chip sourcing.",
+        "GDPR Art. 28 (EU) + CCPA / CPRA (California) — controller / processor framework for cardholder data; PACS log retention + cardholder enrolment + access logs trigger data-protection obligations; signed Data Processing Agreement (DPA) with cloud-PACS vendor (Brivo / Kisi / Openpath / Verkada).",
+        "ADA 2010 Standards for Accessible Design — door operating force ≤5 lbf, reader mounting 15–48 in above floor, audible + visible feedback on door release; ADA-compliant credential issue process for cardholders with disabilities.",
+        "IEC 60839-11-1 / -11-2 — international functional + environmental requirements for electronic access control; basis for EU member-state certification.",
+        "ISO/IEC 27001 A.7.2 (physical access) + A.8.10 (secure disposal) — InfoSec mgmt system requirements that pull PACS logs + credential disposal records into the SOC-2 / ISO 27001 audit scope."
+      ]
+    },
+    {
+      "title": "Programme economics + TCO + procurement leverage",
+      "bullets": [
+        "Credential unit cost at scale (10K+ qty): EM4100 LF card $0.40–$0.80; MIFARE Classic 1K $0.80–$1.20; MIFARE Plus SE $1.50–$2.50; DESFire EV3 $2.80–$5.50; Seos $3.50–$8.00; printable employee badge (any chip) +$0.20–$0.50 for card body. Key-fob form factor +20–50% on chip cost.",
+        "Reader unit cost: legacy 125 kHz $80–$180; HF 13.56 MHz Wiegand-output $180–$350; OSDP-Verified multi-tech $250–$600; biometric (HID Signo Bio, Suprema FaceStation 2, ZKTeco SpeedFace) $600–$2,500.",
+        "Panel cost: legacy 4-door panel (HID Edge / Allegion AD-300) $400–$900; enterprise 8-door (Mercury LP-2500 / Lenel LNL-X) $1,800–$3,500; large enterprise (Mercury LP-4502 / HID VertX V1000) $4,000–$8,000.",
+        "Installation labour: $150–$400 per door (existing wiring usable) or $400–$900 per door (new conduit + cabling). Add $80–$200 per door for OSDP cabling reuse / replacement.",
+        "PACS software licence: per-door annual $50–$150 (SMB cloud — Brivo / Kisi / Openpath); per-door perpetual $200–$600 + 18–22% annual SMA (enterprise on-prem — Genetec / Lenel / C·CURE / Pro-Watch / AMAG / Gallagher). Federal FICAM adds 30–60% premium.",
+        "Mobile credential — HID Origo issuance $3–$8 per credential per year (subscription); Salto JustIN $4–$10; Allegion Mobile $4–$8; Apple Wallet corporate $0 platform fee but requires Apple Business Manager subscription + Apple-Wallet-Verified reader fleet.",
+        "Year-1 total cost — typical 200-door enterprise refresh: 5,000 DESFire EV3 cards × $4 = $20K; 200 OSDP readers × $400 = $80K; 25 Mercury LP-2500 panels × $2.5K = $62K; install labour 200 × $300 = $60K; Genetec Synergis perpetual + SMA = $150K Y1; integration services $50K. Year-1 total ~$420K, ~$2.1K per door.",
+        "Annual recurring (Year 2+): SMA $30K; credential replacement (10% annual) 500 × $4 = $2K; mobile-credential subscription 250 cohort × $5 = $1.3K. Total ~$33K/year.",
+        "Lost-card replacement reality: 8–15% annual rate; self-service kiosk (HID Crescendo + photo + encoder) reduces help-desk minutes from 15 → 3 per replacement.",
+        "Compliance avoidance value: PCI-DSS physical-access non-compliance fines $5K–$100K per breach; HIPAA physical safeguard non-compliance up to $50K per violation; NIST 800-53 PE-3 / PE-4 / PE-6 deficiency findings drive FedRAMP / FISMA delays worth millions in lost contract value.",
+        "Procurement leverage: SKU consolidation (3–5 strategic chip + form-factor combos covering 90% of volume) yields 12–25% unit-price improvement vs fragmented spec sprawl; multi-year commitment + volume commitment another 10–20%; pre-personalised encoding (delivered ready-to-issue) saves $0.50–$2.00 per credential vs on-site encoding."
+      ]
     }
   ],
   "resourceCards": [
@@ -376,6 +474,22 @@
     {
       "question": "What is OSDP v2.2 and do I need it?",
       "answer": "OSDP (Open Supervised Device Protocol) v2.2 is the SIA standard (also published as IEC 60839-11-5) for reader-to-panel communication that replaces legacy Wiegand. It runs over RS-485 multi-drop, supports AES-128 Secure Channel encryption, bidirectional messaging, tamper detection, large card formats up to 2048 bits and over-the-wire firmware update. Wiegand is unencrypted and vulnerable to ESPKey-class wire-tap attacks — for any new deployment we recommend OSDP-Verified readers and panels (HID Signo, Mercury LP-series, ISONAS Pure IP, HID VertX V1000)."
+    },
+    {
+      "question": "Should we switch to mobile credentials and abandon plastic cards?",
+      "answer": "In 2026, no — mobile is complementary, not replacement. Mobile credential (HID Origo / Salto JustIN / Allegion Mobile / LEGIC Connect / Apple Wallet / Google Wallet) reaches ~10-25% of typical workforce as opt-in for executives, IT, facilities, frequent visitors. Plastic remains primary for industrial / construction (no phone on body in PPE), healthcare patient (sterile + wash protocol), K-12 education (phone policy restrictions), short-term visitor / contractor, and hospitality guest (Apple Wallet hotel keys <2% of stays in 2026). The CSA Aliro 1.0 unified standard (February 2026) will end vendor-cloud lock-in by mid-2027 and may accelerate mobile adoption — but plastic will remain primary through at least 2028."
+    },
+    {
+      "question": "Which PACS platform should we pair these credentials with?",
+      "answer": "Match the credential to your existing PACS or to your security tier. Enterprise multi-site: Genetec Synergis or Lenel S2 OnGuard (now Carrier) or Software House C·CURE 9000 (Tyco / Johnson Controls). Industrial / commercial mid-market: Honeywell Pro-Watch or WIN-PAK. Critical infrastructure / prisons / utilities: Gallagher Command Centre or AMAG Symmetry. SMB cloud: Brivo, Avigilon Alta (formerly Openpath), Kisi, Verkada, Feenics (now Honeywell Pro-Watch Cloud). Federal: FICAM Approved Products List required — Genetec, Lenel, AMAG and Software House C·CURE all maintain APL listings. Tell us your PACS head-end + reader model and we match the chip + encoding format + facility code + cardholder-ID range exactly."
+    },
+    {
+      "question": "What is NDAA Section 889 and how does it affect RFID credential procurement?",
+      "answer": "NDAA Section 889 (effective 13 August 2020 via FAR 52.204-25) bars federal agencies and federal contractors from purchasing or using products containing covered telecommunications equipment from Huawei, ZTE, Hytera, Hikvision and Dahua — including subcomponents. For RFID credential procurement this means: reader OEM must publish NDAA Section 889 attestation (HID, Allegion, Mercury Security, ASSA ABLOY all do); chip silicon supply chain must be auditable (NXP, Infineon, ST, EM Microelectronic all clean); card body lamination + printing must be NDAA-compliant facility. Combine with TAA (Trade Agreements Act) requirement for products made in TAA-designated countries. Proud Tek operates NDAA-compliant manufacturing and provides written 889 + TAA attestation for federal contracts."
+    },
+    {
+      "question": "How does the Aliro 1.0 unified mobile credential standard change procurement strategy?",
+      "answer": "Aliro 1.0 was published by Connectivity Standards Alliance (CSA) in February 2026 with founding members including Apple, Google, Samsung, Aqara, Lockly, HID, ASSA ABLOY, Allegion, dormakaba. Aim: one cryptographic credential format any reader can authenticate without proprietary cloud handshake — ending today's vendor-cloud lock-in pattern (HID Origo vs Salto JustIN vs Allegion Mobile vs LEGIC Connect). 2026 status: standard published, first Aliro-Certified products expected H2 2026; broad reader fleet support 2027-2028. Procurement implication: for greenfield deployments late 2026+, specify Aliro-Certified reader fleet (futureproofs against vendor lock-in); for existing deployments, plan Aliro readiness in next reader-refresh cycle. Plastic credential remains unaffected by Aliro."
     }
   ],
   "sources": [
@@ -418,6 +532,118 @@
       "publishedAt": "2018",
       "accessedAt": "2026-04-26",
       "note": "Legacy 125 kHz LF silicon commonly found in older low-security access-control estates; cited for migration-path discussion."
+    },
+    {
+      "label": "NIST SP 800-116 Rev 1 — Guidelines for the Use of PIV Credentials in Facility Access",
+      "url": "https://csrc.nist.gov/publications/detail/sp/800-116/rev-1/final",
+      "publisher": "NIST",
+      "publishedAt": "2018-06",
+      "accessedAt": "2026-04-26",
+      "note": "Federal PACS guidance defining PKI-CAK / PKI-AUTH / BIO / BIO-A transactions for PIV credentials — drives DESFire EV3 / Seos AES-128 baseline."
+    },
+    {
+      "label": "FIPS 201-3 — Personal Identity Verification (PIV) of Federal Employees and Contractors",
+      "url": "https://csrc.nist.gov/publications/detail/fips/201/3/final",
+      "publisher": "NIST",
+      "publishedAt": "2022-01",
+      "accessedAt": "2026-04-26",
+      "note": "Federal credential format + cryptographic baseline + lifecycle standard — required for federal employee + contractor credentials."
+    },
+    {
+      "label": "UL 294 — Standard for Access Control System Units (8th edition)",
+      "url": "https://www.shopulstandards.com/ProductDetail.aspx?productId=UL294",
+      "publisher": "Underwriters Laboratories",
+      "publishedAt": "2023",
+      "accessedAt": "2026-04-26",
+      "note": "North American baseline standard for access control hardware safety + reliability + line security; AHJ approval reference."
+    },
+    {
+      "label": "SIA OSDP v2.2 — Open Supervised Device Protocol specification",
+      "url": "https://www.securityindustry.org/industry-standards/open-supervised-device-protocol/",
+      "publisher": "Security Industry Association",
+      "publishedAt": "2020",
+      "accessedAt": "2026-04-26",
+      "note": "Reader-to-panel protocol with AES-128 Secure Channel replacing legacy Wiegand; mirrored as IEC 60839-11-5:2020."
+    },
+    {
+      "label": "Garcia, de Koning Gans, Verdult — Dismantling MIFARE Classic (Crypto-1 break)",
+      "url": "https://link.springer.com/chapter/10.1007/978-3-540-88313-5_7",
+      "publisher": "ESORICS 2008 / Radboud University Nijmegen",
+      "publishedAt": "2008-10",
+      "accessedAt": "2026-04-26",
+      "note": "Foundational academic break of MIFARE Classic Crypto-1 cipher; basis for recommending DESFire EV3 / Seos migration on all sensitive deployments."
+    },
+    {
+      "label": "Connectivity Standards Alliance — Aliro 1.0 mobile access standard",
+      "url": "https://csa-iot.org/all-solutions/aliro/",
+      "publisher": "Connectivity Standards Alliance",
+      "publishedAt": "2026-02",
+      "accessedAt": "2026-04-26",
+      "note": "February 2026 unified mobile credential standard with Apple, Google, Samsung, HID, ASSA ABLOY, Allegion, dormakaba founders — ends vendor-cloud lock-in by 2027-2028."
+    },
+    {
+      "label": "FAR 52.204-25 — Prohibition on Contracting for Certain Telecommunications and Video Surveillance Services or Equipment (NDAA Section 889)",
+      "url": "https://www.acquisition.gov/far/52.204-25",
+      "publisher": "U.S. General Services Administration",
+      "publishedAt": "2020-08",
+      "accessedAt": "2026-04-26",
+      "note": "NDAA Section 889 implementation barring federal use of Huawei / ZTE / Hytera / Hikvision / Dahua components — drives RFID reader supply-chain attestation requirements."
+    },
+    {
+      "label": "GSA FICAM — Approved Products List (APL)",
+      "url": "https://www.idmanagement.gov/approved-products-list/",
+      "publisher": "U.S. General Services Administration",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Federal Identity, Credential and Access Management Approved Products List of PACS, readers, panels, middleware required for federal procurement."
+    },
+    {
+      "label": "Genetec Synergis — unified access control platform",
+      "url": "https://www.genetec.com/products/unified-security/synergis",
+      "publisher": "Genetec, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Quebec-based unified Security Center platform combining access + video + ALPR; major PACS head-end in enterprise multi-site deployments."
+    },
+    {
+      "label": "Allegion Mobile Access — Schlage NDE / LE / Control ENGAGE platform",
+      "url": "https://us.allegion.com/en/home/products/access-control/electronic-access-control/mobile-access.html",
+      "publisher": "Allegion plc",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "BLE mobile credential ecosystem common in K-12 + higher education, paired with Schlage NDE / LE / Control / XE360 wireless locks."
+    },
+    {
+      "label": "Apple — Employee Badge in Apple Wallet (Apple Business Manager)",
+      "url": "https://support.apple.com/guide/apple-business-manager/employee-badges-axmd34758cbf/web",
+      "publisher": "Apple Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Apple Wallet employee badge issuance via Apple Business Manager — consumed by Apple-Wallet-Verified readers (HID Signo, Schlage, LEGIC, Salto, dormakaba, ASSA ABLOY, Kastle)."
+    },
+    {
+      "label": "ASSA ABLOY — Aperio wireless lock platform",
+      "url": "https://www.assaabloy.com/group/en/solutions/wireless-locks",
+      "publisher": "ASSA ABLOY",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Wireless lock platform integrating with PACS via gateway / hub architecture; common door-hardware partner for HID + Lenel + Genetec + Software House."
+    },
+    {
+      "label": "Mercury Security — LP-series + EP-series intelligent controllers (HID company)",
+      "url": "https://mercury-security.com/products/",
+      "publisher": "Mercury Security (HID company)",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "OEM intelligent controller platform used inside Genetec / Lenel / C·CURE / Pro-Watch / AMAG / Honeywell PACS panels."
+    },
+    {
+      "label": "GDPR Article 28 — Controller / Processor framework",
+      "url": "https://gdpr-info.eu/art-28-gdpr/",
+      "publisher": "EU General Data Protection Regulation",
+      "publishedAt": "2018-05",
+      "accessedAt": "2026-04-26",
+      "note": "Controller / processor obligations triggered by PACS cardholder data + access logs; signed Data Processing Agreement required for cloud PACS."
     }
   ],
   "primaryAction": {
@@ -436,5 +662,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-03-03"
+  "reviewedAt": "2026-05-11"
 }

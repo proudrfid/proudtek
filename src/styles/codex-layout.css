@@ -1,0 +1,796 @@
+/* ═══════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  .codex-product-support,
+  .codex-article-support,
+  .codex-collection-support {
+    padding: var(--codex-space-4-plus);
+  }
+
+  .codex-product-support__grid,
+  .codex-article-support__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .codex-collection-cta {
+    grid-template-columns: 1fr;
+    padding: var(--codex-space-5);
+  }
+
+  .codex-collection-cta__actions {
+    grid-row: auto;
+  }
+
+  .codex-collection-cta__primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .codex-collection-guidance {
+    padding: var(--codex-space-4-plus) var(--codex-space-5);
+  }
+
+  .codex-growth-hub {
+    padding: var(--codex-space-4);
+  }
+
+  .codex-growth-hub__hero,
+  .codex-growth-hub__group,
+  .codex-growth-hub__brief {
+    padding: var(--codex-space-4);
+  }
+
+  .codex-growth-hub__brief {
+    grid-template-columns: 1fr;
+  }
+
+  .codex-legacy-redirect {
+    padding: var(--codex-space-4-plus);
+  }
+
+  .codex-legacy-redirect__actions {
+    flex-direction: column;
+  }
+
+  .codex-legacy-redirect__action {
+    width: 100%;
+  }
+
+  .codex-editorial-page {
+    max-width: calc(100% - var(--codex-space-4));
+  }
+
+  .codex-editorial-hero {
+    grid-template-columns: 1fr;
+    padding: var(--codex-space-5);
+  }
+
+  .codex-editorial-jump-nav {
+    padding: var(--codex-space-4);
+  }
+
+  .codex-editorial-section,
+  .codex-editorial-card,
+  .codex-editorial-action-bar {
+    padding: var(--codex-space-4-plus);
+  }
+
+  .codex-editorial-step {
+    grid-template-columns: 1fr;
+  }
+
+  .codex-editorial-brief-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
+
+/* ═══════════════════════════════════════════
+   WhatsApp Floating Button
+   ═══════════════════════════════════════════ */
+
+.codex-wa-fab {
+  position: fixed;
+  bottom: var(--codex-space-5);
+  right: var(--codex-space-5);
+  z-index: var(--codex-z-toast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+  text-decoration: none;
+  opacity: 0;
+  transform: scale(0.8) translateY(20px);
+  transition: opacity 300ms cubic-bezier(0.25, 1, 0.5, 1),
+              transform 300ms cubic-bezier(0.25, 1, 0.5, 1),
+              box-shadow 160ms ease;
+  pointer-events: none;
+}
+
+.codex-wa-fab.is-visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.codex-wa-fab:hover {
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+  transform: scale(1.06);
+}
+
+.codex-wa-fab:active {
+  transform: scale(0.96);
+  transition-duration: 50ms;
+}
+
+.codex-wa-fab svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+
+@media (max-width: 767px) {
+  .codex-wa-fab {
+    width: 48px;
+    height: 48px;
+    bottom: var(--codex-space-4);
+    right: var(--codex-space-4);
+  }
+
+  .codex-wa-fab svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Sticky Inquiry Bar
+   ═══════════════════════════════════════════ */
+
+/* DS-9 #6 (2026-04-26) — Visual weight upgrade.
+   Original sticky was the same dark-brown as the page footer, so users'
+   eyes treated it as part of the footer and skipped it (verified by the
+   "I don't see the sticky bar" report even when the bar was correctly
+   rendered with `is-visible`). Four changes restore presence:
+     1. Gold top border (`var(--codex-gold)`) creates a hard visual
+        separator that reads as "floating bar", not "footer extension".
+     2. Upward box-shadow gives a subtle elevation cue against the page.
+     3. Slightly more transparent bg + backdrop-filter blur so content
+        scrolling underneath bleeds through, signalling overlay vs static.
+     4. Hero text bumped from 90% white to pure #fff for stronger contrast
+        on the dark bg (also nudges WCAG AA contrast past 7:1 → AAA). */
+/* ═══════════════════════════════════════════
+   Codex Mega-Menu — Industries / Solutions / Resources dropdowns
+   Injected by render-snapshot.ts into #primary-menu + #mobile-menu.
+   ═══════════════════════════════════════════ */
+
+/* ── Desktop: show sub-menu on hover / focus-within ── */
+@media (min-width: 768px) {
+
+  /* Anchor the absolute dropdown to the parent <li> */
+  #primary-menu > li.codex-mega-item {
+    position: relative;
+  }
+
+  /* Override the blanket ".sub-menu { display: none }" for our items */
+  #primary-menu > li.codex-mega-item > .codex-mega-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: var(--codex-z-overlay);
+    margin: 0;
+    padding: var(--codex-space-5) var(--codex-space-6);
+    list-style: none;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(41, 28, 14, 0.16);
+  }
+
+  /* CSS-only trigger: open on hover, keyboard focus-within, or .is-open
+     (the last is set by the lightweight JS in BaseLayout for tap support). */
+  #primary-menu > li.codex-mega-item:hover > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item:focus-within > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item.is-open > .codex-mega-dropdown {
+    display: block;
+  }
+
+  /* Mega variant gets a wider, multi-column layout */
+  #primary-menu > li.codex-mega-item--mega > .codex-mega-dropdown {
+    display: none;
+    min-width: 560px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--codex-space-5) var(--codex-space-6);
+  }
+  #primary-menu > li.codex-mega-item--mega:hover > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item--mega:focus-within > .codex-mega-dropdown,
+  #primary-menu > li.codex-mega-item--mega.is-open > .codex-mega-dropdown {
+    display: grid;
+  }
+
+  /* Simple variant: single column, comfy width */
+  #primary-menu > li.codex-mega-item--simple > .codex-mega-dropdown {
+    min-width: 240px;
+    padding: var(--codex-space-2) 0;
+  }
+
+  .codex-mega-group {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+  }
+
+  .codex-mega-heading {
+    display: block;
+    margin: 0 0 var(--codex-space-2);
+    padding-bottom: var(--codex-space-1-plus);
+    font-family: var(--codex-font-heading, "Lora", serif);
+    font-size: var(--codex-text-xs-plus);
+    font-weight: var(--codex-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--codex-gold, #c39a5f);
+    border-bottom: 1px solid rgba(176, 141, 87, 0.2);
+  }
+
+  .codex-mega-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .codex-mega-list > li {
+    list-style: none;
+    margin: 0;
+  }
+
+  .codex-mega-list > li > a {
+    display: block;
+    padding: var(--codex-space-1-plus) 0;
+    font-size: var(--codex-text-sm);
+    line-height: var(--codex-leading-snug);
+    color: var(--codex-text, #291c0e) !important;
+    text-decoration: none !important;
+    transition: color 160ms ease;
+  }
+
+  /* Hover/focus state — !important on both color AND background to win
+     against Kadence theme's `.header-navigation ... ul ul li.menu-item > a:hover`
+     which otherwise sets background: var(--global-palette4) (dark gray)
+     against our gold text → unreadable contrast. See task #164. */
+  .codex-mega-list > li > a:hover,
+  .codex-mega-list > li > a:focus {
+    color: var(--codex-gold, #c39a5f) !important;
+    background: rgba(176, 141, 87, 0.10) !important;
+  }
+
+  /* Simple dropdown (Resources) link styling */
+  .codex-mega-item--simple .codex-mega-dropdown .codex-mega-list > li > a {
+    padding: var(--codex-space-2-plus) var(--codex-space-4-plus);
+    font-size: var(--codex-text-sm-plus);
+  }
+  .codex-mega-item--simple .codex-mega-dropdown .codex-mega-list > li > a:hover,
+  .codex-mega-item--simple .codex-mega-dropdown .codex-mega-list > li > a:focus {
+    background: rgba(176, 141, 87, 0.12) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Site header — sticky.
+   Kadence ships a `kadence-sticky-header` class on `.site-header-inner-wrap`
+   that depends on its (now-stripped) JS. We pin the outer #masthead with
+   pure CSS so the logo + primary nav stay visible on every page during
+   scroll. Solid white background prevents content bleed-through; the
+   `.is-scrolled` shadow is wired in `BaseLayout.astro` for scroll feedback.
+   z-index sits one tier above `--codex-z-sticky` (sticky CTA + WhatsApp FAB
+   are 30) so the header overlays them cleanly during scroll, but stays
+   below modal / mobile-drawer overlays.
+   ═══════════════════════════════════════════ */
+/* Sticky positioning — uses `html body #masthead.site-header` (specificity
+   0,1,2 with two type selectors) so it beats every Kadence and legacy rule.
+   The legacy block applies `position: sticky` to a half-dozen nested
+   wrappers, which races visually. We pin only the outer header and force
+   the children to `position: static`. */
+html body #masthead.site-header {
+  position: sticky !important;
+  top: 0 !important;
+  /* DS-12 #8A — was raw `1000 !important`; switched to token. Same numeric
+     value, just sourced from the design system. Header sits at dropdown
+     tier so any in-page dropdown stays *above* the masthead by virtue of
+     DOM order (later in source = wins paint with same z-index). */
+  z-index: var(--codex-z-dropdown) !important;
+  transform: none !important;
+  filter: none !important;
+  contain: none !important;
+  transition: box-shadow var(--codex-motion-base) ease;
+}
+html body #masthead.site-header.is-scrolled {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+@media (prefers-reduced-motion: reduce) {
+  html body #masthead.site-header {
+    transition: none;
+  }
+}
+/* The Kadence transparent-header body class forces #masthead to position:
+   absolute. Override so our sticky wins. */
+html body.transparent-header #masthead.site-header,
+html body.mobile-transparent-header #masthead.site-header {
+  position: sticky !important;
+  top: 0 !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+/* ── Header skin: force every wrapper to white-ish so menu links read.
+   The Kadence default sets `#masthead { background: var(--global-palette3) }`
+   (dark brown) and the contact strip `.site-top-header-wrap` ALSO has its
+   own dark background. We blank the whole tree so the menu sits on a clean
+   light surface, matching the rest of the page. ── */
+html body #masthead.site-header,
+html body #masthead.site-header #main-header,
+html body #masthead.site-header .site-header-wrap,
+html body #masthead.site-header .site-header-inner-wrap,
+html body #masthead.site-header .site-header-inner-wrap.kadence-sticky-header,
+html body #masthead.site-header .site-header-inner-wrap.item-is-fixed,
+html body #masthead.site-header .site-header-upper-wrap,
+html body #masthead.site-header .site-header-upper-inner-wrap,
+html body #masthead.site-header .site-top-header-wrap,
+html body #masthead.site-header .site-main-header-wrap,
+html body #masthead.site-header .site-header-row-container,
+html body #masthead.site-header .site-header-row-container-inner,
+html body #masthead.site-header .site-header-row,
+html body #masthead.site-header .site-container {
+  background: #eef5fa !important;
+  background-color: #eef5fa !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #291c0e !important;
+}
+/* Pin inner wrappers to static so they don't race the outer sticky. */
+html body #masthead.site-header #main-header,
+html body #masthead.site-header .site-header-wrap,
+html body #masthead.site-header .site-header-inner-wrap,
+html body #masthead.site-header .site-header-inner-wrap.kadence-sticky-header,
+html body #masthead.site-header .site-header-inner-wrap.item-is-fixed,
+html body #masthead.site-header .site-header-upper-wrap,
+html body #masthead.site-header .site-header-upper-inner-wrap,
+html body #masthead.site-header .site-header-row-container-inner {
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+}
+/* Subtle bottom border so the soft-blue header has a clean edge against
+   page content. Tinted blue to match the bg, not pure grey. */
+html body #masthead.site-header {
+  border-bottom: 1px solid rgba(35, 100, 160, 0.12) !important;
+}
+
+/* ── Force EVERY menu/text element inside the header to dark text.
+   Covers the original Kadence selectors that paint links palette9 (#fff)
+   AND the contact strip's gold/white text spans. ── */
+html body #masthead.site-header,
+html body #masthead.site-header a,
+html body #masthead.site-header span,
+html body #masthead.site-header li,
+html body #masthead.site-header .nav-drop-title-wrap,
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item > a,
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item > a > span,
+html body #masthead.site-header #primary-menu > li > a,
+html body #masthead.site-header .header-navigation a,
+html body #masthead.site-header .header-button,
+html body #masthead.site-header .site-header-item,
+html body #masthead.site-header .header-search-bar-toggle,
+html body #masthead.site-header .header-mobile-search-toggle,
+html body #masthead.site-header .menu-toggle-open,
+html body #masthead.site-header .drawer-toggle,
+html body #masthead.site-header .kadence-svg-iconset {
+  color: #291c0e !important;
+}
+/* Hover / current = brand gold, so users can still tell where they are. */
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item > a:hover,
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item > a:focus,
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item.current-menu-item > a,
+html body #masthead.site-header #primary-menu > li > a:hover,
+html body #masthead.site-header #primary-menu > li.current-menu-item > a,
+html body #masthead.site-header #primary-menu > li > a[aria-current="page"],
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item > a[aria-current="page"],
+html body #masthead.site-header .header-navigation a:hover,
+html body #masthead.site-header .header-navigation a[aria-current="page"] {
+  /* DS-15 Phase 6 #3 iter-2 — was #c39a5f (gold) at 2.86:1 on the
+     light-blue header bg (#eef5fa), failing AA. Switched to gold-muted
+     #6d5a3a (6.96:1, AAA) and added underline so the active state
+     reads on more than color alone. Hover stays muted-gold for
+     visual coherence. */
+  color: var(--codex-gold-muted, #6d5a3a) !important;
+}
+/* DS-15 Phase 6 #3 iter-2 — active-state non-color signal.
+   WCAG 1.4.1 (use of color) requires the active link be distinguishable
+   without color. Add an underline + bold to the current-page link
+   specifically (not hover, which is transient). */
+html body #masthead.site-header #primary-menu > li.current-menu-item > a,
+html body #masthead.site-header #primary-menu > li > a[aria-current="page"],
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item.current-menu-item > a,
+html body #masthead.site-header .main-navigation .primary-menu-container > ul > li.menu-item > a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  font-weight: var(--codex-weight-bold, 700);
+}
+/* Mobile burger lines (background-painted spans) → dark */
+html body #masthead.site-header .menu-toggle-open .menu-toggle-icon::before,
+html body #masthead.site-header .menu-toggle-open .menu-toggle-icon::after,
+html body #masthead.site-header .menu-toggle-open .menu-toggle-icon > span,
+html body #masthead.site-header .drawer-toggle .menu-toggle-icon::before,
+html body #masthead.site-header .drawer-toggle .menu-toggle-icon::after,
+html body #masthead.site-header .drawer-toggle .menu-toggle-icon > span {
+  background-color: #291c0e !important;
+}
+/* SVG icons inherit currentColor so they go dark too */
+html body #masthead.site-header svg {
+  fill: currentColor !important;
+}
+/* Logo is a multi-color asset (black "PROUDTEK" wordmark + blue wifi icon).
+   It reads cleanly on our soft-blue header background — no filter needed. */
+html body #masthead.site-header .site-branding .custom-logo,
+html body #masthead.site-header .mobile-site-branding .custom-logo,
+html body #masthead.site-header img.custom-logo {
+  filter: none !important;
+}
+
+/* (The earlier color overrides have been consolidated into the
+   html-body-prefixed block above; this section intentionally left blank.) */
+
+/* ── Mobile: collapse heavy mega-menus into a 2-level accordion ── */
+@media (max-width: 767px) {
+  /* Legacy flat heading (still used by Resources / single-group dropdowns) */
+  #mobile-menu .codex-mega-item .sub-menu .codex-mobile-heading {
+    padding: var(--codex-space-3-plus) var(--codex-space-4) var(--codex-space-1);
+    font-family: var(--codex-font-heading, "Lora", serif);
+    font-size: var(--codex-text-2xs);
+    font-weight: var(--codex-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--codex-gold, #c39a5f);
+    pointer-events: none;
+  }
+  #mobile-menu .codex-mega-item .codex-mobile-overview a {
+    font-weight: var(--codex-weight-semibold);
+    color: var(--codex-gold, #c39a5f) !important;
+  }
+
+  /* Group accordion row — full-width tap target */
+  #mobile-menu .codex-mobile-group {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  #mobile-menu .codex-mobile-group + .codex-mobile-group {
+    border-top: 1px solid rgba(201, 185, 154, 0.18);
+  }
+  #mobile-menu .codex-mobile-group-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--codex-space-2);
+    width: 100%;
+    padding: var(--codex-space-3-plus) var(--codex-space-4);
+    background: transparent;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: var(--codex-text-sm-plus);
+    font-weight: var(--codex-weight-semibold);
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #mobile-menu .codex-mobile-group-toggle:hover,
+  #mobile-menu .codex-mobile-group-toggle:focus-visible {
+    background: rgba(201, 185, 154, 0.08);
+    outline: none;
+  }
+  #mobile-menu .codex-mobile-group-label {
+    flex: 1 1 auto;
+  }
+  #mobile-menu .codex-mobile-group-count {
+    flex: 0 0 auto;
+    min-width: 1.4em;
+    padding: 1px 6px;
+    background: rgba(201, 185, 154, 0.18);
+    color: var(--codex-text-muted, rgba(0, 0, 0, 0.55));
+    border-radius: var(--codex-radius-pill, 999px);
+    font-size: var(--codex-text-2xs);
+    font-weight: var(--codex-weight-semibold);
+    text-align: center;
+    line-height: 1.4;
+  }
+  #mobile-menu .codex-mobile-group-chevron {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.18s ease;
+    color: var(--codex-gold, #c39a5f);
+  }
+  #mobile-menu .codex-mobile-group-chevron svg {
+    width: 18px;
+    height: 18px;
+  }
+  #mobile-menu .codex-mobile-group-toggle[aria-expanded="true"] .codex-mobile-group-chevron {
+    transform: rotate(180deg);
+  }
+  #mobile-menu .codex-mobile-group-toggle[aria-expanded="true"] {
+    color: var(--codex-gold, #c39a5f);
+  }
+
+  /* Expanded sub-link list — visually nested under the toggle */
+  #mobile-menu .codex-mobile-group-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--codex-space-2);
+    background: rgba(201, 185, 154, 0.05);
+  }
+  #mobile-menu .codex-mobile-group-list[hidden] {
+    display: none;
+  }
+  #mobile-menu .codex-mobile-group-list .codex-mobile-sublink a {
+    display: block;
+    padding: var(--codex-space-2-plus) var(--codex-space-4) var(--codex-space-2-plus) calc(var(--codex-space-4) + var(--codex-space-4));
+    font-size: var(--codex-text-sm);
+    color: inherit;
+    text-decoration: none;
+  }
+  #mobile-menu .codex-mobile-group-list .codex-mobile-sublink a:hover,
+  #mobile-menu .codex-mobile-group-list .codex-mobile-sublink a:focus-visible {
+    background: rgba(201, 185, 154, 0.12);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Codex Footer — unified single-layer footer
+   Brand row → 6-column nav → bottom strip
+   ═══════════════════════════════════════════ */
+
+.codex-footer {
+  background: var(--codex-dark, #291c0e);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* Hide any legacy footer chrome that survives the snapshot transform —
+   defensive belt-and-braces in case the JS removal misses an edge case. */
+.codex-footer ~ .site-bottom-footer-wrap,
+.site-footer-wrap > .site-bottom-footer-wrap {
+  display: none !important;
+}
+
+/* ── Brand row ── */
+.codex-footer-brand {
+  padding: var(--codex-space-10) var(--codex-space-5) var(--codex-space-7);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.codex-footer-brand__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--codex-space-8);
+}
+
+.codex-footer-brand__logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.codex-footer-brand__logo img {
+  height: 48px;
+  width: auto;
+  background: #fff;
+  padding: 6px 14px;
+  border-radius: 6px;
+  display: block;
+}
+
+.codex-footer-brand__tagline {
+  margin: 0;
+  font-size: var(--codex-text-sm);
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  max-width: 560px;
+}
+
+.codex-footer-brand__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 22px;
+  background: var(--codex-gold, #c39a5f);
+  color: var(--codex-text-strong, #1a1a1a) !important;
+  font-weight: var(--codex-weight-semibold, 600);
+  font-size: var(--codex-text-sm);
+  border-radius: 999px;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.codex-footer-brand__cta:hover,
+.codex-footer-brand__cta:focus {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 900px) {
+  .codex-footer-brand__inner {
+    grid-template-columns: 1fr;
+    text-align: left;
+    gap: var(--codex-space-5);
+  }
+  .codex-footer-brand__cta {
+    justify-self: start;
+  }
+}
+
+/* ── Nav grid ── */
+
+.codex-footer-nav {
+  padding: var(--codex-space-10) var(--codex-space-5) var(--codex-space-9);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.codex-footer-nav__inner {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--codex-space-8) var(--codex-space-7);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.codex-footer-nav__col {
+  min-width: 0;
+}
+
+.codex-footer-nav__heading {
+  margin: 0 0 var(--codex-space-3-plus);
+  font-family: var(--codex-font-heading, "Lora", serif);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--codex-gold, #c39a5f);
+}
+
+.codex-footer-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.codex-footer-nav__list > li {
+  list-style: none;
+  margin: 0 0 var(--codex-space-2);
+}
+
+.codex-footer-nav__list > li > a {
+  display: inline-block;
+  padding: var(--codex-space-0-5) 0;
+  font-size: var(--codex-text-sm);
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.78) !important;
+  text-decoration: none !important;
+  transition: color 160ms ease;
+}
+
+.codex-footer-nav__list > li > a:hover,
+.codex-footer-nav__list > li > a:focus {
+  color: var(--codex-gold, #c39a5f) !important;
+}
+
+@media (max-width: 1100px) {
+  .codex-footer-nav__inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .codex-footer-nav {
+    padding: var(--codex-space-8) var(--codex-space-5) var(--codex-space-5);
+  }
+  .codex-footer-nav__inner {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--codex-space-6);
+  }
+  .codex-footer-nav__heading {
+    font-size: var(--codex-text-xs-plus);
+    margin-bottom: var(--codex-space-2-plus);
+  }
+}
+
+/* ── Bottom strip: copyright + contact + social ── */
+
+.codex-footer-bottom {
+  padding: var(--codex-space-5) var(--codex-space-5);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.codex-footer-bottom__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--codex-space-4) var(--codex-space-6);
+  font-size: var(--codex-text-xs-plus);
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.codex-footer-bottom__copy {
+  flex: 0 1 auto;
+}
+
+.codex-footer-bottom__contact {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-2) var(--codex-space-5);
+}
+
+.codex-footer-bottom__contact > li {
+  list-style: none;
+  margin: 0;
+}
+
+.codex-footer-bottom__contact a {
+  color: rgba(255, 255, 255, 0.72) !important;
+  text-decoration: none !important;
+  transition: color 160ms ease;
+}
+
+.codex-footer-bottom__contact a:hover,
+.codex-footer-bottom__contact a:focus {
+  color: var(--codex-gold, #c39a5f) !important;
+}
+
+.codex-footer-bottom__social-row {
+  display: inline-flex;
+  gap: 10px;
+}
+
+.codex-footer-bottom__social {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.78) !important;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.codex-footer-bottom__social:hover,
+.codex-footer-bottom__social:focus {
+  background: var(--codex-gold, #c39a5f);
+  color: var(--codex-text-strong, #1a1a1a) !important;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 720px) {
+  .codex-footer-bottom__inner {
+    justify-content: flex-start;
+  }
+}
+

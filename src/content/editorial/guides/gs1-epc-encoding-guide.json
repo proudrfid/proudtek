@@ -3,10 +3,10 @@
   "group": "guides",
   "title": "GS1 EPC Encoding Guide — SGTIN-96, SSCC-96, GRAI-96, GIAI-96, SGLN-96 Schemes, Partition Tables, EPCIS Alignment and Factory Pre-Encoding Workflow",
   "kicker": "GS1 EPC Encoding Handbook",
-  "summary": "A buyer's and integrator's handbook for GS1 Electronic Product Code (EPC) encoding on UHF RFID tags. This page covers GS1 organization governance and Company Prefix acquisition, the Tag Data Standard (TDS) family of encoding schemes (SGTIN-96 for serialized GTINs, SSCC-96 for shipping container codes, GRAI-96 for returnable assets, GIAI-96 for fixed assets, SGLN-96 for location identifiers) the bit-level memory layout of the EPC memory bank, partition tables that map Company Prefix length to encoding width, filter-value semantics, alignment with EPCIS for event-driven supply-chain visibility, and the Proud Tek production-line pre-encoding workflow that delivers ready-to-apply GS1-compliant tags with per-tag TID-to-EPC mapping files.",
+  "summary": "A buyer's and integrator's handbook for GS1 Electronic Product Code (EPC) encoding on UHF RFID tags, current to GS1 TDS 2.3 (October 2025). This page covers GS1 organization governance and Company Prefix acquisition, the Tag Data Standard (TDS) family of encoding schemes (SGTIN-96 for serialized GTINs, SSCC-96 for shipping container codes, GRAI-96 for returnable assets, GIAI-96 for fixed assets, SGLN-96 for location identifiers, plus the TDS 2.x EPC+ inline-AIDC and DSGTIN+ date-prioritised additions), the bit-level memory layout of the EPC memory bank, partition tables that map Company Prefix length to encoding width, filter-value semantics, alignment with EPCIS 2.0 for event-driven supply-chain visibility, the new TDS 2.3 web-native encoding family that maps directly to GS1 Digital Link Web URIs, and the Proud Tek production-line pre-encoding workflow that delivers ready-to-apply GS1-compliant tags with per-tag TID-to-EPC mapping files.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-01-01",
-  "reviewedAt": "2026-01-02",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -18,12 +18,12 @@
     "EPCIS supply chain visibility"
   ],
   "heroPoints": [
-    "GS1 is the global data-standards body for trade identification. The Electronic Product Code (EPC) Tag Data Standard (TDS) is the GS1-maintained specification that governs how UHF RFID tags carry GS1 identification keys (GTIN, SSCC, GRAI, GIAI, SGLN). Every retailer mandate (Walmart, Target, Nordstrom, Macy's) and pharmaceutical serialization programme (DSCSA, EU FMD) references TDS-compliant encoding for cross-ecosystem readability.",
+    "GS1 is the global data-standards body for trade identification. The Electronic Product Code (EPC) Tag Data Standard (TDS) — current version TDS 2.3, ratified October 2025 — is the GS1-maintained specification that governs how UHF RFID tags carry GS1 identification keys (GTIN, SSCC, GRAI, GIAI, SGLN). Every retailer mandate (Walmart, Target, Nordstrom, Macy's) and pharmaceutical serialization programme (DSCSA, EU FMD) references TDS-compliant encoding for cross-ecosystem readability. TDS 2.3 specifically adds web-native encoding (domain-name-bearing EPC schemes that resolve directly to Web URIs) for EU Digital Product Passport and consumer-scan flows.",
     "Five major encoding schemes cover the common supply-chain use cases. SGTIN-96 serializes GTINs for item-level retail and pharmaceutical tracking; SSCC-96 identifies shipping containers and pallets for ASN reconciliation; GRAI-96 tracks returnable transport items like kegs, crates and pallets; GIAI-96 covers fixed assets like tools, equipment and vehicles; SGLN-96 identifies locations. The 96-bit EPC memory bank fits the serial number alongside the identification key for every scheme.",
     "Proud Tek pre-encodes at production scale. Our UHF encoding lines program your Company Prefix, partition value, filter value, GTIN/SSCC key and unique serial per tag during label manufacturing. Each tag is read-verified and shipped with a per-tag CSV/JSON file mapping TID (unique chip hardware ID) to encoded EPC to human-readable GTIN/serial for your WMS, EPCIS repository or ERP integration."
   ],
-  "imageAlt": "GS1 EPC SGTIN-96 SSCC-96 encoding structure showing Company Prefix GTIN serial and partition value bit layout",
-  "heroImage": "/landing-images/eu-compliance.jpg",
+  "imageAlt": "RFID asset label with GS1 EPC encoded data — SGTIN/SSCC reference",
+  "heroImage": "/landing-images/rfid-asset-label.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/uhf-rfid-inlay/",
     "/products/rfid-labels/impinj-m700-uhf-inlay/"
@@ -34,11 +34,11 @@
       "intro": "GS1 is the global non-profit standards body that maintains the barcode identification keys (GTIN, SSCC, GLN) used in every grocery, retail, pharmaceutical and logistics supply chain. The same identification keys are carried on UHF RFID tags using the EPC Tag Data Standard (TDS). Understanding GS1's governance, the Company Prefix allocation process and the TDS specification family is the prerequisite for any GS1-compliant RFID programme.",
       "bullets": [
         "GS1 global structure: GS1 is headquartered in Brussels and operates through 116 Member Organizations (MOs) covering individual countries or regions (GS1 US, GS1 UK, GS1 China, GS1 Germany, etc.). Each MO issues Company Prefixes to its members, maintains local support and runs regional compliance programmes. A Company Prefix obtained from GS1 US is globally valid; there is no need to register separately with other MOs.",
-        "GS1 Tag Data Standard (TDS). The TDS document, maintained by GS1 EPCglobal and regularly updated (currently TDS 2.1 with amendments), specifies how GS1 identification keys are encoded into binary strings stored in the EPC memory bank of a UHF RFID tag. TDS defines the encoding schemes (SGTIN-96, SSCC-96, GRAI-96, etc.), the partition tables that vary encoding width per Company Prefix length, the filter-value assignments and the URI mapping used for cross-system interchange.",
+        "GS1 Tag Data Standard (TDS). The TDS document, maintained by GS1 and regularly updated (current version TDS 2.3, ratified October 2025; superseding TDS 2.0 ratified 2017 and TDS 1.13 in the 1.x line), specifies how GS1 identification keys are encoded into binary strings stored in the EPC memory bank of a UHF RFID tag. TDS defines the encoding schemes (SGTIN-96/198, SSCC-96, GRAI-96/170, GIAI-96/202, GDTI-96/174, GSRN-96, CPI-96/var), the partition tables that vary encoding width per Company Prefix length, the filter-value assignments and the URI mapping used for cross-system interchange. TDS 2.3 (October 2025) introduces new EPC encoding schemes that accommodate domain-name information alongside the EPC, enabling direct decoding to a resolvable Web URI without requiring a separate GS1 Digital Link resolver lookup; TDS 2.x previously introduced 'EPC+' encoding for inline AIDC data and the date-prioritised DSGTIN+ scheme for perishable supply chains.",
         "Company Prefix acquisition (an organization joins its local GS1 MO by paying a one-time initial fee and annual renewal fee (varying by MO and company size) GS1 US starts around USD 250/year). The MO issues a Company Prefix consisting of a country-code indicator followed by a variable-length identifier (typically 7-10 digits) allocated to the organization for perpetuity (while dues are paid). The Company Prefix is the root from which all GTINs, SSCCs, GLNs and related identifiers are derived.",
         "GS1 identification keys: the GTIN (Global Trade Item Number, 8 / 12 / 13 / 14 digits) identifies a product type; the SSCC (Serial Shipping Container Code, 18 digits) identifies a specific logistics unit; the GLN (Global Location Number, 13 digits) identifies a physical or legal location; the GRAI identifies a returnable asset type and optional serial; the GIAI identifies an individual fixed asset; the SGLN extends the GLN with a sub-location extension.",
         "EPC 'serialized' forms: the base GS1 keys are product-level or location-level. The EPC Tag Data Standard defines serialized forms (SGTIN serializes GTIN, SGLN serializes GLN) that add an item-level serial number so each physical tag can be uniquely identified. Serialization is where EPC-on-RFID goes beyond what a printed barcode can do, and it is what makes item-level tracking in retail and pharmaceutical compliance possible.",
-        "TDS versioning and backward compatibility. TDS 1.x preceded TDS 2.0 (released 2017 with reorganized memory schemes and additional support for NRN / NHRN alternative schemes) and TDS 2.1 (current). New retailer mandates typically reference TDS 2.x; legacy deployments may reference TDS 1.11 or earlier. GS1 maintains backward compatibility for the widely deployed 96-bit schemes (SGTIN-96, SSCC-96, GRAI-96, GIAI-96, SGLN-96) across TDS revisions, so a tag encoded to TDS 1.11 SGTIN-96 is readable by TDS 2.1-compliant middleware."
+        "TDS versioning and backward compatibility. TDS 1.x (last release 1.13) preceded TDS 2.0 (released 2017 with reorganized memory schemes, EPC+ inline AIDC data and additional support for alternative GS1 keys), followed by TDS 2.1, TDS 2.2 and the current TDS 2.3 (October 2025). TDT (Tag Data Translation) follows in step (current TDT 2.2). New retailer mandates typically reference TDS 2.x; legacy deployments may reference TDS 1.11 or 1.13. GS1 maintains backward compatibility for the widely deployed 96-bit schemes (SGTIN-96, SSCC-96, GRAI-96, GIAI-96, SGLN-96) across TDS revisions, so a tag encoded to TDS 1.x SGTIN-96 is readable by TDS 2.x-compliant middleware. TDS 2.3 specifically targets web-native RAIN RFID by encoding domain-name information alongside the EPC, simplifying the consumer-scan-to-Digital-Product-Passport flow that the EU DPP regulation contemplates."
       ]
     },
     {
@@ -223,18 +223,29 @@
       "answer": "Choose sequential serials when: your programme prioritizes simplicity of database management; duplicate-detection logic relies on monotonic IDs; and you are not concerned about counterfeiters predicting next-likely serials. Choose randomized serials when: your programme includes anti-counterfeit / brand-protection objectives; you want to hide production-volume signals from outside observers; and your serialization database can handle non-monotonic IDs. Most Walmart / Target apparel programmes use randomized serials for brand-protection reasons. Most industrial asset programmes use sequential serials for operational simplicity. Pharmaceutical serialization programmes under DSCSA typically use randomized serials to defeat counterfeit prediction; EU FMD permits either. Proud Tek supports both strategies and can also accept a customer-supplied serial list for full control of serial allocation."
     },
     {
+      "question": "Does TDS 2.3 (October 2025) require new RFID hardware?",
+      "answer": "No. TDS 2.3 was specifically designed to be implementable on existing RAIN RFID readers, tags and platforms; it enhances interoperability and adds new web-native encoding options without mandating a hardware refresh. The headline TDS 2.3 addition is a family of EPC encoding schemes that carry domain-name information alongside the EPC, so a decoded tag URI resolves directly to a Web URI without a separate GS1 Digital Link resolver lookup — important for the EU Digital Product Passport workflow where consumer-scan-to-passport latency matters. TDS 2.3 sits on top of TDS 2.x's existing additions: EPC+ inline AIDC data (an alternative to User Memory for AIDC element strings, allowing inventory backscatter of the AIDC payload), the date-prioritised DSGTIN+ scheme for perishable supply chains, and improved alignment with GS1 element strings carried in 2D barcodes. EPC schemes defined in TDS 1.13 continue to be supported, so existing TDS 1.x deployments are not stranded. New encoding programmes in 2026 should plan to TDS 2.3 unless a specific retailer or trading partner mandates an earlier version."
+    },
+    {
       "question": "What data does Proud Tek provide after production to integrate with our WMS or EPCIS?",
       "answer": "Each production batch ships with a TID-to-EPC mapping file in CSV or JSON format, listing for every encoded tag: the TID (unique chip hardware identifier assigned by the chip manufacturer, 96-bit hex), the encoded EPC hex value, the decoded human-readable GTIN, decoded serial number, filter value, partition value, encoded User memory content (if any), and encoding-verification status. The file is structured for direct import into WMS systems, EPCIS repositories (as OBJECT-event captures), serialization management platforms (Tracelink, rfXcel, SAP ATTP) and ERP systems. For customers with specific import requirements (custom column names, EPCIS XML event format, trading-partner specific CSV layouts), we match the delivery format to the target system during the order setup phase."
     }
   ],
   "sources": [
     {
-      "label": "GS1 EPC Tag Data Standard (TDS) v2.0",
-      "url": "https://www.gs1.org/standards/rfid/tds",
+      "label": "GS1 EPC Tag Data Standard (TDS) v2.3 — current edition (October 2025)",
+      "url": "https://ref.gs1.org/standards/tds/2.3.0/",
       "publisher": "GS1",
-      "publishedAt": "2022-03-01",
-      "accessedAt": "2026-04-20",
-      "note": "The authoritative specification for encoding GS1 identification keys (SGTIN-96/198, SSCC-96, GRAI-96/170, GIAI-96/202, GDTI-96/174, GSRN-96, CPI-96/var) into the 96-bit / 128-bit / 496-bit EPC memory bank. Referenced throughout for header bytes, partition values, filter values and serial-number field widths."
+      "publishedAt": "2025-10-01",
+      "accessedAt": "2026-05-10",
+      "note": "Current authoritative specification for encoding GS1 identification keys (SGTIN-96/198, SSCC-96, GRAI-96/170, GIAI-96/202, GDTI-96/174, GSRN-96, CPI-96/var) into the 96-bit / 128-bit / 496-bit EPC memory bank, plus the new EPC+ schemes for inline AIDC data and DSGTIN+ for date-prioritised perishable-supply-chain encoding. TDS 2.3 (October 2025) introduces domain-name-bearing schemes for direct decoding to a resolvable Web URI. Referenced throughout for header bytes, partition values, filter values and serial-number field widths."
+    },
+    {
+      "label": "GS1 EPC Tag Data Standard (TDS) — landing page and version history",
+      "url": "https://www.gs1.org/standards/tds",
+      "publisher": "GS1",
+      "accessedAt": "2026-05-10",
+      "note": "GS1's official TDS overview page (also covering TDT, the Tag Data Translation companion). Confirms TDS 2.3 / TDT 2.2 as the latest standards as of October 2025, the EPC+ design rationale and the Packed Objects mechanism inherited from TDS 1.5 (2010) for User Memory encoding."
     },
     {
       "label": "GS1 EPC Tag Data Translation (TDT) v2.0",

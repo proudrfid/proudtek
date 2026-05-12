@@ -1,0 +1,305 @@
+/* ═══════════════════════════════════════════
+   Design Tokens
+   ═══════════════════════════════════════════ */
+:root {
+  --codex-dark: #291c0e;
+  --codex-dark-mid: #6c5127;
+  --codex-gold: var(--global-palette1, #c39a5f);
+  --codex-gold-muted: #6d5a3a;
+  --codex-text: var(--global-palette3, #291c0e);
+  --codex-text-muted: var(--global-palette4, #4f4f4f);
+  --codex-text-subtle: var(--global-palette5, #5c5c5c);
+  --codex-border: rgba(41, 28, 14, 0.12);
+  --codex-border-light: rgba(41, 28, 14, 0.08);
+  --codex-border-gold: rgba(195, 154, 95, 0.18);
+
+  /* Semantic page-type colors */
+  --codex-teal: #3d6b6b;
+  --codex-teal-light: rgba(61, 107, 107, 0.08);
+  --codex-teal-border: rgba(61, 107, 107, 0.18);
+  --codex-steel: #4a5568;
+  --codex-steel-light: rgba(74, 85, 104, 0.06);
+  --codex-forest: #2d6a4f;
+  --codex-forest-light: rgba(45, 106, 79, 0.07);
+  --codex-forest-border: rgba(45, 106, 79, 0.15);
+  --codex-radius-sm: 8px;
+  --codex-radius-card: 16px;
+  --codex-radius-card-lg: 20px;
+  --codex-radius-card-xl: 24px;
+  --codex-radius-pill: 999px;
+  /* DEPRECATED — DS-12 (2026-04-27, refined DS-12 #9).
+     New code should use --codex-elevation-* (defined below). 9 callsites
+     still consume these legacy tokens; per-site migration analysis is in
+     reports/ds-12-token-consolidation/SHADOW-MIGRATION-CHECKLIST.md.
+     Key findings (don't sweep without reading the checklist):
+
+     1. Six callsites pair --codex-shadow (rest) with --codex-shadow-light
+        (hover) to create a "press release" optical effect — button rises
+        with translateY(-1px) AND shadow lightens. The new elevation scale
+        uses the OPPOSITE convention (hover = heavier). Mechanically swapping
+        rest/hover to elevation-rest/elevation-hover would invert these
+        intentional designs.
+
+     2. Two prominent shells (.codex-editorial-hero, .codex-conversion-shell)
+        use --codex-shadow-heavy (0.08 alpha). The closest new tier is
+        --codex-elevation-modal (0.18 alpha) which is 2.25× heavier — meant
+        for floating modal UI, not in-flow hero cards. There's no "prominent
+        in-flow surface" tier between hover and modal.
+
+     Net: 5 callsites should stay on legacy, 2 need design review, 0 are
+     auto-migratable. New code on .codex-card / .codex-banner / .codex-disclosure
+     uses the elevation scale fine — the legacy retention is purely for these
+     specific intentional patterns. */
+  --codex-shadow: 0 12px 24px rgba(41, 28, 14, 0.14);
+  --codex-shadow-light: 0 12px 24px rgba(41, 28, 14, 0.08);
+  --codex-shadow-heavy: 0 16px 36px rgba(41, 28, 14, 0.08);
+  --codex-bg-warm: rgba(248, 246, 241, 0.92);
+  --codex-bg-warm-gradient: linear-gradient(180deg, rgba(248, 246, 241, 0.98), rgba(255, 255, 255, 0.98));
+  --codex-bg-card: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 246, 241, 0.92));
+  --codex-bg-hero: radial-gradient(circle at top right, var(--codex-border-gold), transparent 30%), var(--codex-bg-warm-gradient);
+  --codex-gradient-dark: linear-gradient(135deg, var(--codex-dark), var(--codex-dark-mid));
+  --codex-gradient-gold: linear-gradient(135deg, rgba(240, 205, 148, 0.96), rgba(195, 154, 95, 0.96));
+  --codex-gradient-gold-hover: linear-gradient(135deg, rgba(250, 230, 194, 0.98), rgba(210, 170, 108, 0.98));
+  --codex-transition: transform 160ms ease, box-shadow 160ms ease;
+  --codex-transition-fast: 160ms ease;
+  --codex-transition-normal: 250ms ease;
+
+  /* ─── Motion scale (DS-12 #1, 2026-04-27) ───
+     50+ rules currently spell out `var(--codex-motion-fast)`, 30+ spell out `var(--codex-motion-base)`, 10+
+     spell out `var(--codex-motion-slow)`. The named scale gives us a place to tune the
+     site's overall pace centrally — bumping --codex-motion-base by
+     20% would propagate across hover/focus animations everywhere. */
+  --codex-motion-instant: 80ms;        /* immediate feedback (toggle bg) */
+  --codex-motion-fast: 150ms;          /* standard hover/focus           */
+  --codex-motion-base: 200ms;          /* cards, button-press, panel     */
+  --codex-motion-slow: 400ms;          /* reveal, fade-in                */
+  --codex-motion-deliberate: 600ms;    /* page-level reveal, hero        */
+  --codex-easing-out: cubic-bezier(0.25, 1, 0.5, 1);
+  --codex-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --codex-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ─── Elevation scale (DS-12 #1) ───
+     Replaces 3 ad-hoc shadow tokens (--codex-shadow{,-light,-heavy}) with
+     a 5-level ladder. The ad-hoc tokens stay aliased to the new scale
+     for backward compat — opportunistic migration, no breaking change. */
+  --codex-elevation-flat: none;
+  --codex-elevation-rest: 0 1px 3px rgba(41, 28, 14, 0.08);
+  --codex-elevation-hover: 0 4px 12px rgba(41, 28, 14, 0.10);
+  --codex-elevation-sticky: 0 -4px 16px rgba(0, 0, 0, 0.10);
+  --codex-elevation-modal: 0 16px 48px rgba(41, 28, 14, 0.18);
+  /* ─── Status colors (DS-12 #1, 2026-04-27) ───
+     Reconciled to the AA-compliant values that DS-10 (compare-table glyph
+     pills) and DS-11 (RFQ form error states) shipped. Both pass WCAG 1.4.3
+     against white at small text:
+       --codex-success #1f6f3a  ≈ 5.46:1  (was #27ae60 @ 3.06:1, AA fail)
+       --codex-error   #8b2d2d  ≈ 7.59:1  (was #c0392b @ 5.13:1, AA pass)
+     The `-tint` variants are the soft-fill backgrounds used in glyph pills
+     and form error halos. */
+  --codex-error: #8b2d2d;
+  --codex-error-tint: rgba(139, 45, 45, 0.10);
+  --codex-success: #1f6f3a;
+  --codex-success-tint: rgba(31, 111, 58, 0.12);
+  --codex-warning: #b48a3a;            /* not yet in production; pre-allocated */
+
+  /* ─── Strong text (DS-12 #1) ───
+     The 13 fallbacks `var(--codex-text, #291c0e)` actually want a
+     near-black, not the warm brown #291c0e the dark token resolves to.
+     `text-strong` makes the intent explicit and lets us migrate those
+     callsites without changing the warm-brown text-default semantics. */
+  --codex-text-strong: #1a1a1a;
+
+  /* ─── Touch target floor (DS-12 #1) ───
+     WCAG 2.5.5 Target Size minimum. Used by the sticky-CTA dismiss,
+     rail close button, table cells, RFQ submit. */
+  --codex-touch-min: 44px;
+
+  /* ─── Gold variants (DS-12 #1) ───
+     The 11 fallbacks `var(--codex-gold, #c39a5f)` mismatched the token's
+     actual resolution (#c39a5f). #d4a755 was a brighter brand-yellow used
+     organically — promote it to a token instead of leaving it as drift. */
+  --codex-gold-light: #d4a755;          /* brighter accent, used in trust strip */
+
+  /* Focus ring tokens — DS-5, 2026-04-22 (WCAG 2.1 AA keyboard nav).
+     --codex-ring         : default ring on light / warm surfaces
+     --codex-ring-on-dark : high-contrast ring on dark / gold CTAs
+     --codex-ring-width   : ring thickness
+     --codex-ring-offset  : ring offset from element edge */
+  --codex-ring: var(--codex-gold, #c39a5f);
+  --codex-ring-on-dark: #ffffff;
+  --codex-ring-width: 2px;
+  --codex-ring-offset: 2px;
+  /* DS-12 #1 — error variant for invalid form states. Used by DS-11
+     RFQ inputs with [aria-invalid="true"]. Width / offset shared with
+     the default ring so the visual rhythm stays identical. */
+  --codex-ring-error: var(--codex-error, #8b2d2d);
+  --codex-ring-focus-glow: 0 0 0 3px rgba(195, 154, 95, 0.30);
+  --codex-ring-error-glow: 0 0 0 3px rgba(139, 45, 45, 0.30);
+
+  /* ─── Spacing scale (DS-6, 2026-04-22; -plus tiers added DS-8) ───
+     4px base, rem-denominated so it scales with root font-size.
+     The `-plus` tiers are half-step overrides that absorb organic
+     off-grid literals (0.3 / 0.35 / 0.4 / 0.45 rem etc.) — ≤0.05rem
+     (≤0.8px) of visual drift, which is imperceptible. */
+  --codex-space-0: 0;
+  --codex-space-0-5: 0.125rem;  /*  2px — hairline spacer           */
+  --codex-space-1: 0.25rem;     /*  4px — tight inline gap          */
+  --codex-space-1-plus: 0.4rem; /* ~6px — absorbs 0.3/0.35/0.4/0.45 */
+  --codex-space-2: 0.5rem;      /*  8px — small cell padding        */
+  --codex-space-2-plus: 0.65rem;/* ~10px — absorbs 0.55/0.65/0.7    */
+  --codex-space-3: 0.75rem;     /* 12px — default inline gap        */
+  --codex-space-3-plus: 0.85rem;/* ~14px — absorbs 0.85/0.9         */
+  --codex-space-4: 1rem;        /* 16px — standard block padding    */
+  --codex-space-4-plus: 1.15rem;/* ~18px — absorbs 1.1/1.15/1.2     */
+  --codex-space-5: 1.25rem;     /* 20px — card padding              */
+  --codex-space-6: 1.5rem;      /* 24px — section inner spacing     */
+  --codex-space-6-plus: 1.65rem;/* ~26px — rare intermediate        */
+  --codex-space-7: 1.75rem;     /* 28px                             */
+  --codex-space-8: 2rem;        /* 32px — section block spacing     */
+  --codex-space-9: 2.25rem;     /* 36px — between 8 and 10          */
+  --codex-space-10: 2.5rem;     /* 40px                             */
+  --codex-space-11: 2.75rem;    /* 44px — nav strip height          */
+  --codex-space-12: 3rem;       /* 48px — large block spacing       */
+  --codex-space-14: 3.5rem;     /* 56px                             */
+  --codex-space-16: 4rem;       /* 64px — hero / section gutter     */
+  --codex-space-20: 5rem;       /* 80px                             */
+
+  /* ─── Typography scale (DS-6; -plus tiers added DS-8) ───
+     Matches the existing cluster around 0.75 / 0.85 / 1 / 1.25 / 1.5 / 2 / 2.5rem.
+     The `-plus` half-step tiers absorb organic intermediate sizes
+     (0.78 / 0.8 / 0.82 / 0.88 / 0.9 / 0.92 / 0.95 / 1.05 / 1.1 / 1.35 /
+      1.4 / 1.7 / 1.75 / 1.8 rem) with ≤0.05rem drift. */
+  --codex-text-2xs: 0.7rem;      /* 11.2px — micro caption          */
+  --codex-text-xs: 0.75rem;      /* 12px   — meta / captions        */
+  --codex-text-xs-plus: 0.8rem;  /* 12.8px — absorbs 0.78/0.8/0.82  */
+  --codex-text-sm: 0.85rem;      /* 13.6px — secondary text         */
+  --codex-text-sm-plus: 0.9rem;  /* 14.4px — absorbs 0.88/0.9/0.92/0.95 */
+  --codex-text-base: 1rem;       /* 16px   — body                   */
+  --codex-text-base-plus: 1.1rem;/* 17.6px — absorbs 1.05/1.1       */
+  --codex-text-md: 1.125rem;     /* 18px   — lead body              */
+  --codex-text-md-plus: 1.15rem; /* 18.4px — rare between md and lg */
+  --codex-text-lg: 1.25rem;      /* 20px   — h4 / large link        */
+  --codex-text-lg-plus: 1.4rem;  /* 22.4px — absorbs 1.35/1.4       */
+  --codex-text-xl: 1.5rem;       /* 24px   — h3                     */
+  --codex-text-xl-plus: 1.75rem; /* 28px   — absorbs 1.7/1.75/1.8   */
+  --codex-text-2xl: 2rem;        /* 32px   — h2                     */
+  --codex-text-3xl: 2.5rem;      /* 40px   — h1 / hero              */
+
+  /* Line-height scale */
+  --codex-leading-tight: 1.2;
+  --codex-leading-snug: 1.35;
+  --codex-leading-normal: 1.5;
+  --codex-leading-relaxed: 1.65;
+
+  /* Font-weight scale */
+  --codex-weight-regular: 400;
+  --codex-weight-medium: 500;
+  --codex-weight-semibold: 600;
+  --codex-weight-bold: 700;
+  --codex-weight-extrabold: 800;
+
+  /* ─── Font family (DS-6) ───
+     --codex-font-heading was already referenced in 3 rules; define it
+     authoritatively and add a body pair for consistent fallback stacks. */
+  --codex-font-heading: "Lora", Georgia, "Times New Roman", serif;
+  --codex-font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --codex-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* ─── Z-index scale (DS-6, annotated DS-12 #8B 2026-04-27) ───
+     Originally 10 tiers replacing 14 scattered z-index integers. Audit found
+     the scale over-stratified — only 5 distinct stacking layers actually
+     matter on this site. New code should prefer the canonical 5:
+
+       --codex-z-base       0      Default flow
+       --codex-z-raised     1      In-card stacking (sticky thead, image overlays)
+       --codex-z-sticky     30     Site chrome (header, sticky nav)
+       --codex-z-dropdown   1000   Dropdowns + sticky CTA + masthead-level surfaces
+       --codex-z-modal      8000   Anything that should win over everything
+
+     The remaining 5 tiers (`surface`, `header`, `toast`, `tooltip`, `overlay`)
+     are kept for backward compat — existing consumers still work — but are
+     deprecation candidates. When touching a rule that uses one of them,
+     migrate to the canonical 5 above. Don't introduce new uses.
+
+     Aliases below mark intent: `--codex-z-toast` and `--codex-z-tooltip`
+     resolve to higher integer values today, but in practice they sit at
+     the same layer as `--codex-z-modal` (anything that needs to win over
+     the modal layer is rare; combine ordering by DOM source order
+     instead). `--codex-z-overlay` is the absolute escape hatch — only
+     use it if you genuinely need to outrank a modal. */
+  --codex-z-base: 0;
+  --codex-z-raised: 1;
+  --codex-z-surface: 2;       /* DEPRECATED — use --codex-z-raised */
+  --codex-z-sticky: 30;
+  --codex-z-header: 40;       /* DEPRECATED — use --codex-z-sticky */
+  --codex-z-dropdown: 1000;
+  --codex-z-modal: 8000;
+  --codex-z-toast: 9000;      /* DEPRECATED — use --codex-z-modal */
+  --codex-z-tooltip: 10000;   /* DEPRECATED — use --codex-z-modal */
+  --codex-z-overlay: 99999;
+
+  /* ─── Breakpoints (DS-6, documentation only) ───
+     CSS custom properties cannot be used inside @media queries directly,
+     so these are declared as reference values. Author-facing rule:
+     use --codex-bp-* names in comments next to @media declarations and
+     keep the literal numeric value in sync with the token. */
+  --codex-bp-sm: 480px;
+  --codex-bp-md: 768px;  /* canonical mobile/tablet breakpoint */
+  --codex-bp-lg: 1024px;
+  --codex-bp-xl: 1280px;
+}
+
+/* ═══════════════════════════════════════════
+   Global Accessibility
+   ═══════════════════════════════════════════ */
+
+/* C1: Focus indicators for keyboard navigation (tokenised DS-5 2026-04-22) */
+:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+}
+
+/* Reduced motion: disable all transitions and animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Defensive / Hardening Rules
+   ═══════════════════════════════════════════ */
+
+/* Prevent horizontal overflow without breaking `position: sticky`.
+   `overflow-x: hidden` on body (or html) turns that element into a scroll
+   container, which silently disables sticky positioning on its children
+   (the masthead never sticks because the viewport is no longer the
+   nearest scrolling ancestor). `overflow-x: clip` clips the same way but
+   does NOT establish a scroll container, so sticky keeps working.
+   Browser support for `clip`: Chrome 90+, Firefox 81+, Safari 16+. */
+body {
+  overflow-x: clip;
+  scroll-padding-bottom: 3.5rem;
+}
+
+/* Force font-display:swap on any @font-face loaded from snapshot */
+@font-face {
+  font-display: swap !important;
+}
+
+/* ═══════════════════════════════════════════
+   Kadence Row/Column Layout — rely on original Kadence CSS.
+   Kadence's own stylesheets (loaded from /site-assets/) set:
+     .kt-row-column-wrap { display: grid; grid-template-columns: minmax(0,1fr) }
+   and per-row inline <style> blocks emit desktop/tablet breakpoints:
+     @media (min-width: 1025px) { .kb-row-layout-id_XXX > .kt-row-column-wrap {
+       grid-template-columns: repeat(N, 1fr) } }
+   We intentionally DO NOT override these — earlier attempts to "polyfill"
+   with display:flex broke every multi-column row on the site. The only
+   additions we keep here are visual spacing between rows and a padding
+   reset for nested theme-content-width containers.
+   ═══════════════════════════════════════════ */
+.kb-row-layout-wrap { margin-bottom: 20px; }
+

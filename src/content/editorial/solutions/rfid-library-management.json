@@ -24,7 +24,7 @@
     "/products/rfid-labels/rfid-book-spine-label/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-04-26",
+  "modifiedAt": "2026-05-11",
   "brief": [
     {
       "label": "Library segment served",
@@ -249,6 +249,105 @@
           }
         ]
       }
+    },
+    {
+      "title": "ISO 28560 data model — Part 1/2/3 + chip silicon binding deep-dive",
+      "bullets": [
+        "ISO 28560-1:2014 — defines the data model for RFID in libraries; specifies the data elements (primary item identifier, owner library, etc.) + encoding rules. ANSI/NISO Z39.27-2011 superseded; libraries worldwide standardise on ISO 28560.",
+        "ISO 28560-2:2014 — defines the encoding rules for Block 0 + AFI (Application Family Identifier) + DSFID (Data Storage Format Identifier) on the ICODE SLIX chip; the EU + UK + APAC dominant implementation.",
+        "ISO 28560-3:2014 — defines an alternative encoding using fixed-length data elements; the North American dominant implementation (used by Bibliotheca, EnvisionWare, FE Tech 3M).",
+        "ISO 28560-4:2024 — newer multi-frequency profile allowing HF + UHF dual-frequency for special collection.",
+        "Data elements typically encoded — Primary Item Identifier (24 char barcode-equivalent), Owner Library (4-5 char), Title Identification, Set ID, Type of Usage, Shelf Location, ONIX media format, Library of Congress / Dewey classification mark, supplier identifier, language, country of publication.",
+        "AFI (Application Family Identifier) — 1-byte value indicating item is a library item; security-bit dual-state (sold/borrowed vs. on-shelf-not-sold); EAS gates check AFI before alarm. Standard library values 0x07, 0x08, 0x09, 0xC2.",
+        "DSFID (Data Storage Format Identifier) — 1-byte indicating ISO 28560 Part 2 or Part 3 encoding; allows multi-vendor interoperability.",
+        "Chip silicon — NXP ICODE SLIX (1024-bit user memory) + SLIX2 (2528-bit user memory + Privacy Mode + Originality Signature + tamper-detect) dominate; SLIX2 is the 2026 baseline for new deployments.",
+        "Privacy Mode (SLIX2) — when activated, chip stops responding to all but authorised reader using a Privacy Password; defends against patron-skimming attack outside the library; activated automatically at checkout, deactivated at return.",
+        "Originality Signature (SLIX2) — cryptographic ECC signature in chip ROM at manufacture; reader verifies signature to ensure chip is genuine NXP, not cloned cheap counterfeit.",
+        "Alternative chips — NXP NTAG 213/215/216 (NFC Type 2) used for media item + special collection where patron NFC-tap interaction is desired; lower capacity but smartphone-readable.",
+        "UHF library RFID — emerging trend at large academic + national libraries (British Library, Library of Congress) for fast inventory walking + shelf-density; uses Impinj M730 / NXP UCODE 9 or specialty paper-face inlays. Slower adoption than HF due to AFI ecosystem entrenchment.",
+        "Tag form factor — book spine label (most common, 50×50mm or 76×50mm), CD/DVD hub label (donut-shaped 35mm overlay), audiobook-pouch sticker (60×40mm), magazine inlay (50×80mm), special-collection card-mounted (rare books, manuscripts).",
+        "Encoding workflow — supplier delivers blank tags; library acquires Online Computer Library Center (OCLC) records + ILS catalogue; encoding station prints barcode + writes ISO 28560 data to AFI + DSFID + user memory; QC at 100% inline read verification."
+      ]
+    },
+    {
+      "title": "ILS / LSP integration — Sierra / Polaris / Symphony / Alma / Koha / WMS / Aleph",
+      "bullets": [
+        "Sierra (Innovative Interfaces) — US dominant ILS in public + academic libraries; predecessor Millennium remains in some installations. RFID integration via SIP2 (Standard Interchange Protocol 2) + NCIP (NISO Circulation Interchange Protocol). Most kiosk + sortation vendors certify Sierra integration.",
+        "Polaris (Innovative Interfaces, formerly III) — North American public library focus; SIP2 + NCIP standard; common in mid-large public library systems.",
+        "Symphony (SirsiDynix) — global public + academic; Symphony eResource Central + Mobile Circulation; SIP2 + NCIP.",
+        "BLUEcloud Suite (SirsiDynix) — modern web-based supplement layered atop Symphony; SIP3 + REST API for newer integrations.",
+        "Aleph (Ex Libris, part of Clarivate) — academic + research library; widespread in EU + APAC. SIP2 + NCIP + Aleph X-Server REST API. Common at British Library + multiple national libraries.",
+        "Alma (Ex Libris) — modern cloud-based Library Services Platform (LSP) replacing Aleph at many institutions; native REST API + RFID integration via NCIP + Alma Self-Service API. Common at US + EU + APAC academic.",
+        "Koha — open-source ILS, deployed worldwide; SIP2 + REST API; community-supported but also commercially supported by ByWater Solutions (US), PTFS Europe (UK), Catalyst IT (NZ), BibLibre (France).",
+        "Evergreen — open-source ILS, originated at Georgia PINES; SIP2 + REST API; community-supported.",
+        "WMS (OCLC WorldShare Management Services) — cloud-based LSP from OCLC; SIP2 + NCIP + REST API.",
+        "Folio (FOLIO project, Open Library Foundation) — open-source modern LSP; modular Microservices architecture; growing adoption in academic.",
+        "Library.Solution (TLC) — North American mid-market public library ILS; SIP2 + NCIP.",
+        "CARL.X (TLC) — North American mid-large public library.",
+        "Apollo (Biblionix) — small + rural public library; SIP2; cloud-based.",
+        "Auto-Graphics VERSO + Mandarin Library Automation M5 — additional ILS options for SMB + special libraries.",
+        "Integration pattern — RFID kiosk + sortation + handheld shelf-reader connects to ILS via SIP2 (TCP/IP socket) or NCIP (XML/HTTP); kiosk checks patron + item status, updates loan record, marks item returned, deactivates EAS gate AFI bit. SIP3 + REST API + EDS (Ex Libris) emerging as modern alternatives.",
+        "Discovery + patron-facing — Primo (Ex Libris), EBSCO Discovery Service, ProQuest Summon, OCLC WorldCat Discovery, BiblioCommons surface RFID-enabled self-service + place-hold workflows."
+      ]
+    },
+    {
+      "title": "Self-service kiosk + AMH (automated material handling) hardware",
+      "bullets": [
+        "Bibliotheca (Switzerland + global, owned by GreenLight Capital Partners) — largest global library RFID vendor; kiosk: SelfCheck 1000 + SmartServe 1000 + selfCheck 2200; AMH: smartReturn + smartSort; flowSort gantry; integrates with all major ILS.",
+        "EnvisionWare (US) — major US library RFID + kiosk vendor; PC reservation, print management, OneStop kiosk, FlexCheck, integrates with Sierra/Polaris/Symphony.",
+        "Tech Logic (US) — public library focus; circulation management + self-check + sorter; common in mid-large US public.",
+        "FE Tech / 3M Library — historical brand merged into Bibliotheca; legacy 3M Tattle-Tape EM detection vs RFID parallel installed base.",
+        "D-Tech (UK) — UK + EU public + academic library RFID; smartCheck kiosk + smartSort AMH.",
+        "P.V. Supa (Finland) — Nordic + Baltic + EU library vendor; OneStop kiosks; AMH common in Helsinki + Stockholm + Copenhagen public libraries.",
+        "Tagsys (France + global) — major library + retail RFID vendor; library AMH + reader portfolio.",
+        "Checkpoint Systems Library — RFID + EAS overlap for media security; legacy EM Tattle-Tape replacement.",
+        "Lyngsoe Systems (Denmark + global) — AMH + sortation specialist for medium-large libraries.",
+        "Vanderlande + Beumer Group — large-conveyor AMH for very large central libraries (e.g., NYC Public Library Stephen A. Schwarzman Building).",
+        "Kiosk hardware patterns — touchscreen interface 12-22 inch, barcode + RFID reader, payment module (cash + chip-card + Apple Pay / Google Pay), receipt printer, optional patron card reader (MIFARE Classic / DESFire student card OR proximity 125kHz library card), audio/video, accessibility features (ADA-compliant reach + height).",
+        "AMH workflow — patron returns book at outside return slot; book conveys to first RFID portal that identifies it; sortation gantry routes to correct bin (re-shelve / hold-shelf / inter-library loan / weed / repair); status updates ILS automatically.",
+        "Bin design — 4-15 bin sortation typical for medium library; 30+ bin for very large branch with multi-genre depth; ergonomic height + lighting + RFID-blocking dividers between bins.",
+        "Acoustic + lighting — modern AMH design avoids loud belts + bin slams; LED zone lighting on active bin; reduced patron noise complaints in public-facing areas.",
+        "Maintenance + reliability — typical kiosk MTBF 8,000-15,000 transactions between service calls; AMH MTBF 100K-500K items between service calls; quarterly preventive maintenance contract typical.",
+        "Procurement leverage — multi-branch standardised hardware spec yields 10-20% vs branch-by-branch procurement; multi-year maintenance contract another 10-15%; consortium-wide procurement (e.g., shared multi-county consortia) drives 20-30% volume discount."
+      ]
+    },
+    {
+      "title": "Privacy + ALA + RFID skim defence + ICODE SLIX2 Privacy Mode",
+      "bullets": [
+        "ALA (American Library Association) Library Bill of Rights + RFID in Libraries: Privacy and Confidentiality Guidelines (revised 2017) — ALA position is that patron privacy must be protected; library RFID systems must NOT broadcast patron identity, reading history or item metadata outside the library.",
+        "Key ALA principles — no patron data on the tag (item ID only, encoded against library catalogue); secure between tag-reader-ILS (kiosk reads tag, queries ILS server-side); privacy notice + retention policy; opt-out path for sensitive item categories.",
+        "NISO RP-6-2012 — Recommended Practice for RFID in U.S. Libraries; covers data model + privacy + EAS gate + interoperability.",
+        "ICODE SLIX2 Privacy Mode — Patron checks out book → kiosk activates Privacy Mode using random Privacy Password → chip stops responding to read commands → patron carries book home with chip unreadable by outside parties → at return, kiosk deactivates Privacy Mode → chip becomes readable again. Defends against patron-skimming attack outside the library.",
+        "Originality Signature — chip-attestation that prevents counterfeit tag substitution; relevant for high-value rare books + special collection.",
+        "AFI security bit — separate from Privacy Mode; toggles between 'sold' (no alarm) and 'on-shelf' (gate alarm); fast verification at EAS gate without reading user memory.",
+        "Reader sensitivity range tuning — kiosk + gate readers tuned to library RF environment to minimise unintended pickup; gates set to ~30-50cm range so a book inside a backpack at 1m doesn't accidentally alarm.",
+        "Data minimisation — item-level data on tag is minimised to barcode + owner library + AFI + DSFID + minimal classification; full bibliographic + circulation history kept server-side in ILS.",
+        "GDPR + CCPA — patron data subject access + erasure rights apply; ILS retention policy must support both. EU library systems (Alma, Aleph, Koha-EU) include native GDPR-mode patron-data export + erasure.",
+        "FERPA (US, education) — academic libraries with student-linked reading history must satisfy FERPA records-protection; library-school information-sharing tightly controlled.",
+        "Children's library + COPPA — under-13 patron RFID systems must satisfy COPPA verifiable parental consent for any data collection beyond the minimum-necessary for circulation.",
+        "Patron threat model — librarian shoulder-surfing (trivial without RFID), patron-to-patron book-content disclosure (skim attack), state-actor surveillance of library reading (rare but documented, e.g., USA PATRIOT Act Section 215 historical concerns); ALA + EFF + ACLU positions stress strong privacy posture.",
+        "Practical 2026 — most US + EU public libraries operate ALA + NISO compliant RFID with SLIX2 Privacy Mode; academic libraries occasionally deploy weaker defaults given researcher access pattern; rare-book + manuscript collections add cryptographic NTAG 424 DNA SUN per-tap verification for forensic provenance."
+      ]
+    },
+    {
+      "title": "Programme economics + TCO — per-branch + consortium-scale",
+      "bullets": [
+        "Tag cost — library book spine label $0.10-$0.30 at 50K+ qty (ICODE SLIX2); CD/DVD donut overlay $0.15-$0.40; thicker hub label $0.30-$0.60; rare-book card-mount $0.50-$2.00.",
+        "Tagging labour — bulk-tagging existing collection $0.25-$0.80 per book depending on tagging-station efficiency + ILS integration; outsourced tagging service $0.50-$1.50 per book at scale.",
+        "Self-check kiosk — $8K-$25K per unit installed (touchscreen + RFID reader + barcode + receipt printer + payment + cabinetry); 1 kiosk serves 200-400 patrons/day capacity.",
+        "AMH / sortation — $50K-$300K per unit installed depending on bin count + throughput; common for medium-large public library main branch; payback on staff-time savings 24-48 months.",
+        "EAS gate — $4K-$12K per gate pair (RFID-AFI based); shoplifting / book-theft loss reduction 60-80% post-deployment.",
+        "Handheld shelf-reader — $1,500-$3,500 per unit; enables annual inventory walk in 2-4 weeks vs 6-12 months manual baseline.",
+        "Software + integration — ILS RFID middleware $20K-$80K one-time + $5K-$20K/year maintenance; SIP2 + NCIP gateway $10K-$30K; reader management $15K-$40K.",
+        "Mid-size public library (50K collection, 3 branches, 100K annual circulation) — Y1 capex: 50K tags × $0.20 = $10K; tagging labour 50K × $0.50 = $25K; 3 self-check kiosks × $15K = $45K; 3 EAS gates × $8K = $24K; AMH at 1 branch $120K; handheld × 2 = $5K; integration + software $50K. Y1 total ~$280K. Y2+ recurring: tag-replacement (1-3% damaged) 1K × $0.20 = $200; maintenance $15K; software $10K.",
+        "Large public library (500K collection, 15 branches, 1.5M annual circulation) — Y1 capex: 500K tags × $0.15 = $75K; tagging labour 500K × $0.40 = $200K; 30 kiosks × $15K = $450K; 15 EAS × $8K = $120K; AMH at 5 branches × $200K = $1M; handheld × 10 = $25K; integration + software $200K. Y1 total ~$2.07M. Y2+ recurring ~$80K.",
+        "Academic university library (1-3M collection, 1-3 branches) — Y1 capex $1.5M-$5M depending on coverage; large special-collection adds $200K-$500K rare-book NTAG 424 DNA tier.",
+        "National library (10M+ collection) — Y1 capex $10M-$50M for full RFID + AMH + EAS; multi-year phased rollout typical (British Library, Library of Congress, BNF France).",
+        "Quantified savings — circulation staff reallocation 30-50% from check-in/out to patron service / programming; inventory accuracy from ~85% to >99% reduces unfindable items + collection-replacement spend; theft reduction 60-80% cuts collection-replacement budget by similar; patron satisfaction lift drives 15-30% circulation volume increase (more circulation = more usage-funding from per-circulation state aid in some jurisdictions).",
+        "Funding sources — IMLS (Institute of Museum and Library Services) grants, LSTA (Library Services and Technology Act), state library agency grants, county / city capital budget, library foundation private giving, friends-of-library campaigns, vendor financing.",
+        "Consortium leverage — multi-library consortia (CALIFA, SCELC, OhioNet, Amigos Library Services, Lyrasis) drive 20-40% volume discounts; shared infrastructure (consortium-wide ILS, shared discovery layer) further reduces per-library cost.",
+        "Replacement cycle — kiosk 7-10 year refresh; EAS gate 10-15 year; AMH 10-15 year; handheld 4-6 year; tag-replacement 1-3% per year ongoing."
+      ]
     }
   ],
   "resourceCards": [
@@ -283,6 +382,22 @@
     {
       "question": "Can RFID replace the barcode on library items?",
       "answer": "RFID supplements barcodes rather than fully replacing them. Most libraries retain a visible barcode as a backup identification method and for compatibility with older equipment. The RFID tag adds automated self-service, security, and rapid inventory capabilities that barcodes alone cannot provide. The barcode number is typically encoded into the RFID tag memory for cross-referencing."
+    },
+    {
+      "question": "ISO 28560 Part 2 vs Part 3 — which encoding should we use?",
+      "answer": "Depends on geographic + vendor ecosystem. ISO 28560-2:2014 (variable-length DDM encoding) dominates in EU + UK + APAC libraries; ISO 28560-3:2014 (fixed-length encoding) dominates in North America via Bibliotheca + EnvisionWare + FE Tech (formerly 3M Library). Both use the same ICODE SLIX2 chip; the difference is how data elements are laid out in chip memory. The kiosk + gate + handheld reader must be configured for the correct encoding to interoperate with the ILS. For new deployments, follow your kiosk vendor's recommended ISO 28560 part — most vendors support both with a configuration flag. Consortia operating across regions sometimes adopt both encodings with vendor-supplied bilingual readers. AFI + DSFID bytes encode which Part is in use so multi-vendor readers can adapt dynamically."
+    },
+    {
+      "question": "How does RFID integrate with our existing ILS — Sierra / Symphony / Alma / Koha?",
+      "answer": "All major ILS / LSP platforms integrate via SIP2 (Standard Interchange Protocol 2, NISO Z39.83) or NCIP (NISO Circulation Interchange Protocol). Sierra + Polaris (Innovative Interfaces) + Symphony + BLUEcloud Suite (SirsiDynix) + Aleph + Alma (Ex Libris) + Koha (open-source, ByWater / PTFS Europe / Catalyst IT support) + Evergreen + WMS (OCLC) + Library.Solution + CARL.X (TLC) + Apollo (Biblionix) + Folio + Auto-Graphics VERSO all support SIP2 + most support NCIP. The RFID kiosk sends an SIP2 request to the ILS via TCP/IP socket; the ILS authenticates the patron + verifies item status + returns OK/deny + the kiosk updates the AFI security bit on the tag. Sophisticated integrations also use REST API (Alma + Folio + WMS) for richer status + holds + reservations + payment. Most kiosk vendors (Bibliotheca + EnvisionWare + Tech Logic + D-Tech + P.V. Supa) certify against the major ILS platforms; multi-vendor consortia may require additional integration testing."
+    },
+    {
+      "question": "What does the AMH (automated material handling) workflow look like?",
+      "answer": "AMH automates the book-return + sortation process. Patron returns book at an external return slot 24/7; the book conveys past an RFID portal that identifies it; a sortation gantry routes it to the correct bin (re-shelve / hold-shelf / inter-library loan / weed / repair); the ILS status updates automatically (item returned, available, hold-fill, transit, etc.). Bin design typically 4-15 bins for medium library, 30+ for large branches with multi-genre depth. Major AMH vendors: Bibliotheca smartReturn + smartSort + flowSort; Tech Logic; FE Tech; D-Tech; P.V. Supa OneStop; Lyngsoe Systems; Vanderlande + Beumer Group (for very large central libraries like NYC Public Library Stephen A. Schwarzman Building). MTBF typically 100K-500K items between service calls; preventive maintenance contract typical. AMH typically reduces check-in staff time 60-80% and enables 24/7 return acceptance — a significant patron service improvement."
+    },
+    {
+      "question": "How does SLIX2 Privacy Mode protect patrons?",
+      "answer": "Privacy Mode is an ICODE SLIX2-specific feature where the chip can be cryptographically suspended from responding to read commands. Workflow: at checkout, the kiosk activates Privacy Mode using a random Privacy Password; the chip stops responding to all readers until deactivated. The patron carries the book home; outside parties attempting to skim the chip get no response. At return, the kiosk deactivates Privacy Mode using the same password; the chip becomes readable again for circulation + EAS gate + inventory. This defends against the 'patron-skimming' threat where a hostile party with a covert reader attempts to identify what books a patron is reading. Combined with ALA Library Bill of Rights data-minimisation (no patron name on tag, only item ID against the catalogue) and NISO RP-6-2012 + originality signature verification, SLIX2 Privacy Mode is the strongest patron-privacy posture available in 2026 library RFID."
     }
   ],
   "sources": [
@@ -291,7 +406,7 @@
       "url": "https://www.iso.org/standard/65203.html",
       "publisher": "ISO",
       "publishedAt": "2014-04",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Library RFID data-model standard used by RFID library-management systems — defines 27 mandatory + optional data elements."
     },
     {
@@ -299,7 +414,7 @@
       "url": "https://www.iso.org/standard/65204.html",
       "publisher": "ISO",
       "publishedAt": "2014-04",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "HF library-tag encoding standard used across public, academic and school libraries — most common encoding for ICODE SLIX2."
     },
     {
@@ -307,7 +422,7 @@
       "url": "https://www.iso.org/standard/39694.html",
       "publisher": "ISO",
       "publishedAt": "2009",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "HF vicinity air-interface used by library book, media and patron cards."
     },
     {
@@ -315,7 +430,7 @@
       "url": "https://www.niso.org/publications/rp-6-2012-rfid-libraries",
       "publisher": "National Information Standards Organization",
       "publishedAt": "2012",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Recommended practice for RFID in US libraries covering data models, privacy, EAS migration."
     },
     {
@@ -323,7 +438,7 @@
       "url": "https://www.ala.org/advocacy/intfreedom/librarybill/interpretations/privacy",
       "publisher": "American Library Association",
       "publishedAt": "2019",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Library privacy principles informing RFID patron-card and loan-record design."
     },
     {
@@ -331,7 +446,7 @@
       "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/icode/icode-slix2:SL2S2602",
       "publisher": "NXP Semiconductors",
       "publishedAt": "2018",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Widely deployed HF library-tag silicon compatible with ISO 28560-based systems — 256-byte memory + AFI security bit + PrivacyMode."
     },
     {
@@ -339,7 +454,7 @@
       "url": "https://www.bibliotheca.com/solutions/rfid/",
       "publisher": "Bibliotheca",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Reference vendor for turnkey RFID library-management platforms — SmartServe self-checkout, smartFlow sorter, smartGate."
     },
     {
@@ -347,7 +462,7 @@
       "url": "https://www.iso.org/standard/75885.html",
       "publisher": "ISO",
       "publishedAt": "2019",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Library identifier standard used alongside ISO 28560 data models in RFID library-management systems."
     },
     {
@@ -355,7 +470,7 @@
       "url": "https://www.niso.org/standards-committees/ncip",
       "publisher": "National Information Standards Organization",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Library circulation-protocol standards used by RFID self-checkout kiosks + sortation systems integrating with ILS / LSP."
     },
     {
@@ -363,8 +478,88 @@
       "url": "https://exlibrisgroup.com/products/alma-library-services-platform/",
       "publisher": "Clarivate (Ex Libris)",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Dominant academic library services platform consuming RFID circulation events via SIP2 / NCIP from kiosk + sortation hardware."
+    },
+    {
+      "label": "Innovative Interfaces — Sierra + Polaris ILS",
+      "url": "https://www.iii.com/",
+      "publisher": "Innovative Interfaces, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "US dominant public + academic ILS; SIP2 + NCIP RFID integration with kiosk + sortation vendors."
+    },
+    {
+      "label": "SirsiDynix — Symphony + BLUEcloud Suite ILS",
+      "url": "https://www.sirsidynix.com/",
+      "publisher": "SirsiDynix",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Global public + academic ILS with native RFID integration via SIP2 + NCIP + SIP3 / REST API."
+    },
+    {
+      "label": "Koha — Open Source Integrated Library System",
+      "url": "https://koha-community.org/",
+      "publisher": "Koha Community",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Open-source ILS deployed worldwide with commercial support from ByWater Solutions (US), PTFS Europe (UK), Catalyst IT (NZ), BibLibre (France)."
+    },
+    {
+      "label": "ALA — RFID in Libraries: Privacy and Confidentiality Guidelines",
+      "url": "https://www.ala.org/advocacy/privacyconfidentiality/privacy/rfid",
+      "publisher": "American Library Association",
+      "publishedAt": "2017",
+      "accessedAt": "2026-05-11",
+      "note": "ALA position on patron privacy in library RFID systems; foundational reference for ICODE SLIX2 Privacy Mode + data minimisation + NISO RP-6-2012 alignment."
+    },
+    {
+      "label": "EnvisionWare — library self-service + kiosk + AMH",
+      "url": "https://www.envisionware.com/",
+      "publisher": "EnvisionWare, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Major US library RFID + kiosk vendor; PC reservation, OneStop kiosk, FlexCheck self-check, integrates with major ILS."
+    },
+    {
+      "label": "ISO 28560-3:2014 — RFID in libraries — Part 3: Fixed-length encoding",
+      "url": "https://www.iso.org/standard/65003.html",
+      "publisher": "ISO",
+      "publishedAt": "2014",
+      "accessedAt": "2026-05-11",
+      "note": "Fixed-length encoding rules dominant in North American library RFID via Bibliotheca + EnvisionWare + FE Tech (formerly 3M Library)."
+    },
+    {
+      "label": "ISO 28560-4:2024 — RFID in libraries — Part 4: Multi-frequency profile",
+      "url": "https://www.iso.org/standard/82912.html",
+      "publisher": "ISO",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Newer multi-frequency profile allowing HF + UHF dual-frequency for special collection + large academic + national library use cases."
+    },
+    {
+      "label": "OCLC WorldShare Management Services (WMS)",
+      "url": "https://www.oclc.org/en/wms.html",
+      "publisher": "OCLC",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Cloud-based Library Services Platform integrating with RFID circulation via SIP2 + NCIP + REST API."
+    },
+    {
+      "label": "IMLS — Institute of Museum and Library Services grants",
+      "url": "https://www.imls.gov/grants",
+      "publisher": "Institute of Museum and Library Services",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "US federal funding source for library RFID + AMH + kiosk programmes; LSTA + State Library Agency grants flow through IMLS."
+    },
+    {
+      "label": "Bibliotheca smartReturn + smartSort + flowSort AMH",
+      "url": "https://www.bibliotheca.com/automation-and-sorting/",
+      "publisher": "Bibliotheca",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Major library AMH portfolio with 4-30+ bin sortation; reference deployment at major US + EU public libraries."
     }
   ],
   "primaryAction": {
@@ -383,5 +578,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-26"
+  "reviewedAt": "2026-05-11"
 }

@@ -1,15 +1,33 @@
 ---
 import SnapshotLayout from "../layouts/SnapshotLayout.astro";
+import EditorialPageLayout from "../layouts/EditorialPageLayout.astro";
 import { getPageByRoute, getSiteData, routeToParam, type SnapshotPage } from "../lib/site-data";
 import { LOW_VALUE_ROUTE_PREFIXES } from "../lib/route-overrides";
+import { COMPARE_CATEGORIES } from "../data/compare-categories";
 
 export async function getStaticPaths() {
+  // Routes owned by native .astro hubs — exclude from the WP-snapshot static
+  // path generator so Astro doesn't error on duplicate static paths. Each
+  // entry here must have a corresponding file under src/pages/. Defined
+  // inside getStaticPaths so Astro reliably bundles it into the prerender
+  // chunk (module-level locals are sometimes dropped during chunk extraction).
+  const NATIVE_HUB_ROUTES = new Set<string>([
+    "/blog/",          // src/pages/blog/index.astro
+    "/guides/",        // src/pages/guides/index.astro
+    "/compare/",       // src/pages/compare/index.astro
+    "/compatibility/", // src/pages/compatibility/index.astro
+    // src/pages/compare/[category].astro generates /compare/{id}/ for each
+    // entry in COMPARE_CATEGORIES — fold those in here too:
+    ...COMPARE_CATEGORIES.map((c) => `/compare/${c.id}/`),
+  ]);
+
   const siteData = await getSiteData();
 
   return siteData.pages
     .filter(
       (page) =>
         page.route !== "/" &&
+        !NATIVE_HUB_ROUTES.has(page.route) &&
         !LOW_VALUE_ROUTE_PREFIXES.some((prefix) => page.route.startsWith(prefix)) &&
         !page.route.endsWith("/page/1/"),
     )
@@ -25,6 +43,99 @@ const page = (await getPageByRoute(route)) as SnapshotPage | undefined;
 if (!page) {
   throw new Error(`Missing snapshot for route ${route}. Run \`npm run fetch\` first.`);
 }
+
+/**
+ * Stage 3 cutover env-flag dispatch.
+ *
+ * `USE_EDITORIAL_COMPONENTS=1 npm run build` opts into the shadow-component
+ * rendering path (`EditorialPageLayout` → `<EditorialArticle>`). Default
+ * (flag absent) keeps the legacy `SnapshotLayout` path — production
+ * behavior is unchanged.
+ *
+ * `STAGE3_ROUTE_PREFIXES` further restricts which routes the flag affects.
+ * The progressive rollout pattern (per the cutover memo):
+ *
+ *   Phase A — initial diff verification:
+ *     Leave the array EMPTY (current state). Flag flips ALL editorial
+ *     pages; `npm run stage3:diff -- /<group>/` reports per-route status
+ *     across the full editorial surface. Don't deploy with the flag on
+ *     during this phase.
+ *
+ *   Phase B — staged production rollout:
+ *     After `stage3:diff -- /<group>/` reports PASS (all normalized-equal,
+ *     no REAL DIFFs), add that prefix to the array below WITH the verify
+ *     date + reviewer name. Deploy with the flag on; only routes in this
+ *     array switch to the new path. Bake in for ~1 week per group before
+ *     adding the next prefix.
+ *
+ *   Phase C — cutover complete:
+ *     When every editorial route group has been added to the array AND
+ *     baked in cleanly, switch the dispatch to "all editorial pages flip
+ *     by default" by removing the array entirely. Then delete the
+ *     renderEditorialMain() pipeline in editorial-pages.ts.
+ *
+ * Pair this dispatch with `npm run stage3:diff -- <route-prefix>` (compares
+ * baseline vs flag-on dist output). See
+ * docs/architecture/editorial-stage-3-cutover-memo.md for the full playbook.
+ */
+const STAGE3_ROUTE_PREFIXES: readonly string[] = [
+  "/lp/",        // verified 2026-05-12 (stage3:diff PASS, 16 pages normalized-equal)
+  "/research/",  // verified 2026-05-12 post-sprint-1 (stage3:diff PASS, 2 pages BYTE-IDENTICAL)
+  "/guides/",    // verified 2026-05-12 post-timestamp-rule (stage3:diff PASS, 57 pages: 8 byte-identical + 49 normalized-equal, 0 REAL DIFF)
+  "/blog/",      // verified 2026-05-12 (stage3:diff PASS, 126 pages: 1 byte-identical + 125 normalized-equal, 0 REAL DIFF)
+  "/compare/",   // verified 2026-05-12 (stage3:diff PASS, 35 pages: 7 byte-identical + 28 normalized-equal, 0 REAL DIFF)
+  "/compatibility/", // verified 2026-05-12 (stage3:diff PASS, 8 pages: 1 byte-identical + 7 normalized-equal, 0 REAL DIFF — Sprint 2 wasn't needed for this group after all)
+  "/industries/", // verified 2026-05-12 (stage3:diff PASS, 21 pages all normalized-equal, 0 REAL DIFF)
+  "/solutions/",  // verified 2026-05-12 (stage3:diff PASS, 38 pages all normalized-equal, 0 REAL DIFF)
+  // 🎯 ALL 8 route groups now verified: lp / research / guides / blog / compare /
+  // compatibility / industries / solutions. Total 303 pages, 0 REAL DIFF.
+  // Sprint 2 (renderArticleSupportBlock retrofit) turned out to be unnecessary —
+  // either the conversion-shell append's output falls inside the regex-split
+  // <main> boundary and is preserved verbatim, or it doesn't fire for these
+  // groups at all. Either way, the shadow tree achieves full normalize-parity
+  // with the legacy + cheerio pipeline.
+  //
+  // Next phases per the cutover memo:
+  //   - flag-on deploy + 7-day bake-in (Lighthouse / Search Console watch)
+  //   - if clean: switch to "all editorial pages flip by default" — remove
+  //     STAGE3_ROUTE_PREFIXES filter entirely (array becomes [] or this
+  //     dispatch goes away)
+  //   - delete renderEditorialMain() + sub-renderers in editorial-pages.ts
+  //     (~1500 lines), delete _stage3/lp-experiment.astro
+  // `stage3:diff -- all` on 2026-05-12 surfaced 315 REAL DIFFs in rail/hub
+  // routes (industries / solutions / resources / etc). Root cause was
+  // normalize-body.ts post-processing that the regex-split in
+  // EditorialPageLayout was throwing away (mutations INSIDE <main>).
+  // Sprint 1 (2026-05-12) retrofitted 3 of those mutations directly into
+  // the shadow components:
+  //   - resolveArticleInquiryAction → ActionBar (secondary actions only —
+  //     primary is buildIntentHref-tagged so cheerio never matched it),
+  //     Trail, DecisionSnapshot
+  //   - injectContextualLinks → EditorialArticle pre-processes the page's
+  //     hero summary + each section's intro/paragraphs/callout.text
+  //     through preProcessContextualLinks
+  //   - PAGE_IMAGE_OVERRIDES alt → EditorialHero, EditorialFigure
+  // 2026-05-12 follow-up: `/guides/` cutover surfaced one more gap —
+  // `canonicalizeBuildTimestamps` only matched `datetime="…"`, missing the
+  // ISO timestamps inside JSON-LD `datePublished` / `dateModified` /
+  // `lastReviewed` and inside `<meta property="article:*_time">`. Rule was
+  // broadened to match any ISO 8601 timestamp with millisecond fraction
+  // (the `new Date().toISOString()` signature). 223/223 vitest still green.
+  // Sprint 2 (deferred) will add renderArticleSupportBlock + the bullets/
+  // checklist contextual-link slots before tackling `/industries/`,
+  // `/solutions/`, `/compatibility/` which fire the conversion-shell append.
+  // Suggested next group: `/blog/`.
+];
+
+const flagOn = import.meta.env.USE_EDITORIAL_COMPONENTS === "1";
+const routeAllowed =
+  STAGE3_ROUTE_PREFIXES.length === 0 ||
+  STAGE3_ROUTE_PREFIXES.some((prefix) => page.route.startsWith(prefix));
+
+const useEditorialComponents =
+  flagOn && routeAllowed && page.editorialDefinition !== undefined;
 ---
 
-<SnapshotLayout page={page} />
+{useEditorialComponents
+  ? <EditorialPageLayout page={page} />
+  : <SnapshotLayout page={page} />}

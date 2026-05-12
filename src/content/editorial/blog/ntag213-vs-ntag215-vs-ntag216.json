@@ -9,22 +9,22 @@
     "Choosing the smallest chip that fits your data payload reduces unit cost by 15-30 percent at volume without sacrificing performance.",
     "All three chips support password-protected memory access, but only NTAG213 and NTAG216 include an originality signature for anti-counterfeiting."
   ],
-  "heroImage": "/landing-images/ntag215-nfc-sticker.jpg",
-  "imageAlt": "Three NFC tags showing NTAG213, NTAG215 and NTAG216 chip variants",
+  "heroImage": "/blog-images/ntag213-vs-ntag215-vs-ntag216.jpg",
+  "imageAlt": "Three blank tags side by side — the visual analogue for comparing NTAG213, NTAG215 and NTAG216 chip variants.",
   "imageSourceRoutes": [
     "/product/nfc-stickers/",
     "/product/nfc-cards/"
   ],
   "sections": [
     {
-      "title": "NTAG21x family overview",
+      "title": "What do NTAG213, NTAG215 and NTAG216 share?",
       "intro": "NXP's NTAG21x series is the industry standard for consumer-facing NFC applications. All three variants operate at 13.56 MHz, comply with ISO 14443-3A and NFC Forum Type 2 Tag specifications, and are supported by every NFC-enabled smartphone without custom drivers or apps.",
       "image": {
         "src": "/blog-images/nfc-chip.jpg",
         "alt": "NXP NTAG NFC chip close-up on an antenna inlay"
       },
       "paragraphs": [
-        "The chips share the same die architecture. The primary difference is EEPROM memory size. This means RF performance, power harvesting and communication protocol are identical across the family. A reader or phone that works with NTAG213 will also work with NTAG215 and NTAG216 without any firmware changes."
+        "The chips share the same die architecture. The primary difference is EEPROM memory size. This means RF performance, power harvesting and communication protocol are identical across the family. A reader or phone that works with NTAG213 will also work with NTAG215 and NTAG216 without any firmware changes. For a register-level reference, see the [NTAG21x family memory map and command set](/guides/ntag21x-family-memory-map-commands/)."
       ],
       "bullets": [
         "All NTAG21x chips use a 7-byte UID that is factory-programmed and unique, enabling per-tag identification.",
@@ -34,7 +34,7 @@
       ]
     },
     {
-      "title": "Detailed specification comparison",
+      "title": "How do NTAG213, NTAG215 and NTAG216 differ in specs?",
       "intro": "The following table compares every specification that differs between the three chips. All other parameters (frequency, protocol, modulation, UID length) are identical.",
       "table": {
         "columns": [
@@ -102,11 +102,11 @@
       }
     },
     {
-      "title": "Use case guidance by chip",
+      "title": "Which NTAG chip should you choose?",
       "intro": "Selecting the right chip comes down to matching your data payload size and security requirements to the chip's capabilities. Overspending on memory you will not use inflates project costs without benefit.",
       "bullets": [
         "NTAG213 — Best for single-URL applications: marketing tap links, Google review cards, Wi-Fi provisioning tags, simple vCard records. Covers 80+ percent of NFC marketing use cases.",
-        "NTAG215 — Best for applications requiring 150-500 bytes of data: multi-record NDEF messages, longer vCards with photos, game figure authentication (e.g., amiibo). Also suitable when you want a cost buffer for future payload expansion.",
+        "NTAG215 — Best for applications requiring 150-500 bytes of data: multi-record NDEF messages, longer vCards with photos, game figure authentication (e.g., the [amiibo standard from Nintendo](https://en.wikipedia.org/wiki/Amiibo)). Also suitable when you want a cost buffer for future payload expansion.",
         "NTAG216 — Best for complex payloads: full vCard with multiple phone numbers and addresses, multi-language NDEF records, combined URL + text + AAR records. Also preferred when originality signature verification is needed alongside large payloads."
       ],
       "paragraphs": [
@@ -119,13 +119,35 @@
       }
     },
     {
-      "title": "Security features and anti-counterfeiting",
+      "title": "How secure are NTAG21x chips against cloning?",
       "intro": "All NTAG21x chips offer password-protected memory access, but the originality signature feature is only available on NTAG213 and NTAG216. This distinction matters for product authentication and anti-counterfeiting applications.",
       "bullets": [
         "The 32-bit password and 16-bit PACK (password acknowledgment) mechanism protects memory pages from unauthorized writes. This prevents tag content from being overwritten after deployment.",
-        "The originality signature is a factory-programmed elliptic curve cryptography (ECC) signature that proves the tag is a genuine NXP product. The public key for verification is published by NXP.",
+        "The originality signature is a factory-programmed elliptic curve cryptography (ECC) signature that proves the tag is a genuine NXP product. The public key for verification is published in the [official NXP NTAG213/215/216 datasheet](https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf).",
         "NTAG215 lacks the originality signature, making it unsuitable for applications where chip authenticity must be cryptographically verified.",
-        "For high-security anti-counterfeiting, consider NTAG424 DNA instead, which provides AES-128 mutual authentication and tamper-evident features beyond what any NTAG21x chip offers."
+        "For high-security anti-counterfeiting, consider [NTAG424 DNA SUN/CMAC authentication](/guides/ntag424-dna-sun-cmac-authentication/) instead, which provides AES-128 mutual authentication and tamper-evident features beyond what any NTAG21x chip offers — see also our [DESFire EV1 vs EV2 vs EV3 comparison](/blog/desfire-ev1-vs-ev2-vs-ev3/) for higher-end secure chips."
+      ]
+    },
+    {
+      "title": "Where do NTAG21x chips fit (and not fit) in the broader NFC chip landscape?",
+      "intro": "NTAG21x is the volume default for consumer-facing NFC, but procurement teams should know exactly when to step up to a higher-spec part. The distinctions below come up in nearly every B2B chip-selection meeting.",
+      "bullets": [
+        "Higher security tier — NTAG 424 DNA: AES-128 SUN/CMAC rolling code, tamper-evident TT variant, ~416 bytes user memory. Pick this when anti-counterfeit, EU DPP authenticity, or repeated tap analytics matter. Costs ~$0.15-0.40 vs NTAG21x's $0.04-0.15. NTAG 424 DNA is the answer for luxury, premium spirits, pharma — NTAG21x is the answer for marketing taps and Wi-Fi handover.",
+        "Higher memory + multi-app tier — MIFARE DESFire EV2/EV3: 2-8 KB user memory, AES-128 / 3DES mutual auth, multiple app keys. Pick this for transit, employee badges with multiple credentials on one chip, building access plus payment. Far more expensive ($0.40-1.50) — over-spec for marketing.",
+        "Higher range tier — NXP ICODE SLI / SLIX (ISO 15693): 13.56 MHz vicinity tags read at up to ~1.5 m by industrial readers. NTAG21x is proximity (≤10 cm) only. Pick ICODE for library books, light asset tracking. Smartphone support for ICODE is narrower than for NTAG21x.",
+        "Cheaper tier — none meaningful in NFC. Below NTAG213 there are licence-restricted Type 1 (Topaz) chips and aggressive copies; in practice NTAG213 is already the cost floor for legitimate, smartphone-readable inlays. Resist the temptation to spec a generic 'Mifare-compatible' chip without naming the SKU.",
+        "Adjacent — UHF RFID (EPC Gen2v2 / RAIN): different frequency (860-960 MHz), no smartphone support, but enables warehouse dock-door reads and combo NFC + UHF inlays. For consumer tap, NTAG21x. For warehouse + consumer on one tag, dual-frequency NTAG + UCODE inlays from Avery Dennison Smartrac, Identiv or Beontag."
+      ]
+    },
+    {
+      "title": "How do NTAG213/215/216 perform in real-world physical conditions?",
+      "intro": "Datasheets show ideal-condition specs. The deployment-condition factors below are what actually determines whether a 10K-unit batch reads reliably in the field — and where most procurement disappointment originates.",
+      "bullets": [
+        "Antenna size dominates range, not chip variant. A 25 mm circular antenna gets ~2-3 cm with iPhone; a 50 mm antenna gets ~4-7 cm. Switching from NTAG213 to NTAG216 will not improve range — same RF interface, same power harvesting.",
+        "On-metal performance: NTAG21x inlays placed directly on metal surfaces (laptops, kitchen appliances, refrigerators, foil packaging) lose 80-100% of read range. Spec ferrite-backed (anti-metal) NTAG21x inlays or place a 1-2 mm spacer.",
+        "Liquid attenuation: tags placed on plastic bottles read at reduced range vs cardboard packaging because water in the bottle absorbs the 13.56 MHz field. For wine/spirits, mount tags under capsule or behind back label, not directly over liquid.",
+        "Industrial laundry and washing: standard NTAG21x inlays do not survive 60 °C+ industrial wash cycles or dry-cleaning solvents. For sewn-in textile NFC, spec laundry-rated PPS (polyphenylene sulfide) shell variants — typically NTAG213 or NTAG424 DNA in a sealed PPS housing.",
+        "Temperature range: NTAG21x operating temperature is typically -25 to +85 °C, storage to +125 °C. Outside this (battery cells, automotive under-hood) you need ceramic-substrate or AEC-Q200 automotive parts — NTAG21x is not the right family. Standard inlays survive 10+ years at typical indoor / cellar conditions."
       ]
     }
   ],
@@ -155,6 +177,16 @@
         {
           "href": "/product/nfc-business-card/",
           "label": "NFC business cards"
+        },
+        {
+          "href": "https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf",
+          "label": "NXP NTAG213/215/216 datasheet (PDF)",
+          "description": "Authoritative NXP datasheet covering memory map, password protection, originality signature and timing."
+        },
+        {
+          "href": "https://nfc-forum.org/our-work/specifications-and-application-documents/specifications/tag-type-technical-specifications/",
+          "label": "NFC Forum Type 2 Tag specification",
+          "description": "Official NFC Forum Type 2 specification that NTAG21x implements."
         }
       ]
     }
@@ -175,10 +207,18 @@
     {
       "question": "Can I password-protect an NTAG213 tag to prevent overwriting?",
       "answer": "Yes. All NTAG21x chips support a 32-bit password that can protect any range of memory pages from write access, read access or both. Set the password using a desktop NFC reader and a writing tool such as NFC TagWriter or TagXplorer."
+    },
+    {
+      "question": "Should I use NTAG21x or NTAG 424 DNA for my use case?",
+      "answer": "Decision rule of thumb: pick NTAG21x for any open-payload consumer engagement (URL taps, Wi-Fi handover, vCard, marketing campaigns, smart posters) — its low cost ($0.04-0.15 per inlay) and universal smartphone support are unbeatable. Pick NTAG 424 DNA when (1) the value of the underlying product justifies anti-counterfeit chip cost (~$0.15-0.40), (2) you need rolling-code authentication that defeats UID cloning, (3) you must satisfy EU DPP authenticity requirements (luxury, premium spirits, electronics, batteries), or (4) you want per-tap analytics with replay protection. Plain NTAG21x's 32-bit password is brute-forceable in seconds; for any anti-counterfeit application the right answer is NTAG 424 DNA, not a password-protected NTAG213."
+    },
+    {
+      "question": "How does the NTAG21x originality signature actually prevent cloning?",
+      "answer": "The originality signature is a 32-byte ECC (NIST P-128 / secp128r1) signature that NXP burns into the chip at manufacture. The signing key is held by NXP; the public key for verification is published in the NXP NTAG213/215/216 datasheet. A reader can request the signature and verify it against the public key plus the chip UID — proving the chip was made in an NXP fab. This stops counterfeiters from selling chips with the NXP name on a fake die, but it does not stop UID-level cloning attacks (because the signature signs the UID, not a per-tap challenge). For full anti-clone protection you need NTAG 424 DNA's rolling SUN/CMAC, which signs each tap with a fresh challenge that a cloned chip cannot reproduce. Note also that NTAG215 lacks the originality signature feature — only NTAG213 and NTAG216 carry it."
     }
   ],
   "primaryAction": {
-    "href": "/contact/nfc-chips/",
+    "href": "/contact/custom-rfid-cards/",
     "label": "Get chip selection guidance"
   },
   "secondaryActions": [
@@ -193,5 +233,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2025-11-09"
+  "reviewedAt": "2026-05-09"
 }

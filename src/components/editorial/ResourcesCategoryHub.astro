@@ -1,0 +1,81 @@
+---
+/**
+ * Resources hub category grid — one article per top-level resource group
+ * (Blog / Buying Guides / Comparisons / Compatibility).
+ *
+ * Shadow component (Stage 3.x). Mirrors `renderResourcesCategoryHub(groups,
+ * sectionLabel)` in editorial-pages.ts (~line 1452).
+ *
+ * Per-group `itemNoun` and `blurb` are hardcoded by `groupSlug` ("blog" →
+ * "articles" / industry-articles blurb, etc.). Each card shows the first 4
+ * sample items + a "Browse all N" CTA pointing at `/{groupSlug}/`.
+ */
+import type { GroupedHubData } from "../../lib/editorial-pages";
+import { getIcon } from "../../lib/icons";
+
+interface Props {
+  groups: GroupedHubData;
+  sectionLabel: string;
+}
+
+const { groups, sectionLabel } = Astro.props;
+const totalItems = groups.reduce((sum, g) => sum + g.items.length, 0);
+const lowerSection = sectionLabel.toLowerCase();
+const sectionId = `${lowerSection.replace(/[^a-z0-9]+/g, "-")}-hub-grid`;
+const nonEmptyGroups = groups.filter((g) => g.items.length > 0);
+
+function nounFor(groupSlug: string): string {
+  switch (groupSlug) {
+    case "blog": return "articles";
+    case "guides": return "guides";
+    case "compare": return "comparisons";
+    default: return "compatibility pages";
+  }
+}
+
+function blurbFor(groupSlug: string): string {
+  switch (groupSlug) {
+    case "blog":    return "Industry articles, deployment notes and field reports — written for buyers and integrators in the field.";
+    case "guides":  return "Long-form technical reference: protocol internals, chip family encyclopedias, integration walkthroughs, regulatory deep-dives.";
+    case "compare": return "Side-by-side picker pages: chip vs chip, frequency band vs band, form-factor vs form-factor — for buyers narrowing a shortlist.";
+    default:        return "Vendor lock cross-reference: which RFID/NFC card encodes for which OEM lock estate, with chip family + sample-request notes.";
+  }
+}
+---
+{totalItems > 0 && (
+  <section
+    class="codex-editorial-section codex-resources-category-hub"
+    id={sectionId}
+    aria-label="Resource categories"
+  >
+    <h2>Browse the {nonEmptyGroups.length} resource categories</h2>
+    <p class="codex-editorial-section-intro">{totalItems} resources across four categories. Pick the one that matches where you are in the buying cycle — read the blog for field stories, guides for technical depth, comparisons for shortlisting, compatibility for vendor lock-in checks.</p>
+    <div class="codex-resources-category-hub__grid">
+      {nonEmptyGroups.map((group) => {
+        const groupId = `${sectionId}-${group.groupSlug}`;
+        const browseHref = `/${group.groupSlug}/`;
+        const itemNoun = nounFor(group.groupSlug);
+        const blurb = blurbFor(group.groupSlug);
+        const sampleItems = group.items.slice(0, 4);
+        return (
+          <article class="codex-card codex-resources-category-card" id={groupId}>
+            <header class="codex-resources-category-card__header">
+              <span class="codex-resources-category-card__emoji codex-icon" aria-hidden="true" set:html={getIcon(group.iconSlug)} />
+              <div class="codex-resources-category-card__heading">
+                <h3 class="codex-resources-category-card__title">{group.groupLabel}</h3>
+                <p class="codex-resources-category-card__count">{group.items.length}{" "}{itemNoun}</p>
+              </div>
+            </header>
+            <p class="codex-resources-category-card__summary">{blurb}</p>
+            <ul class="codex-resources-category-card__samples" aria-label={`Sample ${itemNoun}`}>
+              {sampleItems.map((entry) => (
+                <li><a href={entry.route}>{entry.label}</a></li>
+              ))}
+            </ul>
+            <a class="codex-resources-category-card__cta" href={browseHref}>Browse all {group.items.length}{" "}{itemNoun}{" "}<span aria-hidden="true">→</span></a>
+          </article>
+        );
+      })}
+    </div>
+  </section>
+)}

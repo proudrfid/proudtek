@@ -1,15 +1,21 @@
 ---
 /**
- * On-page anchor navigation.
- * Replaces renderJumpNav() from editorial-pages.ts.
+ * "On this page" jump-link navigation.
+ *
+ * Shadow component (Stage 2). Mirrors `renderJumpNav(links)` in
+ * editorial-pages.ts (~line 1755). Renders nothing when links is empty.
  */
+interface JumpLink {
+  id: string;
+  label: string;
+}
+
 interface Props {
-  links: Array<{ id: string; label: string }>;
+  links: JumpLink[];
 }
 
 const { links } = Astro.props;
 ---
-
 {links.length > 0 && (
   <nav class="codex-editorial-jump-nav" aria-label="On this page">
     <p class="codex-editorial-kicker">On this page</p>

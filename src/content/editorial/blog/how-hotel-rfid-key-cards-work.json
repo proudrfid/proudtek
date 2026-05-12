@@ -39,12 +39,12 @@
       }
     },
     {
-      "title": "Chip families used in hotel key cards",
+      "title": "Which chip families are used in hotel key cards?",
       "intro": "Three NXP MIFARE chip families dominate the hotel lock market. Each operates at 13.56 MHz (HF) and conforms to ISO 14443 Type A, but they differ in memory layout, encryption strength and lock-system support.",
       "bullets": [
-        "MIFARE Classic 1K — 1 KB EEPROM, Crypto-1 encryption. Still the most widely deployed hotel key card chip globally due to massive installed lock bases from Saflok, Onity and older VingCard systems.",
+        "[MIFARE Classic 1K](/guides/mifare-classic-1k-4k-chip-encyclopedia/) — 1 KB EEPROM, Crypto-1 encryption. Still the most widely deployed hotel key card chip globally due to massive installed lock bases from Saflok, Onity and older VingCard systems.",
         "MIFARE Plus EV2 — Drop-in Classic replacement with AES-128 encryption. Properties can operate it in Classic-compatible mode during migration, then switch sectors to AES once locks are updated.",
-        "MIFARE DESFire EV3 — 2-8 KB flexible file system, AES-128 with secure messaging. Required by newer ASSA ABLOY and SALTO platforms and preferred for properties that also run cashless payment or spa-access applications on the same card."
+        "[MIFARE DESFire EV3](/guides/mifare-desfire-ev3-commands-reference/) — 2-8 KB flexible file system, AES-128 with secure messaging. Required by newer ASSA ABLOY and SALTO platforms and preferred for properties that also run cashless payment or spa-access applications on the same card."
       ],
       "table": {
         "columns": [
@@ -94,7 +94,7 @@
       }
     },
     {
-      "title": "Encoding process and front-desk workflow",
+      "title": "How do encoding process and front-desk workflows work?",
       "intro": "Hotel key card encoding is the step where a blank or recycled RFID card is written with room-number, check-in/out time and access-zone data by the Property Management System (PMS) through a desktop encoder.",
       "image": {
         "src": "/blog-images/encoding.jpg",
@@ -111,7 +111,7 @@
       ]
     },
     {
-      "title": "Lock compatibility considerations",
+      "title": "What lock compatibility considerations apply?",
       "intro": "The single most important factor in hotel key card procurement is confirming chip-to-lock compatibility before committing to volume production. A visually perfect card with the wrong chip family will not open the door.",
       "bullets": [
         "Always identify the lock brand, model and firmware version before selecting a chip. Legacy Saflok RT locks use Classic 1K; newer Saflok Quantum supports DESFire.",
@@ -127,7 +127,7 @@
       }
     },
     {
-      "title": "Card lifecycle and replacement planning",
+      "title": "How do you handle card lifecycle and replacement planning?",
       "intro": "Understanding how long RFID hotel key cards last in service helps procurement teams set reorder points, budget annual card spend and evaluate premium versus standard materials.",
       "bullets": [
         "Standard 0.76 mm PVC RFID cards survive 6-18 months of daily guest use before visible wear affects brand perception.",
@@ -135,6 +135,29 @@
         "Eco cards made from PLA or recycled PVC match standard PVC durability while supporting sustainability programs.",
         "Card attrition rate (guests keeping cards as souvenirs or losing them) is typically 15-30 % of issued cards per year at full-service hotels.",
         "Reorder lead time from a manufacturer like Proud Tek is usually 10-15 business days for standard PVC and 15-20 days for premium materials."
+      ]
+    },
+    {
+      "title": "What happens at the moment the lock reads the card",
+      "intro": "Most hotel RFID coverage glosses over the actual radio handshake. Knowing what happens in the 200-500 ms between tap and unlock helps engineering and IT teams diagnose intermittent failures and select the right diagnostic tools. This is the textbook ISO/IEC 14443 Type A sequence used by every MIFARE-based hotel lock.",
+      "bullets": [
+        "Field activation (0-50 ms): the lock's antenna emits a 13.56 MHz unmodulated carrier. When a card enters the field (typically within 1-4 cm), the chip rectifies the carrier into 3.3V DC and powers up. No card battery required — the chip is energy-harvesting.",
+        "Anti-collision (50-150 ms): the lock issues a REQA (request type A) command. All cards in the field reply simultaneously. The lock walks the UID bit-tree to isolate one card at a time — this is why two cards in the same wallet sometimes both fail. ISO 14443-3 anti-collision typically resolves 1-2 cards reliably; 3+ cards may exceed the lock's resolution window.",
+        "Selection and ATS (150-200 ms): the lock sends SELECT with the chosen UID; the card replies with its ATS (Answer To Select) frame announcing supported protocol and chip family. The lock now knows whether it is talking to Classic, Plus, DESFire or another type.",
+        "Mutual authentication (200-400 ms): for Classic cards, a 3-pass Crypto-1 challenge-response (broken since 2008). For DESFire EV2/EV3, a 3-pass AES-128 challenge-response that derives a session key. The lock cannot read access data without authenticating first.",
+        "Read access data and validate (400-450 ms): the lock reads the encoded room number, check-in/out timestamp and access flags, decrypts them with the session key and compares them against the lock's local SAM. If valid, the lock fires the bolt motor.",
+        "Diagnostics: the entire transaction can be captured with a Proxmark3 (RDV4) or NFC sniffer for forensic analysis when intermittent failures surface. Engineering teams investigating chronic complaints should know this tool exists; vendor service tickets can be much shorter when accompanied by a captured RF transcript."
+      ]
+    },
+    {
+      "title": "How do RFID cards coexist with mobile key (BLE and NFC wallet)?",
+      "intro": "Industry digital-key adoption sits at roughly 14% across major chains after a decade of investment by Hilton, Marriott and IHG. Physical RFID cards remain the default for the other 86% of stays, and every chain offering mobile key still issues physical cards as backup. Procurement teams need to plan for both rails — not pick a winner.",
+      "bullets": [
+        "BLE app keys (Hilton Honors, Marriott Bonvoy, IHG One Rewards): the lock listens for a credentialed phone within ~3-10 m range over Bluetooth Low Energy. Activation requires the brand's app installed and the reservation linked. Hilton alone has cumulatively recorded 135M+ door openings via BLE — at scale, but still single-digit percent of total daily openings system-wide.",
+        "NFC wallet keys (Apple Wallet, Google Wallet): a tap-to-unlock model that does not require the brand's standalone app. Club Quarters became the first chain to deploy Apple Wallet + Google Wallet keys at all locations in January 2025. Adoption is climbing fastest in this format because it removes the app-install friction.",
+        "Why physical cards still win the default slot: backup for lost phones / dead batteries (40-50% of stays will request a card even when offered mobile), accessibility for older guests, regulatory environments where guest IDs cannot be transmitted electronically, and the fact that 100% of properties already have physical lock readers while only 60-70% have mobile-key-enabled lock firmware.",
+        "Card-and-mobile coexistence at the lock: ASSA ABLOY Visionline, Salto XS4 2.0 and dormakaba Saflok Quantum all run dual-credential firmware that accepts physical card and mobile key on the same lock. Lock firmware revision matters — confirm with your vendor that your lock generation supports both before specifying mobile-key-capable cards.",
+        "DESFire EV3 specifically supports NFC Forum Type 4 framing required by Apple/Google Wallet provisioning. Properties planning a wallet-key rollout should specify EV3 (not EV2 or Classic) for the physical-card stock as well, so card and mobile credentials live on the same cryptographic standard."
       ]
     }
   ],
@@ -154,6 +177,20 @@
         {
           "href": "/product/mifare-desfire-cards/",
           "label": "MIFARE DESFire cards"
+        }
+      ]
+    },
+    {
+      "title": "Standards and protocol references",
+      "description": "Authoritative sources for the contactless air interface and anti-collision behavior covered above.",
+      "links": [
+        {
+          "href": "https://www.iso.org/standard/73599.html",
+          "label": "ISO/IEC 14443 contactless smart card standard"
+        },
+        {
+          "href": "https://nfc-forum.org/specifications-and-application-documents/",
+          "label": "NFC Forum specifications"
         }
       ]
     },
@@ -196,6 +233,18 @@
     {
       "question": "How should we store blank RFID key card stock?",
       "answer": "Store cards in a cool, dry environment between 5 and 35 degrees Celsius, away from direct sunlight and strong RF or magnetic fields. Keep cards in their original sealed packaging until needed. Shelf life for unprinted RFID inlays is typically 5-10 years when stored properly."
+    },
+    {
+      "question": "What read range can I expect from a hotel RFID card and what affects it?",
+      "answer": "13.56 MHz HF cards (MIFARE Classic, Plus, DESFire) are designed for 1-4 cm read range — the lock must magnetically couple with the card's antenna coil at very short range. This is by design: longer ranges would create cross-room interference and security risk. Range is reduced by metal kick-plates behind the reader, low lock battery, antenna detuning from card-on-card stacking, and the card being inside a metal-foil-lined wallet. Range can be slightly extended by using a larger antenna footprint card (CR80 vs key-fob), but not beyond ~5 cm without changing the lock's reader. If guests complain about needing to hold the card 'just right', the cause is almost always lock-side (antenna housing or battery), not the card."
+    },
+    {
+      "question": "What happens if I tap a wallet with multiple RFID cards on a hotel lock?",
+      "answer": "ISO 14443-3 anti-collision reliably resolves 1-2 contactless cards in the lock's field; with 3+ cards stacked, the lock's resolution window may not isolate a single UID and the read fails silently. You will often see the lock LED stay off (no read at all) or flash red briefly. The fix is simple: hold only the hotel keycard against the reader, or carry the keycard in a separate pocket. For property design, lock vendors recommend not enabling 'tap-with-wallet' marketing language because the failure mode looks like a card-fault but is actually anti-collision noise. If a guest insists on wallet-tap, ASSA ABLOY Vingcard and Salto firmware offer a 'first-card-wins' mode that picks the strongest signal and ignores others; ask your lock vendor whether your firmware supports it."
+    },
+    {
+      "question": "Are RFID hotel cards subject to any specific industry standards beyond ISO 14443?",
+      "answer": "Yes. The most-cited standards in hotel RFID procurement are ISO/IEC 14443 (contactless card air interface), ISO/IEC 7810 (physical card dimensions), ISO/IEC 7816 (contact chip interface for dual-interface cards), NFC Forum Type 2/Type 4 (when mobile-phone read compatibility is required), and Common Criteria EAL5+ (chip-level security certification, which DESFire EV3 holds). Brand security audits at Marriott, Hilton, IHG and Hyatt increasingly reference EAL5+ as the minimum chip-security tier. AHLA cybersecurity guidance also references PCI-DSS (when cards interact with cashless POS) and GDPR (for EU-property guest data on the card)."
     }
   ],
   "primaryAction": {
@@ -218,5 +267,5 @@
   ],
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-02-22"
+  "reviewedAt": "2026-05-10"
 }

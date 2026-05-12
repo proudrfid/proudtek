@@ -1,11 +1,22 @@
 ---
 /**
- * "At a glance" decision snapshot card grid.
- * Replaces renderDecisionSnapshot() from editorial-pages.ts.
+ * "At a glance" decision snapshot — 3-card grid at the top of editorial body.
+ *
+ * Shadow component (Stage 2). Mirrors `renderDecisionSnapshot(definition, id)`
+ * in editorial-pages.ts (~line 1768).
+ *
+ * Card data is built by `buildDecisionSnapshotCards()` which has group-
+ * specific branching (compare group uses table + decision sections; others
+ * use brief fields + sections). That logic stays in editorial-pages.ts; this
+ * component is just rendering.
+ *
+ * Extra brief fields (beyond the first 2 already in cards) render as a
+ * supplementary `<dl>` below the card grid.
  */
-import type { EditorialDefinition, EditorialLink, EditorialBriefField } from "../../lib/editorial-types";
-import { summarizeBriefField, summarizeSection, truncateEditorialText } from "../../lib/editorial-types";
 import BriefField from "./BriefField.astro";
+import type { EditorialDefinition } from "../../lib/editorial-types";
+import { buildDecisionSnapshotCards } from "../../lib/editorial-pages";
+import { rewriteContactHref } from "../../lib/editorial-shadow-normalizers";
 
 interface Props {
   definition: EditorialDefinition;
@@ -13,81 +24,27 @@ interface Props {
 }
 
 const { definition, id } = Astro.props;
-
-// Build decision snapshot cards
-interface SnapshotCard { label: string; text: string; link?: EditorialLink }
-
-function buildCards(): SnapshotCard[] {
-  if (definition.group === "compare") {
-    return buildComparisonCards();
-  }
-
-  const cards: SnapshotCard[] = [];
-  const primaryField = definition.brief?.[0];
-  const secondaryField = definition.brief?.[1];
-  const secondarySection = definition.sections[0];
-
-  if (primaryField) {
-    cards.push({ label: primaryField.label, text: summarizeBriefField(primaryField) });
-  } else if (definition.heroPoints[0]) {
-    cards.push({ label: "Key takeaway", text: definition.heroPoints[0] });
-  }
-
-  if (secondaryField) {
-    cards.push({ label: secondaryField.label, text: summarizeBriefField(secondaryField) });
-  } else if (secondarySection) {
-    cards.push({ label: secondarySection.title, text: summarizeSection(secondarySection) });
-  }
-
-  cards.push({
-    label: "Next step",
-    text: "Ready to move forward? Start your inquiry to get specific answers for this project.",
-    link: definition.primaryAction,
-  });
-
-  return cards.slice(0, 3);
-}
-
-function buildComparisonCards(): SnapshotCard[] {
-  const decisionTable = definition.sections.find((section) => Boolean(section.table))?.table;
-  const decidingSection = definition.sections.find((section) => /decides/i.test(section.title));
-  const confirmSection = definition.sections.find((section) => /confirm/i.test(section.title));
-  const cards: SnapshotCard[] = [];
-
-  if (decisionTable && decisionTable.rows.length > 0) {
-    const [firstRow] = decisionTable.rows;
-    cards.push({
-      label: "Best-fit option",
-      text: truncateEditorialText(firstRow.slice(0, 3).join(" - "), 170),
-    });
-  }
-
-  if (decidingSection) {
-    cards.push({
-      label: "Fastest decision filter",
-      text: summarizeSection(decidingSection),
-    });
-  }
-
-  cards.push({
-    label: "Next step",
-    text: confirmSection ? summarizeSection(confirmSection) : "Ready to narrow the options? Start a conversation with the details from this comparison.",
-    link: definition.primaryAction,
-  });
-
-  return cards.slice(0, 3);
-}
-
-const cards = buildCards();
+const rawCards = buildDecisionSnapshotCards(definition);
 const extraBriefFields = (definition.brief ?? []).slice(2);
----
 
+// Stage 3 shadow normalizer (sprint 1): snapshot-card links that target the
+// generic /contact/ route are rewritten by the legacy cheerio post-process
+// to the routed inquiry path (e.g. /contact/rfid-labels-tags/). Apply the
+// same rewrite at render time so the card href matches production output.
+const cards = rawCards.map((card) => {
+  if (!card.link) return card;
+  return {
+    ...card,
+    link: { ...card.link, href: rewriteContactHref(card.link.href, definition.route, definition.title) },
+  };
+});
+---
 <section class="codex-editorial-section codex-editorial-snapshot" id={id}>
   <h2>At a glance</h2>
   <p class="codex-editorial-section-intro">Use these short answers to decide whether this page matches the project before moving into the detail.</p>
   <div class="codex-editorial-snapshot-grid">
     {cards.map((card) => (
-      <article class="codex-editorial-snapshot-card">
+      <article class="codex-card codex-editorial-snapshot-card">
         <p class="codex-editorial-answer-label">{card.label}</p>
         <p>{card.text}</p>
         {card.link && (
@@ -97,8 +54,10 @@ const extraBriefFields = (definition.brief ?? []).slice(2);
     ))}
   </div>
   {extraBriefFields.length > 0 && (
-    <dl class="codex-editorial-brief-grid" style="margin-top: 1rem;">
-      {extraBriefFields.map((field) => <BriefField field={field} />)}
+    <dl class="codex-editorial-brief-grid codex-editorial-brief-grid--extra">
+      {extraBriefFields.map((field) => (
+        <BriefField field={field} />
+      ))}
     </dl>
   )}
 </section>

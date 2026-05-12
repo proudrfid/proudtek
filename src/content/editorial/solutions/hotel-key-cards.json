@@ -1,23 +1,24 @@
 {
   "route": "/solutions/hotel-key-cards/",
   "group": "solutions",
-  "title": "Hotel Key Cards — VingCard / Saflok / Salto / ONITY / MIFARE Plus EV2 / DESFire EV3 Procurement Guide",
+  "title": "Hotel Key Cards (2026): Lock-Compatible RFID Cards — Saflok, Vingcard, SALTO, Onity, MIWA, Häfele Dialock, Be-Tech | CVE-2024-29916 & Fudan FM11RF08 Procurement Guide",
   "kicker": "Hotel Solution",
-  "summary": "The right hotel key card is determined by lock compatibility first, then chip family, then encoding workflow. And only then by material or finish. This page helps procurement teams work through those decisions in the right order across ASSA ABLOY VingCard / Mobile Access, dormakaba Saflok / Confidant, Salto SVN / KS, ONITY HT / Advance, MIWA Lock, Häfele Dialock, Be-Tech and Kaba estates — with direct links to compatibility pages, chip comparison tools and sample planning guides.",
+  "summary": "Procurement-grade hotel key card guide for properties on the seven major hotel-lock platforms. Maps the chip-family decision (MIFARE Classic 1K / Plus EV1-EV2 / DESFire EV3 / Ultralight C) to the lock generation in scope, walks the encoder + PMS workflow (Oracle OPERA Cloud roomKeysOutbound, Mews open API, Apaleo), explains why CVE-2024-29916 \"Unsaflok\" (March 2024) and the Quarkslab FM11RF08 Fudan-clone backdoor (August 2024) make MIFARE Classic 1K stock a 2026 procurement risk on properties without confirmed firmware remediation, and covers the card material decision (PVC / FSC bamboo / FSC wood / PLA bio-based / metal / paper) including sustainability certifications (FSC chain-of-custody, GRS, OK biobased, ASTM D6868). Cross-links to /compatibility/{vendor}/ for each lock estate.",
   "keywords": [
     "Hotel key card supplier",
-    "VingCard / Saflok compatibility",
-    "MIFARE Plus EV2 hotel lock",
-    "DESFire EV3 guest credential",
-    "Hotel PMS encoding workflow",
-    "Hospitality RFID procurement"
+    "Saflok Vingcard SALTO Onity hotel cards",
+    "MIFARE Plus EV2 DESFire EV3 hotel locks",
+    "Hotel PMS Oracle OPERA Mews encoding",
+    "CVE-2024-29916 Unsaflok procurement",
+    "FSC bamboo wood hotel key cards"
   ],
   "heroPoints": [
-    "Match the chip family to the lock estate before specifying artwork or premium finishes.",
-    "Understand encoding workflow (pre-encoded, blank-issued or PMS-linked) before ordering.",
-    "Fast sampling starts from a current card reference or lock model, not a generic PVC spec."
+    "Identify the lock platform and reader-head firmware before specifying a chip. Properties still on MIFARE Classic 1K with affected Saflok / Onity HT / Fudan-cloned Classic stock should treat chip upgrade as a security action, not just a refresh.",
+    "Match the chip family to the encoder hardware and the back-end. The Encoder 4010 (Vingcard), Gen II 75720 (Saflok), EC904B0 NCoder (SALTO) and Encoder 4000 (Onity) each have a different chip-support envelope.",
+    "Specify the PMS integration path before sample design. Oracle OPERA Cloud's `roomKeysOutbound` action enum (GUESTKEY_GENERIC type — New / Duplicate / One-shot / Read / Delete) and Mews Open API are the most common; document the connector version before scaling.",
+    "Decide material + sustainability cert stack together. FSC chain-of-custody (FSC-STD-40-004), GRS ≥50% recycled, OK biobased and ASTM D6868 / D6400 compostable are the four claims chain procurement actually audits."
   ],
-  "imageAlt": "Stack of branded hotel RFID key cards ready for encoding",
+  "imageAlt": "Stack of branded hotel RFID key cards — PVC, FSC bamboo, FSC wood and recycled-PVC variants ready for encoding",
   "heroImage": "/landing-images/hotel-key-cards-hero.webp",
   "imageSourceRoutes": [
     "/products/rfid-cards/rfid-card-assa-abloy-compatible/",
@@ -25,625 +26,317 @@
     "/products/rfid-cards/rfid-wooden-card/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-01-01",
+  "modifiedAt": "2026-05-11",
   "brief": [
     {
       "label": "Audience",
       "items": [
-        "Hotels and serviced apartments replacing or refreshing their room-key program.",
-        "Resorts evaluating eco, wood or premium card materials alongside their standard stock.",
-        "Procurement teams building a compatibility-first sample plan before requesting pricing.",
-        "Multi-property groups standardising chip family and encoding across a lock estate."
+        "Hotels and serviced apartments refreshing room-key stock without a back-end platform change.",
+        "Multi-property groups standardising chip family and encoding across a mixed-vendor lock estate.",
+        "Resorts evaluating FSC-wood, FSC-bamboo or PLA cards alongside their standard PVC stock.",
+        "Procurement teams building a compatibility-first sample plan before requesting pricing."
       ]
     },
     {
       "label": "Decision sequence",
       "items": [
-        "Lock platform and chip family: MIFARE Classic, MIFARE Plus or DESFire EV3.",
-        "Encoding workflow: pre-encoded by supplier, blank cards issued at front desk, or PMS-linked.",
-        "Material path: standard PVC, eco PLA, wood or specialty card stock.",
-        "Magstripe co-layer requirement for legacy readers still in the property."
+        "Lock vendor + generation + firmware (drives chip-family envelope).",
+        "Chip family: MIFARE Classic 1K / Plus SL1 / Plus SL3 / DESFire EV3 / Ultralight C / Ultralight AES.",
+        "Encoder hardware + back-end + PMS connector version.",
+        "Card material: standard PVC, recycled PVC (GRS), FSC bamboo, FSC wood, PLA, metal, paper, dual-interface."
       ]
     },
     {
-      "label": "Lock-platform compatibility map — eight major hotel-lock estates",
+      "label": "Lock-platform compatibility map — seven major estates",
       "items": [
-        "ASSA ABLOY VingCard / VISIONLINE / Signature RFID + Mobile Access (BLE) — MIFARE Classic 1K legacy, MIFARE Plus EV1/EV2 (mid-2010s onward), DESFire EV2/EV3 (Signature RFID + Mobile Access stack).",
-        "dormakaba Saflok Quantum + Confidant RFID + RT Plus + Oracode — MIFARE Classic / Plus EV1 baseline, DESFire on Confidant RFID and current Quantum builds; Saflok Messenger LENS for online/mobile.",
-        "Salto Systems SVN (Salto Virtual Network) + KS (Keys-as-a-Service) + JustIN Mobile + XS4 Original / 2.0 / Mini — DESFire EV1/EV2/EV3 + MIFARE Plus + iCLASS Seos via multi-credential reader.",
-        "ONITY HT22i / Advance / Trillium / DirectKey + ZigBee online — MIFARE Classic 1K legacy + MIFARE Plus migration since 2018; mobile via DirectKey BLE.",
-        "MIWA Lock 6AT / EAT / DTRT-iCS / DTFL — MIFARE Classic legacy + DESFire EV1/EV2/EV3, dominant in Japan and APAC properties.",
-        "Häfele Dialock + Tag-it HF-I + LE / FT / FH / DT — MIFARE Classic + DESFire EV2/EV3 across European boutique and serviced-apartment estates.",
-        "Be-Tech eGuard / B-Lite / B-Free + Kaba Confidant + Kaba Atlas — MIFARE Classic / Plus EV2 + Kaba 2533 protocol on legacy estates.",
-        "Allegion CISA eSIGNO / SCS / Schlage LE/NDE BLE + ENGAGE — MIFARE Plus EV2 + iCLASS Seos for limited-service brands."
+        "ASSA ABLOY Vingcard (Classic / Essence / Signature / Allure / Flex) — MIFARE Classic 1K + Plus EV1 4K + DESFire EV3 4K/8K + 2024 Ultralight AES; Vision / Visionline / Vostio back-ends; Apple Wallet + Google Wallet on Signature.",
+        "dormakaba Saflok (MT / Confidant / Quantum IV-RT / Messenger LENS / Quantum Plus / Quantum Pixel) — MIFARE Classic 1K legacy + DESFire EV2/EV3 on current generations; System 6000 → Ambiance migration; CVE-2024-29916 firmware remediation since November 2023.",
+        "SALTO Systems (XS4 Original / One / Mini / Locker / AElement Fusion / Neo BLE / XS4 GEO) — MIFARE family + iCLASS Seos + JustIN BLE; SALTO Space → SALTO KS cloud; Apple/Google Wallet via Vostio-like wallet bridge.",
+        "Onity / Honeywell Building Automation (HT-series + ADVANCE + integra + Trillium) — MIFARE Classic 1K + Plus SL1/SL3; DirectKey BLE; 2012 Brocious port-shield remediation status still relevant on legacy HT properties.",
+        "MIWA (ALV2 / ALV3 / V3HTM / AL5H hybrid / PiACK) — MIFARE family + FeliCa IDm (uniquely Japan / APAC); KEYMO BLE mobile key.",
+        "Häfele Dialock (DT 100 → DT 750 + WT wall + FT furniture + EFL / LL locker terminals) — Tag-it HF-I + MIFARE Classic EV1 + DESFire EV2 on the same multi-chip reader; single-credential door + furniture + locker integration.",
+        "Be-Tech (BASE / SHADOW / VISUAL / GUARDIAN) — MIFARE Classic 1K with documented 11 free sectors reserved for All-in-One programmes; budget hotels APAC, MEA, Africa."
       ]
     },
     {
-      "label": "Direct catalogue links",
+      "label": "Direct catalogue + compatibility links",
       "links": [
-        {
-          "href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/",
-          "label": "ASSA ABLOY-compatible hotel key cards"
-        },
-        {
-          "href": "/products/rfid-cards/nfc-card-custom-printing/",
-          "label": "Printed RFID / NFC cards"
-        },
-        {
-          "href": "/products/rfid-cards/rfid-wooden-card/",
-          "label": "Wooden RFID hotel cards"
-        },
-        {
-          "href": "/products/rfid-cards/rfid-bamboo-card/",
-          "label": "Bamboo / eco RFID hotel cards"
-        },
-        {
-          "href": "/products/rfid-cards/mifare-plus-se-card/",
-          "label": "MIFARE Plus SE card (entry-level AES chip)"
-        },
-        {
-          "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 card (AES-128 chip)"
-        }
-      ]
-    },
-    {
-      "label": "Compare-page links",
-      "links": [
-        {
-          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
-          "label": "MIFARE Classic vs Plus vs DESFire for hotel locks"
-        },
-        {
-          "href": "/compare/rfid-vs-magnetic-hotel-key-cards/",
-          "label": "RFID vs magnetic hotel key cards"
-        },
-        {
-          "href": "/guides/hotel-key-card-encoding/",
-          "label": "Hotel key card encoding guide"
-        },
-        {
-          "href": "/guides/hotel-key-card-sample-planning/",
-          "label": "Hotel key card sample planning"
-        },
-        {
-          "href": "/compatibility/",
-          "label": "Browse all lock compatibility pages"
-        }
-      ]
-    },
-    {
-      "label": "PMS integration matrix — encoder and key-server pairings",
-      "items": [
-        "Oracle OPERA Cloud / OPERA 5 PMS + OPERA Vendor Interface (OVI) for guest-key issue, encoder driver via OPERA OVI / OWS.",
-        "Mews PMS + Mews Marketplace lock connectors (ASSA ABLOY VINGCARD / Salto KS / dormakaba Saflok / Häfele Dialock / Be-Tech / MIWA).",
-        "Cloudbeds + SiteMinder + Hotel-Spider channel manager linking property-specific encoder driver to BLE / NFC mobile credential issuance.",
-        "Sabre SynXis CRS + Property Hub for global brand reservations feeding lock-encoding queue at front desk.",
-        "Apaleo open API + Hotelistic + Stayntouch + RoomRaccoon — independent and lifestyle-hotel PMS heads with Salto KS / Mobile Access cloud connectors.",
-        "Sample-brief input list: PMS name + version, encoder model (e.g. ASSA ABLOY VingCard Allure encoder, dormakaba Saflok 5750), encoder driver software version, MIFARE chip family + sector layout, online/standalone door mix, mobile-key plan."
-      ]
-    },
-    {
-      "label": "Card-body materials — environmental + finish profile",
-      "items": [
-        "Standard PVC ID-1 0.76 mm — lowest cost, full CMYK + spot UV + foil + metallic ink + serial-number marking.",
-        "Eco PLA bio-resin — biodegradable plant-derived alternative; passes EU 2022/2380 ESPR draft criteria for hospitality giveaway items.",
-        "Wood-veneer (FSC-certified bamboo / cherry / walnut) — laser-engraved branding for boutique and luxury properties.",
-        "Composite PET-G / PVC blend — increased flex tolerance for resorts with poolside and beach-bag use cases.",
-        "Recycled rPVC (50–100 % post-consumer) — sustainability-procurement option matching Green Key / EarthCheck / LEED criteria.",
-        "Metal hybrid (stainless / brass with HF inlay window) — luxury VIP suite credential at small volumes (≤1000 / property)."
-      ]
-    },
-    {
-      "label": "Encoding lifecycle and key-rotation policy",
-      "items": [
-        "Per-stay encoding: card written at check-in, expires at check-out — standard for transient hotels.",
-        "Permanent / staff: programmer-card based MIFARE Plus EV2 with role-based access to back-of-house, housekeeping, F&B and engineering doors.",
-        "Master / emergency: generated and audited by GM / security manager; physical custody log and quarterly rotation per AHLA / brand-standard policy.",
-        "Key rotation: master keys rotated every 90 days, application keys re-derived per dormakaba / ASSA ABLOY brand standards; site-key change after security incident.",
-        "PCI-DSS SAQ-A scope avoidance: keep PMS payment tokenisation separate from key-encoding workflow — encoder drivers do not handle card payments."
-      ]
-    },
-    {
-      "label": "Mobile-key complement — BLE / NFC alongside plastic",
-      "items": [
-        "ASSA ABLOY Mobile Access — BLE / NFC over Hospitality Mobile Access SDK, integrated with Marriott Bonvoy, Hilton Honors, IHG One Rewards.",
-        "Salto JustIN Mobile + Salto KS Cloud — BLE per-stay key for mid-scale and lifestyle brands, no app-download required for one-time guests.",
-        "dormakaba Saflok Mobile Access + LENS — Hyatt + Wyndham + Choice Hotels deployments using Saflok Messenger online infrastructure.",
-        "ONITY DirectKey + Trillium ZigBee online — DoubleTree, Hampton, Embassy Suites + select Hilton.",
-        "Apple Wallet hotel keys — Hyatt + Hilton + Marriott pilot deployments; plastic remains primary for guests without compatible iPhone / iOS or for sub-properties on legacy lock firmware."
-      ]
-    },
-    {
-      "label": "Brand-standard and compliance considerations",
-      "items": [
-        "Marriott Bonvoy: Mobile Access mandatory across full-service and select-service brands by 2025; lock-firmware refresh cycle synchronised across portfolio.",
-        "Hilton Honors: Digital Key (BLE) standard at 80 %+ US owned + managed properties; plastic-card requirement at properties with non-converted lock firmware.",
-        "IHG One Rewards: IHG Mobile Key on Salto KS at boutique brands (Kimpton, Hotel Indigo, voco) + ASSA ABLOY at Holiday Inn, Crowne Plaza.",
-        "AHLA brand-standard book: master-key rotation, lost-card replacement, audit log retention 1–3 years per brand.",
-        "GDPR / CCPA: cardholder data does not enter lock estate; encoder log retention typically 90 days standalone, longer when synchronised to PMS.",
-        "EU 2022/2380 ESPR (draft): hospitality giveaway items including key cards face material-disclosure obligations from 2027 — eco PLA / FSC wood paths align."
-      ]
-    },
-    {
-      "label": "Anti-cloning + lost-card lifecycle",
-      "items": [
-        "MIFARE Classic 1K Crypto-1 broken academically since 2008 — recommended for replacement during lock-platform refresh.",
-        "MIFARE DESFire EV3 + MIFARE Plus EV2 SL3: AES-128 mutual authentication, no public crack as of 2026.",
-        "Lost-card hot-list: synchronised across online doors via gateway; standalone doors invalidate at next master-key recurrence.",
-        "Re-issue rate: industry benchmark 8–12 % of guest cards per stay (lost / damaged / missed-return).",
-        "Disposal: bulk MIFARE Classic populations cross-shredded with chip-destroy step to satisfy ISO 27001 A.8.10."
-      ]
-    },
-    {
-      "label": "What this solution is NOT — adjacent scope clarifiers",
-      "items": [
-        "NOT a generic enterprise access-control programme — see /solutions/rfid-access-control/ for OSDP v2.2 + Genetec Synergis / Lenel S2 / Honeywell Pro-Watch corporate PACS.",
-        "NOT a hotel-RFID-access-control SOLUTION page — see /solutions/hotel-rfid-access-control/ for the integrated lock-and-credential operations view.",
-        "NOT a compare or compatibility page — see /compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/ and /compatibility/ index for chip-decision deep dive.",
-        "NOT a guest-review programme — see /solutions/google-review-cards-for-hotels/ for in-room Google Review NFC cards.",
-        "NOT a hotel-back-of-house RTLS or housekeeping-management programme — covered separately under hospitality industry landing."
+        {"href": "/compatibility/saflok-hotel-key-cards/", "label": "Saflok compatibility guide"},
+        {"href": "/compatibility/vingcard-hotel-key-cards/", "label": "Vingcard compatibility guide"},
+        {"href": "/compatibility/salto-hotel-key-cards/", "label": "SALTO compatibility guide"},
+        {"href": "/compatibility/onity-hotel-key-cards/", "label": "Onity compatibility guide"},
+        {"href": "/compatibility/miwa-hotel-key-cards/", "label": "MIWA compatibility guide"},
+        {"href": "/compatibility/hafele-dialock-hotel-key-cards/", "label": "Häfele Dialock compatibility guide"},
+        {"href": "/compatibility/be-tech-hotel-key-cards/", "label": "Be-Tech compatibility guide"},
+        {"href": "/compatibility/", "label": "All compatibility guides"}
       ]
     }
   ],
   "sections": [
     {
-      "title": "Pain points procurement teams face with hotel key card suppliers",
-      "intro": "Most hotel key card failures happen before a single card is printed. The root cause is almost always a compatibility decision that was skipped or deferred until after samples arrived.",
-      "statBar": {
-        "items": [
-          {
-            "value": "AES-128",
-            "label": "DESFire EV3 + Plus EV2 SL3 baseline"
-          },
-          {
-            "value": "13.56 MHz",
-            "label": "ISO/IEC 14443-A air interface"
-          },
-          {
-            "value": "8 platforms",
-            "label": "Major hotel-lock estates served"
-          },
-          {
-            "value": "7–10 days",
-            "label": "Compatibility-sample lead time"
-          }
-        ]
-      },
-      "bullets": [
-        "Cards encoded to the wrong sector layout arrive on-site and fail at the lock. Resampling delays the opening.",
-        "Suppliers quote on PVC but can't confirm MIFARE Plus EV2 chip availability at volume, stalling approval.",
-        "Artwork approval cycles run in parallel with compatibility testing, causing expensive reprints when the chip changes.",
-        "Magstripe co-layer is omitted from the brief because it 'probably won't be needed', then properties with legacy readers can't issue.",
-        "Multi-property rollouts discover that each lock platform requires a different chip, fragmenting the order across three suppliers."
+      "title": "Hotel key card procurement in 2026 — what changed since 2023",
+      "intro": "The 2024 disclosure of the Unsaflok master-key attack (CVE-2024-29916) and the August 2024 Quarkslab analysis of the Fudan FM11RF08 / FM11RF08S MIFARE Classic clone backdoor changed the procurement-narrative for hotel key cards. A 2026 buyer can no longer treat \"MIFARE Classic 1K, same as last time\" as a safe default — it now needs an explicit security-posture conversation alongside the standard compatibility check.",
+      "paragraphs": [
+        "Three structural shifts are driving the change. First, the Unsaflok researchers (Lennert Wouters of KU Leuven COSIC and Ian Carroll) demonstrated that the Saflok proprietary key-derivation function for MIFARE Classic sectors used only the card UID as input, allowing an attacker who could read any legitimate guest card to forge a write-pair that opened every door at the property. Roughly three million doors at 13,000+ properties in 131 countries were affected; remediation requires a door-controller firmware update that dormakaba began shipping in November 2023. As of disclosure in March 2024 the researchers estimated 36% of locks were remediated.",
+        "Second, Quarkslab's August 2024 disclosure of a hardware backdoor in the Fudan FM11RF08 and FM11RF08S MIFARE Classic clones widely used in the hospitality supply chain meant that even a fully-remediated Saflok property could still be exposed if the card stock itself was Fudan-cloned. The Fudan backdoor allows brute-force recovery of sector keys in roughly two minutes on consumer hardware.",
+        "Third, the Crypto-1 cipher used to authenticate every MIFARE Classic card across every hotel-lock vendor (not just Saflok) has been publicly broken for over a decade — independent of either the Unsaflok or Fudan disclosures. The procurement consequence is that any new hotel-key card programme in 2026 that wants AES-128-grade security in its physical card stack needs to specify either MIFARE Plus EV2 in SL3 mode, MIFARE DESFire EV3, or MIFARE Ultralight AES (Common Criteria EAL3+, announced 2024)."
       ],
-      "comparePanel": {
-        "beforeHeading": "Artwork-first procurement (typical failure pattern)",
-        "afterHeading": "Compatibility-first procurement (Proud Tek workflow)",
-        "before": [
-          "Property opens RFP with branded card artwork specification before lock-estate audit.",
-          "Supplier quotes on PVC stock and assumes 'standard MIFARE' — chip family unconfirmed.",
-          "Sample arrives with MIFARE Classic; lock estate is actually MIFARE Plus EV2 SL3 — read fails.",
-          "Resampling cycle adds 14–21 days; artwork already approved must be reprinted on correct chip body.",
-          "Multi-property programme fragments across 3 suppliers per lock platform — pricing and SKU sprawl.",
-          "Mobile-key roadmap deferred because lock firmware version not aligned with mobile-access requirements."
-        ],
-        "after": [
-          "Property submits current card reference or lock model + photo first; chip family confirmed in 1 working day.",
-          "Sector layout, encoder driver and PMS encoder model agreed under standard NDA before printing begins.",
-          "Sample produced on correct chip family + sector layout — first-round read at lock validated 90 %+.",
-          "Artwork approved in parallel after compatibility lock-in — no reprint risk on chip mismatch.",
-          "Multi-property programme consolidates to single chip family where lock firmware supports — one supplier, one SKU per material variant.",
-          "Mobile-access roadmap surfaced during compatibility audit — plastic + BLE plan agreed up-front."
-        ],
-        "title": "Compatibility-first vs artwork-first procurement sequence"
-      }
-    },
-    {
-      "title": "How Proud Tek solves hotel key card compatibility",
-      "intro": "Proud Tek's hotel key card process starts with the lock estate and encoder setup, not with artwork. That sequence eliminates the most common resampling causes.",
-      "bullets": [
-        "Chip matching by lock platform: we map MIFARE Classic, MIFARE Plus EV1/EV2 and DESFire EV3 to the property's confirmed lock and encoder before any card goes into production.",
-        "Pre-encoding or blank-card options: cards can ship pre-encoded with a fixed sector layout, or blank for front-desk encoding. The workflow is agreed before printing.",
-        "Magstripe co-layer on request: dual-interface cards for properties with mixed reader estates are a standard catalogue item, not a custom project.",
-        "Sample turnaround in 7–10 working days: a reference card or lock model photo is enough to begin; full artwork is not required to start the compatibility check.",
-        "Multi-property chip standardisation: we can consolidate a single chip family across a mixed lock estate where the lock firmware supports a compatible migration."
-      ],
-      "dataHighlight": {
-        "value": "8 platforms",
-        "heading": "Hotel key-card programme — 2026 procurement baseline",
-        "text": "Major hotel-lock estates supported (VingCard / Saflok / Salto / ONITY / MIWA / Häfele / Be-Tech / CISA). ≈70 % — Industry estimate of HF 13.56 MHz hotel-lock installed-base globally as of 2026 (vs LF / mag-stripe legacy). 8–12 % — Industry-benchmark guest-card re-issue rate per stay (lost / damaged / missed-return). 7–10 days — Compatibility-sample lead time from confirmed chip + sector layout. ≤90 days — Master-key rotation cadence per AHLA / brand-standard guidance. 1–3 years — Encoder / lock log retention per major brand audit policy."
-      }
-    },
-    {
-      "title": "Chip family comparison for hotel locks",
-      "intro": "The three main chip families each carry a different tradeoff between legacy compatibility, upgrade complexity and security profile.",
-      "table": {
-        "columns": [
-          "Chip family",
-          "Typical lock fit",
-          "Main strengths",
-          "Key watch-outs"
-        ],
-        "rows": [
-          [
-            "MIFARE Classic 1K / 4K",
-            "Older VingCard, ONITY, Saflok estates",
-            "Widest installed base, lowest resampling risk on legacy estates",
-            "Security limitations; migration pressure growing in 2024–2026"
-          ],
-          [
-            "MIFARE Plus EV1 / EV2",
-            "Mid-generation locks supporting security-level upgrade",
-            "Backward-compatible with Classic while supporting AES-128 in SL3",
-            "Requires lock and encoder firmware to support the target security level"
-          ],
-          [
-            "DESFire EV3",
-            "New-build or fully upgraded lock estates",
-            "Strongest encryption, multi-application support, mutual authentication",
-            "Not backward-compatible; requires confirmed lock and encoder support before ordering"
-          ]
-        ]
-      },
       "callout": {
-        "label": "Not sure which chip your locks use?",
-        "text": "Share a photo of your current guest card or the lock brand and model. We can usually confirm chip compatibility within one working day.",
-        "href": "/contact/hotel-rfid/"
-      },
-      "timeline": {
-        "title": "Hotel key-card procurement and rollout — week-by-week",
-        "items": [
-          {
-            "text": "Walk every floor, log lock brand + model + firmware version (VingCard Signature RFID vs Allure vs Classic; Saflok Quantum vs Confidant; Salto SVN vs KS; ONITY HT22i vs Advance vs DirectKey). Capture front-desk encoder model + driver version. Send Proud Tek a current guest-card reference plus a lock photo for chip-family confirmation.",
-            "label": "Week 1 — Lock-estate audit + reference-card capture"
-          },
-          {
-            "text": "Confirm chip family per lock platform. Sign NDA for sector-layout / key-block disclosure on pre-encoded path; or confirm blank-card path with on-site encoder. Decide magstripe co-layer requirement based on legacy reader survey (parking, lockers, gym, F&B POS).",
-            "label": "Week 2 — Chip-family lock-in and sector-layout NDA"
-          },
-          {
-            "text": "Standard PVC vs eco PLA vs FSC wood vs metal hybrid. Confirm CMYK / spot UV / foil / metallic-ink artwork constraints. Lead-time impact: standard PVC same-day; PLA + 2 days; wood-veneer + 5–7 days; metal hybrid + 14 days.",
-            "label": "Week 3 — Material and finish selection"
-          },
-          {
-            "text": "Produce 50–100 sample cards on confirmed chip + sector layout. Validate read at one room door + one elevator + one online door + one standalone door + (if applicable) one parking gate / gym / F&B reader. Sign-off triggers full production.",
-            "label": "Week 4 — Compatibility sample at 50–100 cards"
-          },
-          {
-            "text": "Brand-standard artwork sign-off in parallel. Production wave 1 covers initial inventory (typically 6–8 months of stay-volume). Pre-encoded cards include facility code + lock-platform key block; blank cards ship without encoded data.",
-            "label": "Week 5–6 — Artwork proofing and full production"
-          },
-          {
-            "text": "Air or sea freight per opening timeline; Incoterms typically DAP front-desk receiving. Receiving-side QC: visual inspection + 5 % batch read-test + serialised audit-log capture for property records.",
-            "label": "Week 7–8 — Despatch + on-site receiving"
-          },
-          {
-            "text": "Property tracks per-stay re-issue rate (8–12 % industry benchmark); orders re-stock at 60-day inventory threshold. Master-key rotation begins at 90 days per AHLA / brand-standard policy.",
-            "label": "Month 3 — Re-stock cycle and lost-card pipeline"
-          },
-          {
-            "text": "Programme references draw from hospitality, luxury-brands, education, healthcare and brand-protection estates, with periodic compliance reviews, refresh-cycle planning and supplier-onboarding gates customised per vertical. annual brand-standard audit with lock-firmware refresh; semi-annual chip-family review for lock-platform changes; eco-material adoption review against Green Key / EarthCheck / LEED criteria; mobile-access (Apple Wallet / BLE) rollout for properties on compatible firmware.",
-            "label": "Quarter 2 onward — Operate, audit and refresh on annual cycle"
-          }
-        ]
+        "label": "2026 procurement checklist",
+        "text": "Before approving any MIFARE Classic 1K reorder in 2026: (1) confirm the lock vendor and any 2024 firmware remediation status; (2) verify the card supplier ships NXP-fab MIFARE Classic 1K rather than Fudan FM11RF08 clones (request the wafer-source attestation in writing); (3) document the migration path to MIFARE Plus or DESFire EV3 so the Classic order is a transitional step, not a permanent target.",
+        "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/"
       }
     },
     {
-      "title": "Encoding workflow options",
-      "intro": "The encoding approach determines how cards move from production to the front desk and affects the information Proud Tek needs before production starts.",
-      "table": {
-        "columns": [
-          "Workflow",
-          "How it works",
-          "Best fit",
-          "What we need upfront"
-        ],
-        "rows": [
-          [
-            "Pre-encoded at factory",
-            "Cards arrive with sector data written; front desk assigns room via PMS only",
-            "Small properties, simple PMS setups, fast opening timelines",
-            "Sector layout, encoder type and key data under NDA"
-          ],
-          [
-            "Blank cards, encoded at front desk",
-            "Cards ship blank; property's encoder handles all personalisation",
-            "Properties with existing encoder workflow and IT control over keys",
-            "Chip type confirmation only; no key data required"
-          ],
-          [
-            "PMS-linked encoding",
-            "Cards are keyed at issue time using a PMS-integrated encoder",
-            "Larger hotels with high daily turnover or variable room assignments",
-            "PMS name, encoder model, chip family and key block structure"
-          ]
-        ]
-      }
-    },
-    {
-      "title": "Results: what properties report after switching suppliers",
-      "intro": "These figures come from buyer conversations and are illustrative benchmarks, not guaranteed outcomes. Actual results depend on existing lock estate, property size and rollout approach.",
+      "title": "Chip-family decision — Classic, Plus, DESFire, Ultralight C, Ultralight AES",
+      "intro": "Five chip families ship on hotel key cards today. The decision matrix below maps each chip to its security tier, the lock generations that accept it, the encoder firmware required, and the price-per-card range. For non-trivial estates this is rarely a single-chip choice — most properties run a phased migration that issues two or three chip families in parallel for 12–24 months.",
       "bullets": [
-        "Reduced resampling rounds from an average of 3 to 1 by starting with a compatibility check rather than artwork.",
-        "Multi-property groups consolidated from 3 card suppliers to 1 after chip standardisation across a mixed MIFARE estate.",
-        "Sample-to-approval cycle shortened to 12 working days for properties that provided a current card reference on first contact.",
-        "Properties using pre-encoded cards reported fewer front-desk encoding errors compared to blank-card-only programs.",
-        "Eco PLA cards adopted by 3 European hotel groups as default room-key stock, meeting sustainability procurement criteria."
+        "MIFARE Classic 1K (ISO/IEC 14443A, 13.56 MHz, Crypto-1 cipher) — the historical default across every major hotel-lock vendor. 1 KB memory, 16 sectors of 4 blocks. Crypto-1 is broken industry-wide. Lowest cost (~$0.30–0.60/card MOQ 500). Specify only as a transitional refresh on properties with a documented migration plan.",
+        "MIFARE Classic 4K — same Crypto-1 surface as 1K, 4 KB memory, 40 sectors. Used where the property's encoder writes additional data (loyalty, room-spend, amenity-zone access).",
+        "MIFARE Plus EV1 / EV2 — accepted by Saflok (Quantum RT and later), Vingcard (current eStore SKU is Plus EV1 4K), SALTO (XS4 Original+ and later), Onity (integra and Trillium). SL1 mode is Classic-compatible (still Crypto-1 surface); SL3 mode brings AES-128 authenticated sessions. Practical migration step from Classic.",
+        "MIFARE DESFire EV1 / EV2 / EV3 — the recommended target for new estates on Saflok Messenger LENS / Quantum Plus / Quantum Pixel, Vingcard Signature / Allure / Essence reader-type 3G or newer, SALTO XS4 One / Mini / AElement Fusion / Neo BLE, MIWA ALV3M / ALV3MA / V3HTM. EV3 ships in EV2/EV1 backwards-compatible default per the NXP datasheet. AES-128 authenticated sessions; Common Criteria EAL5+.",
+        "MIFARE Ultralight C — supported on most modern reader heads; standard choice for hotel paper guest-key cards (lowest cost, single-use disposable). 3DES authentication (weaker than DESFire).",
+        "MIFARE Ultralight AES — announced 2024. Common Criteria EAL3+ certified; 128-bit AES key length; secure messaging over RF. Vingcard documented compatibility 2024; first vendor to publicly support. Same paper-card form factor as Ultralight C, materially higher security."
+      ],
+      "image": {
+        "src": "/blog-images/mifare-cards.jpg",
+        "alt": "MIFARE Classic 1K, MIFARE Plus EV2, MIFARE DESFire EV3 and MIFARE Ultralight AES hotel key card variants — chip-family decision matrix"
+      }
+    },
+    {
+      "title": "Cross-vendor compatibility matrix — choosing once, sampling many",
+      "intro": "Most multi-property operators run two or more hotel-lock vendors across their portfolio. The card-stock decision needs to work across all of them simultaneously. This section is the entry point — each vendor's full compatibility detail (lock generations, encoder lifecycle, PMS connectors, security disclosures) lives on its dedicated /compatibility/{vendor}/ page.",
+      "bullets": [
+        "Saflok (dormakaba) — Quantum IV / RT, Messenger LENS, Quantum Plus, Quantum Pixel. System 6000 → Ambiance back-end. CVE-2024-29916 firmware remediation status. See full guide: /compatibility/saflok-hotel-key-cards/",
+        "Vingcard (ASSA ABLOY Global Solutions, rebranded April 2024) — Classic / Essence / Signature / Allure / Flex marine. Vision → Visionline → Vostio Access Management lifecycle. F-Secure 2018 InsecureKeys disclosure on Vision. See full guide: /compatibility/vingcard-hotel-key-cards/",
+        "SALTO Systems — XS4 family + Neo Cylinder. SALTO Space → SALTO KS cloud. 2019 ProAccess SPACE CVE cluster (CVE-2019-19457 through 19460). See full guide: /compatibility/salto-hotel-key-cards/",
+        "Onity (Honeywell Building Automation, acquired June 2024; planned Automation spin-off H2 2026) — HT / ADVANCE / integra / Trillium + DirectKey BLE. 2012 Brocious DEF CON 20 disclosure (no public CVE assigned). See full guide: /compatibility/onity-hotel-key-cards/",
+        "MIWA — ALV2 / ALV3 / V3HTM + AL5H magstripe hybrid + PiACK. Unique FeliCa IDm support for Japanese transit IC cards. See full guide: /compatibility/miwa-hotel-key-cards/",
+        "Häfele Dialock — DT 100 → DT 750 door terminals plus WT wall, FT furniture, EFL / LL locker terminals on one credential. Single-credential door + furniture + locker integration is unique to Dialock. See full guide: /compatibility/hafele-dialock-hotel-key-cards/",
+        "Be-Tech — BASE / SHADOW / VISUAL / GUARDIAN. BIS HOTEL back-end. 11 free MIFARE Classic sectors reserved for All-in-One programmes. See full guide: /compatibility/be-tech-hotel-key-cards/"
+      ]
+    },
+    {
+      "title": "Encoder hardware + PMS integration — the workflow path",
+      "intro": "The encoder at the front desk constrains which chips can actually be issued (not just which the lock accepts). The PMS connector version constrains whether issuance / extend / re-encode / cancel actions round-trip cleanly. Most card-sample failures trace back to one of these two pieces being out of sync, not to the chip itself.",
+      "bullets": [
+        "Vingcard — Encoder 4010 (current, USB + Ethernet) supersedes the model 681001025C1 on FCC record. Drives Visionline on-premise or Vostio Access Management cloud back-ends.",
+        "Saflok — RFID Encoder Gen II (model 75720) supersedes Gen I (74750). Supports MIFARE Ultralight C, Plus EV2, DESFire EV3. Pairs with Ambiance or Messenger LENS; System 6000 properties typically still issue MIFARE Classic.",
+        "SALTO — EC904B0 NCoder is current; EC90ENUS is the predecessor; legacy PPD covers Classic / Plus SL1 only.",
+        "Onity — Encoder 4000 (current desktop, PC/SC, BLE mobile-key issuance) supersedes Encoder 2100 (integra-era) and 1100 (Classic-only). PP32 portable programmer commissions Trillium / HT24 / HT28 / ADVANCE.",
+        "MIWA — Card Issuing System USB encoder (single SKU; no Gen I / Gen II distinction; supports MIFARE 1K + 4K + optional BLE).",
+        "Häfele Dialock — ES 110 Encoding Station + MDU 110 Mobile Data Unit. Five-language UI, USB and IR connectivity.",
+        "Oracle OPERA Cloud — integrate via the `roomKeysOutbound` configuration with the GUESTKEY_GENERIC outbound type. Supported actions: New, Duplicate, One-shot, Read, Delete key. Same shape across all major hotel-lock vendor connectors.",
+        "Mews Open API — verified pairings with Saflok, Vingcard, SALTO, Onity, Häfele Dialock and MIWA. Requires the vendor-specific connector (Saflok HMS, Dialock HMS, etc.) co-installed on the front-desk PC.",
+        "Apaleo, Cloudbeds, Hotelkey — listed on Vingcard's VConnect integrations hub launched 2024."
+      ],
+      "callout": {
+        "label": "PMS driver reminder",
+        "text": "A hotel key card sample rarely fails because of the chip itself. More often the PMS connector and the vendor back-end (Vision / Visionline / Vostio / System 6000 / Ambiance / SALTO Space / OnPortal / BIS HOTEL) are out of sync after a PMS upgrade. Confirm both versions and the encoder firmware before sending a new sample batch.",
+        "href": "/guides/hotel-key-card-encoding/"
+      }
+    },
+    {
+      "title": "Mobile Access coexistence — Apple Wallet, Google Wallet, BLE apps",
+      "intro": "Every major hotel-lock vendor now offers a mobile-access track. Mobile credentials do not replace physical cards in practice — most properties run mobile keys as a guest-choice overlay, with physical cards remaining the operational baseline for ADA accessibility, mobile-device failures, walk-in guests without the property app, and front-desk override scenarios.",
+      "bullets": [
+        "Apple Wallet — supported on Vingcard Signature / Allure / Essence (via Vostio), SALTO XS4 One + AElement Fusion + Neo BLE, Saflok Quantum Pixel, Onity Trillium with current firmware. Hyatt is a documented Vingcard adopter; Club Quarters rolled out wallet keys across all properties January 2025.",
+        "Google Wallet — Vingcard added 2024; SALTO supports via wallet bridge. Coverage matrix is narrower than Apple Wallet today but expanding.",
+        "First-party BLE apps — Vingcard Mobile Access (current iOS id 1403770732 supersedes legacy 1017290566); SALTO JustIN Mobile; Saflok Mobile Access Solutions via LEGIC Connect; Onity DirectKey (Hilton Honors Digital Key precedent, 100+ properties since Feb 2016); MIWA KEYMO; Häfele Dialock Smartphone Key; Be-Tech Mobile Key Android.",
+        "Third-party mobile-key bridges — OpenKey (long-running multi-vendor), FLEXIPASS (multi-brand chain deployments), HID Origo via Avigilon Unity Access (mixed-vendor estates with corporate access overlap).",
+        "Physical-card baseline — AHLA 2026 State of the Industry reports 70% of guests prefer mobile check-in, but physical cards remain the operational baseline because ADA accessibility, mobile-device failures, walk-ins and overrides all require a fallback credential.",
+        "Multi-credential reader requirement — a single property running Apple Wallet + Google Wallet + first-party app + physical card needs a reader head that accepts all four. Verify with the lock vendor before scaling a wallet-key programme."
+      ]
+    },
+    {
+      "title": "Card material decision — PVC, FSC bamboo, FSC wood, PLA, metal, paper",
+      "intro": "Material is the last decision in the procurement sequence, not the first. The chip and the encoder firmware decide whether the card opens the door at all; the material decides how the card feels, how durable it is, what brand story it carries, and whether it survives the sustainability-audit clause in the chain's RFP. Cite the certification body rather than the supplier on any material claim destined for an enterprise RFP response.",
+      "bullets": [
+        "Standard PVC (ISO/IEC 7810 ID-1, 0.76 mm ± 0.08 mm) — the workhorse default. Lowest cost, widest material tolerance across all reader heads. Carbon-footprint baseline: roughly 0.21 kg CO₂e per card per supplier lifecycle data.",
+        "Recycled / eco PVC — Global Recycled Standard (GRS) certification requires ≥50% post-consumer recycled content for the product-level claim. Common 65–80% recycled formulations. ~10% cost premium vs virgin PVC.",
+        "FSC bamboo — Forest Stewardship Council chain-of-custody (FSC-STD-40-004). Approved vendor lists exist for ASSA ABLOY and SALTO. ~30–50% cost premium vs PVC at MOQ 1,000. Read distance on bamboo with MIFARE Classic / DESFire inlay is typically 0.85–0.95× of PVC baseline.",
+        "FSC wood (birch, maple, walnut) — similar certification stack to bamboo. Premium hospitality / luxury positioning. Production cycle longer (~3-week lead time vs 2 weeks for PVC). \"Approved Vingcard vendor\" / \"Approved ASSA ABLOY vendor\" badges are real procurement signals in chain RFPs.",
+        "PLA bio-based — TÜV Austria OK biobased certification (EN 16640); BPI ASTM D6868 compostable. Sugar-cane- or corn-starch-derived. 100% biodegradable in industrial composting per ASTM D6400. Quality varies by supplier; pilot before scaling.",
+        "Metal (brushed aluminum, stainless) — premium luxury positioning; requires ferrite isolator behind the chip for iPhone read reliability. Read distance halved vs PVC. ~$3–8/card at MOQ 1,000.",
+        "Paper guest cards — Ultralight C or Ultralight AES inlay laminated in coated paper. Lowest disposable cost; standard at high-throughput conference and arena hotels.",
+        "Dual-interface (magstripe + RFID) — adds ~0.05 mm to card stack, still within ISO 7810 tolerance. Required during magstripe-to-RFID migration windows on legacy Onity HT, Saflok MT and Vingcard Classic dual-track estates."
+      ],
+      "callout": {
+        "label": "Material decision reference",
+        "text": "For a side-by-side comparison of PVC vs FSC wood vs FSC bamboo vs PLA — including cost-per-card ranges, lead-time deltas and chain-approval status — see /compare/pvc-vs-wood-vs-pla-hotel-key-cards/.",
+        "href": "/compare/pvc-vs-wood-vs-pla-hotel-key-cards/"
+      }
+    },
+    {
+      "title": "Standards anchor — ISO/IEC 7810, 14443, 7811, 7816",
+      "intro": "Every spec sheet referenced on this page is anchored by an ISO/IEC standard. Procurement teams writing an RFP for hotel key cards in 2026 should require vendor responses to cite the standard directly rather than vendor-specific marketing language.",
+      "bullets": [
+        "ISO/IEC 7810:2019 \"Identification cards — Physical characteristics\" — defines the ID-1 hotel-card form factor (85.60 × 53.98 mm, 0.76 mm ± 0.08 mm thickness, corner radius 3.18 mm). Universal baseline.",
+        "ISO/IEC 14443 Type A — the 13.56 MHz contactless air interface used by MIFARE Classic, Plus, DESFire and Ultralight. Reader-to-card data rate 106 kbit/s baseline, higher rates negotiated.",
+        "ISO/IEC 14443 Type B — alternative 13.56 MHz air interface used in some Onity and government-card deployments. Hotel locks are almost exclusively Type A.",
+        "ISO/IEC 7811 (parts 1–9) — the magstripe standard. Track 2 / Track 3 layouts used in legacy Onity HT, Saflok MT and Vingcard Classic dual-track variants. Magnetic stripe is not native on SALTO, Häfele Dialock or current Be-Tech.",
+        "ISO/IEC 7816-4 — the APDU command set used by DESFire EV1 / EV2 / EV3 over the contactless air interface. Encoder firmware writes data to DESFire applications via SELECT-AID and READ/WRITE DATA APDUs.",
+        "ISO/IEC 15693 — the vicinity-coupling standard used by Texas Instruments Tag-it HF-I; native on Häfele Dialock multi-chip reader heads alongside MIFARE."
+      ]
+    },
+    {
+      "title": "Pricing tiers, MOQ floors and lead times — what to expect on a 2026 RFQ",
+      "intro": "Hotel key card pricing has three drivers in 2026: chip choice (Classic vs Plus vs DESFire vs Ultralight AES), material choice (PVC vs FSC vs metal vs paper), and order volume. The table below gives indicative ranges for each combination — actual quotes vary by supplier MOQ, artwork complexity, and pre-encoding scope.",
+      "table": {
+        "columns": ["Configuration", "MOQ floor", "Indicative cost/card", "Lead time (weeks)"],
+        "rows": [
+          ["Standard PVC + MIFARE Classic 1K, plain stock", "500", "$0.30–0.60", "2–3"],
+          ["Standard PVC + MIFARE Plus EV1 4K, full-colour CMYK", "500", "$0.80–1.40", "2–3"],
+          ["Standard PVC + MIFARE DESFire EV3 4K, full-colour", "500", "$1.20–2.20", "3–4"],
+          ["Recycled PVC (GRS ≥50%) + DESFire EV3, full-colour", "1,000", "$1.40–2.60", "3–4"],
+          ["FSC bamboo + DESFire EV3, laser-etched logo", "1,000", "$1.80–3.20", "3–4"],
+          ["FSC wood (birch / maple / walnut) + DESFire EV3", "1,000", "$2.20–3.80", "4–5"],
+          ["PLA bio-based (OK biobased + ASTM D6868) + DESFire EV3", "1,000", "$1.60–2.80", "4–5"],
+          ["Metal (brushed aluminum, ferrite isolator) + DESFire EV3", "500", "$3.50–8.00", "5–6"],
+          ["Paper guest card + Ultralight AES", "5,000", "$0.20–0.45", "2–3"]
+        ]
+      },
+      "bullets": [
+        "Pre-encoding (writing site-specific keys at the factory) adds 5–10% to the per-card cost but removes a labour step at the front desk on arrival. Typical for branded chain rollouts.",
+        "Custom artwork (full-colour CMYK, foil stamping, embossing) typically adds $0.10–0.40 / card depending on technique.",
+        "Sample lead time — most suppliers ship samples in 6–10 working days; allow 12–15 working days for premium materials (metal, hardwood)."
+      ]
+    },
+    {
+      "title": "Pilot validation checklist — what to test before scaling",
+      "intro": "A hotel key card pilot should exercise the chip, the encoder firmware, the back-end software version, the PMS connector, the lock-controller firmware, and the front-desk operational workflow. Scaling before all six are proven is the most common source of pilot regret.",
+      "bullets": [
+        "Test the chip / material combination on at least two lock generations in scope before approving any bulk order. ADVANCE / integra / Trillium readers tune differently; same for Quantum IV / Messenger LENS / Quantum Plus, XS4 Original / One, etc.",
+        "Run a full check-in, extend, re-encode and cancel cycle on a live PMS reservation (not a test reservation) to surface PMS-connector edge cases.",
+        "Log the lock-controller firmware, encoder firmware, back-end software version and PMS connector version for every tested unit — these are the four numbers vendor support will ask for first.",
+        "For any property on Saflok with MT / Confidant / Quantum-era controllers: confirm CVE-2024-29916 remediation status with dormakaba service before scaling card stock.",
+        "For any Classic / Classic 4K stock: request written attestation that the card supplier ships NXP-fab silicon, not Fudan FM11RF08 clones (the August 2024 Quarkslab disclosure is real).",
+        "Plan a 100–200 card first production batch before scaling to the full property order. Most field failures show up in the first 30 days of live issuance."
       ]
     }
   ],
   "resourceCards": [
     {
-      "title": "Lock compatibility pages",
-      "description": "Use the brand-specific compatibility pages to confirm chip family before requesting samples.",
+      "title": "Hotel-compatible card products",
+      "description": "Starting points for the per-vendor card-stock order. Chip choice should follow the security-tier analysis above, not the historical default.",
       "links": [
-        {
-          "href": "/compatibility/",
-          "label": "All hotel lock compatibility pages"
-        },
-        {
-          "href": "/compatibility/vingcard-hotel-key-cards/",
-          "label": "VingCard hotel key card compatibility"
-        },
-        {
-          "href": "/compatibility/onity-hotel-key-cards/",
-          "label": "ONITY hotel key card compatibility"
-        },
-        {
-          "href": "/compatibility/saflok-hotel-key-cards/",
-          "label": "Saflok hotel key card compatibility"
-        },
-        {
-          "href": "/compatibility/salto-hotel-key-cards/",
-          "label": "SALTO hotel key card compatibility"
-        },
-        {
-          "href": "/compatibility/hafele-dialock-hotel-key-cards/",
-          "label": "Häfele Dialock hotel key card compatibility"
-        },
-        {
-          "href": "/compatibility/miwa-hotel-key-cards/",
-          "label": "MIWA hotel key card compatibility"
-        },
-        {
-          "href": "/compatibility/be-tech-hotel-key-cards/",
-          "label": "Be-Tech hotel key card compatibility"
-        }
+        {"href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/", "label": "ASSA ABLOY-compatible hotel key cards"},
+        {"href": "/products/rfid-cards/mifare-desfire-ev3-card/", "label": "MIFARE DESFire EV3 card"},
+        {"href": "/products/rfid-cards/mifare-plus-se-card/", "label": "MIFARE Plus card"},
+        {"href": "/products/rfid-cards/mifare-classic-1k-card/", "label": "MIFARE Classic 1K card"},
+        {"href": "/products/rfid-cards/rfid-wooden-card/", "label": "Wooden RFID hotel cards (FSC)"},
+        {"href": "/products/rfid-cards/rfid-bamboo-card/", "label": "Bamboo RFID hotel cards (FSC)"},
+        {"href": "/products/rfid-cards/nfc-card-custom-printing/", "label": "Printed RFID / NFC cards"}
       ]
     },
     {
-      "title": "Chip and material comparison pages",
-      "description": "Use these to narrow the chip family and card material before contacting the team.",
+      "title": "Vendor compatibility deep-dives",
+      "description": "Each vendor's full compatibility detail — lock generations, encoder lifecycle, PMS connectors, security disclosures, FAQ.",
       "links": [
-        {
-          "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
-          "label": "MIFARE Classic vs Plus vs DESFire for hotel locks"
-        },
-        {
-          "href": "/compare/rfid-vs-magnetic-hotel-key-cards/",
-          "label": "RFID vs magnetic hotel key cards"
-        },
-        {
-          "href": "/compare/pvc-vs-wood-vs-pla-hotel-key-cards/",
-          "label": "PVC vs wood vs PLA hotel key cards"
-        }
+        {"href": "/compatibility/saflok-hotel-key-cards/", "label": "Saflok compatibility guide"},
+        {"href": "/compatibility/vingcard-hotel-key-cards/", "label": "Vingcard compatibility guide"},
+        {"href": "/compatibility/salto-hotel-key-cards/", "label": "SALTO compatibility guide"},
+        {"href": "/compatibility/onity-hotel-key-cards/", "label": "Onity compatibility guide"},
+        {"href": "/compatibility/miwa-hotel-key-cards/", "label": "MIWA compatibility guide"},
+        {"href": "/compatibility/hafele-dialock-hotel-key-cards/", "label": "Häfele Dialock compatibility guide"},
+        {"href": "/compatibility/be-tech-hotel-key-cards/", "label": "Be-Tech compatibility guide"},
+        {"href": "/compatibility/", "label": "All compatibility guides"}
       ]
     },
     {
-      "title": "Chip-family SKUs and hospitality vertical",
-      "description": "Silicon-level product pages for the three chip families, plus the hospitality landing that sits above this page in the taxonomy.",
+      "title": "Side-by-side comparisons",
+      "description": "Decision-tool pages for chip family, material and frequency choices.",
       "links": [
-        {
-          "href": "/products/rfid-cards/mifare-classic-1k-card/",
-          "label": "MIFARE Classic 1K card"
-        },
-        {
-          "href": "/products/rfid-cards/mifare-plus-se-card/",
-          "label": "MIFARE Plus SE card"
-        },
-        {
-          "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 card"
-        },
-        {
-          "href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/",
-          "label": "ASSA ABLOY-compatible card (VingCard / Saflok fit)"
-        },
-        {
-          "href": "/products/rfid-cards/rfid-card-magnetic-stripe-combo/",
-          "label": "RFID + magstripe combo card (legacy-reader bridging)"
-        },
-        {
-          "href": "/industries/hospitality/",
-          "label": "Hospitality industry landing — hotel keys in context"
-        },
-        {
-          "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
-          "label": "MIFARE Plus EV2 vs DESFire EV3 (chip-level deep dive)"
-        }
+        {"href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "MIFARE Classic vs Plus vs DESFire for hotel locks"},
+        {"href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "MIFARE Plus EV2 vs DESFire EV3"},
+        {"href": "/compare/pvc-vs-wood-vs-pla-hotel-key-cards/", "label": "PVC vs wood vs PLA hotel key cards"},
+        {"href": "/compare/rfid-vs-magnetic-hotel-key-cards/", "label": "RFID vs magnetic hotel key cards"},
+        {"href": "/guides/hotel-key-card-encoding/", "label": "Hotel key card encoding guide"},
+        {"href": "/guides/hotel-key-card-material-selection/", "label": "Hotel key card material selection"}
       ]
     },
     {
-      "title": "Adjacent solutions — hotel programmes connected to key cards",
-      "description": "Solutions that pair with the room-key programme on hospitality estates.",
+      "title": "Related editorial",
+      "description": "Background reading for teams that want to understand the hospitality RFID ecosystem before the first sample conversation.",
       "links": [
-        {
-          "href": "/solutions/hotel-rfid-access-control/",
-          "label": "Hotel RFID access control — integrated lock + credential view"
-        },
-        {
-          "href": "/solutions/google-review-cards-for-hotels/",
-          "label": "Google Review NFC cards for hotels — in-room reputation programme"
-        },
-        {
-          "href": "/solutions/rfid-access-control/",
-          "label": "RFID access control — back-of-house staff PACS"
-        },
-        {
-          "href": "/solutions/rfid-event-access-control/",
-          "label": "RFID event access control — meetings, conferences and banquets"
-        }
-      ]
-    },
-    {
-      "title": "Planning and encoding guides",
-      "description": "Use these guides to prepare the sample brief and encoding workflow before the first conversation.",
-      "links": [
-        {
-          "href": "/guides/hotel-key-card-encoding/",
-          "label": "Hotel key card encoding guide"
-        },
-        {
-          "href": "/guides/hotel-key-card-sample-planning/",
-          "label": "Hotel key card sample planning"
-        },
-        {
-          "href": "/guides/hotel-key-card-artwork-and-printing-checklist/",
-          "label": "Hotel key card artwork and printing checklist"
-        },
-        {
-          "href": "/guides/hotel-key-card-material-selection/",
-          "label": "Hotel key card material selection"
-        },
-        {
-          "href": "/blog/how-hotel-rfid-key-cards-work/",
-          "label": "How hotel RFID key cards work"
-        }
+        {"href": "/blog/how-hotel-rfid-key-cards-work/", "label": "How hotel RFID key cards work"},
+        {"href": "/blog/hotel-key-card-encoding-explained/", "label": "Hotel key card encoding explained"},
+        {"href": "/blog/mifare-classic-vs-desfire-hotel-chips/", "label": "MIFARE Classic vs DESFire for hotel chips"},
+        {"href": "/blog/hotel-key-card-design-printing/", "label": "Hotel key card design and printing"}
       ]
     }
   ],
   "faq": [
     {
-      "question": "How do I know which chip my hotel locks use?",
-      "answer": "The fastest method is to send a photo of your current guest card or the lock brand and model. Most lock brands map cleanly to one or two chip families. We can confirm compatibility within one working day in most cases."
+      "question": "How do I know which chip my hotel locks accept?",
+      "answer": "Three indicators usually settle it: (1) the visible lock-face badge — Saflok Quantum, Vingcard Signature, SALTO XS4 One, Onity Trillium each have distinct branding; (2) the encoder at the front desk (Encoder 4010, Saflok 75720, SALTO NCoder, Onity Encoder 4000); (3) the back-end software console (Visionline / Vostio / Ambiance / SALTO Space / OnPortal). If all three are unclear, send a current guest card sample to the supplier for an inspection read before committing to a production chip. The per-vendor compatibility guides at /compatibility/ give the full taxonomy."
     },
     {
-      "question": "Can I order cards without providing key data?",
-      "answer": "Yes, if you choose blank cards for front-desk encoding. Pre-encoded cards require the sector layout and key data, shared under a standard NDA. Most properties with existing encoder setups prefer the blank-card route."
+      "question": "Should new hotel estates still order MIFARE Classic 1K stock in 2026?",
+      "answer": "Only as a documented transitional step, not as a long-term target. Three converging issues make Classic a 2026 procurement risk: (1) the Crypto-1 cipher is publicly broken industry-wide; (2) the August 2024 Quarkslab disclosure of a hardware backdoor in Fudan FM11RF08 / FM11RF08S MIFARE Classic clones means cloned card stock can be cracked in roughly two minutes; (3) the March 2024 Unsaflok disclosure (CVE-2024-29916) exposed properties on unpatched Saflok firmware. New estates should standardise on MIFARE DESFire EV3 (AES-128, EAL5+) or MIFARE Plus in SL3 mode (AES-128). For paper guest cards, MIFARE Ultralight AES (CC EAL3+, announced 2024) is the new low-cost AES option."
     },
     {
-      "question": "Do hotel key cards need a magstripe co-layer?",
-      "answer": "Only if your property has magnetic-stripe readers still in service. Typically on older parking barriers, gym lockers or legacy room locks. Dual-interface cards with both RFID and magstripe are a standard catalogue option."
+      "question": "Is the 2024 Saflok Unsaflok vulnerability still a concern for new card orders?",
+      "answer": "Yes for properties not yet on the post-November-2023 remediated firmware. CVE-2024-29916 was disclosed in March 2024 by Lennert Wouters (KU Leuven COSIC) and Ian Carroll. The proprietary Saflok KDF used only the card UID as input, allowing an attacker who could read any legitimate guest card to forge a write-pair that opened every door at the property. Roughly 3 million doors at 13,000+ properties in 131 countries were affected; the remediation is a door-controller firmware update that dormakaba began shipping November 2023. As of disclosure ~36% of locks were remediated. A new card order does not by itself remediate or expose the issue. Confirm with dormakaba service that any Saflok MT / Confidant / Quantum-era doors in scope are on the remediated firmware before scaling card stock; new estates can sidestep the affected MIFARE Classic surface entirely by standardising on DESFire EV3."
     },
     {
-      "question": "How long does hotel key card sampling take?",
-      "answer": "Standard compatibility samples take 7–10 working days from confirmed chip and format. Artwork proofs add 2–3 working days. Providing a current card reference or lock model on first contact usually shortens this to the lower end of the range."
+      "question": "Can one card SKU cover multiple lock vendors in a mixed-vendor estate?",
+      "answer": "Partially. MIFARE Classic 1K reads on every hotel-lock vendor's current reader heads (subject to the security caveats above). MIFARE Plus in SL1 mode is Classic-compatible across major vendors. MIFARE DESFire EV3 reads on Saflok Messenger LENS / Quantum Plus / Pixel, Vingcard Signature / Allure / Essence reader-type 3G+, SALTO XS4 One / Mini / AElement Fusion / Neo BLE, Onity Trillium (where Onity confirms), MIWA ALV3 / V3HTM. EV3 does NOT read on Vingcard E100 / C100 reader variants. The pragmatic multi-vendor strategy: MIFARE Plus EV2 in SL3 mode for the broadest envelope, or a phased per-vendor rollout that targets DESFire EV3 where supported."
     },
     {
-      "question": "Can I get eco or wood hotel key cards in MIFARE Plus?",
-      "answer": "Yes. Eco PLA and wood-veneer card constructions are available with MIFARE Classic, MIFARE Plus EV2 and DESFire EV3 inlays. Lead times for specialty materials are slightly longer than standard PVC."
+      "question": "Will FSC bamboo or FSC wood hotel cards read reliably with DESFire EV3 inlays?",
+      "answer": "Yes on current-generation reader heads (Vingcard Signature / Allure / Essence reader-type 3G+, SALTO XS4 One / AElement Fusion, Saflok Messenger LENS / Quantum Plus / Pixel). Bamboo and wood cards typically read at 0.85–0.95× the distance of equivalent PVC inlays. On older reader heads (Vingcard Classic, SALTO XS4 Original, Saflok Quantum IV) bamboo / wood inlays can be marginal — pilot a production-thickness sample on the actual hardware before scaling. SALTO and ASSA ABLOY both publish their own bamboo guest-card SKUs; \"Approved Vingcard vendor\" / \"Approved ASSA ABLOY vendor\" badges in supplier documentation are real procurement signals for chain RFPs."
     },
     {
-      "question": "What is the minimum order quantity for hotel key cards?",
-      "answer": "Sample quantities start from 50–100 cards depending on the construction. Full production orders typically start from 500 cards for standard PVC and 200–300 for premium or eco materials. Contact the team for quantity-specific pricing."
+      "question": "What is the difference between MIFARE Plus SL1 and SL3 mode?",
+      "answer": "SL1 is the Classic-compatible mode — the Plus card behaves on the wire exactly like a Classic 1K card and shares the Crypto-1 cryptographic surface. Useful as a like-for-like Classic upgrade. SL3 is the AES-128 authenticated-session mode — the Plus card runs proper AES mutual authentication with the reader. Most current Vingcard, Saflok and SALTO reader heads accept Plus in SL3 mode; older Onity HT-RFID and ADVANCE reader heads often only accept Plus in SL1. Confirm SL3 support with vendor service before scaling. SL3 is the security tier most procurement teams should target on a Plus migration."
     },
     {
-      "question": "What if my property uses multiple lock brands?",
-      "answer": "Multi-brand estates are common and usually require a compatibility review across all lock platforms before a single chip family is confirmed. In some cases a dual-application or MIFARE Plus migration strategy can reduce the number of card SKUs in circulation."
+      "question": "How does Oracle OPERA Cloud key encoding work with hotel-lock vendors in 2026?",
+      "answer": "OPERA Cloud uses the `roomKeysOutbound` configuration with a GUESTKEY_GENERIC outbound type. The action enum covers New, Duplicate, One-shot, Read and Delete key. The OPERA-side connector is the same shape across major hotel-lock vendors; the vendor-specific component is the local encoding agent (Saflok HMS, Vingcard Dialock HMS for Mews, SALTO Local IO Bridge, OnPortal for Onity) that runs on the front-desk PC and bridges the cloud PMS to the USB encoder hardware. Confirm both the OPERA connector version and the vendor agent version after any PMS upgrade — they need to match."
+    },
+    {
+      "question": "What sustainability certifications should be in a 2026 hotel-card RFP?",
+      "answer": "Four certifications cover most chain audit clauses: (1) Forest Stewardship Council chain-of-custody (FSC-STD-40-004) for any bamboo or wood card claim; (2) Global Recycled Standard (GRS) ≥50% recycled content for any recycled-PVC claim; (3) TÜV Austria OK biobased (EN 16640) for PLA bio-based content; (4) BPI ASTM D6868 / ASTM D6400 compostability for any biodegradable claim. Cite the certifying body in the supplier's response, not just the supplier's own marketing language — chain procurement audit teams look for the cert number, not the brand claim."
+    },
+    {
+      "question": "Can I order cards without sharing the lock's site keys?",
+      "answer": "Yes for blank stock that the property's encoder will program at the front desk. For pre-encoded cards (factory-programmed with site keys for shorter front-desk arrival workflows), the supplier needs to receive the site keys under a secure key-transport mechanism. dormakaba, ASSA ABLOY, SALTO and Onity all have established key-injection workflows for approved card suppliers. Most properties choose blank stock for the first sample round and only graduate to pre-encoding once the front-desk operational flow is validated."
     }
+  ],
+  "primaryAction": {"href": "/contact/hotel-rfid/", "label": "Get a hotel key card sample plan"},
+  "secondaryActions": [
+    {"href": "/compatibility/", "label": "Browse all 7 compatibility guides"},
+    {"href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "Compare chip families"},
+    {"href": "/products/rfid-cards/", "label": "Hotel card catalogue"},
+    {"href": "/contact/", "label": "General contact"}
   ],
   "sources": [
-    {
-      "label": "ISO/IEC 7810:2019 — Identification cards — Physical characteristics",
-      "url": "https://www.iso.org/standard/70483.html",
-      "publisher": "ISO",
-      "publishedAt": "2019-03",
-      "accessedAt": "2026-04-26",
-      "note": "Normative CR80 / ID-1 dimensions and card-flexure requirements for branded hotel key cards."
-    },
-    {
-      "label": "ISO/IEC 10373-6:2020 — Identification cards — Test methods — Proximity cards",
-      "url": "https://www.iso.org/standard/78016.html",
-      "publisher": "ISO",
-      "publishedAt": "2020-02",
-      "accessedAt": "2026-04-26",
-      "note": "Proximity-card test-method standard used to qualify hotel key cards against the ISO 14443 air interface."
-    },
-    {
-      "label": "ISO/IEC 14443:2018 — Proximity cards (HF 13.56 MHz)",
-      "url": "https://www.iso.org/standard/73599.html",
-      "publisher": "ISO",
-      "publishedAt": "2018-09",
-      "accessedAt": "2026-04-26",
-      "note": "HF air interface used by MIFARE Classic, Plus EV2 and DESFire EV3 hotel-lock credentials."
-    },
-    {
-      "label": "NXP MIFARE DESFire EV3 product brief",
-      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-desfire/mifare-desfire-ev3:MIFARE-DESFIRE-EV3",
-      "publisher": "NXP Semiconductors",
-      "publishedAt": "2020-09",
-      "accessedAt": "2026-04-26",
-      "note": "Current AES-128 secure credential specified by premium hotel lock vendors for new-build and retrofit properties."
-    },
-    {
-      "label": "NXP MIFARE Plus EV2 product brief",
-      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-plus/mifare-plus-ev2:MIFARE-PLUS-EV2",
-      "publisher": "NXP Semiconductors",
-      "publishedAt": "2020-04",
-      "accessedAt": "2026-04-26",
-      "note": "Migration-path silicon between MIFARE Classic and DESFire. Commonly encountered in retrofit hotel estates."
-    },
-    {
-      "label": "ASSA ABLOY Global Solutions — Hospitality (VingCard, Mobile Access, Signature RFID)",
-      "url": "https://www.assaabloyglobalsolutions.com/en/hospitality",
-      "publisher": "ASSA ABLOY Global Solutions",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Leading hotel-lock ecosystem reference for card, wristband and mobile credentials — Marriott / Hilton / IHG default OEM."
-    },
-    {
-      "label": "Salto Systems — Hospitality access solutions (SVN, KS, JustIN Mobile)",
-      "url": "https://saltosystems.com/en/solutions/hospitality/",
-      "publisher": "Salto Systems",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Major hotel-lock platform referenced for compatibility and encoding workflows across branded and independent hotels — Salto KS cloud + JustIN Mobile."
-    },
-    {
-      "label": "dormakaba — Hospitality access (Saflok Quantum, Confidant RFID, LENS)",
-      "url": "https://www.dormakaba.com/us-en/solutions/markets/hotels",
-      "publisher": "dormakaba",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Major hotel-lock vendor ecosystem including Saflok and Confidant RFID families — Hyatt / Wyndham / Choice OEM."
-    },
-    {
-      "label": "ONITY — Hotel locks and DirectKey mobile",
-      "url": "https://www.onity.com/products/hotel-locks/",
-      "publisher": "ONITY (Carrier)",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Major hospitality-lock OEM with HT22i / Advance / Trillium portfolios + DirectKey BLE mobile-access SDK."
-    },
-    {
-      "label": "Oracle Hospitality — OPERA Cloud + OPERA Vendor Interface (OVI) for door locks",
-      "url": "https://www.oracle.com/hospitality/hotel-property-management/",
-      "publisher": "Oracle",
-      "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
-      "note": "Dominant full-service hotel PMS with OVI / OWS interfaces to ASSA ABLOY VingCard, dormakaba Saflok, Salto, ONITY and MIWA encoder drivers."
-    }
+    {"label": "CVE-2024-29916 — NIST National Vulnerability Database", "url": "https://nvd.nist.gov/vuln/detail/CVE-2024-29916", "publisher": "NIST NVD", "publishedAt": "2024-03", "accessedAt": "2026-05-11", "note": "Official CVE record for the Unsaflok master-key forgery vulnerability."},
+    {"label": "Unsaflok researcher disclosure", "url": "https://unsaflok.com/", "publisher": "Lennert Wouters (KU Leuven COSIC), Ian Carroll et al.", "publishedAt": "2024-03-21", "accessedAt": "2026-05-11", "note": "Primary technical disclosure. 3M doors, 13k properties, 131 countries; November 2023 firmware fix rollout; ~36% remediated at disclosure."},
+    {"label": "Wired — Hackers Found a Way to Open Any of 3 Million Hotel Keycard Locks", "url": "https://www.wired.com/story/saflok-hotel-lock-unsaflok-hack-technique/", "publisher": "Condé Nast / Wired (Andy Greenberg)", "publishedAt": "2024-03-21", "accessedAt": "2026-05-11", "note": "General-press coverage; quotable \"two taps\" attack framing."},
+    {"label": "Quarkslab — MIFARE Classic Fudan FM11RF08 backdoor disclosure", "url": "https://blog.quarkslab.com/mifare-classic-static-encrypted-nonce-and-backdoors.html", "publisher": "Quarkslab", "publishedAt": "2024-08", "accessedAt": "2026-05-11", "note": "Hardware backdoor in Fudan FM11RF08 / FM11RF08S MIFARE Classic clones; sector keys brute-forceable in ~2 minutes on consumer hardware."},
+    {"label": "ISO/IEC 7810:2019 — Identification cards — Physical characteristics", "url": "https://www.iso.org/standard/70483.html", "publisher": "ISO", "publishedAt": "2019", "accessedAt": "2026-05-11", "note": "Defines ID-1 hotel-card form factor: 85.60 × 53.98 mm, 0.76 mm ± 0.08 mm thickness."},
+    {"label": "ISO/IEC 14443 — Identification cards — Contactless integrated circuit cards (reference)", "url": "https://en.wikipedia.org/wiki/ISO/IEC_14443", "publisher": "Wikipedia (ISO reference)", "accessedAt": "2026-05-11", "note": "13.56 MHz Type A / Type B air interface used by MIFARE Classic, Plus, DESFire, Ultralight."},
+    {"label": "ISO/IEC 7816-4 (Wikipedia reference)", "url": "https://en.wikipedia.org/wiki/ISO/IEC_7816", "publisher": "Wikipedia (ISO reference)", "accessedAt": "2026-05-11", "note": "APDU command-set layer used by DESFire over the contactless interface."},
+    {"label": "NXP MIFARE DESFire EV3 datasheet (MF3D(H)x3)", "url": "https://www.nxp.com/docs/en/data-sheet/MF3D_H_X3_SDS.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "DESFire EV3 air interface (ISO/IEC 14443-4); AES-128 authenticated sessions; Common Criteria EAL5+; 2K/4K/8K memory variants; EV2 / EV1 backwards-compatible default."},
+    {"label": "NXP MIFARE Classic EV1 1K datasheet (MF1S70YYX_V1)", "url": "https://www.nxp.com.cn/docs/en/data-sheet/MF1S70YYX_V1.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "Authoritative reference for the legitimate NXP-fab Classic 1K sector / block layout — use to distinguish from Fudan FM11RF08 clones."},
+    {"label": "MIFARE Ultralight AES — Vingcard compatibility announcement", "url": "https://www.traveldailynews.com/technology/vingcard-enhances-hotel-security-with-mifare-ultralight-aes-compatibility/", "publisher": "Travel Daily News", "publishedAt": "2024", "accessedAt": "2026-05-11", "note": "Common Criteria EAL3+, 128-bit AES, secure messaging over RF — newest credential in hospitality."},
+    {"label": "dormakaba Saflok Quantum RFID — product page", "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/electronic-hotel-locks/quantum-rfid--ka_117755", "publisher": "dormakaba", "accessedAt": "2026-05-11", "note": "Authoritative product reference for Quantum RFID modular two-piece design and BLE + digital-wallet support."},
+    {"label": "dormakaba RFID Encoder Gen II — model 75720 product page", "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/peripherals/rfid-encoder-gen-ii--dk_77100", "publisher": "dormakaba", "accessedAt": "2026-05-11", "note": "Gen II encoder model 75720 supersedes Gen I 74750; supports MIFARE Ultralight C + Plus EV2 + DESFire EV3."},
+    {"label": "ASSA ABLOY Vingcard rebranding (April 2024)", "url": "https://www.assaabloyglobalsolutions.com/en/about-us/customer-news/vingcard-rebranding", "publisher": "ASSA ABLOY Global Solutions", "publishedAt": "2024-04", "accessedAt": "2026-05-11", "note": "Formal consolidation of hospitality business under the single Vingcard master brand."},
+    {"label": "Vingcard Apple Wallet support page", "url": "https://www.vingcard.com/en/solutions/mobile-access-and-wallet-solutions/apple-wallet", "publisher": "Vingcard", "accessedAt": "2026-05-11", "note": "iPhone and Apple Watch unlock; Find My remote disable; remote credential delivery from Vostio."},
+    {"label": "SALTO XS4 One datasheet", "url": "https://www.tlg-solution.com/wp-content/uploads/2024/04/XS4-One-Datasheet.pdf", "publisher": "SALTO Systems", "publishedAt": "2024", "accessedAt": "2026-05-11", "note": "Chip support for MIFARE DESFire EV2, Classic, Plus, Ultralight C, HID iCLASS Seos."},
+    {"label": "Honeywell Onity Trillium — product page", "url": "https://buildings.honeywell.com/us/en/brands/our-brands/onity/what-we-do/electronic-locking-systems/trillium-lock", "publisher": "Honeywell Building Automation / Onity", "accessedAt": "2026-05-11", "note": "Current Onity flagship; BLE-equipped; MIFARE Plus support; upgrade-from-HT path."},
+    {"label": "Oracle OPERA Cloud roomKeysOutbound configuration", "url": "https://docs.oracle.com/en/industries/hospitality/integration-platform/psrko/c_configurations.htm", "publisher": "Oracle", "accessedAt": "2026-05-11", "note": "GUESTKEY_GENERIC outbound type with New / Duplicate / One-shot / Read / Delete action enum — same shape across major hotel-lock vendor connectors."},
+    {"label": "Mews — hotel-lock integration partners (help center)", "url": "https://help.mews.com/en/", "publisher": "Mews Help Center", "accessedAt": "2026-05-11", "note": "Verified integrations with Saflok, Vingcard, SALTO, Onity, Häfele Dialock, MIWA."},
+    {"label": "Forest Stewardship Council chain-of-custody (FSC-STD-40-004)", "url": "https://fsc.org/en/chain-of-custody", "publisher": "Forest Stewardship Council", "accessedAt": "2026-05-11", "note": "Required certification for wood and bamboo hotel-card claims; chain procurement audit baseline."},
+    {"label": "Global Recycled Standard (GRS) overview", "url": "https://www.scsglobalservices.com/services/global-recycled-standard", "publisher": "Textile Exchange / SCS Global Services", "accessedAt": "2026-05-11", "note": "GRS requires ≥50% post-consumer recycled content for the product-level recycled-PVC claim."},
+    {"label": "TÜV Austria OK biobased certification", "url": "https://okcert.tuvaustria.com/ok-biobased-en/", "publisher": "TÜV Austria", "accessedAt": "2026-05-11", "note": "EN 16640 bio-based-content certification used for PLA hotel-card claims."},
+    {"label": "BPI ASTM D6868 compostable plastics", "url": "https://bpiworld.org/d6868-biodegradable-plastics", "publisher": "Biodegradable Products Institute", "accessedAt": "2026-05-11", "note": "Compostability certification for PLA hotel-card biodegradable claim."},
+    {"label": "AHLA 2026 State of the Industry Report", "url": "https://www.ahla.com/resource/2026-state-industry", "publisher": "American Hotel & Lodging Association", "publishedAt": "2026", "accessedAt": "2026-05-11", "note": "2026 hospitality industry baseline; 70% of guests prefer mobile check-in but physical-card baseline remains operational requirement."}
   ],
-  "primaryAction": {
-    "href": "/contact/hotel-rfid/",
-    "label": "Get hotel lock compatibility check"
-  },
-  "secondaryActions": [
-    {
-      "href": "/compatibility/",
-      "label": "Browse compatibility pages"
-    },
-    {
-      "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
-      "label": "Compare chip families"
-    },
-    {
-      "href": "/products/rfid-cards/",
-      "label": "Browse RFID cards"
-    }
-  ],
-  "authorSlug": "peter-zhang",
+  "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-01-02"
+  "reviewedAt": "2026-05-11"
 }

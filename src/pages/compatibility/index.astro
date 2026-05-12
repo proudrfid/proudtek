@@ -1,0 +1,239 @@
+---
+/**
+ * /compatibility/ — hotel-lock compatibility hub.
+ *
+ * Native .astro hub matching /blog/ + /compare/ + /guides/. Reads the
+ * editorial collection where `group === "compatibility"`, joins each
+ * entry with its display metadata from src/data/compatibility-vendors.ts,
+ * and renders:
+ *   - .codex-blog-index header (H1 + one-line count description)
+ *   - Single flat 3-column grid of vendor cards
+ *   - Each card: hero thumbnail, parent-company tag, short vendor name,
+ *     one-sentence pitch, "View compatibility →" CTA
+ *
+ * Replaces the WP-snapshot rendering of /compatibility/ that previously
+ * came from `src/content/editorial/compatibility.json` (the pillar).
+ * That pillar file can now be deleted — `[...slug].astro` excludes
+ * /compatibility/ via NATIVE_HUB_ROUTES.
+ *
+ * Individual vendor pages (/compatibility/{slug}-hotel-key-cards/) are
+ * unchanged — they still render through [...slug].astro and pick up the
+ * compatibility editorial JSON. The rail-injection seam in
+ * src/lib/seo/enhance-page.ts gives those single pages the same look
+ * as the blog/compare/guides single-pages.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import {
+  COMPATIBILITY_CATEGORIES,
+  COMPATIBILITY_VENDORS,
+  getTotalCompatibilityVendorCount,
+} from "../../data/compatibility-vendors";
+import type { PageSeoData } from "../../lib/seo";
+import { buildCompatibilityRailHtml } from "../../lib/seo/compatibility-rail";
+import { buildRailFilterScript } from "../../lib/seo/rail";
+import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { getPageByRoute } from "../../lib/site-data";
+import { truncateText } from "../../lib/seo/utils";
+
+const SITE_ORIGIN = "https://www.proudtek.com";
+const ROUTE = "/compatibility/";
+const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
+const TOTAL_VENDORS = getTotalCompatibilityVendorCount();
+
+// ── Pull every compatibility entry from editorial ──
+// Each vendor's editorial JSON lives at
+// src/content/editorial/compatibility/{slug}-hotel-key-cards.json.
+const allEditorial = await getCollection("editorial");
+const compatById = new Map<string, ReturnType<typeof Object>>();
+for (const entry of allEditorial) {
+  const m = entry.id.match(/^compatibility\/(.+)$/);
+  if (m) compatById.set(m[1], entry.data);
+}
+
+// Join: walk COMPATIBILITY_VENDORS in curator order, look up each vendor's
+// editorial JSON by `{slug}-hotel-key-cards`, and attach the editorial data
+// for the card body. Skip any vendor whose editorial JSON went missing.
+type VendorCard = {
+  slug: string;
+  vendor: (typeof COMPATIBILITY_VENDORS)[number];
+  data: any;
+};
+const vendorCards: VendorCard[] = [];
+for (const vendor of COMPATIBILITY_VENDORS) {
+  const editorialKey = `${vendor.slug}-hotel-key-cards`;
+  const data = compatById.get(editorialKey);
+  if (data) vendorCards.push({ slug: editorialKey, vendor, data });
+}
+
+// ── Build SEO ──
+const breadcrumbLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN + "/" },
+    { "@type": "ListItem", position: 2, name: "Resources", item: SITE_ORIGIN + "/resources/" },
+    { "@type": "ListItem", position: 3, name: "Compatibility", item: CANONICAL_URL },
+  ],
+});
+
+const collectionLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": CANONICAL_URL,
+  name: "RFID & NFC Hotel Lock Compatibility",
+  description: `Browse compatibility guides for all ${TOTAL_VENDORS} major hotel-lock platforms — Saflok, Vingcard, SALTO, Onity, MIWA, Häfele Dialock and Be-Tech. Procurement-grade card-stock references with lock generations, encoder stacks, PMS integration and security disclosures.`,
+  url: CANONICAL_URL,
+  isPartOf: { "@type": "WebSite", name: "Proud Tek", url: SITE_ORIGIN + "/" },
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: TOTAL_VENDORS,
+    itemListElement: vendorCards.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${SITE_ORIGIN}/compatibility/${c.slug}/`,
+      name: c.vendor.displayName,
+    })),
+  },
+});
+
+const seo: PageSeoData = {
+  htmlAttrs: { lang: "en" },
+  bodyAttrs: { class: "page-compatibility-hub" },
+  headHtml: "",
+  bodyHtml: "",
+  kind: "core",
+  contentTitle: "RFID & NFC Hotel Lock Compatibility",
+  title: `Hotel Lock Compatibility — Saflok, Vingcard, SALTO, Onity, MIWA & Häfele Dialock Card Guides | Proud Tek`,
+  description: `Procurement-grade compatibility references for all ${TOTAL_VENDORS} major hotel-lock platforms. Lock generations, encoder stacks, PMS integration, security disclosures and ${145}+ authoritative sources cited.`,
+  canonicalUrl: CANONICAL_URL,
+  robots: "index, follow",
+  indexable: true,
+  jsonLd: [breadcrumbLd, collectionLd],
+  imageUrl: "",
+  imageAlt: "Proud Tek hotel lock compatibility guides — Saflok, Vingcard, SALTO, Onity, MIWA, Häfele Dialock, Be-Tech",
+  imageGallery: [],
+  faqEntries: [],
+  procurementFields: [],
+  collectionSummary: [],
+  collectionGuidanceFields: [],
+  collectionRelatedPages: [],
+  collectionSourceLinks: [],
+  coreSummary: [
+    `${TOTAL_VENDORS} hotel-lock manufacturer compatibility guides`,
+    "Lock generations, encoder lifecycle, PMS integration, security disclosures (CVE-2024-29916 Saflok, 2018 F-Secure Vingcard Vision, 2012 Onity Brocious)",
+    "Procurement-ready: door-thickness ranges, chip-family per generation, encoder part numbers, Mobile Access narrative",
+  ],
+  coreGuidanceFields: [],
+  coreRelatedPages: [],
+  coreSourceLinks: [],
+  articleSummary: [],
+  articleGuidanceFields: [],
+  articleRelatedPages: [],
+  articleSourceLinks: [],
+  productRelatedPages: [],
+  productSourceLinks: [],
+  ogType: "website",
+  articleMeta: null,
+};
+
+// ── WP chrome donor ──
+// /compatibility/ is not in site-meta.json. Use /about/ (guaranteed disk
+// snapshot) as the chrome donor, falling through /resources/ first if it
+// exists as a synthetic editorial page.
+const donorPage =
+  (await getPageByRoute("/resources/")) ||
+  (await getPageByRoute("/about/"));
+if (!donorPage) {
+  throw new Error(
+    "compatibility/index.astro: no chrome donor snapshot (/resources/, /about/ both missing)",
+  );
+}
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
+seo.bodyAttrs = {
+  ...chrome.bodyAttrs,
+  ...seo.bodyAttrs,
+  class: [chrome.bodyAttrs.class, seo.bodyAttrs.class].filter(Boolean).join(" "),
+};
+seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
+
+/**
+ * Pull the hero thumbnail off the editorial JSON. Falls back through:
+ *   1. `heroImage` if set on the vendor's editorial JSON
+ *   2. a per-vendor default hero (mostly the shared hotel-key card hero)
+ */
+function heroFor(data: any): string {
+  return data.heroImage || "/landing-images/ppc-hotel-key-cards.jpg";
+}
+
+// Left rail + in-place filter script — same shape as blog/compare/guides hubs.
+const railHtml = buildCompatibilityRailHtml(undefined);
+const filterScript = buildRailFilterScript({
+  filterMode: "in-place",
+  hubAnchorId: "compatibility-all",
+  hubPath: "/compatibility/",
+});
+---
+
+<BaseLayout seo={seo}>
+  <Fragment set:html={chrome.beforeMainHtml} />
+
+  <main id="main" class="site-main" role="main">
+    {/* Same rail markup as blog + compare + guides hubs. */}
+    <Fragment set:html={railHtml} />
+
+    {/* Mirror /blog/ + /compare/ + /guides/ hub layout exactly:
+        .codex-blog-index .codex-blog-index--with-rail wrapper, simple
+        header (H1 + one-line description), flat 3-column grid of
+        vendor cards, rail-driven in-place filter. */}
+    <section
+      class="codex-blog-index codex-blog-index--with-rail"
+      id="compatibility-all"
+      aria-label="Hotel-lock compatibility guides"
+    >
+      <div class="codex-blog-index__header">
+        <h1>RFID &amp; NFC Hotel Lock Compatibility</h1>
+        <p>
+          {TOTAL_VENDORS} procurement-grade compatibility guides for the major hotel-lock platforms — Saflok,
+          Vingcard, SALTO, Onity, MIWA, Häfele Dialock and Be-Tech. Each guide maps lock generations,
+          encoder lifecycles, PMS integration and security disclosures to the card-stock decisions a
+          procurement team has to make.
+        </p>
+      </div>
+      <div class="codex-blog-index__grid">
+        {vendorCards.map(({ slug, vendor, data }) => (
+          <a
+            class="codex-card codex-blog-grid-card"
+            href={`/compatibility/${slug}/`}
+            data-rail-key={vendor.category}
+            data-vendor={vendor.slug}
+          >
+            <img
+              class="codex-blog-grid-card__thumb"
+              src={heroFor(data)}
+              alt={data.imageAlt || `${vendor.displayName} hotel lock compatibility`}
+              width="1200"
+              height="675"
+              loading="lazy"
+              decoding="async"
+            />
+            <span class="codex-blog-grid-card__tag">{vendor.parentCompany}</span>
+            <strong>{vendor.displayName}</strong>
+            <p>{truncateText(vendor.shortDescription, 160)}</p>
+            <span class="codex-blog-grid-card__cta">View compatibility →</span>
+          </a>
+        ))}
+      </div>
+      <div class="codex-blog-index__empty" hidden>
+        <div class="codex-blog-index__empty-icon" aria-hidden="true">🔍</div>
+        <h3>No vendors in this group yet</h3>
+        <p>Try another vendor group, or view all vendors.</p>
+        <button type="button" class="codex-blog-index__empty-clear">Show all vendors</button>
+      </div>
+      <script is:inline set:html={filterScript} />
+    </section>
+  </main>
+
+  <Fragment set:html={chrome.afterMainHtml} />
+</BaseLayout>

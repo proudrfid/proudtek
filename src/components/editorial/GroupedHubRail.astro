@@ -1,0 +1,82 @@
+---
+/**
+ * Grouped hub rail — sidebar nav with grouped sections.
+ *
+ * Shadow component (Stage 3.x). Mirrors `renderGroupedHubRail(groups,
+ * currentRoute, sectionLabel)` in editorial-pages.ts (~line 1296).
+ *
+ * Used by /solutions/* (37 items across themes), /guides/*, and /compare/*.
+ * Each group renders its own labelled header with item count and the items
+ * belonging to that group. Drawer-toggle script is shared via
+ * `_railDrawerScript.ts`.
+ *
+ * Empty groups (zero items) are filtered out — matches TS behavior so the
+ * markup stays clean.
+ */
+import type { GroupedHubData } from "../../lib/editorial-pages";
+import { getIcon } from "../../lib/icons";
+import { RAIL_DRAWER_SCRIPT } from "./_railDrawerScript";
+
+interface Props {
+  groups: GroupedHubData;
+  currentRoute: string;
+  sectionLabel: string;
+}
+
+const { groups, currentRoute, sectionLabel } = Astro.props;
+const totalItems = groups.reduce((sum, g) => sum + g.items.length, 0);
+const lowerSection = sectionLabel.toLowerCase();
+const railModifier = lowerSection.replace(/[^a-z0-9]+/g, "-");
+const folderIcon = getIcon("folder");
+const nonEmptyGroups = groups.filter((g) => g.items.length > 0);
+---
+{totalItems > 0 && (
+  <>
+    <button
+      type="button"
+      class="codex-catalog-rail-toggle"
+      aria-expanded="false"
+      aria-controls="codex-catalog-rail-panel"
+      aria-label={`Show ${lowerSection}`}
+    >
+      <span class="codex-catalog-rail-toggle__icon codex-icon" aria-hidden="true" set:html={folderIcon} />
+      <span class="codex-catalog-rail-toggle__label">{sectionLabel}</span>
+    </button>
+    <div class="codex-catalog-rail-backdrop" hidden />
+    <aside
+      id="codex-catalog-rail-panel"
+      class={`codex-catalog-rail codex-catalog-rail--${railModifier} codex-catalog-rail--grouped`}
+      aria-label={sectionLabel}
+    >
+      <button type="button" class="codex-catalog-rail__close" aria-label={`Close ${lowerSection}`}>✕</button>
+      <nav class="codex-industries-rail__nav">
+        <div class="codex-industries-rail__title">{sectionLabel}</div>
+        {nonEmptyGroups.map((group) => (
+          <div class="codex-industries-rail__group">
+            <div class="codex-industries-rail__group-title">
+              <span class="codex-industries-rail__group-icon codex-icon" aria-hidden="true" set:html={getIcon(group.iconSlug)} />
+              {" "}{group.groupLabel}{" "}
+              <span class="codex-industries-rail__group-count">{group.items.length}</span>
+            </div>
+            {group.items.map((entry) => {
+              const isActive = entry.route === currentRoute;
+              const classAttr = isActive ? "codex-industries-rail__link active" : "codex-industries-rail__link";
+              return (
+                <a
+                  href={entry.route}
+                  class={classAttr}
+                  data-slug={entry.slug}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  <span class="codex-industries-rail__emoji codex-icon" aria-hidden="true" set:html={getIcon(entry.iconSlug)} />
+                  <span class="codex-industries-rail__label">{entry.label}</span>
+                </a>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
+    </aside>
+    <script is:inline set:html={RAIL_DRAWER_SCRIPT} />
+  </>
+)}

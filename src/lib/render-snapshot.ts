@@ -108,6 +108,16 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // Remove WP font preloads — we add our own preloads in the Astro layout
   $head('link[rel="preload"][as="font"]').remove();
 
+  // C-2 attempt (2026-05-09) reverted: tried to defer wp-block-library and
+  // easy-table-of-contents stylesheets via print-media swap. /blog/ unchanged
+  // but home `/` CLS jumped from 0.000 → 0.142 (over the 0.1 "Good"
+  // threshold). The block-library CSS turns out to also style above-the-fold
+  // home elements (hero cards / product tiles), so deferring it shifts layout
+  // on the home route. Fix: leave WP CSS render-blocking. Future paths to
+  // explore: critical-CSS extraction (Beasties/Critters integration) — only
+  // inline above-the-fold rules, defer the rest. See PHASE-X-CSS-CRITICAL.md
+  // (TBD) before attempting again.
+
   $body("a[href]").each((_, element) => {
     const href = $body(element).attr("href") ?? "";
     const normalized = collapseFirstPagePagination(href);

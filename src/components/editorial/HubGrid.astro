@@ -1,0 +1,56 @@
+---
+/**
+ * Flat hub card grid — appears below hero on /industries/ and /solutions/ hubs.
+ *
+ * Shadow component (Stage 3.x). Mirrors `renderHubGrid(items, sectionLabel)`
+ * in editorial-pages.ts (~line 1250).
+ *
+ * Intro copy varies by sectionLabel: "industries" gets a sector-focused line,
+ * everything else gets a generic "use case" template with singular-noun
+ * trim (`replace(/s$/, "")`).
+ */
+import type { HubEntry } from "../../lib/editorial-pages";
+import { getIcon } from "../../lib/icons";
+import { truncateEditorialText } from "../../lib/editorial-types";
+
+interface Props {
+  items: HubEntry[];
+  sectionLabel: string;
+}
+
+const { items, sectionLabel } = Astro.props;
+const lowerSection = sectionLabel.toLowerCase();
+const sectionId = `${lowerSection.replace(/[^a-z0-9]+/g, "-")}-hub-grid`;
+const introCopy = lowerSection === "industries"
+  ? "Pick the vertical closest to your project — each page lists the relevant SKUs, real-world deployments and any compliance notes."
+  : `Pick the ${lowerSection.replace(/s$/, "")} closest to your use case — each page covers the relevant SKUs, deployment notes and compatible hardware.`;
+---
+{items.length > 0 && (
+  <section
+    class="codex-editorial-section codex-industries-hub-grid"
+    id={sectionId}
+    aria-label={`All ${lowerSection}`}
+  >
+    <h2>Browse all {items.length}{" "}{lowerSection}</h2>
+    <p class="codex-editorial-section-intro">{introCopy}</p>
+    <div class="codex-industries-hub-grid__list">
+      {items.map((entry) => (
+        <a href={entry.route} class="codex-card codex-card--media codex-industries-hub-card">
+          <div class="codex-industries-hub-card__media">
+            {entry.heroImage ? (
+              <img src={entry.heroImage} alt={entry.label} width="1200" height="675" loading="eager" decoding="async" />
+            ) : (
+              <div class="codex-industries-hub-card__placeholder codex-icon" aria-hidden="true" set:html={getIcon(entry.iconSlug)} />
+            )}
+            <span class="codex-industries-hub-card__emoji codex-icon" aria-hidden="true" set:html={getIcon(entry.iconSlug)} />
+          </div>
+          <div class="codex-industries-hub-card__body">
+            <h3 class="codex-industries-hub-card__title">{entry.label}</h3>
+            <p class="codex-industries-hub-card__summary">{truncateEditorialText(entry.summary, 140)}</p>
+            <span class="codex-industries-hub-card__cta">Explore {entry.label}{" "}<span aria-hidden="true">→</span></span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

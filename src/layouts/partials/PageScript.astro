@@ -1,0 +1,734 @@
+---
+/**
+ * PageScript — global client-side JavaScript bootstrap.
+ *
+ * Inlined as <script is:inline> so it runs synchronously at parse
+ * time (no defer/async). Contains 19 small client-side modules:
+ *
+ *   - Sticky site header scroll detection
+ *   - Mobile drawer focus management
+ *   - Mobile menu accordion
+ *   - Jump-nav active state tracking
+ *   - Scroll-triggered reveal (IntersectionObserver fade-in)
+ *   - WhatsApp FAB visibility (after 300px scroll)
+ *   - Sticky CTA bar show/hide + dismiss
+ *   - RFQ form validation (DS-11 #5c)
+ *   - Compare-table sortable columns (DS-10 #4)
+ *   - Brief block reading-mode auto-expand (DS-10 #3)
+ *   - CTA-tier analytics (DS-10 #1)
+ *   - Generalized event surface (DS-12 #6)
+ *   - Maps embed click-to-activate (Phase 8)
+ *   - RFQ form analytics (DS-12 #6B)
+ *   - Keyboard scroll for .codex-scroll-region (DS-13 #1)
+ *   - Brief auto-expand reduced-motion guard (DS-13 #3)
+ *   - Escape-to-dismiss banners (DS-13 #4)
+ *   - Dev-only sanity check for banner role
+ *
+ * Extracted from BaseLayout.astro on 2026-05-08. Logic unchanged.
+ */
+---
+    <script is:inline>
+    (function() {
+      /* Sticky site header — toggle `.is-scrolled` for the shadow effect.
+         CSS does the actual sticky positioning; this just adds a visual
+         cue once the user has scrolled past the very top. Threshold of 8px
+         avoids flicker from sub-pixel scroll jitter on touch devices. */
+      var stickyHeader = document.getElementById('masthead');
+      if (stickyHeader) {
+        var headerScrollTicking = false;
+        function updateHeaderScrolled() {
+          if (window.scrollY > 8) stickyHeader.classList.add('is-scrolled');
+          else stickyHeader.classList.remove('is-scrolled');
+          headerScrollTicking = false;
+        }
+        window.addEventListener('scroll', function() {
+          if (!headerScrollTicking) {
+            headerScrollTicking = true;
+            requestAnimationFrame(updateHeaderScrolled);
+          }
+        }, { passive: true });
+        updateHeaderScrolled();
+      }
+
+      /* Mobile drawer — focus management on open (a11y best practice).
+         Kadence toggles `body.drawer-open` when the hamburger trigger is
+         tapped. We watch for that class via MutationObserver and shift
+         keyboard focus into the drawer's first focusable element so screen
+         reader + keyboard users land inside the drawer instead of being
+         silently stuck at the hamburger. We also remember the previously
+         focused trigger and restore focus to it on close so tab order
+         doesn't reset to <body>. */
+      var __drawerLastTrigger = null;
+      var __drawerObserver = new MutationObserver(function(mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          if (mutations[i].attributeName !== 'class') continue;
+          var isOpen = document.body.classList.contains('drawer-open');
+          if (isOpen) {
+            __drawerLastTrigger = document.activeElement;
+            // Defer to next frame so the drawer's transition has applied
+            // and elements are actually focusable (display:block, visibility).
+            requestAnimationFrame(function() {
+              var drawer = document.querySelector('#mobile-drawer, .drawer-inner, #mobile-site-navigation');
+              if (!drawer) return;
+              var first = drawer.querySelector('a, button, [tabindex]:not([tabindex="-1"])');
+              if (first && typeof first.focus === 'function') first.focus();
+            });
+          } else if (__drawerLastTrigger && typeof __drawerLastTrigger.focus === 'function') {
+            __drawerLastTrigger.focus();
+            __drawerLastTrigger = null;
+          }
+        }
+      });
+      __drawerObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+      /* Mobile menu — second-level group accordion.
+         Each `[data-codex-mobile-group-toggle]` button is paired with its
+         next-sibling <ul.codex-mobile-group-list>. Click toggles aria-expanded
+         and the `hidden` attribute. Buttons natively handle Enter/Space, no
+         extra keyboard wiring needed. Multiple groups can be open at once —
+         this is a disclosure pattern, not an exclusive accordion. */
+      var mobileGroupToggles = document.querySelectorAll('[data-codex-mobile-group-toggle]');
+      mobileGroupToggles.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var expanded = btn.getAttribute('aria-expanded') === 'true';
+          var controlsId = btn.getAttribute('aria-controls');
+          var panel = controlsId ? document.getElementById(controlsId) : btn.nextElementSibling;
+          if (!panel) return;
+          if (expanded) {
+            btn.setAttribute('aria-expanded', 'false');
+            panel.setAttribute('hidden', '');
+          } else {
+            btn.setAttribute('aria-expanded', 'true');
+            panel.removeAttribute('hidden');
+          }
+        });
+      });
+
+      /* Jump-nav active state tracking */
+      var links = document.querySelectorAll('.codex-editorial-jump-link');
+      if (links.length) {
+        var sections = [];
+        links.forEach(function(link) {
+          var id = (link.getAttribute('href') || '').replace('#', '');
+          var el = id && document.getElementById(id);
+          if (el) sections.push({ link: link, el: el });
+        });
+        if (sections.length) {
+          var active = null;
+          var ticking = false;
+          function update() {
+            var scrollY = window.scrollY + 120;
+            var current = null;
+            for (var i = sections.length - 1; i >= 0; i--) {
+              if (sections[i].el.offsetTop <= scrollY) { current = sections[i]; break; }
+            }
+            if (current === active) return;
+            if (active) active.link.classList.remove('is-active');
+            if (current) current.link.classList.add('is-active');
+            active = current;
+          }
+          window.addEventListener('scroll', function() {
+            if (!ticking) { ticking = true; requestAnimationFrame(function() { update(); ticking = false; }); }
+          }, { passive: true });
+          update();
+        }
+      }
+
+      /* Scroll-triggered reveal: IntersectionObserver for section fade-in */
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var revealTargets = document.querySelectorAll(
+        '.codex-editorial-section, .codex-editorial-card, .codex-editorial-action-bar, .codex-editorial-jump-nav'
+      );
+
+      if (revealTargets.length && !prefersReducedMotion) {
+        /* Threshold 0 + a positive bottom rootMargin so the IO triggers as
+           soon as ANY pixel of the section enters the viewport (plus a
+           120px head-start so the fade-in begins before the section is
+           actually on-screen). The previous 0.08 threshold meant a 5000px
+           section had to expose 400px before .is-visible was added —
+           which never happened for tall sections viewed from the top,
+           leaving tables permanently opacity:0 to the user. */
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, {
+          threshold: 0,
+          rootMargin: '0px 0px 120px 0px'
+        });
+
+        revealTargets.forEach(function(el) { observer.observe(el); });
+
+        /* Belt-and-braces safety net: after 1.5s, force-reveal anything
+           the IO hasn't picked up. Catches edge cases where the observer
+           never fires (display:none ancestors, transform contexts, browser
+           bugs) so a layout glitch can never leave editorial content
+           permanently invisible. */
+        setTimeout(function() {
+          revealTargets.forEach(function(el) {
+            if (!el.classList.contains('is-visible')) el.classList.add('is-visible');
+          });
+        }, 1500);
+      } else {
+        /* Reduced motion or no targets: show everything immediately */
+        revealTargets.forEach(function(el) { el.classList.add('is-visible'); });
+      }
+
+      /* WhatsApp FAB: show after scrolling 300px */
+      var waFab = document.querySelector('.codex-wa-fab');
+      if (waFab) {
+        var waShown = false;
+        function checkWaScroll() {
+          if (window.scrollY > 300 && !waShown) {
+            waFab.classList.add('is-visible');
+            waShown = true;
+            window.removeEventListener('scroll', checkWaScroll);
+          }
+        }
+        window.addEventListener('scroll', checkWaScroll, { passive: true });
+        checkWaScroll();
+      }
+
+      /* Sticky CTA bar — DS-9 #3 (2026-04-26).
+         Single source of truth: refreshSticky() consults three flags
+         (firstShowAllowed, stickyDismissed, visibleCount) and decides whether
+         the bar should be visible. Both the 3s timer and the IntersectionObserver
+         call refreshSticky() instead of mutating the class list directly, which
+         prevents the previous bug where the timer unconditionally showed the
+         sticky even when an in-page CTA (e.g. hero `Request samples` button)
+         was on screen — producing a double-CTA collision. */
+      var stickyCta = document.querySelector('.codex-sticky-cta');
+      if (stickyCta) {
+        var stickyDismissed = false;
+        var firstShowAllowed = false;
+        /* DS-9 #3 fix v2 (2026-04-26): track which anchors are currently
+           intersecting via a Set. The previous accumulator (visibleCount += /
+           -=) double-counted IntersectionObserver's initial isIntersecting=false
+           callbacks for off-screen anchors as "left viewport" decrements,
+           pushing the count negative or out of sync. A Set is per-element
+           and idempotent — add() / delete() are safe for any callback order. */
+        var intersectingAnchors = new Set();
+
+        function refreshSticky() {
+          if (stickyDismissed) return;
+          if (!firstShowAllowed) return;
+          if (intersectingAnchors.size > 0) {
+            stickyCta.classList.remove('is-visible');
+          } else {
+            stickyCta.classList.add('is-visible');
+          }
+        }
+
+        setTimeout(function() {
+          firstShowAllowed = true;
+          refreshSticky();
+        }, 3000);
+
+        var dismissBtn = stickyCta.querySelector('.codex-sticky-cta__dismiss');
+        if (dismissBtn) {
+          dismissBtn.addEventListener('click', function() {
+            stickyDismissed = true;
+            stickyCta.classList.remove('is-visible');
+          });
+        }
+
+        /* Hide sticky whenever ANY in-page conversion anchor is in view. */
+        var conversionAnchors = document.querySelectorAll(
+          '.codex-hero-cta, .codex-editorial-action-bar, .codex-conversion-shell, [data-conversion-anchor]'
+        );
+        if (conversionAnchors.length > 0) {
+          var stickyObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+              if (entry.isIntersecting) {
+                intersectingAnchors.add(entry.target);
+              } else {
+                intersectingAnchors.delete(entry.target);
+              }
+            });
+            refreshSticky();
+          }, { threshold: 0.1 });
+          conversionAnchors.forEach(function(anchor) {
+            stickyObserver.observe(anchor);
+          });
+        }
+      }
+
+      /* RFQ form validation enhancement — DS-11 #5c (2026-04-27).
+         Forms tagged [data-codex-rfq] use the explicit-error pattern: native
+         constraint validation (HTML5 required / type="email") drives the
+         message text, but we render it into a sibling [role="alert"] span
+         (one per field) instead of relying on the browser's native popup,
+         which is inconsistently positioned and styled. The form has
+         `novalidate` so the browser doesn't double-emit. On submit:
+           - Validate every field; for each invalid one fill its error span
+             with the localized message + add aria-invalid + a `.is-invalid`
+             class for the red ring.
+           - Focus the first invalid field so keyboard + SR users land
+             where the problem is.
+           - On valid submit, clear all errors and let the form post.
+         As the user types/edits, errors are cleared per-field on `input`
+         so they don't linger after correction.
+
+         The handler is delegated on document so it survives DOM swaps from
+         the snapshot rendering pipeline. */
+      function codexFormValidate(form) {
+        var firstInvalid = null;
+        var fields = form.querySelectorAll('input, textarea, select');
+        fields.forEach(function(field) {
+          if (field.type === 'hidden') return;
+          if (field.getAttribute('aria-hidden') === 'true') return; // honeypot
+          var errId = field.getAttribute('aria-describedby');
+          // aria-describedby may have multiple IDs; take the one ending in -error.
+          var errEl = null;
+          if (errId) {
+            var parts = errId.split(/\s+/);
+            for (var i = 0; i < parts.length; i++) {
+              if (/-error$/.test(parts[i])) {
+                errEl = document.getElementById(parts[i]);
+                break;
+              }
+            }
+          }
+          var valid = field.checkValidity();
+          if (!valid) {
+            field.setAttribute('aria-invalid', 'true');
+            field.classList.add('is-invalid');
+            if (errEl) {
+              var msg = field.validationMessage || 'This field has an error.';
+              // Friendlier label when we know what's missing.
+              if (field.validity.valueMissing) msg = 'Please fill in this field.';
+              else if (field.validity.typeMismatch && field.type === 'email') msg = 'Please enter a valid email address.';
+              errEl.textContent = msg;
+            }
+            if (!firstInvalid) firstInvalid = field;
+          } else {
+            field.removeAttribute('aria-invalid');
+            field.classList.remove('is-invalid');
+            if (errEl) errEl.textContent = '';
+          }
+        });
+        return firstInvalid;
+      }
+
+      var codexForms = document.querySelectorAll('form[data-codex-rfq]');
+      codexForms.forEach(function(form) {
+        // Per-field clear on input — let users see the error fade once they fix it.
+        form.addEventListener('input', function(e) {
+          var t = e.target;
+          if (!t || !t.matches || !t.matches('input, textarea, select')) return;
+          if (!t.classList.contains('is-invalid')) return;
+          if (t.checkValidity()) {
+            t.removeAttribute('aria-invalid');
+            t.classList.remove('is-invalid');
+            var errId = t.getAttribute('aria-describedby');
+            if (errId) {
+              var parts = errId.split(/\s+/);
+              for (var i = 0; i < parts.length; i++) {
+                if (/-error$/.test(parts[i])) {
+                  var el = document.getElementById(parts[i]);
+                  if (el) el.textContent = '';
+                  break;
+                }
+              }
+            }
+          }
+        });
+        form.addEventListener('submit', function(e) {
+          var firstInvalid = codexFormValidate(form);
+          if (firstInvalid) {
+            e.preventDefault();
+            firstInvalid.focus();
+          }
+        });
+      });
+
+      /* Compare-table sortable columns — DS-10 #4 (2026-04-27).
+         Tables marked [data-sortable] expose click+keyboard sort on each
+         <th scope="col"> after the first (which holds row labels). Three
+         comparators are tried in order:
+           1. Numeric — extract the first number from the cell text. Handles
+              "100m", "$0.42", "3 V", "85 °C", "100k cycles".
+           2. Glyph   — yes/no/neutral via the [data-cell-glyph] attribute
+              we emit from renderTableCellValue (✓ / ✗ / —).
+           3. String  — locale-aware case-insensitive fall-through.
+         Toggling the same column flips ascending↔descending. Toggling
+         another column resets to ascending. aria-sort is updated so SR
+         users hear "ascending"/"descending"/"none" announced. The
+         original DOM order is captured once on init so the user can
+         reset the sort by clicking the row-label header (not currently
+         exposed, but the data is there for future). */
+      var sortableTables = document.querySelectorAll('table[data-sortable="true"]');
+      sortableTables.forEach(function(table) {
+        var tbody = table.querySelector('tbody');
+        if (!tbody) return;
+        var originalRows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+        var headers = table.querySelectorAll('thead th[data-sort-col]');
+
+        function getCellSortValue(cell) {
+          if (!cell) return { kind: 'string', value: '' };
+          var glyphSpan = cell.querySelector('[data-cell-glyph]');
+          if (glyphSpan) {
+            var g = glyphSpan.getAttribute('data-cell-glyph');
+            return { kind: 'glyph', value: g === 'yes' ? 1 : g === 'no' ? -1 : 0 };
+          }
+          var raw = (cell.textContent || '').trim();
+          var num = raw.match(/-?\d+(?:[.,]\d+)?/);
+          if (num) {
+            var n = parseFloat(num[0].replace(',', '.'));
+            // Suffix multipliers. We're deliberately case-sensitive on M so
+            // "100m" (meters of read range) is not mistaken for 100 million.
+            // "k"/"K" both mean thousand; "M" requires capital. "million" or
+            // "billion" word forms are case-insensitive.
+            if (/\d\s*[kK]\b/.test(raw) || /\bkilo/i.test(raw)) n *= 1000;
+            if (/\dM\b/.test(raw) || /\bmillion/i.test(raw)) n *= 1000000;
+            if (/\bbillion/i.test(raw)) n *= 1000000000;
+            return { kind: 'number', value: n };
+          }
+          return { kind: 'string', value: raw.toLowerCase() };
+        }
+
+        function compare(a, b) {
+          if (a.kind === b.kind) {
+            if (a.value < b.value) return -1;
+            if (a.value > b.value) return 1;
+            return 0;
+          }
+          // Mixed types: numbers first, then glyphs, then strings.
+          var rank = { number: 0, glyph: 1, string: 2 };
+          return rank[a.kind] - rank[b.kind];
+        }
+
+        function sortBy(colIndex, direction) {
+          var sorted = originalRows.slice().sort(function(rowA, rowB) {
+            // colIndex is 1-based against the columns array — but inside the
+            // <tr> we have 1 <th scope="row"> + N-1 <td>s, so DOM cells[colIndex]
+            // is the right offset.
+            var a = getCellSortValue(rowA.cells[colIndex]);
+            var b = getCellSortValue(rowB.cells[colIndex]);
+            var c = compare(a, b);
+            return direction === 'asc' ? c : -c;
+          });
+          var frag = document.createDocumentFragment();
+          sorted.forEach(function(r) { frag.appendChild(r); });
+          tbody.appendChild(frag);
+        }
+
+        headers.forEach(function(th) {
+          function activate(e) {
+            if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+            if (e.type === 'keydown') e.preventDefault();
+            var colIndex = parseInt(th.getAttribute('data-sort-col') || '0', 10);
+            var current = th.getAttribute('aria-sort');
+            var direction = current === 'ascending' ? 'desc' : 'asc';
+            // Reset siblings to none.
+            headers.forEach(function(other) {
+              if (other !== th) other.setAttribute('aria-sort', 'none');
+            });
+            th.setAttribute('aria-sort', direction === 'asc' ? 'ascending' : 'descending');
+            sortBy(colIndex, direction);
+          }
+          th.addEventListener('click', activate);
+          th.addEventListener('keydown', activate);
+        });
+      });
+
+      /* Brief block reading-mode auto-expand — DS-10 #3 (2026-04-27).
+         The Project checklist is collapsed by default to keep evaluators on
+         their spec → CTA path. We auto-open it for users who arrive from a
+         long-form context where they're already in reading mode:
+           - same-origin referrer matches /blog/ /guides/ /compare/ /compatibility/
+           - URL has `?reading=true` or `#reading` (deep-linkable from any
+             marketing pixel that wants to surface the full brief)
+         Both signals are user-driven and don't override an explicit user
+         action: if the user has already manually toggled the <details>
+         (e.g. via the back/forward cache restoring its open state) we
+         leave it alone. Skipped under prefers-reduced-motion only for the
+         smooth-expand animation, not the open state itself. */
+      var briefDetails = document.querySelector('[data-collapsible-brief] details');
+      if (briefDetails) {
+        var ref = '';
+        try { ref = document.referrer || ''; } catch (e) { ref = ''; }
+        var sameOrigin = false;
+        try {
+          sameOrigin = ref && new URL(ref).origin === window.location.origin;
+        } catch (e) { sameOrigin = false; }
+        var refPath = '';
+        if (sameOrigin) {
+          try { refPath = new URL(ref).pathname; } catch (e) { refPath = ''; }
+        }
+        var fromLongForm = /^\/(blog|guides|compare|compatibility)\//.test(refPath);
+        var params = new URLSearchParams(window.location.search);
+        var explicit = params.get('reading') === 'true' || window.location.hash === '#reading';
+        if ((fromLongForm || explicit) && !briefDetails.open) {
+          briefDetails.open = true;
+        }
+      }
+
+      /* CTA-tier analytics — DS-10 #1 (2026-04-27).
+         Three commitment levels share the page:
+           hero    = "Request samples"      (low)
+           action  = data-driven label      (medium, e.g. "Request quote and samples")
+           sticky  = "Talk to engineering"  (high)
+         Each carries data-cta-tier so we can attribute clicks per tier and
+         see which depth converts. Pushes to window.dataLayer (GA4 / GTM
+         standard) and falls back to a custom event so any analytics
+         consumer can listen. The handler is delegated on document so it
+         survives DOM swaps from snapshot injection. */
+      /* Generalized event surface — DS-12 #6 (2026-04-27).
+         Pattern: any element can declare itself an analytics event source via
+           data-codex-event="event_name"
+         Optional metadata via additional attributes:
+           data-codex-event-tier="hero|action|sticky|..."  (categorical bucket)
+           data-codex-event-label="..."                    (override label, falls back to textContent)
+         Backward compat: [data-cta-tier="X"] still fires the legacy
+         "cta_click" event with cta_tier=X (same payload as before so existing
+         analytics dashboards keep working). New code should use
+         data-codex-event so we can instrument forms, navigation, scroll
+         milestones, etc. without polluting the cta-tier semantics.
+         The handler is delegated on document with capture=true so it survives
+         snapshot DOM swaps. */
+      function codexPushEvent(eventName, payload) {
+        try {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push(Object.assign({ event: eventName }, payload));
+        } catch (err) { /* ignore */ }
+        try {
+          document.dispatchEvent(new CustomEvent('codex:event', {
+            detail: Object.assign({ event: eventName }, payload),
+          }));
+        } catch (err) { /* ignore */ }
+      }
+
+      document.addEventListener('click', function(e) {
+        if (!e.target || !e.target.closest) return;
+        var route = window.location.pathname;
+
+        // Generalized data-codex-event handler — fires whatever event name the
+        // author declared on the element.
+        var generic = e.target.closest('[data-codex-event]');
+        if (generic) {
+          var eventName = generic.getAttribute('data-codex-event') || 'codex_click';
+          var label = generic.getAttribute('data-codex-event-label')
+            || (generic.textContent || '').replace(/\s+/g, ' ').trim();
+          var tier = generic.getAttribute('data-codex-event-tier') || null;
+          var href = generic.getAttribute('href') || '';
+          codexPushEvent(eventName, {
+            label: label,
+            tier: tier,
+            href: href,
+            route: route,
+          });
+        }
+
+        // Backward-compat — legacy cta_click event for data-cta-tier elements.
+        // Analytics dashboards reading cta_click still work unchanged.
+        var ctaTarget = e.target.closest('[data-cta-tier]');
+        if (ctaTarget) {
+          var ctaTier = ctaTarget.getAttribute('data-cta-tier');
+          var ctaLabel = (ctaTarget.textContent || '').replace(/\s+/g, ' ').trim();
+          var ctaHref = ctaTarget.getAttribute('href') || '';
+          codexPushEvent('cta_click', {
+            cta_tier: ctaTier,
+            cta_label: ctaLabel,
+            cta_href: ctaHref,
+            cta_route: route,
+          });
+          // Also re-fire as the legacy CustomEvent name for any pre-DS-12
+          // listener that's specifically waiting on 'cta:click'.
+          try {
+            document.dispatchEvent(new CustomEvent('cta:click', {
+              detail: {
+                event: 'cta_click',
+                cta_tier: ctaTier,
+                cta_label: ctaLabel,
+                cta_href: ctaHref,
+                cta_route: route,
+              },
+            }));
+          } catch (err) { /* ignore */ }
+        }
+
+        /* Phase 8 — click-to-activate Maps embed.
+           When the user clicks the .codex-contact__map-card-btn, swap
+           the placeholder card for the iframe stashed in the sibling
+           <template>. preventDefault stops the <a href> fallback (which
+           targets google.com/maps in a new tab) so the in-page iframe
+           wins when JS is available. Without JS the link works as-is. */
+        var mapBtn = e.target.closest('[data-codex-map-show]');
+        if (mapBtn) {
+          var section = mapBtn.closest('.codex-contact__map');
+          var card = section && section.querySelector('[data-codex-map-card]');
+          var tpl = section && section.querySelector('template[data-codex-map-iframe]');
+          if (card && tpl && 'content' in tpl) {
+            e.preventDefault();
+            var fragment = tpl.content.cloneNode(true);
+            card.replaceWith(fragment);
+            codexPushEvent('contact_map_open', { route: route });
+          }
+        }
+      }, { capture: true });
+
+      /* RFQ form analytics — DS-12 #6B (2026-04-27).
+         Wires form_focus (first interaction), form_field_complete (per-field
+         completion), and form_submit (success) events on [data-codex-rfq]
+         forms. Lets the funnel correlate:
+           cta_click (tier=hero|action|sticky)
+             → form_focus
+             → form_field_complete (×N)
+             → form_submit
+         Form abandonment can be inferred from form_focus without a matching
+         form_submit. The handler is per-form (not delegated) because focus
+         events don't bubble in older browsers — but rfq forms are static
+         server-rendered so this is safe. */
+      var rfqForms = document.querySelectorAll('form[data-codex-rfq]');
+      rfqForms.forEach(function(form) {
+        var formId = form.getAttribute('data-codex-rfq-id')
+          || form.querySelector('input[name="product"]')?.value
+          || 'rfq';
+        var firstFocus = false;
+        var completedFields = {};
+
+        form.addEventListener('focusin', function(e) {
+          if (firstFocus) return;
+          if (!e.target || !e.target.matches || !e.target.matches('input, textarea, select')) return;
+          if (e.target.type === 'hidden') return;
+          firstFocus = true;
+          codexPushEvent('form_focus', {
+            form_id: formId,
+            route: window.location.pathname,
+            field_focused: e.target.name || e.target.id || '',
+          });
+        });
+
+        form.addEventListener('change', function(e) {
+          var t = e.target;
+          if (!t || !t.matches || !t.matches('input, textarea, select')) return;
+          if (t.type === 'hidden') return;
+          var key = t.name || t.id;
+          if (!key || completedFields[key]) return;
+          var hasValue = t.type === 'checkbox' || t.type === 'radio'
+            ? t.checked
+            : (t.value || '').trim().length > 0;
+          if (!hasValue) return;
+          completedFields[key] = true;
+          codexPushEvent('form_field_complete', {
+            form_id: formId,
+            route: window.location.pathname,
+            field_name: key,
+          });
+        });
+
+        form.addEventListener('submit', function() {
+          // Validation runs in the existing submit handler; this listener
+          // fires regardless because it doesn't preventDefault. Analytics
+          // platforms downstream can filter to "successful" submits via
+          // the form's own redirect target.
+          codexPushEvent('form_submit', {
+            form_id: formId,
+            route: window.location.pathname,
+            fields_completed: Object.keys(completedFields).length,
+          });
+        });
+      });
+
+      /* DS-13 #1 (Critical) — keyboard scroll for .codex-scroll-region.
+         The DS-12 #4B / #5B work added `tabindex="0" role="region"` to
+         compare + spec tables so SR users get region announcements. But
+         making the wrap focusable without wiring keyboard scroll left
+         keyboard-only users in a focus trap: they can't pan the table
+         to see overflowed columns, can't see content that the
+         IntersectionObserver-pinned thead is supposed to expose.
+
+         Fix: when a .codex-scroll-region has focus, intercept arrow /
+         page / home / end keys and update scrollLeft / scrollTop. Other
+         keys (Tab, Shift+Tab, Enter, Space) pass through unchanged so
+         tab order and any inner-element interaction still works. */
+      document.querySelectorAll('.codex-scroll-region').forEach(function(region) {
+        region.addEventListener('keydown', function(e) {
+          // Only handle when the region itself has focus (not a child).
+          if (document.activeElement !== region) return;
+          var step = 64; // pixels per arrow press — half a typical viewport row
+          var pageStep = region.clientWidth || 480;
+          var key = e.key;
+          var handled = true;
+          switch (key) {
+            case 'ArrowLeft':  region.scrollLeft -= step; break;
+            case 'ArrowRight': region.scrollLeft += step; break;
+            case 'ArrowUp':    region.scrollTop  -= step; break;
+            case 'ArrowDown':  region.scrollTop  += step; break;
+            case 'PageUp':     region.scrollLeft -= pageStep; break;
+            case 'PageDown':   region.scrollLeft += pageStep; break;
+            case 'Home':       region.scrollLeft = 0; break;
+            case 'End':        region.scrollLeft = region.scrollWidth; break;
+            default: handled = false;
+          }
+          if (handled) e.preventDefault();
+        });
+      });
+
+      /* DS-13 #3 (Major) — Brief auto-expand respects prefers-reduced-motion.
+         The DS-10 #3 auto-expand silently flips Brief details from collapsed
+         to open when referrer matches a long-form context. SR users hear
+         "collapsed" then walk into "open" content with no announcement —
+         a 3.2.1 Predictable on focus concern. Treat prefers-reduced-motion
+         as proxy for "I don't want unannounced state changes" and skip the
+         auto-expand entirely. Manual click still works. */
+      var briefDetails2 = document.querySelector('[data-collapsible-brief] details');
+      if (briefDetails2) {
+        var prefersReducedMotion = false;
+        try { prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+        if (prefersReducedMotion && briefDetails2.open && !briefDetails2.dataset.userToggled) {
+          // If the earlier auto-expand handler already opened it, undo —
+          // but only if the user hasn't clicked the summary themselves.
+          briefDetails2.open = false;
+        }
+        // Mark as user-toggled when actually clicked so future page-load
+        // re-auto-expand doesn't override the user's choice.
+        var briefSummary = briefDetails2.querySelector('summary');
+        if (briefSummary) {
+          briefSummary.addEventListener('click', function() {
+            briefDetails2.dataset.userToggled = '1';
+          });
+        }
+      }
+
+      /* DS-13 #4 (Major) — Escape-to-dismiss for any visible .codex-banner.
+         Native dismiss button supports Tab+Enter; adding Escape gives
+         keyboard users a faster path to close the sticky CTA / future toast
+         without hunting for the X. Per WCAG 2.1.1 + 2.4.3 — make sure no
+         modal-style focus trap is created (we don't have one), and respect
+         existing keyboard handlers on focused inputs. */
+      document.addEventListener('keydown', function(e) {
+        if (e.key !== 'Escape') return;
+        // Don't fire if user is typing in an input/textarea — Escape may be
+        // bound by the input itself (e.g. clear-search behavior).
+        var t = e.target;
+        if (t && t.matches && t.matches('input, textarea, select, [contenteditable="true"]')) return;
+        document.querySelectorAll('.codex-banner.is-visible').forEach(function(banner) {
+          var btn = banner.querySelector('.codex-banner__dismiss, .codex-sticky-cta__dismiss');
+          if (btn && typeof btn.click === 'function') btn.click();
+        });
+      });
+
+      /* DS-13 #4b — dev-only sanity check for banner role attribute.
+         Pattern docs require role="complementary" / "status" / "alert" per
+         use case. Easy to forget — surface a console.warn during local dev
+         so authors catch it before merge. Production users see no effect. */
+      try {
+        var isLocalhost = /^(localhost|127\.|0\.0\.0\.0|\[::1\])/.test(window.location.hostname);
+        if (isLocalhost) {
+          document.querySelectorAll('.codex-banner').forEach(function(b) {
+            if (!b.getAttribute('role')) {
+              // eslint-disable-next-line no-console
+              console.warn('[codex] .codex-banner is missing role attribute (expected: complementary | status | alert):', b);
+            }
+          });
+        }
+      } catch (e) { /* ignore */ }
+    })();
+    </script>

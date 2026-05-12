@@ -312,6 +312,82 @@
           }
         ]
       }
+    },
+    {
+      "title": "EMR / EHR integration — Epic / Oracle Health / MEDITECH workflow binding",
+      "bullets": [
+        "Epic Willow + EpicCare Inpatient — dominant US academic + community deployment (>40% US acute-care market share 2024); BCMA workflow uses Epic Rover (iOS/Android nurse app) or Epic Haiku/Canto for wristband scan + medication barcode + eMAR documentation. RFID wristband encoded with MRN (Medical Record Number) or Epic CSN (Contact Serial Number) — middleware translates to FHIR Patient resource lookup.",
+        "Oracle Health (formerly Cerner Millennium) PowerChart + CareAware — second-largest US deployment; CareAware MultiMedia Manager + CareAware iBus middleware consume RFID events; PowerChart Touch is the bedside app. RFID wristband encoded with Oracle Health FIN (Financial Number) or MRN.",
+        "MEDITECH Expanse — community + critical-access hospital baseline; Expanse Patient Care + Mobile Access for nurses; BCMA via MEDITECH M-Manage. RFID integration via MEDITECH HL7 interface + FHIR R4 API.",
+        "Allscripts Sunrise / Touchworks (now Veradigm) — multi-site enterprise; HL7 v2.x ADT (Admission/Discharge/Transfer) message drives wristband binding at admission.",
+        "Athenahealth + eClinicalWorks + Greenway Health — ambulatory / outpatient — RFID less common but used for surgery centers + infusion clinics + dialysis chains (DaVita, Fresenius).",
+        "HL7 FHIR R4 + R5 (2023) — modern REST + JSON standard replacing HL7 v2.x for new EHR integrations; Patient resource carries identifier slice for RFID UID mapping.",
+        "IHE PCD-01 (Patient Care Device) + PCD-04 (Subscribe/Notify) — interoperability profile for medical device data including RFID-discovered patient location.",
+        "Workflow patterns: bedside med-pass (wristband scan + drug barcode + eMAR cosign), specimen collection (wristband + lab requisition + LIS update), blood transfusion 2-RN cross-check (wristband + Bridge Medical / Iatric ID + blood-unit barcode), surgical timeout (wristband + procedure + site + side + implant + UDI scan + Time-Out Joint Commission UP.01.03.01)."
+      ]
+    },
+    {
+      "title": "RTLS platforms — Stanley Hugs / CenTrak / Sonitor / Zebra MotionWorks Healthcare",
+      "bullets": [
+        "Stanley Healthcare (Securitas) Hugs — dominant US + EU infant security RTLS; bracelet on infant ankle + Kisses bracelet on mother (Hugs+Kisses mother-baby pair). Active 433 MHz + IR for exit-zone alerts. Zero infant abductions at deployed sites since 1998 introduction.",
+        "Stanley Healthcare AeroScout — Wi-Fi RTLS for staff badge + asset tag + temperature monitor + hand-hygiene compliance; Wi-Fi-based location at 3-5 m accuracy + active battery-powered tags. Acquired from AeroScout Industrial 2012.",
+        "Stanley Healthcare MyCall — nurse-call + workflow alert system; integrates with Hugs + AeroScout for unified clinical event response.",
+        "CenTrak (Halma plc) — UWB + active RFID hybrid RTLS at sub-meter accuracy; competing with AeroScout at the higher accuracy + lower cost-of-deployment end; common in operating room + ER throughput optimisation; Time + Location Services platform.",
+        "Sonitor Technologies — ultrasound-based RTLS at room-level accuracy (no RF, immune to RF interference common in medical equipment areas); Norwegian vendor with growing US footprint.",
+        "Zebra MotionWorks Healthcare — formerly Versus Technology + Awarepoint; Wi-Fi RTLS integrated with Zebra's broader retail + warehouse platform; common in tier-2 community hospitals.",
+        "Cisco DNA Spaces + Aruba Meridian — Wi-Fi infrastructure-based RTLS without dedicated tags; uses existing access points + smartphone Bluetooth Low Energy + Wi-Fi probe; lower accuracy (3-10 m) but uses existing infrastructure.",
+        "Apple iBeacon / Google Eddystone BLE beacons — DIY low-cost RTLS for medium-accuracy use cases (wayfinding, patient call-button proximity).",
+        "Procurement reality: RTLS pilot $300K–$800K (1 unit, 1 application); enterprise rollout (full hospital) $2M–$8M. Payback driven by staff efficiency gains ($150K–$500K/year per 100 beds) + equipment utilisation lift (12-25% on infusion pumps, IV poles, telemetry monitors)."
+      ]
+    },
+    {
+      "title": "Specialised RFID applications — infant security, fall prevention, medication, specimen",
+      "bullets": [
+        "Infant security + maternal pairing — Hugs + Kisses (Stanley) at >85% US maternity unit market share; alternative: McRoberts CodeAlert + RoamAlert. Workflow: infant ankle bracelet + maternal wrist bracelet bound at L&D; bracelet tamper alarm + zone alarm (exit, elevator, stairwell); RFID event triggers Code Pink overhead page + facility lockdown.",
+        "Wander / elopement prevention — dementia + psychiatric + pediatric units; bracelet + door reader + alarm. RoamAlert (McRoberts) + Stanley + Vitatron systems. Common at memory-care + psychiatric admission floors. Integration with door magnet locks + camera + nursing station alarm.",
+        "Fall risk identification — yellow / red color-coded bracelet + RFID-tagged for nursing alert when patient leaves bed or chair without assistance; integrates with bed-exit alarm (Stryker, Hill-Rom, Linet) + nurse call.",
+        "Allergy alert + DNR + restricted-ID — color-coded bracelet variants (red for allergy, purple for DNR, pink for limb restriction). RFID-linked to EMR allergy list + advance directive; surfaced in BCMA workflow when caregiver scans.",
+        "BCMA (Barcode Medication Administration) — Joint Commission expectation since 2011, now standard of care; wristband scan + drug barcode + nurse barcode triple-check; eMAR auto-documents. RFID instead of barcode reduces scan failures (smudged barcode, wet wristband, awkward positioning).",
+        "Specimen collection — wristband scan + lab requisition + tube label; eliminates labeling errors that historically caused ~1% of all transfusions to go to wrong patient. Joint Commission NPSG.01.03.01 (eliminate transfusion errors) is the driver.",
+        "Blood transfusion double-check — Bridge Medical / Iatric Systems Cross-Check / Becton Dickinson Identify; 2-RN signoff with wristband + blood-unit-label + crossmatch + EMR validation.",
+        "Surgical timeout — Joint Commission UP.01.03.01 Universal Protocol; wristband + planned procedure + correct site + correct side + implant UDI scan before incision.",
+        "Mass casualty / disaster — triage bracelet color-coded (black, red, yellow, green per START triage) with RFID for evacuation tracking; FEMA + ASPR Hospital Preparedness Program reference.",
+        "Hand-hygiene compliance — staff badge RFID + sink/dispenser sensor at room entry/exit; CMS Hospital-Acquired Condition reduction programme driver. SwipeSense (now BD HygieneTrack), Stanley HyGreen, GOJO SMARTLINK platforms."
+      ]
+    },
+    {
+      "title": "Privacy + HIPAA + data governance for RFID patient programmes",
+      "bullets": [
+        "HIPAA Privacy Rule (45 CFR 164.502) — wristband + RFID data classified as PHI (Protected Health Information) since it links identity to medical context; covered entity (hospital) responsibilities apply.",
+        "HIPAA Security Rule (45 CFR 164.306-318) — administrative + physical + technical safeguards required; RFID middleware + RTLS platform vendor signs Business Associate Agreement (BAA).",
+        "HIPAA Breach Notification Rule — RFID system compromise affecting >500 patients triggers HHS Office for Civil Rights notification within 60 days; <500 patient breach: annual log.",
+        "Data minimisation — wristband should encode MRN or pseudonymous ID, never demographic detail (name, DOB, diagnosis). Lookup happens server-side in EMR.",
+        "GDPR Article 9 (EU + UK) — health data classified as special category requiring explicit consent or healthcare-provision lawful basis; EU + UK hospitals add patient consent at admission documenting RFID tracking.",
+        "GDPR Article 28 — controller / processor framework with RTLS vendor; signed Data Processing Agreement with retention + deletion terms + sub-processor list (typical: hospital IT + RTLS vendor cloud + storage).",
+        "Retention — typical hospital RFID event log retention 7 years (matches medical record retention in most US states); cleared on planned schedule or per HHS audit request.",
+        "RFID-specific risks — wristband cloning (Tier-1 LF cloneable; mitigated by Tier-3/4 AES wristband chip OR by validating UID against EMR every scan), tag-skimming in public space (UID alone is not PHI but ties to patient if observed at known facility — physical concealment under sleeve recommended).",
+        "Privacy by design — display of patient identifier should never be visible on the wristband exterior (use opaque print on inner surface); barcode + RFID UID only.",
+        "Pediatric + minor considerations — guardian consent for tracking children; school-age psychiatric patients require additional state-law consent (varies by state).",
+        "Cardholder rights — Right of Access (HIPAA 164.524) + Right of Amendment (164.526) — patient can request log copy + correction of inaccurate RFID-derived data.",
+        "RFID + AI/ML — Hospital RFID event streams increasingly feed ML models for fall prediction + sepsis early warning + sepsis bundle compliance + length-of-stay forecasting; FDA's Software as Medical Device (SaMD) framework + EU AI Act 2024 classify high-risk AI applications requiring CE-marking + 510(k) clearance."
+      ]
+    },
+    {
+      "title": "Programme economics, ROI math + procurement levers",
+      "bullets": [
+        "Wristband unit cost: disposable Tyvek/paper $0.15-$0.35; disposable PVC/vinyl $0.20-$0.50; soft TPU/TPE pediatric $0.30-$0.60; MR-conditional $0.40-$0.80; dual-mode HF+UHF $0.60-$1.20.",
+        "Annual wristband spend (500-bed hospital, 30K admissions/year): 30K × $0.30 = $9K; pediatric mix adds $2-3K; specialised (mother-baby, MR, etc.) $3-5K — total ~$15-20K/year wristband spend per facility.",
+        "RTLS infrastructure capex: Hugs infant security $150K-$300K per 30-bed L&D; AeroScout enterprise $500K-$2M per 200-bed; CenTrak room-level $400K-$1.2M; full enterprise RTLS at academic medical center $2M-$8M.",
+        "EMR integration services: $50K-$300K one-time for HL7 + FHIR integration + Epic Willow / Oracle Health PowerChart customisation; ongoing $30-80K/year support.",
+        "BCMA scanner / mobile device fleet: Zebra TC52-HC / Honeywell CT60 / Apple iPhone running Epic Rover: $1.5K-$3K per device; typical 1 per 2-3 nurses on shift = 100-200 devices per 200-bed hospital.",
+        "Hand-hygiene compliance: BD HygieneTrack / Stanley HyGreen / GOJO SMARTLINK: $150-$400 per dispenser + badge electronics + reader infrastructure $200K-$500K per 200-bed facility.",
+        "ROI drivers — wrong-patient event reduction: 95% reduction in wrong-patient events; each event costs $25K-$500K (litigation, regulatory, root-cause analysis, reputation); facilities running 5-15 events/year save $125K-$7.5M in event avoidance.",
+        "ROI drivers — nursing time saved: 30-45 min/shift × 3 shifts × 365 days × $50/hr × 100 RN-FTE = $2.7M-$4M/year recovered nursing time; partial recapture (50% productivity) still $1.4M-$2M.",
+        "ROI drivers — equipment utilisation: RTLS-tracked equipment (infusion pumps, IV poles, telemetry monitors) shows 12-25% utilisation lift; for 1,000-piece infusion pump fleet at $2K/pump capital cost = $250K-$500K saved purchase deferral.",
+        "ROI drivers — Hospital-Acquired Condition (HAC) reduction: CMS HAC reduction programme penalises bottom-quartile hospitals by 1% of Medicare reimbursement (~$1M-$5M for 200-bed); RFID-enabled hand-hygiene + fall prevention + sepsis early warning contribute to HAC reduction.",
+        "Compliance avoidance value: Joint Commission NPSG.01.01.01 deficiency findings drive reaccreditation risk + reputational damage; HIPAA breach notification public disclosure for >500-patient events.",
+        "Payback typically 12-24 months for wristband + EMR integration; 24-48 months for full RTLS infrastructure."
+      ]
     }
   ],
   "resourceCards": [
@@ -358,6 +434,22 @@
     {
       "question": "What is the cost per patient for RFID wristbands?",
       "answer": "Disposable RFID patient wristbands cost $0.15-$0.35 per band depending on material (paper vs. PVC), chip type, and order volume. For a 500-bed hospital, this translates to roughly $15,000-$35,000 per year in wristband costs. A modest investment compared to the cost of even one wrong-patient adverse event."
+    },
+    {
+      "question": "Which RTLS platform should we pair with patient wristbands?",
+      "answer": "Match the RTLS to the use case. Infant security (maternity + NICU): Stanley Healthcare Hugs + Kisses is the dominant choice (>85% US market share, zero abductions at deployed sites). Staff + asset + workflow: Stanley AeroScout (Wi-Fi-based, widest deployment) or CenTrak (UWB + active RFID, sub-meter accuracy, growing in OR + ER throughput). Room-level no-RF environments: Sonitor (ultrasound). Mid-market: Zebra MotionWorks Healthcare. Existing Wi-Fi infrastructure: Cisco DNA Spaces or Aruba Meridian. Procurement reality: RTLS pilot $300K-$800K, enterprise rollout $2M-$8M; payback 24-48 months on staff efficiency + equipment utilisation."
+    },
+    {
+      "question": "Are RFID patient wristbands compatible with our Epic / Cerner / MEDITECH EMR?",
+      "answer": "Yes — all major EMRs integrate via HL7 v2.x ADT messages + FHIR R4 / R5 Patient resource. Epic Willow: BCMA via Epic Rover iOS/Android app + wristband scan + drug barcode + eMAR cosign; wristband encoded with Epic MRN or CSN. Oracle Health (Cerner Millennium) PowerChart: CareAware MultiMedia Manager + CareAware iBus middleware consume RFID events; PowerChart Touch bedside app. MEDITECH Expanse: Patient Care + Mobile Access apps + M-Manage middleware. Allscripts Sunrise: HL7 ADT drives wristband binding at admission. Proud Tek supplies wristbands; integration is typically performed by the hospital IT team + RTLS vendor + Epic/Oracle/MEDITECH analyst."
+    },
+    {
+      "question": "How does RFID patient tracking align with HIPAA privacy?",
+      "answer": "RFID + RTLS data is PHI (Protected Health Information) since it links identity to medical context, so covered-entity HIPAA Privacy + Security + Breach Notification rules apply. Best practices: encode wristband with MRN or pseudonymous ID only (never name/DOB/diagnosis); validate UID against EMR server-side; sign Business Associate Agreement with RTLS vendor + middleware vendor + cloud-host; retain event logs per medical record retention policy (typically 7 years in US); display of identifier on wristband exterior should be minimal (barcode + UID only); pediatric guardian consent required for minors. EU + UK hospitals additionally comply with GDPR Article 9 (health data special category) + Article 28 (controller/processor)."
+    },
+    {
+      "question": "What's the difference between BCMA, eMAR and bedside RFID workflow?",
+      "answer": "BCMA (Barcode Medication Administration) is the workflow — Joint Commission expectation since 2011, now standard of care — where a nurse scans wristband + drug + own badge before administering medication. eMAR (electronic Medication Administration Record) is the EMR documentation layer where BCMA events are recorded (Epic's eMAR is part of Willow; Cerner's is PharmNet). RFID replaces barcode at one or both layers — wristband RFID + drug RFID (where supported) — reducing scan failures from smudged barcode, wet wristband or awkward positioning. The Five Rights of Medication Administration (Right Patient, Right Drug, Right Dose, Right Route, Right Time) are the safety framework BCMA + eMAR enforce."
     }
   ],
   "sources": [
@@ -425,6 +517,94 @@
       "publishedAt": "2024-09-12",
       "accessedAt": "2026-04-25",
       "note": "Dominant US tier-1 academic + community hospital EMR / eMAR / BCMA platforms; native RFID-discovered patient-event consumption via HL7 v2.x + FHIR."
+    },
+    {
+      "label": "HL7 FHIR R4 / R5 — Fast Healthcare Interoperability Resources",
+      "url": "https://www.hl7.org/fhir/",
+      "publisher": "Health Level Seven International",
+      "publishedAt": "2023-05",
+      "accessedAt": "2026-04-26",
+      "note": "Modern REST + JSON healthcare interoperability standard; Patient resource carries identifier slice for RFID UID mapping to MRN / EMR record."
+    },
+    {
+      "label": "CMS Hospital-Acquired Condition Reduction Program",
+      "url": "https://www.cms.gov/medicare/quality/value-based-programs/hac-reduction",
+      "publisher": "Centers for Medicare & Medicaid Services",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Penalises bottom-quartile hospitals by 1% of Medicare reimbursement; RFID-enabled hand-hygiene + fall prevention + sepsis early warning contribute to HAC reduction."
+    },
+    {
+      "label": "CenTrak — RTLS for healthcare (UWB + active RFID hybrid)",
+      "url": "https://www.centrak.com/",
+      "publisher": "CenTrak (Halma plc)",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Sub-meter accuracy UWB + active RFID RTLS competing with AeroScout; common in operating room + ER throughput optimisation deployments."
+    },
+    {
+      "label": "Sonitor Technologies — ultrasound-based RTLS",
+      "url": "https://www.sonitor.com/",
+      "publisher": "Sonitor Technologies",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Ultrasound-based RTLS at room-level accuracy, immune to RF interference common in medical equipment areas."
+    },
+    {
+      "label": "Zebra MotionWorks Healthcare (formerly Versus Technology + Awarepoint)",
+      "url": "https://www.zebra.com/us/en/solutions/healthcare/motionworks-healthcare.html",
+      "publisher": "Zebra Technologies",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Wi-Fi RTLS platform; common in tier-2 community hospitals as part of Zebra's broader retail + warehouse + healthcare ecosystem."
+    },
+    {
+      "label": "ECRI — Patient Identification Errors (technology assessment)",
+      "url": "https://www.ecri.org/landing-patient-identification-errors",
+      "publisher": "ECRI Institute",
+      "publishedAt": "2023",
+      "accessedAt": "2026-04-26",
+      "note": "Patient ID error analysis + technology assessment supporting wristband + BCMA + RFID interventions."
+    },
+    {
+      "label": "Joint Commission UP.01.03.01 — Universal Protocol / Time-Out",
+      "url": "https://www.jointcommission.org/standards/universal-protocol/",
+      "publisher": "The Joint Commission",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Surgical timeout standard requiring patient + procedure + site + side verification; RFID wristband + implant UDI scan supports compliance."
+    },
+    {
+      "label": "BD HygieneTrack (formerly SwipeSense) — hand hygiene compliance monitoring",
+      "url": "https://www.bd.com/en-us/products-and-solutions/products/product-families/hygiene-track",
+      "publisher": "Becton Dickinson",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Staff badge RFID + sink/dispenser sensor for hand-hygiene compliance — drives CMS HAC reduction programme outcomes."
+    },
+    {
+      "label": "EU AI Act (Regulation 2024/1689) — high-risk AI in healthcare",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "publisher": "Publications Office of the European Union",
+      "publishedAt": "2024-06",
+      "accessedAt": "2026-04-26",
+      "note": "Classifies clinical AI (sepsis prediction, fall risk, length-of-stay forecasting) consuming RFID event streams as high-risk requiring CE-marking + conformity assessment."
+    },
+    {
+      "label": "U.S. HHS OCR — HIPAA Business Associate Agreements",
+      "url": "https://www.hhs.gov/hipaa/for-professionals/covered-entities/sample-business-associate-agreement-provisions/index.html",
+      "publisher": "U.S. Department of Health & Human Services",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Required BAA with RTLS vendor + middleware vendor + cloud-host handling RFID-derived PHI."
+    },
+    {
+      "label": "FDA Software as a Medical Device (SaMD) — clinical decision support guidance",
+      "url": "https://www.fda.gov/medical-devices/digital-health-center-excellence/software-medical-device-samd",
+      "publisher": "U.S. Food and Drug Administration",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Regulatory framework for software consuming RFID event streams for clinical decision support (sepsis early warning, fall prediction)."
     }
   ],
   "primaryAction": {

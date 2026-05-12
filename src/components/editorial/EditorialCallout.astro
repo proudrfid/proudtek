@@ -1,0 +1,30 @@
+---
+/**
+ * Editorial section variant — emphasized aside / callout block.
+ *
+ * Shadow component (Stage 2). Mirrors the inline expression in
+ * editorial-pages.ts around `const calloutHtml = section.callout ? ... : ""`.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["callout"]
+ *   label: string             // bold prefix
+ *   text:  string             // body, supports inline markdown + citations
+ *   href?: string             // optional "Learn more →" link
+ */
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface Props {
+  label: string;
+  text: string;
+  href?: string;
+  citations?: CitationCtx;
+}
+
+const { label, text, href, citations } = Astro.props;
+---
+<aside class="codex-editorial-callout">
+  <strong>{label}</strong>
+  <p set:html={renderInlineLinks(text, citations)} />
+  {href && (
+    <a href={href} class="codex-editorial-callout__link">Learn more <span aria-hidden="true">→</span></a>
+  )}
+</aside>

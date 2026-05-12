@@ -1,0 +1,21 @@
+---
+/**
+ * Section body slot — array of body paragraphs.
+ *
+ * Shadow component (Stage 2). Mirrors:
+ *   const paragraphsHtml = (section.paragraphs ?? [])
+ *     .map((paragraph) => `<p>${renderInlineLinks(paragraph, citations)}</p>`)
+ *     .join("");
+ */
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface Props {
+  paragraphs: string[];
+  citations?: CitationCtx;
+}
+
+const { paragraphs, citations } = Astro.props;
+---
+{paragraphs.map((paragraph) => (
+  <p set:html={renderInlineLinks(paragraph, citations)} />
+))}

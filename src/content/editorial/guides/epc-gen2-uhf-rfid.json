@@ -3,10 +3,10 @@
   "group": "guides",
   "title": "EPC Gen2 UHF RFID Protocol — Air Interface, Memory Bank Architecture, Q-Algorithm Anti-Collision, Gen2v2 Crypto-Suite Extensions and Session/Target Mechanics",
   "kicker": "EPC Gen2 / RAIN RFID Protocol",
-  "summary": "A protocol-level technical guide to EPC Gen2 / EPC Gen2v2 (ISO/IEC 18000-63). The specification that underlies every RAIN RFID deployment. Covers the reader-talks-first backscatter air interface, the four memory banks (Reserved / EPC / TID / User) and their addressing model, Q-algorithm slot-based anti-collision mechanics, session (S0-S3) and target (A/B) state management for dense-reader coexistence, access and kill password security, the Gen2v2 2013 amendment with its crypto-suite, file-management and untraceable-mode additions, backward compatibility rules, and practical implementation details that engineers building RAIN deployments need to understand.",
+  "summary": "A protocol-level technical guide to EPC Gen2, the air-interface specification that underlies every RAIN RFID deployment — covered across its three published versions: Gen2v1 (2004, baseline), Gen2v2 (2013, crypto-suite and untraceable mode) and Gen2v3 (January 2025, Query X / Query Y advanced selection, modulated-power inventory and the Read-Var memory command). Formally standardized at ISO as ISO/IEC 18000-63 (current edition: ISO/IEC 18000-63:2021). This page covers the reader-talks-first backscatter air interface, PIE / FM0 / Miller modulation, the four memory banks (Reserved / EPC / TID / User) and their addressing model, Q-algorithm slot-based anti-collision mechanics, session (S0-S3) and target (A/B) state management for dense-reader coexistence, access and kill password security, Gen2v2 crypto-suite identifiers (AES-128 suite 0x21, PRESENT-80 suite 0x22), the Gen2v3 selection and read-variable enhancements, backward-compatibility rules across all three versions, and practical implementation details that engineers building RAIN deployments need to understand.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2025-10-28",
-  "reviewedAt": "2025-11-01",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -112,7 +112,8 @@
       "bullets": [
         "Gen2 v1.0.9 (2004-2008). The original EPC Gen2 specification from EPCglobal, adopted as ISO/IEC 18000-6C in 2006. Defined the baseline air interface, memory banks and anti-collision mechanics still in use today. The specification was the unification point that ended the earlier fragmentation between ISO 18000-6A and 18000-6B.",
         "Gen2 v2.0 (2013). Gen2v2 amendment added crypto-suite support, file management, untraceable mode and other optional features. Incorporated into ISO/IEC 18000-63 in its 2013 revision. Most modern chip families support at least a subset of Gen2v2 extensions.",
-        "Ongoing ISO 18000-63 maintenance — the ISO standard is maintained on a periodic review cycle, with editorial corrections and occasional feature additions as the ecosystem matures. The maintenance cycle is managed through JTC 1/SC 31 of ISO, with RAIN Alliance and GS1 technical input.",
+        "Gen2 v3.0 (January 2025). Gen2v3 — the first protocol revision in a decade — was published by GS1 in alignment with the RAIN Alliance technical workgroup (chaired by Claude Tetelin, with Josef Preishuber-Pflügl as ISO/IEC 18000-63 Project Editor). Three headline additions: Query X and Query Y selection commands enable advanced filtering by EPC scheme, header value or feature flag (clutter reduction in environments where many unrelated tags are present); modulated-power inventory lets the interrogator briefly reduce field strength so only on-target tags wake (suppressing fringe-tag responses in dense-reader deployments); and the Read-Var command instructs the tag to backscatter exactly the requested User / TID memory subset rather than fixed-width reads. Gen2v3 is fully backward compatible: Gen2v2 tags work on Gen2v3 readers and vice versa; reader vendors add support through firmware updates only. Tag-chip silicon supporting Gen2v3 sampled through 2025; production rollout is 2026-2027.",
+        "ISO/IEC 18000-63:2021 maintenance — the current ISO edition (third edition, 2021, replacing the 2015 second edition) is maintained on a periodic review cycle, with editorial corrections and occasional feature additions. The companion ISO/IEC 18000-63 update aligning to Gen2v3 is in progress through JTC 1/SC 31 of ISO with RAIN Alliance and GS1 technical input.",
         "Emerging extensions: specific industry working groups have advanced extensions targeting retail anti-counterfeiting, pharmaceutical authentication, automotive parts lifecycle and aerospace parts management. Some extensions standardize through GS1 and ISO; others remain vendor-specific and become de facto standards through market adoption.",
         "Sensor integration standards: integration of temperature, humidity, tamper and other sensors into Gen2 tags has produced specialized protocol extensions for sensor data reading and battery-assisted-passive operation. Standardization in this area is evolving and varies by chip vendor.",
         "IoT and cloud integration standards. Beyond the air interface, the broader RAIN ecosystem includes standards for reader-to-middleware communication (LLRP), middleware-to-enterprise event exchange (EPCIS), and cloud-integration APIs (OData, REST). These higher-layer standards are where significant ecosystem evolution happens, even though the air-interface layer stays stable.",
@@ -183,7 +184,11 @@
     },
     {
       "question": "What is Gen2v2 and how does it differ from the original Gen2?",
-      "answer": "Gen2v2, ratified by GS1 in 2013 and incorporated into ISO/IEC 18000-63 in its 2013 revision, extends the original Gen2 protocol with optional features for authentication, structured data and privacy. The key extensions are a crypto-suite framework (AES-128, PRESENT-80 and others) enabling cryptographic challenge-response authentication of tags; file-based organization of User memory with file-level access control; the Untraceable command for privacy-aware consumer-facing applications; and various secure-access command variants. Gen2v2 is backward compatible. Gen2v2 chips function correctly with Gen2-only readers for basic inventory, and Gen2-only chips function with Gen2v2 readers without the extended features. Modern chips like Impinj M-series, NXP UCODE 9 and UCODE DNA support Gen2v2 feature subsets; chip datasheets specify which specific Gen2v2 features are supported, and applications should verify feature-level compatibility rather than relying on generic 'Gen2v2 compliant' claims."
+      "answer": "Gen2v2, ratified by GS1 in 2013 and incorporated into ISO/IEC 18000-63 in its 2013 revision, extends the original Gen2 protocol with optional features for authentication, structured data and privacy. The key extensions are a crypto-suite framework (AES-128, PRESENT-80 and others) enabling cryptographic challenge-response authentication of tags; file-based organization of User memory with file-level access control; the Untraceable command for privacy-aware consumer-facing applications; and various secure-access command variants. Gen2v2 is backward compatible. Gen2v2 chips function correctly with Gen2-only readers for basic inventory, and Gen2-only chips function with Gen2v2 readers without the extended features. Modern chips like Impinj M700/M800 series, NXP UCODE 9 and UCODE DNA support Gen2v2 feature subsets; chip datasheets specify which specific Gen2v2 features are supported, and applications should verify feature-level compatibility rather than relying on generic 'Gen2v2 compliant' claims."
+    },
+    {
+      "question": "What is Gen2v3 and should new deployments require it?",
+      "answer": "Gen2v3 is the January 2025 GS1 / RAIN Alliance release of the EPC UHF Gen2 protocol — the first major revision in over a decade (Gen2v2 was 2013). It adds three headline capabilities: Query X and Query Y, which let an interrogator pre-filter the tag population on EPC scheme, header value or feature flag (rather than only by EPC bit-mask) so unrelated tags do not consume inventory time (the canonical use case is reading airport baggage tags when items inside the bag also carry RAIN tags); modulated-power inventory, where the interrogator briefly reduces field strength so only tags clearly within the read zone respond, suppressing fringe-tag interference in dense deployments; and Read-Var, which lets the reader request exactly which subset of User or TID memory to backscatter, so applications that store lot, batch or expiry data in User memory capture only the slice they need in a single round trip. Gen2v3 is fully backward compatible — Gen2v2 tags work on Gen2v3 readers and Gen2v3 tags work on Gen2v2 readers (without the new features) — so existing deployments are not stranded. For new reader infrastructure RFQs in 2026 and beyond, specifying Gen2v3 firmware-upgrade support as a future-readiness clause is sensible; for new tag-chip qualifications planned for 2026-2027 production, evaluate Gen2v3-capable chips alongside the established Gen2v2 portfolio. Production rollout of Gen2v3 silicon is happening through 2026-2027 across the major chip vendors."
     },
     {
       "question": "How many UHF tags can realistically be read per second with EPC Gen2?",
@@ -216,12 +221,20 @@
       "note": "The authoritative industry-authored Gen2 air-interface specification maintained by GS1 — defines commands, memory banks, Q-algorithm anticollision, sessions S0-S3, target A/B flags and the cryptographic suite identifiers (Gen2v2 onward)."
     },
     {
-      "label": "ISO/IEC 18000-63:2015 — Parameters for air interface communications at 860 MHz to 960 MHz Type C",
-      "url": "https://www.iso.org/standard/59643.html",
+      "label": "ISO/IEC 18000-63:2021 — Parameters for air interface communications at 860 MHz to 960 MHz Type C (third edition)",
+      "url": "https://www.iso.org/standard/78309.html",
       "publisher": "ISO",
-      "publishedAt": "2015-12-01",
-      "accessedAt": "2026-04-20",
-      "note": "The ISO-balloted international version of the Gen2 air-interface specification. The formal counterpart to the GS1 Gen2v2 document referenced throughout the guide."
+      "publishedAt": "2021-09-01",
+      "accessedAt": "2026-05-10",
+      "note": "Current ISO-balloted international version of the Gen2 air-interface specification (third edition, replacing 18000-63:2015). The formal counterpart to the GS1 Gen2 document referenced throughout the guide; the next companion ISO update is in progress alongside Gen2v3."
+    },
+    {
+      "label": "RAIN Alliance / RFID Journal — New Gen2v3 Protocol Offers More Effective Operation in Crowded RFID Environments",
+      "url": "https://therainalliance.org/new-gen2v3-protocol-offers-more-effective-operation-in-crowded-rfid-environments/",
+      "publisher": "RAIN Alliance",
+      "publishedAt": "2025-01-30",
+      "accessedAt": "2026-05-10",
+      "note": "Authoritative announcement and technical overview of the January 2025 Gen2v3 release — Query X / Query Y selection commands, modulated-power inventory, the Read-Var command, named technical leads and the backward-compatibility commitment. Source for the Gen2v3 evolution-section claims throughout this guide."
     },
     {
       "label": "FCC Rules and Regulations, Title 47 CFR Part 15.247 — Operation within the bands 902-928 MHz",

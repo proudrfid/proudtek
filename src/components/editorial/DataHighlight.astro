@@ -1,0 +1,32 @@
+---
+/**
+ * Editorial section variant — single big-number / source-cited data point.
+ *
+ * Shadow component (Stage 2). Mirrors the inline expression in
+ * editorial-pages.ts `const dataHighlightHtml = section.dataHighlight ? ... : ""`.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["dataHighlight"]
+ *   value:    big-number string ("30 m", "99.4%")
+ *   heading:  short headline above the body
+ *   text:     body sentence (supports inline markdown + citation markers)
+ *   source?:  optional attribution line
+ */
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface Props {
+  value: string;
+  heading: string;
+  text: string;
+  source?: string;
+  citations?: CitationCtx;
+}
+
+const { value, heading, text, source, citations } = Astro.props;
+const textHtml = renderInlineLinks(text, citations);
+---
+<aside class="codex-editorial-data-highlight" role="figure" aria-label={heading}>
+  <span class="codex-editorial-data-highlight__value">{value}</span>
+  <strong class="codex-editorial-data-highlight__heading">{heading}</strong>
+  <p class="codex-editorial-data-highlight__text" set:html={textHtml} />
+  {source && <cite class="codex-editorial-data-highlight__source">Source: {source}</cite>}
+</aside>

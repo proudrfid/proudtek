@@ -2,42 +2,42 @@
   "route": "/blog/nfc-tag-not-scanning-iphone-fix/",
   "group": "blog",
   "title": "NFC Tag Not Scanning on iPhone? Troubleshooting Guide and Compatible Chip Recommendations",
-  "kicker": "Fix: NFC Tag Not Scanning on iPhone",
-  "summary": "When an NFC tag does not scan on an iPhone, the cause is usually a chip compatibility issue, incorrect NFC data format, or scanning technique rather than a defective tag. This guide covers the specific NFC capabilities of each iPhone model, the NFC Forum tag types that iOS supports, the correct scanning technique, and the chip recommendations that guarantee iPhone compatibility for your NFC tags, stickers, and cards.",
+  "kicker": "NFC Troubleshooting",
+  "summary": "When an NFC tag does not scan on an iPhone, the cause is usually a chip compatibility issue, incorrect NFC data format, or scanning technique rather than a defective tag.",
   "heroPoints": [
     "iPhone NFC hardware supports ISO 14443 (NFC-A and NFC-B) and ISO 15693 (NFC-V) standards. Tags using other protocols or non-standard chips will not be detected by iOS.",
     "Background NFC reading (tap without opening an app) requires iPhone 7 or later with iOS 14+, and the tag must contain a properly formatted NDEF message with a supported record type.",
     "The most reliable NFC chips for iPhone compatibility are NXP NTAG 213, NTAG 215, NTAG 216, and NTAG 424 DNA — all NFC Forum Type 2 or Type 4 tags that iOS natively supports."
   ],
-  "imageAlt": "Person troubleshooting NFC tag scanning on iPhone with NFC tag and smartphone",
-  "heroImage": "/landing-images/nfc-tap-to-pay-sticker.jpg",
+  "imageAlt": "iPhone held over an NFC tag — the user-side scenario where scanning fails and needs troubleshooting.",
+  "heroImage": "/blog-images/nfc-tag-not-scanning-iphone-fix.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/ntag213-nfc-sticker/",
     "/products/rfid-labels/nfc-wet-inlay/"
   ],
   "sections": [
     {
-      "title": "iPhone NFC capabilities by model and iOS version",
+      "title": "How do iPhone NFC capabilities by model and iOS version work?",
       "bullets": [
         "iPhone 7, 8, X (iOS 11+). NFC reading only through Apple's Core NFC framework; requires an app to scan. Background tag reading is not supported on these models.",
-        "iPhone XS, XR, 11, 12, 13, 14, 15, 16 (iOS 13+). Background NFC tag reading enabled. Tap an NFC tag to the top edge of the phone and iOS automatically processes the NDEF record (opens URL, launches app, etc.) without requiring a third-party app.",
-        "iOS 14+ is recommended for the broadest NFC compatibility, including support for NFC Forum Type 1, 2, 4, and 5 tags, as well as ISO 15693 vicinity tags.",
+        "iPhone XS, XR, 11, 12, 13, 14, 15, 16 (iOS 13+). Background NFC tag reading enabled. Tap an NFC tag to the top edge of the phone and iOS automatically processes the [NDEF](/guides/nfc-ndef-format-explained/) record (opens URL, launches app, etc.) without requiring a third-party app.",
+        "iOS 14+ is recommended for the broadest NFC compatibility, including support for [NFC Forum](https://nfc-forum.org/) Type 1, 2, 4, and 5 tags, as well as ISO 15693 vicinity tags.",
         "All iPhones read NFC from the top edge of the device, near the front-facing camera module. Scanning technique matters: hold the tag against the top 2 cm of the iPhone screen for 1-2 seconds."
       ]
     },
     {
-      "title": "Common reasons NFC tags fail to scan on iPhone",
+      "title": "What are the common reasons NFC tags fail to scan on iPhone?",
       "bullets": [
         "Wrong chip type: cheap 125 kHz proximity tags, proprietary Chinese chips without NFC Forum certification, or LF/UHF tags will not be detected by any iPhone. Only 13.56 MHz chips that comply with NFC Forum specifications work with iOS.",
         "Missing or malformed NDEF message. For background scanning to trigger automatically, the tag must contain a valid NDEF (NFC Data Exchange Format) message. A blank or improperly formatted tag will be ignored by iOS even if the chip is compatible.",
-        "Tag is locked with incompatible security. Some MIFARE Classic tags use Crypto-1 authentication that iOS does not support natively. For guaranteed iPhone compatibility, use NTAG or MIFARE Ultralight chips instead.",
+        "Tag is locked with incompatible security. Some [MIFARE Classic](/guides/mifare-classic-1k-4k-chip-encyclopedia/) tags use Crypto-1 authentication that iOS does not support natively. For guaranteed iPhone compatibility, use NTAG or MIFARE Ultralight chips instead.",
         "Tag is too far from the NFC antenna. iPhone's NFC antenna is located at the top edge. If you are tapping the tag to the middle or bottom of the phone, it will not read. Move the tag to the top 2 cm of the front screen.",
         "Metal interference: placing an NFC tag directly on a metal surface detunes the antenna and can prevent iPhone detection. Use anti-metal NFC tags with ferrite backing for metal-mount applications.",
         "Tag is damaged: cracked antenna or broken chip connection from bending, puncture, or manufacturing defect will prevent any read. Test with a known-good tag to isolate the issue."
       ]
     },
     {
-      "title": "Recommended NFC chips for guaranteed iPhone compatibility",
+      "title": "How do you handle recommended NFC chips for guaranteed iPhone compatibility?",
       "bullets": [
         "NTAG 213 (144 bytes). The most popular and cost-effective NFC chip for iPhone-compatible tags, stickers, and cards. NFC Forum Type 2 tag, supported by every iPhone with NFC since iPhone 7.",
         "NTAG 215 (504 bytes). Same compatibility as NTAG 213 with more memory, commonly used for Amiibo and applications requiring larger data storage.",
@@ -45,6 +45,28 @@
         "NTAG 424 DNA — NFC Forum Type 4 tag with cryptographic authentication and dynamic URL generation. Used for product authentication, brand protection, and secure NFC applications.",
         "ICODE SLIX2 — ISO 15693 vicinity chip supported by iOS 14+ for NFC-V reading. Used in library systems and industrial applications requiring longer read range.",
         "All of these chips are manufactured by NXP Semiconductors and are the reference standard for iPhone NFC compatibility. Proud Tek stocks all of them across our tag, sticker, card, and inlay product lines."
+      ]
+    },
+    {
+      "title": "iOS-version-specific behavior changes you need to know in 2026",
+      "intro": "Apple's NFC behavior is not static. Several recent iOS releases changed how the system handles NFC tags, which is why a tag that worked last year might appear broken now. Most 'iPhone NFC stopped working after update' threads on the Apple Support communities trace back to one of the changes below rather than a hardware fault. Verify the iOS version on the device before assuming the tag is dead.",
+      "bullets": [
+        "Control Center NFC Tag Reader removed. Earlier iOS versions exposed an NFC Tag Reader toggle inside Control Center that older iPhones (XR and earlier) needed to read tags without an app. From iOS 14 onward this toggle is gone on iPhone XS and later because background tag reading is always on, but the change is sometimes mistaken for a regression. If your phone is iPhone XR or older, you must add the NFC Tag Reader to Control Center under Settings → Control Center on the iOS version that still exposes it, or use a third-party app such as NFC Tools.",
+        "Background Tag Reading rules. iOS only triggers an automatic notification when the screen is on and unlocked, and the NDEF record contains a fully-formed URL (https or a registered Universal Link). Tags that contain Text records, plain MIME records, or non-URL data will not pop a banner — they require an app to read explicitly. Tags written with a non-https URL (older http://) trigger an unsigned-link prompt that some users mistake for failure.",
+        "iOS 17 Shortcuts NFC writing. Starting with iOS 17 Apple's Shortcuts app can both read and write NDEF records to compatible tags via the 'Find Tag' and 'Write to Tag' actions. This removes the need for a third-party app for many basic tag programming workflows but is hidden — users have to add it under Personal Automation → NFC, then choose Write rather than the more common Tap-to-Run option.",
+        "iOS 18 HCE (Host Card Emulation) and digital car keys. iOS 18.1 opened up parts of the Secure Element to certified developers for HCE-based credentials and digital car keys. This does not change how passive NDEF tags behave, but it means iPhones can now act as the tag for some applications (such as ASSA ABLOY HID Mobile Access, Aliro mobile credentials, and Apple Wallet car keys), which is sometimes confused with passive tag scanning failing.",
+        "VoiceOver / Guided Access edge cases. Several Apple Support threads document NFC scanning being suppressed when VoiceOver is active or Guided Access is locked into a single app. If a single phone fails consistently while other phones succeed on the same tag, check Settings → Accessibility before opening a hardware ticket."
+      ]
+    },
+    {
+      "title": "Step-by-step diagnostic flow when a single iPhone fails to scan",
+      "intro": "Most failed-tag tickets resolve in under five minutes with a structured check rather than guessing. The flow below comes from the same sequence Apple, NFC Tools, and most NFC card vendors recommend, ordered fastest-to-slowest so you stop the moment the tag reads.",
+      "bullets": [
+        "Check the basics first. Confirm the iPhone is awake and unlocked, the case is not a thick metal or MagSafe wallet, and the tap point is the top 2 cm of the screen near the front camera. A surprising share of 'broken tags' resolve at this step, particularly with newer iPhones using cases that include magnetic mounting plates.",
+        "Test the tag against an Android phone with NFC Tools installed. Almost every modern Android device reads NFC Forum Type 2 tags. If Android sees the tag but iPhone does not, the chip is iOS-incompatible (most likely MIFARE Classic) and the tag must be replaced. If neither phone reads it, the tag itself is dead.",
+        "Re-encode the tag with a fully-qualified https URL. Use NFC Tools or NXP TagWriter on Android, or the iOS Shortcuts 'Write to Tag' automation, to overwrite the tag with a known-good https URL such as https://example.com/test. If the tag accepts the write and reads on Android but not iPhone, you've isolated the issue to the NDEF format rather than the chip.",
+        "Try a different tag from the same batch. Manufacturing yields on inexpensive NFC stickers are not 100 percent. If one tag fails but the next ten from the same roll work, the failed tag has a broken antenna trace or a chip bond defect — common in tags that have been bent sharply or stuck onto strongly curved surfaces.",
+        "Last resort: factory-test the iPhone NFC subsystem. Try Apple Pay at any contactless terminal. If Apple Pay also fails, NFC hardware on the iPhone is suspect and the device should be backed up and brought to Apple Support. If Apple Pay works but NDEF tags don't, the issue is software (most often a stuck Background Tag Reading state cleared by a reboot) rather than hardware."
       ]
     }
   ],
@@ -66,6 +88,22 @@
           "label": "How NFC tags work with smartphones"
         }
       ]
+    },
+    {
+      "title": "iOS NFC technical references",
+      "description": "Apple and NFC Forum primary sources for developers and integrators troubleshooting iPhone NFC.",
+      "links": [
+        {
+          "href": "https://nfc-forum.org/build/specifications/",
+          "label": "NFC Forum specifications",
+          "description": "Authoritative NDEF, Type 1-5 tag, and Activity definitions used by iOS Core NFC."
+        },
+        {
+          "href": "https://developer.apple.com/documentation/corenfc",
+          "label": "Apple Core NFC framework documentation",
+          "description": "iOS API reference covering supported tag families, background reading rules, and NDEF formats."
+        }
+      ]
     }
   ],
   "faq": [
@@ -80,10 +118,18 @@
     {
       "question": "Where exactly is the NFC antenna on an iPhone?",
       "answer": "The NFC antenna is located at the very top of the iPhone, behind the screen near the front-facing camera and notch/Dynamic Island area. For best results, hold the NFC tag flat against the top 2 cm of the iPhone screen and wait 1-2 seconds for the phone to detect and process the tag."
+    },
+    {
+      "question": "Why does my iPhone scan an NFC tag once but not the second time without restarting?",
+      "answer": "This is almost always Background Tag Reading filtering out duplicates. iOS suppresses repeated NDEF banners for the same payload from the same tag during a short window (typically a few seconds) so a user holding a phone over a tag does not get spammed with notifications. To force a second read, lock and unlock the phone, move the phone away from the tag for a few seconds, or change the NDEF payload on the tag. If the second tap is from a Shortcuts personal automation, also check Settings → Shortcuts → the automation and make sure 'Run Immediately' or 'Notify When Run' is configured the way you expect — this controls whether the user has to confirm before the action runs."
+    },
+    {
+      "question": "Can I use the same NTAG 213 / 215 / 216 stickers across iPhone and Android, or do I need different SKUs?",
+      "answer": "The same NTAG 213, 215, and 216 stickers work on both iPhone (iOS 14+) and Android (4.0+) and on Windows, macOS, and Linux readers using a USB NFC reader such as the ACR122U. NTAG is part of the NFC Forum Type 2 specification, which is the most widely supported tag family in consumer devices. The only common cross-platform pitfall is MIFARE Classic 1K/4K tags — Android can read them, iPhone cannot. If you want a single SKU for marketing handouts, business cards, smart packaging, or product authentication that has to work on every modern phone, specify NTAG 213 (cheapest, 144 bytes), NTAG 215 (Amiibo-compatible, 504 bytes), NTAG 216 (largest, 888 bytes), or NTAG 424 DNA when you also need cryptographic authentication."
     }
   ],
   "primaryAction": {
-    "href": "/contact/",
+    "href": "/contact/nfc-branding-cards/",
     "label": "Order iPhone-compatible NFC tags"
   },
   "secondaryActions": [
@@ -98,5 +144,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2025-12-31"
+  "reviewedAt": "2026-05-10"
 }

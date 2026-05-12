@@ -1,0 +1,75 @@
+---
+/**
+ * Stage 3 cutover — minimal experimental route.
+ *
+ * Renders ONE production editorial fixture (lp/rfid-tag-wholesale) directly
+ * via the new shadow component tree (`<EditorialArticle>`), bypassing the
+ * legacy `renderEditorialMain` → `<Fragment set:html>` path.
+ *
+ * Purpose: verify the shadow tree compiles and renders correctly under
+ * `astro build` (not just inside vitest's Container API), and let the human
+ * reviewer diff `dist/_stage3/lp-experiment/index.html` against
+ * `dist/lp/rfid-tag-wholesale/index.html` to see the byte-level differences
+ * the parity normalizer characterized in
+ * `src/components/editorial/__tests__/_parity-helpers.ts`.
+ *
+ * The 7 expected diff categories (all functionally equivalent — same DOM
+ * after parsing — none affect rendering / SEO / accessibility):
+ *
+ *   1. Astro dev-mode `data-astro-source-file` / `data-astro-source-loc`
+ *      attrs are absent from production builds, so this category usually
+ *      drops out at `astro build` time.
+ *   2. Whitespace: Astro emits compact single spaces between attributes
+ *      where the TS template literal would have multi-line indentation.
+ *   3. Entity form: Astro emits numeric entities (`&#34;` / `&#38;` /
+ *      `&#60;` / `&#62;`) in attribute values; TS emits named entities.
+ *   4. Apostrophe (`'`): Astro leaves raw inside attribute values; TS
+ *      emits `&#39;`.
+ *   5. Void elements: Astro emits `<img ...>` (no slash); TS emits
+ *      `<img ... />`.
+ *   6. SVG empty elements: Astro emits `<rect ...></rect>` (explicit
+ *      close); TS emits `<rect .../>`.
+ *   7. Pre-`>` whitespace: TS template literals occasionally leave a stray
+ *      space before `>` (e.g. `<th scope="col" >`); Astro doesn't.
+ *
+ * Production routes are untouched — this page builds into a quarantined
+ * dist subtree and only exists to validate the cutover plumbing. Delete it
+ * once an actual route group (e.g. /lp/*) has been flipped via the proper
+ * env-flag layout dispatcher in `[...slug].astro`.
+ */
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve } from "node:path";
+
+import EditorialArticle from "../../components/editorial/EditorialArticle.astro";
+import type { EditorialDefinition } from "../../lib/editorial-types";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+// Pin the time fields so the experimental output is reproducible across
+// builds — mirrors the integration parity test's `loadDefinition` helper.
+const raw = JSON.parse(
+  readFileSync(
+    resolve(__dirname, "../../content/editorial/lp/rfid-tag-wholesale.json"),
+    "utf8",
+  ),
+) as EditorialDefinition;
+
+const definition: EditorialDefinition = {
+  ...raw,
+  publishedAt: raw.publishedAt ?? "2026-01-15T00:00:00.000Z",
+  modifiedAt: raw.modifiedAt ?? "2026-05-01T00:00:00.000Z",
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Stage 3 experiment — {definition.title}</title>
+    <link rel="stylesheet" href="/codex.css" />
+  </head>
+  <body>
+    <EditorialArticle definition={definition} illustration={null} />
+  </body>
+</html>

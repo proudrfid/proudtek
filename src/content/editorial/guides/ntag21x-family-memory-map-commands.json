@@ -10,7 +10,7 @@
     "Features that differentiate NTAG21x from vanilla Type-2 — ASCII-mirror (UID / NFC counter / PWD-AUTH result written directly into a NDEF URL), password-protected memory (32-bit PWD + 16-bit PACK), originality-signature (ECDSA on chip UID, proof of authenticity), scan counter (24-bit, optionally mirrored) and a configurable strong-modulation mode."
   ],
   "imageAlt": "NTAG21x family chips: NTAG213, NTAG215, NTAG216 with memory map diagram",
-  "heroImage": "/landing-images/ntag213-stickers.jpg",
+  "heroImage": "/landing-images/ntag213-nfc-sticker.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/ntag213-sticker/",
     "/products/rfid-labels/ntag215-label/",
@@ -27,10 +27,10 @@
     "NTAG originality signature"
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2025-12-04",
+  "modifiedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2025-12-08",
+  "reviewedAt": "2026-05-10",
   "sections": [
     {
       "title": "Chip family and part numbers",
@@ -70,7 +70,7 @@
         "REQA (0x26) / WUPA (0x52). ISO 14443-3 entry commands. Put the tag into READY state; anti-collision follows.",
         "ANTICOLLISION / SELECT (0x93 / 0x95). Standard ISO 14443-3 Type A anti-collision. Returns the 7-byte UID in two cascade levels.",
         "HLTA (0x50 00): halt command. Tag enters HALT state until next RF field rise.",
-        "GET_VERSION (0x60): returns 8 bytes identifying the chip. Byte 6 is the storage size indicator: 0x0F = NTAG213, 0x11 = NTAG215, 0x13 = NTAG216. Byte 3 indicates silicon generation (NTAG21x = 0x04).",
+        "GET_VERSION (0x60): returns 8 bytes identifying the chip per the NXP NTAG213_215_216 product short data sheet. Byte 1 = 0x04 (vendor ID, NXP Semiconductors). Byte 2 = 0x04 (product type, NTAG). Byte 3 = product subtype (0x02 for 50 pF tuning). Byte 4 / Byte 5 = major / minor version. Byte 6 is the storage size indicator: 0x0F = NTAG213 (144 bytes user), 0x11 = NTAG215 (504 bytes user), 0x13 = NTAG216 (888 bytes user). Byte 7 = 0x03 (protocol type, ISO/IEC 14443-3 compliant).",
         "READ (0x30 addr): reads 16 bytes starting at page addr (i.e. pages addr, addr+1, addr+2, addr+3). The most common read command. For higher throughput use FAST_READ.",
         "FAST_READ (0x3A start end). Reads a contiguous range of pages with a single APDU. Returns (end - start + 1) × 4 bytes. Up to 255 pages per command.",
         "WRITE (0xA2 addr data). Writes 4 bytes to the single page at addr. If the page is locked or above AUTH0 without prior PWD_AUTH, the tag returns a NAK.",
@@ -159,7 +159,7 @@
       "title": "Programming workflow — encode, verify, lock",
       "intro": "Production encoding of NTAG21x converts a blank or CC-only inlay into a final, tamper-resistant product tag. The workflow below is the same pattern Proud Tek and most high-volume converters follow, whether the end product is a review card, a wristband, or a business card. Each step has a failure mode and a specific recovery. Treating the workflow as a reliable assembly-line process rather than a manual operation is what delivers the sub-0.5 % field-defect rates that the review-card and event markets now expect.",
       "bullets": [
-        "Step 1 — Anti-collision plus GET_VERSION. Confirm the inlay under the reader returns ATQA = 0x0044, SAK = 0x00, and GET_VERSION byte 3 = 0x04 (NXP silicon) plus byte 6 matching the expected variant (0x0F for 213, 0x11 for 215, 0x13 for 216). Reject inlays that fail any check. They are either counterfeit or damaged.",
+        "Step 1 — Anti-collision plus GET_VERSION. Confirm the inlay under the reader returns ATQA = 0x0044, SAK = 0x00, and GET_VERSION byte 1 = 0x04 (NXP vendor ID) and byte 2 = 0x04 (NTAG product type) plus byte 6 matching the expected variant (0x0F for 213, 0x11 for 215, 0x13 for 216). Reject inlays that fail any check. They are either counterfeit or damaged.",
         "Step 2 — READ_SIG plus offline ECDSA-P224 verification. Read the 32-byte originality signature, verify against NXP's published public key (AN11350), and log {UID, SIG, timestamp, operator, batch number} in an append-only database. Rejecting the ~0.01 % of inlays that fail signature verification is what separates a mature line from a hobbyist setup.",
         "Step 3 — Build NDEF TLV. Compose the NDEF message (typically a URL record with RTD-URI prefix 0x04 for https://), pad the URL to include placeholder 'X' characters at the exact byte offset where ASCII mirror will splice UID and counter values. Wrap in TLV: 0x03 | length | NDEF bytes | 0xFE. Pad the remaining user-memory pages with 0x00 so that FAST_READ returns a deterministic pattern.",
         "Step 4 — Write CC plus NDEF using FAST_WRITE-equivalent chunking. Issue WRITE (0xA2) commands page by page starting at page 3 (CC: 0xE1 0x10 size 0x00), then page 4 onwards with the NDEF TLV. Some reader drivers batch into multi-page COMPATIBILITY_WRITE but NTAG21x officially requires single-page WRITE. Verify by FAST_READ of the just-written range and byte-compare.",
@@ -375,7 +375,7 @@
     },
     {
       "question": "How do I prove a tag is genuine NTAG21x and not a counterfeit 'NTAG-compatible' chip?",
-      "answer": "Three steps. (1) Send GET_VERSION: byte 3 must be 0x04 (NXP silicon generation marker), byte 6 must match the expected variant (0x0F / 0x11 / 0x13). (2) Send READ_SIG: receive 32 bytes. (3) ECDSA-P224 verify those 32 bytes against NXP's published public key (AN11350) over the tag's UID. Chinese-OEM 'compatible' chips typically pass step 1 but fail step 2 or return a signature that fails verification."
+      "answer": "Three steps. (1) Send GET_VERSION: byte 1 must be 0x04 (NXP vendor ID), byte 2 must be 0x04 (NTAG product type), and byte 6 must match the expected variant (0x0F / 0x11 / 0x13 for 213/215/216). (2) Send READ_SIG: receive 32 bytes. (3) ECDSA-P224 verify those 32 bytes against NXP's published public key (AN11350) over the tag's UID. Chinese-OEM 'compatible' chips typically pass step 1 but fail step 2 or return a signature that fails verification."
     },
     {
       "question": "What is AUTH0 and how do I configure password-protected memory?",

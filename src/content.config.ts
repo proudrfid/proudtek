@@ -146,15 +146,30 @@ const sourceSchema = z.object({
 
 /* ── Editorial definition schema ────────────────────────────────────── */
 
+/**
+ * Editorial schema.
+ *
+ * Common fields apply to every group. The "Products-only fields" block at
+ * the bottom (`chipFamilies`, `envFamilies`, `relatedIndustries`) is only
+ * meaningful for entries with `group: "products"` — they feed the catalog
+ * facet filter on /products/all/ and the "Used in these industries" card
+ * grid on SKU pages. A `.superRefine()` enforces this so a future
+ * editorial author can't bolt them onto a compare/guide/blog page by
+ * accident. As of 2026-05, all 194 files using these fields are in the
+ * products group; the refine is purely a guardrail against drift.
+ */
 const editorialSchema = z.object({
   route: z.string(),
-  group: z.enum(["solutions", "compare", "contact", "compatibility", "guides", "blog", "products", "lp", "markets", "about", "resources", "home", "faq"]),
+  group: z.enum(["solutions", "compare", "contact", "compatibility", "guides", "blog", "products", "lp", "markets", "about", "resources", "home", "faq", "research"]),
   title: z.string(),
   kicker: z.string(),
   summary: z.string(),
   heroPoints: z.array(z.string()),
   imageAlt: z.string(),
-  imageSourceRoutes: z.array(z.string()),
+  /** Routes to harvest hero-image src from when the editorial entry has no
+   *  explicit `heroImage`. Optional — if you set `heroImage` directly this
+   *  array can be left out entirely. Defaults to []. */
+  imageSourceRoutes: z.array(z.string()).optional().default([]),
   heroImage: z.string().optional(),
   brief: z.array(briefFieldSchema).optional(),
   sections: z.array(sectionSchema),
@@ -179,12 +194,30 @@ const editorialSchema = z.object({
   reviewedAt: z.string().optional(),
   /** Authoritative sources cited by this page. Rendered as a uniform citations block + Article.citation JSON-LD. */
   sources: z.array(sourceSchema).optional(),
-  /** Industry slugs (matching `src/content/editorial/industries/<slug>.json`) where this SKU is deployed. Renders a "Used in these industries" card grid on SKU pages. */
+
+  /* ── Products-only fields (group === "products") ─────────────────────── */
+  /** Industry slugs (matching `src/content/editorial/industries/<slug>.json`) where this SKU is deployed. Renders a "Used in these industries" card grid on SKU pages. Products-only. */
   relatedIndustries: z.array(z.string()).optional(),
-  /** Explicit chip-family facet values for the catalog filter on /products/all/. Takes precedence over the regex scan of title+summary+route — use when the SKU supports multiple chips in a compatibility matrix and the filter should surface it for every chip. Valid values match FACET_RULES.chip values in catalog-pages.ts: ntag21x, ntag424, mifare-classic, mifare-desfire, mifare-ultralight, mifare-plus, icode, em-tk5, impinj-m7, alien-higgs, ucode. */
+  /** Explicit chip-family facet values for the catalog filter on /products/all/. Takes precedence over the regex scan of title+summary+route — use when the SKU supports multiple chips in a compatibility matrix and the filter should surface it for every chip. Valid values match FACET_RULES.chip values in catalog-pages.ts: ntag21x, ntag424, mifare-classic, mifare-desfire, mifare-ultralight, mifare-plus, icode, em-tk5, impinj-m7, alien-higgs, ucode. Products-only. */
   chipFamilies: z.array(z.string()).optional(),
-  /** Explicit environment-tag facet values for the catalog filter on /products/all/. Takes precedence over the regex scan of title+summary+route — use when the SKU's environmental specs (IP rating, temperature range, mount type, tamper behaviour) live deep in spec tables. Valid values match FACET_RULES.env values in catalog-pages.ts: anti-metal, high-temp, outdoor, embed, tamper, sensor. */
+  /** Explicit environment-tag facet values for the catalog filter on /products/all/. Takes precedence over the regex scan of title+summary+route — use when the SKU's environmental specs (IP rating, temperature range, mount type, tamper behaviour) live deep in spec tables. Valid values match FACET_RULES.env values in catalog-pages.ts: anti-metal, high-temp, outdoor, embed, tamper, sensor. Products-only. */
   envFamilies: z.array(z.string()).optional(),
+}).superRefine((data, ctx) => {
+  // Guardrail: the catalog-facet and industry-grid fields are only
+  // consumed when group === "products". If a future editorial author
+  // sets them on a compare/guide/blog/solutions entry, fail at build
+  // time with a clear message instead of letting the field silently
+  // do nothing.
+  if (data.group === "products") return;
+  for (const field of ["relatedIndustries", "chipFamilies", "envFamilies"] as const) {
+    if (data[field] !== undefined) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: [field],
+        message: `${field} is only meaningful for group: "products" — this entry has group: "${data.group}". Move it or drop the field.`,
+      });
+    }
+  }
 });
 
 /* ── Authors collection schema (added 2026-04) ─────────────────────── */

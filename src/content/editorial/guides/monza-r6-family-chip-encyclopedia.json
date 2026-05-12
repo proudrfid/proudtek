@@ -1,16 +1,16 @@
 {
   "route": "/guides/monza-r6-family-chip-encyclopedia/",
   "group": "guides",
-  "title": "Impinj Monza R6 Family — UHF Chip Technical Encyclopedia (R6, R6-P, R6-A, M730, M750)",
-  "kicker": "Impinj Monza R6 / R6-P / R6-A / M730 / M750 Reference",
+  "title": "Impinj Monza R6 Family — UHF Chip Technical Encyclopedia (R6, R6-P, R6-A, M730, M750, M775, M800)",
+  "kicker": "Impinj Monza R6 / R6-P / R6-A / M700 Series (M730/M750/M770/M775/M780) / M800 Series (M830/M850) Reference",
   "summary": "The Impinj Monza R6 family and its successor M700/M800 series are the defining UHF chips of retail-apparel item-level tagging. Monza R6 introduced AutoTune (a chip-integrated feature that auto-calibrates antenna impedance in the field) and AutoPilot power management. Monza R6-P added extended user memory and a higher peak temperature rating. The M730 and M750 derivatives extend sensitivity further. This encyclopedia documents the five chips' specifications, the AutoTune mechanism, the FastID and TagFocus serialization features, and the deployment boundaries where each chip is appropriate.",
   "heroPoints": [
     "AutoTune: Monza R6's self-calibrating antenna tuning circuit that automatically compensates for impedance mismatches caused by manufacturing variance, substrate material, and RF-environment detuning. Without AutoTune a 1-dB impedance mismatch can cost 3-5 dB of sensitivity; with it, converters achieve tight performance consistency (±0.5 dB inlay-to-inlay standard deviation vs. ±2 dB without) across huge inlay volumes. The core reason Monza R6 became the de facto standard for retail apparel at scale from 2016 onwards.",
-    "Enhanced TID uniqueness: Monza R6's TID carries a 38-bit random serial within the 96-bit TID block, combined with Impinj's manufacturer ID prefix (0xE280B04x for R6, 0xE280B12x for M730 class). This is the 'TID-based serialization' retailers and supply-chain providers use in lieu of writing EPCs. Faster encoding (skip a Write command, saving ~2-4 ms per tag on a roll-to-roll converter line), tamper-resistant because TID is read-only factory-programmed, and it avoids managing an EPC serial range across brands or suppliers.",
+    "Enhanced TID uniqueness: Monza R6 carries 96 bits of Serialized TID with a 48-bit serial number per the IPJ-W1700-K00 datasheet (Impinj Monza R6 Tag Chip Datasheet); the M700 series (M730/M750) datasheet v6.4 documents the same '96 bits of Serialized TID with 48-bit serial number'. This is the 'TID-based serialization' retailers and supply-chain providers use in lieu of writing EPCs: faster encoding (skip a Write command, saving ~2-4 ms per tag on a roll-to-roll converter line), tamper-resistant because TID is read-only factory-programmed, and it avoids managing an EPC serial range across brands or suppliers.",
     "FastID and TagFocus: two Impinj-specific Monza extensions that speed up high-density read environments. FastID returns the 96-bit TID in a single inventory round alongside the EPC (cutting the TID-fetch overhead that would otherwise add a second RF round-trip per tag). TagFocus keeps a tag in session-B 'inventoried' state after the first read, preventing re-reads and improving high-density inventory cycle speed by 2-3× on crowded retail shelves. Material enough that most retailers rely on these extensions in their back-end deployment assumptions."
   ],
-  "imageAlt": "Impinj Monza R6 chip with AutoTune circuit and apparel inlay",
-  "heroImage": "/landing-images/impinj-m730-uhf-inlay.jpg",
+  "imageAlt": "Impinj UHF RFID inlay (M700 successor family) — Monza R6 chip technical encyclopedia",
+  "heroImage": "/landing-images/impinj-m700-uhf-inlay.jpg",
   "imageSourceRoutes": [
     "/products/rfid-labels/impinj-m730-uhf-inlay/",
     "/products/rfid-labels/impinj-m700-uhf-inlay/"
@@ -26,21 +26,22 @@
     "UHF retail apparel chip"
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2025-12-18",
+  "modifiedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2025-12-21",
+  "reviewedAt": "2026-05-10",
   "sections": [
     {
       "title": "Family lineage — R6, R6-P, R6-A, M700, M730, M750, M800",
       "bullets": [
-        "Monza R6 — the 2015 generation chip (TID model ID 0x170). 96-bit EPC, 32-bit user memory, -22 dBm forward-link sensitivity, AutoTune at launch. The chip that made retail apparel RFID scale; hundreds of billions of units shipped across the decade since, still dominant in 2026 in the cost-sensitive promotional and tertiary-packaging segments because the Monza R6 strap price floor is close to the UCODE 8 floor at strap volume.",
-        "Monza R6-P: the 'Plus' variant (TID model ID 0x172). 128-bit EPC option (selectable via PC word), 32-bit user memory upgradeable to 64 bits in specific inlay configurations, higher peak temperature rating (+105 °C sustained, +125 °C short excursions, qualified to 200 °C/40 min for tire-cure per Impinj's AN0023 tire-industry characterization report), enhanced AutoTune with wider impedance capture range. The go-to choice for tire-cure (Pirelli Cyber-Tire, Michelin TPMS-internal), autoclave-survivable hospital-linen programs, and other medium-temperature industrial deployments.",
-        "Monza R6-A: 'Advanced' variant positioned for automotive and demanding-environment applications (TID model ID 0x174). Same core silicon but with an extended operating-temperature envelope (-40 °C to +125 °C continuous), enhanced chip die packaging (epoxy-encapsulated bump rather than standard solder bump) for improved vibration tolerance (tested to MIL-STD-810G shock and vibration profiles), and wider supply-voltage tolerance to survive RF-environment transients.",
-        "Impinj M700 series — the 2020 successor to Monza R6, TID model ID 0x190. 96-bit EPC, 32-bit user memory, -22 dBm sensitivity matching late-life Monza R6-P. Pin-compatible with reference designs, so strap vendors could substitute M700 for R6 in existing antenna layouts without retuning. Which is exactly what happened in 2021-2022 as most converters migrated the Monza-R6-era Dogbone and similar antennas to M700 silicon without reissuing antenna revisions.",
-        "Impinj M730 — 2021 generation, TID model ID 0x1A0. -24 dBm forward-link sensitivity, -22 dBm backscatter (3 dB improvement over M700). This is the chip that matches UCODE 9's sensitivity envelope and is the retail-apparel volume driver from 2022 onwards; nearly all Walmart Tier-2 mandate deployment inlays ship on M730 or UCODE 9.",
-        "Impinj M750 — 2022 generation, TID model ID 0x1B0. -26 dBm forward-link sensitivity, -24 dBm backscatter. 3 dB beyond M730. Targeted at longest-range applications (yard management, warehouse dock doors, high-ceiling retail POS) where the extra 3 dB translates to ~40% longer read range on the same antenna.",
-        "Impinj M800 — 2024 generation, TID model ID 0x1C0. Further sensitivity improvement to -27 to -28 dBm, extended command support including a new 'ReadRange' power-control feature and integrated crypto-ready personalization. Described in more detail in the M800 section of the UHF chip comparison guide."
+        "Monza R6 (IPJ-W1700-K00) — the 2015 generation chip. Up to 96-bit EPC, 96-bit Serialized TID with 48-bit serial number, no user memory on the base R6 die. -22.1 dBm forward-link sensitivity and -18.8 dBm write sensitivity per the IPJ-W1700-K00 datasheet. AutoTune at launch. The chip that made retail apparel RFID scale; hundreds of billions of units shipped across the decade since, still dominant in 2026 in the cost-sensitive promotional and tertiary-packaging segments because the Monza R6 strap price floor is close to the UCODE 8 floor at strap volume.",
+        "Monza R6-P: the 'Plus' variant. 96- or 128-bit EPC option (selectable via PC word), with 32 bits of user memory enabled in specific configurations, higher peak temperature rating qualified for tire-cure (+200 °C/40 min for tire-cure characterization), enhanced AutoTune with wider impedance capture range. The go-to choice for tire-cure (Pirelli Cyber-Tire, Michelin TPMS-internal), autoclave-survivable hospital-linen programs, and other medium-temperature industrial deployments.",
+        "Monza R6-A: 'Advanced' variant positioned for automotive and demanding-environment applications. Same core silicon but with an extended operating-temperature envelope, enhanced chip die packaging (epoxy-encapsulated bump rather than standard solder bump) for improved vibration tolerance, and wider supply-voltage tolerance to survive RF-environment transients.",
+        "Impinj M700 series (M730 and M750) — the 2020 successor to Monza R6, datasheet v6.4 (2024). Both chips share -24 dBm read sensitivity and -21 dBm write sensitivity. Per the M700 datasheet: M730 (IPJ-M730A-A00) has 128 bits of EPC memory and 0 bits of User memory; M750 (IPJ-M750A-A00) has 96 bits of EPC memory and 32 bits of User memory. Pin-compatible with reference designs, so strap vendors could substitute M700 for R6 in existing antenna layouts.",
+        "Impinj M770 — extended-feature M700-series chip with additional memory and Gen2X support. Same -24 dBm read sensitivity class as M730/M750.",
+        "Impinj M775 — the M700-series authentication chip. Equipped with a cryptographic engine and a unique Impinj-programmed cryptographic key. Together with the Impinj Authentication Service it enables cryptographic authentication of tagged items. -24 dBm read sensitivity per Impinj's M775 product brief.",
+        "Impinj M780 / M781 — extended-memory variants with additional EPC and user memory configurations, -23.5 dBm read sensitivity per the M780/M781 datasheet v1.0 (November 2022).",
+        "Impinj M800 series (M830 and M850) — 2024 generation per the M800 Series Tag Chips Product Brief (Impinj support article 17197826632979). Per the M830/M850 datasheet, both have -25.5 dBm read sensitivity (with up to 2 dB additional improvement when used with Impinj Gen2X performance enhancement). M830 has 128 bits of EPC memory and 0 bits User memory; M850 has 96 bits EPC + 32 bits User memory. Impinj Gen2X is an enhancement to Gen2v2 radio and logical layers that speeds inventory, increases read range, declutters the environment, and supports consumer-privacy modes."
       ]
     },
     {
@@ -56,7 +57,7 @@
     {
       "title": "TID serialization and FastID / TagFocus",
       "bullets": [
-        "Monza R6 TID — 96 bits. First 8 bits = 0xE2 (EPC class identifier per Gen2 v2 Section 6.3.2.1.2.2). Next 12 bits = 0x801 (Impinj's manufacturer designator, allocated by GS1). Next 12 bits = model ID (0x170 for Monza R6, 0x172 for R6-P, 0x174 for R6-A, 0x190 for M700, 0x1A0 for M730, 0x1B0 for M750, 0x1C0 for M800). Remaining 64 bits = 26-bit XTID header (flags for serialization type, reserved bits) plus a 38-bit per-chip unique serial drawn from Impinj's entropy pool at wafer probe.",
+        "Monza R6 TID — 96 bits per the IPJ-W1700-K00 datasheet. First 8 bits = 0xE2 (EPC class identifier per Gen2 v2 Section 6.3.2.1.2.2). Next 12 bits = the Impinj mask-designer prefix allocated by GS1. Subsequent bits encode the Impinj model number per the table in the datasheet, followed by a 48-bit serial number (Impinj M700 datasheet v6.4 explicitly cites '96 bits of Serialized TID with 48-bit serial number'). Earlier rumored 38-bit serial figures circulating in third-party content are not in the current Impinj datasheets; rely on the IPJ-W1700-K00 and M700-series datasheet v6.4 for the authoritative bit layout.",
         "TID-based serialization: retailers increasingly encode just a 'plate tag' (short EPC like 0xAA55... or a vendor-common identifier indicating 'this is a Brand X apparel tag') and use the Monza R6 TID as the actual unique identifier. Faster for high-volume encoding (skip the Write(EPC) step, saving 2-4 ms per tag = 100-200M tags/line/year of converter throughput improvement), tamper-resistant (TID is read-only factory-programmed and cannot be altered post-manufacturing), and avoids managing an EPC serial range coordination problem between brands or suppliers (the classic 'who owns SGTIN range 00123456-00200000' problem disappears).",
         "FastID: Impinj-specific feature that returns the TID in a single inventory round alongside the EPC. Without FastID the reader must issue a Read(TID bank) command after each EPC detection. A second RF round trip at ~2-4 ms per tag. FastID cuts inventory cycle time by ~2× for TID-serialized deployments; in a busy POS portal with 500 items/minute this is the difference between a reader that completes the inventory in 3 seconds and one that takes 6 seconds. Invoked via an Impinj-extended Select + Query sequence; transparent to the chip otherwise.",
         "TagFocus: another Impinj-specific feature that keeps a tag in session B (inventoried-B state) after the reader has read it, preventing it from re-responding to subsequent Query commands within the same session. For a portal trying to inventory 500 tags, TagFocus prevents re-reads and lets the reader cycle through all unique tags faster. Typical improvement is 30-50% fewer redundant reads per cycle, which on a 500-tag shelf means the reader completes the inventory in 8-12 seconds instead of 15-20 seconds.",
@@ -67,9 +68,9 @@
       "title": "Memory organization",
       "bullets": [
         "Four EPC Gen2 memory banks per ISO/IEC 18000-63 Section 6.3.2.1.2. Bank 00 = reserved (Kill password bits 0-31, Access password bits 32-63). Bank 01 = EPC (CRC-16 + PC + EPC starting at bit 32). Bank 10 = TID. Bank 11 = user memory.",
-        "EPC bank — 96 bits standard on Monza R6 and M700/M730/M750 (total bank size 128 bits including CRC-16 and PC word). 128 bits EPC on Monza R6-P when configured via the PC word's Length field. Most apparel retailers encode SGTIN-96 (96 bits) and leave the extension unused; high-end luxury goods and pharmaceutical programs occasionally use the extended 128-bit EPC on R6-P for more granular lot-level encoding.",
-        "User memory — 32 bits on Monza R6 and M700, 32 bits on M730 and M750. On Monza R6-P the user memory is configurable up to 64 bits in specific inlay designs (using the XPC_W2 extension). On M800 user memory is extended to 96 bits standard with optional configurations up to 384 bits for memory-heavy applications; see the M800 datasheet for specifics.",
-        "TID bank — 96 bits read-only, as described in the TID section above. Includes the 38-bit per-chip serial plus Impinj's mask designer ID (0x801) and model ID bits. Factory-programmed at wafer probe and verified before die shipment; cannot be altered post-manufacturing.",
+        "EPC bank — per the M700-series datasheet v6.4: M730 (IPJ-M730A-A00) provides 128 bits of EPC memory; M750 (IPJ-M750A-A00) provides 96 bits of EPC memory. Monza R6 base provides up to 96 bits of EPC memory per the IPJ-W1700-K00 datasheet. Most apparel retailers encode SGTIN-96 (96 bits) and leave the extension unused; high-end luxury goods, pharmaceutical and defense programs use the extended 128-bit EPC on M730 / M830 for more granular lot-level encoding or proprietary identifiers.",
+        "User memory — per the M700 datasheet v6.4, M730 has 0 bits of User memory while M750 has 32 bits of User memory at bank 11 starting at memory address 00h. The M800-series M850 has 32 bits of User memory; M830 has 0 bits. Monza R6-P configurations can include user memory in specific inlay designs (using the XPC extensions in the Gen2 PC word).",
+        "TID bank — 96 bits read-only with a 48-bit per-chip serial number per the M700-series datasheet v6.4 and the Monza R6 IPJ-W1700-K00 datasheet. Includes the EPC class identifier 0xE2, the Impinj mask designer prefix and model-ID field per the datasheet's TID structure section. Factory-programmed at wafer probe and verified before die shipment; cannot be altered post-manufacturing.",
         "Kill and Access passwords — 32 bits each, stored in bank 00 at addresses 0x00-0x1F (Kill) and 0x20-0x3F (Access). Factory default all-zeros on shipped chips; customers set them during personalization if password-protected operations are needed (typical for anti-counterfeit and anti-cloning programs that want to lock EPC or user-memory writes).",
         "Write endurance — 100,000 cycles per location on Monza R6 and R6-P, extended to 300,000 cycles on M730 and M750 silicon (Impinj's characterization report cites 300k typical, 100k min guaranteed). For laundry-counter applications writing every cycle, 300k cycles ≈ 17 years at 40 washes/week. Effectively unlimited for the tag's physical life.",
         "Data retention: ≥ 10 years at 55 °C on Monza R6 per the product brief Arrhenius chart; extended to ≥ 20 years at 55 °C on M730/M750/M800 thanks to improved floating-gate charge-retention characteristics on the newer silicon process node."
@@ -78,11 +79,11 @@
     {
       "title": "Sensitivity envelope across the family",
       "bullets": [
-        "Forward-link sensitivity, reference free-air conditions (ISO 18046-3, 30 dBm reader output, reference dipole antenna at 915 MHz): Monza R6 -22 dBm. Monza R6-P -21 dBm (slight penalty for the extended-memory configuration). Monza R6-A -21 dBm (slight penalty for the extended-temperature packaging). Impinj M700 -22 dBm. Impinj M730 -24 dBm. Impinj M750 -26 dBm. Impinj M800 -27 to -28 dBm (characterization continues to improve with silicon maturity).",
-        "Backscatter sensitivity equivalent offsets: typically 2-3 dB less sensitive than the forward-link number. Together they determine practical read range; at typical retail reader output (30 dBm / 1 W ERP) the forward link is usually the binding constraint at 5-10 m distances, while at long distances (>12 m) the backscatter sensitivity becomes the limiter.",
-        "Read-range guidance on reference apparel inlay (Smartrac Dogbone equivalent), 30 dBm reader power, 915 MHz, free-air, 1 m tag height, retail shelf environment: Monza R6 ~7-9 m. M700 ~7-9 m. M730 ~9-11 m. M750 ~12-14 m. M800 ~14-16 m. Shorter in dense retail backroom environments; longer in high-ceiling warehouses with minimal clutter.",
+        "Forward-link sensitivity, reference free-air conditions (ISO 18046-3, 30 dBm reader output, reference dipole antenna at 915 MHz), per the official Impinj datasheets: Monza R6 -22.1 dBm read / -18.8 dBm write (IPJ-W1700-K00). Monza R6-P approximately -22.4 dBm read (Monza R6-P datasheet). M730 / M750 / M770 / M775 -24 dBm read / -21 dBm write (M700 series datasheet v6.4). M780 / M781 -23.5 dBm read (M780/M781 datasheet v1.0). M830 / M850 -25.5 dBm read with up to 2 dB additional uplift via Impinj Gen2X (M800 series product brief).",
+        "Write sensitivity offsets: typically 3-4 dB less sensitive than the read sensitivity number, per the published datasheet pairs (Monza R6 -22.1/-18.8 read/write; M700 series -24/-21 read/write). Together they determine practical encoding and read range; at typical retail reader output (30 dBm / 1 W ERP) the forward link is usually the binding constraint at 5-10 m distances, while at long distances (>12 m) the write sensitivity becomes the limiter for any field re-encoding operation.",
+        "Read-range guidance on reference apparel inlay (Smartrac Dogbone equivalent), 30 dBm reader power, 915 MHz, free-air, 1 m tag height, retail shelf environment: Monza R6 ~8-10 m, M730/M750 ~10-12 m, M830/M850 ~12-14 m. Shorter in dense retail backroom environments; longer in high-ceiling warehouses with minimal clutter.",
         "Temperature sensitivity: all Monza R6 chips are specified -40 °C to +85 °C normal operation, with forward-link sensitivity degrading approximately 0.05 dB/°C above 85 °C. R6-P and R6-A extend the peak temperature specifications for sustained industrial use (R6-P +105 °C sustained, R6-A +125 °C sustained). M730/M750 match R6 spec (-40 °C to +85 °C) with sharper sensitivity at room temperature. For high-temperature use the R6-P remains the reference chip even though M730 has better room-temperature sensitivity.",
-        "Practical implication: for retail POS portal applications M730 or UCODE 9 is the current specification baseline (both -24 dBm forward-link). For pure cost-driven promotional programs Monza R6 or M700 remains appropriate (strap price within a few tenths of a cent of UCODE 8). For tire-cure (>125 °C, 40+ minutes sustained) specify Monza R6-P specifically. It is effectively the only mainstream UHF chip characterized for that thermal profile. For long-range warehouse or yard management specify M750 or M800 where the 3-5 dB advantage over M730 matters at 12-18 m distances."
+        "Practical implication: for retail POS portal applications M730 or UCODE 9 is the current specification baseline (both -24 dBm forward-link). For pure cost-driven promotional programs Monza R6 or M700 remains appropriate (strap price within a few tenths of a cent of UCODE 8). For tire-cure (>125 °C, 40+ minutes sustained) specify Monza R6-P specifically. It is effectively the only mainstream UHF chip characterized for that thermal profile. For longest-range warehouse or yard management specify M830/M850 where the 1-1.5 dB advantage over M730/M750 matters at 12-18 m distances. For brand authentication at the chip level use M775 with the Impinj Authentication Service."
       ]
     },
     {
@@ -153,45 +154,38 @@
           ],
           [
             "EPC memory",
-            "96 bits",
+            "Up to 96 bits",
             "96 or 128 bits",
-            "96 bits",
+            "128 bits",
             "96 bits"
           ],
           [
             "User memory",
-            "32 bits",
-            "32–64 bits",
-            "32 bits",
+            "0 bits",
+            "32 bits (config-dependent)",
+            "0 bits",
             "32 bits"
           ],
           [
             "TID memory",
-            "96 bits unique",
-            "96 bits unique",
-            "96 bits unique",
-            "96 bits unique"
+            "96 bits, 48-bit serial",
+            "96 bits, 48-bit serial",
+            "96 bits, 48-bit serial",
+            "96 bits, 48-bit serial"
           ],
           [
-            "TID model ID",
-            "0x170",
-            "0x172",
-            "0x1A0",
-            "0x1B0"
-          ],
-          [
-            "Forward-link sensitivity",
-            "-22 dBm",
-            "-21 dBm",
+            "Read sensitivity (datasheet)",
+            "-22.1 dBm",
+            "-22.4 dBm",
             "-24 dBm",
-            "-26 dBm"
+            "-24 dBm"
           ],
           [
-            "Backscatter sensitivity",
-            "-20 dBm",
-            "-19 dBm",
-            "-22 dBm",
-            "-24 dBm"
+            "Write sensitivity (datasheet)",
+            "-18.8 dBm",
+            "-18.8 dBm",
+            "-21 dBm",
+            "-21 dBm"
           ],
           [
             "AutoTune",
@@ -325,7 +319,7 @@
   "faq": [
     {
       "question": "Should new deployments specify Monza R6 or M730?",
-      "answer": "M730 for anything new in 2026. The 2-3 dB sensitivity improvement (-24 dBm vs -22 dBm forward-link, -22 dBm vs -20 dBm backscatter) translates to 20-25% longer practical read range on the same inlay design and 3-5 percentage points higher first-pass read rate at retail POS portals. Which compounds to a 40-60% reduction in manual-rescan events. The endurance upgrade (300,000 writes vs 100,000) and data retention improvement (20 years at 55 °C vs 10 years) also future-proof the deployment for longer-lived durable-goods applications. Monza R6 itself is still shipping and still appropriate for programs with installed-base consistency requirements (replacing failed tags in an existing M6-tagged population where read-rate consistency across the pool matters more than peak performance) or for pure cost-driven promotional campaigns where M700 is approximately 10-15% cheaper. Typical industry rule: M730/M750 for apparel and durables, M700 for cartons and tertiary packaging, Monza R6-P for tire-cure and autoclave."
+      "answer": "M730 (or M750) for anything new in 2026. The ~2 dB read-sensitivity improvement (M700 series datasheet v6.4: -24 dBm read / -21 dBm write, vs Monza R6 IPJ-W1700-K00: -22.1 dBm read / -18.8 dBm write) translates to ~20% longer practical read range on the same inlay design and 3-5 percentage points higher first-pass read rate at retail POS portals, which compounds to a 40-60% reduction in manual-rescan events. The Enduro IC bonding upgrade and AutoTune V2 / Integra V2 diagnostics also future-proof the deployment. Monza R6 itself is still shipping and still appropriate for programs with installed-base consistency requirements (replacing failed tags in an existing R6-tagged population where read-rate consistency across the pool matters more than peak performance) or for pure cost-driven promotional campaigns. Typical industry rule: M730/M750 for apparel and durables, M730 (128-bit EPC, 0 user memory) for SKUs that only need EPC, M750 (96-bit EPC, 32-bit user memory) when on-tag user memory is needed, Monza R6-P for tire-cure and autoclave, M775 for chip-level cryptographic authentication, M830/M850 for longest-range applications."
     },
     {
       "question": "What does AutoTune actually do?",
@@ -345,27 +339,41 @@
     },
     {
       "question": "How do I verify a chip is authentic Impinj Monza R6 and not a clone?",
-      "answer": "Read the full 96-bit TID. Authentic Monza R6 returns first 8 bits = 0xE2 (EPC class per Gen2 v2), next 12 bits = 0x801 (Impinj mask designer, allocated by GS1), next 12 bits = 0x170 (Monza R6 model ID). Impinj's published model IDs: M700 = 0x190, M730 = 0x1A0, M750 = 0x1B0, M800 = 0x1C0, R6-P = 0x172, R6-A = 0x174. Incoming-inspection scripts should verify: (1) class identifier = 0xE2, (2) mask designer = 0x801, (3) model ID matches the expected chip variant, (4) serials are unique across a 200-500 tag sample (Impinj's 38-bit random entropy pool gives birthday-paradox collision probability ~10^-5 across 500 tags, so any observed duplicate serial in a small sample is strong evidence of a non-authentic chip). Cloned chips typically present with invalid mask-designer bits (often 0x000 or a randomized 12-bit value), incorrect or zero model-ID bits, or non-unique serials within a lot. Maintain chip-authenticity clauses in master purchase agreements with penalty terms for TID mismatches; Impinj's RAIN Chip Authentication Program (RCAP) provides reference validation utilities for converters."
+      "answer": "Read the full 96-bit TID. Authentic Monza R6 returns first 8 bits = 0xE2 (EPC class per Gen2 v2), followed by the Impinj mask designer prefix (allocated by GS1) and the Impinj model-ID field per the IPJ-W1700-K00 datasheet's TID structure section. The M700 series datasheet v6.4 documents a separate model-ID table for M730/M750/M770/M775; the M775 product brief and the M800 series product brief publish the model IDs for those parts. Incoming-inspection scripts should: (1) verify the class identifier = 0xE2, (2) verify the Impinj mask-designer prefix matches the value in the relevant Impinj datasheet, (3) verify the model-ID matches the expected chip variant per that datasheet's table, (4) check serials are unique across a 200-500 tag sample (the 48-bit Impinj serial provides ample uniqueness — any observed duplicate within a small sample is strong evidence of a non-authentic chip). Cloned chips typically present with invalid mask-designer bits, incorrect or zero model-ID bits, or non-unique serials. Maintain chip-authenticity clauses in master purchase agreements with penalty terms for TID mismatches; Impinj's authentication services (M775 + Impinj Authentication Service) provide chip-level cryptographic verification for high-risk programs."
     },
     {
       "question": "What is the difference between M730 and UCODE 9 at a practical deployment level?",
-      "answer": "Both chips have equivalent forward-link sensitivity (-24 dBm) and are competitive for retail POS and logistics portal deployments; the practical difference is vendor ecosystem rather than RF performance. M730 adds Impinj-specific FastID/TagFocus which cut inventory cycle time by 20-50% on Impinj readers (and on third-party readers that have licensed the extensions. Zebra FX9600 3.x+, some Alien firmware); UCODE 9 adds Self-Adjust Sensitivity for custom antenna layouts (useful for small-format or anti-metal inlays where antenna tuning tolerance is wide) and supports the Gen2 v2 Untraceable range-reduction submode which UCODE 8 and Monza R6 don't. UCODE 9 is often cheaper at strap volume by 5-10% in purely commercial negotiations. For brand-agnostic deployments, vendor relationships and inlay availability usually dominate the choice; performance is functionally equivalent. Many large retailers now dual-source on both chips (UCODE 9 on some inlay SKUs, M730 on others) to avoid single-vendor supply exposure and to retain negotiating leverage on chip-level pricing."
+      "answer": "Both chips have equivalent forward-link sensitivity (-24 dBm read) and are competitive for retail POS and logistics portal deployments; the practical difference is vendor ecosystem and memory layout rather than RF performance. M730 has 128 bits of EPC and 0 bits of user memory, M750 has 96 bits EPC + 32 bits user memory; UCODE 9 (SL3S1206) supports a 96-bit EPC + 32-bit user memory configuration. M730/M750 add Impinj-specific FastID/TagFocus which cut inventory cycle time by 20-50% on Impinj readers (and on third-party readers that have licensed the extensions. Zebra FX9600 3.x+, some Alien firmware); UCODE 9 adds Self-Adjust Sensitivity for custom antenna layouts and supports the Gen2 v2 Untraceable range-reduction submode. UCODE 9 is often cheaper at strap volume by 5-10% in purely commercial negotiations. For brand-agnostic deployments, vendor relationships and inlay availability usually dominate the choice; performance is functionally equivalent. Many large retailers now dual-source on both chips (UCODE 9 on some inlay SKUs, M730 on others) to avoid single-vendor supply exposure and to retain negotiating leverage on chip-level pricing."
     }
   ],
   "sources": [
     {
-      "label": "Impinj Monza R6 Series Tag Chips Product Page",
-      "url": "https://www.impinj.com/products/tag-chips/impinj-monza-r6",
+      "label": "Impinj Monza R6 Series RAIN RFID Endpoint ICs Product Page",
+      "url": "https://www.impinj.com/products/tag-chips/impinj-monza-r6-series",
       "publisher": "Impinj",
-      "accessedAt": "2026-04-20",
-      "note": "Canonical Impinj product page for Monza R6 / R6-P / R6-A. Authority for the 96-bit EPC, chip sensitivity (-22.1 dBm R6, -22.4 dBm R6-P) and AutoTune, Enduro and Integra technology family references."
+      "accessedAt": "2026-05-10",
+      "note": "Canonical Impinj product page for Monza R6 / R6-P / R6-A. Authority for the up-to-96-bit EPC, chip sensitivity (-22.1 dBm read / -18.8 dBm write per IPJ-W1700-K00) and AutoTune, Enduro, Integra technology family references."
     },
     {
-      "label": "Impinj M700 Series Tag Chips Product Page (successor to Monza R6)",
-      "url": "https://www.impinj.com/products/tag-chips/impinj-m700-series",
-      "publisher": "Impinj",
-      "accessedAt": "2026-04-20",
-      "note": "Product page for the M730 / M750 / M770 tag chips that succeeded Monza R6 — authority for the -24 dBm sensitivity class and FastID / TagFocus features discussed in the family-evolution section."
+      "label": "Impinj M700 Series Tag Chips Product Brief / Datasheet (v6.4, 2024)",
+      "url": "https://support.impinj.com/hc/en-us/articles/360010797539-Impinj-M700-Series-Tag-Chips-Product-Brief-Datasheet",
+      "publisher": "Impinj Support",
+      "accessedAt": "2026-05-10",
+      "note": "Official datasheet for the M730 (IPJ-M730A-A00, 128-bit EPC + 0-bit user) and M750 (IPJ-M750A-A00, 96-bit EPC + 32-bit user) tag chips. Authority for the -24 dBm read / -21 dBm write sensitivity and the '96 bits Serialized TID with 48-bit serial number' specification used in the family-evolution and TID-serialization sections."
+    },
+    {
+      "label": "Impinj M775 Product Brief / Datasheet",
+      "url": "https://support.impinj.com/hc/en-us/articles/9726381874195-Impinj-M775-Product-Brief-Datasheet",
+      "publisher": "Impinj Support",
+      "accessedAt": "2026-05-10",
+      "note": "Datasheet for the M775 chip-level cryptographic authentication endpoint IC. Source for the brand-protection / Impinj Authentication Service references."
+    },
+    {
+      "label": "Impinj M800 Series Tag Chips Product Brief / Datasheet",
+      "url": "https://support.impinj.com/hc/en-us/articles/17197826632979-Impinj-M800-Series-Tag-Chips-Product-Brief-Datasheet",
+      "publisher": "Impinj Support",
+      "accessedAt": "2026-05-10",
+      "note": "Official datasheet for the M830 / M850 chips (M800 series). Authority for the -25.5 dBm read sensitivity (with up to 2 dB Gen2X uplift), the M830 (128-bit EPC + 0-bit user) and M850 (96-bit EPC + 32-bit user) memory configurations, and Gen2X feature support."
     },
     {
       "label": "Impinj Monza R6 Tag Chip Datasheet",

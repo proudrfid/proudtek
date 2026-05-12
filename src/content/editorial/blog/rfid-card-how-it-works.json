@@ -3,24 +3,24 @@
   "group": "blog",
   "title": "How Does an RFID Card Work? — The Technology Inside Contactless Smart Cards Explained",
   "kicker": "How RFID Cards Work",
-  "summary": "RFID cards look like ordinary plastic cards but contain a hidden antenna and microchip that communicate wirelessly with card readers. When you tap your hotel key, office badge, transit pass or contactless payment card, the reader's electromagnetic field powers the card's chip through the antenna, enabling data exchange without batteries, physical contact, or visible moving parts. This article explains the technology inside RFID cards in plain language for anyone curious about how these ubiquitous devices actually work.",
+  "summary": "RFID cards look like ordinary plastic cards but contain a hidden antenna and microchip that communicate wirelessly with card readers.",
   "heroPoints": [
     "Where audit trails matter, no battery required — RFID cards are powered entirely by the electromagnetic field emitted by the card reader. The card's antenna captures this energy and converts it into electricity to power the chip, a process called electromagnetic induction.",
     "Antenna and chip: every RFID card contains two key components: a coil antenna (a loop of wire embedded in the card) and a microchip (smaller than a grain of rice) that stores data and processes commands.",
     "Data exchange in milliseconds. The entire communication cycle (power up, authenticate, exchange data, power down) happens in 50-200 milliseconds, which is why tapping feels instantaneous."
   ],
-  "imageAlt": "Cross section of RFID card showing antenna coil and microchip inside PVC layers",
-  "heroImage": "/landing-images/em4100-rfid-card.jpg",
+  "imageAlt": "Close-up of a contactless credit card reader, illustrating how RFID cards exchange data with point-of-sale terminals.",
+  "heroImage": "/blog-images/rfid-card-how-it-works.jpg",
   "imageSourceRoutes": [
     "/product/rfid-cards/",
     "/product/nfc-stickers/"
   ],
   "sections": [
     {
-      "title": "Inside an RFID card: components and construction",
+      "title": "What's inside an RFID card?",
       "bullets": [
         "Antenna coil: a flat loop of thin copper or aluminum wire laminated between PVC card layers. The antenna serves two functions: it captures electromagnetic energy from the reader to power the chip, and it transmits the chip's data back to the reader by modulating the reader's field.",
-        "Microchip (IC): a silicon integrated circuit typically 1-2mm square, bonded to the antenna at a connection point. The chip contains a processor, memory (ROM, EEPROM, RAM), and a radio frequency interface. It stores the card's unique identifier and any application data.",
+        "Microchip (IC): a silicon integrated circuit typically 1-2mm square, bonded to the antenna at a connection point. The chip contains a processor, memory (ROM, [EEPROM](https://en.wikipedia.org/wiki/EEPROM), RAM), and a radio frequency interface. It stores the card's unique identifier and any application data.",
         "PVC card body: the standard CR80 card (85.6 x 54mm, 0.76mm thick) made from layers of PVC or PETG plastic. The antenna and chip inlay is laminated between inner PVC sheets, then the outer printed layers are fused on top under heat and pressure.",
         "No battery: the entire card is passive. It has no battery, no power button, and no active electronics. Power comes exclusively from the reader's electromagnetic field when the card is brought within range. This is why RFID cards last for years without maintenance.",
         "Printing layers (the outer surfaces of the card can be printed with full-color artwork, logos, text, barcodes, photos and security features using offset, digital or thermal transfer printing) all without affecting the RFID functionality inside."
@@ -29,11 +29,44 @@
     {
       "title": "How the card communicates with the reader",
       "bullets": [
-        "Step 1: Reader energizes. The card reader generates an alternating electromagnetic field at the card's operating frequency (13.56 MHz for most smart cards, 125 kHz for legacy access cards). This field extends a few centimeters from the reader surface.",
+        "Step 1: Reader energizes. The card reader generates an alternating electromagnetic field at the card's operating frequency (13.56 MHz for most smart cards, [125 kHz](/compare/125khz-vs-13.56mhz-rfid/) for legacy access cards). This field extends a few centimeters from the reader surface.",
         "Step 2: Card powers up. When the card enters the reader's field, the antenna coil captures electromagnetic energy through induction (similar to how a wireless phone charger works). The energy is rectified into DC power for the chip.",
         "Step 3: Reader sends commands. The reader modulates its field to transmit commands to the card. These commands might request the card's UID, authenticate the card, or read data from specific memory sectors.",
         "Step 4: Card responds. The chip processes the command and sends its response by modulating the load on the reader's field (called load modulation). The reader detects these tiny variations and decodes the card's data.",
         "Step 5: Transaction completes. The entire exchange (power, authenticate, read/write data) takes 50-200 milliseconds. When the card moves away from the reader's field, the chip powers down and retains its data in non-volatile memory until the next interaction."
+      ]
+    },
+    {
+      "title": "Why do RFID cards beat magnetic stripe and barcode?",
+      "intro": "RFID cards replaced magnetic stripes in hotels, transit and access control because of five concrete advantages that show up in everyday operation, not just the spec sheet.",
+      "bullets": [
+        "Contactless reads: no physical contact between card and reader means no wear on either side. Magnetic stripes wear out in 200-500 swipes; an RFID card's antenna lasts 100,000+ read cycles with no mechanical degradation.",
+        "Tolerance to dirt and weather: rain, dust and lint on a magstripe head causes immediate read failures. RFID reads through plastic wallets, leather, gloves and a few millimeters of water without dropping signal.",
+        "Active anti-cloning: NTAG 424 DNA and DESFire EV3 sign every read with rotating cryptographic challenges that magnetic stripes simply cannot match. A magstripe is a static playback device; modern RFID is interactive cryptography.",
+        "Multi-application capability: one DESFire card can hold separate applications for room access, employee ID and cashless payment in walled-off memory zones. Magstripe forces one application per track, three tracks max.",
+        "Bulk read at gates: RAIN UHF cards (used at toll booths and stadium entries) read 50-200 cards per second from 3-5 m. Magstripe and barcode require single-file scanning and never approach this throughput."
+      ]
+    },
+    {
+      "title": "Frequency families and chip selection — 125 kHz, 13.56 MHz HF, 860-960 MHz UHF",
+      "intro": "RFID is a family of technologies operating at three different frequency bands. Each band has different range, security, smartphone-compatibility and cost profile. Choosing the wrong band locks you into a multi-year deployment that can't reach the use case you actually need.",
+      "bullets": [
+        "125 kHz LF (low frequency) — legacy proximity cards (HID Prox, EM4100, EM4200, T5577). Range 5-15 cm via card readers. Cheapest chip ($0.05-$0.15) but no encryption — every commodity NFC writer can clone the card UID. Still deployed for door-only access at low-security facilities; new deployments should avoid LF unless cost is the absolute priority.",
+        "13.56 MHz HF (high frequency, ISO 14443 / ISO 15693) — the dominant smart-card frequency. NFC chips like NTAG 213/215/216 ($0.05-$0.15), MIFARE Classic 1K ($0.10-$0.18), MIFARE Ultralight C ($0.07-$0.12), MIFARE DESFire EV2/EV3 ($0.65-$1.40), MIFARE Plus EV2 SL3 ($0.45-$0.85) and NTAG 424 DNA ($0.18-$0.30) all live here. Smartphone tap support is universal on iPhone (iOS 13+) and Android (5.0+).",
+        "860-960 MHz UHF (RAIN RFID, ISO 18000-63) — long-range cards (3-12 m) for parking, vehicle access, sports timing and large-venue badges. Chips like NXP UCODE 9 ($0.012-$0.018 wafer) and Impinj M730/M770 ($0.014-$0.020) make per-card cost extremely low. Smartphone-readable only with external UHF sled.",
+        "Dual-frequency cards (HF + UHF combo) — combine NFC tap-to-verify with UHF gate-throughput in a single card. Premium $0.50-$1.50 per unit. Used at large stadiums and transit systems where the same card must work as a smartphone wallet AND a long-range gate badge.",
+        "Smart-card chip security tiers — MIFARE Classic 1K is broken (Crypto-1 cipher publicly attacked since 2008); only use it where security doesn't matter. MIFARE DESFire EV3 and Plus EV2 use AES-128 with EAL5+ Common Criteria certification — the secure floor for hotel access, payment, transit and corporate badges. NTAG 424 DNA brings DESFire-grade AES-128 SUN authentication into the consumer NFC tier."
+      ]
+    },
+    {
+      "title": "Real card families and where they're deployed in 2026",
+      "intro": "Knowing the chip family on your card tells you 80% of what you need about security, smartphone compatibility and cloning risk. The reference deployments below give procurement teams concrete benchmarks for sourcing decisions.",
+      "bullets": [
+        "Hotel key cards — globally dominated by MIFARE Classic 1K (legacy) and MIFARE DESFire EV2/EV3 (modern installs). Marriott Bonvoy, Hilton Honors, IHG and Accor all moved to DESFire EV2/EV3 since 2020 because of the 2008+ MIFARE Classic Crypto-1 break. ASSA ABLOY VingCard, dormakaba Saflok, Salto and Onity are the lock vendors.",
+        "Transit and metro — Octopus (Hong Kong, Sony FeliCa), Suica (Tokyo, FeliCa), Oyster (London, MIFARE DESFire), MetroCard (NYC, magstripe being replaced by OMNY DESFire EV3), Compass (Vancouver, DESFire). Most new transit deployments since 2020 use DESFire EV2/EV3 for AES-128 anti-cloning.",
+        "Corporate and government ID — HID iCLASS Seos, MIFARE DESFire EV3, US Federal PIV (FIPS 201, Java Card OS) and German neuer Personalausweis (eID, Mifare Plus). Global Fortune 500 standardising on HID Seos + Apple Wallet / Google Wallet for hybrid plastic + mobile.",
+        "Cashless payment — EMV contactless on Visa, Mastercard, Discover and Amex uses NXP-derived secure elements; banking-grade EAL5+ certification. Apple Pay and Google Wallet store the same EMV credentials in the phone Secure Element via tokenised PAN.",
+        "Loyalty and brand — NTAG 213/215/216 dominate single-tap loyalty; NTAG 424 DNA for anti-counterfeit luxury (Estée Lauder, Hennessy, LVMH Aura). Chip selection drives the SUN or static-UID dichotomy that decides whether the card is clone-proof or trivially cloned at $20 of hardware."
       ]
     }
   ],
@@ -55,6 +88,22 @@
           "label": "Order custom RFID cards"
         }
       ]
+    },
+    {
+      "title": "Smart-card chip and standard references",
+      "description": "Manufacturer datasheets and ISO standards for the chips inside RFID cards.",
+      "links": [
+        {
+          "href": "https://www.nxp.com/products/identification-security/mifare-products:MC_53450",
+          "label": "NXP MIFARE chip family",
+          "description": "Datasheets for MIFARE Classic, Ultralight, DESFire and Plus."
+        },
+        {
+          "href": "https://www.iso.org/standard/73599.html",
+          "label": "ISO/IEC 14443 contactless smart card",
+          "description": "Air-interface standard for 13.56 MHz HF cards (Type A and Type B)."
+        }
+      ]
     }
   ],
   "faq": [
@@ -69,10 +118,18 @@
     {
       "question": "Do RFID cards stop working near magnets or phones?",
       "answer": "No. Unlike magnetic stripe cards, RFID cards are not affected by magnets, phone proximity, or static electricity. The chip stores data electronically in non-volatile memory, not magnetically. This is why hotels are migrating from magstripe to RFID key cards. RFID cards do not demagnetize from phone contact, which is the number one complaint about traditional hotel key cards."
+    },
+    {
+      "question": "Why do iPhone and Android phones read some RFID cards but not others?",
+      "answer": "Smartphones contain NFC controllers that operate at 13.56 MHz HF only — the ISO 14443 / ISO 15693 / FeliCa stack. They cannot read 125 kHz LF proximity cards or 860-960 MHz UHF cards. So an iCLASS Seos badge, a MIFARE DESFire EV3 hotel key or a NTAG 213 NFC tag all read fine on a phone; an HID Prox 125 kHz access card or a Walmart UHF apparel tag does not. iPhones since iOS 13 (2019) support full NFC tag reading; Android has supported it since 5.0 (2014). For LF or UHF cards, you need a USB sled or BLE handheld reader."
+    },
+    {
+      "question": "Are NTAG 215, MIFARE Ultralight C, MIFARE Classic 1K and DESFire EV3 interchangeable for the same use case?",
+      "answer": "No — they sit at very different security and memory tiers. NTAG 215 (504 bytes user memory, password protection only) is fine for tap-and-launch loyalty and product authentication where cloning isn't catastrophic. MIFARE Ultralight C (192 bytes, 3DES authentication) is a step up at low cost. MIFARE Classic 1K (1KB, broken Crypto-1 cipher) is suitable only when security doesn't matter; widely deployed historically but cloned with $20 of hardware. MIFARE DESFire EV3 (8KB+, AES-128, mutual auth) and NTAG 424 DNA (416 bytes, AES-128 SUN) are the secure floor for hotels, transit, payment and brand protection. Choose based on the data you need to store + whether cloning is a real threat in your application."
     }
   ],
   "primaryAction": {
-    "href": "/contact/",
+    "href": "/contact/custom-rfid-cards/",
     "label": "Order custom RFID cards"
   },
   "secondaryActions": [
@@ -87,5 +144,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-03-04"
+  "reviewedAt": "2026-05-10"
 }

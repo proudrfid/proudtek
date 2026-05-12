@@ -15,6 +15,18 @@ export interface SnapshotPage {
   bodyAttrs: Record<string, string>;
   headHtml: string;
   bodyHtml: string;
+  /**
+   * Editorial definition attached when this page was produced by
+   * `mergeEditorialPages`. Stage 3 cutover plumbing — route layouts can
+   * branch on this field's presence + an env flag to render via the
+   * `<EditorialArticle>` shadow component tree instead of the legacy
+   * `<Fragment set:html={bodyHtml}>` path. Absent for WP-snapshot pages.
+   * Typed as `unknown` to avoid a circular import with editorial-types.ts;
+   * consumers narrow via `import type { EditorialDefinition } from "./editorial-types"`.
+   */
+  editorialDefinition?: unknown;
+  /** Illustration descriptor for the editorial hero, computed during merge. Stage 3 plumbing. */
+  editorialIllustration?: { src: string; alt: string } | null;
 }
 
 export interface SiteData {

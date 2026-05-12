@@ -1,0 +1,34 @@
+---
+/**
+ * FAQ accordion block.
+ *
+ * Shadow component (Stage 2). Mirrors `renderFaq(faq, id)` in
+ * editorial-pages.ts (~line 2182).
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialFaq[]
+ *   question: string
+ *   answer:   string
+ */
+interface FaqEntry {
+  question: string;
+  answer: string;
+}
+
+interface Props {
+  faq: FaqEntry[];
+  id: string;
+}
+
+const { faq, id } = Astro.props;
+---
+<section class="codex-editorial-section" id={id}>
+  <h2>FAQ</h2>
+  <div class="codex-editorial-faq">
+    {faq.map((entry) => (
+      <details>
+        <summary>{entry.question}</summary>
+        <p>{entry.answer}</p>
+      </details>
+    ))}
+  </div>
+</section>

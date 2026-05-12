@@ -1283,8 +1283,8 @@ function renderProductCard(product: CatalogProduct, featured = false): string {
   // smaller bytes on scroll-into-view.
   const imgTag = product.image
     ? srcset
-      ? html`<img src="${product.image}" srcset="${srcset}" sizes="${raw(sizes)}" alt="${product.title}" ${raw(loading)} decoding="async">`
-      : html`<img src="${product.image}" alt="${product.title}" ${raw(loading)} decoding="async">`
+      ? html`<img src="${product.image}" srcset="${srcset}" sizes="${raw(sizes)}" alt="${product.title}" width="1200" height="675" ${raw(loading)} decoding="async">`
+      : html`<img src="${product.image}" alt="${product.title}" width="1200" height="675" ${raw(loading)} decoding="async">`
     : "";
   const imageHtml = product.image && product.image.startsWith("/landing-images/")
     ? html`<picture><source srcset="${product.image.replace(/\.(jpe?g|png)$/i, ".webp")}" type="image/webp">${raw(imgTag)}</picture>`

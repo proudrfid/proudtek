@@ -1,0 +1,28 @@
+---
+/**
+ * Editorial section variant — testimonial quote block.
+ *
+ * Shadow component for the inline template-literal in
+ * editorial-pages.ts around `const testimonialHtml = section.testimonial ? ... : ""`.
+ *
+ * Path-3 prep (Stage 2). Not yet wired into any route; production rendering
+ * still flows through editorial-pages.ts → bodyHtml → Fragment set:html.
+ * Parity is asserted in __tests__/Testimonial.parity.test.ts.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["testimonial"]
+ */
+import { renderInlineLinks, type CitationCtx } from "../../lib/editorial-types";
+
+interface Props {
+  text: string;
+  source: string;
+  citations?: CitationCtx;
+}
+
+const { text, source, citations } = Astro.props;
+const textHtml = renderInlineLinks(text, citations);
+---
+<figure class="codex-editorial-testimonial">
+  <blockquote><p set:html={textHtml} /></blockquote>
+  <figcaption>— {source}</figcaption>
+</figure>

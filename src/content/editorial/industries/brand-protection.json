@@ -3,7 +3,7 @@
   "group": "products",
   "title": "Brand Protection NFC — Anti-Counterfeit Tap-to-Verify",
   "kicker": "Brand Protection",
-  "summary": "ProudTek supplies the cryptographic NFC layer that brand-protection programmes need: NTAG 424 DNA SUN authentication, NTAG 424 DNA TagTamper tamper-evidence, GS1 Digital Link URLs, and form factors from woven sneaker labels to under-capsule wine seals. One tap, unique code, phone-native verification — no app.",
+  "summary": "Brand-protection NFC binds an AES-128 cryptographic identity to each consumer unit so a tap on any iOS 14+ or Android phone returns a server-verified authenticity, tamper-state and provenance answer without an app. ProudTek manufactures the chip layer: NXP NTAG 424 DNA (SUN/CMAC per-tap signing per AN12196), NTAG 424 DNA TagTamper (signed open/closed loop), and MIFARE DESFire EV3 for closed-reader environments; URLs are shaped as GS1 Digital Link (ISO/IEC 18975) so the same tap serves consumer, regulator and enforcement views. OECD/EUIPO estimates global trade in counterfeits at USD 467 billion (2021); programs using SUN-verified tap evidence report 60-80% reductions in cloned-unit takedown latency on Amazon, Alibaba and Tmall and meet the carrier requirements emerging under EU Regulation 2024/1781 (ESPR) Digital Product Passport.",
   "heroPoints": [
     "Cryptographic, not cosmetic. NTAG 424 DNA generates an AES-128 SUN (Secure Unique NFC) message on every tap, so a photograph, a dumped UID, or a static QR clone is mathematically invalid on the verification server.",
     "Tamper-evident variants. NTAG 424 DNA TT (TagTamper) has a physical loop whose open/closed state is signed in the same SUN message — you can tell \"opened\" from \"unopened\" cryptographically, not visually.",
@@ -25,12 +25,12 @@
     "GS1 Digital Link authentication"
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2026-01-02",
+  "modifiedAt": "2026-05-11",
   "authorSlug": "editorial-board",
   "author": "ProudTek Editorial Board",
   "reviewedBySlug": "peter-zhang",
   "reviewedBy": "Peter Zhang",
-  "reviewedAt": "2026-01-06",
+  "reviewedAt": "2026-05-11",
   "sections": [
     {
       "title": "What a defensible brand-protection tag actually does",
@@ -330,6 +330,18 @@
     {
       "question": "Is NFC authentication defensible in court or in a marketplace takedown?",
       "answer": "In our experience, yes — and measurably more so than holograms or QR codes. Major marketplaces (Amazon, Alibaba, Tmall, the Luxury / Vestiaire segment) accept SUN-verified tap evidence as part of counterfeit takedown submissions. Customs agencies in the EU, US and China accept cryptographic authentication alongside physical inspection. For litigation, what usually matters is the chain of custody from chip personalisation to product embedding; keep the issuance log."
+    },
+    {
+      "question": "Can NFC tags be cloned?",
+      "answer": "Static-UID NFC chips (NTAG213, NTAG215, NTAG216, MIFARE Classic 1K) can be cloned in seconds with a sub-EUR 20 reader because their identifier is fixed and not signed. Cryptographic chips cannot — NTAG 424 DNA, NTAG 424 DNA TT and MIFARE DESFire EV3 each hold an AES-128 secret inside hardware and emit a fresh CMAC (per NIST SP 800-38B) on every tap. The secret never leaves the chip; a clone produced from a photograph of the UID fails server verification on the first tap. The NXP application note AN12196 documents the SUN/CMAC flow; choose 424 DNA or DESFire EV3 for any enforcement-grade program."
+    },
+    {
+      "question": "What is GS1 Digital Link and why does it matter for anti-counterfeiting?",
+      "answer": "GS1 Digital Link (ISO/IEC 18975) is the web-resolvable URL standard that lets one identifier (e.g. https://id.gs1.org/01/{GTIN}/21/{serial}) resolve to different content for different audiences — consumer authenticity page, regulator Digital Product Passport, retailer GS1 record. When the SUN parameter from an NTAG 424 DNA tap is appended to a GS1 Digital Link URL, a single chip supports brand-protection, EU ESPR 2024/1781 DPP and retailer SKU lookup with no inlay re-spin. EUIPO Anti-Counterfeiting Technology Guide endorses this pattern. See https://www.gs1.org/standards/gs1-digital-link for the spec."
+    },
+    {
+      "question": "How big is the global counterfeit market?",
+      "answer": "OECD and EUIPO estimate global trade in counterfeit and pirated goods at approximately USD 467 billion in 2021, around 2.5% of world trade (Global Trade in Fakes, 2025 edition). Footwear, clothing and leather goods dominate seizures; pharmaceuticals, perfumes, cosmetics, toys and electronics are the high-harm categories. WIPO and ICC BASCAP track parallel figures. EU customs seizure data (DG TAXUD) shows e-commerce parcels carrying counterfeit goods rising year-on-year. These figures are the standard reference for justifying NFC tap-to-verify investment; see https://www.oecd.org/en/publications/global-trade-in-fakes_74c81154-en.html."
     }
   ],
   "sources": [
@@ -380,6 +392,20 @@
       "url": "https://nfc-forum.org/our-work/specification-releases/",
       "publisher": "NFC Forum",
       "note": "Baseline NFC specification for the tap-to-read behaviour that NTAG 424 DNA tags rely on across iOS and Android."
+    },
+    {
+      "label": "WIPO — Enforcement of intellectual property rights",
+      "url": "https://www.wipo.int/enforcement/en/",
+      "publisher": "World Intellectual Property Organization",
+      "accessedAt": "2026-04-23",
+      "note": "International framework for anti-counterfeiting enforcement that brand-protection NFC programs feed evidence into."
+    },
+    {
+      "label": "ICC BASCAP — Business Action to Stop Counterfeiting and Piracy",
+      "url": "https://iccwbo.org/global-issues-trends/bascap-anti-counterfeiting/",
+      "publisher": "International Chamber of Commerce",
+      "accessedAt": "2026-04-23",
+      "note": "Industry coalition tracking counterfeit economic impact and best-practice authentication technologies."
     }
   ],
   "relatedIndustries": [

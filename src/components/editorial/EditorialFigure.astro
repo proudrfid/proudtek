@@ -1,0 +1,42 @@
+---
+/**
+ * Editorial section variant — inline figure / lazy-loaded illustration.
+ *
+ * Shadow component (Stage 2). Mirrors the inline expression in
+ * editorial-pages.ts around `const imageHtml = section.image ? ... : ""`.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["image"]
+ *   src: string
+ *   alt: string
+ *
+ * The legacy TS expression hard-codes width/height to 1200×675 (16:9) for
+ * intrinsic-size CLS prevention and tags loading=lazy / decoding=async. This
+ * shadow component reproduces those attributes exactly. The hero version
+ * (eager + fetchpriority=high) lives elsewhere in editorial-pages.ts and is
+ * not covered by this component.
+ *
+ * Stage 3 sprint 1: optional `route` prop opts the figure into the
+ * `PAGE_IMAGE_OVERRIDES` alt rewrite mirrored from normalize-body.ts. If
+ * the route + src match an override, alt is replaced (src untouched).
+ */
+import { resolveHeroAltOverride } from "../../lib/editorial-shadow-normalizers";
+
+interface Props {
+  src: string;
+  alt: string;
+  route?: string;
+}
+
+const { src, alt, route } = Astro.props;
+const resolvedAlt = route ? (resolveHeroAltOverride(route, src) ?? alt) : alt;
+---
+<figure class="codex-editorial-figure">
+  <img
+    src={src}
+    alt={resolvedAlt}
+    width="1200"
+    height="675"
+    loading="lazy"
+    decoding="async"
+  />
+</figure>

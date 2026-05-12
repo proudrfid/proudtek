@@ -1,0 +1,198 @@
+---
+/**
+ * Editorial page composer — full-page shadow of `renderEditorialMain` in
+ * editorial-pages.ts (~line 1518).
+ *
+ * Stage 3.x finale. Composes 24+ shadow sub-components — all infrastructure
+ * blocks (rail / hub-grid / product grids / contact channels / inline RFQ
+ * form) are now proper Astro components. `buildEditorialScaffold(definition)`
+ * supplies discriminated descriptors (rail.kind / hubGrid.kind) plus the
+ * structured card data the grid components consume.
+ *
+ * No `<Fragment set:html>` delegations remain — every block is a typed,
+ * stateless Astro component fed by editorial-types-defined data.
+ *
+ * Rendering order is preserved from `renderEditorialMain` exactly (lines
+ * 1593-1683 of editorial-pages.ts) so the parity test can compare byte-for-
+ * byte after the standard normalization.
+ *
+ * Determinism: `publishedAt` and `modifiedAt` fall back to ISO build-time
+ * when absent. Parity tests pin them to fixed values so the snapshot is
+ * stable; this component does NOT pin them itself (production behavior
+ * preserved).
+ */
+import {
+  buildEditorialOutline,
+  type EditorialDefinition,
+  type CitationCtx,
+} from "../../lib/editorial-types";
+import { buildEditorialScaffold } from "../../lib/editorial-pages";
+import {
+  preProcessContextualLinks,
+  rewriteResourceCardsContactLinks,
+  rewriteSectionsContactLinks,
+} from "../../lib/editorial-shadow-normalizers";
+
+import Trail from "./Trail.astro";
+import EditorialHero from "./EditorialHero.astro";
+import DecisionSnapshot from "./DecisionSnapshot.astro";
+import JumpNav from "./JumpNav.astro";
+import EditorialSection from "./EditorialSection.astro";
+import ResourceGrid from "./ResourceGrid.astro";
+import Faq from "./Faq.astro";
+import Sources from "./Sources.astro";
+import TrustSignals from "./TrustSignals.astro";
+import ActionBar from "./ActionBar.astro";
+import ContactChannels from "./ContactChannels.astro";
+import InlineRfqForm from "./InlineRfqForm.astro";
+import RelatedIndustriesGrid from "./RelatedIndustriesGrid.astro";
+import IndustryProductGrid from "./IndustryProductGrid.astro";
+import SolutionProductGrid from "./SolutionProductGrid.astro";
+import HubRail from "./HubRail.astro";
+import GroupedHubRail from "./GroupedHubRail.astro";
+import HubGrid from "./HubGrid.astro";
+import ResourcesCategoryHub from "./ResourcesCategoryHub.astro";
+
+interface Props {
+  definition: EditorialDefinition;
+  illustration: { src: string; alt: string } | null;
+}
+
+const { definition, illustration } = Astro.props;
+
+const outline = buildEditorialOutline(definition);
+const scaffold = buildEditorialScaffold(definition);
+
+// Stage 3 shadow normalizer pass 1: rewrite all bare `/contact/` href
+// targets on sections (callout hrefs) and resource cards. The legacy
+// cheerio `a[href="/contact/"]` sweep catches anchors anywhere in
+// entry-content; we mirror that pre-render for callout + resource-grid
+// link slots (Trail / DecisionSnapshot / ActionBar secondary actions
+// already do this at their own component layer).
+const sectionsWithContactRewrites = rewriteSectionsContactLinks(
+  outline.filteredSections,
+  definition.route,
+  definition.title,
+);
+const resourceCardsWithContactRewrites = rewriteResourceCardsContactLinks(
+  definition.resourceCards,
+  definition.route,
+  definition.title,
+);
+
+// Stage 3 shadow normalizer pass 2: mirror the legacy cheerio
+// `injectContextualLinks` pass. Up to 3 keyword→internal-link injections
+// per page, walking the text-bearing slots in DOM order — hero summary,
+// then each section's intro / paragraphs / callout.text — skipping any
+// slot that already contains a markdown link. The legacy path mutated
+// the parsed DOM after render; we do the equivalent transform on the raw
+// markdown strings BEFORE renderInlineLinks runs (which now understands
+// the `[label](href "title")` syntax this helper emits).
+const { summary: summaryWithLinks, sections: filteredSectionsWithContextualLinks } =
+  preProcessContextualLinks(definition.summary, sectionsWithContactRewrites, definition.route);
+
+// EditorialHero reads `definition.summary`; if a contextual link landed in
+// the summary, swap the field on a shallow-cloned definition so the hero
+// renders the rewritten text without mutating the caller's definition.
+const heroDefinition = summaryWithLinks === definition.summary
+  ? definition
+  : { ...definition, summary: summaryWithLinks };
+
+// Freshness signal — mirror renderEditorialMain's fallback. `new Date()`
+// is only hit in production builds where publishedAt is missing; integration
+// snapshot fixtures pin both to fixed values.
+const published = definition.publishedAt || new Date().toISOString();
+const modified = definition.modifiedAt || published;
+const publishedLabel = new Date(published).toISOString().slice(0, 10);
+const modifiedLabel = new Date(modified).toISOString().slice(0, 10);
+
+// Citation context for inline [^N] markers inside section bodies.
+const citationCtx: CitationCtx | undefined =
+  outline.sourcesId && (definition.sources?.length ?? 0) > 0
+    ? { sourcesId: outline.sourcesId, sourcesCount: definition.sources!.length }
+    : undefined;
+
+const contentWrapClass = scaffold.hasRail
+  ? "content-wrap codex-editorial-pillar--with-rail"
+  : "content-wrap";
+
+const isContact = definition.group === "contact";
+---
+<div class="woocommerce kadence-woo-messages-none-woo-pages woocommerce-notices-wrapper" />
+{scaffold.rail?.kind === "flat" && (
+  <HubRail
+    items={scaffold.rail.items}
+    currentRoute={scaffold.rail.currentRoute}
+    sectionLabel={scaffold.rail.sectionLabel}
+  />
+)}
+{scaffold.rail?.kind === "grouped" && (
+  <GroupedHubRail
+    groups={scaffold.rail.groups}
+    currentRoute={scaffold.rail.currentRoute}
+    sectionLabel={scaffold.rail.sectionLabel}
+  />
+)}
+<div class={contentWrapClass}>
+  <article class="entry content-bg single-entry page type-page status-publish hentry codex-editorial-page">
+    <div class="entry-content-wrap">
+      <div class="entry-content single-content">
+        <div class="codex-editorial-dates" hidden aria-hidden="true">
+          <time class="entry-date published" datetime={published}>{publishedLabel}</time>
+          <time class="updated" datetime={modified}>{modifiedLabel}</time>
+        </div>
+        <Trail definition={definition} />
+        <EditorialHero definition={heroDefinition} illustration={illustration} />
+        {isContact && <ContactChannels definition={definition} />}
+        {scaffold.hubGrid?.kind === "flat" && (
+          <HubGrid items={scaffold.hubGrid.items} sectionLabel={scaffold.hubGrid.sectionLabel} />
+        )}
+        {scaffold.hubGrid?.kind === "resourcesCategory" && (
+          <ResourcesCategoryHub groups={scaffold.hubGrid.groups} sectionLabel={scaffold.hubGrid.sectionLabel} />
+        )}
+        {scaffold.industryProductGrid && (
+          <IndustryProductGrid
+            categoryTitle={scaffold.industryProductGrid.categoryTitle}
+            cards={scaffold.industryProductGrid.cards}
+          />
+        )}
+        {scaffold.solutionProductGrid && (
+          <SolutionProductGrid
+            sectionLabel={scaffold.solutionProductGrid.sectionLabel}
+            cards={scaffold.solutionProductGrid.cards}
+          />
+        )}
+        {scaffold.relatedIndustries && (
+          <RelatedIndustriesGrid cards={scaffold.relatedIndustries.cards} />
+        )}
+        <DecisionSnapshot definition={definition} id={outline.snapshotId} />
+        <JumpNav links={outline.jumpLinks} />
+        {filteredSectionsWithContextualLinks.map((section, index) => (
+          <EditorialSection
+            section={section}
+            id={outline.sectionLinks[index]?.id ?? "section"}
+            citations={citationCtx}
+            route={definition.route}
+          />
+        ))}
+        <ResourceGrid cards={resourceCardsWithContactRewrites} id={outline.resourcesId} />
+        {definition.faq.length > 0 && outline.faqId && (
+          <Faq faq={definition.faq} id={outline.faqId} />
+        )}
+        {outline.sourcesId && (
+          <Sources sources={definition.sources ?? []} id={outline.sourcesId} />
+        )}
+        {!isContact && <TrustSignals />}
+        <InlineRfqForm definition={definition} />
+        <ActionBar
+          group={definition.group}
+          title={definition.title}
+          route={definition.route}
+          primaryAction={definition.primaryAction}
+          secondaryActions={definition.secondaryActions}
+          id={outline.nextStepId}
+        />
+      </div>
+    </div>
+  </article>
+</div>

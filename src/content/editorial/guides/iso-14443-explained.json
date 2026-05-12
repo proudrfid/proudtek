@@ -5,8 +5,8 @@
   "kicker": "ISO/IEC 14443 Deep Dive",
   "summary": "A protocol-level technical guide to ISO/IEC 14443, the four-part international standard for 13.56 MHz proximity-coupling smart cards and NFC tags. This page covers the standard's governance under ISO/IEC JTC 1/SC 17, the physical and mechanical requirements of Part 1, the RF interface and modulation schemes of Part 2, the initialization and anti-collision algorithms of Part 3 (including Type A bit-frame collision detection and Type B slotted response), the T=CL block transmission protocol of Part 4, the interaction with companion standards ISO/IEC 14443-4 application-layer APDUs, ISO/IEC 7816-4, ISO/IEC 15693, and the NFC Forum NFC-A / NFC-B digital protocols. Proud Tek manufactures ISO 14443-compliant cards and tags spanning MIFARE Classic, MIFARE DESFire EV3, NTAG 21x and NTAG 424 DNA.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-03-20",
-  "reviewedAt": "2026-03-24",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -47,7 +47,7 @@
       "intro": "ISO/IEC 14443 Type A is the dominant air interface in today's market, implemented by NXP MIFARE, NTAG, Infineon SLE, STMicroelectronics ST25 and many other chip families. A working knowledge of the Type A physical-layer choices — 100% ASK modulation, Modified Miller coding, Manchester-with-subcarrier reverse link, and the cascade-UID model — helps integrators interpret timing diagrams, troubleshoot read failures, and specify compliant hardware.",
       "bullets": [
         "100% ASK modulation forward link. The reader transmits data to the card by pausing the 13.56 MHz carrier during logical 0 bits (100% amplitude shift keying). The Modified Miller code uses different pause positions within a bit period to encode 1s and 0s while maintaining carrier-active regions that keep the passively powered card energized. Forward-link bit rate is 106 kbps in baseline Type A, with optional higher rates (212, 424, 848 kbps) defined in Part 2 Amendment 3.",
-        "Manchester with 847.5 kHz subcarrier reverse link. The card responds by load-modulating the reader's RF field to impress a sub-carrier at fc/16 (847.5 kHz). The sub-carrier is on-off keyed with Manchester-coded data, producing a reverse-link signal that the reader demodulates through its envelope detector. Reverse-link timing is tightly specified in Part 2 to preserve bit-synchronization against carrier-level variation.",
+        "Load-modulated 847.5 kHz subcarrier (OOK + Manchester) reverse link. The card responds by load-modulating the reader's RF field to impress a sub-carrier at fc/16 = 13.56 MHz / 16 = 847.5 kHz. The sub-carrier is on-off keyed (OOK) and carries Manchester-coded data, producing a reverse-link signal that the reader demodulates through its envelope detector. Reverse-link timing is tightly specified in Part 2 to preserve bit-synchronization against carrier-level variation. Baseline reverse-link bit rate is 106 kbps with optional higher rates 212, 424, 848 kbps following the same fc/16 subcarrier.",
         "REQA / WUPA field activation. When a reader energizes its field, it periodically issues a REQA (Request Type A, 7-bit short frame 0x26) or WUPA (Wake-Up Type A, 7-bit short frame 0x52). Each Type A card in the field responds with a 2-byte ATQA (Answer to Request) indicating the chip family and bit-frame anti-collision support. Cards outside any collision-resolved session respond; selected cards do not.",
         "Cascade UID anti-collision (CL1, CL2, CL3). Type A resolves multiple cards in the field through a bit-frame anti-collision scheme. The reader issues Cascade Level 1 SEL (select) commands and reads back UID bits. When two cards send different bits simultaneously, the reader detects the collision bit position (by detecting that both logic levels were present) and issues a narrower SEL command selecting one card. The cascade extends to CL2 (for 7-byte UIDs, used by MIFARE DESFire, NTAG 21x, NTAG 424 DNA) and CL3 (for 10-byte UIDs, rarely deployed).",
         "UID uniqueness and randomization. Each chip has a unique UID assigned by the chip manufacturer. Older MIFARE Classic used 4-byte UIDs with risk of collision across billions of cards; modern NTAG and DESFire chips use 7-byte UIDs (manufacturer code + unique serial) producing unique identifiers across chip-family lifetimes. Random-UID mode on newer chips (DESFire EV2/EV3, NTAG 424 DNA) generates a fresh 4-byte random UID on every power-up, defeating UID-based tracking while retaining the stable underlying chip serial for authenticated access.",
@@ -95,7 +95,7 @@
       "intro": "ISO/IEC 14443 does not stand alone; it anchors a family of related specifications that together define how contactless smart-card and NFC ecosystems work in practice. Knowing where each companion standard fits clarifies why some products reference ISO 14443, some reference NFC Forum specifications, and some reference industry-specific standards that sit on top of 14443 at the application layer.",
       "bullets": [
         "ISO/IEC 15693 — vicinity cards (0-1 m read range) also at 13.56 MHz but with different modulation (OOK with pulse-position encoding) and anti-collision (slotted with 16 slots). ISO 15693 is used for library RFID (NXP ICODE SLIX, NXP ICODE DNA), laundry tracking and long-range NFC applications. ISO 15693 and ISO 14443 share the 13.56 MHz carrier but are not interoperable at the air-interface level; a card supporting one does not automatically support the other.",
-        "NFC Forum digital protocol. NFC-A and NFC-B are direct profiles of ISO/IEC 14443 Type A and Type B with NFC-Forum-specific initialization additions. The NFC Forum also defines tag type profiles: Type 1 (Topaz, rarely deployed), Type 2 (NTAG 21x, memory card), Type 3 (FeliCa / NFC-F, Japanese market), Type 4 (MIFARE DESFire-compatible, file-system based), and Type 5 (ISO 15693, library tags and vicinity applications). Smartphone OS-level NFC APIs (Android Nfc, iOS Core NFC) operate on the NFC Forum tag-type abstraction, not directly on the underlying ISO standards.",
+        "NFC Forum digital protocol. NFC-A and NFC-B are direct profiles of ISO/IEC 14443 Type A and Type B with NFC-Forum-specific initialization additions. The NFC Forum defines tag type profiles: Type 1 (Topaz; formally deprecated in Technical Specification Release 2021, with Digital Protocol 2.3, Activity 2.2, Analog 2.2 and NCI 2.2 removing the requirement to support Type 1), Type 2 (NTAG 21x, memory card; current spec Type 2 Tag 1.3), Type 3 (FeliCa / NFC-F, Japanese market), Type 4 (MIFARE DESFire-compatible, file-system based; ISO-DEP / 7816-4 APDU layer), and Type 5 (ISO/IEC 15693, library tags and vicinity applications). Smartphone OS-level NFC APIs (Android Nfc, iOS Core NFC) operate on the NFC Forum tag-type abstraction. The NDEF Technical Specification was formally adopted by IEC as IEC 63652-2:2026 in March 2026, alongside the WLC specification as IEC 63652-1:2026.",
         "EMV contactless: EMVCo specifies the payment-transaction protocol that runs on top of ISO 14443-4 T=CL. An EMV contactless transaction is a sequence of APDU exchanges defined by EMV Contactless Book C-1 (Mastercard), C-2 (Visa), C-3 (American Express), and other kernel specifications. The card's secure element generates a dynamic cryptogram (ARQC) that the terminal forwards for online authorization. From the ISO 14443 perspective, EMV contactless is just one of many application-layer protocols that can ride T=CL.",
         "ICAO 9303 e-passport. The International Civil Aviation Organization document specifying machine-readable travel documents uses ISO 14443 Type B (most commonly) or Type A for the chip interface, with BAC (Basic Access Control) or PACE (Password Authenticated Connection Establishment) for secure-channel establishment, followed by standard 7816-4 APDUs for reading datagroups (DG1-DG16) containing biometric and biographic data.",
         "PBOC, Calypso, Suica: regional transit payment systems layered on ISO 14443 Type A (PBOC in China, Calypso in France via Innovatron's own 'B-prime' variant), Type B (some Calypso) or FeliCa / NFC-F (Suica in Japan). Transit deployments historically favour lower-level protocols (ISO 14443-3 without T=CL) for sub-300 ms tap-through-gate performance; modern implementations increasingly adopt NFC-Forum-compliant profiles.",
@@ -245,12 +245,20 @@
       "note": "Specifies the physical, mechanical and environmental requirements for ID-1 contactless cards, including bending and torsion resistance, UV / X-ray exposure, and surface properties."
     },
     {
-      "label": "ISO/IEC 14443-2:2020 — Contactless proximity objects — Part 2: Radio frequency power and signal interface",
+      "label": "ISO/IEC 14443-2:2020 — Contactless proximity objects — Part 2: Radio frequency power and signal interface (fourth edition)",
       "url": "https://www.iso.org/standard/73597.html",
       "publisher": "ISO",
       "publishedAt": "2020-07-01",
-      "accessedAt": "2026-04-20",
-      "note": "Defines the 13.56 MHz carrier, operating field strength (1.5-7.5 A/m), Type A 100% ASK / Modified Miller and Type B 10% ASK / NRZ modulation and coding schemes."
+      "accessedAt": "2026-05-10",
+      "note": "Defines the 13.56 MHz carrier, operating field strength (1.5-7.5 A/m), Type A 100% ASK / Modified Miller and Type B 10% ASK / NRZ modulation and coding schemes, plus reverse-link load modulation at the 847.5 kHz subcarrier (Type A OOK Manchester / Type B BPSK NRZ-L) at 106-848 kbps."
+    },
+    {
+      "label": "ISO/IEC 14443-2:2020/Amd 1:2021 — Dynamic power level management",
+      "url": "https://www.iso.org/standard/81867.html",
+      "publisher": "ISO",
+      "publishedAt": "2021-09-01",
+      "accessedAt": "2026-05-10",
+      "note": "First amendment to Part 2 (2021) introducing Dynamic Power Level Management for the contactless proximity interface — relevant to readers and devices that need to adapt RF power for thermal, EMC or coexistence reasons during a transaction."
     },
     {
       "label": "ISO/IEC 14443-3:2018 — Contactless proximity objects — Part 3: Initialization and anticollision",

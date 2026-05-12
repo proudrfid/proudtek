@@ -1,55 +1,41 @@
 ---
 /**
- * Product card grid for industry landing pages.
- * Replaces renderIndustryProductGrid() from editorial-pages.ts.
+ * Featured product grid for an industry landing page.
+ *
+ * Shadow component (Stage 2 optimization). Mirrors `renderIndustryProductGrid`
+ * in editorial-pages.ts (~line 1072). Card data is prepared by
+ * `buildIndustryProductGridData(definition)` so this component is a pure
+ * renderer.
+ *
+ * Heading copy is parameterized on `categoryTitle` — the human-readable
+ * industry name pulled from `INDUSTRY_CATEGORIES`.
  */
-import type { EditorialDefinition } from "../../lib/editorial-types";
-import { INDUSTRY_CATEGORIES } from "../../lib/catalog-pages";
+import type { EditorialProductGridCard } from "../../lib/editorial-pages";
 
 interface Props {
-  definition: EditorialDefinition;
-  editorialImageMap: Map<string, { title: string; heroImage: string }>;
-  wpProductImageMap: Map<string, { title: string; image: string }>;
+  categoryTitle: string;
+  cards: EditorialProductGridCard[];
 }
 
-const { definition, editorialImageMap, wpProductImageMap } = Astro.props;
-
-const category = definition.route.startsWith("/industries/")
-  ? INDUSTRY_CATEGORIES.find((cat) => cat.href === definition.route)
-  : undefined;
-
-const cards = category && category.productRoutes.length > 0
-  ? category.productRoutes.map((route) => {
-      const editorial = editorialImageMap.get(route);
-      const wpProduct = wpProductImageMap.get(route);
-      const name = editorial?.title
-        ?? wpProduct?.title
-        ?? route.split("/").filter(Boolean).pop()?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-        ?? route;
-      const shortName = name.length > 50 ? name.slice(0, 47).trimEnd() + "..." : name;
-      const img = editorial?.heroImage ?? wpProduct?.image ?? "";
-      return { route, shortName, img };
-    })
-  : [];
+const { categoryTitle, cards } = Astro.props;
+const lowerTitle = categoryTitle.toLowerCase();
 ---
-
-{category && cards.length > 0 && (
-  <section class="codex-industries-cat-products" aria-label={`Products for ${category.title}`}>
-    <h2 class="codex-industries-cat-products__title">Featured {category.title} Products</h2>
-    <p class="codex-industries-cat-products__sub">Explore our complete range of RFID solutions for {category.title.toLowerCase()}.</p>
-    <div class="codex-industries-cat-products__grid">
-      {cards.map((card) => (
-        <a href={card.route} class="codex-industries-cat-card">
-          {card.img
-            ? <img src={card.img} alt={card.shortName} loading="lazy" />
-            : <div class="codex-industries-cat-card__placeholder"></div>
-          }
-          <div class="codex-industries-cat-card__body">
-            <h3>{card.shortName}</h3>
-            <span class="codex-industries-cat-card__arrow">&rarr;</span>
-          </div>
-        </a>
-      ))}
-    </div>
-  </section>
-)}
+<section class="codex-industries-cat-products" aria-label={`Products for ${categoryTitle}`}>
+  <h2 class="codex-industries-cat-products__title">Featured {categoryTitle} Products</h2>
+  <p class="codex-industries-cat-products__sub">Explore our complete range of RFID solutions for {lowerTitle}.</p>
+  <div class="codex-industries-cat-products__grid">
+    {cards.map((card) => (
+      <a href={card.route} class="codex-card codex-card--media codex-industries-cat-card">
+        {card.img ? (
+          <img src={card.img} alt={card.shortName} width="1200" height="675" loading="eager" />
+        ) : (
+          <div class="codex-industries-cat-card__placeholder" />
+        )}
+        <div class="codex-industries-cat-card__body">
+          <h3>{card.shortName}</h3>
+          <span class="codex-industries-cat-card__arrow">&rarr;</span>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>

@@ -39,7 +39,7 @@
       }
     },
     {
-      "title": "LF vs HF key fob technology",
+      "title": "What's the difference between LF and HF key fob technology?",
       "intro": "The two dominant frequency bands for key fob access control are 125 kHz (Low Frequency) and 13.56 MHz (High Frequency). Each has distinct characteristics that affect security, cost and system architecture.",
       "image": {
         "src": "/blog-images/chip-125khz.jpg",
@@ -90,21 +90,21 @@
         ]
       },
       "paragraphs": [
-        "EM4100 at 125 kHz is the most widely deployed credential worldwide due to its low cost and simplicity. However, EM4100 transmits its ID in plaintext with no authentication, making it trivially clonable with a $15 handheld duplicator. For any access point protecting assets, personnel safety or sensitive areas, HF protocols with encryption are the minimum recommendation."
+        "[EM4100](/guides/em4100-em4305-t5577-lf-chip-encyclopedia/) at 125 kHz is the most widely deployed credential worldwide due to its low cost and simplicity. However, EM4100 transmits its ID in plaintext with no authentication, making it trivially clonable with a $15 handheld duplicator. For any access point protecting assets, personnel safety or sensitive areas, HF protocols with encryption are the minimum recommendation."
       ]
     },
     {
-      "title": "Reader compatibility and protocol matching",
+      "title": "How do reader compatibility and protocol matching work?",
       "intro": "Same frequency does not mean same protocol. A 125 kHz EM4100 fob will not work on a 125 kHz HID ProxPoint reader. Protocol matching between fob and reader is the critical procurement requirement.",
       "bullets": [
         "Identify the reader brand, model and protocol before ordering fobs. Common combinations: HID ProxPoint/ProxPro readers with HID Prox II fobs; EM readers with EM4100/EM4200 fobs.",
         "Multi-protocol readers (e.g., HID multiCLASS SE) can read both LF Prox and HF iCLASS/SEOS credentials, useful during migration from LF to HF.",
         "Request 10-20 sample fobs and test on actual readers before placing production orders. Some generic EM4100 fobs have antenna tuning differences that reduce read range on specific reader models.",
-        "For new installations, specify open-standard protocols (ISO 14443, ISO 15693) to avoid vendor lock-in and ensure multi-source fob availability."
+        "For new installations, specify open-standard protocols ([ISO 14443](/guides/iso-14443-explained/), ISO 15693) to avoid vendor lock-in and ensure multi-source fob availability."
       ]
     },
     {
-      "title": "Fob form factors and durability",
+      "title": "How do fob form factors and durability work?",
       "intro": "Key fobs are available in multiple shapes and materials. Form factor selection affects user acceptance, durability and cost.",
       "bullets": [
         "Standard teardrop ABS fobs are the most common, measuring approximately 40 x 30 x 5 mm with a keyring hole. Durable enough for years of daily use.",
@@ -115,7 +115,7 @@
       ]
     },
     {
-      "title": "Deployment planning and lifecycle management",
+      "title": "How do you manage deployment planning and lifecycle?",
       "intro": "A successful fob deployment requires planning for initial enrollment, replacement inventory, deactivation procedures and eventual technology migration.",
       "bullets": [
         "Pre-enroll fob UIDs into the access control system in batches using a desktop reader and CSV import, rather than enrolling one-by-one at the door.",
@@ -123,6 +123,28 @@
         "Implement a deactivation procedure when employees leave: revoke the credential ID in the controller immediately and collect the physical fob during exit processing.",
         "Plan for technology migration from LF to HF by specifying multi-protocol readers in new installations, allowing fob upgrade without reader replacement.",
         "Track fob issuance, replacement rate and deactivation metrics to optimize reorder quantities and identify unusual loss patterns that may indicate security issues."
+      ]
+    },
+    {
+      "title": "Vendor and credential family comparison for 2026 procurement",
+      "intro": "The access-control credential market consolidated around a handful of credential families. Picking the right one for a key fob program is largely about reader compatibility, vendor lock-in tolerance, and how long the credentials need to live in the field. The summary below covers the families integrators most often quote in 2026 specifications.",
+      "bullets": [
+        "HID Prox (125 kHz). Still the largest installed base, especially in older office buildings and government facilities. Cheap fobs ($1-2), unencrypted, easily cloned with a $15 handheld duplicator. Spec only for new installs where the building is on a known migration timeline and existing readers must continue working — never as a long-term security choice.",
+        "HID iCLASS SE (13.56 MHz). HID's mid-range AES-128 credential with Secure Identity Object (SIO). Compatible with the existing multiCLASS SE reader population. Good middle ground when you want stronger security than Prox but the building already runs on HID readers and Seos is overkill or out of budget.",
+        "HID Seos (13.56 MHz). HID's open-standard AES-128 credential with Diffie-Hellman ECC and SIO data wrapper. Same identity is portable across cards, fobs, smartphones, and wearables. Best fit when the building wants HID Mobile Access on iPhone and Android out of the box and is willing to standardize on HID Signo readers.",
+        "MIFARE DESFire EV2/EV3 (13.56 MHz). NXP's vendor-neutral AES-128 credential. Multiple card bureaus, fob suppliers, and reader vendors (HID, ELATEC, Allegion, Wavelynx, Identiv) can supply DESFire-compatible products. Best fit when you want flexible procurement and multi-application capability (one fob for door access, transit, vending, library).",
+        "NTAG / Custom NFC fobs. NTAG 213/215/216 fobs are inexpensive and work with any iPhone or Android phone, but they have no AES authentication. Use only for marketing, branding, loyalty, or low-value access (gym member sign-in, event badge). For security-grade NFC fobs, specify NTAG 424 DNA which adds AES-128 SUN message authentication."
+      ]
+    },
+    {
+      "title": "Power, wiring, and reader-side troubleshooting that prevents fob complaints",
+      "intro": "Most 'my fob doesn't work' help-desk tickets actually trace back to the reader, the wiring, or the panel — not to the fob itself. Building this short list into the install checklist prevents the most common deployment regressions, especially in retrofits where new readers share wire runs with much older infrastructure.",
+      "bullets": [
+        "Reader power. Many modern multi-format readers (HID Signo, ELATEC TWN4 MultiTech 2, Allegion Schlage MTB11, Wavelynx Ethos) draw 200-500 mA at 12-24 V DC, well above the 100-150 mA legacy ProxPoint readers consumed. Underpowering is the single most common cause of intermittent reads after a reader upgrade. Pull a clean PoE or larger gauge low-voltage run rather than reusing the original 22 AWG home-run that powered a Prox reader.",
+        "Wiegand vs OSDP. Older readers communicate to the panel over Wiegand, which transmits the card number in cleartext over ~150 m of copper and is sniffable by anyone who can briefly access the cable run. Modern readers should run OSDP v2 with Secure Channel (AES-128 between reader and panel). Confirm the panel firmware supports OSDP Secure Channel — a downgraded reader running plain Wiegand undermines even an AES-encrypted DESFire fob.",
+        "Reader-to-metal spacing. Mounting a reader directly on a metal door frame, mullion, or aluminum window frame detunes the antenna and shortens read range from 5-10 cm to 1-2 cm. Use the manufacturer's spacer or back-box and keep at least 6 mm of plastic or air between the reader head and the metal surface. For metal-mount installs, specify on-metal-rated reader heads (HID iCLASS R10/R40 with mounting ring, ELATEC TWN4 MultiTech HF with on-metal kit).",
+        "Antenna polarization is mostly an HF/UHF reader issue, not a fob issue. Fobs are short-range HF (3-15 cm) and orientation-tolerant; if a single fob reads at one door and not the next, the difference is almost always reader power, mounting, or panel config — not the fob itself. Swap the suspect fob to a known-good door before opening a fob-side ticket.",
+        "Cable noise and ground loops. RS-485 OSDP runs and antenna cables should not share conduit with high-current AC, VFD output, or large LED driver runs. Symptoms of induced noise include intermittent failures during specific times of day (when nearby HVAC kicks on) or random reader resets. Re-route the data run, add ferrite beads at the reader and panel, and confirm a single building ground rather than star-ground topology."
       ]
     }
   ],
@@ -150,6 +172,22 @@
           "label": "Access control solutions"
         }
       ]
+    },
+    {
+      "title": "Reader and credential vendor references",
+      "description": "Manufacturer documentation cited above for fob and reader procurement decisions.",
+      "links": [
+        {
+          "href": "https://www.hidglobal.com/product-mix/seos",
+          "label": "HID Seos credential overview",
+          "description": "Official HID overview of Seos AES-128 credential family across cards, fobs, and mobile."
+        },
+        {
+          "href": "https://www.elatec-rfid.com/int/products/rfid-reader",
+          "label": "ELATEC TWN4 multi-format readers",
+          "description": "Multi-format reader line covering 125 kHz Prox, MIFARE, DESFire, iCLASS, Seos, NTAG, and BLE in one device."
+        }
+      ]
     }
   ],
   "faq": [
@@ -172,10 +210,18 @@
     {
       "question": "What is the MOQ for custom-branded key fobs?",
       "answer": "Standard-shape fobs with logo pad printing are available from 500 units. Custom-molded fob shapes with unique tooling typically require 2,000-5,000 unit minimums due to injection-mold tooling costs. Tooling setup runs $500-$2,000 depending on shape complexity and is amortized across the initial order."
+    },
+    {
+      "question": "Should I add mobile credentials (Apple Wallet, Google Wallet, HID Mobile Access) instead of issuing fobs?",
+      "answer": "Mobile credentials are an additive option rather than a complete replacement. They are useful for short-term residents, hotel guests, contractors, and visitors because they can be provisioned and revoked instantly from the access portal without issuing physical hardware. They also use the phone's Secure Element plus biometric unlock, which is cryptographically stronger than even an AES-encrypted fob. The trade-offs: mobile credentials require BLE or NFC-capable readers (HID Signo, Allegion Schlage MTB11, ELATEC TWN4 with BLE, Wavelynx Ethos), the building must subscribe to the mobile credential service (HID Origo, Wavelynx EMS, Brivo Mobile Pass, OpenPath Pass), and some users will always prefer plastic. Most modern programs run both fobs and mobile credentials in parallel for several years."
+    },
+    {
+      "question": "If we already have HID Prox readers, do we have to replace them to get clone-resistant fobs?",
+      "answer": "Often yes, but the upgrade path is well-trodden. The straightforward route is to swap each Prox reader head for a multi-format reader (HID Signo, ELATEC TWN4, Allegion Schlage MTB11, Wavelynx Ethos) that reads both 125 kHz Prox and 13.56 MHz HF credentials, then issue new MIFARE DESFire EV3 or HID Seos fobs. During the overlap period the new readers accept both old Prox and new encrypted fobs, which lets the building swap credentials gradually rather than all in one weekend. Confirm reader power requirements before the swap — modern multi-format readers draw more current than legacy ProxPoint and may need a heavier-gauge cable run. Replace plain Wiegand wiring with OSDP v2 Secure Channel at the same time so the upgrade closes both the credential and the wiring vulnerabilities."
     }
   ],
   "primaryAction": {
-    "href": "/contact/access-control/",
+    "href": "/contact/access-control-keyfobs/",
     "label": "Get key fob samples"
   },
   "secondaryActions": [
@@ -194,5 +240,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-02-01"
+  "reviewedAt": "2026-05-10"
 }

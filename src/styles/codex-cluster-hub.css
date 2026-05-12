@@ -1,0 +1,368 @@
+/* ═══════════════════════════════════════════
+   Cluster hub pages — /guides/{cluster}/ and any future cluster routes.
+   Imported by codex.css after codex-pages.css.
+
+   Architecture: this is the FIRST set of styles written for native
+   .astro pages (not editorial-pages.ts string concat). See
+   docs/architecture/editorial-rendering-debt.md.
+   ═══════════════════════════════════════════ */
+
+.codex-cluster-hub {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem) 4rem;
+  color: var(--codex-text, #291c0e);
+}
+
+/* When the left-rail is rendered (cluster hubs), shift main content right
+   to give the fixed-position rail (>=1280px) breathing room. Mirrors the
+   pattern .codex-blog-index--with-rail uses for /blog/. */
+@media (min-width: 1280px) {
+  .codex-cluster-hub--with-rail {
+    margin-left: 280px;
+    max-width: 920px;
+  }
+}
+
+/* ── Breadcrumb ── */
+.codex-cluster-trail {
+  font-size: var(--codex-text-xs, 0.8125rem);
+  color: var(--codex-text-muted, #6e6051);
+  margin-bottom: clamp(1.25rem, 3vw, 2rem);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+.codex-cluster-trail a {
+  color: var(--codex-text-muted, #6e6051);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+.codex-cluster-trail a:hover,
+.codex-cluster-trail a:focus {
+  color: var(--codex-gold, #c39a5f);
+  text-decoration: underline;
+}
+.codex-cluster-trail span[aria-current="page"] {
+  color: var(--codex-text, #291c0e);
+  font-weight: 600;
+}
+
+/* ── Hero ── */
+.codex-cluster-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  align-items: start;
+  background: linear-gradient(
+    135deg,
+    rgba(196, 154, 95, 0.08) 0%,
+    rgba(196, 154, 95, 0.02) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  border: 1px solid rgba(196, 154, 95, 0.2);
+  border-radius: 18px;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  margin-bottom: clamp(1.5rem, 4vw, 3rem);
+}
+
+.codex-cluster-hero__icon-wrap {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: clamp(64px, 8vw, 88px);
+  height: clamp(64px, 8vw, 88px);
+  border-radius: 22px;
+  background: var(--codex-surface, #fff);
+  box-shadow: 0 6px 20px rgba(196, 154, 95, 0.18);
+  border: 1px solid rgba(196, 154, 95, 0.25);
+}
+
+.codex-cluster-hero__icon {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1;
+  padding-top: 0.6rem;
+}
+
+.codex-cluster-hero__body {
+  min-width: 0;
+}
+
+.codex-cluster-hero__kicker {
+  font-size: var(--codex-text-xs, 0.8125rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--codex-gold, #c39a5f);
+  margin: 0 0 0.5rem;
+}
+
+.codex-cluster-hero h1 {
+  font-family: var(--codex-font-display, "Playfair Display", Georgia, serif);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  line-height: 1.15;
+  margin: 0 0 0.75rem;
+  color: var(--codex-text, #291c0e);
+}
+
+.codex-cluster-hero__lede {
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+  line-height: 1.6;
+  color: var(--codex-text-muted, #4f4338);
+  margin: 0 0 1.25rem;
+}
+
+.codex-cluster-hero__pillars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem;
+}
+
+@media (min-width: 720px) {
+  .codex-cluster-hero__pillars {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem 1.5rem;
+  }
+}
+
+.codex-cluster-hero__pillars li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: var(--codex-text-sm, 0.9375rem);
+  line-height: 1.5;
+  color: var(--codex-text, #291c0e);
+}
+
+.codex-cluster-hero__pillar-bullet {
+  color: var(--codex-gold, #c39a5f);
+  font-weight: 700;
+  margin-top: 0.05rem;
+  flex-shrink: 0;
+}
+
+/* ── Guide grid ── */
+.codex-cluster-grid-wrap {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.codex-cluster-grid-heading {
+  font-family: var(--codex-font-display, "Playfair Display", Georgia, serif);
+  font-size: clamp(1.4rem, 3vw, 1.875rem);
+  margin: 0 0 0.5rem;
+  color: var(--codex-text, #291c0e);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.55rem;
+}
+
+.codex-cluster-grid-heading a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted transparent;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.codex-cluster-grid-heading a:hover,
+.codex-cluster-grid-heading a:focus {
+  color: var(--codex-gold, #c39a5f);
+  border-bottom-color: var(--codex-gold, #c39a5f);
+}
+
+.codex-cluster-grid-heading__count {
+  font-family: var(--codex-font-body, system-ui, sans-serif);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--codex-text-muted, #6e6051);
+  letter-spacing: 0;
+}
+
+.codex-cluster-grid-intro {
+  font-size: var(--codex-text-sm, 0.9375rem);
+  line-height: 1.55;
+  color: var(--codex-text-muted, #4f4338);
+  margin: 0 0 1.25rem;
+  max-width: 65ch;
+}
+
+.codex-cluster-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+@media (min-width: 600px) {
+  .codex-cluster-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1000px) {
+  .codex-cluster-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.codex-cluster-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--codex-surface, #fff);
+  border: 1px solid var(--codex-border, #e7decc);
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    border-color 200ms ease;
+}
+
+.codex-cluster-card:hover,
+.codex-cluster-card:focus-within {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(41, 28, 14, 0.08);
+  border-color: var(--codex-gold, #c39a5f);
+  text-decoration: none;
+}
+
+.codex-cluster-card__thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--codex-bg-soft, #f4ecd9);
+  display: block;
+}
+
+.codex-cluster-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  flex: 1;
+}
+
+.codex-cluster-card__kicker {
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--codex-gold, #c39a5f);
+  background: rgba(196, 154, 95, 0.1);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  align-self: flex-start;
+  line-height: 1.4;
+}
+
+.codex-cluster-card__title {
+  font-family: var(--codex-font-display, "Playfair Display", Georgia, serif);
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  color: var(--codex-text, #291c0e);
+  font-weight: 600;
+}
+
+.codex-cluster-card__summary {
+  font-size: 0.8875rem;
+  line-height: 1.5;
+  color: var(--codex-text-muted, #4f4338);
+  margin: 0;
+  flex: 1;
+  /* Clamp summary to 3 lines for grid evenness */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.codex-cluster-card__cta {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--codex-gold, #c39a5f);
+  margin-top: 0.25rem;
+}
+
+/* ── Cross-cluster nav ── */
+.codex-cluster-cross-nav {
+  border-top: 1px solid var(--codex-border, #e7decc);
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+}
+
+.codex-cluster-cross-nav__heading {
+  font-family: var(--codex-font-display, "Playfair Display", Georgia, serif);
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  margin: 0 0 1rem;
+  color: var(--codex-text, #291c0e);
+}
+
+.codex-cluster-cross-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
+
+@media (min-width: 600px) {
+  .codex-cluster-cross-nav ul {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1000px) {
+  .codex-cluster-cross-nav ul {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+.codex-cluster-cross-nav__link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  background: var(--codex-bg-soft, #f4ecd9);
+  text-decoration: none;
+  color: var(--codex-text, #291c0e);
+  font-size: 0.9375rem;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.codex-cluster-cross-nav__link:hover,
+.codex-cluster-cross-nav__link:focus {
+  background: rgba(196, 154, 95, 0.18);
+  color: var(--codex-text, #291c0e);
+  transform: translateX(2px);
+  text-decoration: none;
+}
+
+.codex-cluster-cross-nav__icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.codex-cluster-cross-nav__label {
+  flex: 1;
+  font-weight: 500;
+}
+
+.codex-cluster-cross-nav__count {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--codex-text-muted, #6e6051);
+  background: var(--codex-surface, #fff);
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  min-width: 1.5rem;
+  text-align: center;
+}

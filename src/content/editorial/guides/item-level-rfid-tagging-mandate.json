@@ -5,8 +5,8 @@
   "kicker": "Item-Level RFID Tagging",
   "summary": "A cross-retailer compliance overview for suppliers handling item-level RFID mandates from Walmart, Target, Nordstrom, Macy's, Kohl's and the major European retailers. Covering where each retailer's requirements align around GS1 SGTIN-96 encoding, where they diverge (tag placement, ARC certification categories, ASN formats, verification cadence), the source-tagging operating model that covers multiple retailers simultaneously, inlay selection by product material, and the governance that keeps multi-retailer programmes from fragmenting.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2025-11-16",
-  "reviewedAt": "2025-11-19",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -22,8 +22,8 @@
     "Source tagging at factory is the standard operating model. All major retailers prefer or require RFID tags to be applied at the point of manufacture, integrated into existing labelling processes rather than added as a retrofit at distribution centres.",
     "Proud Tek supplies compliant tags. Pre-encoded UHF RFID labels, hang tags, care labels and packaging inlays for every major retail RFID mandate, with encoding verification at the factory and ARC-aligned inlay selection by product type."
   ],
-  "imageAlt": "Item level RFID tags for retail compliance including hang tags and labels",
-  "heroImage": "/landing-images/industrial.webp",
+  "imageAlt": "Retail apparel with RFID — item-level tagging mandate compliance",
+  "heroImage": "/landing-images/retail-apparel.jpg",
   "imageSourceRoutes": [
     "/product/uhf-rfid-tags/",
     "/product/rfid-cards/"
@@ -51,7 +51,7 @@
       "title": "Where retailers align (and where they diverge)",
       "intro": "Designing a multi-retailer source-tagging programme is easier than it looks because the shared standards cover ~80% of the specification. The remaining 20% (placement, ASN format, and verification workflow) is where the engineering work lives.",
       "bullets": [
-        "Shared: GS1 SGTIN-96 encoding on UHF Gen2 tags per GS1 EPC Tag Data Standard (TDS) 2.1 (2021). This is the baseline across every major US retailer mandate and most European deployments. A tag encoded correctly for one retailer is encoded correctly for all of them. The 96-bit EPC contains the supplier's GS1 Company Prefix, the item GTIN and a unique 38-bit serial number, all mapped to the retailer's Item Master via the GTIN.",
+        "Shared: GS1 SGTIN-96 encoding on UHF Gen2 tags per GS1 EPC Tag Data Standard (TDS) 2.3 (October 2025; current version on the GS1 standards site). This is the baseline across every major US retailer mandate and most European deployments. A tag encoded correctly for one retailer is encoded correctly for all of them. The 96-bit EPC contains the supplier's GS1 Company Prefix, the item GTIN and a unique 38-bit serial number, all mapped to the retailer's Item Master via the GTIN.",
         "Shared: UHF Gen2 v2 (ISO/IEC 18000-63 / EPC Gen2v2 per EPCglobal Class 1 Gen 2) air-interface protocol operating at 860-960 MHz. Tags that support this standard work with every retailer's reader infrastructure (Impinj R700/R420/xArray, Zebra FX9600/FX7500, Alien ALR-F800). Gen2 v2 adds Crypto Suites and Untraceable command for anti-counterfeit and privacy features, though most retail deployments use only the legacy Gen2 command set.",
         "Shared: ARC certification categories (A through T) as the performance baseline. The specific required category varies by retailer and product type (e.g. Spec A for apparel, Spec L for on-metal, Spec G for small items, Spec M for footwear, Spec R for high-attenuation), but the underlying test methodology is common. Auburn University's RFID Lab conducts standardized anechoic-chamber measurements with Impinj xArray reference readers.",
         "Shared: GS1 EPC Identifier System. Suppliers use their Global Trade Item Number (GTIN-14) which links the RFID serial to the product master across all retailers simultaneously, avoiding per-retailer item encoding.",
@@ -225,18 +225,26 @@
       "answer": "European retailers (Zara, H&M, Decathlon) use the same core GS1 SGTIN-96 standard on UHF Gen2 tags but operate under the European UHF frequency band (ETSI 865-868 MHz) rather than the US FCC band (902-928 MHz). Most modern inlays are global (902-928 / 865-868 compatible) and do not require separate SKUs. The larger difference is the approaching EU Digital Product Passport, which adds data-exchange requirements on top of physical tagging."
     },
     {
+      "question": "What is the Auburn ARC program and how does it govern inlay selection?",
+      "answer": "The Auburn ARC program is the universal language for identifying and communicating passive UHF RFID inlay quality and performance requirements. It was founded in 2009 at Auburn University's RFID Lab in the Harbert College of Business, and as of 2026 supports 15+ retail end users (Walmart, Nordstrom, DICK'S Sporting Goods, H&M, Lowe's, T-Mobile and others) plus aviation, manufacturing and transportation programmes. End users define a 'Spec' — a quality and performance profile that captures their use case, product and packaging types, environment and reader infrastructure. The ARC Lab benchmarks each candidate inlay in standardized anechoic-chamber conditions and stores its performance profile in the ARC Database. Inlays meeting the Spec's threshold are 'ARC-approved' for that Spec and are communicated to suppliers through each end-user's RFID playbook. Suppliers should not assume that a generic ARC-approved inlay is approved for every retailer's Spec; the approval is per-Spec, and the per-retailer playbook lists the specific approved inlays for each product or packaging type. ARC re-tests inlays against updated Specs as inlay vendors release new chip generations or as end users tighten requirements."
+    },
+    {
+      "question": "How does the EU Digital Product Passport interact with US retailer RFID mandates for textile suppliers?",
+      "answer": "Textile suppliers shipping to both US retailers (Walmart, Target, Macy's) and EU markets face two parallel obligations from 2027 onwards. The US retailer mandates require an SGTIN-96-encoded UHF tag for supplier-to-DC logistics visibility; the EU DPP requires a consumer-accessible data carrier (NFC tag, QR code or RFID transponder) linking to the lifecycle registry under ESPR Regulation (EU) 2024/1781. The architecturally efficient solution is a dual-technology label carrying one NFC inlay (NTAG 424 DNA for consumer authentication) and one UHF inlay (Impinj M800 / NXP UCODE 9 for supply chain) on a single substrate, encoded so that the NFC URL and the UHF EPC resolve to the same product identifier. One supplier investment satisfies both obligations, and the logistics data captured at the DC is available to inform the DPP lifecycle record. The textile-specific ESPR delegated act is in the 2027 working-plan wave, so 2025-2026 is the planning window for suppliers who want to deploy a unified architecture rather than build the EU DPP layer separately later."
+    },
+    {
       "question": "What is the single biggest avoidable mistake in multi-retailer RFID rollout?",
       "answer": "Treating each retailer's programme as a separate project. The shared GS1 SGTIN-96 encoding means one source-tagging programme covers every major retailer. Building parallel programmes per retailer fragments inventory, doubles the compliance workload, and multiplies the exception-handling surface. Design the programme around the shared standard first, then adapt placement and ASN per retailer at the packing and fulfilment steps."
     }
   ],
   "sources": [
     {
-      "label": "GS1 EPC Tag Data Standard (TDS) 2.1",
-      "url": "https://www.gs1.org/standards/rfid/tds",
+      "label": "GS1 EPC Tag Data Standard (TDS) 2.3",
+      "url": "https://www.gs1.org/standards/tds",
       "publisher": "GS1",
-      "publishedAt": "2022-11-01",
-      "accessedAt": "2026-04-20",
-      "note": "Authoritative encoding specification for SGTIN-96 used across every retailer's item-level RFID mandate."
+      "publishedAt": "2025-10-01",
+      "accessedAt": "2026-05-10",
+      "note": "Authoritative encoding specification for SGTIN-96 used across every retailer's item-level RFID mandate; TDS 2.3 is the current version (October 2025) supporting domain-name-bearing schemes and date-prioritised SGTIN encoding."
     },
     {
       "label": "GS1 EPC Tag Data Translation (TDT) 2.0",

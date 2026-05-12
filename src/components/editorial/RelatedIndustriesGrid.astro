@@ -1,0 +1,42 @@
+---
+/**
+ * Cross-link grid — "Used in these industries" block on SKU pages.
+ *
+ * Shadow component (Stage 2 optimization). Mirrors `renderRelatedIndustriesGrid`
+ * in editorial-pages.ts (~line 1011). Card data is prepared by
+ * `buildRelatedIndustriesData(definition)` and passed in as a flat `cards`
+ * array — this component just renders.
+ */
+import type { EditorialRelatedIndustryCard } from "../../lib/editorial-pages";
+
+interface Props {
+  cards: EditorialRelatedIndustryCard[];
+}
+
+const { cards } = Astro.props;
+---
+<section class="codex-editorial-section codex-related-industries" id="used-in-industries">
+  <h2>Used in these industries</h2>
+  <p class="codex-editorial-section-intro">Deployments where this product is referenced on our industry landing pages.</p>
+  <div class="codex-related-industries-grid">
+    {cards.map((cat) => (
+      <a href={cat.href} class="codex-card codex-card--media codex-related-industry-card">
+        {cat.heroImage && (
+          <img
+            src={cat.heroImage}
+            alt={cat.title}
+            width="1200"
+            height="675"
+            loading="eager"
+            decoding="async"
+          />
+        )}
+        <div class="codex-related-industry-card__body">
+          <span class="codex-related-industry-card__emoji" aria-hidden="true">{cat.emoji}</span>
+          <strong>{cat.title}</strong>
+          <p>{cat.description}</p>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>

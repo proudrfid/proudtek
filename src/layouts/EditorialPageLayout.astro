@@ -1,0 +1,87 @@
+---
+/**
+ * EditorialPageLayout — Stage 3 cutover sibling of SnapshotLayout.
+ *
+ * Renders editorial-flavored pages via the shadow `.astro` component tree
+ * (`<EditorialArticle>`) instead of the legacy template-literal pipeline
+ * (`<Fragment set:html={seo.bodyHtml} />`).
+ *
+ * Architecture: the WP chrome (header, sidebar, nav, footer, etc.) lives
+ * AROUND the `<main>` element inside `seo.bodyHtml`. The chrome is the same
+ * for both render paths and we want to preserve it byte-for-byte. So we
+ * regex-split `seo.bodyHtml` at the `<main>...</main>` boundary, emit the
+ * pre-main chrome via `<Fragment set:html>`, then `<EditorialArticle>` for
+ * the main contents, then the post-main chrome via another `<Fragment>`.
+ *
+ * The split happens at render time (per-page-build SSG cost is negligible).
+ * If `<main>` isn't found in bodyHtml (shouldn't happen for editorial pages
+ * but defensive), we log a warning and fall back to the legacy `set:html`
+ * dump so the page still renders — Stage 3 should never silently drop
+ * content.
+ *
+ * Page route consumers gate on `import.meta.env.USE_EDITORIAL_COMPONENTS`
+ * AND `page.editorialDefinition` being present (see [...slug].astro).
+ */
+import BaseLayout from "./BaseLayout.astro";
+import EditorialArticle from "../components/editorial/EditorialArticle.astro";
+import type { SnapshotPage } from "../lib/site-data";
+import type { EditorialDefinition } from "../lib/editorial-types";
+import { prepareSnapshot } from "../lib/render-snapshot";
+import { buildMachineRoute, buildPageSeo } from "../lib/seo";
+import { buildAuthorityLdForRoute } from "../lib/editorial-authority-ld";
+
+const { page } = Astro.props as { page: SnapshotPage };
+
+// Mirror SnapshotLayout exactly for the SEO / JSON-LD pipeline — these are
+// the path-independent parts.
+const snapshot = prepareSnapshot(page);
+const seo = buildPageSeo({
+  ...page,
+  htmlAttrs: snapshot.htmlAttrs,
+  bodyAttrs: snapshot.bodyAttrs,
+  headHtml: snapshot.headHtml,
+  bodyHtml: snapshot.bodyHtml,
+});
+
+const authorityLd = await buildAuthorityLdForRoute(page.route);
+if (authorityLd) seo.jsonLd = [...seo.jsonLd, authorityLd];
+
+const machineJsonPath = buildMachineRoute(page.route, "json");
+const machineTextPath = buildMachineRoute(page.route, "txt");
+
+// Split bodyHtml around <main>. The regex captures three groups:
+//   1. everything up to and including the <main ...> opening tag
+//   2. everything inside main (which the legacy path filled via renderEditorialMain)
+//   3. everything from </main> onward
+//
+// `[\s\S]` (any char incl. newline) is used instead of `.` so the regex
+// handles real-world multi-line bodyHtml. The `?` quantifiers are non-greedy
+// so `<main>` and `</main>` bind to the first / last occurrence respectively
+// (pages typically have exactly one <main>; the non-greedy outer captures
+// handle the edge case where chrome contains a literal string `</main>` —
+// which it shouldn't, but the regex stays robust).
+const MAIN_RE = /^([\s\S]*?<main[^>]*>)[\s\S]*?(<\/main>[\s\S]*)$/;
+const match = seo.bodyHtml.match(MAIN_RE);
+
+const definition = page.editorialDefinition as EditorialDefinition | undefined;
+const illustration = page.editorialIllustration ?? null;
+
+// Defensive: if no <main> in bodyHtml OR no definition attached, fall back
+// to the legacy path. The wrapper page route should never invoke this
+// layout when definition is missing, but defense-in-depth catches misuse.
+const canSplit = Boolean(match && definition);
+const preMain = canSplit ? match![1] : "";
+const postMain = canSplit ? match![2] : "";
+---
+
+<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
+  {canSplit ? (
+    <>
+      <Fragment set:html={preMain} />
+      <EditorialArticle definition={definition!} illustration={illustration} />
+      <Fragment set:html={postMain} />
+    </>
+  ) : (
+    <Fragment set:html={seo.bodyHtml} />
+  )}
+</BaseLayout>

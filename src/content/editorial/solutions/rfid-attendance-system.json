@@ -24,7 +24,7 @@
     "/products/rfid-cards/mifare-classic-1k-card/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-04-26",
+  "modifiedAt": "2026-05-11",
   "brief": [
     {
       "label": "Vertical applications served",
@@ -260,6 +260,125 @@
         "RFID wristbands: silicone or fabric bands for environments where cards are impractical, such as construction sites, factory floors and healthcare facilities.",
         "RFID key fobs: compact fobs for workers who prefer carrying credentials on a keychain rather than in a card holder."
       ]
+    },
+    {
+      "title": "Chip silicon decision — MIFARE Classic / Plus / DESFire / NTAG / HID Prox per security tier",
+      "bullets": [
+        "Tier-1 EM4100 / HID Prox 26-bit (125 kHz LF) — cheapest, lowest security. EM4100 read-only with hardcoded ID; HID Prox 26-bit Wiegand-format. Cloneable in <60s with Proxmark or Flipper Zero. Suitable for low-stakes attendance only (school field-trip, low-trust event) where buddy-punching liability is contained.",
+        "Tier-2 MIFARE Classic 1K/4K (13.56 MHz HF) — most-deployed worldwide for attendance. Crypto-1 cipher broken in 2008 but still adequate for attendance applications where the attack surface is low. $0.80-$1.20 unit cost at scale. Compatible with virtually every attendance reader (ZKTeco, Hikvision, Suprema, Anviz, Realand, Granding).",
+        "Tier-3 MIFARE Plus SE/EV2 — AES-128 in SL3 + backwards-compatible Classic emulation in SL1 for staged migration. $1.50-$2.50 unit. Used by organisations refreshing readers without forklift swap.",
+        "Tier-4 MIFARE DESFire EV2/EV3 — AES-128 mutual auth + file-based directory + Random UID + Originality Signature. $2.80-$5.50 unit. Used in healthcare + government + high-security manufacturing where credential cloning has compliance impact (HIPAA, NIST 800-53, CMMC).",
+        "Tier-4 HID iCLASS Seos — equivalent AES-128 + file-format-agnostic credential, programmed via HID Origo. Common in enterprises that already standardise on HID Signo / multiCLASS SE readers for combined access control + attendance.",
+        "NTAG 213 / 215 / 216 (NFC Type 2) — used in NFC wristband + sticker form factors for event attendance, fitness check-in and meeting-room tap. Lower security than DESFire but cheaper ($0.20-$0.50) and supports smartphone tap.",
+        "NTAG 424 DNA — AES-CMAC SUN message for tap-to-verify attendance with anti-cloning. Used in premium employee badge + executive credentialing where each tap generates a unique signed timestamp.",
+        "UHF EPC Gen2 (ISO/IEC 18000-63) — long-range UHF wristband + badge for hands-free attendance at portal (construction site entry, manufacturing zone, hospital ward). $0.30-$0.80 unit but reader infrastructure costs more (Impinj R420/R510/R700, Zebra FX9600).",
+        "Dual-frequency LF+HF cards — 125 kHz EM/HID + 13.56 MHz MIFARE in one card for buildings migrating from legacy proximity to encrypted HF. $1.80-$3.50 unit.",
+        "Mobile credentials (Apple Wallet, Google Wallet, HID Mobile Access, Salto JustIN) — increasingly used for attendance in remote-work + hybrid scenarios; pairs phone secure-element to BLE/NFC reader; subscription model $3-$8/credential/year."
+      ]
+    },
+    {
+      "title": "Payroll + HCM + SIS integration — UKG / Kronos / ADP / Workday / Oracle / Infor / SAP SuccessFactors",
+      "bullets": [
+        "UKG Pro Workforce Management (formerly Kronos Workforce Central + UKG Dimensions) — dominant enterprise time-and-attendance platform; native RFID terminal integration via UKG InTouch DX + UKG Touch ID terminals; supports Z-style + Kronos 4500 + Kronos InTouch hardware with embedded MIFARE/DESFire readers.",
+        "ADP Workforce Now + ADP Vantage HCM — second-largest US employer payroll platform; RFID integration via ADP Time + Attendance module or third-party connector to ZKTeco / Suprema / Hikvision terminals.",
+        "Workday HCM + Workday Time Tracking — modern cloud HCM common in tier-1 enterprise (>50K employees); RFID integration via Workday Connector or middleware (Boomi, MuleSoft) to attendance terminals.",
+        "Oracle Fusion Cloud HCM + Oracle PeopleSoft HCM — Oracle ecosystem; RFID via Oracle Time and Labor + custom integration.",
+        "SAP SuccessFactors + SAP Time Sheet — SAP-stack employers; RFID via SAP CATS (Cross Application Time Sheet) + IDoc integration.",
+        "Infor CloudSuite HCM + Infor Lawson — mid-market + healthcare; native RFID integration.",
+        "Ceridian Dayforce — Canadian + US mid-market; RFID via Dayforce Time + Attendance.",
+        "Paychex Flex — SMB payroll; basic RFID integration via Paychex Time module.",
+        "Education SIS (Student Information System): PowerSchool, Infinite Campus, Skyward, Blackbaud SKY API, Aeries, Synergy SIS — RFID attendance terminal data flows via SIF (Schools Interoperability Framework) or vendor REST API into the SIS for daily attendance + parent notification.",
+        "Higher education: Banner (Ellucian), Workday Student, Oracle PeopleSoft Campus Solutions, Jenzabar — RFID class attendance + dorm access integration.",
+        "Healthcare: integration with Epic / Cerner / Workday Healthcare to track clinician time-on-unit; supports CMS staffing reports + Joint Commission staffing minimum compliance.",
+        "Construction + field service: Procore + Autodesk Construction Cloud + ServiceTitan + Buildertrend — RFID + GPS-paired site attendance for OSHA + DOL compliance + project-cost-coding.",
+        "Integration pattern — RFID terminal captures clock event → uploads to attendance platform (local or cloud) → HRIS / payroll pull via API or scheduled batch → exception handling (missed punch, mid-shift edit) via supervisor approval workflow."
+      ]
+    },
+    {
+      "title": "Anti-fraud + buddy-punching prevention — biometric + RFID hybrids",
+      "bullets": [
+        "Buddy punching — co-worker swipes a colleague's card to clock them in while they're absent. American Payroll Association estimates buddy punching costs employers ~$373B annually (2.2% of total US payroll). Common in retail, food service, manufacturing, healthcare, education.",
+        "RFID alone — moderate deterrent; well-supervised RFID terminal in plain sight discourages but doesn't prevent. Best for low-stakes office environments.",
+        "RFID + photo capture — terminal includes camera; clock event records still photo + timestamp; supervisor reviews exception. Suprema BioStation + ZKTeco SpeedFace + Anviz FaceDeep + Lathem PayClock all support photo-capture mode.",
+        "RFID + PIN — two-factor; cardholder enters 4-6 digit PIN after RFID swipe. Reduces fraud but adds 2-3 seconds per clock event (queue impact in high-volume).",
+        "RFID + fingerprint (1:1) — most common second factor; cardholder swipes RFID then places finger; reader verifies fingerprint matches template stored on card or central server. Suprema BioStation 2 + ZKTeco MultiBio700 + Anviz FacePass + Hikvision DS-K1T607 all support.",
+        "RFID + face recognition (1:1) — emerging alternative to fingerprint, particularly for healthcare + clean-room environments where finger contact is restricted; Hikvision DS-K1T6T + Suprema FaceStation 2 + Anviz FaceDeep 5 + Realand A-F011 are typical hardware.",
+        "RFID + iris (1:1) — highest security but slower scan + higher hardware cost; used in pharma + nuclear + classified environments. IrisGuard + Iris ID + EyeLock OEM into specialised terminals.",
+        "RFID + GPS / geofence — for field workers + construction; mobile app + BLE / NFC tap + GPS coordinate validation against jobsite geofence; Buildertrend + ConnectTeam + Procore + Tsheets (now QuickBooks Time) all support.",
+        "BIPA compliance (Illinois Biometric Information Privacy Act) — written informed consent + data retention policy + secure storage + destruction schedule required for any biometric template; large class-action settlements ($228M Facebook 2020, $92M TikTok 2021, $50M+ Six Flags 2019). Many employers in Illinois + Texas + Washington avoid biometric attendance for legal-risk reasons; RFID-only fallback common.",
+        "Liveness detection — face-recognition terminals increasingly include 3D depth-sensing (Suprema FaceStation 2 IR+RGB, Hikvision DS-K1T6T) to defeat photo-replay attacks; iris cameras inherently liveness-detecting.",
+        "Audit trail — modern attendance platforms maintain immutable event log with timestamp + terminal ID + cardholder ID + verification method + exception flag — admissible in wage-and-hour litigation under FLSA + state law."
+      ]
+    },
+    {
+      "title": "Vertical applications — corporate / manufacturing / construction / education / healthcare",
+      "bullets": [
+        "Corporate office — employee badge (MIFARE Plus / DESFire EV3 / Seos) at building entry + suite door + meeting-room booking + time-and-attendance terminal. Single credential for PACS + attendance + cashless vending + secure print. Typical population 500-50,000 per facility; daily clock-in volume 1-2 events per employee.",
+        "Manufacturing + warehouse — rugged epoxy fob or fabric wristband for site entry + shop-floor zone + lunch / break logging + clean-room access. Job-coding capability — employee swipes at machine / workstation to attribute time to specific job number for cost accounting. Common with Plex Smart Manufacturing + Epicor Kinetic + IQMS + JD Edwards EnterpriseOne ERP.",
+        "Construction site — wristband or hardhat-mounted RFID + portal at site gate for OSHA-compliant entry log + safety briefing tracking + worker certification verification (OSHA 10/30, MSHA, NCCER, NCCCO, ACI). Procore + Autodesk Construction Cloud + Tenna + Triax integrations. Major customers: Turner, Skanska, Bechtel, Fluor, Bouygues, Vinci, Strabag.",
+        "Education K-12 — RFID student ID + classroom reader + bus reader + dining hall + library + parent notification. Daily attendance roll-up to SIS (PowerSchool, Infinite Campus, Skyward) + ADA / state attendance reporting + truancy alert. ZPass / Smart Cards / SmartTag dominant vendors for school transportation RFID.",
+        "Education higher ed — student photo ID + class attendance terminal + dormitory door + meal plan + cashless vending + transit + athletic event ticketing. Integration with Banner / Workday Student / PeopleSoft / Jenzabar SIS.",
+        "Healthcare — clinician badge + ward door + medication-room access + time-and-attendance + CMS staffing report. Joint Commission compliance + CMS staffing minimum reporting + HIPAA audit logs. Epic Hyperdrive + Cerner PowerChart + Workday Healthcare integration.",
+        "Hospitality + retail — back-of-house staff swipe + service-zone tracking + tip-pool calculation + manager-override + shift-swap audit. Common with Toast POS + Square POS + Lightspeed + UKG Ready integrations.",
+        "Government + military — PIV / CAC card + FICAM-approved terminal + multi-factor (PIN + PKI-CAK) verification + audit log for federal-employee time reporting per OPM + DCAA + DCMA.",
+        "Events + conferences — wristband + portal at registration + breakout session check-in + CME credit hours auto-tracking (medical conferences) + lead-retrieval scan (trade shows). Cvent + Bizzabo + Aventri (now Stova) platform integrations.",
+        "Fitness + leisure — silicone wristband or membership card + turnstile entry + class attendance + locker + cashless. Mindbody + Zen Planner + ABC Financial + Club Automation backend."
+      ]
+    },
+    {
+      "title": "Reader fleet hardware — ZKTeco / Hikvision / Suprema / Anviz / Honeywell / Lathem",
+      "bullets": [
+        "ZKTeco — Chinese vendor, dominant global SMB + mid-market attendance terminal market share; BioTime + ZKBioCV cloud management. Hardware: SpeedFace-V5L (face + RFID), MultiBio700 (face + finger + RFID), KF160 + KF400 (RFID + finger), Realand A-F011 (face + RFID). Supports MIFARE Classic + DESFire + EM4100 + HID Prox.",
+        "Hikvision — Chinese vendor, dominant in security camera + access control; attendance terminal portfolio: DS-K1T607 + DS-K1T6T + DS-K1T331 (face + finger + RFID). Hik-Central platform for multi-site. NOTE: NDAA Section 889 bars federal procurement + many enterprise customers blacklist.",
+        "Suprema — Korean vendor, premium tier biometric attendance; BioStation 3 (face + finger + RFID + BLE mobile), BioLite N2 (finger + RFID outdoor), BioEntry W2 (finger + RFID). BioStar 2 platform. Tier-1 enterprise + government deployment.",
+        "Anviz — Chinese vendor, global mid-market; AnvizCloud platform. Hardware: FaceDeep 5 + FaceDeep 3 (face + RFID), CrossChex (mobile attendance app), W2 + IRIS-1 (iris + RFID).",
+        "Honeywell — Pro-Watch terminals + IFP readers; common in industrial + commercial + healthcare; tier-1 brand-name premium.",
+        "HID — Signo + multiCLASS SE + OMNIKEY readers — when attendance + PACS share single reader fleet; HID Origo cloud platform.",
+        "Lathem — US specialist time-and-attendance vendor; PayClock terminals (RFID + biometric); strong US SMB + mid-market.",
+        "Acroprint — US specialist; AcroTime terminals; SMB.",
+        "Allegion / Schlage — XE360 + AD-Series terminals when attendance shares PACS + door hardware.",
+        "Mobile attendance — smartphone NFC tap-to-clock + GPS geofence; ConnectTeam + When I Work + Homebase + 7shifts + Buddy Punch + Time Doctor + Hubstaff + Tsheets (QuickBooks Time) + Clockify all support mobile clock-in.",
+        "Tablet attendance — iPad / Android tablet + external NFC reader + cloud platform (Deputy + ConnectTeam + Homebase + 7shifts); $300-$600 per kiosk + monthly SaaS $3-$8 per employee.",
+        "Reader fleet management — Suprema BioStar 2 + ZKTeco BioTime + Hikvision Hik-Central + UKG InTouch DX + ADP TimeKeeper provide centralised multi-site terminal firmware + user-template + reader-health monitoring.",
+        "Power + connectivity — most terminals use PoE+ (802.3at) with 12V backup; cellular fallback (4G/5G) for outdoor + construction site + remote-location applications; offline cache (1,000-50,000 events) so terminal continues operating during network outage."
+      ]
+    },
+    {
+      "title": "Compliance — FLSA / FERPA / COPPA / BIPA / GDPR / state-specific",
+      "bullets": [
+        "FLSA (Fair Labor Standards Act, US, 1938) — establishes minimum wage + overtime + recordkeeping; employers must maintain accurate hours-worked records for 2-3 years. RFID attendance log directly satisfies FLSA Section 11(c) recordkeeping requirements.",
+        "FLSA hours-worked definition — DOL clarifies that 'rounding' to nearest 15-minute increment is permissible if neutral over time; many class-action wage-and-hour cases (Wal-Mart, Marriott, McDonald's franchisees) settled on rounding-against-employee patterns — RFID attendance with precise timestamp resolves disputes.",
+        "FLSA 'continuous workday' doctrine — once an employee is on the clock, all activities until off the clock are compensable; RFID terminal at meal-break entry + exit allows automated unpaid-meal-break treatment per state law.",
+        "PAGA (Private Attorneys General Act, California) — California-specific cause of action for wage-and-hour violations; recent settlements (Activision $54M, Tesla $137M, Walmart $69M) underscore audit-grade attendance records value.",
+        "BIPA (Illinois Biometric Information Privacy Act, 2008) — informed written consent + data retention policy + secure storage + destruction schedule required for biometric templates. Class-action settlements: Facebook $650M (2020), TikTok $92M (2021), Six Flags $36M (2019), White Castle settled 2024. Texas + Washington + NY + multiple cities have similar laws.",
+        "FERPA (Family Educational Rights and Privacy Act, US, 1974) — protects student education records including attendance; written parental consent required to share with third parties; education attendance system providers sign FERPA-compliant DPA with district.",
+        "COPPA (Children's Online Privacy Protection Act, US, 1998) — applies to under-13 student data; verifiable parental consent required for collection beyond minimum necessary; impacts K-5 attendance systems.",
+        "GDPR (EU, 2018) — Articles 6 + 9 lawful basis; biometric attendance data is special-category requiring explicit consent or employment-law justification; employer must conduct Data Protection Impact Assessment (DPIA) under Art. 35 before deploying biometric attendance; data minimisation + storage limitation principles apply.",
+        "GDPR Article 22 — automated decision-making restrictions; attendance terminals making automated termination / discipline decisions trigger meaningful human review requirement.",
+        "UK GDPR + DPA 2018 — equivalent UK framework post-Brexit; ICO has published specific guidance on workplace monitoring restricting biometric attendance to high-security exceptions only.",
+        "California CCPA / CPRA — disclosure + opt-out rights apply to employee attendance data; California Labor Code Section 432 restricts polygraph + similar tests, narrowed for biometric attendance.",
+        "Healthcare HIPAA — clinician attendance + role assignment ties into PHI access auditing; covered entity must maintain attendance records linkable to PHI access events.",
+        "Federal contracts FAR + DCAA — federal contractors must maintain DCAA-compliant time records with daily certification by employee; RFID attendance with employee daily-self-certification (digital signature on weekly timesheet) satisfies DCAA requirements.",
+        "OSHA recordkeeping (29 CFR 1904) — workplace injury records tie back to attendance records; RFID-based site-entry log essential for accurate injury-incidence reporting.",
+        "EU AI Act 2024 — biometric attendance systems in employment classified as high-risk under Annex III; conformity assessment + CE-marking + fundamental-rights impact assessment + transparency to workers required from 2026."
+      ]
+    },
+    {
+      "title": "Programme economics + cloud-fleet TCO + procurement levers",
+      "bullets": [
+        "Credential unit cost (10K+ qty): EM4100 LF card $0.40-$0.80; MIFARE Classic 1K $0.80-$1.20; MIFARE Plus SE $1.50-$2.50; DESFire EV3 $2.80-$5.50; Seos $3.50-$8.00; NTAG 213/215 $0.20-$0.50 (wristband + sticker form); UHF EPC Gen2 wristband $0.30-$0.80.",
+        "Form-factor premium: printable employee badge with photo + DESFire chip $4-$8; key fob $1.50-$4; silicone wristband $0.80-$2.50; rugged epoxy fob (construction) $2-$5.",
+        "Terminal hardware (per device): basic RFID terminal (ZKTeco KF160 / Anviz FacePass 7 / Realand A-F011) $150-$350; biometric + RFID (Suprema BioStation 2 / Hikvision DS-K1T6T / ZKTeco SpeedFace V5L) $400-$1,200; premium tier (Suprema FaceStation 2 / HID Signo Bio / Honeywell IFP) $1,500-$3,500; iris reader $2,500-$8,000.",
+        "Multi-site cloud platform: UKG Pro $8-$15 per employee per month all-in; ADP Workforce Now $4-$12; Workday HCM $20-$45; Ceridian Dayforce $6-$15; Paychex Flex $4-$10; SMB cloud (Homebase, ConnectTeam, Deputy, 7shifts, Tsheets/QuickBooks Time) $3-$8.",
+        "Installation cost: $150-$400 per terminal (existing wiring) or $400-$900 per terminal (new conduit + cabling); add $80-$200 for cellular failover + UPS battery backup.",
+        "Year-1 typical SMB (50 employees, 3 sites): 50 employees × $4 MIFARE Classic = $200 credentials; 3 terminals × $400 = $1,200; install $1,200; UKG Ready cloud at $5/employee/month × 12 = $3,000 Y1; integration setup $1,500. Total Y1 ~$7,100, ~$142/employee.",
+        "Year-1 typical mid-market (1,000 employees, 25 sites): 1,000 employees × $4 = $4K credentials; 50 terminals × $600 = $30K; install $15K; UKG Pro at $10/employee/month × 12 = $120K Y1; integration services $50K. Total Y1 ~$219K, ~$219/employee.",
+        "Year-1 typical enterprise (10,000 employees, 200 sites): 10K × $5 (DESFire) = $50K credentials; 400 terminals × $1K = $400K; install $200K; Workday HCM + Time Tracking at $30/employee/month × 12 = $3.6M Y1; integration + change management $300K. Total Y1 ~$4.55M, ~$455/employee.",
+        "Recurring (Y2+): cloud platform fees dominate; credential replacement 8-15% annual; terminal hardware refresh 7-10 year cycle; firmware OTA + reader-health monitoring included in platform fee.",
+        "Buddy-punching savings — at 2.2% American Payroll Association estimate × payroll = significant on any sizeable workforce. Conservative 50% recovery of estimated buddy-punching loss typically recovers programme cost within 6-12 months.",
+        "Procurement leverage — SKU consolidation (3-5 strategic chip + form-factor combos covering 90% of population) yields 15-25% unit-price improvement; multi-year platform contract 10-20% discount; pre-personalised encoding (delivered ready-to-issue with photo + facility code + employee ID) saves $0.50-$2/credential vs on-site encoding; terminal fleet standardisation reduces field-service cost 20-30%.",
+        "Compliance avoidance value — FLSA class-action settlements routinely $1M-$100M; PAGA + BIPA + state-specific actions add tens of millions; OSHA + HIPAA + FERPA + GDPR fines compound quickly; audit-grade RFID attendance records sharply reduce exposure."
+      ]
     }
   ],
   "resourceCards": [
@@ -344,6 +463,18 @@
     {
       "question": "What FERPA / COPPA / GDPR implications apply to school attendance systems?",
       "answer": "FERPA (US student-record privacy) requires attendance data be retained per district / state policy and disclosed only to authorised parties. COPPA (US under-13 privacy) requires parental consent for any data collection on under-13 students; tap-attendance generally falls under educational-purpose exception but data minimisation still applies. GDPR (EU) requires lawful-basis for student data and consent for any non-essential processing. Most attendance platforms (Frontline, PowerSchool, Skyward) are FERPA / COPPA / GDPR compliant out of the box, but configuration matters for retention periods + parental access portals."
+    },
+    {
+      "question": "Should we add biometric (face / finger / iris) on top of RFID, and what's the BIPA risk?",
+      "answer": "Biometric + RFID is the strongest defence against buddy punching, but the legal risk varies sharply by location. BIPA (Illinois Biometric Information Privacy Act) requires written informed consent + retention policy + secure storage + destruction schedule for any biometric template, with class-action settlements running into the hundreds of millions (Facebook $650M 2020, TikTok $92M 2021, Six Flags $36M 2019). Texas, Washington, NY and several cities have similar laws. EU GDPR Article 9 classifies biometric as special-category requiring DPIA + explicit consent or employment-law justification. UK ICO has issued specific guidance restricting workplace biometric monitoring. EU AI Act 2024 classifies employment biometric attendance as high-risk under Annex III, requiring conformity assessment from 2026. Practical approach: deploy biometric only where buddy-punching savings clearly outweigh legal risk (high-wage manufacturing, healthcare, federal contracts under DCAA); fall back to RFID + photo capture + manager review for general office + retail + education."
+    },
+    {
+      "question": "How does RFID attendance support FLSA + PAGA + state wage-and-hour compliance?",
+      "answer": "FLSA (Fair Labor Standards Act, 1938) requires employers maintain accurate hours-worked records for 2-3 years; RFID attendance log directly satisfies Section 11(c) recordkeeping. The 'continuous workday' doctrine means once an employee is on the clock, all activities until off the clock are compensable — RFID at meal-break entry/exit enables automated unpaid-meal-break treatment per state law. California PAGA (Private Attorneys General Act) and the rounding-against-employee class actions (Walmart, Marriott, McDonald's franchisees) underscore that precise RFID timestamps (vs paper or honor-system records) reduce wage-and-hour litigation exposure substantially. DCAA-compliant federal-contractor time records require daily certification by employee; RFID attendance with digital signature on weekly timesheet satisfies. Recommended retention: 4+ years of timestamped event log + immutable audit trail."
+    },
+    {
+      "question": "Can we do RFID attendance for remote / hybrid / field workers?",
+      "answer": "Yes — three patterns work. (1) Mobile NFC tap-to-clock: employee taps phone on NFC sticker at home office desk or at client site to record clock-in/out; ConnectTeam, When I Work, Homebase, 7shifts, Buddy Punch, Time Doctor, Hubstaff, Tsheets (QuickBooks Time), Clockify all support. (2) Mobile app + GPS geofence: employee opens app, clocks in; app validates GPS coordinate against jobsite geofence; Buildertrend, ConnectTeam, Procore, ServiceTitan all support. (3) RFID wristband / fob + portable tablet kiosk: 4G-connected tablet at jobsite trailer accepts RFID + face/finger biometric; sync to cloud when connection available; common at construction (Turner, Skanska, Bechtel deployments). All three support FLSA-compliant audit trail. Hybrid offices: combine on-site fixed terminal with remote-app option per employee role."
     }
   ],
   "sources": [
@@ -426,6 +557,94 @@
       "publishedAt": "2024",
       "accessedAt": "2026-04-26",
       "note": "Dominant SMB / mid-market attendance reader vendor with integrated cloud / on-prem fleet management + RFID + biometric multimodal."
+    },
+    {
+      "label": "Illinois Biometric Information Privacy Act (BIPA, 740 ILCS 14)",
+      "url": "https://www.ilga.gov/legislation/ilcs/ilcs3.asp?ActID=3004",
+      "publisher": "Illinois General Assembly",
+      "publishedAt": "2008-10",
+      "accessedAt": "2026-04-26",
+      "note": "Illinois biometric template informed-consent + retention + secure-storage requirement; class-action settlements exceed $1B aggregate; major constraint on workplace biometric attendance."
+    },
+    {
+      "label": "American Payroll Association — buddy punching impact study",
+      "url": "https://www.americanpayroll.org/",
+      "publisher": "American Payroll Association",
+      "publishedAt": "2023",
+      "accessedAt": "2026-04-26",
+      "note": "Cites ~$373B annual employer cost from buddy punching (~2.2% of US payroll); foundational economic case for RFID + biometric attendance investments."
+    },
+    {
+      "label": "UKG Pro Workforce Management (formerly Kronos + UKG Dimensions)",
+      "url": "https://www.ukg.com/solutions/workforce-management",
+      "publisher": "UKG Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Dominant enterprise time-and-attendance platform; native RFID terminal integration via UKG InTouch DX + Touch ID terminals."
+    },
+    {
+      "label": "ADP Workforce Now + Vantage HCM",
+      "url": "https://www.adp.com/what-we-offer/products/workforce-now.aspx",
+      "publisher": "ADP, LLC",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Second-largest US employer payroll platform; RFID terminal integration via ADP Time & Attendance module."
+    },
+    {
+      "label": "Workday HCM + Workday Time Tracking",
+      "url": "https://www.workday.com/en-us/products/human-capital-management/time-tracking.html",
+      "publisher": "Workday, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Modern cloud HCM common in tier-1 enterprise; RFID terminal integration via Workday Connector + middleware."
+    },
+    {
+      "label": "Suprema BioStar 2 — biometric + RFID attendance platform",
+      "url": "https://www.supremainc.com/en/platform/biostar-2.asp",
+      "publisher": "Suprema, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Korean premium-tier biometric attendance platform; BioStation 3 + FaceStation 2 hardware combining face + finger + RFID + BLE mobile."
+    },
+    {
+      "label": "PowerSchool SIS — K-12 attendance integration",
+      "url": "https://www.powerschool.com/solutions/sis-system/",
+      "publisher": "PowerSchool Group LLC",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Dominant K-12 student information system; RFID attendance terminal integration via SIF + REST API for daily attendance + parent notification."
+    },
+    {
+      "label": "Procore Construction Management",
+      "url": "https://www.procore.com/",
+      "publisher": "Procore Technologies",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Dominant construction management platform; RFID + GPS-paired site attendance for OSHA + DOL compliance + project-cost-coding."
+    },
+    {
+      "label": "EU AI Act (Regulation 2024/1689) — high-risk biometric employment",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "publisher": "Publications Office of the European Union",
+      "publishedAt": "2024-06",
+      "accessedAt": "2026-04-26",
+      "note": "Classifies biometric attendance in employment as high-risk under Annex III; conformity assessment + CE-marking + fundamental-rights impact assessment + worker transparency required from 2026."
+    },
+    {
+      "label": "DCAA — Federal contractor time-keeping compliance",
+      "url": "https://www.dcaa.mil/",
+      "publisher": "Defense Contract Audit Agency",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Federal contractor daily-self-certification time-recording requirement; RFID attendance + employee weekly digital signature satisfies."
+    },
+    {
+      "label": "ICO (UK) — Workplace monitoring biometric guidance",
+      "url": "https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment-information/monitoring-workers/",
+      "publisher": "UK Information Commissioner's Office",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "UK regulator guidance restricting workplace biometric monitoring to high-security exceptions; recommends RFID-only for general attendance."
     }
   ],
   "primaryAction": {
@@ -444,5 +663,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-26"
+  "reviewedAt": "2026-05-11"
 }

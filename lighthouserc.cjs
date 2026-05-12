@@ -7,7 +7,7 @@
  *
  * Run via: npm run lh:baseline (after `npm install --save-dev @lhci/cli`).
  *
- * Static-dist mode: LHCI spins its own server against ./dist-restored
+ * Static-dist mode: LHCI spins its own server against ./dist
  * (matches astro.config.mjs `outDir`). Build must succeed first; the
  * npm script chains them.
  *
@@ -18,7 +18,7 @@
 module.exports = {
   ci: {
     collect: {
-      staticDistDir: "./dist-restored",
+      staticDistDir: "./dist",
       // Trailing slashes match astro.config.mjs `trailingSlash: "always"`.
       url: [
         "http://localhost/",

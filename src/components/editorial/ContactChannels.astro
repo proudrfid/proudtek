@@ -1,0 +1,89 @@
+---
+/**
+ * Contact channels grid — email / phone / WhatsApp / form quad on
+ * contact-group editorial pages.
+ *
+ * Shadow component (Stage 2 optimization). Mirrors `renderContactChannels`
+ * in editorial-pages.ts (~line 2278).
+ *
+ * Phone / WhatsApp numbers are kept in lockstep with the global Contact page
+ * and footer. Email body uses the same project-brief template the TS path
+ * generates. Icons are inline SVG (stroke-based, 20×20 inside the 40px
+ * circular badge).
+ */
+import type { EditorialDefinition } from "../../lib/editorial-types";
+
+interface Props {
+  definition: EditorialDefinition;
+}
+
+const { definition } = Astro.props;
+
+const mailtoFromPrimary =
+  definition.primaryAction &&
+  typeof definition.primaryAction.href === "string" &&
+  definition.primaryAction.href.toLowerCase().startsWith("mailto:")
+    ? definition.primaryAction.href
+    : null;
+
+const fallbackSubject = encodeURIComponent(`Inquiry: ${definition.title}`);
+const fallbackBody = encodeURIComponent(
+  `Hi Proud Tek,\n\nI'm reaching out via the ${definition.kicker} contact route about: ${definition.title}\n\nProject details:\n- Application:\n- Chip / frequency requirement:\n- Quantity:\n- Target date:\n\nThanks`,
+);
+const mailtoHref = mailtoFromPrimary ?? `mailto:info@proudtek.com?subject=${fallbackSubject}&body=${fallbackBody}`;
+
+const phoneDisplay = "+86 186 6582 0632";
+const phoneHref = "tel:+8618665820632";
+const whatsappHref = "https://wa.me/8618665820632";
+
+const kickerLower = definition.kicker.toLowerCase();
+---
+<section class="codex-editorial-channels" aria-label={`How to contact us about ${definition.kicker}`}>
+  <div class="codex-editorial-channels__head">
+    <p class="codex-editorial-kicker">How to reach us</p>
+    <h2>Three ways to start this {kickerLower} conversation</h2>
+    <p class="codex-editorial-channels__lede">Pick whichever channel fits your team. Email opens with the recommended subject and project checklist already filled in for this route.</p>
+  </div>
+  <div class="codex-editorial-channels__grid">
+    <a class="codex-editorial-channel" href={mailtoHref}>
+      <span class="codex-editorial-channel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" /></svg>
+      </span>
+      <span class="codex-editorial-channel__body">
+        <span class="codex-editorial-channel__label">Email</span>
+        <span class="codex-editorial-channel__value">info@proudtek.com</span>
+        <span class="codex-editorial-channel__hint">Opens prefilled with the {kickerLower} brief <span aria-hidden="true">→</span></span>
+      </span>
+    </a>
+    <a class="codex-editorial-channel" href={phoneHref}>
+      <span class="codex-editorial-channel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92Z" /></svg>
+      </span>
+      <span class="codex-editorial-channel__body">
+        <span class="codex-editorial-channel__label">Phone</span>
+        <span class="codex-editorial-channel__value">{phoneDisplay}</span>
+        <span class="codex-editorial-channel__hint">Mon–Fri, 9:00–18:00 (UTC+8)</span>
+      </span>
+    </a>
+    <a class="codex-editorial-channel" href={whatsappHref} target="_blank" rel="noopener">
+      <span class="codex-editorial-channel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 1 1-3.86-7.13L21 3l-1.37 3.86A8.46 8.46 0 0 1 21 11.5Z" /><path d="M8.5 9.5c.5 2 2 3.5 4 4l1-1c.4-.4 1-.5 1.5-.3l1.5.6c.3.13.5.43.5.77V15a1 1 0 0 1-1 1c-4.42 0-8-3.58-8-8a1 1 0 0 1 1-1h.43c.34 0 .64.2.77.5l.6 1.5c.2.5.1 1.1-.3 1.5l-1 1Z" /></svg>
+      </span>
+      <span class="codex-editorial-channel__body">
+        <span class="codex-editorial-channel__label">WhatsApp</span>
+        <span class="codex-editorial-channel__value">{phoneDisplay}</span>
+        <span class="codex-editorial-channel__hint">Fastest for quick spec checks</span>
+      </span>
+    </a>
+    <a class="codex-editorial-channel codex-editorial-channel--alt" href="/contact/">
+      <span class="codex-editorial-channel__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+      </span>
+      <span class="codex-editorial-channel__body">
+        <span class="codex-editorial-channel__label">Contact form</span>
+        <span class="codex-editorial-channel__value">Send a structured brief</span>
+        <span class="codex-editorial-channel__hint">Use the main form on /contact/ <span aria-hidden="true">→</span></span>
+      </span>
+    </a>
+  </div>
+</section>

@@ -89,20 +89,20 @@
       }
     },
     {
-      "title": "NFC tag selection for DPP applications",
+      "title": "Where are NFC tag selection for DPP used?",
       "intro": "The NFC tag embedded in a DPP-compliant product must survive the product's expected lifetime, resist tampering and provide cryptographic authentication to prevent counterfeit passports.",
       "bullets": [
-        "NTAG 424 DNA (NXP) is purpose-built for DPP and authentication applications. It generates a unique, one-time authentication code (SUN message) on every tap, verifiable by the cloud backend.",
+        "[NTAG 424 DNA](/guides/ntag424-dna-sun-cmac-authentication/) (NXP) is purpose-built for DPP and authentication applications. It generates a unique, one-time authentication code (SUN message) on every tap, verifiable by the cloud backend.",
         "NTAG 213/215/216 are suitable for basic DPP implementations where the tag serves as a simple URL carrier without on-tag cryptographic authentication.",
         "Textile DPP tags must survive industrial washing (60 °C+), dry cleaning solvents and mechanical agitation. RFID laundry tags or sewn-in NFC labels are required.",
         "For electronics and batteries, NFC tags can be embedded under the product label or in the packaging, where they are protected from mechanical damage."
       ]
     },
     {
-      "title": "Data architecture and standards",
+      "title": "How do data architecture and standards work?",
       "intro": "A DPP is not a monolithic data file on the tag. It is a distributed data architecture with the NFC tag providing a resolvable link to a cloud-hosted data record.",
       "paragraphs": [
-        "The GS1 Digital Link standard provides the URI structure for DPP identifiers: a product GTIN (Global Trade Item Number) combined with a serial number, encoded as a URL that resolves to the product's DPP data endpoint. The NFC tag stores this GS1 Digital Link URL as an NDEF URI record. When tapped, the smartphone browser resolves the URL to the manufacturer's DPP data repository or a neutral registry."
+        "The GS1 Digital Link standard provides the URI structure for DPP identifiers: a product GTIN (Global Trade Item Number) combined with a serial number, encoded as a URL that resolves to the product's DPP data endpoint. The NFC tag stores this GS1 Digital Link URL as an [NDEF](/guides/nfc-ndef-format-explained/) URI record. When tapped, the smartphone browser resolves the URL to the manufacturer's DPP data repository or a neutral registry."
       ],
       "bullets": [
         "GS1 Digital Link format: https://id.gs1.org/01/{GTIN}/21/{serial} — resolvable to product-specific data via GS1 Resolver infrastructure.",
@@ -112,13 +112,35 @@
       ]
     },
     {
-      "title": "Implementation roadmap for B2B manufacturers",
+      "title": "What's the implementation roadmap for B2B manufacturers?",
       "intro": "Manufacturers should begin DPP preparation now, even before delegated acts are finalized, to avoid last-minute compliance scrambles that increase cost and risk.",
       "bullets": [
         "Phase 1 (now): Audit product-data availability. Identify gaps in material composition, supplier origin, carbon-footprint and recyclability data.",
         "Phase 2 (6–12 months before mandate): Select NFC tag hardware, establish GS1 Digital Link identifiers and build or procure the cloud DPP data repository.",
         "Phase 3 (3–6 months before mandate): Integrate NFC tag encoding into production lines, pilot with a single product category and validate consumer tap experience.",
         "Phase 4 (go-live): Scale to all mandated product categories, train supply-chain partners on source-tagging requirements and establish ongoing data-maintenance workflows."
+      ]
+    },
+    {
+      "title": "What does the ESPR delegated-act timeline actually look like?",
+      "intro": "ESPR Regulation (EU) 2024/1781 entered into force in July 2024 as a framework — not a single compliance date. Each product category receives its own delegated act and 18+ month transition period. The Commission published the ESPR Working Plan 2025-2030 on 16 April 2025, which set the order in which categories will receive delegated acts.",
+      "bullets": [
+        "By 19 July 2026 the Commission must stand up the EU DPP digital registry that stores the unique identifiers — that infrastructure deadline is on track even when product-specific deadlines slip. Brand-side DPP backends should be designed to interoperate with this registry from day one.",
+        "Battery passports go live first: from 18 February 2027, EV batteries, industrial batteries above 2 kWh, and LMT (light means of transport, e.g., e-bike) batteries on the EU market must carry a DPP retrievable via QR — under Regulation (EU) 2023/1542. The Commission's battery due-diligence guidelines are expected by 26 July 2026.",
+        "ESPR product-specific delegated acts: iron and steel adoption expected 2026 (the first ESPR product act), textiles 2027 (compliance ~late 2028 / 2029), furniture 2028, electronics 2028-2029. The first delegated acts have already slipped 6-9 months from the originally planned late-2025 dates.",
+        "Adjacent regulations create overlapping obligations: the revised Detergents Regulation (EU) 2025/411 (Council approval December 2025) and the Toy Safety Regulation (EU) 2025/279 (application from August 2030) both add DPP-style passports outside ESPR. End-of-Life Vehicles Regulation, Critical Raw Materials Act and revised Construction Products Regulation each add their own product-passport obligations.",
+        "CEN/CENELEC harmonised standards under European Commission Standardisation Request M/616 (2024) are scheduled to land March 2026 — these will dictate DPP data model interoperability, so brands shouldn't lock proprietary schemas before then."
+      ]
+    },
+    {
+      "title": "Which NFC chip and encoding choices stay future-proof through the ESPR rollout?",
+      "intro": "Because compliance dates land in 2027-2030 but tags ordered today must survive 5-10+ year product lifecycles, the chip + encoding decisions made in 2026 carry direct cost and re-tag risk if you under-spec.",
+      "bullets": [
+        "Default to NTAG 424 DNA (or DESFire EV3 for higher security) for any product likely to fall under ESPR or sectoral DPP. Plain NTAG213/215/216 work for low-risk categories, but their lack of cryptographic SUN/CMAC authentication exposes brands to counterfeit-DPP attacks once enforcement scales.",
+        "Specify GS1 Digital Link 1.4.x grammar at encoding time: `https://id.gs1.org/01/{GTIN}/21/{serial}` (or your brand-controlled resolver). One URL covers product info, anti-counterfeit landing page and DPP — and aligns with GS1 EU DPP guidance.",
+        "Plan EPCIS 2.0 event emission from manufacturing, customs handover and repair events. EPCIS 2.0 is JSON-LD native and is rapidly becoming the de facto event schema for DPP supply-chain data in EU pilots.",
+        "Pick tamper-evident form factors (NTAG 424 DNA TT) for categories where a substituted chip on a counterfeit shell would be valuable to attackers — luxury, electronics, high-value batteries.",
+        "Validate persistence: ESPR Article 9 requires the data carrier to remain accessible for the product's expected lifetime. For textiles that means surviving 60 °C+ industrial wash and dry-cleaning solvents (sewn-in NFC laundry tags); for electronics and batteries that means under-label or in-mould placement that survives normal handling and end-of-life recovery."
       ]
     }
   ],
@@ -144,6 +166,16 @@
         {
           "href": "/product/nfc-stickers/",
           "label": "NFC authentication stickers"
+        },
+        {
+          "href": "https://eur-lex.europa.eu/eli/reg/2024/1781/oj/eng",
+          "label": "ESPR Regulation (EU) 2024/1781 (EUR-Lex)",
+          "description": "Authoritative full text of the Ecodesign for Sustainable Products Regulation."
+        },
+        {
+          "href": "https://www.gs1.org/standards/gs1-digital-link",
+          "label": "GS1 Digital Link standard",
+          "description": "URL grammar that pairs GTIN + serial number for DPP-friendly NFC encoding."
         }
       ]
     }
@@ -164,10 +196,18 @@
     {
       "question": "What data must a Digital Product Passport contain?",
       "answer": "Required data elements vary by product category and are defined in delegated acts. Common elements include: product identification (GTIN + serial), material composition, country of manufacturing, carbon footprint, repairability score, hazardous substance declarations, recycling instructions and warranty information."
+    },
+    {
+      "question": "Which product categories receive ESPR delegated acts first, and when?",
+      "answer": "Per the ESPR Working Plan 2025-2030 (adopted 16 April 2025): iron and steel is the first product-specific delegated act expected in 2026. Textiles follow in 2027 (compliance ~late 2028 to 2029). Furniture is targeted for 2028 (compliance 2029-2030). Electronics is expected 2028-2029 (compliance 2029-2030). Mattresses, mobile phones and construction materials follow in 2029-2030+. Note that the first ESPR delegated acts have already slipped 6-9 months from the originally planned late-2025 dates — treat published timelines as moving targets and budget for an 18+ month implementation runway regardless of your specific deadline."
+    },
+    {
+      "question": "How does the EU Battery Regulation 2023/1542 differ from ESPR-driven DPPs?",
+      "answer": "The Battery Regulation is technically separate from ESPR and pre-dates the ESPR Working Plan, but it serves as the template that ESPR delegated acts will follow. Key differences: (1) the Battery passport is mandatory from 18 February 2027 for EV, ≥2 kWh industrial and LMT (e-bike, e-scooter) batteries — earlier than any ESPR product category; (2) it explicitly requires QR as the data carrier (NFC and RFID are also permitted but QR is the named default); (3) required data includes state-of-health metrics, cobalt and lithium sourcing, and end-of-life handling instructions specific to electrochemistry. Brands subject to both the Battery Regulation and a future ESPR delegated act will typically use one shared data backend, with one tag per product carrying the GS1 Digital Link URL that resolves into the appropriate passport view."
     }
   ],
   "primaryAction": {
-    "href": "/contact/dpp-nfc/",
+    "href": "/contact/nfc-branding-cards/",
     "label": "Plan your DPP implementation"
   },
   "secondaryActions": [
@@ -182,5 +222,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-03-28"
+  "reviewedAt": "2026-05-09"
 }

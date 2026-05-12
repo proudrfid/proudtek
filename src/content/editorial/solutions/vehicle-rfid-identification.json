@@ -280,6 +280,67 @@
           }
         ]
       }
+    },
+    {
+      "title": "RFID vs ALPR — when each technology wins",
+      "bullets": [
+        "Accuracy — RFID 99%+ first-read at properly tuned portal regardless of conditions; ALPR 80-95% in good light + clean plate, degrades to 60-80% in rain / snow / dust / glare / dirty plates / plate cover / oblique angle.",
+        "Speed — RFID reads in <50 ms at any lane speed up to 120 km/h (highway tolling); ALPR requires camera trigger + OCR processing 200-800 ms.",
+        "Foreign + non-standard plates — RFID indifferent; ALPR struggles with foreign-script (Arabic, Chinese), motorcycle plates, dealer plates, oversize/historic plates.",
+        "Privacy — RFID encodes UID only by design (privacy-friendly + GDPR-compatible with proper data-minimisation); ALPR captures unfiltered images that may include incidental personal info (driver, passengers, contents visible through windshield); requires data-protection impact assessment under GDPR Art. 35.",
+        "Cost per lane — ALPR camera + processor + lighting $8K-$25K per lane; RFID portal + reader + antennas $5K-$15K per lane.",
+        "Pre-registration — RFID requires credential issuance + tag mounting (cost + workflow); ALPR captures any vehicle without registration.",
+        "Enforcement — ALPR catches every plate (revenue-protection + scofflaw); RFID catches credentialed only.",
+        "Combined ALPR + RFID is the dominant 2024-2026 pattern at hybrid lanes — RFID for known + credentialed vehicles (fleet, employee, season-pass, residents) and ALPR for exception-handling + revenue-protection (visitors, missing-tag fallback, enforcement). Cost typically $15K-$30K per lane combined.",
+        "Vendor reality — RFID readers: TransCore Encompass / ELYO, Kapsch IRT/IRC, Q-Free, Sirit, Neology, Impinj R700 with 6C decode. ALPR cameras: Genetec AutoVu, Vigilant LEARN (Motorola), Rekor, Flock Safety, NDI Recognition Systems, Tattile.",
+        "Hybrid integration — Genetec Synergis + AutoVu unifies access control + ALPR + RFID into single platform with single-pane-of-glass for parking + campus + community.",
+        "Privacy regulation trends — Illinois Biometric Information Privacy Act (BIPA), California Consumer Privacy Act (CCPA), GDPR push toward RFID over ALPR where the use case allows; EU AI Act 2024 classifies real-time biometric ALPR as high-risk + restricted."
+      ]
+    },
+    {
+      "title": "Yard management system integration — Manhattan / Blue Yonder / SAP / Oracle / Körber",
+      "bullets": [
+        "Manhattan Active YMS — cloud-native, dominant tier-1 retail + 3PL deployment; replaces legacy SCALE YMS; native EPCIS 2.0 + REST API integration. Native portal-reader integration via Manhattan EOM (Equipment Operations Manager); supports dock-door + cross-dock + gate + yard-jockey workflows.",
+        "Blue Yonder Luminate Yard Management — formerly JDA YMS; tier-1 retail + 3PL + manufacturing; integrates with Luminate WMS + TMS; EPCIS 2.0 event consumption via Yard Sensor Suite.",
+        "SAP Yard Logistics + SAP EWM — for SAP-stack customers; tightly integrated with SAP TM (Transport Management) + EWM (Extended Warehouse Management); supports yard-task management + dock-door allocation + trailer-arrival forecasting.",
+        "Oracle WMS Cloud + Yard Management — Oracle Fusion SCM module; common in oil + gas + chemical + retail Oracle-stack deployments.",
+        "Körber K.Motion Yard Management — global tier-1 mid-large 3PL; cloud + on-prem options; multi-language + multi-currency for global rollouts.",
+        "Specialist YMS — PINC (North American specialist, AI-driven yard optimisation), C3 Solutions (cloud-native, mid-market), Yardmaster + Yardmaster Pro (mid-market), Cargobase, OneRail.",
+        "Yard portal reader — Impinj R700 (4-port) or Zebra FX9600 (4-port high power) with Times-7 SlimLine A5530 / Laird S9028PCR antennas; 2-pole frame at 3.0-3.6 m wide × 3.0 m tall; achieves 99%+ first-read on properly tagged windshield + chassis.",
+        "Middleware translation — Impinj ItemSense, Zebra Savanna, Pyramid Solutions Mosaic, RFID4U Streams, Smartrac TagCentric translate EPC stream into YMS-native message format.",
+        "Fleet telematics pairing — Geotab, Samsara, Verizon Connect, Trimble TMW, Omnitracs, Motive (formerly KeepTruckin) pair RFID EPC with telematics ID + VIN + plate + driver ID for cradle-to-grave traceability.",
+        "Workflow patterns — arriving (gate portal fires ObjectEvent bizStep=arriving disposition=in_progress) → check-in (yard-jockey assignment) → spotting (dock-door portal fires AggregationEvent for trailer-to-door) → loading (WMS event) → departure (gate portal fires ObjectEvent bizStep=departing disposition=in_transit)."
+      ]
+    },
+    {
+      "title": "6C tolling deep-dive — IBTTA / TransCore / Kapsch / private operators",
+      "bullets": [
+        "6C = ISO/IEC 18000-63:2015 RAIN RFID EPC Gen2v2 UHF 860-960 MHz air-interface, also called Gen2v2 or RAIN. The international interoperability standard for tolling + parking + yard.",
+        "IBTTA (International Bridge, Tunnel and Turnpike Association) maintains 6C as the recommended common protocol for new tolling deployments; published 6C Toll Operations Committee guidance + interoperability test framework.",
+        "US public toll history — E-ZPass (Northeast 17 states + DC + 7-zone Northeast Corridor, largest US interoperable network), I-Pass (Illinois), ezTAG (Houston METRO + Harris County), SunPass (Florida), Peach Pass (Georgia), FasTrak (California Bay Area + Caltrans), Good to Go! (Washington State + Oregon), TxTag (Texas + DFW), ExpressToll (Colorado), TollTag (Dallas NTTA).",
+        "Public toll radios — historically proprietary IAG TDM (Inter-Agency Group, used by E-ZPass) at 915 MHz, 5.9 GHz DSRC (Dedicated Short Range Communications), or Mark IV TransCore eGo (915 MHz proprietary). FCC reallocated 5.9 GHz partially to Wi-Fi 6E in 2020 — accelerating tolling-industry migration to 6C.",
+        "Major reader OEMs — TransCore Encompass 4 / 6 / ELYO (US market leader), Kapsch TrafficCom IRT IRC (Austrian, global), Q-Free Quattro + Saturn (Norwegian, global), Sirit Identity (Federal Signal, since 2010), Neology nFusion, Star Systems International, Cubic Transportation Systems.",
+        "Major tag suppliers — TransCore eGo, Star Systems Sticker Tag, Neology iAuto + iPark, Smartrac WIPER, NetSyne, Confidex Steelwave + Heavy Metal, Identiv Smart Sticker.",
+        "Cross-protocol interoperability — toll networks may not directly cross-recognise (E-ZPass IAG tag does not work at 6C lane and vice versa) but new toll deployments increasingly install multi-protocol readers (6C + IAG + eGo) to support migration without forklift swap.",
+        "Private 6C tolling — express toll lanes on existing freeways (LBJ Express, North Tarrant Express, I-405 Express Toll Lanes, SR-91 OCTA), bridge + tunnel privatisations, mileage-based-user-fee (MBUF) pilots, congestion charging schemes (NYC + London + Singapore + Stockholm).",
+        "Parking + corporate campus 6C — same hardware + tag standard at lower transaction value but higher reliability requirement; common at airport long-term parking, hospital staff parking, corporate campus, university student parking, gated community.",
+        "Yard + drayage 6C — port drayage (LA / Long Beach + NY / NJ + Savannah + Houston + Charleston), intermodal terminals (BNSF + UP + CSX + Norfolk Southern), 3PL distribution yards.",
+        "Anti-fraud + revenue protection — windshield tag + ALPR + license plate match + EPC-to-plate pairing in toll-back-office; tag-on-plate + tag-on-windshield mismatch triggers exception review."
+      ]
+    },
+    {
+      "title": "Anti-transfer + tamper-evidence for compliance + revenue-critical applications",
+      "bullets": [
+        "Tier-1 anti-transfer — frangible adhesive substrate (paper + PET frangible) destroys tag on attempted removal; replacement tag must be issued. Baseline for parking, employee badge mount, gated-community resident.",
+        "Tier-2 anti-transfer — tamper-evident frangible antenna trace: tag antenna breaks on peel-off, tag becomes electrically dead but visually intact (forensic evidence of tampering). Used at high-revenue parking + tolling.",
+        "Tier-3 anti-transfer — NTAG 424 DNA SUN (Secure Unique NFC) + AES-128 cryptographic per-tap message + server-side ban-list. Each tap generates a unique signed message; server validates + bans cloned tags. Used at VIP + classified + high-revenue tolling + corporate campus VIP zones.",
+        "Physical mount — windshield bonded inside glass at top-center per state DOT regulation (some states restrict windshield placement); headlight sticker for athermic / metallised windshield; chassis screw-mount for permanent fleet ID; license-plate-mounted for transferable rental fleet.",
+        "Forensic + audit — VIN + plate + driver + EPC pairing stored in YMS / parking / tolling platform; multi-factor verification (RFID + plate + visual) at high-revenue + classified lanes.",
+        "Anti-cloning — UHF EPC space is large (96-bit / 198-bit) so brute-force cloning is impractical, but EPC alone is read-only and reproducible. Server-side ban-list + per-vehicle EPC + plate pairing closes the cloning gap.",
+        "Tamper indication — Confidex Heavy Metal + Smartrac WIPER + Beontag with tamper-evident layer; visual indicator + electrical kill on tamper.",
+        "Lifecycle — typical windshield tag lifecycle: 3-5 years (UV + thermal cycling + glass-replacement attrition); rental + short-term tag: 6 months - 2 years; permanent chassis mount: 7-10 years.",
+        "Disposal — end-of-life tag disposal per local e-waste regulation; cross-cut destruction for revenue-tagged credentials per ISO 27001 A.8.10."
+      ]
     }
   ],
   "resourceCards": [
@@ -356,6 +417,14 @@
     {
       "question": "How does RFID integrate with yard management systems (YMS) like Manhattan Active YMS + Blue Yonder + SAP Yard Logistics?",
       "answer": "Manhattan Active YMS (cloud-native; tier-1 retail + 3PL) + Blue Yonder Luminate Yard Management (multi-site) + SAP Yard Logistics (SAP-stack) + Oracle WMS Cloud + Yard Management (Oracle ERP) + Körber K.Motion YMS (global mid-large 3PL) + PINC + C3 Solutions (North American specialist) + Yardmaster + Yardmaster Pro (mid-market) all natively consume RFID-discovered EPC events via GS1 EPCIS 2.0 (ISO/IEC 19987:2021) Commission + ObjectEvent + AggregationEvent + Lightweight Messaging Standard. The yard-portal UHF reader (Impinj Speedway R700 + R420 + Zebra FX9600 with Times-7 A5010 + MTI MT-261021 RHCP antennas) fires an ObjectEvent (bizStep=arriving, disposition=in_progress) for every windshield-tagged tractor + trailer + chassis at the gate. Middleware (Impinj ItemSense + Zebra Savanna + Pyramid Solutions Mosaic + RFID4U) translates the EPC stream into YMS-native message format. Fleet telematics integration (Geotab + Samsara + Verizon Connect + Trimble TMW + Omnitracs + Motive) pairs the RFID EPC with the telematics ID + VIN + plate + driver ID for cradle-to-grave traceability."
+    },
+    {
+      "question": "What's the read range on a UHF windshield label?",
+      "answer": "Read range depends on tag chip + antenna design + reader power + antenna gain + windshield attenuation. Standard windshield label (e.g., Smartrac WIPER or Beontag with NXP UCODE 9): 2-5 m at FCC 30 dBm EIRP / 4W ERP through clear windshield; degraded to 0.5-2 m through athermic / heavily metallised / IR-reflective windshield. Long-range windshield sticker (purpose-built for tolling + yard, e.g., TransCore eGo or NetSyne LR-UHF): 5-12 m at FCC 36 dBm EIRP / 4W ERP through clear glass. Headlight RFID sticker (mounted between headlight housing and glass): 3-7 m without windshield attenuation. Chassis screw-mount anti-metal tag: 4-10 m. Always design lane geometry + portal antenna placement to your worst-case windshield + lane speed; pilot before production."
+    },
+    {
+      "question": "Does NHTSA TIN tire-marking compete with or complement vehicle RFID?",
+      "answer": "Complement, not compete. NHTSA TIN (Tire Identification Number, FMVSS 119 + 139) requires tire-sidewall printed identification but is moving toward RFID-encoded format under FMVSS 571 + EU 2020/740 General Safety Regulation. The tire RFID tag (Michelin + Continental + Bridgestone + Pirelli + Goodyear all participate) carries TIN + manufacture date + plant code for safety-recall traceability + EUDR rubber-deforestation compliance + EU end-of-life tire regulation. Tire RFID is read-only at production + recall + end-of-life — not used for vehicle access. Vehicle RFID windshield label is separately issued and read at access + tolling + yard. Both can coexist on one vehicle (4 tires × 1 tire-tag + 1 windshield label = 5 RFID tags per vehicle in some 2027+ scenarios)."
     }
   ],
   "primaryAction": {
@@ -373,10 +442,10 @@
     }
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-03-12",
+  "modifiedAt": "2026-05-11",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-03-15",
+  "reviewedAt": "2026-05-11",
   "sources": [
     {
       "label": "ISO/IEC 18000-63:2015 — RAIN RFID EPC Gen2v2 air-interface (UHF 860-960 MHz)",
@@ -417,6 +486,102 @@
       "publishedAt": "2020-08-04",
       "accessedAt": "2026-04-25",
       "note": "Region 1 (EU + UK + Norway + Switzerland) UHF allocation for vehicle-identification + parking + private tolling."
+    },
+    {
+      "label": "TransCore — Encompass + ELYO 6C-compatible UHF readers + eGo tags",
+      "url": "https://www.transcore.com/products-services/products/rfid-systems/",
+      "publisher": "TransCore (Roper Technologies)",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "US tolling market leader; Encompass 4 / 6 multi-protocol readers + eGo tag family widely deployed across E-ZPass + private toll lanes."
+    },
+    {
+      "label": "Kapsch TrafficCom — IRT + IRC roadside tolling readers",
+      "url": "https://www.kapsch.net/ktc/portfolio/tolling",
+      "publisher": "Kapsch TrafficCom AG",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Austrian-headquartered global tolling vendor with 6C-compatible UHF + 5.9 GHz DSRC + GNSS systems deployed across EU + Americas + APAC."
+    },
+    {
+      "label": "Impinj R700 — 4-port fixed UHF reader (6C-compatible)",
+      "url": "https://www.impinj.com/products/readers/impinj-r700",
+      "publisher": "Impinj, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Flagship 4-port fixed UHF reader widely deployed at yard portal + 6C parking + private tolling lanes."
+    },
+    {
+      "label": "Manhattan Active YMS — cloud-native yard management",
+      "url": "https://www.manh.com/solutions/yard-management",
+      "publisher": "Manhattan Associates",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Tier-1 retail + 3PL cloud YMS; native EPCIS 2.0 + REST API integration; replaces legacy SCALE YMS."
+    },
+    {
+      "label": "Blue Yonder Luminate Yard Management",
+      "url": "https://blueyonder.com/solutions/yard-management",
+      "publisher": "Blue Yonder, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Formerly JDA YMS; tier-1 retail + 3PL + manufacturing yard management with EPCIS 2.0 event consumption."
+    },
+    {
+      "label": "Genetec AutoVu — ALPR + RFID unified platform",
+      "url": "https://www.genetec.com/products/unified-security/autovu",
+      "publisher": "Genetec, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Unified ALPR + access control + RFID platform; common at hybrid lane parking + campus + community deployments."
+    },
+    {
+      "label": "NHTSA FMVSS 119 + 139 — Tire Identification Number (TIN)",
+      "url": "https://www.nhtsa.gov/laws-regulations/fmvss",
+      "publisher": "U.S. National Highway Traffic Safety Administration",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Tire-sidewall identification standards; transitioning to RFID-encoded TIN for safety-recall traceability + EUDR rubber-deforestation compliance."
+    },
+    {
+      "label": "EU Regulation 2020/740 — Tyre labelling + General Safety Regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2020/740/oj",
+      "publisher": "Publications Office of the European Union",
+      "publishedAt": "2020-05",
+      "accessedAt": "2026-04-26",
+      "note": "EU tyre-labelling regulation + General Safety Regulation; RFID tire-tag integration with EUDR rubber-supply-chain compliance."
+    },
+    {
+      "label": "Geotab — Connected vehicle telematics platform",
+      "url": "https://www.geotab.com/",
+      "publisher": "Geotab Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Fleet telematics platform pairing RFID EPC with telematics ID + VIN + plate + driver ID for cradle-to-grave traceability."
+    },
+    {
+      "label": "Samsara — Connected Operations Platform",
+      "url": "https://www.samsara.com/",
+      "publisher": "Samsara Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Fleet telematics + driver safety platform with API integration to RFID-discovered yard + gate events."
+    },
+    {
+      "label": "EU AI Act (Regulation 2024/1689) — real-time biometric identification",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "publisher": "Publications Office of the European Union",
+      "publishedAt": "2024-06",
+      "accessedAt": "2026-04-26",
+      "note": "Classifies real-time biometric ALPR as high-risk + restricted in EU; pushes parking + access programmes toward RFID alternatives where viable."
+    },
+    {
+      "label": "ATA Spec 2000 Ch. 9-5 — RFID on aerospace parts and ground equipment",
+      "url": "https://publications.airlines.org/CommerceProductDetail.aspx?Product=131",
+      "publisher": "Airlines for America (A4A)",
+      "publishedAt": "2024",
+      "accessedAt": "2026-04-26",
+      "note": "Aerospace ground equipment + part-tracking RFID standard; relevant for airport + MRO + ramp-vehicle identification."
     }
   ]
 }

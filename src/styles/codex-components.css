@@ -1,0 +1,4451 @@
+/* ═══════════════════════════════════════════
+   Animations & Motion
+   ═══════════════════════════════════════════ */
+
+/* Scroll-triggered reveal: sections fade up when entering viewport */
+.codex-editorial-section,
+.codex-editorial-card,
+.codex-editorial-action-bar,
+.codex-editorial-jump-nav {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 420ms cubic-bezier(0.25, 1, 0.5, 1),
+              transform 420ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.codex-editorial-section.is-visible,
+.codex-editorial-card.is-visible,
+.codex-editorial-action-bar.is-visible,
+.codex-editorial-jump-nav.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero entrance: fade up with slight stagger */
+.codex-editorial-hero {
+  animation: codex-hero-enter 550ms cubic-bezier(0.25, 1, 0.5, 1) both;
+}
+
+.codex-editorial-hero .codex-editorial-kicker {
+  animation: codex-fade-up 400ms cubic-bezier(0.25, 1, 0.5, 1) 100ms both;
+}
+
+.codex-editorial-hero h1 {
+  animation: codex-fade-up 450ms cubic-bezier(0.25, 1, 0.5, 1) 180ms both;
+}
+
+.codex-editorial-hero .codex-editorial-answer {
+  animation: codex-fade-up 400ms cubic-bezier(0.25, 1, 0.5, 1) 280ms both;
+}
+
+.codex-editorial-hero .codex-editorial-figure {
+  animation: codex-fade-up 500ms cubic-bezier(0.25, 1, 0.5, 1) 200ms both;
+}
+
+@keyframes codex-hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes codex-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* FAQ accordion: smooth open/close */
+.codex-editorial-faq details .codex-editorial-faq-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 250ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.codex-editorial-faq details[open] .codex-editorial-faq-body {
+  grid-template-rows: 1fr;
+}
+
+.codex-editorial-faq details .codex-editorial-faq-body > * {
+  overflow: hidden;
+}
+
+/* FAQ +/- icon rotation */
+.codex-editorial-faq summary::before {
+  transition: transform 200ms cubic-bezier(0.25, 1, 0.5, 1),
+              background-color 200ms ease,
+              color 200ms ease,
+              border-color 200ms ease;
+}
+
+/* Jump-nav pill: smooth active state transition */
+.codex-editorial-jump-link {
+  transition: background 200ms cubic-bezier(0.25, 1, 0.5, 1),
+              color 200ms cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 200ms cubic-bezier(0.25, 1, 0.5, 1),
+              transform 160ms ease,
+              box-shadow 160ms ease;
+}
+
+/* Growth hub card: subtle lift on hover */
+.codex-growth-hub__card {
+  transition: transform 250ms cubic-bezier(0.25, 1, 0.5, 1),
+              border-color 250ms ease,
+              box-shadow 250ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* L4: Skip-to-content link — visible on focus */
+a[href="#main"] {
+  position: fixed;
+  top: -100%;
+  left: var(--codex-space-4);
+  z-index: var(--codex-z-tooltip);
+  padding: var(--codex-space-3) var(--codex-space-5);
+  border-radius: var(--codex-radius-pill);
+  background: var(--codex-dark);
+  color: #fff;
+  font-weight: var(--codex-weight-bold);
+  text-decoration: none;
+  transition: top 160ms ease;
+}
+
+a[href="#main"]:focus {
+  top: var(--codex-space-4);
+}
+
+/* ═══════════════════════════════════════════
+   Shared Component Patterns
+   ═══════════════════════════════════════════ */
+
+/* Eyebrow / kicker label — decorative, NOT interactive */
+.codex-product-cta__eyebrow,
+.codex-collection-cta__eyebrow,
+.codex-growth-hub__eyebrow,
+.codex-legacy-redirect__eyebrow,
+.codex-editorial-kicker,
+.codex-editorial-answer-label {
+  margin: 0 0 var(--codex-space-1-plus);
+  color: var(--codex-gold-muted);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.codex-product-cta__eyebrow { margin-bottom: var(--codex-space-1-plus); }
+.codex-collection-cta__eyebrow { letter-spacing: 0.08em; }
+.codex-editorial-answer-label { letter-spacing: 0.08em; }
+
+/* Pill button – shared base */
+.codex-product-cta__primary,
+.codex-collection-cta__primary,
+.codex-footer-rfq-link,
+.codex-legacy-redirect__action,
+.codex-growth-hub__action,
+.codex-editorial-link-card,
+.codex-editorial-brief-link,
+.codex-editorial-secondary,
+.codex-editorial-primary,
+.codex-editorial-jump-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  padding: var(--codex-space-2-plus) var(--codex-space-4);
+  border-radius: var(--codex-radius-pill);
+  text-decoration: none;
+  transition: var(--codex-transition), background-color 160ms ease;
+}
+
+/* Pill button – dark variant */
+.codex-product-cta__primary,
+.codex-footer-rfq-link,
+.codex-legacy-redirect__action--primary {
+  color: #fff;
+  background: var(--codex-gradient-dark);
+  box-shadow: var(--codex-shadow);
+}
+
+.codex-product-cta__primary:hover,
+.codex-footer-rfq-link:hover,
+.codex-legacy-redirect__action--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--codex-shadow-light);
+}
+
+/* Pill button – outlined / ghost variant */
+.codex-legacy-redirect__action,
+.codex-growth-hub__action,
+.codex-editorial-link-card,
+.codex-editorial-brief-link,
+.codex-editorial-secondary,
+.codex-editorial-jump-link {
+  border: 1px solid var(--codex-border);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--codex-text);
+}
+
+.codex-editorial-jump-link {
+  min-height: var(--codex-space-11);
+  padding: var(--codex-space-2-plus) var(--codex-space-4);
+  background: linear-gradient(180deg, var(--codex-bg-warm), rgba(255, 255, 255, 0.98));
+  border: 1px solid rgba(41, 28, 14, 0.1);
+  font-size: var(--codex-text-sm-plus);
+}
+
+.codex-legacy-redirect__action:hover,
+.codex-growth-hub__action:hover,
+.codex-editorial-link-card:hover,
+.codex-editorial-brief-link:hover,
+.codex-editorial-secondary:hover,
+.codex-editorial-primary:hover,
+.codex-editorial-jump-link:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--codex-shadow-light);
+}
+
+/* Active/pressed state — subtle press-down feedback */
+.codex-product-cta__primary:active,
+.codex-collection-cta__primary:active,
+.codex-footer-rfq-link:active,
+.codex-legacy-redirect__action:active,
+.codex-growth-hub__action:active,
+.codex-editorial-link-card:active,
+.codex-editorial-brief-link:active,
+.codex-editorial-secondary:active,
+.codex-editorial-primary:active,
+.codex-editorial-jump-link:active {
+  transform: translateY(0);
+  box-shadow: none;
+  transition-duration: 50ms;
+}
+
+.codex-editorial-jump-link:hover {
+  border-color: rgba(195, 154, 95, 0.28);
+}
+
+/* Pill button – gold / accent variant (primary CTA) */
+.codex-editorial-primary {
+  background: var(--codex-gradient-dark);
+  color: #fff;
+  font-weight: var(--codex-weight-bold);
+  box-shadow: var(--codex-shadow);
+  padding: var(--codex-space-3-plus) 1.4rem;
+  font-size: var(--codex-text-base);
+}
+
+/* Pill button – green variant (collection) */
+.codex-collection-cta__primary {
+  color: #fff;
+  background: linear-gradient(135deg, #1f5f47, #0d3a2b);
+  box-shadow: 0 10px 22px rgba(13, 58, 43, 0.18);
+  font-weight: var(--codex-weight-bold);
+}
+
+.codex-collection-cta__primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(41, 28, 14, 0.14);
+}
+
+/* Action row – shared flex layout for button groups */
+.codex-product-cta__actions,
+.codex-collection-cta__actions,
+.codex-growth-hub__actions,
+.codex-legacy-redirect__actions,
+.codex-editorial-link-list,
+.codex-editorial-action-links,
+.codex-editorial-brief-links,
+.codex-editorial-jump-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-3);
+}
+
+.codex-product-cta__actions,
+.codex-legacy-redirect__actions {
+  margin-top: var(--codex-space-4);
+}
+
+.codex-legacy-redirect__actions { margin-top: var(--codex-space-5); gap: var(--codex-space-3-plus); }
+.codex-growth-hub__actions { gap: var(--codex-space-3-plus); grid-column: 1 / -1; }
+.codex-editorial-link-list,
+.codex-editorial-action-links,
+.codex-editorial-brief-links { gap: var(--codex-space-3-plus); }
+
+/* Support / card panel – shared pattern for info grids */
+.codex-product-support,
+.codex-article-support,
+.codex-collection-support {
+  padding: var(--codex-space-6);
+  border: 1px solid var(--codex-border);
+  border-radius: var(--codex-radius-card);
+}
+
+.codex-product-support {
+  margin: var(--codex-space-8) 0 var(--codex-space-10);
+  background: linear-gradient(180deg, rgba(245, 245, 245, 0.9), rgba(255, 255, 255, 0.98));
+}
+
+.codex-article-support {
+  margin: var(--codex-space-10) 0 0;
+  background: linear-gradient(180deg, rgba(245, 245, 245, 0.85), rgba(255, 255, 255, 0.98));
+}
+
+.codex-collection-support {
+  margin: var(--codex-space-6) 0 var(--codex-space-8);
+  background: linear-gradient(180deg, var(--codex-bg-warm), rgba(255, 255, 255, 0.98));
+}
+
+/* ── Collection Buying Support (redesigned) ── */
+
+.codex-collection-buying-support {
+  margin: var(--codex-space-6) 0 var(--codex-space-8);
+  display: grid;
+  gap: var(--codex-space-5);
+}
+
+/* Collection CTA — redesigned as a horizontal card */
+.codex-collection-cta {
+  display: grid;
+  gap: var(--codex-space-4);
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: var(--codex-space-6) var(--codex-space-7);
+  border-radius: var(--codex-radius-card-lg);
+  background: linear-gradient(135deg, #1e150b 0%, #3a2a16 100%);
+  color: #f0e8dd;
+  border: none;
+}
+
+.codex-collection-cta h2 {
+  margin: 0 0 var(--codex-space-1-plus);
+  font-size: var(--codex-text-lg);
+  line-height: 1.25;
+  color: #fff;
+}
+
+.codex-collection-cta__copy p:last-child {
+  margin-bottom: 0;
+  color: #d4c5b0;
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.55;
+}
+
+.codex-collection-cta__brief {
+  margin: var(--codex-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-1-plus) var(--codex-space-5);
+}
+
+.codex-collection-cta__brief li {
+  display: flex;
+  align-items: baseline;
+  gap: var(--codex-space-1-plus);
+  font-size: var(--codex-text-sm-plus);
+  color: #c8b89e;
+}
+
+.codex-collection-cta__check {
+  color: var(--codex-gold);
+  font-weight: var(--codex-weight-bold);
+}
+
+.codex-collection-cta__brief li + li {
+  margin-top: 0;
+}
+
+.codex-collection-cta__actions {
+  grid-row: 1 / -1;
+  align-self: center;
+}
+
+.codex-collection-cta__primary {
+  white-space: nowrap;
+  background: var(--codex-gold) !important;
+  color: var(--codex-dark) !important;
+  font-weight: var(--codex-weight-bold);
+  box-shadow: 0 8px 20px rgba(195, 154, 95, 0.3);
+}
+
+.codex-collection-cta__primary:hover {
+  box-shadow: 0 10px 24px rgba(195, 154, 95, 0.4);
+}
+
+/* Collection Guidance — redesigned as numbered steps */
+.codex-collection-guidance {
+  padding: var(--codex-space-6) var(--codex-space-7);
+  border-radius: var(--codex-radius-card-lg);
+  border: 1px solid var(--codex-border-light);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.codex-collection-guidance__title {
+  margin: 0 0 var(--codex-space-4-plus);
+  font-size: var(--codex-text-md-plus);
+  color: var(--codex-text);
+}
+
+.codex-collection-guidance__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.codex-collection-guidance__step {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: var(--codex-space-3);
+  padding: var(--codex-space-4) 0;
+  border-top: 1px solid var(--codex-border-light);
+  align-items: start;
+}
+
+.codex-collection-guidance__step:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.codex-collection-guidance__step:last-child {
+  padding-bottom: 0;
+}
+
+.codex-collection-guidance__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--codex-space-9);
+  height: var(--codex-space-9);
+  border-radius: 50%;
+  background: var(--codex-bg-warm);
+  border: 1px solid var(--codex-border);
+  color: var(--codex-dark-mid);
+  font-size: var(--codex-text-sm);
+  font-weight: var(--codex-weight-bold);
+  flex-shrink: 0;
+}
+
+.codex-collection-guidance__body strong {
+  display: block;
+  margin-bottom: var(--codex-space-1);
+  color: var(--codex-text);
+  font-size: var(--codex-text-sm-plus);
+}
+
+.codex-collection-guidance__body p {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.6;
+}
+
+/* Support grids */
+.codex-product-support__grid {
+  display: grid;
+  gap: var(--codex-space-5);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.codex-article-support__grid {
+  display: grid;
+  gap: var(--codex-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* Support panel headings */
+.codex-product-support__panel h2,
+.codex-article-support__panel h2 {
+  margin: 0 0 var(--codex-space-3-plus);
+  font-size: var(--codex-text-md-plus);
+}
+
+/* Support dl resets */
+.codex-product-procurement dl,
+.codex-article-guidance dl {
+  margin: 0;
+}
+
+/* Support row separators */
+.codex-product-support__row + .codex-product-support__row,
+.codex-article-support__row + .codex-article-support__row {
+  margin-top: var(--codex-space-3-plus);
+  padding-top: var(--codex-space-3-plus);
+  border-top: 1px solid var(--codex-border-light);
+}
+
+.codex-product-support__row dt,
+.codex-article-support__row dt {
+  margin: 0 0 var(--codex-space-1);
+  font-weight: var(--codex-weight-bold);
+  color: var(--codex-text);
+}
+
+.codex-product-support__row dd,
+.codex-article-support__row dd {
+  margin: 0;
+  color: var(--codex-text-muted);
+}
+
+/* ── Blog Index ── */
+
+.codex-blog-index {
+  max-width: 1100px;
+  margin: var(--codex-space-8) auto var(--codex-space-12);
+  padding: 0 var(--codex-space-4);
+}
+
+.codex-blog-index__header {
+  margin-bottom: var(--codex-space-6);
+}
+
+.codex-blog-index__header h1 {
+  margin: 0 0 var(--codex-space-1-plus);
+  font-size: var(--codex-text-xl-plus);
+  color: var(--codex-text);
+}
+
+.codex-blog-index__header p {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-base);
+  line-height: var(--codex-leading-normal);
+}
+
+/* Topic filter pills */
+.codex-blog-index__topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-2);
+  margin-bottom: var(--codex-space-8);
+  padding-bottom: var(--codex-space-6);
+  border-bottom: 1px solid var(--codex-border-light);
+}
+
+.codex-blog-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--codex-space-1-plus);
+  padding: var(--codex-space-1-plus) var(--codex-space-3-plus);
+  border: 1px solid var(--codex-border);
+  border-radius: var(--codex-radius-pill);
+  background: #fff;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-medium);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.codex-blog-pill:hover {
+  border-color: var(--codex-gold);
+  color: var(--codex-text);
+}
+
+.codex-blog-pill--active {
+  background: var(--codex-dark);
+  border-color: var(--codex-dark);
+  color: #fff;
+}
+
+.codex-blog-pill--active:hover {
+  background: var(--codex-dark-mid);
+  color: #fff;
+}
+
+.codex-blog-pill span {
+  font-size: var(--codex-text-2xs);
+  opacity: 0.6;
+}
+
+/* Card grid */
+.codex-blog-index__grid {
+  display: grid;
+  gap: var(--codex-space-4);
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.codex-blog-grid-card {
+  --card-padding: var(--codex-space-5) 1.35rem;
+  --card-hover-border: rgba(195, 154, 95, 0.35);
+  --card-elevation-hover: 0 10px 28px rgba(41, 28, 14, 0.07);
+}
+
+.codex-blog-grid-card__thumb {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--codex-radius-card);
+  margin-bottom: var(--codex-space-3);
+  background: var(--codex-bg-warm);
+}
+
+.codex-blog-grid-card__tag {
+  display: inline-block;
+  align-self: flex-start;
+  margin-bottom: var(--codex-space-2-plus);
+  padding: var(--codex-space-1) var(--codex-space-2);
+  border-radius: 4px;
+  background: var(--codex-bg-warm);
+  color: var(--codex-dark-mid);
+  font-size: var(--codex-text-2xs);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.codex-blog-grid-card strong {
+  display: block;
+  margin-bottom: var(--codex-space-2);
+  color: var(--codex-text);
+  font-size: var(--codex-text-base);
+  line-height: var(--codex-leading-snug);
+}
+
+.codex-blog-grid-card p {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.55;
+  flex-grow: 1;
+}
+
+.codex-blog-grid-card__cta {
+  display: inline-block;
+  margin-top: var(--codex-space-3-plus);
+  /* A11y batch (DS-9, 2026-04-26) — Was --codex-gold (#c39a5f, 2.8:1 fail
+     at 13.6px). Gold-muted (#6d5a3a, 5.6:1) passes WCAG AA 1.4.3. */
+  color: var(--codex-gold-muted);
+  font-size: var(--codex-text-sm);
+  font-weight: var(--codex-weight-semibold);
+}
+.codex-blog-grid-card__cta:focus-visible {
+  outline: 2px solid var(--codex-gold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 900px) {
+  .codex-blog-index__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .codex-blog-index__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* When the blog index renders with the floating left rail (mirrors the
+   /products/all/ pattern), give the centered content a left margin on wide
+   viewports so the 220px-wide fixed rail doesn't overlap the heading or
+   first column of cards. The rail is hidden below 1280px so we only shift
+   above that breakpoint. */
+@media (min-width: 1280px) {
+  .codex-blog-index--with-rail {
+    max-width: none;
+    margin-left: 272px;
+    margin-right: var(--codex-space-6);
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+/* Empty-state shown when a topic filter matches zero cards. */
+.codex-blog-index__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--codex-space-10) var(--codex-space-4);
+  background: var(--codex-bg-warm);
+  border-radius: var(--codex-radius-card);
+  border: 1px dashed var(--codex-border);
+  margin-top: var(--codex-space-6);
+}
+.codex-blog-index__empty-icon {
+  font-size: var(--codex-text-2xl);
+  margin-bottom: var(--codex-space-2);
+}
+.codex-blog-index__empty h3 {
+  margin: 0 0 var(--codex-space-1-plus);
+  color: var(--codex-text);
+  font-size: var(--codex-text-base-plus);
+}
+.codex-blog-index__empty p {
+  margin: 0 0 var(--codex-space-4);
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+}
+.codex-blog-index__empty-clear {
+  padding: var(--codex-space-2) var(--codex-space-4-plus);
+  border: 1px solid var(--codex-gold);
+  border-radius: var(--codex-radius-pill);
+  background: #fff;
+  /* A11y batch — gold-muted for AA contrast on 12.8px text. */
+  color: var(--codex-gold-muted);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-semibold);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+.codex-blog-index__empty-clear:hover {
+  background: var(--codex-gold);
+  color: #fff;
+}
+
+/* ── Product Spec Sheet ── */
+
+.codex-product-spec-sheet {
+  display: grid;
+  gap: var(--codex-space-6);
+  grid-template-columns: 1.4fr 0.6fr;
+  margin: var(--codex-space-6) 0;
+}
+
+.codex-spec-table-wrap {
+  padding: var(--codex-space-6);
+  border-radius: var(--codex-radius-card-lg);
+  border: 1px solid var(--codex-border-light);
+  background: #fff;
+}
+
+.codex-spec-table-wrap h2 {
+  margin: 0 0 var(--codex-space-4);
+  font-size: var(--codex-text-md-plus);
+  color: var(--codex-text);
+}
+
+.codex-spec-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.codex-spec-table th,
+.codex-spec-table td {
+  padding: var(--codex-space-2-plus) var(--codex-space-3-plus);
+  border-bottom: 1px solid var(--codex-border-light);
+  text-align: left;
+  vertical-align: top;
+  font-size: var(--codex-text-sm-plus);
+}
+
+.codex-spec-table th {
+  width: 35%;
+  font-weight: var(--codex-weight-semibold);
+  color: var(--codex-text);
+  background: var(--codex-bg-warm);
+}
+
+.codex-spec-table td {
+  color: var(--codex-text-muted);
+}
+
+.codex-spec-table tbody tr:last-child th,
+.codex-spec-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.codex-spec-table tbody tr:nth-child(even) th {
+  background: rgba(248, 246, 241, 0.5);
+}
+
+.codex-spec-compat {
+  margin-top: var(--codex-space-4);
+  padding: var(--codex-space-3-plus) var(--codex-space-4);
+  border-radius: 12px;
+  background: var(--codex-bg-warm);
+  font-size: var(--codex-text-sm-plus);
+  color: var(--codex-text-muted);
+  line-height: 1.55;
+}
+
+.codex-spec-compat strong {
+  color: var(--codex-text);
+}
+
+.codex-spec-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-5);
+}
+
+.codex-spec-applications,
+.codex-spec-buyer-notes {
+  padding: var(--codex-space-4-plus) var(--codex-space-5);
+  border-radius: var(--codex-radius-card-lg);
+  border: 1px solid var(--codex-border-light);
+  background: #fff;
+}
+
+.codex-spec-applications h3,
+.codex-spec-buyer-notes h3 {
+  margin: 0 0 var(--codex-space-3);
+  font-size: var(--codex-text-base);
+  color: var(--codex-text);
+}
+
+.codex-spec-applications ul {
+  margin: 0;
+  padding-left: var(--codex-space-4-plus);
+}
+
+.codex-spec-applications li {
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+}
+
+.codex-spec-applications li + li {
+  margin-top: var(--codex-space-1-plus);
+}
+
+.codex-spec-buyer-notes ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.codex-spec-note {
+  display: flex;
+  gap: var(--codex-space-2-plus);
+  align-items: start;
+  font-size: var(--codex-text-sm-plus);
+  color: var(--codex-text-muted);
+  line-height: 1.55;
+}
+
+.codex-spec-note + .codex-spec-note {
+  margin-top: var(--codex-space-2-plus);
+  padding-top: var(--codex-space-2-plus);
+  border-top: 1px solid var(--codex-border-light);
+}
+
+.codex-spec-note__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--codex-space-6-plus);
+  height: var(--codex-space-6-plus);
+  border-radius: 50%;
+  background: var(--codex-bg-warm);
+  border: 1px solid var(--codex-border);
+  color: var(--codex-dark-mid);
+  font-size: var(--codex-text-xs);
+  font-weight: var(--codex-weight-bold);
+  flex-shrink: 0;
+}
+
+@media (max-width: 767px) {
+  .codex-product-spec-sheet {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Support list styles */
+.codex-article-summary ul,
+.codex-article-sources ul,
+.codex-article-related ul {
+  margin: 0;
+  padding-left: var(--codex-space-4-plus);
+}
+
+.codex-article-summary li,
+.codex-article-sources li,
+.codex-article-related li {
+  margin: 0;
+  color: var(--codex-text-muted);
+}
+
+.codex-article-summary li + li,
+.codex-article-sources li + li,
+.codex-article-related li + li {
+  margin-top: var(--codex-space-2-plus);
+}
+
+/* ── Mobile: keep hamburger layout ── */
+@media (max-width: 767px) {
+
+  .mobile-site-branding .custom-logo {
+    max-height: 30px;
+    width: auto;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   WordPress Overrides
+   ═══════════════════════════════════════════ */
+
+.single-product .woocommerce-product-gallery {
+  opacity: 1 !important;
+}
+
+.entry-content > .kb-row-layout-wrap.kt-row-has-bg:first-child p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+#footer-navigation .codex-nav-rfq-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--codex-radius-pill);
+  padding: var(--codex-space-2) var(--codex-space-4) !important;
+  background: var(--codex-gradient-gold);
+  color: var(--codex-dark) !important;
+  box-shadow: var(--codex-shadow);
+}
+
+.header-navigation .header-menu-container.primary-menu-container > ul > li > a.codex-nav-rfq-link:after,
+.footer-navigation .footer-menu-container > ul > li > a.codex-nav-rfq-link:after {
+  display: none !important;
+}
+
+#footer-navigation .codex-nav-rfq-link:hover {
+  transform: translateY(-1px);
+  background: var(--codex-gradient-gold-hover);
+  color: var(--codex-dark) !important;
+}
+
+#mobile-site-navigation .codex-nav-rfq-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--codex-space-3-plus);
+  border-radius: var(--codex-radius-pill);
+  padding: var(--codex-space-3-plus) var(--codex-space-4) !important;
+  background: var(--codex-gradient-gold);
+  color: var(--codex-dark) !important;
+  box-shadow: 0 12px 24px rgba(41, 28, 14, 0.16);
+}
+
+#mobile-site-navigation .codex-nav-rfq-link:hover,
+#mobile-site-navigation .current-menu-item > .codex-nav-rfq-link {
+  background: var(--codex-gradient-gold-hover);
+  color: var(--codex-dark) !important;
+}
+
+/* ── Industries simple dropdown ───────────────────────── */
+.codex-industries-drop {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: var(--codex-z-overlay);
+  background: #fff !important;
+  min-width: 260px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  border-radius: 10px;
+  padding: 10px 0;
+  list-style: none;
+  border: 1px solid rgba(0,0,0,.06);
+}
+.codex-industries-menu:hover > .codex-industries-drop,
+.codex-industries-menu:focus-within > .codex-industries-drop {
+  display: block !important;
+}
+.codex-industries-drop > li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.codex-industries-drop > li > a {
+  display: block;
+  padding: 10px 22px;
+  font-size: var(--codex-text-sm-plus);
+  font-weight: var(--codex-weight-medium);
+  color: var(--codex-text) !important;
+  text-decoration: none !important;
+  transition: background var(--codex-motion-fast), color var(--codex-motion-fast);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.codex-industries-drop > li > a:hover {
+  background: rgba(176, 141, 87, 0.1);
+  color: var(--codex-gold-muted) !important;
+}
+/* mobile industries menu */
+#mobile-site-navigation .codex-industries-menu > .sub-menu > li > a {
+  font-weight: var(--codex-weight-semibold);
+  font-size: var(--codex-text-sm-plus);
+  color: var(--codex-text);
+}
+/* ── Industries summary page (redesigned) ──────────────── */
+.codex-industries-page { max-width: 100%; margin: 0 auto; padding: 0 var(--codex-space-6); }
+.codex-industries-header { text-align: center; padding: var(--codex-space-8) 0 var(--codex-space-6); }
+.codex-industries-header h1 { font-size: 2.2rem; color: var(--codex-text); margin: var(--codex-space-2) 0; }
+.codex-industries-header__sub { color: var(--codex-text-muted); font-size: var(--codex-text-base); max-width: 700px; margin: var(--codex-space-2) auto var(--codex-space-6); line-height: 1.6; }
+
+/* ── Sidebar + Content Layout ──
+   Legacy 2-column flex used before /industries/ adopted the floating
+   .codex-catalog-rail pattern (see /products/all/). Kept so any other
+   page that still wraps content in .codex-industries-layout renders
+   correctly; the new /industries/ markup uses .codex-industries-page--with-rail. */
+.codex-industries-layout { display: flex; gap: var(--codex-space-5); align-items: flex-start; }
+.codex-industries-rail { flex-shrink: 0; width: 190px; position: sticky; top: 90px; max-height: calc(100vh - 110px); overflow-y: auto; }
+.codex-industries-rail__nav { background: #fff; border-radius: 12px; border: 1px solid var(--codex-border-light); padding: var(--codex-space-3) 0; box-shadow: 0 2px 12px rgba(41,28,14,0.04); }
+.codex-industries-rail__title { font-size: var(--codex-text-xs); font-weight: var(--codex-weight-bold); text-transform: uppercase; letter-spacing: 0.08em; color: var(--codex-text-subtle); padding: var(--codex-space-2) var(--codex-space-4-plus) var(--codex-space-2-plus); border-bottom: 1px solid var(--codex-border-light); }
+.codex-industries-rail__link { display: flex; align-items: center; gap: var(--codex-space-1-plus); padding: var(--codex-space-2) var(--codex-space-3-plus); text-decoration: none; color: var(--codex-text); font-size: var(--codex-text-xs-plus); font-weight: var(--codex-weight-medium); transition: all var(--codex-motion-fast); border-left: 3px solid transparent; }
+.codex-industries-rail__link:hover { background: var(--codex-bg-warm); border-left-color: var(--codex-gold); }
+/* A11y #1 (DS-9, 2026-04-26) — Active link text was `var(--codex-gold)` (#c39a5f) on warm bg
+   = ~2.8:1 contrast at 12.8px non-bold — fails WCAG 2.1 AA 1.4.3 (4.5:1 required). The gold
+   left-border + bg shift already convey active state visually; switch text color to
+   `var(--codex-text)` for AAA contrast (~14:1) without losing the gold visual anchor. */
+.codex-industries-rail__link.active { background: var(--codex-bg-warm); border-left-color: var(--codex-gold); color: var(--codex-text); font-weight: var(--codex-weight-semibold); }
+.codex-industries-rail__link.active .codex-industries-rail__emoji.codex-icon { color: var(--codex-gold); }
+.codex-industries-rail__emoji { font-size: var(--codex-text-base); flex-shrink: 0; }
+.codex-industries-rail__label { flex: 1; line-height: 1.3; }
+.codex-industries-rail__count { font-size: var(--codex-text-2xs); color: var(--codex-text-subtle); background: var(--codex-bg-warm); border-radius: var(--codex-radius-pill); padding: var(--codex-space-0-5) var(--codex-space-2); font-weight: var(--codex-weight-semibold); flex-shrink: 0; }
+.codex-industries-content { flex: 1; min-width: 0; }
+
+/* ═══════════════════════════════════════════
+   .codex-card — base — DS-12 Phase 3 (2026-04-27)
+   ═══════════════════════════════════════════
+   Shared baseline for every preview card variant on the site (12 in total
+   pre-DS-12: blog-grid, editorial, editorial-brief, editorial-snapshot,
+   editorial-link, industries-hero, industries-hub, industries-cat,
+   industries-product, related-industry, resources-category, conversion).
+
+   Configuration is via custom properties so a variant can override one or
+   two aspects without re-declaring the entire shape. This collapses ~400
+   lines of repeated padding/border/radius/shadow/transition declarations
+   and standardizes hover translate (DS-10 audit flagged 3px on hubs vs.
+   6px on home).
+
+   API:
+     --card-bg                 # background. Default: #fff
+     --card-padding            # padding. Default: var(--codex-space-5) var(--codex-space-5-plus)
+     --card-radius             # border-radius. Default: var(--codex-radius-card)
+     --card-border-color       # border color. Default: var(--codex-border-light)
+     --card-elevation          # box-shadow at rest. Default: var(--codex-elevation-rest)
+     --card-elevation-hover    # box-shadow on hover. Default: var(--codex-elevation-hover)
+     --card-hover-lift         # translateY value on hover. Default: -3px
+     --card-hover-border       # border color on hover. Default: var(--codex-gold-muted)
+     --card-text-decoration    # for <a> cards. Default: none
+
+   Usage:
+     1. Add `.codex-card` to the element class list.
+     2. (Optional) override custom properties in a variant rule:
+        .codex-blog-grid-card { --card-padding: var(--codex-space-5) 1.35rem; }
+     3. Keep existing variant-specific rules (image styling, body layout,
+        body typography) — those aren't part of the base.
+*/
+.codex-card {
+  --card-bg: #fff;
+  --card-padding: var(--codex-space-5) var(--codex-space-5-plus, 1.35rem);
+  --card-radius: var(--codex-radius-card);
+  --card-border-color: var(--codex-border-light);
+  --card-elevation: var(--codex-elevation-rest);
+  --card-elevation-hover: var(--codex-elevation-hover);
+  --card-hover-lift: -3px;
+  --card-hover-border: var(--codex-gold-muted);
+  --card-text-decoration: none;
+
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border-color);
+  border-radius: var(--card-radius);
+  padding: var(--card-padding);
+  text-decoration: var(--card-text-decoration);
+  color: inherit;
+  box-shadow: var(--card-elevation);
+  transition:
+    transform var(--codex-motion-base) var(--codex-easing-out),
+    box-shadow var(--codex-motion-base) var(--codex-easing-out),
+    border-color var(--codex-motion-fast) var(--codex-easing-out);
+}
+.codex-card:hover,
+.codex-card:focus-visible {
+  transform: translateY(var(--card-hover-lift));
+  box-shadow: var(--card-elevation-hover);
+  border-color: var(--card-hover-border);
+}
+/* DS-13 #2 (Major) — suppress hover transform under prefers-reduced-motion.
+   The global `prefers-reduced-motion` rule near :root already kills the
+   transition-duration; this rule additionally removes the *destination*
+   transform so vestibular-sensitive users don't see the card hop on hover.
+   Box-shadow + border-color changes still apply (they're not animation,
+   just visual feedback). */
+@media (prefers-reduced-motion: reduce) {
+  .codex-card:hover,
+  .codex-card:focus-visible {
+    transform: none;
+  }
+}
+/* Image-card subvariant — for cards whose first child is an <img> filling
+   the top edge-to-edge. Overflow:hidden contains the image inside the
+   rounded corners; padding:0 lets the image touch the card edges. */
+.codex-card--media {
+  --card-padding: 0;
+  overflow: hidden;
+}
+
+.codex-industries-hero-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--codex-space-5); margin-bottom: var(--codex-space-12); }
+/* Variant overrides only — base from .codex-card */
+.codex-industries-hero-card {
+  --card-radius: 12px;
+  --card-hover-lift: -4px;
+  --card-elevation: 0 2px 12px rgba(41, 28, 14, 0.06);
+  --card-elevation-hover: 0 12px 32px rgba(41, 28, 14, 0.12);
+}
+.codex-industries-hero-card__img { height: 140px; background-size: cover; background-position: center; background-color: var(--codex-bg-warm); }
+.codex-industries-hero-card__body { padding: var(--codex-space-4) var(--codex-space-4-plus) var(--codex-space-4-plus); }
+.codex-industries-hero-card__emoji { font-size: var(--codex-text-lg); }
+.codex-industries-hero-card__title { font-size: var(--codex-text-base); font-weight: var(--codex-weight-bold); color: var(--codex-text); margin: var(--codex-space-1) 0; }
+.codex-industries-hero-card__desc { font-size: var(--codex-text-xs-plus); color: var(--codex-text-muted); line-height: var(--codex-leading-normal); margin: 0 0 var(--codex-space-2); }
+.codex-industries-hero-card__count { font-size: var(--codex-text-xs-plus); color: var(--codex-gold-muted); font-weight: var(--codex-weight-semibold); }
+
+.codex-industries-section { margin-bottom: var(--codex-space-12); padding-top: var(--codex-space-6); border-top: 2px solid var(--codex-border-light); }
+.codex-industries-section__header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--codex-space-6); margin-bottom: var(--codex-space-6); }
+.codex-industries-section__header-text { flex: 1; }
+.codex-industries-section__emoji { font-size: var(--codex-text-xl); margin-right: var(--codex-space-1); vertical-align: middle; }
+.codex-industries-section__header h2 { display: inline; font-size: var(--codex-text-xl); vertical-align: middle; }
+.codex-industries-section__header h2 a { color: var(--codex-text); text-decoration: none; }
+.codex-industries-section__header h2 a:hover { color: var(--codex-gold); }
+.codex-industries-section__header p { color: var(--codex-text-muted); font-size: var(--codex-text-sm-plus); margin: var(--codex-space-1-plus) 0 0; line-height: var(--codex-leading-normal); }
+.codex-industries-section__cta { flex-shrink: 0; margin-top: var(--codex-space-1-plus); padding: var(--codex-space-2) var(--codex-space-4-plus); border-radius: var(--codex-radius-sm); background: var(--codex-gold); color: #fff; font-size: var(--codex-text-sm); font-weight: var(--codex-weight-semibold); text-decoration: none; white-space: nowrap; transition: background var(--codex-motion-base); }
+.codex-industries-section__cta:hover { background: var(--codex-dark-mid); color: #fff; }
+.codex-industries-section__cta:focus-visible { outline: 2px solid var(--codex-gold); outline-offset: 2px; }
+
+.codex-industries-product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: var(--codex-space-4); }
+.codex-industries-product-card { --card-radius: 10px; }
+.codex-industries-product-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(41,28,14,0.08); }
+.codex-industries-product-card img { width: 100%; height: 160px; object-fit: cover; background: var(--codex-bg-warm); }
+.codex-industries-product-card__placeholder { width: 100%; height: 160px; background: linear-gradient(135deg, var(--codex-bg-warm), rgba(240,235,227,1)); }
+.codex-industries-product-card__body { padding: var(--codex-space-3-plus) var(--codex-space-4) var(--codex-space-4); }
+.codex-industries-product-card__body h4 { font-size: var(--codex-text-sm-plus); font-weight: var(--codex-weight-semibold); color: var(--codex-text); margin: 0 0 var(--codex-space-1); line-height: var(--codex-leading-snug); }
+.codex-industries-product-card__body p { font-size: var(--codex-text-xs-plus); color: var(--codex-text-muted); margin: 0; line-height: 1.4; }
+
+/* ── Industry category product grid (on /industries/xxx/ pages) ── */
+.codex-industries-cat-products { margin: var(--codex-space-10) 0; padding: var(--codex-space-8) 0; border-top: 2px solid var(--codex-border-light); border-bottom: 2px solid var(--codex-border-light); }
+.codex-industries-cat-products__title { font-size: var(--codex-text-xl); color: var(--codex-text); margin: 0 0 var(--codex-space-1); text-align: center; }
+.codex-industries-cat-products__sub { color: var(--codex-text-muted); font-size: var(--codex-text-sm-plus); text-align: center; margin: 0 0 var(--codex-space-6); }
+.codex-industries-cat-products__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: var(--codex-space-4); }
+.codex-industries-cat-card { --card-radius: 10px; }
+.codex-industries-cat-card:hover { border-color: var(--codex-gold); box-shadow: 0 6px 20px rgba(41,28,14,0.1); transform: translateY(-3px); }
+.codex-industries-cat-card img { width: 100%; height: 140px; object-fit: cover; background: var(--codex-bg-warm); }
+.codex-industries-cat-card__placeholder { width: 100%; height: 140px; background: linear-gradient(135deg, var(--codex-bg-warm), rgba(240,235,227,1)); }
+.codex-industries-cat-card__body { padding: var(--codex-space-3) var(--codex-space-4) var(--codex-space-3-plus); display: flex; justify-content: space-between; align-items: center; gap: var(--codex-space-2); }
+.codex-industries-cat-card__body h3 { font-size: var(--codex-text-sm); font-weight: var(--codex-weight-semibold); color: var(--codex-text); margin: 0; line-height: 1.3; flex: 1; }
+.codex-industries-cat-card__arrow { color: var(--codex-gold); font-size: var(--codex-text-base-plus); font-weight: var(--codex-weight-bold); transition: transform var(--codex-motion-base); flex-shrink: 0; }
+.codex-industries-cat-card:hover .codex-industries-cat-card__arrow { transform: translateX(4px); }
+
+/* ── "Used in these industries" grid on SKU pages (W4 internal-link pass) ── */
+.codex-related-industries { margin-top: var(--codex-space-6); }
+.codex-related-industries > h2 { font-size: var(--codex-text-lg-plus); color: var(--codex-text); margin: 0 0 var(--codex-space-1-plus); }
+.codex-related-industries-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--codex-space-4);
+  margin-top: var(--codex-space-4);
+}
+.codex-related-industry-card {
+  --card-radius: 10px;
+  --card-hover-lift: -2px;
+  --card-hover-border: var(--codex-gold);
+  --card-elevation-hover: 0 6px 20px rgba(41, 28, 14, 0.10);
+}
+.codex-related-industry-card img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  background: var(--codex-bg-warm);
+}
+.codex-related-industry-card__body {
+  padding: var(--codex-space-3-plus) var(--codex-space-4) var(--codex-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-1-plus);
+}
+.codex-related-industry-card__emoji { font-size: var(--codex-text-base-plus); line-height: 1; }
+.codex-related-industry-card__body strong {
+  font-size: var(--codex-text-base);
+  color: var(--codex-text);
+  font-weight: var(--codex-weight-bold);
+}
+.codex-related-industry-card__body p {
+  font-size: var(--codex-text-sm);
+  color: var(--codex-text-muted);
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* ── /industries/ hub aggregation card grid ──
+   One card per industry sub-page. Sits directly under the pillar hero so
+   visitors can jump to their vertical without scrolling through the long
+   editorial body. Hover lifts the card and shifts the CTA arrow right. */
+.codex-industries-hub-grid { margin-top: var(--codex-space-6); }
+.codex-industries-hub-grid > h2 {
+  font-size: var(--codex-text-xl);
+  color: var(--codex-text);
+  margin: 0 0 var(--codex-space-1-plus);
+}
+.codex-industries-hub-grid__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--codex-space-4-plus);
+  margin-top: var(--codex-space-4);
+}
+.codex-industries-hub-card {
+  --card-radius: 12px;
+  --card-hover-border: var(--codex-gold);
+  --card-elevation-hover: 0 10px 28px rgba(41, 28, 14, 0.12);
+}
+.codex-industries-hub-card__media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: var(--codex-bg-warm);
+  overflow: hidden;
+}
+.codex-industries-hub-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.codex-industries-hub-card__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background: linear-gradient(135deg, #f7efe1, #ece2cd);
+  color: var(--codex-text-subtle);
+}
+.codex-industries-hub-card__emoji {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 2px 8px rgba(41, 28, 14, 0.12);
+  line-height: 1;
+}
+.codex-industries-hub-card__body {
+  padding: var(--codex-space-3-plus) var(--codex-space-4) var(--codex-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-1-plus);
+  flex: 1 1 auto;
+}
+.codex-industries-hub-card__title {
+  font-size: var(--codex-text-base-plus);
+  color: var(--codex-text);
+  font-weight: var(--codex-weight-bold);
+  margin: 0;
+  line-height: 1.25;
+}
+.codex-industries-hub-card__summary {
+  font-size: var(--codex-text-sm);
+  color: var(--codex-text-muted);
+  margin: 0;
+  line-height: 1.5;
+  flex: 1 1 auto;
+  /* Clamp to keep card heights even when summaries vary in length. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.codex-industries-hub-card__cta {
+  margin-top: var(--codex-space-2);
+  font-size: var(--codex-text-sm);
+  font-weight: var(--codex-weight-semibold);
+  color: var(--codex-gold-dark, var(--codex-text));
+  display: inline-flex;
+  gap: var(--codex-space-1);
+  align-items: center;
+}
+.codex-industries-hub-card:hover .codex-industries-hub-card__cta span {
+  transform: translateX(3px);
+  transition: transform var(--codex-motion-base) ease;
+}
+
+@media (max-width: 1024px) {
+  .codex-industries-rail { display: none; }
+  .codex-industries-layout { display: block; }
+  .codex-industries-hero-grid { grid-template-columns: repeat(2, 1fr); }
+  .codex-industries-section__header { flex-direction: column; }
+}
+@media (max-width: 600px) {
+  .codex-industries-hero-grid { grid-template-columns: 1fr; }
+  .codex-industries-header h1 { font-size: 1.6rem; }
+  .codex-industries-product-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Catalog page (/products/all/) — floating left rail, full-width content ── */
+/* The category navigator is a fixed rail pinned to the viewport's left edge.
+   All other page content (header, result count, product sections, support CTA)
+   stretches to the full width of the page — the rail does NOT pull the content
+   into a narrower flex column. The rail is hidden below 1280px because there
+   isn't enough horizontal room for an overlay without colliding with content. */
+.codex-catalog-rail {
+  position: fixed;
+  top: 120px;
+  left: var(--codex-space-4);
+  width: 220px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  z-index: var(--codex-z-sticky);
+}
+.codex-catalog-rail .codex-industries-rail__nav {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--codex-border-light);
+  padding: var(--codex-space-3) 0;
+  box-shadow: 0 2px 12px rgba(41, 28, 14, 0.04);
+}
+.codex-catalog-rail .codex-industries-rail__title {
+  font-size: var(--codex-text-xs);
+  font-weight: var(--codex-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--codex-text-subtle);
+  padding: var(--codex-space-2) var(--codex-space-4-plus) var(--codex-space-2-plus);
+  border-bottom: 1px solid var(--codex-border-light);
+}
+.codex-catalog-rail .codex-industries-rail__link {
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-1-plus);
+  padding: var(--codex-space-2) var(--codex-space-3-plus);
+  text-decoration: none;
+  color: var(--codex-text);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-medium);
+  transition: all var(--codex-motion-fast);
+  border-left: 3px solid transparent;
+}
+.codex-catalog-rail .codex-industries-rail__link:hover {
+  background: var(--codex-bg-warm);
+  border-left-color: var(--codex-gold);
+}
+.codex-catalog-rail .codex-industries-rail__link.active {
+  background: var(--codex-bg-warm);
+  border-left-color: var(--codex-gold);
+  /* A11y batch — same fix as #1 (sidebar active text → dark for AAA contrast). */
+  color: var(--codex-text);
+  font-weight: var(--codex-weight-semibold);
+}
+.codex-catalog-rail .codex-industries-rail__link.active .codex-industries-rail__emoji.codex-icon { color: var(--codex-gold); }
+.codex-catalog-rail .codex-industries-rail__emoji { font-size: var(--codex-text-base); flex-shrink: 0; }
+.codex-catalog-rail .codex-industries-rail__label { flex: 1; line-height: 1.3; }
+.codex-catalog-rail .codex-industries-rail__count {
+  font-size: var(--codex-text-2xs);
+  color: var(--codex-text-subtle);
+  background: var(--codex-bg-warm);
+  border-radius: var(--codex-radius-pill);
+  padding: var(--codex-space-0-5) var(--codex-space-2);
+  font-weight: var(--codex-weight-semibold);
+  flex-shrink: 0;
+}
+
+/* Product-family sections stretch full width; separate with subtle rule. */
+.codex-catalog-content .codex-catalog-category {
+  margin-bottom: var(--codex-space-10);
+  padding-top: var(--codex-space-5);
+  border-top: 1px solid var(--codex-border-light);
+}
+.codex-catalog-content .codex-catalog-category:first-child {
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
+}
+
+/* Floating toggle button + close button — hidden at wide viewports, where
+   the rail is always visible. At ≤1279px the rail collapses and the button
+   appears. Clicking either toggles the rail as an overlay. */
+.codex-catalog-rail-toggle {
+  display: none;
+  position: fixed;
+  top: 100px;
+  left: var(--codex-space-4);
+  z-index: var(--codex-z-header);
+  align-items: center;
+  gap: var(--codex-space-2);
+  padding: var(--codex-space-2) var(--codex-space-4);
+  background: var(--codex-gold, #c89d2d);
+  color: #fff;
+  border: none;
+  border-radius: var(--codex-radius-pill);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-semibold);
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(41, 28, 14, 0.18);
+  transition: transform var(--codex-motion-fast) ease, box-shadow var(--codex-motion-fast) ease;
+}
+.codex-catalog-rail-toggle:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(41, 28, 14, 0.24); }
+.codex-catalog-rail-toggle__icon { font-size: var(--codex-text-base); line-height: 1; }
+.codex-catalog-rail-toggle__label { line-height: 1; }
+
+.codex-catalog-rail-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(41, 28, 14, 0.35);
+  z-index: var(--codex-z-sticky);
+  animation: codex-rail-fade-in var(--codex-motion-fast) ease;
+}
+@keyframes codex-rail-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+.codex-catalog-rail__close {
+  display: none;
+  position: absolute;
+  top: var(--codex-space-1-plus);
+  right: var(--codex-space-2);
+  /* A11y #2 (DS-9, 2026-04-26) — Enforce 44×44 minimum touch target per
+     WCAG 2.1 AA 2.5.5. Original padding ~6px around an `✕` glyph yielded
+     ~22×22 hit area, undershooting the touch target on mobile. */
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  font-size: var(--codex-text-base);
+  color: var(--codex-text-subtle, #7a6a55);
+  cursor: pointer;
+  padding: var(--codex-space-1) var(--codex-space-2);
+  line-height: 1;
+}
+.codex-catalog-rail__close:hover { color: var(--codex-text, #291c0e); }
+
+body.codex-catalog-rail-locked { overflow: hidden; }
+
+/* Narrow viewports: hide the fixed rail by default, show the toggle button.
+   When .is-open is added by JS, the rail slides in as an overlay panel. */
+@media (max-width: 1279px) {
+  .codex-catalog-rail {
+    display: none;
+    top: 0;
+    left: 0;
+    width: 280px;
+    max-width: 82vw;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    padding-top: var(--codex-space-10);
+    box-shadow: 8px 0 32px rgba(41, 28, 14, 0.18);
+    z-index: var(--codex-z-header);
+    animation: codex-rail-slide-in 0.22s ease;
+  }
+  .codex-catalog-rail.is-open { display: block; }
+  .codex-catalog-rail .codex-industries-rail__nav {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding: var(--codex-space-2) 0 var(--codex-space-4);
+  }
+  /* A11y #2 — inline-flex (not block) so the 44×44 min sizing centers the ✕ glyph. */
+  .codex-catalog-rail__close { display: inline-flex; }
+  .codex-catalog-rail-toggle { display: inline-flex; }
+  .codex-catalog-rail-backdrop:not([hidden]) { display: block; }
+}
+@keyframes codex-rail-slide-in {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+/* When a non-catalog page (e.g. /industries/) wraps its content in
+   .codex-industries-page--with-rail to opt into the floating .codex-catalog-rail
+   pattern, push the content right of the 220px-wide rail on wide viewports.
+   The rail is hidden below 1280px so we only shift above that breakpoint. */
+@media (min-width: 1280px) {
+  .codex-industries-page--with-rail {
+    margin-left: 272px;
+    margin-right: var(--codex-space-6);
+  }
+}
+
+/* Editorial pillar (e.g. /industries/) opt-in: same offset, but applied to
+   the Kadence .content-wrap instead of a custom shell, because the editorial
+   pillar render path keeps the WordPress-style outer markup. We reset the
+   theme's centered max-width so the article fills the remaining width. */
+@media (min-width: 1280px) {
+  .content-wrap.codex-editorial-pillar--with-rail {
+    max-width: none;
+    margin-left: 272px;
+    margin-right: var(--codex-space-6);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Grouped rail variant (used by /resources/ — Guides, Compare, Compatibility
+   share one rail, separated by group headers). Adds a small uppercase header
+   above each group of links plus a count chip; otherwise inherits all the
+   .codex-catalog-rail link / hover / active styling unchanged.
+   ═══════════════════════════════════════════ */
+.codex-industries-rail__group + .codex-industries-rail__group {
+  margin-top: var(--codex-space-3);
+  border-top: 1px solid var(--codex-border-light);
+  padding-top: var(--codex-space-1);
+}
+.codex-industries-rail__group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--codex-space-2);
+  font-size: var(--codex-text-2xs);
+  font-weight: var(--codex-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--codex-text-subtle);
+  padding: var(--codex-space-2) var(--codex-space-4-plus) var(--codex-space-1);
+}
+.codex-industries-rail__group-count {
+  font-size: var(--codex-text-2xs);
+  color: var(--codex-text-subtle);
+  background: var(--codex-bg-warm);
+  border-radius: var(--codex-radius-pill);
+  padding: var(--codex-space-0-5) var(--codex-space-2);
+  font-weight: var(--codex-weight-semibold);
+}
+/* Grouped rail can get tall (80+ items in /resources/) — let it scroll
+   inside its own pinned position instead of pushing the page. */
+.codex-catalog-rail--grouped { max-height: calc(100vh - 140px); }
+.codex-catalog-rail--grouped .codex-industries-rail__nav { padding-bottom: var(--codex-space-2); }
+
+/* ═══════════════════════════════════════════
+   Grouped hub grid (one section per group, e.g. /resources/). Each section
+   gets its own h2 + count + grid; the cards themselves reuse
+   .codex-industries-hub-card so the visual treatment matches /industries/
+   and /solutions/.
+   ═══════════════════════════════════════════ */
+.codex-industries-hub-grid--grouped > .codex-resources-group + .codex-resources-group {
+  margin-top: var(--codex-space-10);
+  padding-top: var(--codex-space-6);
+  border-top: 2px solid var(--codex-border-light);
+}
+.codex-resources-group__title {
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-2);
+  font-size: var(--codex-text-xl);
+  color: var(--codex-text);
+  margin: 0 0 var(--codex-space-1);
+}
+.codex-resources-group__emoji { font-size: var(--codex-text-xl); }
+.codex-resources-group__count {
+  font-size: var(--codex-text-sm);
+  color: var(--codex-text-subtle);
+  background: var(--codex-bg-warm);
+  border-radius: var(--codex-radius-pill);
+  padding: var(--codex-space-0-5) var(--codex-space-2-plus);
+  font-weight: var(--codex-weight-semibold);
+  margin-left: var(--codex-space-1);
+}
+/* Tighter card grid for resources — long titles, prefer 3-column layout where
+   possible so the page doesn't feel sparse. */
+.codex-industries-hub-grid--grouped .codex-industries-hub-grid__list {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+/* ═══════════════════════════════════════════
+   /resources/ category hub — 4 large cards, one per group, mirroring the
+   /industries/ hub-grid pattern but at the category-router level (one card
+   per category, not per leaf). Each card carries an emoji icon, a count
+   badge, a one-line summary, a short list of sample leaf links, and a
+   "Browse all N items" CTA pointing to the dedicated category landing page.
+   ═══════════════════════════════════════════ */
+.codex-resources-category-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--codex-space-4);
+  margin-top: var(--codex-space-4);
+}
+.codex-resources-category-card {
+  --card-padding: var(--codex-space-4) var(--codex-space-4-plus);
+  --card-radius: 14px;
+  --card-elevation: 0 2px 12px rgba(41, 28, 14, 0.05);
+  --card-elevation-hover: 0 6px 20px rgba(41, 28, 14, 0.08);
+  --card-hover-lift: -2px;
+  --card-hover-border: var(--codex-accent);
+  gap: var(--codex-space-3);
+  scroll-margin-top: 140px;
+}
+.codex-resources-category-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-3);
+}
+.codex-resources-category-card__emoji {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.codex-resources-category-card__heading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-0-5);
+  min-width: 0;
+}
+.codex-resources-category-card__title {
+  font-size: var(--codex-text-lg);
+  font-weight: var(--codex-weight-bold);
+  color: var(--codex-text);
+  margin: 0;
+  line-height: 1.25;
+}
+.codex-resources-category-card__count {
+  font-size: var(--codex-text-sm);
+  color: var(--codex-text-subtle);
+  margin: 0;
+  font-weight: var(--codex-weight-semibold);
+}
+.codex-resources-category-card__summary {
+  font-size: var(--codex-text-sm);
+  color: var(--codex-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+.codex-resources-category-card__samples {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-1);
+  border-top: 1px dashed var(--codex-border-light);
+  padding-top: var(--codex-space-3);
+}
+.codex-resources-category-card__samples li {
+  font-size: var(--codex-text-sm);
+  line-height: 1.4;
+}
+.codex-resources-category-card__samples a {
+  color: var(--codex-text);
+  text-decoration: none;
+  display: block;
+  padding: var(--codex-space-0-5) 0;
+  border-bottom: 1px solid transparent;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+.codex-resources-category-card__samples a:hover,
+.codex-resources-category-card__samples a:focus-visible {
+  color: var(--codex-accent);
+  border-bottom-color: var(--codex-accent);
+}
+.codex-resources-category-card__cta {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: var(--codex-text-sm);
+  font-weight: var(--codex-weight-semibold);
+  color: var(--codex-accent);
+  text-decoration: none;
+  padding: var(--codex-space-2) var(--codex-space-3);
+  border-radius: var(--codex-radius-pill);
+  background: var(--codex-bg-warm);
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.codex-resources-category-card__cta:hover,
+.codex-resources-category-card__cta:focus-visible {
+  background: var(--codex-accent);
+  color: #fff;
+}
+.codex-resources-category-card__cta span {
+  display: inline-block;
+  transition: transform 160ms ease;
+}
+.codex-resources-category-card__cta:hover span,
+.codex-resources-category-card__cta:focus-visible span {
+  transform: translateX(2px);
+}
+
+/* ═══════════════════════════════════════════
+   Catalog faceted filter panel
+   Sits directly below the Product Families nav inside the rail.
+   Each group is a titled block of checkbox rows; counts trail each row.
+   "has-active-filters" state tightens visual weight so the user can see
+   what's active at a glance.
+   ═══════════════════════════════════════════ */
+.codex-catalog-filter {
+  margin-top: var(--codex-space-3);
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid var(--codex-border-light);
+  box-shadow: 0 2px 12px rgba(41, 28, 14, 0.04);
+  padding: var(--codex-space-3) 0 var(--codex-space-3-plus);
+}
+.codex-catalog-filter__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--codex-space-3);
+  border-bottom: 1px solid var(--codex-border-light);
+}
+.codex-catalog-filter__header .codex-industries-rail__title {
+  border-bottom: none;
+  padding: var(--codex-space-2) 0 var(--codex-space-2);
+}
+.codex-catalog-filter__clear {
+  background: transparent;
+  border: 1px solid var(--codex-border-light);
+  color: var(--codex-text-subtle);
+  border-radius: var(--codex-radius-pill);
+  padding: 0.18rem var(--codex-space-2-plus);
+  font-size: var(--codex-text-2xs);
+  font-weight: var(--codex-weight-semibold);
+  cursor: pointer;
+  transition: color var(--codex-motion-fast), border-color var(--codex-motion-fast), background var(--codex-motion-fast);
+}
+.codex-catalog-filter__clear:hover {
+  color: var(--codex-gold-muted);
+  border-color: var(--codex-gold-muted);
+  background: var(--codex-bg-warm);
+}
+.codex-catalog-filter.has-active-filters {
+  border-color: var(--codex-gold);
+  box-shadow: 0 4px 16px rgba(200, 157, 45, 0.12);
+}
+
+.codex-facet-group {
+  padding: var(--codex-space-1-plus) 0 var(--codex-space-1);
+  border-bottom: 1px solid var(--codex-border-light);
+}
+.codex-facet-group:last-child { border-bottom: none; }
+.codex-facet-group__title {
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-1-plus);
+  font-size: var(--codex-text-2xs);
+  font-weight: var(--codex-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--codex-text-subtle);
+  padding: var(--codex-space-1-plus) var(--codex-space-3-plus) var(--codex-space-1);
+}
+.codex-facet-group__icon { font-size: var(--codex-text-sm-plus); line-height: 1; }
+
+.codex-facet-option {
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-1-plus);
+  padding: 0.32rem var(--codex-space-3-plus) 0.32rem var(--codex-space-3);
+  font-size: var(--codex-text-xs-plus);
+  color: var(--codex-text);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.codex-facet-option:hover { background: var(--codex-bg-warm); }
+.codex-facet-option input[type="checkbox"] {
+  margin: 0;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--codex-gold, #c89d2d);
+  cursor: pointer;
+}
+.codex-facet-option__label { flex: 1; line-height: 1.3; }
+.codex-facet-option__count {
+  font-size: var(--codex-text-2xs);
+  color: var(--codex-text-subtle);
+  background: var(--codex-bg-warm);
+  border-radius: var(--codex-radius-pill);
+  padding: var(--codex-space-0-5) var(--codex-space-1-plus);
+  font-weight: var(--codex-weight-semibold);
+  flex-shrink: 0;
+}
+.codex-facet-option input[type="checkbox"]:checked ~ .codex-facet-option__label {
+  color: var(--codex-gold);
+  font-weight: var(--codex-weight-semibold);
+}
+
+/* Rail count pill greys out when a filter zeroes out its category. */
+.codex-catalog-rail .codex-industries-rail__count.is-empty {
+  opacity: 0.35;
+}
+
+/* Empty state surfaces when the active filter combination matches no SKUs. */
+.codex-catalog-empty {
+  margin: var(--codex-space-12) auto;
+  max-width: 520px;
+  padding: var(--codex-space-8) var(--codex-space-6);
+  text-align: center;
+  background: #fff;
+  border: 1px dashed var(--codex-border-light);
+  border-radius: 14px;
+}
+.codex-catalog-empty__icon { font-size: 2.25rem; margin-bottom: var(--codex-space-2); }
+.codex-catalog-empty__title {
+  font-size: var(--codex-text-base-plus);
+  margin: var(--codex-space-1) 0 var(--codex-space-1-plus);
+  color: var(--codex-text);
+}
+.codex-catalog-empty__desc {
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  margin: 0 0 var(--codex-space-4-plus);
+}
+.codex-catalog-empty__clear {
+  background: var(--codex-gold, #c89d2d);
+  color: #fff;
+  border: none;
+  border-radius: var(--codex-radius-pill);
+  padding: var(--codex-space-2) var(--codex-space-4-plus);
+  font-size: var(--codex-text-sm);
+  font-weight: var(--codex-weight-semibold);
+  cursor: pointer;
+  transition: transform var(--codex-motion-fast), box-shadow var(--codex-motion-fast);
+}
+.codex-catalog-empty__clear:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(200, 157, 45, 0.28);
+}
+
+/* Keep old classes for backward compat */
+.codex-industry-section { margin-bottom: var(--codex-space-10); padding-bottom: var(--codex-space-8); border-bottom: 1px solid var(--codex-border-light); }
+.codex-industry-section:last-child { border-bottom: none; }
+.codex-industry-title { font-size: var(--codex-text-xl); margin-bottom: var(--codex-space-1); }
+.codex-industry-title a { color: var(--codex-text); text-decoration: none; }
+.codex-industry-title a:hover { color: var(--codex-gold); }
+.codex-industry-desc { color: var(--codex-text-muted); font-size: var(--codex-text-sm-plus); margin-bottom: var(--codex-space-4); }
+
+.codex-footer-rfq-entry {
+  margin: var(--codex-space-3) 0;
+}
+
+.codex-footer-rfq-link {
+  min-height: var(--codex-space-11);
+  padding: var(--codex-space-2-plus) var(--codex-space-4);
+  color: #fff !important;
+  box-shadow: 0 12px 24px rgba(41, 28, 14, 0.18);
+}
+
+.codex-footer-rfq-link:hover {
+  color: #fff !important;
+}
+
+/* ═══════════════════════════════════════════
+   Product CTA Block
+   ═══════════════════════════════════════════ */
+
+.codex-product-cta {
+  margin: 1.35rem 0 var(--codex-space-8);
+  padding: 1.35rem;
+  border: 1px solid var(--codex-border);
+  border-radius: 22px;
+  background: var(--codex-bg-hero);
+  box-shadow: 0 16px 34px rgba(41, 28, 14, 0.08);
+}
+
+.codex-product-cta h2 {
+  margin: 0 0 var(--codex-space-2);
+  font-size: clamp(var(--codex-text-lg-plus), var(--codex-text-lg) + 0.35vw, var(--codex-text-xl-plus));
+  color: var(--codex-text);
+}
+
+.codex-product-cta__copy p:last-child {
+  margin: 0;
+  color: var(--codex-text-muted);
+}
+
+.codex-product-cta__brief {
+  margin: var(--codex-space-4) 0 0;
+  padding-left: var(--codex-space-4-plus);
+  color: var(--codex-text-muted);
+}
+
+.codex-product-cta__brief li + li {
+  margin-top: var(--codex-space-2);
+}
+
+/* ═══════════════════════════════════════════
+   Article FAQ (inside support panels)
+   ═══════════════════════════════════════════ */
+
+.codex-article-faq {
+  margin-top: var(--codex-space-5);
+}
+
+.codex-article-faq details {
+  border-top: 1px solid var(--codex-border-light);
+  padding-top: var(--codex-space-3-plus);
+  margin-top: var(--codex-space-3-plus);
+}
+
+.codex-article-faq details:first-of-type {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.codex-article-faq summary {
+  cursor: pointer;
+  font-weight: var(--codex-weight-bold);
+  color: var(--codex-text);
+}
+
+.codex-article-faq p {
+  margin: var(--codex-space-2) 0 0;
+  color: var(--codex-text-muted);
+}
+
+/* ═══════════════════════════════════════════
+   Collection CTA Block
+   ═══════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════
+   Growth Hub Block
+   ═══════════════════════════════════════════ */
+
+.codex-growth-hub {
+  margin: var(--codex-space-8) 0;
+  padding: var(--codex-space-6);
+  border: 1px solid rgba(41, 28, 14, 0.1);
+  border-radius: var(--codex-radius-card-xl);
+  background:
+    radial-gradient(circle at top right, var(--codex-border-gold), transparent 28%),
+    var(--codex-bg-warm-gradient);
+  box-shadow: 0 18px 36px rgba(41, 28, 14, 0.08);
+}
+
+.codex-growth-hub__hero,
+.codex-growth-hub__group,
+.codex-growth-hub__brief {
+  padding: var(--codex-space-5);
+  border-radius: var(--codex-radius-card-lg);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.codex-growth-hub__group,
+.codex-growth-hub__brief {
+  margin-top: var(--codex-space-4);
+}
+
+.codex-growth-hub__hero h2,
+.codex-growth-hub__group h2,
+.codex-growth-hub__brief h2 {
+  margin: 0 0 var(--codex-space-2-plus);
+  color: var(--codex-text);
+}
+
+.codex-growth-hub__hero p:last-child,
+.codex-growth-hub__group p:last-child,
+.codex-growth-hub__brief p:last-child {
+  margin-bottom: 0;
+}
+
+.codex-growth-hub__grid {
+  display: grid;
+  gap: var(--codex-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-top: var(--codex-space-4);
+}
+
+.codex-growth-hub__card {
+  display: block;
+  padding: var(--codex-space-4);
+  border: 1px solid rgba(41, 28, 14, 0.1);
+  border-radius: 18px;
+  background: var(--codex-bg-card);
+  text-decoration: none;
+  transition: var(--codex-transition), border-color 160ms ease;
+}
+
+.codex-growth-hub__card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(195, 154, 95, 0.3);
+  box-shadow: 0 14px 28px rgba(41, 28, 14, 0.08);
+}
+
+.codex-growth-hub__card-eyebrow {
+  display: block;
+  margin-bottom: var(--codex-space-1-plus);
+  color: var(--codex-gold-muted);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.codex-growth-hub__card strong {
+  display: block;
+  color: var(--codex-text);
+}
+
+.codex-growth-hub__card span:last-child {
+  display: block;
+  margin-top: var(--codex-space-1-plus);
+  color: var(--codex-text-muted);
+}
+
+.codex-growth-hub__brief {
+  display: grid;
+  gap: var(--codex-space-4);
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
+  align-items: center;
+}
+
+.codex-growth-hub__brief-list {
+  margin: 0;
+  padding-left: var(--codex-space-4-plus);
+}
+
+.codex-growth-hub__brief-list li + li {
+  margin-top: var(--codex-space-2);
+}
+
+/* ═══════════════════════════════════════════
+   Editorial Pages
+   ═══════════════════════════════════════════ */
+
+.codex-editorial-page {
+  max-width: min(1160px, calc(100% - var(--codex-space-8)));
+  margin: 0 auto var(--codex-space-12);
+}
+
+.codex-editorial-trail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-2);
+  margin: 0 0 var(--codex-space-5);
+  padding-top: var(--codex-space-14);
+  color: var(--codex-text-subtle);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.4;
+  position: relative;
+  z-index: var(--codex-z-raised);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.codex-editorial-trail a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--codex-gold);
+  text-decoration: underline;
+  text-decoration-color: rgba(195, 154, 95, 0.3);
+  text-underline-offset: 3px;
+}
+
+.codex-editorial-trail a:hover {
+  text-decoration-color: var(--codex-gold);
+}
+
+.codex-editorial-hero {
+  display: grid;
+  gap: var(--codex-space-6);
+  align-items: center;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
+  padding: var(--codex-space-7);
+  border: 1px solid rgba(41, 28, 14, 0.1);
+  border-radius: var(--codex-radius-card-xl);
+  background:
+    radial-gradient(circle at top left, rgba(195, 154, 95, 0.16), transparent 38%),
+    var(--codex-bg-warm-gradient);
+  box-shadow: var(--codex-shadow-heavy);
+}
+
+.codex-editorial-hero h1 {
+  margin: 0;
+  color: var(--codex-text);
+  font-size: clamp(var(--codex-text-2xl), var(--codex-text-xl-plus) + 1vw, 2.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+/* Page-type hero color variants */
+.codex-editorial-hero[data-page-type="solution"] {
+  border-left: 4px solid var(--codex-teal);
+  background:
+    radial-gradient(circle at top left, var(--codex-teal-light), transparent 38%),
+    var(--codex-bg-warm-gradient);
+}
+
+.codex-editorial-hero[data-page-type="solution"] .codex-editorial-kicker {
+  color: var(--codex-teal);
+}
+
+.codex-editorial-hero[data-page-type="compare"] {
+  border-left: 4px solid var(--codex-steel);
+  background:
+    radial-gradient(circle at top left, var(--codex-steel-light), transparent 38%),
+    var(--codex-bg-warm-gradient);
+}
+
+.codex-editorial-hero[data-page-type="compare"] .codex-editorial-kicker {
+  color: var(--codex-steel);
+}
+
+.codex-editorial-hero[data-page-type="guide"] {
+  border-left: 4px solid var(--codex-forest);
+  background:
+    radial-gradient(circle at top left, var(--codex-forest-light), transparent 38%),
+    var(--codex-bg-warm-gradient);
+}
+
+.codex-editorial-hero[data-page-type="guide"] .codex-editorial-kicker {
+  color: var(--codex-forest);
+}
+
+.codex-editorial-hero[data-page-type="compatibility"] {
+  border-left: 4px solid var(--codex-gold-muted);
+}
+
+.codex-editorial-answer {
+  margin-top: var(--codex-space-4);
+  padding: var(--codex-space-4) var(--codex-space-4-plus);
+  border: 1px solid var(--codex-border-gold);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.codex-editorial-summary {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-base);
+  line-height: 1.7;
+}
+
+.codex-editorial-jump-nav {
+  margin-top: var(--codex-space-6);
+  padding: var(--codex-space-4-plus) var(--codex-space-4-plus);
+  border: 1px solid var(--codex-border-light);
+  border-radius: var(--codex-radius-card-lg);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.codex-editorial-jump-nav .codex-editorial-kicker {
+  margin-bottom: var(--codex-space-2-plus);
+}
+
+.codex-editorial-snapshot-grid {
+  display: grid;
+  gap: var(--codex-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* ── Editorial contact-route channels card ────────────────────────────── */
+.codex-editorial-channels {
+  margin: var(--codex-space-6, 32px) 0;
+  padding: var(--codex-space-5, 28px) var(--codex-space-5, 28px);
+  background: linear-gradient(180deg, #ffffff 0%, #fbf7ee 100%);
+  border: 1px solid rgba(212, 167, 85, 0.28);
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+
+.codex-editorial-channels__head {
+  margin-bottom: var(--codex-space-4, 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.codex-editorial-channels__head h2 {
+  margin: 2px 0 0;
+  font-size: clamp(20px, 2.4vw, 26px);
+  line-height: 1.25;
+  color: var(--codex-text, #291c0e);
+}
+
+.codex-editorial-channels__lede {
+  margin: 4px 0 0;
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 15px;
+  line-height: 1.55;
+  max-width: 60ch;
+}
+
+.codex-editorial-channels__grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.codex-editorial-channel {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 16px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  border-radius: 14px;
+  text-decoration: none !important;
+  color: inherit !important;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.codex-editorial-channel:hover,
+.codex-editorial-channel:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(212, 167, 85, 0.55);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.07);
+}
+
+.codex-editorial-channel--alt {
+  background: rgba(212, 167, 85, 0.08);
+  border-color: rgba(212, 167, 85, 0.35);
+}
+
+.codex-editorial-channel__icon {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(212, 167, 85, 0.14);
+  color: var(--codex-gold, #c39a5f);
+}
+
+.codex-editorial-channel__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  /* DS-12 #5C (2026-04-27): make the body column fill the available
+     card height so secondary copy lands at the bottom regardless of
+     length. The grid stretches each card to row height; this then
+     pushes the __hint to the bottom of every card. */
+  flex: 1;
+  min-height: 100%;
+}
+/* DS-12 #5C — pin hint text to the card bottom so the 4-up row visually
+   balances when one card has a longer hint (e.g. email's "Opens prefilled
+   with the {kicker} brief →" which wraps to 2 lines on flagship pages). */
+.codex-editorial-channel__hint {
+  margin-top: auto;
+  padding-top: var(--codex-space-1-plus, 0.4rem);
+}
+
+.codex-editorial-channel__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.codex-editorial-channel__value {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--codex-text, #291c0e);
+  word-break: break-word;
+}
+
+.codex-editorial-channel__hint {
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.55);
+  margin-top: 2px;
+}
+
+.codex-editorial-snapshot-card {
+  padding: var(--codex-space-4);
+  border-radius: 18px;
+  border: 1px solid var(--codex-border-light);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.codex-editorial-snapshot-card p {
+  margin: 0;
+}
+
+.codex-editorial-snapshot-card p + p {
+  margin-top: var(--codex-space-2);
+}
+
+.codex-editorial-snapshot-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--codex-space-11);
+  margin-top: var(--codex-space-2);
+  color: var(--codex-gold);
+  font-weight: var(--codex-weight-bold);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.codex-editorial-snapshot-link:hover {
+  color: var(--codex-dark-mid);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.codex-editorial-points,
+.codex-editorial-list {
+  margin: var(--codex-space-4) 0 0;
+  padding-left: var(--codex-space-4-plus);
+}
+
+.codex-editorial-points li,
+.codex-editorial-list li {
+  color: var(--codex-text-muted);
+}
+
+.codex-editorial-points li + li,
+.codex-editorial-list li + li {
+  margin-top: var(--codex-space-2);
+}
+
+.codex-hero-cta {
+  margin-top: var(--codex-space-5);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-3);
+  align-items: center;
+}
+
+.codex-hero-cta-btn {
+  display: inline-block;
+  padding: var(--codex-space-3) var(--codex-space-8);
+  background: var(--codex-gold);
+  color: var(--codex-dark);
+  font-weight: var(--codex-weight-bold);
+  font-size: var(--codex-text-base);
+  border-radius: var(--codex-radius-card);
+  text-decoration: none;
+  transition: opacity var(--codex-motion-fast);
+}
+
+.codex-hero-cta-btn:hover {
+  opacity: 0.88;
+  color: var(--codex-dark);
+}
+
+.codex-hero-cta-btn--ghost {
+  background: transparent;
+  color: var(--codex-text);
+  border: 1px solid var(--codex-gold);
+  padding: calc(var(--codex-space-3) - 1px) calc(var(--codex-space-6) - 1px);
+}
+
+.codex-hero-cta-btn--ghost:hover {
+  background: rgba(201, 185, 154, 0.12);
+  color: var(--codex-text);
+  opacity: 1;
+}
+
+.codex-hero-trust-bar {
+  display: flex;
+  gap: var(--codex-space-6);
+  margin-top: var(--codex-space-4);
+  font-size: var(--codex-text-xs-plus);
+  color: var(--codex-text-muted);
+}
+
+.codex-hero-trust-bar strong {
+  color: var(--codex-gold-muted);
+}
+
+@media (max-width: 600px) {
+  .codex-hero-trust-bar {
+    flex-wrap: wrap;
+    gap: var(--codex-space-3);
+  }
+}
+
+.codex-editorial-step-list {
+  list-style: none;
+  margin: var(--codex-space-4) 0 0;
+  padding: 0 0 0 var(--codex-space-1-plus);
+  display: grid;
+  gap: 0;
+  position: relative;
+}
+
+/* Vertical connecting line */
+.codex-editorial-step-list::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--codex-space-1-plus) + var(--codex-space-10));
+  top: var(--codex-space-6);
+  bottom: var(--codex-space-6);
+  width: 2px;
+  background: linear-gradient(180deg, var(--codex-border), transparent);
+  z-index: var(--codex-z-base);
+}
+
+.codex-editorial-step {
+  display: grid;
+  gap: var(--codex-space-3-plus);
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  padding: var(--codex-space-3-plus) var(--codex-space-2-plus);
+  position: relative;
+  z-index: var(--codex-z-raised);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.codex-editorial-step-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 4.9rem;
+  min-height: var(--codex-space-9);
+  padding: var(--codex-space-1-plus) var(--codex-space-2-plus);
+  border-radius: var(--codex-radius-pill);
+  background: linear-gradient(135deg, rgba(41, 28, 14, 0.96), rgba(108, 81, 39, 0.96));
+  color: #fff;
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.codex-editorial-step-copy {
+  color: var(--codex-text-muted);
+  line-height: 1.7;
+}
+
+.codex-editorial-callout {
+  margin: var(--codex-space-5) 0;
+  padding: var(--codex-space-4-plus) 1.35rem;
+  border-left: 3px solid var(--codex-gold);
+  border-radius: 0 var(--codex-radius-card) var(--codex-radius-card) 0;
+  background: var(--codex-bg-warm);
+}
+
+.codex-editorial-callout strong {
+  display: block;
+  margin-bottom: var(--codex-space-1);
+  color: var(--codex-text);
+  font-size: var(--codex-text-sm-plus);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.codex-editorial-callout p {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.6;
+}
+
+.codex-editorial-callout__link {
+  display: inline-block;
+  margin-top: var(--codex-space-2);
+  color: var(--codex-gold);
+  font-size: var(--codex-text-sm-plus);
+  font-weight: var(--codex-weight-semibold);
+  text-decoration: none;
+}
+
+.codex-editorial-section a {
+  color: var(--codex-gold);
+  text-decoration: none;
+  font-weight: var(--codex-weight-medium);
+}
+
+.codex-editorial-section a:hover {
+  text-decoration: underline;
+}
+
+.codex-editorial-figure {
+  margin: var(--codex-space-4) 0;
+}
+
+.codex-editorial-figure img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--codex-radius-card-lg);
+}
+
+.codex-editorial-section,
+.codex-editorial-card {
+  --card-padding: var(--codex-space-6) var(--codex-space-6-plus);
+  --card-radius: var(--codex-radius-card-lg);
+  --card-bg: var(--codex-bg-card);
+  --card-border-color: rgba(41, 28, 14, 0.10);
+  --card-hover-lift: 0;
+  margin-top: var(--codex-space-8);
+}
+
+.codex-editorial-action-bar {
+  margin-top: var(--codex-space-10);
+  padding: var(--codex-space-6) var(--codex-space-6-plus);
+  border: 1px solid rgba(41, 28, 14, 0.1);
+  border-radius: var(--codex-radius-card-lg);
+  background: var(--codex-bg-card);
+}
+
+.codex-editorial-section[id],
+.codex-editorial-action-bar[id] {
+  scroll-margin-top: 6rem;
+}
+
+.codex-editorial-section h2,
+.codex-editorial-card h2,
+.codex-editorial-action-bar h2 {
+  margin: 0 0 var(--codex-space-3-plus);
+  color: var(--codex-text);
+  font-size: var(--codex-text-xl);
+}
+
+.codex-editorial-section p,
+.codex-editorial-card p,
+.codex-editorial-action-bar p,
+.codex-editorial-brief-card p,
+.codex-editorial-brief-card dd {
+  color: var(--codex-text-muted);
+}
+
+.codex-editorial-section p:last-child,
+.codex-editorial-card p:last-child,
+.codex-editorial-action-bar p:last-child {
+  margin-bottom: 0;
+}
+
+.codex-editorial-resource-grid {
+  display: grid;
+  gap: var(--codex-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: var(--codex-space-6);
+}
+
+.codex-editorial-link-card strong {
+  display: block;
+}
+
+.codex-editorial-link-card span {
+  display: block;
+  font-size: var(--codex-text-sm-plus);
+}
+
+.codex-editorial-brief-grid {
+  display: grid;
+  gap: var(--codex-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 0;
+}
+.codex-editorial-brief-grid--extra {
+  margin-top: var(--codex-space-4);
+}
+
+.codex-editorial-brief-card {
+  margin: 0;
+  padding: var(--codex-space-4);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.codex-editorial-brief-card dt {
+  margin: 0 0 var(--codex-space-1-plus);
+  color: var(--codex-text);
+  font-weight: var(--codex-weight-bold);
+}
+
+.codex-editorial-brief-card dd {
+  margin: 0;
+}
+
+.codex-editorial-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--codex-border);
+  border-radius: 14px;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scroll fade hint on small screens */
+@media (max-width: 767px) {
+  .codex-editorial-table-wrap {
+    background:
+      linear-gradient(to right, #fff 85%, rgba(255, 255, 255, 0)) 100% 0 / 3rem 100% no-repeat,
+      #fff;
+  }
+}
+
+.codex-editorial-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.codex-editorial-table th,
+.codex-editorial-table td {
+  padding: var(--codex-space-3-plus) var(--codex-space-4);
+  border-bottom: 1px solid var(--codex-border-light);
+  text-align: left;
+  vertical-align: top;
+  font-size: var(--codex-text-sm-plus);
+  line-height: var(--codex-leading-normal);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.codex-editorial-table thead th {
+  background: var(--codex-dark);
+  color: #fff;
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.codex-editorial-table thead th:first-child {
+  border-radius: 13px 0 0 0;
+}
+
+.codex-editorial-table thead th:last-child {
+  border-radius: 0 13px 0 0;
+}
+
+.codex-editorial-table tbody tr:nth-child(even) {
+  background: rgba(248, 246, 241, 0.5);
+}
+
+.codex-editorial-table tbody tr:last-child th,
+.codex-editorial-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.codex-editorial-table tbody th {
+  font-weight: var(--codex-weight-bold);
+  color: var(--codex-text);
+}
+
+.codex-editorial-faq details {
+  border-bottom: 1px solid var(--codex-border-light);
+  padding-bottom: var(--codex-space-3);
+}
+
+.codex-editorial-faq details + details {
+  margin-top: var(--codex-space-3);
+}
+
+.codex-editorial-faq details:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.codex-editorial-faq summary {
+  cursor: pointer;
+  color: var(--codex-text);
+  font-weight: var(--codex-weight-bold);
+  padding: var(--codex-space-2) 0;
+  min-height: var(--codex-space-11);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-2-plus);
+}
+
+.codex-editorial-faq summary::before {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--codex-space-6-plus);
+  height: var(--codex-space-6-plus);
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--codex-bg-warm);
+  border: 1px solid var(--codex-border-light);
+  font-size: var(--codex-text-base);
+  font-weight: var(--codex-weight-regular);
+  color: var(--codex-text-muted);
+  transition: transform 200ms ease, background-color 200ms ease;
+}
+
+.codex-editorial-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.codex-editorial-faq details[open] > summary::before {
+  content: "−";
+  background: var(--codex-dark);
+  color: #fff;
+  border-color: transparent;
+}
+
+.codex-editorial-faq p {
+  margin: var(--codex-space-1-plus) 0 0 var(--codex-space-9);
+}
+
+/* Inline RFQ form */
+.codex-inline-rfq {
+  margin-top: var(--codex-space-10);
+  padding: var(--codex-space-8);
+  border-radius: var(--codex-radius-card-lg);
+  background: linear-gradient(135deg, var(--codex-dark) 0%, #3d2a14 100%);
+  color: #fff;
+}
+
+.codex-inline-rfq h2 {
+  margin: 0 0 var(--codex-space-2);
+  color: var(--codex-gold);
+  font-size: var(--codex-text-lg-plus);
+}
+
+.codex-inline-rfq p {
+  margin: 0 0 var(--codex-space-5);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--codex-text-sm-plus);
+}
+
+.codex-inline-rfq-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-3);
+}
+
+.codex-inline-rfq-row {
+  display: flex;
+  gap: var(--codex-space-3);
+}
+
+.codex-inline-rfq-row input {
+  flex: 1;
+}
+
+.codex-inline-rfq input,
+.codex-inline-rfq textarea {
+  width: 100%;
+  padding: var(--codex-space-2-plus) var(--codex-space-3-plus);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--codex-radius-card);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: var(--codex-text-sm-plus);
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.codex-inline-rfq input::placeholder,
+.codex-inline-rfq textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.codex-inline-rfq input:focus,
+.codex-inline-rfq textarea:focus {
+  outline: 2px solid var(--codex-gold);
+  outline-offset: 2px;
+  border-color: var(--codex-gold);
+}
+
+.codex-inline-rfq button {
+  align-self: flex-start;
+  padding: var(--codex-space-2-plus) var(--codex-space-8);
+  border: none;
+  border-radius: var(--codex-radius-card);
+  background: var(--codex-gold);
+  color: var(--codex-dark);
+  font-weight: var(--codex-weight-bold);
+  font-size: var(--codex-text-sm-plus);
+  cursor: pointer;
+  transition: opacity var(--codex-motion-fast);
+}
+
+.codex-inline-rfq button:hover {
+  opacity: 0.88;
+}
+
+@media (max-width: 600px) {
+  .codex-inline-rfq-row {
+    flex-direction: column;
+  }
+}
+
+/* Trust signals */
+.codex-trust-signals {
+  margin-top: var(--codex-space-10);
+  padding: var(--codex-space-7) var(--codex-space-8);
+  border-radius: var(--codex-radius-card-lg);
+  background: var(--codex-bg-warm);
+  border: 1px solid var(--codex-border-light);
+}
+
+.codex-trust-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--codex-space-4);
+  text-align: center;
+  margin-bottom: var(--codex-space-5);
+}
+
+.codex-trust-stat strong {
+  display: block;
+  font-size: var(--codex-text-lg-plus);
+  color: var(--codex-gold);
+  line-height: var(--codex-leading-tight);
+}
+
+.codex-trust-stat span {
+  font-size: var(--codex-text-xs-plus);
+  color: var(--codex-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.codex-trust-note {
+  font-size: var(--codex-text-sm-plus);
+  color: var(--codex-text-muted);
+  text-align: center;
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .codex-trust-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Pain point / solution section styles */
+.codex-editorial-section[data-section-type="pain"] {
+  border-left: 3px solid var(--codex-error);
+  padding-left: var(--codex-space-5);
+  background: rgba(192, 57, 43, 0.03);
+  border-radius: 0 var(--codex-radius-card) var(--codex-radius-card) 0;
+}
+
+.codex-editorial-section[data-section-type="pain"] h2::before {
+  content: "⚠ ";
+}
+
+.codex-editorial-section[data-section-type="solution"] {
+  border-left: 3px solid var(--codex-success);
+  padding-left: var(--codex-space-5);
+  background: rgba(39, 174, 96, 0.03);
+  border-radius: 0 var(--codex-radius-card) var(--codex-radius-card) 0;
+}
+
+.codex-editorial-section[data-section-type="solution"] h2::before {
+  content: "✓ ";
+}
+
+.codex-editorial-section[data-section-type="results"] {
+  border-left: 3px solid var(--codex-gold);
+  padding-left: var(--codex-space-5);
+  background: rgba(195, 154, 95, 0.04);
+  border-radius: 0 var(--codex-radius-card) var(--codex-radius-card) 0;
+}
+
+/* Action bar: strong CTA treatment */
+.codex-editorial-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--codex-space-4);
+  border-left: 4px solid var(--codex-gold);
+  background:
+    radial-gradient(circle at top right, var(--codex-border-gold), transparent 40%),
+    var(--codex-bg-card);
+}
+
+/* FAQ shell: lighter, supplementary feel */
+.codex-editorial-section.codex-editorial-faq-shell {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px dashed rgba(41, 28, 14, 0.15);
+}
+
+/* Snapshot / at-a-glance sections: left accent colored by page type */
+.codex-editorial-section.codex-editorial-snapshot {
+  border-left: 4px solid var(--codex-gold-muted);
+}
+
+[data-page-type="solution"] ~ .codex-editorial-section.codex-editorial-snapshot {
+  border-left-color: var(--codex-teal);
+}
+
+[data-page-type="compare"] ~ .codex-editorial-section.codex-editorial-snapshot {
+  border-left-color: var(--codex-steel);
+}
+
+[data-page-type="guide"] ~ .codex-editorial-section.codex-editorial-snapshot {
+  border-left-color: var(--codex-forest);
+}
+
+/* Resource sections: grid-heavy, no card wrapper feel */
+.codex-editorial-section.codex-editorial-resource-shell {
+  background: transparent;
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+  box-shadow: none;
+}
+
+/* Page-type colored action bar variants */
+[data-page-type="solution"] ~ .codex-editorial-action-bar {
+  border-left-color: var(--codex-teal);
+}
+
+[data-page-type="solution"] ~ .codex-editorial-action-bar .codex-editorial-primary {
+  background: linear-gradient(135deg, #2c5454, var(--codex-teal));
+}
+
+[data-page-type="compare"] ~ .codex-editorial-action-bar {
+  border-left-color: var(--codex-steel);
+}
+
+[data-page-type="guide"] ~ .codex-editorial-action-bar {
+  border-left-color: var(--codex-forest);
+}
+
+[data-page-type="guide"] ~ .codex-editorial-action-bar .codex-editorial-primary {
+  background: linear-gradient(135deg, #1b4332, var(--codex-forest));
+}
+
+/* ═══════════════════════════════════════════
+   Conversion Blocks (Product & Article CTA)
+   ═══════════════════════════════════════════ */
+
+.codex-conversion-shell {
+  margin: var(--codex-space-10) 0 var(--codex-space-8);
+  padding: var(--codex-space-7);
+  border: 1px solid var(--codex-border);
+  border-left: 4px solid var(--codex-gold);
+  border-radius: var(--codex-radius-card-lg);
+  background: var(--codex-bg-hero);
+  box-shadow: var(--codex-shadow-heavy);
+}
+
+.codex-conversion-header {
+  margin-bottom: var(--codex-space-6);
+}
+
+.codex-conversion-kicker {
+  margin: 0 0 var(--codex-space-1-plus);
+  color: var(--codex-gold-muted);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.codex-conversion-header h2 {
+  margin: 0 0 var(--codex-space-2);
+  color: var(--codex-text);
+  font-size: var(--codex-text-lg-plus);
+}
+
+.codex-conversion-header p {
+  margin: 0;
+  color: var(--codex-text-muted);
+  line-height: 1.6;
+}
+
+.codex-conversion-grid {
+  display: grid;
+  gap: var(--codex-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.codex-conversion-card {
+  padding: var(--codex-space-4-plus);
+  border: 1px solid var(--codex-border-light);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.codex-conversion-card h3 {
+  margin: 0 0 var(--codex-space-2);
+  font-size: var(--codex-text-base);
+  color: var(--codex-text);
+}
+
+.codex-conversion-card p {
+  margin: 0 0 var(--codex-space-2-plus);
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.55;
+}
+
+.codex-conversion-list {
+  margin: var(--codex-space-2) 0 0;
+  padding-left: var(--codex-space-4-plus);
+}
+
+.codex-conversion-list li {
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: 1.55;
+}
+
+.codex-conversion-list li + li {
+  margin-top: var(--codex-space-1-plus);
+}
+
+.codex-conversion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-2-plus);
+  margin-top: var(--codex-space-3-plus);
+}
+
+.codex-conversion-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.85rem;
+  padding: var(--codex-space-3) var(--codex-space-4-plus);
+  border-radius: var(--codex-radius-pill);
+  background: var(--codex-gradient-dark);
+  color: #fff;
+  font-weight: var(--codex-weight-bold);
+  text-decoration: none;
+  box-shadow: var(--codex-shadow);
+  transition: var(--codex-transition), background-color 160ms ease;
+}
+
+.codex-conversion-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--codex-shadow-light);
+}
+
+.codex-conversion-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+  transition-duration: 50ms;
+}
+
+.codex-conversion-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--codex-space-11);
+  padding: var(--codex-space-2-plus) 0;
+  color: var(--codex-gold);
+  font-weight: var(--codex-weight-semibold);
+  font-size: var(--codex-text-sm-plus);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.codex-conversion-link:hover {
+  color: var(--codex-dark-mid);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  .codex-conversion-shell {
+    padding: var(--codex-space-5);
+  }
+
+  .codex-conversion-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Double breadcrumb on hero pages — hide the second one */
+.woocommerce-products-header .kadence-breadcrumbs + .kadence-breadcrumbs {
+  display: none;
+}
+
+/* (Interactive link styles consolidated above) */
+
+/* Jump-nav active state via scroll observer */
+.codex-editorial-jump-link[aria-current="true"],
+.codex-editorial-jump-link.is-active {
+  background: var(--codex-gradient-dark);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ═══════════════════════════════════════════
+   .codex-banner — pattern — DS-12 Phase 4 (2026-04-27)
+   ═══════════════════════════════════════════
+   Generic "fixed/sticky banner" pattern. Covers:
+     - Sticky CTA bar at viewport bottom (current consumer; DS-9 #6 + DS-10 #1c)
+     - Announcement bar at viewport top (e.g. "Free shipping on 5,000+")
+     - Toast notification at corner (e.g. "Form submitted")
+     - Privacy / cookie consent banner
+     - Any future "fixed message + action + dismiss" surface
+
+   Anatomy:
+     <div class="codex-banner codex-banner--<variant>" role="..." aria-label="...">
+       <span class="codex-banner__message">Optional content text</span>
+       <a class="codex-banner__action" href="...">Action button</a>
+       <button class="codex-banner__dismiss" aria-label="Dismiss">×</button>
+     </div>
+
+   API (custom properties):
+     --banner-position             # fixed | sticky                 (default: fixed)
+     --banner-top                  # top offset                     (default: auto)
+     --banner-bottom               # bottom offset                  (default: 0)
+     --banner-left, --banner-right # horizontal anchoring           (default: 0 / 0 → full width)
+     --banner-bg                   # background                     (default: rgba(41,28,14,0.92))
+     --banner-color                # text color                     (default: #fff)
+     --banner-padding              # internal padding               (default: space-3 space-5)
+     --banner-gap                  # gap between message/action/dismiss (default: space-4)
+     --banner-z                    # z-index                        (default: --codex-z-modal)
+     --banner-border-top           # top border (e.g. gold accent)  (default: 1px solid var(--codex-gold))
+     --banner-border-bottom        # bottom border                  (default: none)
+     --banner-shadow               # elevation                      (default: 0 -8px 24px rgba(0,0,0,0.18))
+     --banner-blur                 # backdrop-filter blur amount    (default: 12px)
+     --banner-enter-from           # transform origin for enter anim (default: translateY(100%))
+     --banner-show-duration        # show transition duration       (default: 300ms)
+
+   The `is-visible` state class gates opacity + transform. Authors are
+   responsible for adding/removing it via JS based on whatever signal makes
+   sense (scroll, timer, dismiss flag, toast queue).
+
+   Action button (`__action`) and dismiss button (`__dismiss`) get their own
+   custom-property knobs for color theming when the banner sits on a non-
+   default background. The dismiss meets WCAG 2.5.5 (44×44 min) by default.
+*/
+.codex-banner {
+  --banner-position: fixed;
+  --banner-top: auto;
+  --banner-bottom: 0;
+  --banner-left: 0;
+  --banner-right: 0;
+  --banner-bg: rgba(41, 28, 14, 0.92);
+  --banner-color: #ffffff;
+  --banner-padding: var(--codex-space-3) var(--codex-space-5);
+  --banner-gap: var(--codex-space-4);
+  --banner-z: var(--codex-z-modal);
+  --banner-border-top: 1px solid var(--codex-gold);
+  --banner-border-bottom: none;
+  --banner-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+  --banner-blur: 12px;
+  --banner-enter-from: translateY(100%);
+  --banner-show-duration: 300ms;
+
+  position: var(--banner-position);
+  top: var(--banner-top);
+  bottom: var(--banner-bottom);
+  left: var(--banner-left);
+  right: var(--banner-right);
+  z-index: var(--banner-z);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--banner-gap);
+  padding: var(--banner-padding);
+  background: var(--banner-bg);
+  -webkit-backdrop-filter: blur(var(--banner-blur));
+  backdrop-filter: blur(var(--banner-blur));
+  color: var(--banner-color);
+  font-size: var(--codex-text-sm-plus);
+  border-top: var(--banner-border-top);
+  border-bottom: var(--banner-border-bottom);
+  box-shadow: var(--banner-shadow);
+  opacity: 0;
+  transform: var(--banner-enter-from);
+  transition:
+    opacity var(--banner-show-duration) var(--codex-easing-out, cubic-bezier(0.25, 1, 0.5, 1)),
+    transform var(--banner-show-duration) var(--codex-easing-out, cubic-bezier(0.25, 1, 0.5, 1));
+  pointer-events: none;
+}
+.codex-banner.is-visible {
+  opacity: 1;
+  transform: translateY(0) translateX(0);
+  pointer-events: auto;
+}
+.codex-banner__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--codex-space-2) var(--codex-space-4-plus);
+  border-radius: var(--codex-radius-pill);
+  background: var(--codex-gradient-gold);
+  color: var(--codex-dark);
+  font-weight: var(--codex-weight-bold);
+  font-size: var(--codex-text-sm-plus);
+  text-decoration: none;
+  transition: var(--codex-transition);
+}
+.codex-banner__action:hover {
+  transform: translateY(-1px);
+}
+.codex-banner__dismiss {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: var(--codex-space-1-plus);
+  font-size: var(--codex-text-base-plus);
+  line-height: 1;
+  min-width: var(--codex-touch-min, 44px);
+  min-height: var(--codex-touch-min, 44px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--codex-motion-base) ease;
+}
+.codex-banner__dismiss:hover,
+.codex-banner__dismiss:focus-visible {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Variant: sticky-top (announcement bar). Slides down from the top of
+   viewport; reverses the entry transform and the border-top/-bottom
+   relationship. */
+.codex-banner--sticky-top {
+  --banner-top: 0;
+  --banner-bottom: auto;
+  --banner-border-top: none;
+  --banner-border-bottom: 1px solid var(--codex-gold);
+  --banner-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  --banner-enter-from: translateY(-100%);
+}
+
+/* Variant: toast (corner notification). Anchored to bottom-right with a
+   max-width so it doesn't span the viewport. Authors are expected to set
+   --banner-bg to a status color (success/error/info) for the toast type. */
+.codex-banner--toast {
+  --banner-left: auto;
+  --banner-right: var(--codex-space-5);
+  --banner-bottom: var(--codex-space-5);
+  --banner-shadow: var(--codex-elevation-modal);
+  --banner-enter-from: translateX(120%);
+  max-width: 420px;
+}
+
+/* Sticky CTA — DS-9/10 retrofit to .codex-banner. The legacy class
+   (.codex-sticky-cta) remains in HTML for backward compatibility (the JS
+   in BaseLayout.astro queries .codex-sticky-cta for IntersectionObserver
+   tracking + dismiss flag). All visual styling now comes from the
+   .codex-banner base — this rule is reduced to a no-op anchor. */
+.codex-sticky-cta {
+  /* All baseline styling now provided by .codex-banner (see HTML class
+     list emits both classes). Kept as a no-op for any future overrides
+     specific to this consumer. */
+}
+.codex-sticky-cta__btn {
+  /* Backward-compat alias — styles inherit from .codex-banner__action
+     via the additional class added in the render function. */
+}
+.codex-sticky-cta__dismiss {
+  /* Backward-compat alias — styles inherit from .codex-banner__dismiss. */
+}
+
+@media (max-width: 767px) {
+  .codex-sticky-cta {
+    padding: var(--codex-space-2-plus) var(--codex-space-4);
+    gap: var(--codex-space-3);
+    font-size: var(--codex-text-sm);
+  }
+
+  .codex-wa-fab.is-visible ~ .codex-sticky-cta.is-visible {
+    bottom: 0;
+    padding-right: 4.5rem;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Product Catalog Grid
+   (Moved from catalog-pages.ts template literal
+   for single-source-of-truth maintainability)
+   ═══════════════════════════════════════════ */
+.codex-catalog-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--codex-space-2);
+  margin: var(--codex-space-6) 0 var(--codex-space-8);
+  padding: var(--codex-space-4) var(--codex-space-5);
+  background: linear-gradient(135deg, var(--codex-bg-warm), rgba(245, 239, 230, 0.95));
+  border-radius: var(--codex-radius-card);
+  border: 1px solid var(--codex-border);
+}
+.codex-catalog-nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--codex-space-1-plus);
+  min-height: var(--codex-space-11);
+  padding: var(--codex-space-2) var(--codex-space-4);
+  background: #fff;
+  border: 1px solid rgba(212, 201, 184, 0.8);
+  border-radius: var(--codex-radius-pill);
+  font-size: var(--codex-text-sm-plus);
+  font-weight: var(--codex-weight-medium);
+  color: var(--codex-text);
+  text-decoration: none;
+  transition: all var(--codex-transition-fast);
+  white-space: nowrap;
+}
+.codex-catalog-nav-chip:hover {
+  background: var(--codex-dark-mid);
+  color: #fff;
+  border-color: var(--codex-dark-mid);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(124, 106, 79, 0.25);
+}
+.codex-catalog-nav-chip:focus-visible {
+  outline: 2px solid var(--codex-gold);
+  outline-offset: 2px;
+}
+.codex-catalog-category {
+  margin: 0;
+  padding: var(--codex-space-12) 0;
+}
+.codex-catalog-category + .codex-catalog-category {
+  border-top: 1px solid var(--codex-border);
+}
+.codex-catalog-category-header {
+  margin-bottom: var(--codex-space-6);
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  border-left: none;
+}
+.codex-catalog-category-header h2 {
+  margin: 0 0 var(--codex-space-1);
+  font-size: var(--codex-text-lg-plus);
+  font-weight: var(--codex-weight-extrabold);
+  color: var(--codex-text);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+.codex-catalog-category-header p {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: var(--codex-leading-normal);
+  max-width: 520px;
+}
+.codex-catalog-count {
+  display: inline-block;
+  margin-top: var(--codex-space-1-plus);
+  padding: var(--codex-space-0-5) var(--codex-space-2);
+  background: none;
+  border: 1px solid rgba(201, 185, 154, 0.7);
+  color: var(--codex-text-muted);
+  border-radius: var(--codex-radius-pill);
+  font-size: var(--codex-text-2xs);
+  font-weight: var(--codex-weight-semibold);
+  letter-spacing: 0.03em;
+}
+.codex-catalog-category-meta {
+  margin-top: var(--codex-space-1-plus);
+  display: flex;
+  align-items: center;
+  gap: var(--codex-space-3);
+  flex-wrap: wrap;
+}
+.codex-catalog-category-meta .codex-catalog-count {
+  margin-top: 0;
+}
+.codex-catalog-category-guide {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--codex-text-sm);
+  font-weight: var(--codex-weight-semibold);
+  color: var(--codex-accent, #b48a3a);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(180, 138, 58, 0.5);
+  padding-bottom: 1px;
+  transition: color var(--codex-motion-fast) ease, border-color var(--codex-motion-fast) ease;
+}
+.codex-catalog-category-guide:hover,
+.codex-catalog-category-guide:focus {
+  color: var(--codex-text);
+  border-bottom-color: var(--codex-text);
+}
+.codex-catalog-category .products {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--codex-space-5);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.codex-catalog-category .product {
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid var(--codex-border);
+  border-radius: var(--codex-radius-card);
+  padding: 0;
+  overflow: hidden;
+  transition: border-color var(--codex-transition-fast), box-shadow var(--codex-transition-fast);
+}
+.codex-catalog-category .product:hover {
+  border-color: rgba(201, 185, 154, 0.7);
+  box-shadow: 0 8px 24px rgba(124, 106, 79, 0.12);
+}
+.codex-catalog-category .product img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--codex-bg-warm);
+}
+.codex-catalog-category .product .woocommerce-LoopProduct-link {
+  text-decoration: none;
+  color: inherit;
+}
+.codex-catalog-category .woocommerce-loop-product__title {
+  padding: var(--codex-space-3) var(--codex-space-4) var(--codex-space-1);
+  font-size: var(--codex-text-sm-plus);
+  font-weight: var(--codex-weight-semibold);
+  color: var(--codex-text);
+  line-height: var(--codex-leading-snug);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.codex-catalog-category .codex-catalog-summary {
+  padding: 0 var(--codex-space-4);
+  font-size: var(--codex-text-xs-plus);
+  color: var(--codex-text-muted);
+  line-height: var(--codex-leading-normal);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+.codex-catalog-category .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto var(--codex-space-4) var(--codex-space-4);
+  padding: var(--codex-space-2) var(--codex-space-4);
+  text-align: center;
+  background: none;
+  border: 1px solid rgba(212, 201, 184, 0.8);
+  border-radius: var(--codex-radius-sm);
+  color: var(--codex-dark-mid);
+  font-size: var(--codex-text-xs-plus);
+  font-weight: var(--codex-weight-semibold);
+  text-decoration: none;
+  transition: all var(--codex-transition-fast);
+}
+.codex-catalog-category .button:hover {
+  background: var(--codex-dark-mid);
+  color: #fff;
+  border-color: var(--codex-dark-mid);
+}
+.codex-catalog-category .button:focus-visible {
+  outline: 2px solid var(--codex-gold);
+  outline-offset: 2px;
+}
+/* Featured product — first card in category */
+.codex-catalog-featured {
+  grid-column: span 2;
+  grid-row: span 2;
+  border-color: rgba(212, 201, 184, 0.8);
+}
+.codex-catalog-featured img {
+  aspect-ratio: 4 / 3;
+}
+.codex-catalog-featured .woocommerce-loop-product__title {
+  font-size: var(--codex-text-md-plus);
+  font-weight: var(--codex-weight-bold);
+  padding: var(--codex-space-4) var(--codex-space-5) var(--codex-space-1-plus);
+  -webkit-line-clamp: 3;
+}
+.codex-catalog-featured .codex-catalog-summary {
+  padding: 0 var(--codex-space-5);
+  font-size: var(--codex-text-sm-plus);
+  -webkit-line-clamp: 4;
+}
+.codex-catalog-featured .button {
+  margin: auto var(--codex-space-5) var(--codex-space-5);
+  padding: var(--codex-space-2-plus) var(--codex-space-6);
+  font-size: var(--codex-text-sm-plus);
+  background: var(--codex-dark-mid);
+  color: #fff;
+  border-color: var(--codex-dark-mid);
+}
+.codex-catalog-featured .button:hover {
+  background: var(--codex-dark);
+  border-color: var(--codex-dark);
+}
+@media (max-width: 1024px) {
+  .codex-catalog-category .products { grid-template-columns: repeat(3, 1fr); gap: var(--codex-space-4-plus); }
+  .codex-catalog-featured { grid-row: span 1; }
+  .codex-catalog-featured img { aspect-ratio: 3 / 2; }
+}
+@media (max-width: 767px) {
+  .codex-catalog-category .products { grid-template-columns: repeat(2, 1fr); gap: var(--codex-space-3-plus); }
+  .codex-catalog-nav { gap: var(--codex-space-1-plus); }
+  .codex-catalog-nav-chip { font-size: var(--codex-text-xs-plus); padding: var(--codex-space-1-plus) var(--codex-space-3); }
+  .codex-catalog-featured { grid-row: span 1; }
+}
+@media (max-width: 480px) {
+  .codex-catalog-category .products { grid-template-columns: 1fr; }
+  .codex-catalog-featured { grid-column: span 1; }
+}
+
+/* ═══════════════════════════════════════════
+   Editorial Component Focus Indicators (DS-5, 2026-04-22)
+   Explicit :focus-visible rules for every interactive element in the
+   18 editorial components. Defends keyboard-only users and satisfies
+   WCAG 2.1 AA Success Criterion 2.4.7 (Focus Visible).
+   ═══════════════════════════════════════════ */
+
+/* Shared baseline — links, buttons and list items that carry
+   .codex-editorial-* BEM classes inside editorial layouts. */
+.codex-editorial-primary:focus-visible,
+.codex-editorial-secondary:focus-visible,
+.codex-editorial-brief-link:focus-visible,
+.codex-editorial-snapshot-link:focus-visible,
+.codex-editorial-jump-link:focus-visible,
+.codex-editorial-link-card:focus-visible,
+.codex-editorial-callout__link:focus-visible,
+.codex-editorial-trail a:focus-visible,
+.codex-sources-link:focus-visible,
+.codex-byline-name:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  /* drop any inherited text-decoration jitter so the ring owns the focus affordance */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* High-contrast ring on dark / gold CTA — default gold ring fails AA on the
+   gold-gradient hero button. Swap to white and thicken for AAA-grade contrast. */
+.codex-hero-cta-btn:focus-visible,
+.codex-editorial-primary:focus-visible {
+  outline: calc(var(--codex-ring-width) + 1px) solid var(--codex-ring-on-dark);
+  outline-offset: var(--codex-ring-offset);
+  box-shadow: 0 0 0 calc(var(--codex-ring-width) + 3px) var(--codex-ring);
+}
+
+/* FaqSection — <details><summary> is the interactive control, not <details>. */
+.codex-editorial-faq summary:focus-visible,
+.codex-editorial-faq details > summary:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  border-radius: var(--codex-radius-sm);
+}
+
+/* IndustryProductGrid uses legacy .codex-industries-cat-card until the rename sweep lands. */
+.codex-industries-cat-card:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+}
+
+/* InlineRfqForm — form controls get a ring that also absorbs the offset,
+   because inputs already sit in a shadow-bordered container. */
+.codex-inline-rfq input:focus-visible,
+.codex-inline-rfq textarea:focus-visible,
+.codex-inline-rfq-form input:focus-visible,
+.codex-inline-rfq-form textarea:focus-visible,
+.codex-inline-rfq-form button:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  /* Neutralise the existing :focus border-color swap so the ring is unambiguous */
+  border-color: var(--codex-ring);
+}
+
+/* Breadcrumb plain <a> (no class) fallback — covers the one un-classed link. */
+.codex-editorial-trail a:focus-visible,
+.codex-editorial-trail [href]:focus-visible {
+  outline: var(--codex-ring-width) solid var(--codex-ring);
+  outline-offset: var(--codex-ring-offset);
+  border-radius: 3px;
+}
+
+/* SourceList (EEAT citations) — legacy HTML-render pathway (snapshot pages).
+   The Astro component in src/components/editorial/SourceList.astro carries its
+   own scoped <style>; these rules mirror those for the legacy
+   renderEditorialMain() pathway in editorial-pages.ts so both render identically. */
+.codex-sources {
+  margin-top: 2.5rem;
+  padding: 1.25rem 1.4rem 1.5rem;
+  background: #fafbfc;
+  border: 1px solid #e4e8ed;
+  border-radius: 8px;
+}
+.codex-sources-heading {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+  color: #0f2333;
+}
+.codex-sources-lead {
+  margin: 0 0 0.9rem;
+  font-size: 0.92rem;
+  color: #55687a;
+}
+.codex-sources-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.codex-sources-item { margin-bottom: 0.5rem; }
+.codex-sources-link {
+  color: #0f6a7a;
+  text-decoration: none;
+  font-weight: 600;
+}
+.codex-sources-link:hover { text-decoration: underline; }
+.codex-sources-meta {
+  color: #55687a;
+  font-size: 0.88rem;
+  margin-left: 0.35rem;
+}
+.codex-sources-publisher { font-style: italic; }
+.codex-sources-note {
+  margin: 0.15rem 0 0;
+  color: #55687a;
+  font-size: 0.88rem;
+}
+
+
+/* ═══════════════════════════════════════════
+   SVG icons — DS-9 emoji-replacement (2026-04-26)
+   ═══════════════════════════════════════════
+   Standard icon class applied alongside the original wrapper class
+   (`.codex-industries-rail__emoji`, `.codex-industries-hub-card__emoji`,
+   etc.). Sized + colored consistently regardless of context. */
+
+.codex-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--codex-gold);
+  transition: color 200ms ease, transform 200ms ease;
+}
+
+.codex-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Sidebar item icons (Solutions / Industries rail). 20px target. */
+.codex-industries-rail__emoji.codex-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Active sidebar item — icon picks up active link color, no special tint. */
+.codex-industries-rail__link.active .codex-industries-rail__emoji.codex-icon,
+.codex-industries-rail__link[aria-current="page"] .codex-industries-rail__emoji.codex-icon {
+  color: var(--codex-gold);
+}
+
+/* Group heading icon — slightly larger 22px for visual anchor. */
+.codex-industries-rail__group-icon.codex-icon {
+  width: 22px;
+  height: 22px;
+  margin-right: var(--codex-space-2);
+  vertical-align: -4px;
+}
+
+/* Hub-card emoji (industries / solutions overview cards). 32px on
+   the floating overlay; placeholder fills its full container. */
+.codex-industries-hub-card__emoji.codex-icon {
+  width: 32px;
+  height: 32px;
+  color: var(--codex-gold);
+}
+
+.codex-industries-hub-card__placeholder.codex-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--codex-gold-muted);
+  margin: auto;
+}
+
+/* Resources category-card heading icon. */
+.codex-resources-category-card__emoji.codex-icon {
+  width: 28px;
+  height: 28px;
+}
+
+/* Resources group title icon. */
+.codex-resources-group__emoji.codex-icon {
+  width: 24px;
+  height: 24px;
+  vertical-align: -5px;
+}
+
+/* Rail-toggle (mobile) folder icon. */
+.codex-catalog-rail-toggle__icon.codex-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Hover: card-level reveal nudges icon color towards the active gold. */
+.codex-industries-rail__link:hover .codex-industries-rail__emoji.codex-icon,
+.codex-industries-hub-card:hover .codex-industries-hub-card__emoji.codex-icon {
+  color: var(--codex-dark);
+}
+
+/* ═══════════════════════════════════════════
+   A11y batch cleanup — WCAG 2.1 AA Minor + Major
+   (2026-04-27)
+   ═══════════════════════════════════════════
+   - Anchor scroll-margin: when an in-page link jumps to #section,
+     ensure the destination heading isn't hidden behind the sticky
+     site header (~80px) or the sticky CTA bar (~16px buffer).
+     This addresses 2.4.7 Focus Visible by making sure focused
+     anchors are visually identifiable rather than scrolled
+     under chrome.
+*/
+[id] {
+  scroll-margin-top: 96px;
+}
+
+/* ═══════════════════════════════════════════
+   Inline citations — DS-10 #2 (2026-04-27)
+   ═══════════════════════════════════════════
+   Authors mark contested claims in body text with `[^N]`. The
+   render layer rewrites them as a small <sup> link that scrolls
+   to the matching <li> in the Sources block at page bottom.
+   Rationale: the 10-source block was a passive "credentialing
+   badge" that lived in the basement. Inline superscripts surface
+   the citation right at the point of skepticism, turning sources
+   into an active trust mechanism mid-read.
+
+   Visual: gold-muted (5.6:1 AA) at 0.65em, subtle until hovered.
+   On focus + hover the superscript darkens for keyboard parity.
+   The numbered prefix in the sources <li> ("1.") provides a
+   visual anchor when the page scrolls there.
+
+   :target highlight: when a source <li> is the URL fragment, a
+   warm cream background pulses for 1.6s so the user immediately
+   sees which entry matched the citation they clicked.
+*/
+.codex-citation {
+  font-size: 0.65em;
+  vertical-align: super;
+  line-height: 0;
+  margin-left: 0.1em;
+}
+.codex-citation a {
+  color: var(--codex-gold-muted);
+  text-decoration: none;
+  font-weight: var(--codex-weight-semibold, 600);
+  padding: 0 2px;
+  border-radius: 3px;
+  transition: color var(--codex-motion-fast), background var(--codex-motion-fast);
+}
+.codex-citation a:hover,
+.codex-citation a:focus-visible {
+  color: var(--codex-text);
+  background: rgba(195, 154, 95, 0.18);
+}
+
+.codex-sources-item {
+  position: relative;
+  transition: background var(--codex-motion-slow);
+}
+.codex-sources-num {
+  display: inline-block;
+  min-width: 1.6em;
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text-subtle);
+  margin-right: 0.25em;
+}
+@keyframes codex-source-flash {
+  0% { background: rgba(195, 154, 95, 0.30); }
+  100% { background: transparent; }
+}
+.codex-sources-item:target {
+  animation: codex-source-flash 1.6s ease-out;
+  outline: 2px solid var(--codex-gold-muted);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .codex-sources-item:target {
+    animation: none;
+    background: rgba(195, 154, 95, 0.18);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Brief reading-mode collapse — DS-10 #3 (2026-04-27)
+   ═══════════════════════════════════════════
+   The Project checklist body lives inside a <details> so evaluators can
+   skip past 4–6 fields of prose to spec → CTA. The summary reads as a
+   clickable banner with a chevron and an estimated read time. It opens
+   on click (native), or auto-opens when the user came from /blog/,
+   /guides/, /compare/, /compatibility/, or has `?reading=true` in the
+   URL (BaseLayout.astro DS-10 #3 script).
+*/
+/* ═══════════════════════════════════════════
+   .codex-disclosure — pattern — DS-12 Phase 4 (2026-04-27)
+   ═══════════════════════════════════════════
+   The "expand from a clickable banner summary" pattern. Started as
+   one-off styling for the Brief details (DS-10 #3); now generalized so
+   FAQ, "show all sources", future "show methodology", etc. all share
+   the same chevron + reveal animation + reduced-motion treatment.
+
+   API (CSS custom properties):
+     --disclosure-margin-top    # offset from preceding content (default: var(--codex-space-3))
+     --disclosure-bg            # summary banner background (default: var(--codex-bg-warm))
+     --disclosure-padding       # summary padding (default: 0.85rem 1.1rem)
+     --disclosure-radius        # summary border-radius (default: var(--codex-radius-sm))
+     --disclosure-border        # summary border (default: 1px solid var(--codex-border-light))
+     --disclosure-hover-bg      # hover state background (default: rgba(195,154,95,0.10))
+     --disclosure-hover-border  # hover state border color (default: var(--codex-gold-muted))
+     --disclosure-chevron-color # chevron color (default: var(--codex-gold-muted))
+     --disclosure-body-gap      # space between summary and body when open
+                                  (default: var(--codex-space-3))
+     --disclosure-reveal-duration   # body reveal animation duration (default: 240ms)
+
+   Usage:
+     <details class="codex-disclosure">
+       <summary class="codex-disclosure__summary">
+         <span class="codex-disclosure__label">Read the full thing (~3 min)</span>
+         <span class="codex-disclosure__hint">5 fields</span>
+       </summary>
+       <div class="codex-disclosure__body">
+         ...content...
+       </div>
+     </details>
+
+   The chevron is a pseudo-element on the summary — no extra DOM. The
+   reveal animation runs only on the direct child `.codex-disclosure__body`,
+   so nested disclosures animate independently. Reduced-motion users get
+   instant reveal without animation.
+*/
+.codex-disclosure {
+  --disclosure-margin-top: var(--codex-space-3, 1rem);
+  --disclosure-bg: var(--codex-bg-warm);
+  --disclosure-padding: 0.85rem 1.1rem;
+  --disclosure-radius: var(--codex-radius-sm, 8px);
+  --disclosure-border: 1px solid var(--codex-border-light);
+  --disclosure-hover-bg: rgba(195, 154, 95, 0.10);
+  --disclosure-hover-border: var(--codex-gold-muted);
+  --disclosure-chevron-color: var(--codex-gold-muted);
+  --disclosure-body-gap: var(--codex-space-3, 1rem);
+  --disclosure-reveal-duration: 240ms;
+
+  margin: var(--disclosure-margin-top) 0 0;
+}
+.codex-disclosure__summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--codex-space-2, 0.5rem);
+  padding: var(--disclosure-padding);
+  background: var(--disclosure-bg);
+  border: var(--disclosure-border);
+  border-radius: var(--disclosure-radius);
+  cursor: pointer;
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text);
+  transition:
+    background var(--codex-motion-fast),
+    border-color var(--codex-motion-fast);
+}
+.codex-disclosure__summary::-webkit-details-marker { display: none; }
+.codex-disclosure__summary::marker { content: ""; }
+.codex-disclosure__summary::before {
+  content: "";
+  width: 0.7em;
+  height: 0.7em;
+  border-right: 2px solid var(--disclosure-chevron-color);
+  border-bottom: 2px solid var(--disclosure-chevron-color);
+  transform: rotate(-45deg);
+  transition: transform var(--codex-motion-base) ease;
+  flex-shrink: 0;
+  margin-right: 0.4em;
+}
+.codex-disclosure[open] > .codex-disclosure__summary::before {
+  transform: rotate(45deg);
+}
+.codex-disclosure__summary:hover,
+.codex-disclosure__summary:focus-visible {
+  background: var(--disclosure-hover-bg);
+  border-color: var(--disclosure-hover-border);
+  outline: none;
+}
+.codex-disclosure__summary:focus-visible {
+  box-shadow: var(--codex-ring-focus-glow);
+}
+.codex-disclosure__label {
+  flex: 1;
+  min-width: 0;
+}
+.codex-disclosure__hint {
+  /* DS-13 #7 — bumped from --codex-text-subtle (4.7:1, borderline AA) to
+     --codex-text-muted (~7.2:1, AAA) for sighted-low-vision parity with
+     the SR-skipped aria-hidden state. */
+  color: var(--codex-text-muted);
+  font-weight: var(--codex-weight-medium, 500);
+  font-size: var(--codex-text-sm, 0.9rem);
+  white-space: nowrap;
+}
+.codex-disclosure[open] > .codex-disclosure__body {
+  margin-top: var(--disclosure-body-gap);
+  animation: codex-disclosure-reveal var(--disclosure-reveal-duration) ease-out;
+}
+@keyframes codex-disclosure-reveal {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .codex-disclosure__summary::before { transition: none; }
+  .codex-disclosure[open] > .codex-disclosure__body { animation: none; }
+}
+
+/* Brief variant — DS-10 #3 backward-compat aliases.
+   Render still emits the legacy class names; these aliases let the
+   existing markup keep working while the base class picks up the
+   styling. New disclosures should use the .codex-disclosure* names
+   directly. */
+.codex-editorial-brief-details {
+  /* Inherit base via alias — see render in editorial-pages.ts */
+  margin: var(--codex-space-3, 1rem) 0 0;
+}
+
+/* ═══════════════════════════════════════════
+   Compare table interactions — DS-10 #4 (2026-04-27)
+   ═══════════════════════════════════════════
+   Three changes turn editorial tables from static authored markup into
+   a usable comparison surface:
+     1. Sortable column headers — click or Enter/Space toggles asc/desc.
+        Visual: chevron in :hover and :focus; filled chevron when active.
+        aria-sort drives the indicator state for SR + visual.
+     2. Sticky first column (<th scope="row">) so a buyer scrolling
+        horizontally never loses the row label.
+     3. Sticky <thead> so column headers stay visible during vertical
+        scroll within the table-wrap (long compare tables).
+     4. 44×44 minimum hit targets on every cell — meets WCAG 2.5.5
+        and gives glyph cells (✓/✗) proper centered tap regions.
+
+   The wrap is keyboard-focusable (tabindex=0) with role="region" + label
+   so SR users get a "comparison table — scroll horizontally" announce.
+*/
+/* ═══════════════════════════════════════════
+   .codex-scroll-region — pattern — DS-12 Phase 4 (2026-04-27)
+   ═══════════════════════════════════════════
+   Generic "scrollable region with keyboard parity" wrapper. The pattern
+   appeared first as the compare-table wrap (DS-10 #4): tabindex=0 +
+   role="region" + aria-label + horizontal/vertical overflow + focus
+   ring. Generalized here so the spec table, future timeline charts,
+   any wide data surface that needs scroll-on-overflow can inherit the
+   same a11y treatment.
+
+   API:
+     --scroll-region-max-height   # default: 70vh (used for vertical overflow)
+     --scroll-region-radius       # default: var(--codex-radius-sm)
+     --scroll-region-border       # default: 1px solid var(--codex-border-light)
+
+   Usage:
+     <div class="codex-scroll-region"
+          tabindex="0"
+          role="region"
+          aria-label="Comparison table — scroll horizontally to see more">
+       <table>...</table>
+     </div>
+
+   The keyboard + ARIA semantics are the author's responsibility (the
+   tabindex/role/aria-label combo is what makes it a "region" for SR
+   announcements). The CSS provides only the visual layer: overflow,
+   max-height ceiling, border, focus ring on keyboard focus. The render
+   function is responsible for emitting the right attributes; this rule
+   applies regardless.
+*/
+.codex-scroll-region {
+  --scroll-region-max-height: 70vh;
+  --scroll-region-radius: var(--codex-radius-sm, 8px);
+  --scroll-region-border: 1px solid var(--codex-border-light);
+
+  position: relative;
+  overflow: auto;
+  max-height: var(--scroll-region-max-height);
+  border-radius: var(--scroll-region-radius);
+  border: var(--scroll-region-border);
+}
+.codex-scroll-region:focus-visible {
+  outline: 3px solid rgba(195, 154, 95, 0.50);
+  outline-offset: 2px;
+}
+
+/* Compare-table wrap — DS-10 #4 backward-compat alias.
+   Render still emits this class; styles inherit the .codex-scroll-region
+   base via the additional class added in the render function. */
+.codex-editorial-table-wrap {
+  /* All baseline styling now lives on .codex-scroll-region — keeping
+     this rule as a no-op anchor for overrides if a future variant
+     needs to differ. */
+}
+.codex-editorial-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+}
+.codex-editorial-table th,
+.codex-editorial-table td {
+  min-height: 44px;
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--codex-border-light);
+  background: var(--codex-bg, #ffffff);
+}
+.codex-editorial-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--codex-bg-warm);
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text);
+  border-bottom: 2px solid var(--codex-border, #d8cdb8);
+  white-space: nowrap;
+}
+.codex-editorial-table tbody th[scope="row"] {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--codex-bg-warm);
+  font-weight: var(--codex-weight-semibold, 600);
+  border-right: 1px solid var(--codex-border-light);
+  /* Min hit target for the row label — also makes long labels readable. */
+  min-width: 12rem;
+}
+/* Top-left corner needs to win both stickies. */
+.codex-editorial-table thead th:first-child {
+  left: 0;
+  z-index: 3;
+}
+
+/* Sortable column header affordances. */
+.codex-editorial-table thead th[data-sort-col] {
+  cursor: pointer;
+  user-select: none;
+  padding-right: 1.6rem; /* room for the indicator */
+  position: sticky;
+  top: 0;
+}
+.codex-editorial-table thead th[data-sort-col]:hover,
+.codex-editorial-table thead th[data-sort-col]:focus-visible {
+  background: rgba(195, 154, 95, 0.14);
+  outline: none;
+}
+.codex-editorial-table thead th[data-sort-col]:focus-visible {
+  box-shadow: inset 0 0 0 3px rgba(195, 154, 95, 0.50);
+}
+.codex-th-indicator {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  opacity: 0.30;
+  transition: opacity var(--codex-motion-fast), transform var(--codex-motion-base);
+}
+.codex-th-indicator::before,
+.codex-th-indicator::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+}
+.codex-th-indicator::before {
+  top: 0;
+  border-bottom: 5px solid currentColor;
+}
+.codex-th-indicator::after {
+  bottom: 0;
+  border-top: 5px solid currentColor;
+}
+.codex-editorial-table thead th[data-sort-col]:hover .codex-th-indicator,
+.codex-editorial-table thead th[data-sort-col]:focus-visible .codex-th-indicator {
+  opacity: 0.65;
+}
+.codex-editorial-table thead th[aria-sort="ascending"] .codex-th-indicator {
+  opacity: 1;
+}
+.codex-editorial-table thead th[aria-sort="ascending"] .codex-th-indicator::after {
+  border-top-color: transparent;
+}
+.codex-editorial-table thead th[aria-sort="descending"] .codex-th-indicator {
+  opacity: 1;
+}
+.codex-editorial-table thead th[aria-sort="descending"] .codex-th-indicator::before {
+  border-bottom-color: transparent;
+}
+
+/* Glyph cells — ✓ / ✗ / — wrapped for centered, AA-contrast hit regions. */
+.codex-cell-glyph {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 32px;
+  padding: 0.2em 0.4em;
+  border-radius: 999px;
+  font-weight: var(--codex-weight-bold, 700);
+  font-size: 1.1em;
+  line-height: 1;
+}
+.codex-cell-glyph[data-cell-glyph="yes"] {
+  color: var(--codex-success);
+  background: var(--codex-success-tint);
+}
+.codex-cell-glyph[data-cell-glyph="no"] {
+  color: var(--codex-error);
+  background: var(--codex-error-tint);
+}
+.codex-cell-glyph[data-cell-glyph="neutral"] {
+  color: var(--codex-text-subtle);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codex-th-indicator { transition: none; }
+}
+
+/* ═══════════════════════════════════════════
+   RFQ form a11y — DS-11 #5d (2026-04-27)
+   ═══════════════════════════════════════════
+   Two forms now share these styles:
+     - The inline RFQ on every editorial page (renderInlineRfqForm)
+     - The Kadence contact form (#contact-rfq-form), post-processed in
+       seo.ts to use the same hint/error spans + data-codex-rfq attribute
+
+   Patterns:
+     - Real <label> above each input (no placeholder-as-label)
+     - Hint text below the label, smaller + subtle
+     - Error span below the input, red 5.4:1 (#8b2d2d) when populated
+     - Required asterisk gold-muted with sr-only fallback
+     - .is-invalid → red 3:1 border + 4px halo on focus
+     - Visually-hidden helper class for screen-reader-only text
+*/
+.codex-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.codex-rfq-required {
+  color: var(--codex-gold-muted);
+  font-weight: var(--codex-weight-bold, 700);
+  margin-left: 0.15em;
+}
+.codex-inline-rfq-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+.codex-inline-rfq-label,
+.kadence-blocks-form-field > label {
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text);
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+}
+.codex-inline-rfq-hint {
+  display: block;
+  color: var(--codex-text-subtle);
+  font-size: var(--codex-text-xs, 0.8rem);
+  line-height: 1.4;
+}
+.codex-inline-rfq-error {
+  display: block;
+  min-height: 1.25rem;
+  color: var(--codex-error);
+  font-size: var(--codex-text-xs, 0.8rem);
+  font-weight: var(--codex-weight-semibold, 600);
+  line-height: 1.4;
+}
+.codex-inline-rfq-error:empty {
+  min-height: 0;
+}
+.codex-inline-rfq-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.codex-inline-rfq input,
+.codex-inline-rfq textarea,
+form[data-codex-rfq] input,
+form[data-codex-rfq] textarea {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--codex-border, #d8cdb8);
+  border-radius: var(--codex-radius-sm, 6px);
+  font: inherit;
+  color: var(--codex-text);
+  background: var(--codex-bg, #ffffff);
+  min-height: 44px;
+  transition: border-color var(--codex-motion-fast), box-shadow var(--codex-motion-fast);
+}
+.codex-inline-rfq input:focus-visible,
+.codex-inline-rfq textarea:focus-visible,
+form[data-codex-rfq] input:focus-visible,
+form[data-codex-rfq] textarea:focus-visible {
+  outline: none;
+  border-color: var(--codex-gold-muted);
+  box-shadow: var(--codex-ring-focus-glow);
+}
+.codex-inline-rfq input.is-invalid,
+.codex-inline-rfq textarea.is-invalid,
+form[data-codex-rfq] input.is-invalid,
+form[data-codex-rfq] textarea.is-invalid,
+.codex-inline-rfq input[aria-invalid="true"],
+.codex-inline-rfq textarea[aria-invalid="true"],
+form[data-codex-rfq] input[aria-invalid="true"],
+form[data-codex-rfq] textarea[aria-invalid="true"] {
+  border-color: var(--codex-error);
+}
+.codex-inline-rfq input.is-invalid:focus-visible,
+.codex-inline-rfq textarea.is-invalid:focus-visible,
+form[data-codex-rfq] input.is-invalid:focus-visible,
+form[data-codex-rfq] textarea.is-invalid:focus-visible {
+  box-shadow: var(--codex-ring-error-glow);
+}
+.codex-inline-rfq-submit,
+form[data-codex-rfq] button[type="submit"],
+form[data-codex-rfq] .kb-forms-submit {
+  min-height: 44px;
+  padding: 0.75rem 1.5rem;
+  font-weight: var(--codex-weight-semibold, 600);
+  cursor: pointer;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Extended editorial section blocks (added 2026-05-11)
+   For statBar / comparePanel / featureGrid / dataHighlight /
+   timeline / testimonial / checklist that were previously
+   accepted by Zod but never rendered. Used by 20/20 industry
+   landing pages + many product / solution pages.
+   ───────────────────────────────────────────────────────────── */
+
+.codex-editorial-stat-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--codex-space-3);
+  margin: var(--codex-space-4) 0;
+  padding: var(--codex-space-4) var(--codex-space-4);
+  list-style: none;
+  background: var(--codex-bg-warm);
+  border-radius: var(--codex-radius-card);
+  border-top: 3px solid var(--codex-gold);
+}
+.codex-editorial-stat-bar__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: center;
+}
+.codex-editorial-stat-bar__value {
+  font-family: var(--codex-font-display, "Lora", serif);
+  font-size: clamp(1.5rem, 1.1rem + 1.2vw, 2rem);
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.codex-editorial-stat-bar__label {
+  font-size: var(--codex-text-sm, 0.875rem);
+  color: var(--codex-text-muted);
+  line-height: 1.4;
+}
+
+.codex-editorial-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--codex-space-4);
+  margin: var(--codex-space-5) 0;
+}
+@media (max-width: 640px) {
+  .codex-editorial-compare { grid-template-columns: 1fr; }
+}
+.codex-editorial-compare__col {
+  padding: var(--codex-space-4);
+  border-radius: var(--codex-radius-card);
+  background: var(--codex-bg-warm);
+  border: 1px solid var(--codex-border-soft, #eadfd0);
+}
+.codex-editorial-compare__col--before {
+  border-left: 3px solid var(--codex-error, #c44d3c);
+}
+.codex-editorial-compare__col--after {
+  border-left: 3px solid var(--codex-gold);
+}
+.codex-editorial-compare__col h3 {
+  margin: 0 0 var(--codex-space-2);
+  font-size: var(--codex-text-base, 1rem);
+  font-weight: var(--codex-weight-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--codex-text);
+}
+
+.codex-editorial-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--codex-space-3);
+  margin: var(--codex-space-4) 0;
+}
+.codex-editorial-feature {
+  padding: var(--codex-space-4);
+  border-radius: var(--codex-radius-card);
+  background: var(--codex-bg-soft, var(--codex-bg-warm));
+  border: 1px solid var(--codex-border-soft, #eadfd0);
+}
+.codex-editorial-feature__icon {
+  display: inline-block;
+  font-size: 1.5rem;
+  margin-bottom: var(--codex-space-2);
+}
+/* SVG-path variant: a real <img> rendered at 40×40, tinted via currentColor
+   when the SVG uses stroke="currentColor" / fill="none". Production
+   replacement for the emoji glyphs featureGrid originally shipped with.
+   Added 2026-05-11. */
+.codex-editorial-feature__icon--svg {
+  width: 40px;
+  height: 40px;
+  color: var(--codex-gold);
+  /* `img` defaults to inline; align baseline with title. */
+  display: block;
+}
+.codex-editorial-feature__title {
+  margin: 0 0 var(--codex-space-1);
+  font-size: var(--codex-text-base, 1rem);
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text);
+}
+.codex-editorial-feature__text {
+  margin: 0;
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+  color: var(--codex-text-muted);
+  line-height: 1.6;
+}
+
+.codex-editorial-data-highlight {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr;
+  gap: var(--codex-space-3) var(--codex-space-4);
+  align-items: start;
+  margin: var(--codex-space-5) 0;
+  padding: var(--codex-space-4) var(--codex-space-4);
+  border-left: 4px solid var(--codex-gold);
+  background: var(--codex-bg-warm);
+  border-radius: 0 var(--codex-radius-card) var(--codex-radius-card) 0;
+}
+@media (max-width: 480px) {
+  .codex-editorial-data-highlight { grid-template-columns: 1fr; }
+}
+.codex-editorial-data-highlight__value {
+  grid-row: span 2;
+  font-family: var(--codex-font-display, "Lora", serif);
+  font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-gold);
+  line-height: 1;
+}
+.codex-editorial-data-highlight__heading {
+  display: block;
+  font-size: var(--codex-text-base, 1rem);
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.codex-editorial-data-highlight__text {
+  grid-column: 2;
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+  line-height: 1.6;
+}
+.codex-editorial-data-highlight__source {
+  grid-column: 1 / -1;
+  margin-top: var(--codex-space-2);
+  font-size: var(--codex-text-xs, 0.8rem);
+  color: var(--codex-text-muted);
+  font-style: normal;
+}
+
+.codex-editorial-timeline {
+  position: relative;
+  list-style: none;
+  padding: 0;
+  margin: var(--codex-space-5) 0;
+  display: grid;
+  gap: var(--codex-space-3);
+  border-left: 2px solid var(--codex-border-soft, #eadfd0);
+  padding-left: var(--codex-space-4);
+}
+.codex-editorial-timeline__item {
+  position: relative;
+}
+.codex-editorial-timeline__item::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--codex-space-4) - 5px);
+  top: 0.55rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--codex-gold);
+}
+.codex-editorial-timeline__label {
+  display: block;
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-text);
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+  letter-spacing: 0.02em;
+}
+.codex-editorial-timeline__text {
+  margin: 0.25rem 0 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+  line-height: 1.6;
+}
+
+.codex-editorial-testimonial {
+  margin: var(--codex-space-5) 0;
+  padding: var(--codex-space-4) var(--codex-space-5);
+  border-left: 3px solid var(--codex-gold);
+  background: var(--codex-bg-warm);
+  border-radius: 0 var(--codex-radius-card) var(--codex-radius-card) 0;
+}
+.codex-editorial-testimonial blockquote {
+  margin: 0;
+  font-size: var(--codex-text-base, 1rem);
+  font-style: italic;
+  color: var(--codex-text);
+  line-height: 1.6;
+}
+.codex-editorial-testimonial figcaption {
+  margin-top: var(--codex-space-2);
+  font-size: var(--codex-text-sm, 0.875rem);
+  color: var(--codex-text-muted);
+}
+
+.codex-editorial-checklist {
+  list-style: none;
+  padding: 0;
+  margin: var(--codex-space-3) 0;
+  display: grid;
+  gap: var(--codex-space-1-plus);
+}
+.codex-editorial-checklist__item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--codex-space-2);
+  align-items: start;
+  font-size: var(--codex-text-sm-plus, 0.95rem);
+  line-height: 1.6;
+  color: var(--codex-text);
+}
+.codex-editorial-checklist__mark {
+  font-weight: var(--codex-weight-bold, 700);
+  color: var(--codex-gold);
+  line-height: 1.6;
+}

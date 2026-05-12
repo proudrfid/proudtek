@@ -1,18 +1,36 @@
 ---
 /**
- * Single brief/checklist field (DT/DD pair).
- * Replaces renderBriefField() from editorial-pages.ts.
+ * Single brief field — one `<div>` inside the Brief `<dl>` grid.
+ *
+ * Shadow component (Stage 2). Mirrors `renderBriefField(field)` in
+ * editorial-pages.ts (~line 2066).
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialBriefField
+ *   label:  string
+ *   text?:  string                                            // optional body paragraph
+ *   items?: string[]                                          // optional ul list
+ *   links?: Array<{ href, label, description? }>              // optional link row
  */
-import type { EditorialBriefField } from "../../lib/editorial-types";
+interface BriefLink {
+  href: string;
+  label: string;
+  description?: string;
+}
+
+interface BriefFieldData {
+  label: string;
+  text?: string;
+  items?: string[];
+  links?: BriefLink[];
+}
 
 interface Props {
-  field: EditorialBriefField;
+  field: BriefFieldData;
 }
 
 const { field } = Astro.props;
 ---
-
-<div class="codex-editorial-brief-card">
+<div class="codex-card codex-editorial-brief-card">
   <dt>{field.label}</dt>
   <dd>
     {field.text && <p>{field.text}</p>}

@@ -5,8 +5,8 @@
   "kicker": "Hospitality Guide",
   "summary": "A practical encoding guide for hotels that covers lock-estate discovery, chip family selection, pre-encoding brief structure, pilot validation, replacement workflow, mobile key integration, and the specific questions that separate a clean rollout from a renegotiation six months in.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2025-11-15",
-  "reviewedAt": "2025-11-19",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -22,7 +22,8 @@
     "The installed lock and encoder estate determines what pre-encoding is realistic before a single sample is produced.",
     "A good pilot validates guest recovery, front-desk handling and PMS re-issue flow. Not just whether the door opens."
   ],
-  "imageAlt": "Hotel key card encoding workflow at the front desk encoder",
+  "imageAlt": "Hotel front-desk staff encoding RFID key card — MIFARE/DESFire encoder workflow",
+  "heroImage": "/blog-images/hotel-key-card-encoding-explained.jpg",
   "imageSourceRoutes": [
     "/product/hotel-key-cards/",
     "/product/printed-rfid-cards/"
@@ -104,6 +105,86 @@
       ]
     },
     {
+      "title": "Lock-vendor × chip-family compatibility matrix",
+      "intro": "The matrix below summarises what the major lock vendors actually support for hotel guest credentials in 2026. Each cell reflects the vendor's published compatibility plus the most common real-world deployment posture; properties should still verify against their specific lock model and firmware before committing. The shorthand 'native' means the chip family is the recommended credential and unlocks the vendor's mobile-key SDK; 'supported' means the lock reads the chip but a security or migration caveat applies; 'legacy' means the chip works only on older firmware and the vendor has signalled end-of-life. Table below: Lock vendor compatibility for the four most common hotel chip families.",
+      "table": {
+        "rows": [
+          [
+            "dormakaba (Saflok, Ambiance, Quantum)",
+            "Supported (legacy keys)",
+            "Native, recommended (DESFire Ultralight AES on newest firmware)",
+            "Supported (Ultralight C / AES)",
+            "DESFire EV3 or Plus SL3 with AES-128"
+          ],
+          [
+            "ASSA ABLOY VingCard / Visionline (Vostio)",
+            "Supported (Classic & Visionline legacy)",
+            "Native (DESFire EV2/EV3 default for Vostio cloud)",
+            "Supported (IHG-style branded cards)",
+            "DESFire family + Vostio key tree"
+          ],
+          [
+            "Salto Systems (XS4, KS, SALTO Space)",
+            "Supported (legacy SALTO Space)",
+            "Native (DESFire EV2/EV3, MIFARE Plus SL3, SALTO Identity)",
+            "Supported (lower memory tier)",
+            "DESFire / Plus SL3 + JustIN Mobile"
+          ],
+          [
+            "Onity (HT series, Advance, DirectKey)",
+            "Supported (DirectKey legacy)",
+            "Supported on newer firmware",
+            "Supported",
+            "DESFire on newer DirectKey only"
+          ],
+          [
+            "MIWA (eMG-S, ALV4)",
+            "Supported",
+            "Supported (DESFire EV2/EV3)",
+            "Supported",
+            "DESFire + MIWA mobile-key bridge"
+          ],
+          [
+            "HID Global (iCLASS SE / SEOS)",
+            "Not native (legacy MIFARE only via interop)",
+            "Supported (DESFire EV3 via SEOS)",
+            "Limited",
+            "SEOS credential layer required"
+          ]
+        ],
+        "columns": [
+          "Lock vendor / platform",
+          "MIFARE Classic 1K",
+          "MIFARE Plus SL3 / DESFire EV3",
+          "MIFARE Ultralight C / EV1",
+          "Mobile-key SDK requirement"
+        ]
+      },
+      "bullets": [
+        "DESFire EV3 with AES-128 is the converging default across every major vendor's 2024–2026 firmware roadmap. Properties on a new build or a major refresh should default to DESFire EV3 unless the chain credential standard explicitly says otherwise.",
+        "MIFARE Classic 1K still works at most vendors but is increasingly carried as legacy support, not recommended posture. Any property planning to keep Classic past 2027 should expect the lock vendor to flag it during the next firmware-support contract renewal.",
+        "Ultralight C and Ultralight AES remain common for chain-branded cards (notably IHG's Ultralight C deployment, which RFIDHotel.com lists in stock at ~US$0.32 per card with same-day shipping for 200-card sleeves). Ultralight is cost-optimised for large chain volume; DESFire is security-optimised for new builds and refurbs.",
+        "The cells above are baseline. Always cross-check the specific lock model's firmware support note before committing, because lock vendors quietly change credential support in mid-cycle firmware releases (typical 12–18 month cadence)."
+      ]
+    },
+    {
+      "title": "Step-by-step encoding workflow: lock audit to first issued card",
+      "intro": "The encoding rollout below is the linear sequence the encoding lead should walk a new property through, with each step gated on a written deliverable rather than an elapsed-time estimate. Properties that follow the sequence reach a first issued card in 8–12 weeks (chain greenfield), 12–20 weeks (boutique retrofit), or 20–32 weeks (multi-property refresh requiring lock firmware updates). Skipping or compressing steps almost always pushes the failure into pilot or worse, into the first peak-check-in week.",
+      "bullets": [
+        "Step 1 — lock estate audit (week 1–2): document every lock brand, model and firmware version across guest rooms and back-of-house. Include lifts, garage, pool, spa, minibar, safes. Produce one spreadsheet that the supplier and the lock vendor can both reference.",
+        "Step 2 — encoder fleet audit (week 2): document encoder model, firmware, connection type and software version at every front desk plus mobile encoders. Flag any encoder that caps write speed or chip-family support, because a single laggard encoder can constrain the chip choice for the entire estate.",
+        "Step 3 — chip family decision (week 3): apply the lock-vendor compatibility matrix above against the property's chain credential standard (if any) and select the chip family with one viable fallback. Get sign-off from operations, IT, security and the lock-vendor account manager before moving forward.",
+        "Step 4 — encoding scope decision (week 3–4): blank, partial pre-encoded, or fully pre-encoded with key injection. Tie the choice to encoder capacity, peak-check-in throughput target, security posture and chain audit requirements. Document the key-handling agreement at this step, not later.",
+        "Step 5 — supplier brief (week 4–5): one PDF covering property profile, chip family, encoding scope, numbering rules, artwork references, pilot plan, compliance posture. Send to 2–3 qualified suppliers; expect realistic samples and pricing in 10–14 days.",
+        "Step 6 — control sample arrives (week 6–7): standard-spec PVC card on the chosen chip family, no premium finish. Bench-test on a reference lock and a reference encoder before doing anything else.",
+        "Step 7 — pilot order (week 8–10): 200 cards at production spec. Run the full pilot exit-criteria checklist (opening, issue speed, invalidation, housekeeping override, durability, encoder failure rate). Document each criterion pass/fail with named sign-off.",
+        "Step 8 — pilot retrospective and full-order trigger (week 10–11): if exit criteria pass, lock the production order and reserve the supplier's slot. If any criterion fails, return to the relevant upstream step rather than negotiating around the failure.",
+        "Step 9 — production and shipping (week 11–18): production runs for 2–6 weeks depending on substrate and MOQ tier; shipping adds 1–4 weeks depending on transit mode. Maintain a small blank-card buffer at the property so issuance does not depend on the production order arriving on the planned day.",
+        "Step 10 — site-key loading and first issuance (week 18–20): if partial pre-encoding, run the one-time site-key load (typical 3–4 hours per 10,000 cards) before first issue. If fully pre-encoded, validate a 50-card issuance batch end-to-end before opening the new stock to general issuance.",
+        "Step 11 — post-launch audit (week 22–26): four weeks after first issuance, audit encoder write failure rate, guest-card complaint volume, replacement burn rate vs forecast, and lock-firmware compatibility incidents. Adjust reorder threshold and supplier review cadence based on the audit outcome."
+      ]
+    },
+    {
       "title": "Documentation that makes a supplier reply with a real proposal",
       "intro": "The difference between a two-week RFQ cycle and a six-week RFQ cycle is usually the quality of the initial document. Specifically whether the supplier has to ask the property follow-up questions about chip family, lock firmware, numbering rules, key handling and pilot scope, or whether all of that information is in the first PDF. Pack the following into one document and most reputable suppliers can reply with realistic samples, pricing and lead times in 10–14 days; ship a partial brief and expect the supplier to reply with a clarifying-questions email instead of a quote.",
       "bullets": [
@@ -170,6 +251,27 @@
           "label": "Hotel key card sample planning"
         }
       ]
+    },
+    {
+      "title": "Lock vendor and chip references",
+      "description": "Authoritative vendor and standards references for the chip-family decision.",
+      "links": [
+        {
+          "href": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/complementary-products/keycards-credentials--ka_117177",
+          "label": "dormakaba keycards & credentials portfolio",
+          "description": "Official dormakaba documentation listing supported chip families and the move toward MIFARE Ultralight AES."
+        },
+        {
+          "href": "https://www.assaabloyglobalsolutions.com/en/solutions/hospitality/",
+          "label": "ASSA ABLOY Global Solutions hospitality portfolio",
+          "description": "VingCard / Visionline / Vostio compatibility and credential-management documentation."
+        },
+        {
+          "href": "https://saltosystems.com/en/solutions/hotel/",
+          "label": "Salto Systems hotel access platform",
+          "description": "Salto XS4/KS lock platform documentation covering DESFire and MIFARE Plus support."
+        }
+      ]
     }
   ],
   "faq": [
@@ -200,6 +302,14 @@
     {
       "question": "What is the most common avoidable mistake in hotel encoding projects?",
       "answer": "Treating the card finish as the first decision. Finish is the last decision. It follows chip family (driven by lock firmware and chain security policy), encoding scope (driven by encoder capacity and throughput requirements), pilot result (driven by real-lock compatibility and PMS integration), and rollout timing (driven by occupancy calendar and production lead time). Projects that sample wood or PLA before confirming lock firmware and pilot compatibility almost always re-sample after the first pilot fails, because the upgraded substrate detunes the antenna in ways the PVC control would have surfaced safely. The correct ordering is lock estate audit → chip family selection → encoding scope (blank/partial/full) → sample planning with control-first → pilot → material selection → artwork → production. Inverting any step in that sequence is how a clean 12-week project becomes a messy 24-week one."
+    },
+    {
+      "question": "Which chip family is the safest 2026 default if no chain standard applies?",
+      "answer": "MIFARE DESFire EV3 with AES-128, sized at 2K for most properties. Every major lock vendor (dormakaba, ASSA ABLOY VingCard, Salto, Onity newer firmware, MIWA) lists DESFire EV3 as a recommended credential, the chip carries Common Criteria EAL5+ certification (BSI-DSZ-CC), and it is the credential layer mobile-key SDKs derive from across all the major hospitality lock vendors. The fallback for tight budgets is MIFARE Plus SL3, which is also AES-based but slightly less flexible on multi-application credentials. Avoid defaulting to MIFARE Classic 1K in 2026 unless a deep retrofit constraint forces it; the cost saving (typically US$0.05–0.10 per card) does not offset the migration debt and the security audit risk that comes with the broken Crypto1 cipher."
+    },
+    {
+      "question": "How long should a complete encoding project take from lock audit to first issued card?",
+      "answer": "8–12 weeks for a chain greenfield property where the chip family, encoder fleet and PMS are all standardised at the corporate level. 12–20 weeks for a boutique retrofit where the property has to do its own lock and encoder audit, run the supplier RFQ, and pilot before committing. 20–32 weeks for a multi-property refresh where some sites need lock firmware updates before the new chip family will work, especially if the firmware update requires coordinated downtime across the chain's IT, the lock vendor and the PMS vendor. Each of these timelines assumes a clean brief and a single round of pilot rework; an unstable upstream gate (chip family changing mid-project, PMS integration revealing a serial-format mismatch) typically adds 4–8 weeks per occurrence."
     }
   ],
   "sources": [

@@ -5,86 +5,39 @@ import type { SiteData, SnapshotPage } from "./site-data";
 import { loadPageFromDisk } from "./site-data";
 import { INDUSTRY_CATEGORIES } from "./catalog-pages";
 import { getIcon } from "./icons";
+// Editorial types + pure helpers all live in editorial-types.ts as the single
+// canonical source. Local duplicates were removed in Stage 1 / 1.5 cleanup
+// (2026-05); see docs/architecture/editorial-rendering-debt.md for the audit
+// and per-helper parity table. `EditorialGroup` and `EditorialDefinition` are
+// re-exported here for backwards-compat with any external consumer that still
+// imports them from this module — though grep shows none currently do.
+import {
+  // text helpers
+  escapeHtml,
+  escapeAttribute,
+  renderInlineLinks,
+  truncateEditorialText,
+  // outline + summary
+  buildEditorialOutline,
+  summarizeBriefField,
+  summarizeSection,
+  // classifiers
+  isWorkflowSection,
+  detectSectionType,
+  resolvePageType,
+  // types
+  type CitationCtx,
+  type EditorialGroup,
+  type EditorialLink,
+  type EditorialTable,
+  type EditorialSectionData,
+  type EditorialBriefField,
+  type EditorialResourceCard,
+  type EditorialFaq,
+  type EditorialDefinition,
+} from "./editorial-types";
 
-export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "resources";
-
-interface EditorialLink {
-  href: string;
-  label: string;
-  description?: string;
-}
-
-interface EditorialTable {
-  columns: string[];
-  rows: string[][];
-}
-
-interface EditorialSection {
-  title: string;
-  intro?: string;
-  paragraphs?: string[];
-  bullets?: string[];
-  table?: EditorialTable;
-  image?: { src: string; alt: string };
-  callout?: { label: string; text: string; href?: string };
-}
-
-interface EditorialBriefField {
-  label: string;
-  text?: string;
-  items?: string[];
-  links?: EditorialLink[];
-}
-
-interface EditorialResourceCard {
-  title: string;
-  description: string;
-  links: EditorialLink[];
-}
-
-interface EditorialFaq {
-  question: string;
-  answer: string;
-}
-
-export interface EditorialDefinition {
-  route: string;
-  group: EditorialGroup;
-  title: string;
-  kicker: string;
-  summary: string;
-  heroPoints: string[];
-  imageAlt: string;
-  imageSourceRoutes: string[];
-  heroImage?: string;
-  brief?: EditorialBriefField[];
-  sections: EditorialSection[];
-  resourceCards: EditorialResourceCard[];
-  faq: EditorialFaq[];
-  primaryAction: EditorialLink;
-  secondaryActions: EditorialLink[];
-  /** Optional ISO-8601 content freshness dates; injected into bodyHtml as <time.entry-date.published> and <time.updated> so resolveArticleMeta picks them up for JSON-LD. */
-  publishedAt?: string;
-  modifiedAt?: string;
-  /** Optional keyword phrases for Article/Product JSON-LD; preferred over tokenized title. */
-  keywords?: string[];
-  /** Authority / EEAT signals — see src/content.config.ts for field contract. */
-  authorSlug?: string;
-  author?: string;
-  reviewedBySlug?: string;
-  reviewedBy?: string;
-  reviewedAt?: string;
-  sources?: Array<{
-    label: string;
-    url: string;
-    publisher?: string;
-    publishedAt?: string;
-    accessedAt?: string;
-    note?: string;
-  }>;
-  /** Industry slugs where this SKU is deployed (e.g. ["retail-apparel", "hospitality"]). */
-  relatedIndustries?: string[];
-}
+export type { EditorialGroup, EditorialDefinition };
 
 const EDITORIAL_LINK_REWRITES: Record<string, EditorialLink> = {
   "/2024/12/25/rfid-hotel-key-card/": {
@@ -316,7 +269,7 @@ function isEditorialOverrideRoute(route: string): boolean {
  * informational and SKU-discovery intent stay on their own pages while still
  * being one click apart.
  */
-const PILLAR_CLUSTER_LABELS: Record<string, string> = {
+export const PILLAR_CLUSTER_LABELS: Record<string, string> = {
   "rfid-cards": "RFID Cards",
   "rfid-keyfobs": "RFID Keyfobs",
   "rfid-labels": "RFID Labels",
@@ -325,7 +278,7 @@ const PILLAR_CLUSTER_LABELS: Record<string, string> = {
   "rfid-wristbands": "RFID Wristbands",
 };
 
-function getPillarClusterId(route: string): string | null {
+export function getPillarClusterId(route: string): string | null {
   const match = /^\/products\/([^/]+)\/$/.exec(route);
   if (!match) return null;
   return match[1] in PILLAR_CLUSTER_LABELS ? match[1] : null;
@@ -687,14 +640,19 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
 
   const pages: SnapshotPage[] = [];
   for (const definition of EDITORIAL_DEFINITIONS) {
+    const illustration = await resolveIllustration(definition);
     pages.push({
-    route: definition.route,
-    sourceUrl: `${siteData.siteOrigin}${definition.route}`,
-    title: definition.title,
-    htmlAttrs: { ...template.htmlAttrs },
-    bodyAttrs: buildBodyAttrs(template.bodyAttrs, definition),
-    headHtml,
-    bodyHtml: buildBodyHtml(template.bodyHtml, definition, await resolveIllustration(definition)),
+      route: definition.route,
+      sourceUrl: `${siteData.siteOrigin}${definition.route}`,
+      title: definition.title,
+      htmlAttrs: { ...template.htmlAttrs },
+      bodyAttrs: buildBodyAttrs(template.bodyAttrs, definition),
+      headHtml,
+      bodyHtml: buildBodyHtml(template.bodyHtml, definition, illustration),
+      // Stage 3 cutover plumbing — exposed for future env-flag dispatch
+      // in route layouts. Default render path still uses bodyHtml above.
+      editorialDefinition: definition,
+      editorialIllustration: illustration,
     });
   }
   return pages;
@@ -798,7 +756,7 @@ const INDUSTRY_HUB_META: Array<{ slug: string; label: string; emoji: string; ico
  * `_<section>HubData: HubEntry[]` in buildEditorialPages, and call
  * `renderHubRail` / `renderHubGrid` from `renderEditorialMain`.
  */
-type HubEntry = { slug: string; route: string; label: string; emoji: string; iconSlug: string; summary: string; heroImage: string };
+export type HubEntry = { slug: string; route: string; label: string; emoji: string; iconSlug: string; summary: string; heroImage: string };
 type IndustryHubEntry = HubEntry;
 const _industriesHubData: HubEntry[] = [];
 
@@ -964,7 +922,7 @@ const _solutionsGroupedHubData: GroupedHubData = [];
  * compatibility into a single rail with group headers). Each group renders
  * as its own labelled section in both the rail and the card grid.
  */
-type GroupedHubData = Array<{
+export type GroupedHubData = Array<{
   groupLabel: string;
   groupSlug: string;
   emoji: string;
@@ -1059,7 +1017,7 @@ function renderRelatedIndustriesGrid(definition: EditorialDefinition): string {
   const slugs = definition.relatedIndustries ?? [];
   if (slugs.length === 0) return "";
   // Scope: SKU pages only (inside a product cluster, excluding the cluster roots themselves).
-  if (!/^\/products\/rfid-[a-z]+\/[a-z0-9\-]+\/$/.test(definition.route)) return "";
+  if (!/^\/products\/rfid-[a-z]+\/[a-z0-9-]+\/$/.test(definition.route)) return "";
 
   type IndustryCard = { href: string; title: string; description: string; heroImage: string; emoji: string };
   const entries: IndustryCard[] = slugs
@@ -1096,7 +1054,7 @@ function renderRelatedIndustriesGrid(definition: EditorialDefinition): string {
     .map(
       (cat) => `
         <a href="${escapeAttribute(cat.href)}" class="codex-card codex-card--media codex-related-industry-card">
-          ${cat.heroImage ? `<img src="${escapeAttribute(cat.heroImage)}" alt="${escapeAttribute(cat.title)}" loading="lazy" decoding="async">` : ""}
+          ${cat.heroImage ? `<img src="${escapeAttribute(cat.heroImage)}" alt="${escapeAttribute(cat.title)}" width="1200" height="675" loading="eager" decoding="async">` : ""}
           <div class="codex-related-industry-card__body">
             <span class="codex-related-industry-card__emoji" aria-hidden="true">${escapeHtml(cat.emoji)}</span>
             <strong>${escapeHtml(cat.title)}</strong>
@@ -1135,7 +1093,7 @@ function renderIndustryProductGrid(definition: EditorialDefinition): string {
 
     return `
       <a href="${escapeAttribute(route)}" class="codex-card codex-card--media codex-industries-cat-card">
-        ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" loading="lazy">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
+        ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" width="1200" height="675" loading="eager">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
         <div class="codex-industries-cat-card__body">
           <h3>${escapeHtml(shortName)}</h3>
           <span class="codex-industries-cat-card__arrow">&rarr;</span>
@@ -1187,7 +1145,7 @@ function renderSolutionProductGrid(definition: EditorialDefinition): string {
 
     return `
       <a href="${escapeAttribute(route)}" class="codex-card codex-card--media codex-industries-cat-card">
-        ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" loading="lazy">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
+        ${img ? `<img src="${escapeAttribute(img)}" alt="${escapeAttribute(shortName)}" width="1200" height="675" loading="eager">` : `<div class="codex-industries-cat-card__placeholder"></div>`}
         <div class="codex-industries-cat-card__body">
           <h3>${escapeHtml(shortName)}</h3>
           <span class="codex-industries-cat-card__arrow">&rarr;</span>
@@ -1309,7 +1267,7 @@ function renderHubGrid(items: HubEntry[], sectionLabel: string): string {
         <a href="${escapeAttribute(entry.route)}" class="codex-card codex-card--media codex-industries-hub-card">
           <div class="codex-industries-hub-card__media">
             ${entry.heroImage
-              ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" loading="lazy" decoding="async">`
+              ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" width="1200" height="675" loading="eager" decoding="async">`
               : `<div class="codex-industries-hub-card__placeholder codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</div>`}
             <span class="codex-industries-hub-card__emoji codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</span>
           </div>
@@ -1447,7 +1405,7 @@ function renderGroupedHubGrid(groups: GroupedHubData, sectionLabel: string): str
             <a href="${escapeAttribute(entry.route)}" class="codex-card codex-card--media codex-industries-hub-card">
               <div class="codex-industries-hub-card__media">
                 ${entry.heroImage
-                  ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" loading="lazy" decoding="async">`
+                  ? `<img src="${escapeAttribute(entry.heroImage)}" alt="${escapeAttribute(entry.label)}" width="1200" height="675" loading="eager" decoding="async">`
                   : `<div class="codex-industries-hub-card__placeholder codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</div>`}
                 <span class="codex-industries-hub-card__emoji codex-icon" aria-hidden="true">${getIcon(entry.iconSlug)}</span>
               </div>
@@ -1740,7 +1698,9 @@ function renderTrail(definition: EditorialDefinition): string {
   } else if (definition.route.startsWith("/products/rfid-tags/")) {
     links.push({ href: "/products/rfid-tags/", label: "RFID Tags" });
   } else if (definition.route.startsWith("/industries/")) {
-    links.push({ href: "/industries/hospitality/", label: "Industries" });
+    // Fixed 2026-05-11: was hardcoded to /industries/hospitality/ — wrong parent
+    // for every industry that isn't hospitality. Point at the actual pillar.
+    links.push({ href: "/industries/", label: "Industries" });
   } else if (definition.route.startsWith("/products/rfid-wristbands/")) {
     links.push({ href: "/products/rfid-wristbands/", label: "RFID Wristbands" });
   } else if (definition.route.startsWith("/products/rfid-keyfobs/")) {
@@ -1772,7 +1732,7 @@ function renderTrail(definition: EditorialDefinition): string {
     links.push({ href: "/contact/", label: "Contact" });
   }
 
-  if (!isSectionRoot(definition.route)) {
+  if (!isBreadcrumbSectionRoot(definition.route)) {
     /* DS-9 KPI cleanup (2026-04-26) — Breadcrumbs should show a SHORT
        page label, not the full SEO title. Many editorial titles carry a
        chip-spec or compliance suffix after an em-dash / pipe / colon
@@ -1796,68 +1756,6 @@ function renderTrail(definition: EditorialDefinition): string {
   </nav>`;
 }
 
-function buildEditorialOutline(definition: EditorialDefinition): {
-  snapshotId: string;
-  briefId: string | null;
-  sectionLinks: Array<{ id: string; label: string }>;
-  filteredSections: EditorialSection[];
-  resourcesId: string;
-  faqId: string | null;
-  sourcesId: string | null;
-  nextStepId: string;
-  jumpLinks: Array<{ id: string; label: string }>;
-} {
-  const used = new Set<string>();
-  const createId = (label: string): string => {
-    const base =
-      label
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "") || "section";
-    let candidate = base;
-    let suffix = 2;
-
-    while (used.has(candidate)) {
-      candidate = `${base}-${suffix}`;
-      suffix += 1;
-    }
-
-    used.add(candidate);
-    return candidate;
-  };
-
-  const snapshotId = createId("At a glance");
-  const briefId = definition.brief && definition.brief.length > 0 ? createId("Project checklist") : null;
-  // Filter out "Where this ... fits" sections — their content is redundant with the snapshot
-  const filteredSections = definition.sections.filter(
-    (section) => !/^where\s+this\s+/i.test(section.title),
-  );
-  const sectionLinks = filteredSections.map((section) => ({ id: createId(section.title), label: section.title }));
-  const resourcesId = createId("Useful next pages");
-  const faqId = definition.faq.length > 0 ? createId("FAQ") : null;
-  const sourcesId = definition.sources && definition.sources.length > 0 ? createId("Sources") : null;
-  const nextStepId = createId("Next step");
-  const jumpLinks = [
-    { id: snapshotId, label: "At a glance" },
-    ...sectionLinks,
-    { id: resourcesId, label: "Useful next pages" },
-    ...(faqId ? [{ id: faqId, label: "FAQ" }] : []),
-    ...(sourcesId ? [{ id: sourcesId, label: "Sources" }] : []),
-    { id: nextStepId, label: "Next step" },
-  ];
-
-  return {
-    snapshotId,
-    briefId,
-    sectionLinks,
-    filteredSections,
-    resourcesId,
-    faqId,
-    sourcesId,
-    nextStepId,
-    jumpLinks,
-  };
-}
 
 function renderJumpNav(links: Array<{ id: string; label: string }>): string {
   if (links.length === 0) {
@@ -1901,7 +1799,7 @@ function renderDecisionSnapshot(definition: EditorialDefinition, id: string): st
   </section>`;
 }
 
-function buildDecisionSnapshotCards(definition: EditorialDefinition): Array<{ label: string; text: string; link?: EditorialLink }> {
+export function buildDecisionSnapshotCards(definition: EditorialDefinition): Array<{ label: string; text: string; link?: EditorialLink }> {
   if (definition.group === "compare") {
     return buildComparisonDecisionSnapshot(definition);
   }
@@ -1962,110 +1860,20 @@ function buildComparisonDecisionSnapshot(definition: EditorialDefinition): Array
   return cards.slice(0, 3);
 }
 
-function summarizeBriefField(field: EditorialBriefField): string {
-  if (field.text) {
-    return truncateEditorialText(field.text, 170);
-  }
 
-  if (field.items && field.items.length > 0) {
-    return truncateEditorialText(field.items.slice(0, 2).join(" "), 170);
-  }
 
-  if (field.links && field.links.length > 0) {
-    return truncateEditorialText(field.links.slice(0, 2).map((link) => link.label).join(" / "), 170);
-  }
 
-  return "Use the checklist below to prepare a clear inquiry before you contact the team.";
-}
+// CitationCtx + renderInlineLinks now live in editorial-types.ts as the single
+// canonical source. Imported at the top of this file. Stage 1 cleanup 2026-05.
 
-function summarizeSection(section: EditorialSection): string {
-  if (section.intro) {
-    return truncateEditorialText(section.intro, 170);
-  }
 
-  if (section.paragraphs && section.paragraphs.length > 0) {
-    return truncateEditorialText(section.paragraphs[0], 170);
-  }
-
-  if (section.bullets && section.bullets.length > 0) {
-    return truncateEditorialText(section.bullets.slice(0, 2).join(" "), 170);
-  }
-
-  return "Use the section below to choose the best option and what your inquiry should include.";
-}
-
-function truncateEditorialText(value: string, limit: number): string {
-  const normalized = value.replace(/\s+/g, " ").trim();
-
-  if (normalized.length <= limit) {
-    return normalized;
-  }
-
-  return `${normalized.slice(0, Math.max(0, limit - 1)).trimEnd()}...`;
-}
-
-/**
- * Optional citation context passed through the render pipeline so authors can
- * use `[^N]` markers in body text to link a contested claim to source #N in
- * the page's Sources block. DS-10 #2 — turn the sources block from a passive
- * "credentialing badge" at the page bottom into an active in-read trust
- * mechanism.
- */
-type CitationCtx = {
-  sourcesId: string;
-  sourcesCount: number;
-};
-
-function renderInlineLinks(text: string, citations?: CitationCtx): string {
-  // Convert markdown-style [label](url) to HTML links, escape everything else.
-  // Citation markers are rewritten BEFORE escapeHtml so the produced markup
-  // survives. We use a temporary token so the inner HTML is reintroduced after
-  // escaping the surrounding plain text.
-  const CITE_OPEN = "CITEOPEN";
-  const CITE_CLOSE = "CITECLOSE";
-
-  let working = text;
-
-  if (citations && citations.sourcesCount > 0) {
-    working = working.replace(/\[\^(\d+)\]/g, (match, raw) => {
-      const n = Number(raw);
-      if (!Number.isInteger(n) || n < 1 || n > citations.sourcesCount) return match;
-      return `${CITE_OPEN}${n}${CITE_CLOSE}`;
-    });
-  }
-
-  let html = escapeHtml(working).replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    (_match, label, url) => `<a href="${escapeAttribute(url)}">${label}</a>`,
-  );
-
-  if (citations) {
-    const re = new RegExp(`${CITE_OPEN}(\\d+)${CITE_CLOSE}`, "g");
-    html = html.replace(re, (_match, n) => {
-      const href = `#${citations.sourcesId}-${n}`;
-      return `<sup class="codex-citation"><a href="${escapeAttribute(href)}" aria-label="Citation ${n}, see Sources block">[${n}]</a></sup>`;
-    });
-  }
-
-  return html;
-}
-
-function detectSectionType(title: string): string {
-  const lower = title.toLowerCase();
-  // Check solution FIRST — "How Proud Tek solves ... challenges" should be green, not red
-  if (/solution|how .* solve|how .* help|our approach|how proud tek|what we offer/.test(lower)) return "solution";
-  if (/result|case|success|outcome|client|customer .* story|impact|roi/.test(lower)) return "results";
-  if (/pain|problem|challenge|issue|common .* face|why .* fail|risk|obstacle/.test(lower)) return "pain";
-  return "";
-}
-
-function renderSection(section: EditorialSection, id: string, citations?: CitationCtx): string {
+function renderSection(section: EditorialSectionData, id: string, citations?: CitationCtx): string {
   const introHtml = section.intro ? `<p class="codex-editorial-section-intro">${renderInlineLinks(section.intro, citations)}</p>` : "";
   const paragraphsHtml = (section.paragraphs ?? []).map((paragraph) => `<p>${renderInlineLinks(paragraph, citations)}</p>`).join("");
   const bulletsHtml = renderSectionList(section, citations);
   const tableHtml = section.table ? renderTable(section.table) : "";
   const imageHtml = section.image
-    ? `<figure class="codex-editorial-figure"><img src="${escapeAttribute(section.image.src)}" alt="${escapeAttribute(section.image.alt)}" loading="lazy" decoding="async"></figure>`
+    ? `<figure class="codex-editorial-figure"><img src="${escapeAttribute(section.image.src)}" alt="${escapeAttribute(section.image.alt)}" width="1200" height="675" loading="lazy" decoding="async"></figure>`
     : "";
   const calloutHtml = section.callout
     ? `<aside class="codex-editorial-callout">
@@ -2075,21 +1883,136 @@ function renderSection(section: EditorialSection, id: string, citations?: Citati
       </aside>`
     : "";
 
+  /* ── Extended section blocks ───────────────────────────────────
+     Previously the Zod schema accepted statBar / comparePanel /
+     featureGrid / dataHighlight / timeline / testimonial / checklist
+     but renderSection() did not honor them, so 20/20 industry pages
+     were silently dropping high-value, schema-rich content blocks.
+     Added 2026-05-11.                                              */
+
+  const statBarHtml = section.statBar?.items?.length
+    ? `<ul class="codex-editorial-stat-bar" role="list">
+        ${section.statBar.items
+          .map(
+            (item) => `<li class="codex-editorial-stat-bar__item">
+              <span class="codex-editorial-stat-bar__value">${escapeHtml(item.value)}</span>
+              <span class="codex-editorial-stat-bar__label">${escapeHtml(item.label)}</span>
+            </li>`,
+          )
+          .join("")}
+      </ul>`
+    : "";
+
+  const comparePanelHtml = section.comparePanel
+    ? `<div class="codex-editorial-compare" role="group" aria-label="Before vs after comparison">
+        <div class="codex-editorial-compare__col codex-editorial-compare__col--before">
+          <h3>${escapeHtml(section.comparePanel.beforeHeading ?? "Before")}</h3>
+          <ul class="codex-editorial-list">
+            ${section.comparePanel.before.map((item) => `<li>${renderInlineLinks(item, citations)}</li>`).join("")}
+          </ul>
+        </div>
+        <div class="codex-editorial-compare__col codex-editorial-compare__col--after">
+          <h3>${escapeHtml(section.comparePanel.afterHeading ?? "After")}</h3>
+          <ul class="codex-editorial-list">
+            ${section.comparePanel.after.map((item) => `<li>${renderInlineLinks(item, citations)}</li>`).join("")}
+          </ul>
+        </div>
+      </div>`
+    : "";
+
+  const featureGridHtml = section.featureGrid?.features?.length
+    ? `<div class="codex-editorial-feature-grid">
+        ${section.featureGrid.features
+          .map((feature) => {
+            // Icon can be either a path (./public-served SVG / PNG / etc.) or a
+            // glyph / emoji / short text. Detect the path form and render as an
+            // <img> for crisp scaling and currentColor styling; otherwise keep
+            // the legacy <span>-with-text behavior so existing decks don't break.
+            const trimmed = feature.icon.trim();
+            const isPath =
+              trimmed.startsWith("/") ||
+              trimmed.startsWith("./") ||
+              trimmed.startsWith("https://") ||
+              trimmed.startsWith("http://") ||
+              trimmed.startsWith("data:image/");
+            const iconHtml = isPath
+              ? `<img class="codex-editorial-feature__icon codex-editorial-feature__icon--svg" src="${escapeAttribute(trimmed)}" alt="" loading="lazy" decoding="async" width="48" height="48" aria-hidden="true" />`
+              : `<span class="codex-editorial-feature__icon" aria-hidden="true">${escapeHtml(feature.icon)}</span>`;
+            return `<article class="codex-editorial-feature">
+              ${iconHtml}
+              <h3 class="codex-editorial-feature__title">${escapeHtml(feature.title)}</h3>
+              <p class="codex-editorial-feature__text">${renderInlineLinks(feature.text, citations)}</p>
+            </article>`;
+          })
+          .join("")}
+      </div>`
+    : "";
+
+  const dataHighlightHtml = section.dataHighlight
+    ? `<aside class="codex-editorial-data-highlight" role="figure" aria-label="${escapeAttribute(section.dataHighlight.heading)}">
+        <span class="codex-editorial-data-highlight__value">${escapeHtml(section.dataHighlight.value)}</span>
+        <strong class="codex-editorial-data-highlight__heading">${escapeHtml(section.dataHighlight.heading)}</strong>
+        <p class="codex-editorial-data-highlight__text">${renderInlineLinks(section.dataHighlight.text, citations)}</p>
+        ${section.dataHighlight.source ? `<cite class="codex-editorial-data-highlight__source">Source: ${escapeHtml(section.dataHighlight.source)}</cite>` : ""}
+      </aside>`
+    : "";
+
+  const timelineHtml = section.timeline?.items?.length
+    ? `<ol class="codex-editorial-timeline">
+        ${section.timeline.items
+          .map(
+            (item) => `<li class="codex-editorial-timeline__item">
+              <span class="codex-editorial-timeline__label">${escapeHtml(item.label)}</span>
+              <p class="codex-editorial-timeline__text">${renderInlineLinks(item.text, citations)}</p>
+            </li>`,
+          )
+          .join("")}
+      </ol>`
+    : "";
+
+  const testimonialHtml = section.testimonial
+    ? `<figure class="codex-editorial-testimonial">
+        <blockquote><p>${renderInlineLinks(section.testimonial.text, citations)}</p></blockquote>
+        <figcaption>— ${escapeHtml(section.testimonial.source)}</figcaption>
+      </figure>`
+    : "";
+
+  const checklistHtml = section.checklist?.length
+    ? `<ul class="codex-editorial-checklist" role="list">
+        ${section.checklist
+          .map(
+            (item) => `<li class="codex-editorial-checklist__item">
+              <span class="codex-editorial-checklist__mark" aria-hidden="true">✓</span>
+              <span class="codex-editorial-checklist__text">${renderInlineLinks(item, citations)}</span>
+            </li>`,
+          )
+          .join("")}
+      </ul>`
+    : "";
+
   const sectionType = detectSectionType(section.title);
   const typeAttr = sectionType ? ` data-section-type="${sectionType}"` : "";
+  const layoutAttr = section.layout && section.layout !== "default" ? ` data-section-layout="${section.layout}"` : "";
 
-  return `<section class="codex-editorial-section"${typeAttr} id="${escapeAttribute(id)}">
+  return `<section class="codex-editorial-section"${typeAttr}${layoutAttr} id="${escapeAttribute(id)}">
     <h2>${escapeHtml(section.title)}</h2>
     ${introHtml}
+    ${statBarHtml}
     ${imageHtml}
     ${paragraphsHtml}
+    ${dataHighlightHtml}
+    ${featureGridHtml}
+    ${comparePanelHtml}
+    ${timelineHtml}
     ${bulletsHtml}
+    ${checklistHtml}
     ${tableHtml}
+    ${testimonialHtml}
     ${calloutHtml}
   </section>`;
 }
 
-function renderSectionList(section: EditorialSection, citations?: CitationCtx): string {
+function renderSectionList(section: EditorialSectionData, citations?: CitationCtx): string {
   if (!section.bullets || section.bullets.length === 0) {
     return "";
   }
@@ -2110,9 +2033,6 @@ function renderSectionList(section: EditorialSection, citations?: CitationCtx): 
   return `<ul class="codex-editorial-list">${section.bullets.map((item) => `<li>${renderInlineLinks(item, citations)}</li>`).join("")}</ul>`;
 }
 
-function isWorkflowSection(title: string): boolean {
-  return /workflow|steps|playbook/i.test(title);
-}
 
 function renderBrief(fields: EditorialBriefField[], id: string): string {
   // DS-10 #3 — collapse Brief into <details> by default. Most evaluators
@@ -2573,7 +2493,16 @@ function findMeaningfulImage(bodyHtml: string): string | null {
   return null;
 }
 
-function isSectionRoot(route: string): boolean {
+/**
+ * Breadcrumb-skip predicate. Returns true for routes whose breadcrumb is
+ * just "Home / Section" — no third "current page" crumb appended. NOT a
+ * duplicate of the canonical `isSectionRoot` in editorial-types.ts; that
+ * one classifies hub roots (15 hardcoded routes). This one is breadcrumb-
+ * specific and extensible via EDITORIAL_OVERRIDE_ROUTES (product cluster
+ * pillars). Renamed and exported during Stage 2 wrap so Trail.astro can
+ * share the implementation without name collision.
+ */
+export function isBreadcrumbSectionRoot(route: string): boolean {
   return (
     route === "/solutions/" ||
     route === "/compare/" ||
@@ -2584,18 +2513,8 @@ function isSectionRoot(route: string): boolean {
   );
 }
 
-function resolvePageType(group: EditorialGroup): string {
-  switch (group) {
-    case "solutions": return "solution";
-    case "compare": return "compare";
-    case "guides": return "guide";
-    case "compatibility": return "compatibility";
-    case "contact": return "contact";
-    case "products": return "product";
-    case "resources": return "resources";
-    default: return "";
-  }
-}
+// resolvePageType now imported from editorial-types.ts (BUG-2 fix, Stage 1
+// 2026-05). Local copy was missing 7 cases — see git log / debt doc.
 
 function cleanText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -2609,7 +2528,7 @@ function cleanText(value: string): string {
  * Preserves an existing query string and any hash. Skips off-site / mailto / tel
  * hrefs since intent tagging only makes sense for our own contact route.
  */
-function buildIntentHref(href: string, intent: "samples" | "quote" | "engineering", route?: string): string {
+export function buildIntentHref(href: string, intent: "samples" | "quote" | "engineering", route?: string): string {
   if (!href) return href;
   if (/^(mailto:|tel:|https?:|\/\/)/i.test(href) && !href.startsWith("/")) return href;
   const [pathAndQuery, hash = ""] = href.split("#", 2);
@@ -2621,15 +2540,233 @@ function buildIntentHref(href: string, intent: "samples" | "quote" | "engineerin
   return `${path}${query ? `?${query}` : ""}${hash ? `#${hash}` : ""}`;
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+
+
+// ---------------------------------------------------------------------------
+// Stage 2 scaffold export — single entry point for EditorialArticle.astro
+//
+// The shadow `.astro` page composer needs HTML for several blocks that aren't
+// worth shadow-componentizing individually (collection-dependent hub/rail
+// data; rare-activation product grids; long inline RFQ form; contact-only
+// channel grid). Rather than promote each of those private functions plus
+// their backing module-private hub data arrays to top-level exports,
+// `buildEditorialScaffold(definition)` encapsulates the entire branching
+// logic and returns a flat object the .astro component can blit via
+// `set:html`. Keeps editorial-pages.ts public API surface minimal while
+// still letting the .astro composer reproduce renderEditorialMain output
+// byte-for-byte.
+// ---------------------------------------------------------------------------
+
+export interface EditorialRelatedIndustryCard {
+  href: string;
+  title: string;
+  description: string;
+  heroImage: string;
+  emoji: string;
 }
 
-function escapeAttribute(value: string): string {
-  return escapeHtml(value);
+export interface EditorialProductGridCard {
+  route: string;
+  shortName: string;
+  img: string;
 }
+
+/** Discriminated descriptor for the hub rail block. Null when no rail applies to this route. */
+export type EditorialRailDescriptor =
+  | { kind: "flat"; items: HubEntry[]; currentRoute: string; sectionLabel: string }
+  | { kind: "grouped"; groups: GroupedHubData; currentRoute: string; sectionLabel: string };
+
+/** Discriminated descriptor for the hub-grid block below the hero. Null when not on a hub page. */
+export type EditorialHubGridDescriptor =
+  | { kind: "flat"; items: HubEntry[]; sectionLabel: string }
+  | { kind: "resourcesCategory"; groups: GroupedHubData; sectionLabel: string };
+
+export interface EditorialScaffold {
+  /** Hub rail descriptor — null when no rail applies. */
+  rail: EditorialRailDescriptor | null;
+  /** Hub-grid descriptor — null for leaf pages. */
+  hubGrid: EditorialHubGridDescriptor | null;
+  /** Structured data for the cross-link related-industries grid. Null when not applicable. */
+  relatedIndustries: { cards: EditorialRelatedIndustryCard[] } | null;
+  /** Structured data for the industries-page product grid. Null when not applicable. */
+  industryProductGrid: { categoryTitle: string; cards: EditorialProductGridCard[] } | null;
+  /** Structured data for the solutions sub-page product grid. Null when not applicable. */
+  solutionProductGrid: { sectionLabel: string; cards: EditorialProductGridCard[] } | null;
+  /** True when rail is non-null — used to switch `contentWrapClass` between with-rail and default. */
+  hasRail: boolean;
+}
+
+function buildRelatedIndustriesData(definition: EditorialDefinition): { cards: EditorialRelatedIndustryCard[] } | null {
+  const slugs = definition.relatedIndustries ?? [];
+  if (slugs.length === 0) return null;
+  if (!/^\/products\/rfid-[a-z]+\/[a-z0-9-]+\/$/.test(definition.route)) return null;
+
+  const entries: EditorialRelatedIndustryCard[] = slugs
+    .map((slug): EditorialRelatedIndustryCard | null => {
+      const known = INDUSTRY_CATEGORIES.find((c) => c.id === slug);
+      if (known) {
+        return {
+          href: known.href,
+          title: known.title,
+          description: known.description,
+          heroImage: known.heroImage,
+          emoji: known.emoji,
+        };
+      }
+      const route = `/industries/${slug}/`;
+      const editorial = _editorialImageMap.get(route);
+      if (!editorial) return null;
+      const title = editorial.title.split(/—|–|-|\|/, 1)[0]?.trim() || slug;
+      return {
+        href: route,
+        title,
+        description: "Real-world deployments, compliance notes and product picks for this vertical.",
+        heroImage: editorial.heroImage,
+        emoji: "→",
+      };
+    })
+    .filter((c): c is EditorialRelatedIndustryCard => Boolean(c));
+
+  return entries.length === 0 ? null : { cards: entries };
+}
+
+function buildProductCard(route: string): EditorialProductGridCard {
+  const editorial = _editorialImageMap.get(route);
+  const wpProduct = _wpProductImageMap.get(route);
+  const name = editorial?.title
+    ?? wpProduct?.title
+    ?? route.split("/").filter(Boolean).pop()?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    ?? route;
+  const shortName = name.length > 50 ? name.slice(0, 47).trimEnd() + "..." : name;
+  const img = editorial?.heroImage ?? wpProduct?.image ?? "";
+  return { route, shortName, img };
+}
+
+function buildIndustryProductGridData(definition: EditorialDefinition): { categoryTitle: string; cards: EditorialProductGridCard[] } | null {
+  if (!definition.route.startsWith("/industries/")) return null;
+  const category = INDUSTRY_CATEGORIES.find((cat) => cat.href === definition.route);
+  if (!category || category.productRoutes.length === 0) return null;
+  return {
+    categoryTitle: category.title,
+    cards: category.productRoutes.map((r) => buildProductCard(r)),
+  };
+}
+
+function buildSolutionProductGridData(definition: EditorialDefinition): { sectionLabel: string; cards: EditorialProductGridCard[] } | null {
+  if (!/^\/solutions\/[^/]+\/$/.test(definition.route)) return null;
+  const routes = definition.imageSourceRoutes ?? [];
+  if (routes.length === 0) return null;
+
+  const hubEntry = _solutionsHubData.find((e) => e.route === definition.route);
+  const sectionLabel = hubEntry?.label
+    ?? definition.route
+        .replace(/^\/solutions\//, "")
+        .replace(/\/$/, "")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return {
+    sectionLabel,
+    cards: routes.map((r) => buildProductCard(r)),
+  };
+}
+
+export function buildEditorialScaffold(definition: EditorialDefinition): EditorialScaffold {
+  const isIndustriesHub = definition.route === "/industries/";
+  const isIndustriesPage = isIndustriesHub || /^\/industries\/[^/]+\/$/.test(definition.route);
+  const isSolutionsHub = definition.route === "/solutions/";
+  const isSolutionsPage = isSolutionsHub || /^\/solutions\/[^/]+\/$/.test(definition.route);
+  const isResourcesHub = definition.route === "/resources/";
+  const isResourcesPage = isResourcesHub || /^\/(?:blog|guides|compare|compatibility)\/(?:[^/]+\/)?$/.test(definition.route);
+
+  let rail: EditorialRailDescriptor | null = null;
+  let hubGrid: EditorialHubGridDescriptor | null = null;
+
+  if (isIndustriesPage) {
+    rail = { kind: "flat", items: _industriesHubData, currentRoute: definition.route, sectionLabel: "Industries" };
+    if (isIndustriesHub) hubGrid = { kind: "flat", items: _industriesHubData, sectionLabel: "industries" };
+  } else if (isSolutionsPage) {
+    rail = { kind: "grouped", groups: _solutionsGroupedHubData, currentRoute: definition.route, sectionLabel: "Solutions" };
+    if (isSolutionsHub) hubGrid = { kind: "flat", items: _solutionsHubData, sectionLabel: "solutions" };
+  } else if (isResourcesPage) {
+    if (isResourcesHub) {
+      rail = { kind: "flat", items: _resourcesRailData, currentRoute: definition.route, sectionLabel: "Resources" };
+      hubGrid = { kind: "resourcesCategory", groups: _resourcesHubData, sectionLabel: "resources" };
+    } else if (definition.route.startsWith("/guides/")) {
+      rail = { kind: "grouped", groups: _guidesGroupedRailData, currentRoute: definition.route, sectionLabel: "Buying Guides" };
+    } else if (definition.route.startsWith("/compare/")) {
+      rail = { kind: "grouped", groups: _compareGroupedRailData, currentRoute: definition.route, sectionLabel: "Comparisons" };
+    } else if (definition.route.startsWith("/compatibility/")) {
+      rail = { kind: "flat", items: _compatibilityRailData, currentRoute: definition.route, sectionLabel: "Lock Compatibility" };
+    } else {
+      // /blog/* and any other resources leaf gets the cross-family Resources rail
+      rail = { kind: "flat", items: _resourcesRailData, currentRoute: definition.route, sectionLabel: "Resources" };
+    }
+  }
+
+  return {
+    rail,
+    hubGrid,
+    relatedIndustries: buildRelatedIndustriesData(definition),
+    industryProductGrid: buildIndustryProductGridData(definition),
+    solutionProductGrid: buildSolutionProductGridData(definition),
+    hasRail: rail !== null,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// __TEST__ — internal hook for vitest snapshot tests.
+//
+// Path-4 guardrail. See docs/architecture/editorial-rendering-debt.md.
+//
+// These functions are not exported individually because they're considered
+// internal to editorial-pages.ts. Snapshot tests in src/lib/__tests__/
+// import this single hook to lock down current HTML output. Any future
+// refactor (e.g. path-3 .astro componentization) must keep these snapshots
+// passing or commit a deliberate baseline update.
+// ---------------------------------------------------------------------------
+
+export const __TEST__ = {
+  // Leaf renderers (smallest output, most stable)
+  renderResourceCard,
+  renderResourceGrid,
+  renderFaq,
+  renderTrustSignals,
+
+  // Mid-level renderers
+  renderSection,
+  renderSectionList,
+  renderBrief,
+  renderBriefField,
+  renderTable,
+  renderTrail,
+  renderJumpNav,
+  renderDecisionSnapshot,
+  renderSources,
+
+  // Hub/grid renderers
+  renderHubRail,
+  renderHubGrid,
+  renderGroupedHubRail,
+  renderGroupedHubGrid,
+  renderResourcesCategoryHub,
+  renderRelatedIndustriesGrid,
+  renderIndustryProductGrid,
+  renderSolutionProductGrid,
+
+  // Top-level orchestrators (canary — any drift surfaces here)
+  renderEditorialMain,
+  renderContactChannels,
+  renderInlineRfqForm,
+  renderActionBar,
+
+  // Pure data builders (no HTML, but exercised by snapshot inputs)
+  buildEditorialOutline,
+  buildDecisionSnapshotCards,
+  buildComparisonDecisionSnapshot,
+
+  // Scaffold export (Stage 2) — also re-surfaced here so existing snapshot
+  // / parity tests can import via __TEST__ without a separate top-level
+  // import statement. Same identity as the top-level export.
+  buildEditorialScaffold,
+};

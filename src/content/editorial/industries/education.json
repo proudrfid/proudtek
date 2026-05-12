@@ -3,7 +3,7 @@
   "group": "products",
   "title": "Education RFID — Student IDs, Attendance & Library Systems",
   "kicker": "Education RFID",
-  "summary": "ProudTek supplies the RFID stack that schools, colleges and universities actually deploy: multi-function MIFARE DESFire or Classic 1K student ID cards, ICODE SLIX library book tags to ISO 28560, attendance and building-access readers, dorm key fobs, and cashless-campus wristbands for sports and events. FERPA-compatible, GDPR-compatible, and priced for public budgets.",
+  "summary": "Education RFID uses one ISO/IEC 7810 ID-1 contactless card to unify student identification, building access, library circulation, cashless meal plans and attendance under the privacy frames of FERPA (20 U.S.C. 1232g; 34 CFR Part 99) and GDPR Articles 6, 8 and 25. ProudTek ships MIFARE DESFire EV3 (AES-128, multi-application) for universities operating stored-value cashless campuses, MIFARE Plus EV2 (SL3, AES-128) as the Classic-to-AES migration step, and NXP ICODE SLIX library tags encoded to ISO 28560 and NISO RP-6-2012 for self-checkout and shelf inventory with ILS platforms (Ex Libris Alma, Innovative Sierra, Koha, Evergreen) over SIP2 / NCIP. Field deployments show roll-call time falling to near zero, library checkout throughput rising 60-80%, and dual-frequency cards bridging legacy HID Prox during 12-24 month migrations to AES.",
   "heroPoints": [
     "One credential, many doors. A single MIFARE DESFire EV3 or Classic 1K card handles building access, library checkout, cashless meal plans, attendance, print release and exam identification — no extra tokens in the student's wallet.",
     "Library RFID on the international standard. ICODE SLIX book tags to ISO 28560 and NISO RP-6-2012 — self-checkout, self-return, security gate and shelf inventory work with every library automation system on the market.",
@@ -25,12 +25,12 @@
     "FERPA GDPR RFID schools"
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2026-03-29",
+  "modifiedAt": "2026-05-11",
   "authorSlug": "editorial-board",
   "author": "ProudTek Editorial Board",
   "reviewedBySlug": "peter-zhang",
   "reviewedBy": "Peter Zhang",
-  "reviewedAt": "2026-04-01",
+  "reviewedAt": "2026-05-11",
   "sections": [
     {
       "title": "What ProudTek supplies to schools, colleges and universities",
@@ -324,6 +324,18 @@
     {
       "question": "What is a realistic timeline for a university-wide deployment?",
       "answer": "For a 10,000–25,000 student university migrating from a mixed Prox / Classic 1K fleet to DESFire EV3 with cashless campus, budget 12–18 months from procurement decision to steady-state. Phase 1 (access + attendance) takes one summer; Phase 2 (library) another semester; Phase 3 (cashless) a full academic year because of POS integration and cafeteria-vendor contracts. Trying to compress this below 12 months typically produces the outage stories that end up in the campus newspaper."
+    },
+    {
+      "question": "Does FERPA allow RFID attendance tracking in K-12 schools?",
+      "answer": "Yes, when implemented correctly. The Family Educational Rights and Privacy Act (20 U.S.C. 1232g; 34 CFR Part 99) treats attendance as an education record, releasable only to school officials with a legitimate educational interest or with written parent / eligible-student consent. The chip itself must carry a non-PII serial, never the name, date of birth or photograph; identifying data lives in the secured SIS (PowerSchool, Infinite Campus, Skyward). For under-13 learners COPPA (16 CFR Part 312) adds parental-consent requirements. The US Department of Education student-privacy hub at https://studentprivacy.ed.gov/ferpa provides the authoritative guidance; schools should publish a privacy notice and complete a written data-minimisation review."
+    },
+    {
+      "question": "What card platform do CBORD, Atrium and Transact use for cashless campus?",
+      "answer": "CBORD (Odyssey, Foodservice Suite), Atrium Campus and Transact (eAccounts) all natively support MIFARE Classic 1K, MIFARE Plus EV2 and MIFARE DESFire EV3 contactless credentials over ISO/IEC 14443 Type A at 13.56 MHz. New-build cashless deployments standardise on DESFire EV3 because AES-128 mutual authentication and the 32-application-slot file system let attendance, building access, meal-plan stored value and print release each live in a protected application on one card. Legacy estates on HID Prox 125 kHz are bridged with dual-frequency cards (EM4305 plus MIFARE) during 12-24 month migrations. See ISO/IEC 7810 ID-1 for card dimensions and ISO/IEC 14443 for the air interface."
+    },
+    {
+      "question": "How do RFID library tags interoperate with Sierra, Alma, Koha and Evergreen?",
+      "answer": "Library RFID tags encoded to ISO 28560 Part 2 (variable-length) or Part 3 (fixed-length ISIL) interoperate with every major Integrated Library System through the SIP2 (3M Standard Interchange Protocol) or NCIP (NISO Z39.83) standards. Ex Libris Alma, Innovative Sierra, Koha and Evergreen all expose SIP2 endpoints; the RFID middleware (Bibliotheca, FE Technologies, P.V. Supa, mk Solutions) translates tag reads into SIP2 checkout, checkin and patron-status messages. NISO RP-6-2012 documents the US recommended practice including privacy norms (ALA RFID Privacy Guidelines). Encode to ISO 28560 from day one — proprietary schemes lock you into a single vendor."
     }
   ],
   "sources": [
@@ -362,6 +374,36 @@
       "url": "https://www.iso.org/standard/71599.html",
       "publisher": "ISO",
       "note": "International standard defining the library RFID data model and encoding schemes used by academic and school library RFID systems."
+    },
+    {
+      "label": "ISO/IEC 7810:2019 — Identification cards — Physical characteristics",
+      "url": "https://www.iso.org/standard/70483.html",
+      "publisher": "ISO",
+      "publishedAt": "2019",
+      "accessedAt": "2026-04-23",
+      "note": "Defines the ID-1 (CR80, 85.60 x 53.98 x 0.76 mm) form factor used for student ID cards and staff badges."
+    },
+    {
+      "label": "NXP MIFARE DESFire EV3 product brief",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-desfire/mifare-desfire-ev3:MIFARE-DESFIRE-EV3",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-04-23",
+      "note": "AES-128 multi-application chip specified for stored-value cashless campus credentials."
+    },
+    {
+      "label": "ALA RFID in Libraries: Privacy and Confidentiality Guidelines",
+      "url": "https://www.ala.org/advocacy/intfreedom/iftoolkits/rfidguidelines",
+      "publisher": "American Library Association",
+      "accessedAt": "2026-04-23",
+      "note": "Authoritative privacy framework for library RFID, referenced by NISO RP-6-2012 and academic library procurements."
+    },
+    {
+      "label": "EU GDPR — Regulation 2016/679 (Articles 6, 8 and 25)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+      "publisher": "Publications Office of the European Union",
+      "publishedAt": "2016",
+      "accessedAt": "2026-04-23",
+      "note": "Lawful basis, processing for children and privacy by design — the EU privacy frame for school and university RFID attendance and cashless campus."
     }
   ],
   "relatedIndustries": [

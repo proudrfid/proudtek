@@ -1,30 +1,132 @@
 ---
 /**
- * "Get a Quick Quote" inline form.
- * Replaces renderInlineRfqForm() from editorial-pages.ts.
+ * Inline RFQ form — top-of-page quick-quote block.
+ *
+ * Shadow component (Stage 2 optimization). Mirrors `renderInlineRfqForm` in
+ * editorial-pages.ts (~line 2346).
+ *
+ * DS-11 #5a a11y contract preserved verbatim: each field has a real `<label>`,
+ * required-marker span, hint span, error span (role=alert, aria-live=polite),
+ * and `aria-describedby` linking hint + error to the control. Form carries
+ * `data-codex-rfq` so the form-enhancement script in BaseLayout opts in.
+ *
+ * Field IDs are namespaced via a route-derived seed so multiple forms on the
+ * same page (rare but possible) don't collide.
+ *
+ * Stage 3 sprint 1 note: `resolveArticleInquiryAction` is NOT wired here.
+ * The legacy cheerio normalizer in `seo/normalize-body.ts` only rewrites
+ * `<a href="/contact/">` anchors found inside `.entry-content`. This form
+ * submits to Formspree (`https://formspree.io/f/...`) and contains no
+ * `/contact/` anchor, so no rewrite applies. See sibling `ActionBar.astro`
+ * for the routed-inquiry retrofit.
  */
+import type { EditorialDefinition } from "../../lib/editorial-types";
+
 interface Props {
-  title: string;
+  definition: EditorialDefinition;
 }
 
-const { title } = Astro.props;
----
+const { definition } = Astro.props;
 
+const productName = definition.title;
+const seed = (
+  (definition.route || "rfq")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase()
+    .slice(0, 32) || "rfq"
+);
+
+interface FieldOpts {
+  name: string;
+  type: "text" | "email" | "textarea";
+  label: string;
+  hint: string;
+  required?: boolean;
+  rows?: number;
+  autocomplete?: string;
+  inputmode?: "numeric" | "email";
+}
+
+const fields: FieldOpts[] = [
+  { name: "email",       type: "email",    label: "Your email",         hint: "We'll only use this to reply to your inquiry.", required: true, autocomplete: "email", inputmode: "email" },
+  { name: "company",     type: "text",     label: "Company name",       hint: "Optional, but helps us route your inquiry faster.", autocomplete: "organization" },
+  { name: "quantity",    type: "text",     label: "Quantity",           hint: "e.g. 5,000 pcs", inputmode: "numeric" },
+  { name: "application", type: "text",     label: "Application",        hint: "e.g. hotel, event, asset tracking" },
+  { name: "message",     type: "textarea", label: "Additional details", hint: "Chip preference, timeline, special requirements...", rows: 3 },
+];
+
+function idOf(name: string): string { return `codex-rfq-${seed}-${name}`; }
+---
 <section class="codex-inline-rfq">
   <h2>Get a Quick Quote</h2>
-  <p>Tell us about your project and we'll respond within one business day.</p>
-  <form action="https://formspree.io/f/xlgorlog" method="POST" class="codex-inline-rfq-form">
-    <input type="hidden" name="_subject" value={`Inquiry: ${title}`} />
-    <input type="hidden" name="product" value={title} />
+  <p>Tell us about your project and we'll respond within one business day. Fields marked <span class="codex-rfq-required" aria-hidden="true">*</span><span class="codex-sr-only">(asterisk)</span> are required.</p>
+  <form action="https://formspree.io/f/xlgorlog" method="POST" class="codex-inline-rfq-form" data-codex-rfq novalidate>
+    <input type="hidden" name="_subject" value={`Inquiry: ${productName}`} />
+    <input type="hidden" name="product" value={productName} />
     <div class="codex-inline-rfq-row">
-      <input type="email" name="email" aria-label="Your email address" placeholder="Your email *" required />
-      <input type="text" name="company" aria-label="Company name" placeholder="Company name" />
+      {fields.slice(0, 2).map((f) => {
+        const id = idOf(f.name);
+        return (
+          <div class="codex-inline-rfq-field">
+            <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
+            <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
+            <input
+              id={id}
+              name={f.name}
+              type={f.type}
+              required={f.required}
+              aria-required={f.required ? "true" : undefined}
+              aria-describedby={`${id}-hint ${id}-error`}
+              autocomplete={f.autocomplete}
+              inputmode={f.inputmode}
+            />
+            <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
+          </div>
+        );
+      })}
     </div>
     <div class="codex-inline-rfq-row">
-      <input type="text" name="quantity" aria-label="Quantity (e.g. 5,000 pcs)" placeholder="Quantity (e.g. 5,000 pcs)" />
-      <input type="text" name="application" aria-label="Application (e.g. hotel, event)" placeholder="Application (e.g. hotel, event)" />
+      {fields.slice(2, 4).map((f) => {
+        const id = idOf(f.name);
+        return (
+          <div class="codex-inline-rfq-field">
+            <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
+            <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
+            <input
+              id={id}
+              name={f.name}
+              type={f.type}
+              required={f.required}
+              aria-required={f.required ? "true" : undefined}
+              aria-describedby={`${id}-hint ${id}-error`}
+              autocomplete={f.autocomplete}
+              inputmode={f.inputmode}
+            />
+            <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
+          </div>
+        );
+      })}
     </div>
-    <textarea name="message" rows="3" aria-label="Additional details about your inquiry" placeholder="Additional details (chip preference, timeline, special requirements...)"></textarea>
-    <button type="submit">Send Inquiry</button>
+    {(() => {
+      const f = fields[4]; // message textarea
+      const id = idOf(f.name);
+      return (
+        <div class="codex-inline-rfq-field">
+          <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
+          <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
+          <textarea
+            id={id}
+            name={f.name}
+            rows={f.rows ?? 3}
+            required={f.required}
+            aria-required={f.required ? "true" : undefined}
+            aria-describedby={`${id}-hint ${id}-error`}
+          />
+          <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
+        </div>
+      );
+    })()}
+    <button type="submit" class="codex-inline-rfq-submit">Send Inquiry</button>
   </form>
 </section>

@@ -1,0 +1,40 @@
+---
+/**
+ * Featured product grid for a /solutions/<slug>/ sub-page.
+ *
+ * Shadow component (Stage 2 optimization). Mirrors `renderSolutionProductGrid`
+ * in editorial-pages.ts (~line 1114). Card data + section label are prepared
+ * by `buildSolutionProductGridData(definition)`.
+ *
+ * Reuses the industry product grid card styles (.codex-industries-cat-*) so
+ * the visual treatment matches.
+ */
+import type { EditorialProductGridCard } from "../../lib/editorial-pages";
+
+interface Props {
+  sectionLabel: string;
+  cards: EditorialProductGridCard[];
+}
+
+const { sectionLabel, cards } = Astro.props;
+const lowerLabel = sectionLabel.toLowerCase();
+---
+<section class="codex-industries-cat-products" aria-label={`Products for ${sectionLabel}`}>
+  <h2 class="codex-industries-cat-products__title">Featured {sectionLabel} Products</h2>
+  <p class="codex-industries-cat-products__sub">SKUs we typically deploy for {lowerLabel}. Tap a card for specs and samples.</p>
+  <div class="codex-industries-cat-products__grid">
+    {cards.map((card) => (
+      <a href={card.route} class="codex-card codex-card--media codex-industries-cat-card">
+        {card.img ? (
+          <img src={card.img} alt={card.shortName} width="1200" height="675" loading="eager" />
+        ) : (
+          <div class="codex-industries-cat-card__placeholder" />
+        )}
+        <div class="codex-industries-cat-card__body">
+          <h3>{card.shortName}</h3>
+          <span class="codex-industries-cat-card__arrow">&rarr;</span>
+        </div>
+      </a>
+    ))}
+  </div>
+</section>

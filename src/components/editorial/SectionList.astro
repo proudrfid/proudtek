@@ -1,34 +1,44 @@
 ---
 /**
- * Bullet list or ordered step-list within a section.
- * Replaces renderSectionList() from editorial-pages.ts.
+ * Section body slot — bullet list with workflow-vs-plain switch.
+ *
+ * Shadow component (Stage 2). Mirrors `renderSectionList()` in editorial-pages.ts
+ * (~line 2010). Switches output based on the section title:
+ *
+ *   - Workflow titles (matching /workflow|steps|playbook/i):
+ *     <ol class="codex-editorial-step-list"> with numbered Step entries.
+ *   - Plain titles:
+ *     <ul class="codex-editorial-list"> with simple <li> entries.
+ *
+ * Schema: bullets is `string[]` on EditorialSectionData. Items support inline
+ * markdown + citation markers.
  */
-import { isWorkflowSection, renderInlineLinks } from "../../lib/editorial-types";
+import { renderInlineLinks, isWorkflowSection, type CitationCtx } from "../../lib/editorial-types";
 
 interface Props {
+  title: string;
   bullets: string[];
-  sectionTitle: string;
+  citations?: CitationCtx;
 }
 
-const { bullets, sectionTitle } = Astro.props;
-const isWorkflow = isWorkflowSection(sectionTitle);
+const { title, bullets, citations } = Astro.props;
+const isWorkflow = isWorkflowSection(title);
 ---
-
-{isWorkflow ? (
-  <ol class="codex-editorial-step-list">
-    {bullets.map((item, index) => (
-      <li class="codex-editorial-step">
-        <span class="codex-editorial-step-index">Step {index + 1}</span>
-        <div class="codex-editorial-step-copy">
-          <Fragment set:html={renderInlineLinks(item)} />
-        </div>
-      </li>
-    ))}
-  </ol>
-) : (
-  <ul class="codex-editorial-list">
-    {bullets.map((item) => (
-      <li><Fragment set:html={renderInlineLinks(item)} /></li>
-    ))}
-  </ul>
+{bullets.length > 0 && (
+  isWorkflow ? (
+    <ol class="codex-editorial-step-list">
+      {bullets.map((item, index) => (
+        <li class="codex-editorial-step">
+          <span class="codex-editorial-step-index">Step {index + 1}</span>
+          <div class="codex-editorial-step-copy" set:html={renderInlineLinks(item, citations)} />
+        </li>
+      ))}
+    </ol>
+  ) : (
+    <ul class="codex-editorial-list">
+      {bullets.map((item) => (
+        <li set:html={renderInlineLinks(item, citations)} />
+      ))}
+    </ul>
+  )
 )}

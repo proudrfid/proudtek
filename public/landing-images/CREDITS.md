@@ -3,6 +3,16 @@
 Third-party images used in `public/landing-images/` that require attribution
 under their source license are listed here.
 
+## sheraton-hotel-keycard.jpg
+
+- **Source:** Wikimedia Commons — "Hotel Room Magnetic Stripe Key Card - Sheraton"
+- **URL:** https://commons.wikimedia.org/wiki/File:Hotel_Room_Magnetic_Stripe_Key_Card_-_Sheraton_(43777103072).jpg
+- **Original Flickr URL:** https://www.flickr.com/photos/diversey/43777103072/
+- **Author:** Tony Webster (Flickr user `diversey`, Minneapolis, MN, USA)
+- **License:** Creative Commons Attribution 2.0 Generic (CC BY 2.0) — https://creativecommons.org/licenses/by/2.0/
+- **Modifications:** downloaded the 1,280 × 840 Wikimedia thumbnail of the 7,023 × 4,607 original; no color or content alteration. A matching `sheraton-hotel-keycard.webp` was re-encoded from this JPEG at quality 85 via Pillow.
+- **Used on:** `/guides/hotel-key-card-artwork-and-printing-checklist/` (2026-05-11 hero fix). Replaces `ppc-custom-rfid-cards.jpg` on that page, which was an airport employee-pass photo and did not match the hotel key-card artwork brief the article describes. The Sheraton card shown here illustrates a real branded hotel key card with matte finish, foil-stamped logo and small chip cut-out — visually accurate for the substrate, finish-stack and brand-color choices the checklist walks through. The old `ppc-custom-rfid-cards.{jpg,webp}` files are retained unchanged for the other 12 pages that reference them.
+
 ## impinj-m700-uhf-inlay.jpg
 
 - **Source:** Wikimedia Commons — "RFID tag in a label 1"

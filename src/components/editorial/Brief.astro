@@ -1,0 +1,50 @@
+---
+/**
+ * Project checklist (Brief) section — collapsible <details> with grid of fields.
+ *
+ * Shadow component (Stage 2). Mirrors `renderBrief(fields, id)` in
+ * editorial-pages.ts (~line 2032).
+ *
+ * Read-time estimate matches the TS algorithm exactly: ~220 words/min, capped
+ * at 6 min. The DS-10 #3 collapse-by-default behavior is preserved via the
+ * `<details>` element (an inline script auto-opens it in long-read contexts).
+ */
+import BriefField from "./BriefField.astro";
+import type { EditorialBriefField } from "../../lib/editorial-types";
+
+interface Props {
+  fields: EditorialBriefField[];
+  id: string;
+}
+
+const { fields, id } = Astro.props;
+
+const wordCount = fields.reduce((sum, field) => {
+  let n = 0;
+  if (field.text) n += field.text.split(/\s+/).length;
+  if (field.items) n += field.items.reduce((s, item) => s + item.split(/\s+/).length, 0);
+  return sum + n;
+}, 0);
+const minutes = Math.max(1, Math.min(6, Math.round(wordCount / 220)));
+const summaryLabel = `Read the full project checklist (~${minutes} min)`;
+const fieldsLabel = `${fields.length} field${fields.length === 1 ? "" : "s"}`;
+---
+<section
+  class="codex-editorial-section codex-editorial-brief"
+  id={id}
+  data-collapsible-brief
+>
+  <h2>Project checklist</h2>
+  <p class="codex-editorial-section-intro">Use this checklist to write a clear first inquiry and shorten the back-and-forth on samples, pricing, or compatibility.</p>
+  <details class="codex-disclosure codex-editorial-brief-details">
+    <summary class="codex-disclosure__summary">
+      <span class="codex-disclosure__label">{summaryLabel}</span>
+      <span class="codex-disclosure__hint" aria-hidden="true">{fieldsLabel}</span>
+    </summary>
+    <dl class="codex-disclosure__body codex-editorial-brief-grid">
+      {fields.map((field) => (
+        <BriefField field={field} />
+      ))}
+    </dl>
+  </details>
+</section>

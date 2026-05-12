@@ -5,8 +5,8 @@
   "kicker": "NetSuite RFID Integration",
   "summary": "A mid-market cloud-ERP practitioner's guide to integrating RFID with Oracle NetSuite for inventory counting, goods receipt, pick verification and omnichannel fulfillment. This page covers NetSuite's inventory and warehouse data model (items, inventory items, lot-numbered, serialized, bins, subsidiaries, locations), the SuiteTalk REST and GraphQL APIs, SuiteScript 2.1 server-side automation, RESTlet custom endpoints, SuiteFlow workflow triggers, the RF-SMART WMS SuiteApp partnership (the most common NetSuite-native WMS with RFID readiness), tag encoding patterns that match NetSuite's GTIN and custom-record fields, and the Proud Tek tag and encoding services sized for mid-market NetSuite customers.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2025-12-08",
-  "reviewedAt": "2025-12-12",
+  "modifiedAt": "2026-05-10",
+  "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "keywords": [
@@ -22,8 +22,8 @@
     "Inventory-first data model aligns with RFID use cases. NetSuite's item master distinguishes inventory items (counted by quantity), lot-numbered (counted by lot), serialized (counted by individual serial) and kit/assembly items; inventory is tracked per location (warehouse) and optionally per bin. RFID tag encoding naturally maps to the (item + location + serial/lot) tuple that NetSuite expects, enabling clean automation without custom data structures.",
     "Proud Tek supplies tags and encoding services tuned for mid-market NetSuite programmes. Smaller volume per SKU than enterprise retail, more frequent SKU turnover, lot/serial mixes depending on regulated-product requirements. Our per-tag TID-to-EPC mapping file imports directly into NetSuite as an inventory adjustment, inventory item receipt or CSV-bulk upload, letting customers go live within weeks rather than months."
   ],
-  "imageAlt": "RFID integration with Oracle NetSuite cloud ERP showing inventory sync warehouse receipt and fulfillment workflows",
-  "heroImage": "/landing-images/retail-apparel.jpg",
+  "imageAlt": "Warehouse with RFID-tracked inventory — NetSuite ERP integration",
+  "heroImage": "/landing-images/industrial.webp",
   "imageSourceRoutes": [
     "/products/rfid-labels/uhf-rfid-inlay/",
     "/products/rfid-labels/impinj-m700-uhf-inlay/"
@@ -101,6 +101,19 @@
         "Map/Reduce for baseline load. When an RFID pilot goes live on a 50000-tag warehouse, a Map/Reduce script processes the baseline load without blocking users: `getInputData` returns the staged CSV as an N/file reference, `map(context)` parses each line and emits `{ key: locationId, value: itemId }`, `reduce(context)` aggregates all items for each location into one Inventory Adjustment record, `summarize(context)` logs totals and surfaces errors. Governance limit is 10000 units per script invocation; Map/Reduce handles chunking automatically across up to 5 parallel instances.",
         "Scheduled script nightly reconciliation. A Scheduled Script running at 02:00 local time reconciles RFID middleware counts against NetSuite on-hand: `var sr = search.load({ id: 'customsearch_rfid_reconcile' }); sr.run().each(function(result) { var nsQty = result.getValue('quantityonhand'); var rfidQty = getRfidQty(result.id); if (Math.abs(nsQty - rfidQty) > threshold) { createReconcileTask(result.id, nsQty, rfidQty); } return true; });`. Drift alerts surface as tasks assigned to the inventory controller role.",
         "Idempotency pattern with externalId. RFID middleware generates deterministic externalIds like `rfid-{readerid}-{yyyymmddhhmm}-{seq}` and uses them on every inventory adjustment, item receipt and inventory transfer. On network retry after timeout, if the original POST succeeded NetSuite returns `409 Conflict` on the duplicate, which the middleware treats as success. If the original failed, the retry succeeds normally. This pattern eliminates double-posting without requiring distributed-lock infrastructure in the middleware layer."
+      ]
+    },
+    {
+      "title": "SuiteTalk REST endpoint reference, RESTlet URL anatomy, OAuth scopes and concurrency pricing",
+      "intro": "This section consolidates the SuiteTalk REST URL patterns, RESTlet URL anatomy, OAuth Token-Based Authentication parameters, OAuth 2.0 Machine-to-Machine flow and the SuiteCloud concurrency tiers that drive RFID middleware design decisions. Names and paths are taken from Oracle NetSuite's SuiteCloud and SuiteTalk REST documentation; verify against your account's specific NetSuite version because Oracle versions the REST URL prefix per release.",
+      "bullets": [
+        "REST Record URL pattern. `https://<accountId>.suitetalk.api.netsuite.com/services/rest/record/v1/<record_type>/<id>` for individual record GET / PATCH / DELETE; `/services/rest/record/v1/<record_type>` for collection POST / list. The accountId is your NetSuite account number (visible in Setup > Company > Company Information). Use HTTP method semantics: GET to read, POST to create (returns 201 with Location header), PATCH to update, DELETE to remove.",
+        "REST Query (SuiteQL) URL pattern. `POST https://<accountId>.suitetalk.api.netsuite.com/services/rest/query/v1/suiteql` with body `{ \"q\": \"SELECT ... FROM ... WHERE ...\" }` and headers `Prefer: transient` (avoid caching) plus `Content-Type: application/json`. Pagination via `?limit=1000&offset=0` query params; response includes `links[]` with `next` href.",
+        "RESTlet URL anatomy. `https://<accountId>.restlets.api.netsuite.com/app/site/hosting/restlet.nl?script=<scriptInternalId>&deploy=<deploymentId>`. The scriptInternalId and deploymentId are visible on the Script Deployment record after you upload your SuiteScript file and create the deployment. Methods supported: GET, POST, PUT, DELETE — your SuiteScript module's exported handlers (`get`, `post`, `put`, `delete_`) decide the dispatch. Authentication is via the same OAuth headers as REST Record.",
+        "OAuth 1.0a Token-Based Authentication (TBA) — still the most widely used unattended authentication path. Headers: `Authorization: OAuth realm=\"<accountId>\", oauth_consumer_key=\"<consumerKey>\", oauth_token=\"<tokenId>\", oauth_signature_method=\"HMAC-SHA256\", oauth_timestamp=\"<unix>\", oauth_nonce=\"<random>\", oauth_version=\"1.0\", oauth_signature=\"<base64HmacSha256>\"`. Signing key: `<consumerSecret>&<tokenSecret>`. Base string: `METHOD&URL_ENCODED&PARAMS_ENCODED`. Use libraries like `requests-oauthlib` (Python) or `oauth-1.0a` (Node.js) — hand-rolling the signature is the single most common source of NetSuite 401 errors.",
+        "OAuth 2.0 Machine-to-Machine (M2M) — supported for SuiteTalk REST as of NetSuite 2021.2 and the modern alternative to TBA for new integrations. Flow: (1) Obtain a private RSA-2048 key pair, register the public key in NetSuite OAuth 2.0 Machine-to-Machine credentials with the desired scopes; (2) Build a JWT signed with your private key (`iss`=consumer key, `aud`=NetSuite token endpoint, `iat`/`exp`, `scope`); (3) POST to `https://<accountId>.suitetalk.api.netsuite.com/services/rest/auth/oauth2/v1/token` with `grant_type=client_credentials` and the JWT as `client_assertion`; (4) Receive `access_token` (1 hour TTL) and use it as `Authorization: Bearer <token>` on subsequent SuiteTalk REST and RESTlet calls.",
+        "SuiteCloud concurrency tiers. NetSuite imposes per-account concurrency limits on SuiteTalk REST + SOAP + RESTlets combined: SuiteCloud Plus tier grants additional concurrency above the account default; SuiteCloud Plus Premium grants more. Production RFID middleware should implement a bounded semaphore (typically 3-5 concurrent calls), exponential backoff on HTTP 429 (`Retry-After` header may be present), and idempotency keys via the `externalId` field so retries do not double-post.",
+        "Common error codes. 400 USER_ERROR (validation failure, schema mismatch), 401 INVALID_LOGIN_ATTEMPT (TBA signature failure, expired token, wrong realm), 403 INSUFFICIENT_PERMISSION (role missing the required permission for the record type), 404 NONEXISTENT_FIELD or RECORD_NOT_FOUND, 409 DUPLICATE_REFERENCE (externalId conflict — treat as success on retry), 429 USAGE_LIMIT_EXCEEDED (concurrency saturated), 500 UNEXPECTED_ERROR (NetSuite-side, retry with backoff), 503 PLATFORM_NOT_AVAILABLE (release-window maintenance, typically Saturday nights for sandbox accounts)."
       ]
     },
     {
@@ -217,6 +230,10 @@
     {
       "question": "What if our items are serialized. Does RFID integration still work?",
       "answer": "Yes, and RFID is a particularly good fit for serialized items because the 1:1 tag-to-unit correspondence aligns with NetSuite's serial-number tracking. The SGTIN-96 serial portion (38-bit integer, up to ~274 billion values per GTIN) can be used directly as the NetSuite serial number, or the middleware can map a unique tag identifier (TID or EPC) to a human-readable serial stored in a custom field. RF-SMART and other NetSuite WMS solutions include native support for RFID-to-serial workflows, automatically creating serial records on receipt and updating them through fulfillment, returns and warranty."
+    },
+    {
+      "question": "Should we use OAuth 1.0a Token-Based Authentication or OAuth 2.0 for new NetSuite RFID integrations?",
+      "answer": "Both work for unattended server-to-server SuiteTalk REST and RESTlet calls. OAuth 2.0 Machine-to-Machine (added to SuiteTalk REST in NetSuite 2021.2) is the recommended modern choice for greenfield integrations because it is simpler to implement (RSA-signed JWT exchanged for a 1-hour bearer token at `/services/rest/auth/oauth2/v1/token`, then `Authorization: Bearer <token>` on every call) and aligns with the OAuth 2.0 Client Credentials patterns used by the rest of your stack. OAuth 1.0a TBA remains supported and is still the most widely deployed pattern in production NetSuite RFID middleware because it predates OAuth 2.0 by several NetSuite releases. If you are migrating an existing TBA integration there is no urgent compatibility reason to switch; if you are building new, prefer OAuth 2.0 M2M."
     },
     {
       "question": "How does Proud Tek engage with NetSuite customers who have smaller volumes per SKU?",

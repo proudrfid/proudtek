@@ -9,8 +9,8 @@
     "Smartphone apps handle single-tag programming, while desktop readers with SDK support enable batch encoding of hundreds of tags per hour.",
     "Write-locking tags after programming prevents tampering but makes future URL updates impossible. Choose the right protection strategy for your use case."
   ],
-  "heroImage": "/landing-images/nfc-smart-poster-tag.jpg",
-  "imageAlt": "Desktop NFC reader programming an NFC sticker with a laptop",
+  "heroImage": "/blog-images/how-to-program-nfc-tags.jpg",
+  "imageAlt": "Smartphone scanning an NFC tag — the workflow used to write data to the chip.",
   "imageSourceRoutes": [
     "/product/nfc-stickers/",
     "/product/acr122u/",
@@ -18,7 +18,7 @@
   ],
   "sections": [
     {
-      "title": "Tools for NFC tag programming",
+      "title": "How do you handle tools for NFC tag programming?",
       "intro": "NFC tags are programmed by writing NDEF-formatted data to the tag's EEPROM memory using an NFC reader/writer. The choice of tool depends on volume: smartphone apps for one-off programming, desktop readers for batch operations.",
       "image": {
         "src": "/blog-images/program-nfc.jpg",
@@ -77,18 +77,18 @@
       }
     },
     {
-      "title": "Programming a URL record step by step",
+      "title": "How do you program a URL record step by step?",
       "intro": "The most common NFC programming task is writing a URL record that opens a web page when tapped. Here is the workflow using a desktop ACR122U reader, which applies to any reader with NDEF writing capability.",
       "bullets": [
         "Step 1 — Connect the ACR122U reader to your computer via USB. Install the driver if prompted (Windows may auto-detect; macOS and Linux require the ACR driver package).",
-        "Step 2 — Open your NFC writing software. For the ACR122U, NXP's TagXplorer or the open-source NDEF library with a Python/Java wrapper works well.",
+        "Step 2 — Open your NFC writing software. For the ACR122U, NXP's TagXplorer or the open-source [NDEF](/guides/nfc-ndef-format-explained/) library with a Python/Java wrapper works well.",
         "Step 3 — Place the NFC tag on the reader. The software should detect the tag and display its UID, chip type and available memory.",
         "Step 4 — Create a new NDEF URI record. Enter the full URL including https:// prefix. The software will automatically select the URI prefix byte to optimize memory usage.",
         "Step 5 — Write the record to the tag. A successful write is confirmed in under 500 milliseconds. Test the tag with a smartphone to verify the URL opens correctly."
       ]
     },
     {
-      "title": "Batch encoding workflows",
+      "title": "How do batch encoding workflows work?",
       "intro": "When programming hundreds or thousands of tags for a campaign or product line, manual one-by-one encoding is impractical. Batch workflows automate the process using scripted desktop reader sessions.",
       "paragraphs": [
         "A typical batch encoding script loops through a data source (CSV file, database query or API response), writes a unique URL to each tag, logs the tag UID alongside the written URL and sounds an audible confirmation. The operator places tags on the reader one at a time, and the script handles encoding and logging automatically."
@@ -102,18 +102,18 @@
       ]
     },
     {
-      "title": "Write protection and security options",
+      "title": "What write protection and security options exist?",
       "intro": "After programming, you must decide whether to lock the tag against future writes. This is a critical decision that affects tag security, flexibility and operational recovery options.",
       "bullets": [
         "No protection: The tag remains fully writable. Anyone with an NFC phone can overwrite the content. Suitable for internal testing and personal tags only.",
-        "Password protection (NTAG21x): Set a 32-bit password that must be presented before writes are accepted. The tag remains updatable by authorized personnel but is protected against casual overwriting.",
+        "Password protection ([NTAG21x](/guides/ntag21x-family-memory-map-commands/)): Set a 32-bit password that must be presented before writes are accepted. The tag remains updatable by authorized personnel but is protected against casual overwriting.",
         "Permanent lock (OTP bits): The NTAG21x lock bits can be set to permanently prevent writes to specific memory pages. This is irreversible: the tag content is fixed forever.",
         "Dynamic lock bits: Allow selective locking of individual memory pages while leaving others writable. Useful for tags that need a fixed URL but updatable metadata.",
         "Recommendation for most B2B deployments: Use password protection rather than permanent lock. This prevents casual tampering while preserving the ability to update content for campaign changes or URL migrations."
       ]
     },
     {
-      "title": "Common programming errors and how to avoid them",
+      "title": "What are common programming errors and how do you avoid them?",
       "intro": "Programming errors during batch encoding are costly because they may not be discovered until tags are deployed in the field. These are the most frequent mistakes and their preventions.",
       "bullets": [
         "Wrong NDEF format: Writing raw bytes instead of formatted NDEF messages results in tags that desktop readers can parse but smartphones ignore. Always use NDEF library functions, not raw memory writes.",
@@ -121,6 +121,17 @@
         "Missing NDEF terminator TLV: Some low-level writing tools do not append the terminator (0xFE) after the last NDEF record. Without it, some phones read corrupted data.",
         "Skipped verification read: Always read back the tag after writing to confirm the data was stored correctly. Memory errors during write are rare but not impossible.",
         "Accidental lock: Setting lock bits when intending to set a password. Always double-check the lock configuration before writing. Permanent locks cannot be reversed."
+      ]
+    },
+    {
+      "title": "How is NTAG 424 DNA SUN provisioning different from plain NDEF programming?",
+      "intro": "Plain NTAG21x programming writes a static NDEF record. NTAG 424 DNA's Secure Unique NFC (SUN) message changes the URL on every tap with an AES-128 CMAC signature — which means provisioning involves keys, counters and a verification backend. Skipping these steps in pilot leaves brands shipping 'authentic' chips that any cloned UID will satisfy.",
+      "bullets": [
+        "Five AES-128 application keys per chip: Key 0 (Master/Origin), Key 1 (App), Key 2 (Read), Key 3 (Write), Key 4 (Change). Most production deployments only program Keys 0 + 2; the rest stay at default unless your application demands tiered access. Each is 16 bytes long.",
+        "Secure Dynamic Messaging (SDM): the on-chip feature that injects the rotating PICC data + CMAC into the URL on each tap. SDM enables confidentiality + integrity without a preceding mutual-authentication round trip — that's why a smartphone can verify with one tap, no app.",
+        "Two provisioning paths: (1) NXP Trust Provisioning Service — chip-individual AES keys derived from Master keys in FIPS 140-2 Level 3 HSMs at NXP's secure factory, delivered as encrypted key files; (2) post-issuance encoding — you receive default-key chips and program your own keys via a Change Key command. Trust Provisioning is preferred for high-volume luxury / DPP programs; post-issuance is fine for medium-volume marketing.",
+        "URL template at encoding time: pre-set the SDM URL template (`https://brand.com/v?picc={picc_data}&cmac={cmac}`), the SDM read counter file, and tamper status file (for NTAG 424 DNA TT). These three settings are what the chip dynamically populates on each tap — get the template wrong and your verification backend has nothing to validate.",
+        "Backend verification stack: your authentication endpoint must store the per-chip Key 2 (AES-128), recompute the CMAC over the PICC data, compare to the chip's signature, and reject taps where the read counter goes backwards (replay attack). Open-source SDKs from sweetTango (Python), Klingele (Node) and the NXP TapLinx SDK (Java) are the common starting points."
       ]
     }
   ],
@@ -150,6 +161,16 @@
         {
           "href": "/product/nfc-reader-writer-with-free-sdks/",
           "label": "NFC reader with free SDKs"
+        },
+        {
+          "href": "https://www.nxp.com/docs/en/data-sheet/NT4H2421Gx.pdf",
+          "label": "NXP NTAG 424 DNA datasheet (PDF)",
+          "description": "Official NXP datasheet covering AES-128 keys, SUN/SDM message format, and tamper status file."
+        },
+        {
+          "href": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-and-labels/ntag-trust-provisioning-services:NTAG-TRUST-PROVISIONING",
+          "label": "NXP Trust Provisioning Services",
+          "description": "FIPS 140-2 Level 3 HSM-backed key personalisation for NTAG 424 DNA volume programs."
         }
       ]
     }
@@ -174,10 +195,18 @@
     {
       "question": "How do I verify that a tag was programmed correctly?",
       "answer": "Perform a read-back verification immediately after writing by reading the tag's NDEF content and comparing it byte-for-byte against the intended data. Additionally, test a sample of tags with an actual smartphone to confirm the end-user experience matches expectations."
+    },
+    {
+      "question": "Should we order pre-programmed tags or program them in-house?",
+      "answer": "Pre-programmed (vendor-encoded) tags are best when (1) volume exceeds ~10K units and you can lock the URL template, (2) you need NTAG 424 DNA with chip-individual keys derived from NXP Trust Provisioning Service in FIPS 140-2 Level 3 HSMs (the only path with cryptographic guarantees you didn't manufacture yourself), or (3) you require GS1 Digital Link encoding and EPCIS event registration that the vendor handles end-to-end. In-house programming is best for (1) low volume and frequent URL changes, (2) variable per-tag data your vendor doesn't have, or (3) confidential payloads. Many brands run a hybrid: keys + base URL provisioned by vendor, per-unit serial appended in-house at the labeling step."
+    },
+    {
+      "question": "What's the realistic encoding throughput at production scale?",
+      "answer": "A trained operator with a single ACR122U or Identiv reader sustains 200-400 tags per hour for desktop NDEF writes. NTAG 424 DNA SUN provisioning (with key change, SDM template setup and verification read-back) drops to 100-250 tags per hour because each chip needs more round-trips. For volumes >1000 tags per day, switch to (1) inline encoders integrated into a label printer like Zebra ZD621R or SATO CT4-LX-RFID at 800-2,000 tags/hour, (2) a multi-head desktop encoder array, or (3) factory-side vendor encoding. Industrial inline encoders amortise the capex over 50K-200K tags/year before they beat outsourcing."
     }
   ],
   "primaryAction": {
-    "href": "/contact/nfc-programming/",
+    "href": "/contact/nfc-branding-cards/",
     "label": "Get programming support"
   },
   "secondaryActions": [
@@ -192,5 +221,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2025-12-07"
+  "reviewedAt": "2026-05-09"
 }

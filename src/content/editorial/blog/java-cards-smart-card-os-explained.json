@@ -18,7 +18,7 @@
   "sections": [
     {
       "title": "What is a smart card operating system?",
-      "intro": "A smart-card OS manages the card's secure storage, cryptographic coprocessor, communication interface and application lifecycle. Unlike a general-purpose OS, it is designed for resource-constrained environments with as little as 2 KB of RAM, 64 KB of ROM and 32 KB of EEPROM.",
+      "intro": "A smart-card OS manages the card's secure storage, cryptographic coprocessor, communication interface and application lifecycle. Unlike a general-purpose OS, it is designed for resource-constrained environments with as little as 2 KB of RAM, 64 KB of ROM and 32 KB of [EEPROM](https://en.wikipedia.org/wiki/EEPROM).",
       "image": {
         "src": "/blog-images/java-smartcard.jpg",
         "alt": "Java Card smart card with visible chip contact pad"
@@ -38,7 +38,7 @@
       }
     },
     {
-      "title": "Java Card platform editions",
+      "title": "What Java Card platform editions exist?",
       "intro": "Oracle publishes the Java Card specification in multiple editions. B2B buyers and integrators should understand which edition their vendor supports, as it determines available API features.",
       "table": {
         "columns": [
@@ -76,7 +76,7 @@
       }
     },
     {
-      "title": "Applet development and deployment lifecycle",
+      "title": "How do applet development and deployment lifecycle work?",
       "intro": "Developing for Java Card follows a distinct workflow compared to standard Java development. The compiled applet is converted to a CAP file, loaded onto the card via a secure channel and then installed and made selectable through GlobalPlatform commands.",
       "paragraphs": [
         "The development cycle begins with writing Java source code using the Java Card API subset. The standard javac compiler produces class files, which are then processed by the Java Card converter tool to generate a CAP (Converted Applet) file. The CAP file is loaded onto the card using a GlobalPlatform-compliant tool such as GPShell, GlobalPlatformPro or the vendor's personalization software."
@@ -90,23 +90,45 @@
       ]
     },
     {
-      "title": "Contact vs contactless vs dual-interface Java Cards",
+      "title": "What's the difference between contact and contactless vs dual-interface Java Cards?",
       "intro": "Java Cards are available in contact-only (ISO 7816), contactless-only (ISO 14443) and dual-interface form factors. Dual-interface cards are increasingly the default for B2B applications because they support both insertion-based and tap-based workflows from a single credential.",
       "bullets": [
         "Contact interface provides reliable, high-throughput communication (up to 921 kbps at T=1) and is preferred for initial card personalization and high-security key injection.",
-        "Contactless interface operates at 13.56 MHz with typical data rates of 106–848 kbps and supports the fast transaction times needed for transit and access-control tap-and-go.",
+        "Contactless interface operates at [13.56 MHz](/compare/uhf-vs-hf-rfid/) with typical data rates of 106–848 kbps and supports the fast transaction times needed for transit and access-control tap-and-go.",
         "Dual-interface cards share a single secure element between both interfaces. An applet installed via the contact interface is automatically available via contactless and vice versa.",
         "Some Java Card implementations restrict certain cryptographic operations to the contact interface for security policy compliance."
       ]
     },
     {
-      "title": "B2B use cases for Java Card technology",
+      "title": "How do you handle B2B use cases for java Card technology?",
       "intro": "Java Card's multi-application architecture makes it the platform of choice for converged credential programs where a single card serves multiple functions.",
       "bullets": [
         "Corporate identity badges combining physical access (DESFire applet), logical access (PKI applet), cashless vending and secure print-release on one card.",
         "Government national ID programs using Java Card for biometric storage, digital signature and ePassport ICAO MRTD compliance.",
         "Transit fare-collection systems running a Calypso or CIPURSE applet alongside a general-purpose loyalty applet.",
         "Healthcare professional credentials with on-card X.509 certificates for ePrescription signing and facility access."
+      ]
+    },
+    {
+      "title": "JCOP 4 vs JCOP 5 vs Java Card 3.1 — what changed and why it matters",
+      "intro": "NXP's JCOP family is the most widely deployed Java Card operating system in payment, government ID and high-assurance access control. The 4-to-5 jump and the parallel Java Card 3.1 specification update are not cosmetic — they re-platform the cryptographic library, the secure-channel protocol stack and the certifiable footprint that procurement teams must verify on every PO.",
+      "bullets": [
+        "JCOP 4 (Java Card 3.0.5 + GlobalPlatform 2.3) — Currently shipping on NXP SmartMX3 P71 secure microcontroller; common in EMV cobranded payment, MIFARE Plus + DESFire bundled applets, USIM/SIM, transit, and government eID. Supports RSA up to 4096-bit, ECC NIST P-256/P-384/P-521 + Brainpool, AES-256, 3DES, SHA-256/512. Common Criteria EAL6+ augmented (composite certification with the SmartMX3 hardware).",
+        "JCOP 5 (Java Card 3.1 features + GlobalPlatform 2.3.1) — Adds extended length APDUs (up to 32 KiB payload), elliptic curve crypto suite expansion (Curve25519 / Ed25519), post-quantum-ready key agreement frameworks, and SCP11 ECDH-based secure channel for key loading. Targeted at FIDO2 authenticators, eID/eMRTD with biometric ICAO 9303, and emerging digital identity wallets including EUDI Wallet and mDL ISO/IEC 18013-5.",
+        "Java Card 3.1 reference highlights — Logical channels are mandatory, supplementary security domains support per-applet access control, and the new 'Sensitive Result' API allows applets to return cryptographically-tagged results that resist fault injection. Backward compatibility is preserved: a Classic 2.2.2 applet CAP file still loads and runs on a Java Card 3.1 card without recompilation.",
+        "Hardware substrate matters — A Java Card OS only achieves its certified security level when paired with the certified secure microcontroller it was evaluated on. JCOP 4 P71 is certified on NXP P71D320; JCOP 4.7 SE051 on the SE051 IoT secure element; G+D Sm@rtCafe 7.0 on Infineon SLE 78. Buyers should always cite the OS-and-IC pair (e.g. 'JCOP 4 P71 144K') in the PO, not just 'Java Card'.",
+        "Memory footprint and applet density — A typical JCOP 4 P71 144K card holds 144 KB of EEPROM available to applets; a single payment applet (Visa VSDC, Mastercard M/Chip 4) consumes 30-60 KB, a transit applet (CIPURSE, Calypso) 20-40 KB, an eID applet (PIV, ICAO MRTD LDS) 80-120 KB. Plan PO around the SKU SAS variant (J3R110/J3R150/J3R200/J3R300/J3R350) that fits the applet bundle plus 20% headroom for keys, certificates and audit logs."
+      ]
+    },
+    {
+      "title": "Picking a Java Card vendor and applet ecosystem in 2026",
+      "intro": "The Java Card market consolidated around four implementations, but the applet ecosystem and certification depth vary widely. Buyers running a multi-application program — campus ID + payment + transit + access — need to evaluate not just the OS but the catalogue of certified applets available off-the-shelf and the personalisation toolchain.",
+      "bullets": [
+        "NXP JCOP 4 / 5 (SmartMX3) — Largest certified applet catalogue including MIFARE Plus, DESFire EV3 emulation, Visa, Mastercard, AmEx, JCB, Discover/PULSE payment applets; PIV, ICAO MRTD, German nPA, Estonian eID; FIDO2/WebAuthn. Tooling: NXP MIFARE SDK, JCOP Tools, ATR Editor. Ideal for multi-application banks-and-government cards.",
+        "G+D (Giesecke+Devrient) Sm@rtCafe Expert — Sm@rtCafe Expert 7.0 / 8.0 on Infineon SLE 78/Atos secure element. Deep transit specialisation (Calypso, CIPURSE, NFC mobile credentials), payment, German GeldKarte, Brazilian COMPE. Strong personalisation bureau footprint in Europe and Latin America.",
+        "Thales Gemalto IDPrime / TOP DL — TOP DL family on Infineon Integrity Guard secure controllers; IDPrime MD line for enterprise PKI smart cards (PIV, CAC, .NET smart card emulation), strong for federal government and large enterprise deployments. ID Confirm and IDCore 3110 for banking.",
+        "Infineon SECORA — Infineon's Java Card stack on its own SLE 78 / SLE 97 secure controllers; targets payment, transit and eID with very high write endurance (1M write cycles per page) and long retention (25 years). Often selected when a single supplier across IC and OS is a procurement requirement.",
+        "Open-source applet stacks worth knowing — javacardio.com and crocs-muni/javacard-curated-list catalogue mature open-source applets including IsoApplet (PKCS#15), GidsApplet (Microsoft GIDS), OpenSC compatible cards, OpenPGP card applet, FIDO2 Salty Crypto applet and YubiKey-compatible OATH-HOTP/TOTP. Useful for prototypes and developer tokens; not a substitute for a certified bureau-personalised card in production."
       ]
     }
   ],
@@ -134,6 +156,22 @@
           "label": "ACR122U USB reader"
         }
       ]
+    },
+    {
+      "title": "Java Card and Global Platform standards",
+      "description": "Authoritative specifications and developer references for Java Card OS, GlobalPlatform applet management and JCOP.",
+      "links": [
+        {
+          "href": "https://docs.oracle.com/en/java/javacard/3.1/guide/java-card-3-platform-architecture.html",
+          "label": "Oracle Java Card 3.1 Platform Architecture",
+          "description": "Official Oracle reference for Classic VM, Connected VM, applet firewall and cryptographic API."
+        },
+        {
+          "href": "https://globalplatform.org/specs-library/",
+          "label": "GlobalPlatform specifications library",
+          "description": "Card Specification 2.3.1, Secure Channel Protocols (SCP02/03/11), Confidential Card Content Management."
+        }
+      ]
     }
   ],
   "faq": [
@@ -156,10 +194,18 @@
     {
       "question": "Can Java Card applets be updated after deployment?",
       "answer": "Yes. GlobalPlatform defines a complete applet lifecycle management framework. Applets can be loaded, installed, updated and deleted via secure channels (SCP02/SCP03) using authenticated and encrypted APDU commands. Over-the-air (OTA) management is standard in telecom SIM deployments."
+    },
+    {
+      "question": "Why do payment networks (Visa, Mastercard, EMVCo) require Java Card and not just any smart card OS?",
+      "answer": "EMVCo certification of a payment applet (Visa VSDC, Mastercard M/Chip 4, AmEx ExpressPay, Discover D-Pas) is granted to the applet on a specific Java Card OS on a specific secure microcontroller — a 'composite certification' under Common Criteria EAL5+ or EAL6+. The cryptographic library, secure messaging, fault-injection countermeasures, side-channel resistance and applet firewall are all in scope. Re-implementing the same applet on a different OS would require re-certification (typically 9-18 months and $200K-$1M per platform). Java Card became the de-facto payment platform because NXP, G+D, Thales, Idemia and Infineon all maintain certified payment applet portfolios that issuers can mix and match."
+    },
+    {
+      "question": "How is a Java Card different from a SIM/eSIM and from MIFARE DESFire?",
+      "answer": "A SIM card is a Java Card with a specific applet loaded (the USIM applet plus optional applets like ISIM, CSIM, or remote-managed applets via OTA OTA-RFM). The OS underneath is typically JCOP, Sm@rtCafe or G+D STARCOS — the same Java Card platforms that go into bank cards. eSIM/eUICC adds remote provisioning per GSMA SGP.22. MIFARE DESFire is a different paradigm: it is a fixed-function file-system smart card OS (DESFire EV3 = NXP's proprietary file-system OS) without programmable applets — you create AID-scoped applications and files via APDUs but cannot upload arbitrary code. DESFire trades programmability for cost and certification simplicity; Java Card trades cost and footprint for full applet flexibility."
     }
   ],
   "primaryAction": {
-    "href": "/contact/java-cards/",
+    "href": "/contact/custom-rfid-cards/",
     "label": "Discuss Java Card projects"
   },
   "secondaryActions": [
@@ -174,5 +220,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-02-08"
+  "reviewedAt": "2026-05-10"
 }

@@ -24,7 +24,7 @@
     "/products/rfid-tags/rfid-pps-laundry-chip/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-04-26",
+  "modifiedAt": "2026-05-11",
   "brief": [
     {
       "label": "Buyer cohort served",
@@ -286,6 +286,100 @@
         "heading": "Linen-loss reduction across hospitality + healthcare laundry estates",
         "text": "Industry benchmarks across Cintas, Aramark, Vestis, UniFirst, ImageFIRST, Alsco and major hotel-chain linen programmes consistently show 20–40 % linen-loss reduction post-RFID rollout in hospitality + healthcare segments, with uniform-rental loss-rate dropping 8–12 %. Counting-labour reduces 50–70 % at sortation + dispatch portals, and customer-billing disputes essentially disappear (90 %+ elimination) once RFID-validated counts replace manual reconciliation. ROI typically lands at 6–12 months for hospitality + healthcare deployments, 12–18 months for uniform / workwear estates. Per-tag BOM ranges $0.20–$1.00 depending on material; full plant portal estate $50K–$200K capex; WMS subscription $20K–$200K annually. Compliance benefit: TRSA Hygienically Clean recertification + Joint Commission + CMS audit evidence pulled directly from per-item RFID record reduces audit-prep time by 60–80 %. Useful-life extension via lifecycle-data-driven replacement scheduling further extends item life 10–20 %, delivering compounding savings across the multi-year textile pool."
       }
+    },
+    {
+      "title": "Item-level lifecycle tracking — commission → cycle → par-stock → discard",
+      "bullets": [
+        "Commission — at tag-sew or heat-seal step, tag is bound to garment / linen / uniform inventory record with GIAI-96 EPC encoding (Global Individual Asset Identifier). Item attributes captured: SKU + size + colour + customer assignment + purchase cost + projected useful life.",
+        "First read — typically at outbound dispatch from laundry plant; portal reader captures EPC + photographs item if needed for QA. Establishes baseline read profile (read distance, signal strength).",
+        "Per-cycle event tracking — every wash + finish + dispatch event captured with timestamp + reader location; item EPC accumulates cycle count over time; flagged for inspection at 50%, 75%, 90% of projected useful life.",
+        "Par-stock at customer location — hotel housekeeping cart + hospital ward + clinic exam-room has its own par-stock target; RFID handheld walk-around verifies par-stock + flags shortfall + auto-orders replenishment.",
+        "Soiled return — soiled linen bag picked up at customer location; bag-level RFID + item-level RFID inside the bag captures pickup event + customer + soiled-state for chargeback dispute resolution.",
+        "Sort + segregation — at laundry plant inbound, items sorted by customer + category + wash profile; RFID reader at every sort point captures + routes to correct wash cycle.",
+        "Wash cycle — tag survives wash + chemistry; tunnel reader at finish point captures cycle complete event.",
+        "Finishing + folding + bundling — RFID reader at folder + bundler captures finishing event + count + customer allocation.",
+        "Dispatch reconciliation — outbound RFID portal counts every item leaving plant; matches against customer order + delivery manifest; chargeback dispute prevented at source.",
+        "Customer delivery + receipt confirmation — delivery driver scans RFID at customer dock to confirm count delivered.",
+        "Use cycle — customer staff use linen; missing-from-bed-after-housekeeping alarm; soiled return triggers next cycle.",
+        "End-of-life — at projected useful-life-end or read-degradation threshold, item flagged for retirement; recovery + recycle / donate / discard per textile-circularity programme.",
+        "Reincarnation — recycled textile (PET fibre from recycled plastic, or upcycled fabric) re-enters supply chain with new EPC; old EPC + cycle history available for EU ESPR Digital Product Passport mandatory 2027 textile compliance.",
+        "Full lifecycle data — typical hotel sheet: 200-400 cycles over 2-3 year life; surgical gown: 60-80 cycles over 12-18 months; uniform shirt: 300-500 cycles over 3-5 years."
+      ]
+    },
+    {
+      "title": "Customer-site reader topology — hotel cart / hospital ward / clinic / kitchen / cleanroom",
+      "bullets": [
+        "Hotel housekeeping cart — handheld UHF reader on cart for par-stock verification + missed-linen check + bedding-set audit at room cleanout. Handheld $1,500-$3,000 + monthly subscription $30-$80/cart for housekeeping management software.",
+        "Hospital ward / nurse station — fixed reader at clean-supply room entrance + soiled-linen-collection bin; auto-counts par-stock as items enter / exit; integrates with hospital materials management (e.g., GHX, Premier, McKesson).",
+        "Clinic exam-room — small fixed reader in exam-room cabinet; verifies clean exam-gown + drape + sheet at room turn; integrates with EMR / patient flow.",
+        "Sterile processing department (SPD) — RFID at autoclave loading + decontamination + sterile-pack station; tracks sterile-barrier textile (surgical gown, drape, towel) through cycle + lot binding for HAP / NHSN reporting.",
+        "Surgical theatre — count board + back-table + sterile-field RFID with high-precision UHF or active RFID; surgical instrument + textile FOD prevention; preliminary AORN AAMI guidance.",
+        "Kitchen + restaurant — back-of-house apron + cap + chef coat with RFID for daily wash + uniform-allocation tracking; reader at uniform locker + soiled-bin.",
+        "ATEX / hazardous-environment workwear — flame-resistant uniform (FRC, NFPA 2112, OSHA HRC) with intrinsically-safe RFID rated for ATEX Zone 1/2; reader at PPE locker + entry to hazardous area.",
+        "Cleanroom + pharma + biotech — bunny-suit + cleanroom gown with RFID for cycle count + sterilisation lot binding + USP <797> / <800> compliance documentation.",
+        "Long-term care + assisted living — resident clothing programme with RFID for laundry-loss reduction (chronic complaint in care homes); item-to-resident binding via custom EPC encoding.",
+        "Cruise ship — laundry + uniform programme similar to hotel but in marine environment; sealed enclosure readers + corrosion-resistant tag housing required.",
+        "Marine + offshore — work-vessel + oil-platform workwear with RFID + saltwater-resistant housing; specialty submarine-class rated.",
+        "Reader hardware patterns — fixed reader $1.5K-$5K per zone; handheld $1.5K-$3K; cart-mounted $2K-$5K with embedded power + connectivity; smart-bin $3K-$10K with weight + RFID sensor combination.",
+        "Connectivity — Wi-Fi to building network primary; cellular fallback for remote sites; offline cache 1K-10K events at reader for network outage tolerance.",
+        "Customer-side benefits — par-stock accuracy + chargeback dispute prevention + linen-utilisation analytics + room-turn time reduction (no more searching for missing linen)."
+      ]
+    },
+    {
+      "title": "Sustainability + EU ESPR DPP + textile circularity",
+      "bullets": [
+        "EU ESPR (Ecodesign for Sustainable Products Regulation, EU 2024/1781) — Digital Product Passport (DPP) for textiles + footwear delegated act expected 2026, mandatory 2027. Requires unique product identifier (UPI) + supply-chain origin + material composition + repair / reuse / recycle instructions.",
+        "GS1 Digital Link 1.3 (ISO/IEC 18975:2023) — web-resolvable URL form for DPP; carried in RFID + QR + DataMatrix. Single-label strategy for ESPR compliance.",
+        "Per-garment DPP — every uniform / linen / textile has a unique cryptographic identifier (NTAG 424 DNA SUN AES-CMAC) carrying ESPR-required data; consumer + regulator can scan at any point in lifecycle.",
+        "Lifecycle data — cycle count + wash chemistry + repair events + material recovery + carbon footprint per item; surfaces in DPP scan.",
+        "Textile recycling — at end-of-life, textile fibre recovered + recycled or upcycled; GRS (Global Recycled Standard) + OK biobased certification + ASTM D6868 compliance.",
+        "Repair-and-reuse vs replace — RFID-driven repair-and-reuse programme extends useful life 20-40% vs replace-on-damage; pioneered by Cintas + Aramark uniform-rental + specialty repair vendors (Stoll, Atelier Tuffery).",
+        "Carbon accounting — per-cycle water + energy + chemistry footprint allocated to RFID-tracked item; aggregated for textile carbon report under EU CSRD (Corporate Sustainability Reporting Directive) + GHG Protocol Scope 3.",
+        "Aura Blockchain Consortium + Arianee + Circulor — luxury + specialty brand DPP platforms supporting RFID + NFC + DPP convergence; cross-vertical lessons applicable to uniform + workwear textile.",
+        "EUDR (Regulation 2023/1115) — deforestation regulation; cotton + wool + leather + rubber supply-chain origin verification; RFID + DPP supports compliance.",
+        "EU Battery Regulation (EU 2023/1542) — adjacent regulation for wearable electronics + smart textile with battery components; informs textile-electronic supply-chain DPP architecture.",
+        "Circular textile + closed-loop reuse — uniform-rental + linen-rental business model is inherently circular; RFID-tracked items have measurable cycle count + carbon footprint vs single-use disposable alternative.",
+        "Textile waste benchmarks — EU textile waste ~12kg per capita per year; US ~36kg per capita per year; uniform-rental + linen-rental reduces single-use disposable consumption + drives textile-pool optimisation. RFID is the measurement enabler.",
+        "Sustainability KPI — operators publish RFID-derived metrics: cycle-utilisation rate, repair-vs-replace ratio, end-of-life recycle %, carbon footprint per cycle. Published in annual ESG report under CSRD + SEC climate disclosure rules.",
+        "Major operator commitments — Cintas + Aramark + UniFirst + Elis all publish public sustainability reports; RFID-derived lifecycle data underpins reported metrics."
+      ]
+    },
+    {
+      "title": "Chargeback dispute prevention + AI-driven loss detection",
+      "bullets": [
+        "Chargeback dispute reality — pre-RFID, customer-vs-laundry billing disputes were endemic; 'we sent 100 sheets, you billed for 110' arguments resolved by manual count + paper trail; 5-15% of billing volume disputed in typical hotel-laundry relationship.",
+        "RFID-validated count — at every transfer point (customer pickup, plant inbound, plant outbound, customer delivery), RFID reader counts every item; immutable timestamped audit trail; dispute disappears.",
+        "Per-customer item tagging — every item EPC bound to customer assignment; transfer between customers (intentional or accidental) flagged at next dispatch portal.",
+        "Sortation portal — at plant inbound, RFID reader identifies each item's customer assignment; auto-routes to correct cycle; misrouted items flagged immediately.",
+        "Missing item alarm — daily reconciliation of expected-vs-actual count per customer; missing item alarm at customer location (housekeeping cart, ward storeroom) drives immediate search.",
+        "Theft detection — repeated missing-item pattern from specific customer-staff cohort flagged; investigation + corrective action.",
+        "Anomaly detection — ML models on RFID event streams detect anomalies: item missing from expected dispatch + customer-claim-mismatch + cycle-count outlier; flags for human review.",
+        "Dispute resolution speed — modern operators resolve disputes in hours (not weeks) using RFID audit trail; customer satisfaction lift + reduced billing-AR aging.",
+        "Customer-facing portal — laundry operator provides customer-side dashboard showing real-time + historical inventory + cycle count + delivery confirmation; transparency reduces dispute volume.",
+        "AI / ML applications — predictive replacement (cycle count + wear pattern → flag for retirement before failure); demand forecasting (seasonal + event-driven volume); route optimisation (driver + delivery + customer cluster); quality monitoring (RFID + computer-vision combined inspection).",
+        "Insurance + claims — RFID-validated loss data supports inventory insurance claims (theft, fire, flood, vandalism); easier-to-prove loss vs paper-trail-only.",
+        "Compliance audit — TRSA Hygienically Clean Healthcare + EN 14065 audit evidence pulled directly from RFID record; audit-prep time reduced 60-80%.",
+        "Real-world example — major US healthcare laundry reported pre-RFID 15% annual loss-rate on surgical-gown pool; post-RFID 4% loss-rate, $1M+ annual savings on $7M gown pool; chargeback disputes reduced 95%.",
+        "Insurance premium — some commercial property + casualty insurers offer reduced premium for RFID-validated linen + uniform programmes due to lower loss-rate + faster claims processing."
+      ]
+    },
+    {
+      "title": "Implementation programme — pilot to multi-site scale",
+      "bullets": [
+        "Pre-pilot — define scope (which textile category, which customer segment, which plant), measure baseline (current loss rate, cycle count, labour), set ROI target, select tag-encoding partner.",
+        "Pilot stage (8-16 weeks) — sample 100-1000 tags of 2-3 form factors (PPS + silicone + woven) on actual textile, test on actual tunnel + chemistry + finisher, measure read accuracy at every reader location, validate end-to-end EPC capture + ERP integration.",
+        "Pilot exit criteria — 99%+ read accuracy at every reader; >95% chargeback dispute resolution at pilot customer; ERP integration end-to-end validated; operator + customer-side staff trained.",
+        "Production ramp (3-12 months) — tag the existing inventory pool (50K-2M items typical); install fixed readers at every dispatch / inbound / sort / finishing portal (10-50 portals typical per plant); deploy handhelds to housekeeping + delivery + collection routes.",
+        "Multi-site scale (12-36 months) — replicate pilot at additional plants + customer sites; centralised reader fleet management + cloud ERP; cross-site analytics dashboards; multi-vendor SKU consolidation.",
+        "Implementation services — laundry-specialist integrators (Positek RFID, BTM Lavetech, Spindle, Datatex NOW, Aktion Associates) lead end-to-end; tier-1 SI (Accenture, Deloitte, Cognizant) for very large multi-national rollouts; in-house team for ongoing operations.",
+        "Tag-encoding station — print-and-apply line at supplier or at laundry plant with inline RFID encoding + 100% verify; per-tag encoding cost $0.05-$0.20.",
+        "Sample-then-procure — always sample 100-piece roll of each candidate form factor on actual customer textile before bulk procurement; 4-8 week first-article testing typical.",
+        "Vendor selection — primary tag supplier (1-2 chosen for SKU consolidation); reader OEM (Impinj or Zebra dominant); ERP platform (Positek, BTM Lavetech, Datatex NOW, Spindle); integrator + SI for implementation.",
+        "Procurement leverage — multi-year volume commitment (3-5 year contract) 10-20% discount; tag SKU consolidation (3-5 form factors covering 90% of textile types) 15-25% per-unit discount; bundled tag + reader + software + service 10-15% vs separate procurement.",
+        "Common pitfalls — wrong form factor for textile + wash chemistry (tested too late); reader fleet not tuned for wet-laundry RF environment; ERP integration scope underestimated (HL7 + IDoc + REST API + EPCIS combinations); customer-side staff training overlooked (90%+ of customer-side benefits depend on housekeeping + ward staff actually using the handhelds).",
+        "Pilot-to-production timeline — 8-16 week pilot → 6-12 month ramp at first plant → 12-36 months multi-site rollout; typical total programme cost $500K-$5M for tier-2 operator, $5M-$50M for tier-1 operator.",
+        "Quick-win at low spend — pilot with 1 plant + 1 customer + 10K tags + 2 readers + handheld can demonstrate ROI within 6 weeks; proof-of-concept budget $40K-$120K; subsequent scale-up on confidence."
+      ]
     }
   ],
   "resourceCards": [
@@ -320,6 +414,18 @@
     {
       "question": "What is the ROI of RFID laundry tracking?",
       "answer": "Typical ROI is achieved in 6-12 months. Primary savings: 20-40% reduction in linen loss (the largest cost driver), 50-70% reduction in counting labor, elimination of inventory discrepancies and disputes, and better replacement scheduling that extends useful life. A 1,000-bed hotel losing $50,000/year in linens can save $10,000-$20,000 annually with RFID tracking."
+    },
+    {
+      "question": "What item-level lifecycle data does RFID capture, and how does it support EU ESPR DPP 2027?",
+      "answer": "Every textile item gets a unique GIAI-96 EPC + cycle count + customer assignment + first-read + per-cycle events + repair events + end-of-life retirement event. For EU ESPR Digital Product Passport (textile delegated act expected 2026, mandatory 2027 under Regulation 2024/1781), this lifecycle data populates the per-garment DPP including: unique product identifier (GS1 Digital Link 1.3 URL), supply-chain origin, material composition, repair / reuse / recycle instructions, carbon footprint per cycle (water + energy + chemistry allocated to each item), end-of-life routing (recycle / donate / discard). Combined with NTAG 424 DNA SUN AES-CMAC for tamper-proof identity verification, RFID + DPP enables ESPR-compliant traceability without standing up parallel infrastructure. Operators (Cintas, Aramark, UniFirst, Elis, ImageFIRST, Crothall) using RFID today are positioned for ESPR compliance with marginal incremental work."
+    },
+    {
+      "question": "What does the customer-site reader topology look like — hotel cart, hospital ward, clinic?",
+      "answer": "Multiple deployment patterns depending on use case. Hotel housekeeping cart: handheld UHF reader for par-stock verification + missed-linen check + bedding-set audit at room cleanout ($1.5K-$3K + monthly software). Hospital ward / nurse station: fixed reader at clean-supply room + soiled-collection bin auto-counts par-stock + integrates with hospital materials management (GHX, Premier, McKesson). Clinic exam-room: small fixed reader in cabinet verifies clean exam-gown + drape + sheet at room turn + integrates with EMR / patient flow. Sterile processing (SPD): RFID at autoclave + decontamination + sterile-pack station + sterile-barrier textile lot binding for HAP / NHSN reporting. Kitchen + restaurant: chef coat + apron + cap RFID for daily wash + uniform-allocation. ATEX hazardous-environment: flame-resistant uniform with intrinsically-safe RFID for ATEX Zone 1/2. Cleanroom + pharma + biotech: bunny-suit + cleanroom gown with USP <797> / <800> compliance documentation. Long-term care: resident clothing programme with item-to-resident binding."
+    },
+    {
+      "question": "How does RFID prevent chargeback disputes between laundry and customers?",
+      "answer": "Pre-RFID, billing disputes were endemic — 'we sent 100 sheets, you billed for 110' — with 5-15% of typical hotel-laundry billing volume disputed. RFID-validated count at every transfer point (customer pickup, plant inbound, plant outbound, customer delivery) creates an immutable timestamped audit trail; disputes resolved in hours not weeks. Per-customer item tagging via GIAI-96 EPC binds every item to customer assignment; cross-customer item-transfer (intentional or accidental) flagged at next dispatch portal. Missing-item alarm based on daily reconciliation drives immediate search at customer location. Real-world example: major US healthcare laundry reported pre-RFID 15% annual loss on surgical-gown pool ($7M pool); post-RFID 4% loss, $1M+ savings + 95% reduction in chargeback disputes. AI / ML applications add anomaly detection, predictive replacement (cycle count + wear pattern), demand forecasting + route optimisation. Some property + casualty insurers offer reduced premium for RFID-validated linen + uniform programmes."
     }
   ],
   "sources": [
@@ -328,7 +434,7 @@
       "url": "https://www.iso.org/standard/63675.html",
       "publisher": "ISO",
       "publishedAt": "2015-03",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "UHF air-interface underlying flatwork-ironer, tunnel-washer portal and laundry-cart reads in RFID laundry tracking."
     },
     {
@@ -336,7 +442,7 @@
       "url": "https://www.gs1.org/standards/epc-rfid/tds",
       "publisher": "GS1",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "GIAI and SGTIN encoding schemes used for uniform, linen and healthcare-textile serialisation in laundry tracking."
     },
     {
@@ -344,7 +450,7 @@
       "url": "https://www.iso.org/standard/76504.html",
       "publisher": "ISO",
       "publishedAt": "2021-04",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Reference wash-cycle methodology used when qualifying RFID laundry-tracking tag durability."
     },
     {
@@ -352,7 +458,7 @@
       "url": "https://www.trsa.org/certification/hygienically-clean-certifications/",
       "publisher": "TRSA: The Textile Services Association",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Industrial-laundry hygiene certification relied on when selecting wash-durable RFID tracking tags — bioburden + microbiological audit per AATCC TM172 + AAMI ST79."
     },
     {
@@ -360,7 +466,7 @@
       "url": "https://www.syensqo.com/en/specialty-polymers/ryton-pps",
       "publisher": "Syensqo (formerly Solvay Specialty Polymers)",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Polymer data supporting the 200+ cycles at 95 °C PPS laundry-tracking tag specification."
     },
     {
@@ -368,7 +474,7 @@
       "url": "https://www.wacker.com/h/en-us/silicone-rubber/solid-silicone-rubber-htv/c/40",
       "publisher": "Wacker Chemie AG",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Material-data reference for silicone-pouch laundry-tracking tag housings supporting 100–150 cycles at 80 °C."
     },
     {
@@ -376,7 +482,7 @@
       "url": "https://www.impinj.com/products/tag-chips",
       "publisher": "Impinj, Inc.",
       "publishedAt": "2024",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Common UHF silicon inside industrial-laundry tracking tags — M800 latest generation 2024."
     },
     {
@@ -384,7 +490,7 @@
       "url": "https://www.nxp.com/products/rfid-nfc/rfid-ucode/ucode-8-9:UCODE-8-9",
       "publisher": "NXP Semiconductors",
       "publishedAt": "2020",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Alternative UHF silicon family deployed across hospitality and healthcare laundry-tracking programmes."
     },
     {
@@ -392,7 +498,7 @@
       "url": "https://www.aami.org/standards/comprehensive-guide-to-steam-sterilization-and-sterility-assurance-in-healthcare-facilities",
       "publisher": "Association for the Advancement of Medical Instrumentation",
       "publishedAt": "2017",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "Healthcare textile sterilisation reference standard for RFID laundry-tracking validation in hospital + ASC laundry programmes."
     },
     {
@@ -400,8 +506,88 @@
       "url": "https://www.iso.org/standard/57139.html",
       "publisher": "European Committee for Standardization (CEN)",
       "publishedAt": "2016",
-      "accessedAt": "2026-04-26",
+      "accessedAt": "2026-05-11",
       "note": "European biocontamination-control system standard for laundered textiles — RFID tracking supports RABC audit + bioburden control evidence."
+    },
+    {
+      "label": "EU Regulation 2024/1781 — ESPR Digital Product Passport (textile + footwear)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1781/oj",
+      "publisher": "Publications Office of the European Union",
+      "publishedAt": "2024-06",
+      "accessedAt": "2026-05-11",
+      "note": "EU ESPR establishing Digital Product Passport framework; textile + footwear delegated act expected 2026, mandatory 2027 — RFID + GS1 Digital Link supports compliance."
+    },
+    {
+      "label": "GS1 Digital Link 1.3 (ISO/IEC 18975:2023)",
+      "url": "https://www.gs1.org/standards/gs1-digital-link",
+      "publisher": "GS1",
+      "publishedAt": "2023",
+      "accessedAt": "2026-05-11",
+      "note": "Web-resolvable URL syntax (https://brand.com/01/{GTIN}/21/{serial}) for ESPR DPP textile compliance."
+    },
+    {
+      "label": "EU CSRD (Corporate Sustainability Reporting Directive)",
+      "url": "https://finance.ec.europa.eu/capital-markets-union-and-financial-markets/company-reporting-and-auditing/company-reporting/corporate-sustainability-reporting_en",
+      "publisher": "European Commission",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "EU corporate sustainability reporting directive driving RFID-derived per-cycle water + energy + carbon footprint disclosure in ESG report."
+    },
+    {
+      "label": "GS1 EPC TDS 2.1 — GIAI-96 + GS1 Digital Link encoding",
+      "url": "https://www.gs1.org/standards/epc-rfid/tds",
+      "publisher": "GS1",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "EPC Tag Data Standard for GIAI-96 individual asset identifier encoding used in textile + linen + uniform RFID tracking."
+    },
+    {
+      "label": "GS1 EPCIS 2.0 (ISO/IEC 19987:2021)",
+      "url": "https://www.gs1.org/standards/epcis",
+      "publisher": "GS1",
+      "publishedAt": "2021",
+      "accessedAt": "2026-05-11",
+      "note": "Event-data sharing standard for laundry tracking visibility across trading partners + customer + operator + regulator."
+    },
+    {
+      "label": "Stoll + Atelier Tuffery — textile repair-and-reuse specialty vendors",
+      "url": "https://www.stoll.com/en/",
+      "publisher": "Karl Mayer Stoll Textile Machines GmbH + Atelier Tuffery",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Reference textile repair + reuse vendors enabling RFID-driven repair-vs-replace lifecycle decisions in uniform + workwear programmes."
+    },
+    {
+      "label": "Aura Blockchain Consortium + Arianee — luxury + textile DPP platforms",
+      "url": "https://auraluxuryblockchain.com/",
+      "publisher": "Aura Blockchain Consortium + Arianee",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Luxury + specialty brand DPP platforms supporting RFID + NFC + DPP convergence; cross-vertical lessons applicable to uniform + workwear textile."
+    },
+    {
+      "label": "GHX + Premier + McKesson — hospital materials management",
+      "url": "https://www.ghx.com/",
+      "publisher": "GHX, LLC + Premier, Inc. + McKesson",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Major hospital supply-chain + materials management platforms integrating with RFID laundry tracking at hospital ward + nurse-station deployments."
+    },
+    {
+      "label": "Joint Commission Environment of Care EC.02.06.05",
+      "url": "https://www.jointcommission.org/",
+      "publisher": "The Joint Commission",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Hospital environmental + linen management standards; RFID-tagged linen supports compliance with par-stock + temperature + chemistry monitoring."
+    },
+    {
+      "label": "Positek RFID — laundry RFID specialist integrator",
+      "url": "https://www.positek.net/",
+      "publisher": "Positek RFID, Inc.",
+      "publishedAt": "2024",
+      "accessedAt": "2026-05-11",
+      "note": "Dominant US laundry RFID specialist integrator; tunnel reader + ERP integration + customer-site deployment for hospitality + healthcare + uniform-rental operators."
     }
   ],
   "primaryAction": {
@@ -420,5 +606,5 @@
   ],
   "authorSlug": "nancy-wu",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-26"
+  "reviewedAt": "2026-05-11"
 }

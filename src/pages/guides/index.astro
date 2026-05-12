@@ -1,0 +1,182 @@
+---
+/**
+ * /guides/ — comprehensive buying-guides hub.
+ *
+ * Mirrors the /blog/ hub layout exactly:
+ *   - Left rail (cluster navigation, click → navigate to /guides/{cluster}/)
+ *   - Simple .codex-blog-index header (H1 + one-line count description)
+ *   - Single flat 3-column grid of all 49 guide cards
+ *   - No hero card, no per-cluster sectioning — same structure as blog
+ *
+ * Card markup matches /blog/ exactly: .codex-card .codex-blog-grid-card with
+ * thumbnail, kicker tag, title (<strong>), summary (<p>), Read guide CTA.
+ *
+ * Architecture note: 2nd native .astro editorial page (after [cluster].astro).
+ * See docs/architecture/editorial-rendering-debt.md for the path-3 plan.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { GUIDE_CLUSTERS, getTotalGuideCount, getClusterForGuideSlug } from "../../data/guide-clusters";
+import type { PageSeoData } from "../../lib/seo";
+import { buildGuideClustersRailHtml } from "../../lib/seo/guides-rail";
+import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { getPageByRoute } from "../../lib/site-data";
+
+const SITE_ORIGIN = "https://www.proudtek.com";
+const ROUTE = "/guides/";
+const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
+const TOTAL_GUIDES = getTotalGuideCount();
+
+// ── Pull all guide entries from the editorial collection ──
+const allEditorial = await getCollection("editorial");
+const guidesById = new Map<string, ReturnType<typeof Object>>();
+for (const entry of allEditorial) {
+  const m = entry.id.match(/^guides\/(.+)$/);
+  if (m) guidesById.set(m[1], entry.data);
+}
+
+// Flatten: walk GUIDE_CLUSTERS to preserve curator order, attach cluster id
+// to each guide so the card can carry data-rail-key (the unified attribute
+// shared with blog and compare hubs — see src/lib/seo/rail.ts).
+// All 49 in one array, no per-cluster grouping.
+type FlatGuide = { slug: string; data: any; clusterId: string; clusterLabel: string };
+const allGuides: FlatGuide[] = [];
+for (const cluster of GUIDE_CLUSTERS) {
+  for (const slug of cluster.slugs) {
+    const data = guidesById.get(slug);
+    if (data) allGuides.push({ slug, data, clusterId: cluster.id, clusterLabel: cluster.label });
+  }
+}
+
+// ── Build SEO ──
+const breadcrumbLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN + "/" },
+    { "@type": "ListItem", position: 2, name: "Resources", item: SITE_ORIGIN + "/resources/" },
+    { "@type": "ListItem", position: 3, name: "Buying Guides", item: CANONICAL_URL },
+  ],
+});
+
+const collectionLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": CANONICAL_URL,
+  name: "RFID and NFC Buying Guides",
+  description: `Browse all ${TOTAL_GUIDES} Proud Tek RFID and NFC buying guides — Google review cards, hotel keycards, chip encyclopedias, standards & encoding, compliance, integration tools, and buying reference.`,
+  url: CANONICAL_URL,
+  isPartOf: { "@type": "WebSite", name: "Proud Tek", url: SITE_ORIGIN + "/" },
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: TOTAL_GUIDES,
+    itemListElement: allGuides.map((g, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${SITE_ORIGIN}/guides/${g.slug}/`,
+    })),
+  },
+});
+
+const seo: PageSeoData = {
+  htmlAttrs: { lang: "en" },
+  bodyAttrs: { class: "page-guides-hub" },
+  headHtml: "",
+  bodyHtml: "",
+  kind: "core",
+  contentTitle: "RFID and NFC Buying Guides",
+  title: `RFID & NFC Buying Guides — ${TOTAL_GUIDES} Operational Playbooks | Proud Tek`,
+  description: `Browse all ${TOTAL_GUIDES} Proud Tek RFID and NFC buying guides organized into 7 clusters: Google review cards, hotel keycards, chip encyclopedias, standards & encoding, compliance, integration tools, and buying reference.`,
+  canonicalUrl: CANONICAL_URL,
+  robots: "index, follow",
+  indexable: true,
+  jsonLd: [breadcrumbLd, collectionLd],
+  imageUrl: "",
+  imageAlt: "Proud Tek RFID and NFC buying guides",
+  imageGallery: [],
+  faqEntries: [],
+  procurementFields: [],
+  collectionSummary: [],
+  collectionGuidanceFields: [],
+  collectionRelatedPages: [],
+  collectionSourceLinks: [],
+  coreSummary: [
+    `${TOTAL_GUIDES} buying guides organized into 7 clusters`,
+    "Vertical playbooks, technical encyclopedias, regulatory references",
+    "Independent of any specific product line — focus on operational decisions",
+  ],
+  coreGuidanceFields: [],
+  coreRelatedPages: [],
+  coreSourceLinks: [],
+  articleSummary: [],
+  articleGuidanceFields: [],
+  articleRelatedPages: [],
+  articleSourceLinks: [],
+  productRelatedPages: [],
+  productSourceLinks: [],
+  ogType: "website",
+  articleMeta: null,
+};
+
+// ── Pull WP chrome from a donor snapshot (/resources/ is real WP) ──
+const donorPage = (await getPageByRoute("/resources/")) || (await getPageByRoute("/about/"));
+if (!donorPage) {
+  throw new Error("guides/index.astro: no chrome donor snapshot (/resources/ + /about/ both missing)");
+}
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
+seo.bodyAttrs = {
+  ...chrome.bodyAttrs,
+  ...seo.bodyAttrs,
+  class: [chrome.bodyAttrs.class, seo.bodyAttrs.class].filter(Boolean).join(" "),
+};
+seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
+
+// Rail with "All guides" highlighted (no active cluster).
+const railHtml = buildGuideClustersRailHtml(undefined);
+---
+
+<BaseLayout seo={seo}>
+  <Fragment set:html={chrome.beforeMainHtml} />
+
+  <main id="main" class="site-main" role="main">
+    {/* Same rail markup as blog hub. */}
+    <Fragment set:html={railHtml} />
+
+    {/* Same outer section as blog hub: .codex-blog-index .codex-blog-index--with-rail */}
+    <section class="codex-blog-index codex-blog-index--with-rail" id="topic-all" aria-label="Buying guides">
+      <div class="codex-blog-index__header">
+        <h1>RFID &amp; NFC Buying Guides</h1>
+        <p>{TOTAL_GUIDES} operational playbooks for buyers — Google review cards, hotel keycards, chip encyclopedias, standards &amp; encoding, compliance, integration tools, and buying reference.</p>
+      </div>
+      <div class="codex-blog-index__grid">
+        {allGuides.map(({ slug, data, clusterId, clusterLabel }) => (
+          <a
+            class="codex-card codex-blog-grid-card"
+            href={`/guides/${slug}/`}
+            data-rail-key={clusterId}
+            data-kicker={data.kicker || clusterLabel}
+          >
+            {data.heroImage && (
+              <img
+                class="codex-blog-grid-card__thumb"
+                src={data.heroImage}
+                alt={data.imageAlt || data.title}
+                width="1200"
+                height="675"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+            <span class="codex-blog-grid-card__tag">{data.kicker || clusterLabel}</span>
+            <strong>{data.title}</strong>
+            <p>{data.summary}</p>
+            <span class="codex-blog-grid-card__cta">Read guide →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <Fragment set:html={chrome.afterMainHtml} />
+</BaseLayout>

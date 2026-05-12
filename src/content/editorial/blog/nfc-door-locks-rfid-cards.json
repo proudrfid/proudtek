@@ -9,8 +9,8 @@
     "Offline NFC locks store authorization data on the card itself, eliminating the need for real-time network connectivity at every door. Critical for hotels and remote facilities.",
     "Online NFC locks communicate with a central access-control server in real time, enabling instant credential revocation, audit logging and integration with building management systems."
   ],
-  "heroImage": "/landing-images/hotel-key-cards-hero.webp",
-  "imageAlt": "NFC-enabled door lock with an RFID card being presented for room access",
+  "heroImage": "/blog-images/nfc-door-locks-rfid-cards.jpg",
+  "imageAlt": "Smart electronic door lock with keypad, the residential format that pairs with NFC/RFID cards.",
   "imageSourceRoutes": [
     "/product/hotel-key-cards/",
     "/product/mifare-desfire-cards/"
@@ -39,7 +39,7 @@
       }
     },
     {
-      "title": "Offline vs online lock architectures",
+      "title": "What's the difference between offline and online lock architectures?",
       "intro": "NFC door locks are deployed in two primary architectures (offline (card-centric) and online (server-centric)) each with different infrastructure requirements, security properties and operational characteristics.",
       "table": {
         "columns": [
@@ -87,10 +87,10 @@
       }
     },
     {
-      "title": "Card credential encoding and management",
+      "title": "How do you handle card credential encoding and management?",
       "intro": "The data written to the RFID card determines which doors the cardholder can open and for how long. Credential encoding is performed at front desks, security offices or kiosks using USB NFC readers and lock-vendor software.",
       "bullets": [
-        "Hotel key cards encode room number, arrival date, departure date, common-area access flags (pool, gym, parking) and a card-sequence counter for re-encoding detection.",
+        "[Hotel key cards](/solutions/hotel-key-cards/) encode room number, arrival date, departure date, common-area access flags (pool, gym, parking) and a card-sequence counter for re-encoding detection.",
         "Corporate access cards encode a cardholder ID that maps to access-level groups in the lock-management database.",
         "Diversified keys ensure each lock uses a unique encryption key derived from a master key. Compromising one lock does not expose the entire system.",
         "Card blacklisting on offline systems is propagated via staff cards or mobile devices that carry blacklist updates and transmit them to locks during routine property walks.",
@@ -98,10 +98,10 @@
       ]
     },
     {
-      "title": "Security best practices for NFC lock deployments",
+      "title": "What are the security best practices for NFC lock deployments?",
       "intro": "Deploying NFC locks securely requires attention to key management, card lifecycle, firmware maintenance and physical security of the lock hardware.",
       "bullets": [
-        "Use MIFARE DESFire EV2 or EV3 for all new lock deployments. Avoid MIFARE Classic (Crypto-1 is compromised) and UID-only authentication.",
+        "Use [MIFARE DESFire EV2](/guides/mifare-desfire-ev3-commands-reference/) or EV3 for all new lock deployments. Avoid MIFARE Classic (Crypto-1 is compromised) and UID-only authentication.",
         "Implement diversified keys using AES CMAC key derivation. Never use the same static key across multiple locks.",
         "Rotate master keys annually and maintain offline backup copies in a physically secure location.",
         "Enable lock-audit-trail collection and review access logs for anomalies. Repeated denied accesses, off-hours entries, or cards used after checkout.",
@@ -110,13 +110,24 @@
       ]
     },
     {
-      "title": "Integration with building management systems",
+      "title": "How does it integrate with building management systems?",
       "intro": "In corporate and multi-tenant buildings, NFC door locks are one component of a broader building-management ecosystem that includes elevators, HVAC, lighting and video surveillance.",
       "bullets": [
         "OSDP (Open Supervised Device Protocol) is replacing legacy Wiegand as the standard interface between NFC readers and access-control panels, providing encrypted bidirectional communication.",
         "BACnet and Modbus integrations allow NFC card presentations to trigger HVAC set-point changes, lighting scenes and elevator dispatching.",
         "Video-management system (VMS) integration correlates NFC access events with camera feeds for forensic review.",
         "Visitor-management systems issue temporary NFC credentials with time-bound and area-restricted access. Automatically expiring at the end of the scheduled visit."
+      ]
+    },
+    {
+      "title": "How are mobile credentials (Apple Wallet, Google Wallet, Aliro) reshaping NFC door locks?",
+      "intro": "The 2024-2026 wave of mobile credential standards has changed the lock-procurement decision. A lock spec'd today must support both physical RFID cards and at least one mobile credential framework — otherwise it's obsolete by year 2 of the deployment.",
+      "bullets": [
+        "Apple Home Key and Wallet keys: Apple's Wallet now stores digital keys for homes, hotel rooms, offices, schools, cars and scooters. iPhone or Apple Watch unlocks via NFC tap with the device within ~1 inch of the lock. Express Mode keeps the credential active even with a fully black screen — critical for hospitality user experience.",
+        "Apple's iOS 18.1 NFC and Secure Element opening: Apple introduced expanded NFC and Secure Element access in iOS 18.1 for in-app contactless beyond Apple Pay — including badges, keys and tickets. This is the technical change that finally lets non-Apple-partner credential providers issue Wallet-grade keys on iPhone, opening up far broader smart-lock interoperability.",
+        "Google Wallet keys: Android's equivalent for hotel and office mobile credentials, increasingly bundled with hotel chain apps (Hilton Honors, Marriott Bonvoy) and smart-home lock vendors (August / Yale, Schlage).",
+        "Aliro 1.0 (Connectivity Standards Alliance, released 26 February 2026): the new cross-vendor mobile-credential standard for corporate offices, universities, hospitality, single-family and multi-family homes — designed to work even without network coverage. Aliro is to mobile credentials what Matter is to smart-home control.",
+        "Procurement implication: any new lock spec in 2026 should require AES-128 mutual auth (DESFire EV2/EV3), OSDP for reader-to-panel encryption, and explicit Aliro and/or Apple Home Key + Google Wallet roadmap. Locks that only do MIFARE Classic UID checks will be replaced inside 3-5 years."
       ]
     }
   ],
@@ -138,6 +149,16 @@
         {
           "href": "/product/mifare-desfire-cards/",
           "label": "MIFARE DESFire cards"
+        },
+        {
+          "href": "https://csa-iot.org/all-solutions/aliro/",
+          "label": "Aliro standard (CSA)",
+          "description": "Connectivity Standards Alliance Aliro 1.0 — cross-vendor mobile credential standard for access control."
+        },
+        {
+          "href": "https://support.apple.com/guide/iphone/use-digital-keys-iph6d3076f9c/ios",
+          "label": "Apple Wallet digital keys",
+          "description": "Apple support reference for digital keys in Wallet — homes, hotel rooms, offices, schools, cars."
         }
       ]
     }
@@ -154,10 +175,18 @@
     {
       "question": "How long do batteries last in NFC door locks?",
       "answer": "Offline NFC locks running on 4 AA batteries typically last 2–4 years or 30 000–50 000 openings. Online locks with Wi-Fi or BLE radios consume more power and last 6–18 months. Low-battery indicators warn maintenance staff 2–4 weeks before replacement is needed."
+    },
+    {
+      "question": "Should new lock deployments support Apple Home Key, Google Wallet and Aliro?",
+      "answer": "Yes — at minimum a clear roadmap. Apple Home Key (iOS 15+) and Google Wallet keys are now common in hospitality (Hilton, Marriott, Hyatt) and increasingly in residential and office. Apple's iOS 18.1 NFC and Secure Element opening expanded which credential providers can issue Wallet-grade keys on iPhone, broadening compatibility. The Connectivity Standards Alliance released Aliro 1.0 on 26 February 2026 as a cross-vendor mobile credential standard for offices, universities, hospitality, single-family and multi-family homes. Locks specified in 2026 without an Aliro / Apple Home Key / Google Wallet roadmap will be replaced inside 3-5 years; physical RFID cards will remain the fallback but mobile must work for premium guest and employee experience."
+    },
+    {
+      "question": "What's the right way to handle credential revocation across offline and online locks?",
+      "answer": "For online locks, revoke at the central server and the next attempted swipe is denied immediately. For offline locks, two patterns work: (1) blacklist propagation — staff cards or maintenance-tablet BLE pushes blacklist updates as part of routine property walks, typical refresh 12-48 hours; (2) sequence counter invalidation — re-issuing a higher-sequence card to the same room automatically invalidates the previous card on the next presentation, the standard hospitality flow for guests changing rooms or staying past initial check-out. For mobile credentials (Apple Wallet, Google Wallet, Aliro), revocation is server-pushed to the user's device at next network sync, typically near-real-time. Best practice for high-security deployments: combine all three — online server, offline blacklist propagation and per-card sequence counters — so no single failure mode leaves a revoked credential active."
     }
   ],
   "primaryAction": {
-    "href": "/contact/nfc-locks/",
+    "href": "/contact/access-control-keyfobs/",
     "label": "Get lock-system advice"
   },
   "secondaryActions": [
@@ -172,5 +201,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-04-25"
+  "reviewedAt": "2026-05-09"
 }

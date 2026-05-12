@@ -1,0 +1,230 @@
+---
+/**
+ * /compare/ — comparison-library hub.
+ *
+ * Mirrors the /blog/ + /guides/ hub layout:
+ *   - Left rail (category navigation, click → navigate to /compare/{category}/)
+ *   - Simple .codex-blog-index header (H1 + one-line count description)
+ *   - Single flat 3-column grid of every compare card (28 cards)
+ *
+ * Card markup matches /blog/ + /guides/ exactly: .codex-card .codex-blog-grid-card
+ * with thumbnail, kicker tag, title (<strong>), summary (<p>), Compare → CTA.
+ *
+ * Architecture note: native .astro editorial hub (path-3 pattern), same
+ * approach as src/pages/guides/index.astro. Replaces the previous
+ * WordPress-snapshot rendering of /compare/ via [...slug].astro.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { COMPARE_CATEGORIES, getTotalCompareCount } from "../../data/compare-categories";
+import type { PageSeoData } from "../../lib/seo";
+import { buildCompareCategoriesRailHtml } from "../../lib/seo/compare-rail";
+import { buildRailFilterScript } from "../../lib/seo/rail";
+import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { getPageByRoute } from "../../lib/site-data";
+import { truncateText } from "../../lib/seo/utils";
+
+/**
+ * Compare-page titles are written long-form for SEO (e.g. "MIFARE Classic vs
+ * Plus vs DESFire for Hotel Locks — The Practical 2026 Chip Comparison").
+ * On the hub card we want the same visual rhythm as the blog grid — short
+ * headline, supporting paragraph — so strip the editorial subtitle that sits
+ * after an em-dash and cap the headline at ~64 chars.
+ */
+function shortenCardTitle(title: string): string {
+  const headline = title.split(/\s+[—–-]\s+/u, 1)[0].trim();
+  return truncateText(headline, 64);
+}
+
+const SITE_ORIGIN = "https://www.proudtek.com";
+const ROUTE = "/compare/";
+const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
+const TOTAL_COMPARES = getTotalCompareCount();
+
+// ── Pull every compare entry from the editorial collection ──
+const allEditorial = await getCollection("editorial");
+const comparesById = new Map<string, ReturnType<typeof Object>>();
+for (const entry of allEditorial) {
+  const m = entry.id.match(/^compare\/(.+)$/);
+  if (m) comparesById.set(m[1], entry.data);
+}
+
+// Flatten: walk COMPARE_CATEGORIES in curator order, attach category id
+// to each compare so the card carries data-rail-key (the unified attribute
+// shared with blog and guides hubs — see src/lib/seo/rail.ts).
+// All 28 in one array — the rail filters in-place on the hub.
+type FlatCompare = {
+  slug: string;
+  data: any;
+  categoryId: string;
+  categoryLabel: string;
+};
+const allCompares: FlatCompare[] = [];
+for (const category of COMPARE_CATEGORIES) {
+  for (const slug of category.slugs) {
+    const data = comparesById.get(slug);
+    if (data) {
+      allCompares.push({
+        slug,
+        data,
+        categoryId: category.id,
+        categoryLabel: category.label,
+      });
+    }
+  }
+}
+
+// ── Build SEO ──
+const breadcrumbLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN + "/" },
+    { "@type": "ListItem", position: 2, name: "Resources", item: SITE_ORIGIN + "/resources/" },
+    { "@type": "ListItem", position: 3, name: "Comparisons", item: CANONICAL_URL },
+  ],
+});
+
+const collectionLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": CANONICAL_URL,
+  name: "RFID and NFC Comparison Library",
+  description: `Browse all ${TOTAL_COMPARES} Proud Tek RFID and NFC side-by-side comparisons — chip vs chip, reader vs reader, form factor & material, frequency & technology.`,
+  url: CANONICAL_URL,
+  isPartOf: { "@type": "WebSite", name: "Proud Tek", url: SITE_ORIGIN + "/" },
+  mainEntity: {
+    "@type": "ItemList",
+    numberOfItems: TOTAL_COMPARES,
+    itemListElement: allCompares.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${SITE_ORIGIN}/compare/${c.slug}/`,
+    })),
+  },
+});
+
+const seo: PageSeoData = {
+  htmlAttrs: { lang: "en" },
+  bodyAttrs: { class: "page-compare-hub" },
+  headHtml: "",
+  bodyHtml: "",
+  kind: "core",
+  contentTitle: "RFID & NFC Comparison Library",
+  title: `RFID & NFC Comparisons — ${TOTAL_COMPARES} Side-by-Side Decision Pages | Proud Tek`,
+  description: `Browse all ${TOTAL_COMPARES} Proud Tek RFID and NFC comparison pages, grouped into chip vs chip, reader vs reader, form factor & material, and frequency & technology.`,
+  canonicalUrl: CANONICAL_URL,
+  robots: "index, follow",
+  indexable: true,
+  jsonLd: [breadcrumbLd, collectionLd],
+  imageUrl: "",
+  imageAlt: "Proud Tek RFID and NFC comparison library",
+  imageGallery: [],
+  faqEntries: [],
+  procurementFields: [],
+  collectionSummary: [],
+  collectionGuidanceFields: [],
+  collectionRelatedPages: [],
+  collectionSourceLinks: [],
+  coreSummary: [
+    `${TOTAL_COMPARES} side-by-side comparison pages organized into 4 categories`,
+    "Chip-family, reader, form-factor and frequency decisions",
+    "Each page settles one ambiguous procurement question before sample review",
+  ],
+  coreGuidanceFields: [],
+  coreRelatedPages: [],
+  coreSourceLinks: [],
+  articleSummary: [],
+  articleGuidanceFields: [],
+  articleRelatedPages: [],
+  articleSourceLinks: [],
+  productRelatedPages: [],
+  productSourceLinks: [],
+  ogType: "website",
+  articleMeta: null,
+};
+
+// ── Pull WP chrome from a donor snapshot (use /resources/ as donor, same as guides) ──
+const donorPage = (await getPageByRoute("/resources/")) || (await getPageByRoute("/about/"));
+if (!donorPage) {
+  throw new Error("compare/index.astro: no chrome donor snapshot (/resources/ + /about/ both missing)");
+}
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
+seo.bodyAttrs = {
+  ...chrome.bodyAttrs,
+  ...seo.bodyAttrs,
+  class: [chrome.bodyAttrs.class, seo.bodyAttrs.class].filter(Boolean).join(" "),
+};
+seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
+
+// Rail with "All comparisons" highlighted (no active category).
+const railHtml = buildCompareCategoriesRailHtml(undefined);
+
+// Shared filter handler — Alt-click on a rail link filters in place;
+// plain click navigates to the sub-category page. See src/lib/seo/rail.ts.
+const filterScript = buildRailFilterScript({
+  filterMode: "alt-toggle",
+  hubAnchorId: "category-all",
+  hubPath: "/compare/",
+});
+---
+
+<BaseLayout seo={seo}>
+  <Fragment set:html={chrome.beforeMainHtml} />
+
+  <main id="main" class="site-main" role="main">
+    {/* Same rail markup as blog + guides hubs. */}
+    <Fragment set:html={railHtml} />
+
+    {/* Same outer section as blog hub: .codex-blog-index .codex-blog-index--with-rail */}
+    <section
+      class="codex-blog-index codex-blog-index--with-rail"
+      id="category-all"
+      aria-label="Comparison pages"
+    >
+      <div class="codex-blog-index__header">
+        <h1>RFID &amp; NFC Comparison Library</h1>
+        <p>
+          {TOTAL_COMPARES} side-by-side decision pages for procurement teams — chip vs chip, reader
+          vs reader, form factor &amp; material, and frequency &amp; technology.
+        </p>
+      </div>
+      <div class="codex-blog-index__grid">
+        {allCompares.map(({ slug, data, categoryId, categoryLabel }) => (
+          <a
+            class="codex-card codex-blog-grid-card"
+            href={`/compare/${slug}/`}
+            data-rail-key={categoryId}
+            data-kicker={data.kicker || categoryLabel}
+          >
+            {data.heroImage && (
+              <img
+                class="codex-blog-grid-card__thumb"
+                src={data.heroImage}
+                alt={data.imageAlt || data.title}
+                width="1200"
+                height="675"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+            <span class="codex-blog-grid-card__tag">{categoryLabel}</span>
+            <strong>{shortenCardTitle(data.title)}</strong>
+            <p>{truncateText(data.summary, 120)}</p>
+            <span class="codex-blog-grid-card__cta">Compare →</span>
+          </a>
+        ))}
+      </div>
+      <div class="codex-blog-index__empty" hidden>
+        <div class="codex-blog-index__empty-icon" aria-hidden="true">🔍</div>
+        <h3>No comparisons in this category yet</h3>
+        <p>Try another category, or view all comparisons.</p>
+        <button type="button" class="codex-blog-index__empty-clear">Show all comparisons</button>
+      </div>
+      <script is:inline set:html={filterScript} />
+    </section>
+  </main>
+
+  <Fragment set:html={chrome.afterMainHtml} />
+</BaseLayout>

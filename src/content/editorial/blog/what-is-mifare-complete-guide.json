@@ -29,7 +29,7 @@
       ],
       "bullets": [
         "MIFARE chips are embedded in cards, stickers, wristbands, key fobs, watches and other form factors. The chip is independent of the physical product.",
-        "All MIFARE products communicate at 13.56 MHz and use ISO 14443 Type A anti-collision, ensuring basic RF-level interoperability across the family.",
+        "All MIFARE products communicate at 13.56 MHz and use [ISO 14443](/guides/iso-14443-explained/) Type A anti-collision, ensuring basic RF-level interoperability across the family.",
         "Application-level compatibility varies significantly between MIFARE product lines. A DESFire reader cannot read Classic data structures without firmware changes.",
         "NXP licenses MIFARE technology to other silicon manufacturers, but genuine NXP chips dominate the market and are specified by most system integrators."
       ],
@@ -40,7 +40,7 @@
       }
     },
     {
-      "title": "MIFARE product line comparison",
+      "title": "How do MIFARE product line options compare?",
       "intro": "The MIFARE family includes five major product lines, each targeting different application requirements. The following comparison covers the current-generation variant of each line.",
       "table": {
         "columns": [
@@ -96,7 +96,7 @@
       }
     },
     {
-      "title": "MIFARE Classic: legacy workhorse",
+      "title": "What is MIFARE Classic, the legacy workhorse?",
       "intro": "MIFARE Classic is the most widely installed contactless chip in history. Despite known security vulnerabilities in its Crypto-1 encryption, it remains in active use because billions of dollars of reader infrastructure depend on it.",
       "paragraphs": [
         "Classic uses a sector-and-block memory structure. The 1K variant has 16 sectors of 4 blocks (16 bytes each). Each sector is protected by two keys (Key A and Key B) that control read and write access. The 4K variant extends this to 40 sectors, with the first 32 being standard size and the last 8 being double-size."
@@ -105,24 +105,24 @@
         "Crypto-1 encryption was reverse-engineered in 2008. Known attacks allow key recovery in seconds with inexpensive hardware. Classic should not be used for security-critical applications.",
         "Despite security concerns, Classic remains specified for hotel lock systems (Saflok, Onity, legacy VingCard), parking systems and many corporate access control installations.",
         "Migration from Classic to more secure chips (Plus or DESFire) is possible but requires reader firmware updates and a transition period where both chip types are accepted.",
-        "MIFARE Classic EV1 (the current production variant) adds an originality check feature but retains Crypto-1 for backward compatibility.",
+        "[MIFARE Classic](/guides/mifare-classic-1k-4k-chip-encyclopedia/) EV1 (the current production variant) adds an originality check feature but retains Crypto-1 for backward compatibility.",
         "For new installations, MIFARE Plus in Classic-compatible mode provides the same sector structure with optional AES upgrade, making it the recommended replacement."
       ]
     },
     {
-      "title": "MIFARE DESFire: the modern standard",
+      "title": "What is MIFARE DESFire, the modern standard?",
       "intro": "MIFARE DESFire is NXP's flagship contactless chip, designed for multi-application environments where strong security, flexible data structures and interoperability with banking and government standards are required.",
       "bullets": [
         "DESFire uses a file-system architecture with application directories, replacing Classic's rigid sector structure. Up to 28 independent applications can coexist on a single chip.",
         "AES-128 encryption with secure messaging protects all data in transit and at rest. Mutual authentication ensures both the card and reader prove their identity before exchanging data.",
         "Transaction MAC (Message Authentication Code) provides cryptographic proof that a transaction occurred, enabling offline verification without server connectivity.",
-        "DESFire EV3 adds Secure Dynamic Messaging (SDM) for NFC phone interactions, enabling tap-to-verify authentication similar to NTAG424 DNA functionality.",
+        "DESFire EV3 adds Secure Dynamic Messaging (SDM) for NFC phone interactions, enabling tap-to-verify authentication similar to [NTAG424 DNA](/guides/ntag424-dna-sun-cmac-authentication/) functionality.",
         "Common Criteria EAL5+ certification makes DESFire suitable for government identity and banking applications where regulatory certification is required.",
         "The main disadvantage is cost: DESFire chips cost 2-5x more than Classic, which can be significant for high-volume, low-security applications like hotel key cards."
       ]
     },
     {
-      "title": "Migration paths and compatibility planning",
+      "title": "How do you plan migration paths and compatibility?",
       "intro": "Most procurement teams encounter MIFARE when maintaining or upgrading an existing contactless system. Understanding migration paths prevents costly compatibility failures.",
       "bullets": [
         "Classic to Plus: MIFARE Plus can operate in Classic-compatible mode (Security Level 1) using the same sector structure and Crypto-1 keys. Once all readers are updated, cards can be switched to AES mode (Security Level 3) without replacing the cards.",
@@ -130,6 +130,28 @@
         "Ultralight to DESFire Light: For transit systems upgrading from single-use tickets to reusable credentials, DESFire Light provides AES security in a cost-optimized chip.",
         "Dual-chip cards: During migration, cards can contain both a Classic and a DESFire chip, allowing the card to work with both legacy and updated readers. This doubles the chip cost but enables gradual reader upgrades.",
         "Always test compatibility with a sample batch of 50-100 cards across all reader types in the system before committing to a production order. Chip-to-reader incompatibility is the most common and most expensive procurement mistake in contactless systems."
+      ]
+    },
+    {
+      "title": "MIFARE security history — the breaks, the patches and the chips you must avoid",
+      "intro": "Every MIFARE family member sits on a security trajectory shaped by published attacks, NXP responses and downstream user migrations. Buyers writing access-control or payment specs in 2026 need to read the credential not as a feature list but as a position on this timeline — what has been broken, what was patched, and what has held up to public cryptanalysis.",
+      "bullets": [
+        "MIFARE Classic 1K/4K (broken since 2008) — Karsten Nohl and Henryk Plötz reverse-engineered the proprietary Crypto-1 stream cipher in 2007-2008. Nested attacks (Garcia et al. 2008-2009), darkside attack (Courtois 2009) and hardnested (mfoc, mfcuk tools) extract sector keys in seconds. December 2024 saw the Quarkslab disclosure of an undocumented backdoor key in Fudan FM11RF08 MIFARE Classic clones — affecting hotel, transit and access cards in dozens of countries. Treat MIFARE Classic as a unique-ID-only token, never as a security credential.",
+        "MIFARE Plus EV1/EV2 (transitional, AES-128 in SL3) — Plus offers four security levels (SL0-SL3) for backward-compatible migration. SL1 emulates Classic (still vulnerable). SL3 uses AES-128 mutual authentication and is considered secure today. Common Criteria EAL4+ certified at SL3. Used where you need a phased migration off Classic without replacing the entire reader fleet on day one.",
+        "MIFARE DESFire EV1 (2008-2018, 3DES + AES, mostly secure) — Original DESFire EV1 used 3DES, 2K3DES and optional AES-128. Side-channel attacks (David Oswald 2011) extracted DESFire EV1 keys via differential power analysis with $3,000 of lab equipment, but this requires physical access and is rarely used at scale. EAL4+ certified.",
+        "MIFARE DESFire EV2 (2017+, AES + CMAC sessions, mature) — Adds AuthenticateEV2First/AuthenticateEV2NonFirst session-key derivation, CMAC-protected commands resistant to relay and replay attacks. Up to 28 simultaneous applications increased to unlimited. EAL5+ Common Criteria certification on 4K SKU. Now the workhorse for transit and access in 2018-2025 deployments.",
+        "MIFARE DESFire EV3 / EV3C (2020+, AES + SUN/SDM + EAL5+) — Adds Secure Unique NFC (SUN) message and Secure Dynamic Messaging (SDM) — same dynamic per-tap cryptographic value used by NTAG 424 DNA, but inside a full DESFire file system. EV3C variant is byte-compatible with MIFARE Classic for migration without changing reader code. EAL5+ on 4K SKU. Default specification for new high-assurance deployments in 2026."
+      ]
+    },
+    {
+      "title": "MIFARE buying playbook — chip selection, encoding, key diversification and supply chain",
+      "intro": "MIFARE chips arrive blank. Turning them into a working credential requires three coordinated activities — chip selection matched to the application, key generation and diversification, and personalisation logistics. Get any of these wrong and you either pay for unused capability or lock yourself into a security architecture you cannot change.",
+      "bullets": [
+        "Choose the chip variant that matches the AID + file + key budget — MIFARE Classic 1K (1024 bytes, 16 sectors): legacy migrations only. Classic 4K (4096 bytes, 40 sectors): legacy bulk transit. DESFire EV3 2K (2 KB, 28 apps): single-use access or single transit. DESFire EV3 4K (4 KB, 28 apps + EAL5+ certified): multi-app campus + payment + transit. DESFire EV3 8K (8 KB): heavy multi-app eID overlay. NTAG 213 (144 B), NTAG 215 (504 B), NTAG 216 (888 B): consumer NFC bookmark/URL/wifi tags. NTAG 424 DNA (416 B + SUN): consumer authentication, brand protection.",
+        "Diversify keys per card, never use the master key in the field — Generate per-card AES-128 keys via cryptographic key derivation (KDF) using the card's UID and a master key held in an HSM. NXP application notes AN10922 and AN12752 specify the standard KDF. Compromise of one card never compromises the system — only that single credential.",
+        "Personalisation bureau or in-house — For >50K credentials, use a personalisation bureau (G+D, Idemia, Thales-Gemalto, NagraID, IDEMIA Smart Identity) — bureau-grade HSM-backed key injection, per-card audit logs, and BSI/CC-compliant facility security. For <10K credentials, in-house personalisation with ACR1252U/Identive uTrust/HID OMNIKEY readers and OpenSSL/PyCryptodome scripts is feasible.",
+        "Encoding throughput — Card printers (Zebra ZC350, Fargo HDP6600 with iCLASS encoder, Evolis Primacy 2 LCD with NXP encoder) hit 300-500 cards/hour with simultaneous print and encode. Inline UHF + HF dual encoders reach 1,500-3,000 tags/hour for inlay-grade volumes.",
+        "Supply chain risk and clone awareness — Always source MIFARE chips through NXP-authorised distributors (Avnet, Arrow, Mouser, Future Electronics) or directly from NXP-licensed card converters. The grey market 'MIFARE compatible' chips (Fudan FM11RF08, ICODE clones, EM Microelectronic compatible Classic) often have undocumented behaviour, missing security features or known backdoors. Specify NXP genuine in the PO and request the lot test report."
       ]
     }
   ],
@@ -175,6 +197,22 @@
           "label": "ACR122U NFC reader/writer"
         }
       ]
+    },
+    {
+      "title": "MIFARE technical references and standards",
+      "description": "NXP application notes and ISO standards that govern the MIFARE family.",
+      "links": [
+        {
+          "href": "https://www.nxp.com/docs/en/application-note/AN12752.pdf",
+          "label": "NXP AN12752 — MIFARE DESFire EV3 features and hints",
+          "description": "Official NXP application note covering EV3 architecture, security features, and EV1/EV2 migration."
+        },
+        {
+          "href": "https://www.nxp.com/docs/en/application-note/AN10833.pdf",
+          "label": "NXP AN10833 — MIFARE type identification procedure",
+          "description": "How to identify any MIFARE chip from ATQA/SAK/version response — essential for field troubleshooting."
+        }
+      ]
     }
   ],
   "faq": [
@@ -197,10 +235,18 @@
     {
       "question": "Can I put multiple MIFARE applications on one card?",
       "answer": "MIFARE DESFire supports up to 28 independent applications on a single chip, each with its own encryption keys and access rules. MIFARE Classic supports multiple applications by assigning different sectors to different systems, but lacks cryptographic isolation between applications. MIFARE Ultralight and Plus (in Classic mode) do not support multi-application use."
+    },
+    {
+      "question": "Does the December 2024 Fudan FM11RF08 backdoor affect genuine NXP MIFARE products?",
+      "answer": "No — the Quarkslab-disclosed backdoor is in Fudan FM11RF08 chips manufactured by Shanghai Fudan Microelectronics, sold as MIFARE Classic clones in hotel keys, transit cards and white-label cards across many countries. Genuine NXP MIFARE Classic 1K/4K and the entire DESFire EV1/EV2/EV3 family are not affected. The lesson is to specify 'NXP genuine' in your PO and verify supply chain — not to abandon MIFARE entirely. For new high-assurance deployments, jump straight to DESFire EV3 (AES-128 + EAL5+) or HID Seos to avoid both the Classic Crypto-1 break and the Fudan supply-chain risk."
+    },
+    {
+      "question": "Can MIFARE DESFire emulate MIFARE Classic for backward compatibility during migration?",
+      "answer": "Partially, and only with the EV3C variant. Standard DESFire EV1/EV2/EV3 cards are not bit-compatible with Classic readers — they speak ISO/IEC 14443-4 APDUs whereas Classic uses the Crypto-1 protocol. The DESFire EV3C (released 2022) adds Classic-mapped command set so a single card can present a Classic-emulated sector to legacy readers and a full DESFire file system to upgraded readers. This enables transit operators (London Oyster, Hong Kong Octopus, Tokyo Suica) to migrate gate hardware in waves while keeping the rider's card unchanged. For new credential issuance, specify EV3C if you need migration window compatibility, or pure EV3 if all readers are upgraded."
     }
   ],
   "primaryAction": {
-    "href": "/contact/mifare-cards/",
+    "href": "/contact/custom-rfid-cards/",
     "label": "Get MIFARE chip guidance"
   },
   "secondaryActions": [
@@ -219,5 +265,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2025-11-15"
+  "reviewedAt": "2026-05-10"
 }

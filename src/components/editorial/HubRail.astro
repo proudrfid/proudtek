@@ -1,0 +1,68 @@
+---
+/**
+ * Flat hub rail — sidebar nav with current-page highlight.
+ *
+ * Shadow component (Stage 3.x). Mirrors `renderHubRail(items, currentRoute,
+ * sectionLabel)` in editorial-pages.ts (~line 1170).
+ *
+ * Used by /industries/* (flat 20-item rail), /compatibility/* (flat per-lock-
+ * brand rail), and /resources/ + /blog/* fallback. The drawer-toggle script
+ * is shared between this and GroupedHubRail via `_railDrawerScript.ts` so
+ * both variants emit byte-identical interaction logic.
+ */
+import type { HubEntry } from "../../lib/editorial-pages";
+import { getIcon } from "../../lib/icons";
+import { RAIL_DRAWER_SCRIPT } from "./_railDrawerScript";
+
+interface Props {
+  items: HubEntry[];
+  currentRoute: string;
+  sectionLabel: string;
+}
+
+const { items, currentRoute, sectionLabel } = Astro.props;
+const lowerSection = sectionLabel.toLowerCase();
+const railModifier = lowerSection.replace(/[^a-z0-9]+/g, "-");
+const folderIcon = getIcon("folder");
+---
+{items.length > 0 && (
+  <>
+    <button
+      type="button"
+      class="codex-catalog-rail-toggle"
+      aria-expanded="false"
+      aria-controls="codex-catalog-rail-panel"
+      aria-label={`Show ${lowerSection}`}
+    >
+      <span class="codex-catalog-rail-toggle__icon codex-icon" aria-hidden="true" set:html={folderIcon} />
+      <span class="codex-catalog-rail-toggle__label">{sectionLabel}</span>
+    </button>
+    <div class="codex-catalog-rail-backdrop" hidden />
+    <aside
+      id="codex-catalog-rail-panel"
+      class={`codex-catalog-rail codex-catalog-rail--${railModifier}`}
+      aria-label={sectionLabel}
+    >
+      <button type="button" class="codex-catalog-rail__close" aria-label={`Close ${lowerSection}`}>✕</button>
+      <nav class="codex-industries-rail__nav">
+        <div class="codex-industries-rail__title">{sectionLabel}</div>
+        {items.map((entry) => {
+          const isActive = entry.route === currentRoute;
+          const classAttr = isActive ? "codex-industries-rail__link active" : "codex-industries-rail__link";
+          return (
+            <a
+              href={entry.route}
+              class={classAttr}
+              data-slug={entry.slug}
+              aria-current={isActive ? "page" : undefined}
+            >
+              <span class="codex-industries-rail__emoji codex-icon" aria-hidden="true" set:html={getIcon(entry.iconSlug)} />
+              <span class="codex-industries-rail__label">{entry.label}</span>
+            </a>
+          );
+        })}
+      </nav>
+    </aside>
+    <script is:inline set:html={RAIL_DRAWER_SCRIPT} />
+  </>
+)}

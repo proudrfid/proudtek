@@ -89,7 +89,7 @@ d) 如果第一次搜索不满意，尝试以下备选策略：
 
 ### 下载与更新
 
-- 下载图片保存到 `dist-restored/blog-images/{slug}.jpg`
+- 下载图片保存到 `dist/blog-images/{slug}.jpg`
 - 如果原图是 PNG/WebP，转换为 JPG，质量 85%
 - 更新 JSON 文件的 `heroImage` 字段为 `/blog-images/{slug}.jpg`
 - 如果原来有旧图且文件名不同，**不删除旧图**（可能被其他页面引用）
@@ -123,6 +123,6 @@ d) 如果第一次搜索不满意，尝试以下备选策略：
 
 ## 注意事项
 
-- 图片存储路径：`dist-restored/blog-images/{slug}.jpg`
+- 图片存储路径：`dist/blog-images/{slug}.jpg`
 - heroImage 字段值：`/blog-images/{slug}.jpg`
 - 搜索完成后需要运行 `npm run build` 重新构建

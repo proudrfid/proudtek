@@ -1,0 +1,70 @@
+---
+/**
+ * "Sources & references" footnote section.
+ *
+ * Shadow component (Stage 2). Mirrors `renderSources(definition, id)` in
+ * editorial-pages.ts (~line 2204).
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSource[]
+ *   label / url / publisher? / publishedAt? / accessedAt? / note?
+ *
+ * Date formatting and host extraction are preserved verbatim from the TS
+ * version so byte parity holds across locales (the `toLocaleDateString`
+ * call uses "en-US" explicitly).
+ */
+import type { EditorialSource } from "../../lib/editorial-types";
+
+interface Props {
+  sources: EditorialSource[];
+  id: string;
+}
+
+const { sources, id } = Astro.props;
+
+function formatDate(iso: string | undefined): string | null {
+  if (!iso) return null;
+  try {
+    const d = new Date(iso.length === 4 ? `${iso}-01-01` : iso);
+    if (Number.isNaN(d.getTime())) return iso;
+    return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  } catch {
+    return iso;
+  }
+}
+
+function displayHost(url: string): string {
+  try {
+    return new URL(url).host.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
+const items = sources.map((src, index) => ({
+  itemId: `${id}-${index + 1}`,
+  index: index + 1,
+  label: src.label,
+  url: src.url,
+  publisher: src.publisher ? src.publisher : displayHost(src.url),
+  published: formatDate(src.publishedAt),
+  accessed: formatDate(src.accessedAt),
+  note: src.note,
+}));
+---
+{sources.length > 0 && (
+  <section id={id} class="codex-sources" aria-labelledby={`${id}-heading`}>
+    <h2 id={`${id}-heading`} class="codex-sources-heading">Sources &amp; references</h2>
+    <p class="codex-sources-lead">Primary standards, OEM datasheets and regulatory documents cited by this article. All URLs were verified on the access date shown below.</p>
+    <ol class="codex-sources-list">
+      {items.map((item) => (
+        <li id={item.itemId} class="codex-sources-item" tabindex="-1">
+          <span class="codex-sources-num" aria-hidden="true">{item.index}.</span>
+          <a class="codex-sources-link" href={item.url} rel="noopener external" target="_blank">{item.label}</a>
+          <span class="codex-sources-meta">
+            <span class="codex-sources-publisher">{item.publisher}</span>{item.published && <span class="codex-sources-date"> · {item.published}</span>}{item.accessed && <span class="codex-sources-accessed"> · accessed {item.accessed}</span>}
+          </span>{item.note && <p class="codex-sources-note">{item.note}</p>}
+        </li>
+      ))}
+    </ol>
+  </section>
+)}

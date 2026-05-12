@@ -1,0 +1,94 @@
+---
+/**
+ * Editorial table — sortable columns + sticky first column.
+ *
+ * Shadow component (Stage 2). Mirrors the `renderTable()` function in
+ * editorial-pages.ts (~line 2123). Includes:
+ *  - First-column treatment: no sort attrs, no indicator span
+ *  - Other columns: data-sort-col + aria-sort=none + tabindex=0
+ *  - First cell of each row: <th scope="row">
+ *  - Other cells: glyph-wrap for ✓ / ✗ / Yes / No / — / N/A (DS-10 #4)
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialTable
+ */
+import { escapeHtml } from "../../lib/editorial-types";
+
+interface Table {
+  columns: string[];
+  rows: string[][];
+}
+
+interface Props {
+  table: Table;
+}
+
+const { table } = Astro.props;
+
+// Wrap "glyph cells" (✓ / ✗ / Yes / No / —) for touch-target sizing per DS-10 #4.
+// Returns raw HTML — the wrapping span carries aria-label so screen readers
+// announce the meaning instead of the glyph character.
+function renderCellValue(value: string): string {
+  const trimmed = value.trim();
+  const glyphMap: Record<string, string> = {
+    "✓": "yes",
+    "✔": "yes",
+    "✗": "no",
+    "✘": "no",
+    "—": "neutral",
+    "–": "neutral",
+    "-": "neutral",
+    "Yes": "yes",
+    "No": "no",
+    "N/A": "neutral",
+    "n/a": "neutral",
+  };
+  const glyphKey = glyphMap[trimmed];
+  if (glyphKey) {
+    const ariaLabel =
+      glyphKey === "yes" ? "Supported" : glyphKey === "no" ? "Not supported" : "Not applicable";
+    return `<span class="codex-cell-glyph" data-cell-glyph="${glyphKey}" aria-label="${ariaLabel}" role="img">${escapeHtml(trimmed)}</span>`;
+  }
+  return escapeHtml(value);
+}
+---
+<div
+  class="codex-scroll-region codex-editorial-table-wrap"
+  tabindex="0"
+  role="region"
+  aria-label="Comparison table — scroll horizontally to see more columns"
+>
+  <table class="codex-editorial-table" data-sortable="true">
+    <thead>
+      <tr>
+        {table.columns.map((column, index) =>
+          index === 0 ? (
+            <th scope="col">
+              <span class="codex-th-label">{column}</span>
+            </th>
+          ) : (
+            <th
+              scope="col"
+              data-sort-col={String(index)}
+              aria-sort="none"
+              tabindex="0"
+              role="columnheader button"
+            >
+              <span class="codex-th-label">{column}</span>
+              <span class="codex-th-indicator" aria-hidden="true" />
+            </th>
+          ),
+        )}
+      </tr>
+    </thead>
+    <tbody>
+      {table.rows.map((row) => (
+        <tr>
+          <th scope="row">{row[0]}</th>
+          {row.slice(1).map((value) => (
+            <td set:html={renderCellValue(value)} />
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
