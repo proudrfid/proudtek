@@ -25,6 +25,8 @@ import {
 } from "../seo-content";
 
 import { EDITORIAL_KEYWORDS_MAP } from "../editorial-pages";
+import type { EditorialDefinition } from "../editorial-types";
+import { isWorkflowSection } from "../editorial-types";
 
 import {
   absoluteUrl,
@@ -477,16 +479,40 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
     }
   }
 
-  // HowTo schema for pages with step-by-step workflow sections
+  // HowTo schema for pages with step-by-step content. Data-driven: walks
+  // page.editorialDefinition.sections directly instead of inspecting the
+  // rendered DOM (which is now empty in page.bodyHtml since Stage 3 cutover —
+  // EditorialPageLayout fills <main> at render time, after this function runs).
+  //
+  // Step extraction rules (data-source ordered by Google preference):
+  //   1. section.timeline.items  → use .text from each item
+  //   2. section.bullets + isWorkflowSection(section.title)
+  //                              → treat each bullet as a step
+  //   3. multiple workflow-titled sections concatenate; Google reads the
+  //      whole HowTo as one procedure
   if (context.kind === "article" || context.kind === "collection" || context.kind === "home") {
-    const $body = load(`<body>${page.bodyHtml}</body>`);
-    const stepElements = $body(".codex-editorial-step-copy");
+    const definition = page.editorialDefinition as EditorialDefinition | undefined;
+    if (definition && Array.isArray(definition.sections)) {
+      const steps: string[] = [];
 
-    if (stepElements.length >= 2) {
-      const steps = stepElements
-        .toArray()
-        .map((el) => cleanText($body(el).text()))
-        .filter((text) => text.length > 10);
+      for (const section of definition.sections) {
+        // timeline variant — every item is a step
+        if (section.timeline?.items && Array.isArray(section.timeline.items)) {
+          for (const item of section.timeline.items) {
+            const text = cleanText(item.text ?? "");
+            if (text.length > 10) steps.push(text);
+          }
+          continue;
+        }
+
+        // bullets + workflow title — each bullet is a step
+        if (section.bullets && Array.isArray(section.bullets) && isWorkflowSection(section.title)) {
+          for (const bullet of section.bullets) {
+            const text = cleanText(bullet);
+            if (text.length > 10) steps.push(text);
+          }
+        }
+      }
 
       if (steps.length >= 2) {
         entries.push({

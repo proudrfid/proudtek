@@ -21,6 +21,7 @@ import { load } from "cheerio";
 
 import type { SiteData, SnapshotPage } from "../site-data";
 import { loadPageFromDisk } from "../site-data";
+import type { EditorialDefinition } from "../editorial-types";
 
 import type {
   BreadcrumbItem,
@@ -121,18 +122,30 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
   const articleSummary = kind === "article" ? buildArticleSummary(contentTitle, description, $body, page.route) : [];
   const resolvedFaqEntries = kind === "faq" || kind === "contact" || kind === "page" ? resolveFaqEntries($body) : [];
   const coreFaqEntries = isCoreSupportKind(kind) ? buildCoreFaqEntries(page.route, contentTitle, description, $body) : [];
+
+  // Editorial pages carry FAQ data in `definition.faq` (set at content-authoring
+  // time). After Stage 3 cutover the `<main>` of `page.bodyHtml` is empty, so
+  // DOM-extraction-based FAQ builders (buildArticleFaqEntries, etc.) return
+  // nothing for editorial pages. Prefer the authored-data path when present.
+  const editorialFaq = (page.editorialDefinition as EditorialDefinition | undefined)?.faq;
+  const editorialFaqEntries: FaqEntry[] = (editorialFaq && editorialFaq.length > 0)
+    ? editorialFaq.map((e) => ({ question: e.question, answer: e.answer }))
+    : [];
+
   const faqEntries =
-    kind === "product"
-      ? buildProductFaqEntries(contentTitle, description, productSpecs, page.route)
-      : kind === "collection"
-        ? buildCollectionFaqEntries(page.route, contentTitle, description, $body)
-      : kind === "article"
-        ? buildArticleFaqEntries(contentTitle, description, $body, page.route)
-      : kind === "faq" || kind === "contact" || kind === "page"
-        ? dedupeFaqEntries([...resolvedFaqEntries, ...coreFaqEntries], 10)
-      : isCoreSupportKind(kind)
-        ? coreFaqEntries
-        : [];
+    editorialFaqEntries.length > 0
+      ? editorialFaqEntries
+      : kind === "product"
+        ? buildProductFaqEntries(contentTitle, description, productSpecs, page.route)
+        : kind === "collection"
+          ? buildCollectionFaqEntries(page.route, contentTitle, description, $body)
+        : kind === "article"
+          ? buildArticleFaqEntries(contentTitle, description, $body, page.route)
+        : kind === "faq" || kind === "contact" || kind === "page"
+          ? dedupeFaqEntries([...resolvedFaqEntries, ...coreFaqEntries], 10)
+        : isCoreSupportKind(kind)
+          ? coreFaqEntries
+          : [];
   const procurementFields =
     kind === "product" ? buildProductProcurementFields(contentTitle, description, productSpecs, page.route) : [];
   const collectionGuidanceFields = kind === "collection" ? buildCollectionGuidanceFields(page.route, contentTitle, $body) : [];
