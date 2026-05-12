@@ -1,0 +1,52 @@
+chore(editorial): drop ~1450 lines dead render code from editorial-pages.ts [P3-cleanup-2]
+
+Final cleanup pass after Stage 3 cutover. Surgical removal of the
+`renderEditorialMain` + 23 sub-renderer functions + `__TEST__` export
+that were left in editorial-pages.ts as unreachable dead code after the
+shadow component tree became the sole render path.
+
+editorial-pages.ts: 2780 → 1346 lines (~52% reduction).
+
+Deleted:
+  - 8 hub render functions (renderRelatedIndustriesGrid,
+    renderIndustryProductGrid, renderSolutionProductGrid, renderHubRail,
+    renderHubGrid, renderGroupedHubRail, renderGroupedHubGrid,
+    renderResourcesCategoryHub)
+  - 4 page-orchestrator functions (renderEditorialMain, renderTrail,
+    renderJumpNav, renderDecisionSnapshot)
+  - 14 section + leaf render functions (renderSection, renderSectionList,
+    renderBrief, renderBriefField, renderTableCellValue, renderTable,
+    renderResourceCard, renderResourceGrid, renderFaq, renderSources,
+    renderTrustSignals, renderContactChannels, renderInlineRfqForm,
+    renderActionBar)
+  - __TEST__ export (28 entries, no longer imported by anything)
+  - 13 orphan imports made dead by the above deletions: escapeHtml,
+    escapeAttribute, renderInlineLinks, buildEditorialOutline,
+    isWorkflowSection, detectSectionType, resolvePageType, CitationCtx,
+    EditorialTable, EditorialSectionData, EditorialBriefField,
+    EditorialResourceCard, EditorialFaq, getIcon
+
+Kept (the data + helpers the production tree actually uses):
+  - mergeEditorialPages — site-data composer
+  - loadEditorialDefinitions — astro:content loader
+  - buildEditorialScaffold — used by EditorialArticle.astro
+  - buildDecisionSnapshotCards — used by DecisionSnapshot.astro
+  - buildIntentHref — used by ActionBar.astro
+  - isBreadcrumbSectionRoot — used by Trail.astro
+  - getPillarClusterId + PILLAR_CLUSTER_LABELS — used by EditorialHero.astro
+  - EDITORIAL_KEYWORDS_MAP — used by seo.ts and seo/jsonld.ts
+  - resolveIllustration — internal helper (initially deleted by mistake,
+    restored — it's called by mergeEditorialPages, not a render fn)
+  - Hub data (_industriesHubData, _solutionsHubData, etc.) + meta tables
+  - Type exports: HubEntry, GroupedHubData, EditorialRelatedIndustryCard,
+    EditorialProductGridCard, EditorialRailDescriptor,
+    EditorialHubGridDescriptor, EditorialScaffold, EditorialGroup,
+    EditorialDefinition
+
+Test signal: 78/78 vitest still green (no test changes needed — the
+parity + legacy snapshot tests that used __TEST__ were already removed
+in the previous cleanup commit; surviving tests don't touch deleted code).
+
+Docs:
+  - editorial-rendering-debt.md: marked Stage 3.x cleanup COMPLETE; the
+    debt this document tracked is now paid in full.

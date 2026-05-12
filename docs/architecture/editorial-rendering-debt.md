@@ -1,16 +1,17 @@
 # Editorial Rendering Debt — Status & Path-3 Trigger Conditions
 
-**Status:** ~~path-4 guardrail in place; Stages 0 / 1 / 1.5 / 2 all complete~~ → **Path 3 cutover SHIPPED (2026-05-12)**. All editorial pages now render via the shadow `.astro` component tree (`EditorialArticle.astro` + sub-components). `editorial-pages.ts` is reduced to data-and-helpers; the `render*` functions remain in the file as dead code awaiting a follow-up cleanup pass but are unreachable from production.
+**Status:** ~~path-4 guardrail in place; Stages 0 / 1 / 1.5 / 2 all complete~~ → **Path 3 cutover SHIPPED + final dead-code removal complete (2026-05-12)**. All editorial pages render via the shadow `.astro` component tree (`EditorialArticle.astro` + sub-components); `editorial-pages.ts` is now data-and-helpers only.
 
-**Stage status (after cleanup):**
+**Stage status (after final cleanup):**
 - ~~Stage 0:~~ snapshot-test guardrail ✅ shipped, then retired with parity tests in cleanup
 - ~~Stage 1:~~ ✅ shipped
 - ~~Stage 1.5:~~ ✅ shipped (BUG-1/BUG-2 fixed, interfaces merged)
 - ~~Stage 2:~~ ✅ shipped (38 .astro components + parity test suite)
 - ~~Stage 3:~~ ✅ **CUTOVER SHIPPED** — 303 pages verified, env-flag dispatch removed, shadow tree is sole render path
+- ~~Stage 3.x cleanup:~~ ✅ **COMPLETE** — `editorial-pages.ts` 2780 → 1346 lines (~52% reduction). Deleted: `renderEditorialMain` + 23 sub-renderers + `__TEST__` export + 13 orphan imports. Kept: data layer (`mergeEditorialPages`, hub data, scaffold builders, decision-snapshot builders, intent-href helper, etc.).
 
-**Last reviewed:** 2026-05-12 (post-cleanup).
-**Owners:** whoever next does the dead-code removal pass in `editorial-pages.ts` (deletes the ~24 `render*` functions plus the `__TEST__` export, dropping the file from 2772 → ~1200 lines).
+**Last reviewed:** 2026-05-12 (post-final-cleanup).
+**Owners:** historical reference; the debt this document tracked is paid in full.
 
 ---
 
