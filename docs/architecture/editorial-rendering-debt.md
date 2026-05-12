@@ -1,8 +1,16 @@
 # Editorial Rendering Debt — Status & Path-3 Trigger Conditions
 
-**Status:** path-4 guardrail in place; Stages 0 / 1 / 1.5 / 2 all complete (2026-05). Stage 2 shipped a full shadow `.astro` component tree (28 components) with end-to-end parity verified against 5 production fixtures. Path 3 cutover is now engineering-only.
-**Last reviewed:** 2026-05-12.
-**Owners:** whoever next touches `src/lib/editorial-pages.ts` or `SnapshotLayout.astro`.
+**Status:** ~~path-4 guardrail in place; Stages 0 / 1 / 1.5 / 2 all complete~~ → **Path 3 cutover SHIPPED (2026-05-12)**. All editorial pages now render via the shadow `.astro` component tree (`EditorialArticle.astro` + sub-components). `editorial-pages.ts` is reduced to data-and-helpers; the `render*` functions remain in the file as dead code awaiting a follow-up cleanup pass but are unreachable from production.
+
+**Stage status (after cleanup):**
+- ~~Stage 0:~~ snapshot-test guardrail ✅ shipped, then retired with parity tests in cleanup
+- ~~Stage 1:~~ ✅ shipped
+- ~~Stage 1.5:~~ ✅ shipped (BUG-1/BUG-2 fixed, interfaces merged)
+- ~~Stage 2:~~ ✅ shipped (38 .astro components + parity test suite)
+- ~~Stage 3:~~ ✅ **CUTOVER SHIPPED** — 303 pages verified, env-flag dispatch removed, shadow tree is sole render path
+
+**Last reviewed:** 2026-05-12 (post-cleanup).
+**Owners:** whoever next does the dead-code removal pass in `editorial-pages.ts` (deletes the ~24 `render*` functions plus the `__TEST__` export, dropping the file from 2772 → ~1200 lines).
 
 ---
 

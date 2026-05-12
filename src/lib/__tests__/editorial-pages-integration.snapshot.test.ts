@@ -1,40 +1,42 @@
 /**
- * Integration snapshot tests — full-page renderEditorialMain output for
+ * Integration snapshot tests — full-page EditorialArticle.astro output for
  * 5 representative production fixtures (one per major route group).
  *
- * Path-3 prep (Stage 0). See docs/architecture/editorial-rendering-debt.md.
+ * Post-cutover (2026-05-12). Replaces the legacy `renderEditorialMain`-based
+ * snapshots. EditorialArticle.astro is the only render path now; this file
+ * locks the full-page composition (hero, jump-nav, decision snapshot, brief,
+ * sections, resource grid, FAQ, sources, action bar, etc.) so any future
+ * drift across the entire shadow tree surfaces in one diff.
  *
  * Variant-level snapshots (editorial-pages-variants.snapshot.test.ts) lock
  * each section variant in isolation. This file complements that by locking
- * the full-page composition: hero, kicker, summary, heroPoints, jump-nav,
- * decision snapshot, brief, sections (in production combinations), resource
- * grid, FAQ, sources, action bar, etc. — all the wiring that variant-level
- * tests don't exercise.
+ * the full-page composition wiring that variant tests don't exercise.
  *
- * The 5 fixtures are deliberately drawn from disjoint content groups so
- * that any group-specific branch (e.g. `definition.route === "/industries/"`
- * adds a hub-rail; `group === "lp"` strips trail; etc.) gets locked
- * somewhere. Picked the smallest-file fixture in each group to keep the
- * snapshot file from ballooning.
+ * The 5 fixtures are deliberately drawn from disjoint content groups so any
+ * group-specific branch (e.g. `definition.route === "/industries/"` adds a
+ * hub-rail; `group === "lp"` strips trail; etc.) gets locked somewhere.
+ * Picked the smallest-file fixture in each group to keep the snapshot file
+ * from ballooning.
  *
  * Determinism guards:
  *   1. `publishedAt` / `modifiedAt` are pinned to fixed values for any
- *      fixture missing them — renderEditorialMain otherwise falls back to
+ *      fixture missing them — EditorialArticle.astro otherwise falls back to
  *      `new Date().toISOString()` which would make snapshots time-dependent.
  *   2. The astro:content stub (see ./stubs/astro-content.ts) returns empty
  *      arrays, so module-level hub/rail data (`_industriesHubData`,
- *      `_solutionsHubData`, etc.) is empty during tests. The rail/hub
- *      HTML therefore renders empty even for industries/solutions/resources
- *      routes. That's a deliberate trade-off: the rail content is collection-
- *      driven and lives elsewhere; this test focuses on the per-page
- *      template that DOES exist in editorial-pages.ts.
+ *      `_solutionsHubData`, etc. in editorial-pages.ts) is empty during
+ *      tests. Rail/hub HTML therefore renders empty even for routes that
+ *      would carry them in production. That's deliberate: rail content is
+ *      collection-driven and lives elsewhere; this test focuses on the
+ *      per-page composition.
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { experimental_AstroContainer as AstroContainer } from "astro/container";
 
-import { __TEST__ } from "../editorial-pages";
+import EditorialArticle from "../../components/editorial/EditorialArticle.astro";
 import type { EditorialDefinition } from "../editorial-types";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -45,8 +47,6 @@ function loadDefinition(relativePath: string): EditorialDefinition {
   const raw = JSON.parse(readFileSync(resolve(CONTENT_ROOT, relativePath), "utf8")) as EditorialDefinition;
   return {
     ...raw,
-    // Pin time-based fields so renderEditorialMain's `new Date()` fallback
-    // never fires. These values are arbitrary but stable.
     publishedAt: raw.publishedAt ?? "2026-01-15T00:00:00.000Z",
     modifiedAt: raw.modifiedAt ?? "2026-05-01T00:00:00.000Z",
   };
@@ -66,12 +66,19 @@ const FIXTURES = [
   ["blog", "blog/case-study-restaurant-group-nfc-review-cards-google-reviews-320-percent.json"],
 ] as const;
 
-describe("renderEditorialMain — full-page integration snapshots", () => {
+let container: AstroContainer;
+beforeAll(async () => {
+  container = await AstroContainer.create();
+});
+
+describe("EditorialArticle.astro — full-page integration snapshots", () => {
   it.each(FIXTURES)(
     "%s group: locks full page HTML for representative fixture (%s)",
-    (_group, path) => {
+    async (_group, path) => {
       const definition = loadDefinition(path);
-      const html = __TEST__.renderEditorialMain(definition, null);
+      const html = await container.renderToString(EditorialArticle, {
+        props: { definition, illustration: null },
+      });
       expect(html).toMatchSnapshot();
     },
   );

@@ -1,22 +1,12 @@
 /**
- * Snapshot tests for renderSection() — the 11 section variants.
+ * Snapshot tests for EditorialSection.astro — the 11 section variants.
  *
- * Path-3 prep (Stage 0). See docs/architecture/editorial-rendering-debt.md.
- *
- * renderSection() inlines the rendering logic for each section "variant"
- * (statBar, comparePanel, featureGrid, dataHighlight, timeline, testimonial,
- * checklist, callout, image, body slots, table) via template literals. This
- * file locks each variant's HTML output byte-for-byte so any future refactor
- * — physical file split, .astro componentization (path 3), or accidental
- * drift from dependency upgrades — surfaces as a snapshot diff.
- *
- * We test through renderSection() (the public surface in __TEST__) rather
- * than calling each variant's inline expression directly. This keeps the
- * tests black-box: they capture what production actually renders, including
- * the outer `<section>` wrapper, slot ordering, and empty-slot-collapse
- * behavior. The trade-off is each snapshot includes some constant boilerplate;
- * that's acceptable because the locked behavior is "production output for
- * this input", not "the inline expression in isolation".
+ * Post-cutover (2026-05-12). Replaces the legacy `__TEST__.renderSection`-based
+ * snapshot tests. EditorialSection.astro is now the single render path for
+ * every variant (statBar, comparePanel, featureGrid, dataHighlight, timeline,
+ * testimonial, checklist, callout, image, body slots, table). This file
+ * locks each variant's shadow-tree HTML output byte-for-byte so any future
+ * refactor or dependency upgrade surfaces as a snapshot diff.
  *
  * Each variant pairs:
  *   - minimal — smallest valid input
@@ -25,15 +15,16 @@
  *     (only for variants whose text fields route through it)
  *
  * Branch coverage explicitly targeted:
- *   - featureGrid icon path-vs-glyph (renderSection lines ~2147-2156)
+ *   - featureGrid icon path-vs-glyph
  *   - dataHighlight with/without `source`
  *   - comparePanel custom vs default headings
- *   - bullets workflow-vs-plain (renderSectionList ordered-list switch)
+ *   - bullets workflow-vs-plain (ordered-list switch via isWorkflowSection)
  *   - section layout=split / split-reverse data-attribute emission
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
+import { experimental_AstroContainer as AstroContainer } from "astro/container";
 
-import { __TEST__ } from "../editorial-pages";
+import EditorialSection from "../../components/editorial/EditorialSection.astro";
 import {
   sectionWithVariant,
   noCitations,
@@ -77,106 +68,98 @@ import {
 
 const ID = "test-section-id";
 
+let container: AstroContainer;
+beforeAll(async () => {
+  container = await AstroContainer.create();
+});
+
+/** Render an EditorialSection via Astro Container and return the HTML. */
+async function renderSec(section: unknown, citations = noCitations): Promise<string> {
+  return container.renderToString(EditorialSection, {
+    props: { section, id: ID, citations },
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Extended section variants
 // ---------------------------------------------------------------------------
 
-describe("renderSection — statBar", () => {
-  it("minimal: 1 item", () => {
-    const section = sectionWithVariant("statBar", minimalStatBar);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — statBar", () => {
+  it("minimal: 1 item", async () => {
+    expect(await renderSec(sectionWithVariant("statBar", minimalStatBar))).toMatchSnapshot();
   });
 
-  it("typical: 3 items", () => {
-    const section = sectionWithVariant("statBar", typicalStatBar);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+  it("typical: 3 items", async () => {
+    expect(await renderSec(sectionWithVariant("statBar", typicalStatBar))).toMatchSnapshot();
   });
 });
 
-describe("renderSection — comparePanel", () => {
-  it("minimal: default headings", () => {
-    const section = sectionWithVariant("comparePanel", minimalComparePanel);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — comparePanel", () => {
+  it("minimal: default headings", async () => {
+    expect(await renderSec(sectionWithVariant("comparePanel", minimalComparePanel))).toMatchSnapshot();
   });
 
-  it("typical: custom headings + inline link", () => {
-    const section = sectionWithVariant("comparePanel", typicalComparePanel);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+  it("typical: custom headings + inline link", async () => {
+    expect(await renderSec(sectionWithVariant("comparePanel", typicalComparePanel))).toMatchSnapshot();
   });
 
-  it("with citations: [^N] markers rewrite into sup", () => {
-    const section = sectionWithVariant("comparePanel", citationsComparePanel);
-    expect(__TEST__.renderSection(section as never, ID, typicalCitations)).toMatchSnapshot();
+  it("with citations: [^N] markers rewrite into sup", async () => {
+    expect(await renderSec(sectionWithVariant("comparePanel", citationsComparePanel), typicalCitations)).toMatchSnapshot();
   });
 });
 
-describe("renderSection — featureGrid", () => {
-  it("minimal: 1 glyph icon", () => {
-    const section = sectionWithVariant("featureGrid", minimalFeatureGrid);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — featureGrid", () => {
+  it("minimal: 1 glyph icon", async () => {
+    expect(await renderSec(sectionWithVariant("featureGrid", minimalFeatureGrid))).toMatchSnapshot();
   });
 
-  it("typical: mixed icons (glyph + abs path + https + data:image/)", () => {
-    // Branch coverage: lines ~2147-2156 of editorial-pages.ts.
-    // Each icon kind hits a different arm of the isPath check.
-    const section = sectionWithVariant("featureGrid", typicalFeatureGrid);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+  it("typical: mixed icons (glyph + abs path + https + data:image/)", async () => {
+    expect(await renderSec(sectionWithVariant("featureGrid", typicalFeatureGrid))).toMatchSnapshot();
   });
 
-  it("typical with citations", () => {
-    // Feature text routes through renderInlineLinks(feature.text, citations).
-    // The typical fixture already contains an inline markdown link; this case
-    // adds the citation rewrite path on top of it.
+  it("typical with citations", async () => {
     const featuresWithCitations = {
       features: typicalFeatureGrid.features.map((f, i) =>
         i === 0 ? { ...f, text: `${f.text} See [^1].` } : f,
       ),
     };
-    const section = sectionWithVariant("featureGrid", featuresWithCitations);
-    expect(__TEST__.renderSection(section as never, ID, typicalCitations)).toMatchSnapshot();
+    expect(await renderSec(sectionWithVariant("featureGrid", featuresWithCitations), typicalCitations)).toMatchSnapshot();
   });
 });
 
-describe("renderSection — dataHighlight", () => {
-  it("minimal: no source", () => {
-    const section = sectionWithVariant("dataHighlight", minimalDataHighlight);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — dataHighlight", () => {
+  it("minimal: no source", async () => {
+    expect(await renderSec(sectionWithVariant("dataHighlight", minimalDataHighlight))).toMatchSnapshot();
   });
 
-  it("typical: with source + citation marker", () => {
-    const section = sectionWithVariant("dataHighlight", typicalDataHighlight);
-    expect(__TEST__.renderSection(section as never, ID, typicalCitations)).toMatchSnapshot();
+  it("typical: with source + citation marker", async () => {
+    expect(await renderSec(sectionWithVariant("dataHighlight", typicalDataHighlight), typicalCitations)).toMatchSnapshot();
   });
 });
 
-describe("renderSection — timeline", () => {
-  it("minimal: 1 step", () => {
-    const section = sectionWithVariant("timeline", minimalTimeline);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — timeline", () => {
+  it("minimal: 1 step", async () => {
+    expect(await renderSec(sectionWithVariant("timeline", minimalTimeline))).toMatchSnapshot();
   });
 
-  it("typical: 3 steps + citation + inline link", () => {
-    const section = sectionWithVariant("timeline", typicalTimeline);
-    expect(__TEST__.renderSection(section as never, ID, typicalCitations)).toMatchSnapshot();
+  it("typical: 3 steps + citation + inline link", async () => {
+    expect(await renderSec(sectionWithVariant("timeline", typicalTimeline), typicalCitations)).toMatchSnapshot();
   });
 });
 
-describe("renderSection — testimonial", () => {
-  it("minimal: text + source", () => {
-    const section = sectionWithVariant("testimonial", minimalTestimonial);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — testimonial", () => {
+  it("minimal: text + source", async () => {
+    expect(await renderSec(sectionWithVariant("testimonial", minimalTestimonial))).toMatchSnapshot();
   });
 });
 
-describe("renderSection — checklist", () => {
-  it("minimal: 1 item", () => {
-    const section = sectionWithVariant("checklist", minimalChecklist);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — checklist", () => {
+  it("minimal: 1 item", async () => {
+    expect(await renderSec(sectionWithVariant("checklist", minimalChecklist))).toMatchSnapshot();
   });
 
-  it("typical: link + citation marker", () => {
-    const section = sectionWithVariant("checklist", typicalChecklist);
-    expect(__TEST__.renderSection(section as never, ID, typicalCitations)).toMatchSnapshot();
+  it("typical: link + citation marker", async () => {
+    expect(await renderSec(sectionWithVariant("checklist", typicalChecklist), typicalCitations)).toMatchSnapshot();
   });
 });
 
@@ -184,59 +167,52 @@ describe("renderSection — checklist", () => {
 // Basic section slots (image / callout / body / layout / table)
 // ---------------------------------------------------------------------------
 
-describe("renderSection — image", () => {
-  it("minimal: src + alt", () => {
-    const section = sectionWithVariant("image", minimalImage);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — image", () => {
+  it("minimal: src + alt", async () => {
+    expect(await renderSec(sectionWithVariant("image", minimalImage))).toMatchSnapshot();
   });
 });
 
-describe("renderSection — callout", () => {
-  it("minimal: no href", () => {
-    const section = sectionWithVariant("callout", minimalCallout);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — callout", () => {
+  it("minimal: no href", async () => {
+    expect(await renderSec(sectionWithVariant("callout", minimalCallout))).toMatchSnapshot();
   });
 
-  it("typical: with href, inline link, citation", () => {
-    const section = sectionWithVariant("callout", typicalCallout);
-    expect(__TEST__.renderSection(section as never, ID, typicalCitations)).toMatchSnapshot();
+  it("typical: with href, inline link, citation", async () => {
+    expect(await renderSec(sectionWithVariant("callout", typicalCallout), typicalCitations)).toMatchSnapshot();
   });
 });
 
-describe("renderSection — body slots (intro/paragraphs/bullets)", () => {
-  it("intro only", () => {
-    expect(__TEST__.renderSection(introOnlySection as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — body slots (intro/paragraphs/bullets)", () => {
+  it("intro only", async () => {
+    expect(await renderSec(introOnlySection)).toMatchSnapshot();
   });
 
-  it("paragraphs with link + citation", () => {
-    expect(__TEST__.renderSection(paragraphsSection as never, ID, typicalCitations)).toMatchSnapshot();
+  it("paragraphs with link + citation", async () => {
+    expect(await renderSec(paragraphsSection, typicalCitations)).toMatchSnapshot();
   });
 
-  it("bullets — plain (unordered list)", () => {
-    expect(__TEST__.renderSection(bulletsPlainSection as never, ID, noCitations)).toMatchSnapshot();
+  it("bullets — plain (unordered list)", async () => {
+    expect(await renderSec(bulletsPlainSection)).toMatchSnapshot();
   });
 
-  it("bullets — workflow title (ordered list with step-list class)", () => {
-    // isWorkflowSection() switches renderSectionList from ul → ol.codex-editorial-step-list
-    expect(__TEST__.renderSection(bulletsWorkflowSection as never, ID, noCitations)).toMatchSnapshot();
-  });
-});
-
-describe("renderSection — layout attribute", () => {
-  it("split", () => {
-    expect(__TEST__.renderSection(splitLayoutSection as never, ID, noCitations)).toMatchSnapshot();
-  });
-
-  it("split-reverse", () => {
-    expect(__TEST__.renderSection(splitReverseLayoutSection as never, ID, noCitations)).toMatchSnapshot();
+  it("bullets — workflow title (ordered list with step-list class)", async () => {
+    expect(await renderSec(bulletsWorkflowSection)).toMatchSnapshot();
   });
 });
 
-describe("renderSection — table-only", () => {
-  // renderTable is already covered standalone by the leaf snapshot file;
-  // this case locks the wrapping behavior when a section carries only a table.
-  it("table inside section", () => {
-    const section = sectionWithVariant("table", minimalTable);
-    expect(__TEST__.renderSection(section as never, ID, noCitations)).toMatchSnapshot();
+describe("EditorialSection — layout attribute", () => {
+  it("split", async () => {
+    expect(await renderSec(splitLayoutSection)).toMatchSnapshot();
+  });
+
+  it("split-reverse", async () => {
+    expect(await renderSec(splitReverseLayoutSection)).toMatchSnapshot();
+  });
+});
+
+describe("EditorialSection — table-only", () => {
+  it("table inside section", async () => {
+    expect(await renderSec(sectionWithVariant("table", minimalTable))).toMatchSnapshot();
   });
 });

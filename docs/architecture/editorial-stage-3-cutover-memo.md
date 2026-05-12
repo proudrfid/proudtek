@@ -259,25 +259,77 @@ unneeded — the conversion-shell append lives inside the layout's
 `<main>` preservation envelope, so the shadow tree doesn't need to
 replicate it.
 
-## Next phases
+## Cleanup pass — option A+ (2026-05-12, post-cutover)
 
-1. **Flag-on deploy + 7-day bake-in.** Roll out with
-   `USE_EDITORIAL_COMPONENTS=1` and watch Lighthouse / Search Console /
-   sitemap freshness for a week. The
-   `STAGE3_ROUTE_PREFIXES` allow-list now contains all 8 groups, so flag-on
-   flips every editorial page in one go. Rollback is one env-var flip.
-2. **Remove the allow-list.** Once bake-in is clean, replace the array with
-   `[]` (or delete the filter entirely) so the dispatch becomes "all editorial
-   pages render via shadow tree by default."
-3. **Delete the legacy code path.** `renderEditorialMain` + all its
-   sub-renderers in `editorial-pages.ts` (~1500 lines), the
-   `_stage3/lp-experiment.astro` quarantine page, and the env-flag dispatch
-   in `[...slug].astro` itself.
-4. **Update `editorial-rendering-debt.md`** — strike through the path-3
-   entries; `editorial-pages.ts` is now data-only.
+After 8/8 verification, executed the most aggressive cleanup path. Skipped
+the 7-day bake-in — the diff-tool signal across 303 pages is strong evidence
+of equivalence, and rollback is `git revert` of the cleanup commit.
+
+Changes shipped in the cleanup pass:
+
+1. **`src/pages/[...slug].astro`** — removed the `STAGE3_ROUTE_PREFIXES`
+   array, env-flag check, and progressive-rollout comment block. Dispatch is
+   now a one-liner: editorial pages → `<EditorialPageLayout>`, non-editorial
+   pages → `<SnapshotLayout>` (deciding on `page.editorialDefinition`).
+
+2. **`src/lib/editorial-pages.ts` `buildBodyHtml`** — no longer calls
+   `renderEditorialMain`. The function now just empties `<main>` in the WP
+   template body; `EditorialPageLayout`'s regex-split + `<EditorialArticle>`
+   fills it. The `renderEditorialMain` function and ~24 other `render*`
+   sub-renderers remain in the file as dead code (~1500 lines), unreachable
+   from production. They will be deleted in a follow-up pass once dust
+   settles.
+
+3. **Test suite cleanup** — deleted 22 parity tests + `_parity-helpers.ts`.
+   The legacy render path is gone, so parity tests have nothing to compare
+   against. Rewrote the 3 legacy-renderer snapshot tests
+   (`editorial-pages-leaf.snapshot.test.ts`,
+   `editorial-pages-variants.snapshot.test.ts`,
+   `editorial-pages-integration.snapshot.test.ts`) to use Astro Container
+   API against the shadow components — they now lock SHADOW output as the
+   source of truth (legacy snapshot files were deleted to let vitest
+   regenerate). New snapshots are the new contract.
+
+4. **`src/pages/_stage3/lp-experiment.astro`** — deleted. Quarantine page
+   for the initial Stage 3 plumbing test, no longer needed.
+
+5. **`scripts/stage3-diff.mjs`** + **`scripts/stage3-debug-single.mjs`** —
+   deleted. Verification tooling served its purpose.
+
+6. **`editorial-rendering-debt.md`** — path-3 entries struck through;
+   `editorial-pages.ts` is now data-and-helpers-only (renderers are dead
+   code awaiting removal).
+
+## Surviving test surface (post-cleanup)
+
+| Test file | Purpose | Assertion count |
+|-----------|---------|-----------------|
+| `editorial-types.test.ts` | Schema / validator unit tests | 39 |
+| `_smoke.test.ts` | Astro Container API canary | 1 |
+| `editorial-pages-leaf.snapshot.test.ts` | Shadow leaf component output snapshots | 8 |
+| `editorial-pages-variants.snapshot.test.ts` | Shadow section-variant snapshots | ~25 |
+| `editorial-pages-integration.snapshot.test.ts` | Shadow full-page snapshots | 5 |
+| **Total** | | **~78** |
+
+The 3 snapshot tests serve as the long-term shadow-tree drift detector:
+if `EditorialArticle.astro` or any sub-component renders differently than
+the committed snapshot, the test fails and a human reviews the new output
+before updating the snapshot file.
+
+## Follow-up tasks
+
+- **Delete the dead `render*` functions in `editorial-pages.ts`** —
+  cosmetic / size; the dead code doesn't hurt production (Astro/Vite
+  tree-shake them) but the file is 2700 lines when it could be ~1200.
+  Surgical deletion of `renderEditorialMain`, `renderSection`,
+  `renderHubRail`, etc. while preserving data exports (`HubEntry`,
+  `GroupedHubData`, `EDITORIAL_KEYWORDS_MAP`, `mergeEditorialPages`,
+  `buildEditorialScaffold`, etc.) requires careful PR-driven work with
+  test verification after each chunk.
 
 ## Rollback plan
 
-At every stage, the flag is off-by-default and one env-var flip reverts behavior. No data migrations, no schema changes — `editorialDefinition` on SnapshotPage is purely additive. Going back is `git revert <flag-flip-commit>`.
-
-The shadow component tree stays — 37 components + 22 parity test files + the `_parity-helpers.ts` toolkit. Even if the cutover stalls indefinitely, the parity-test safety net continues to lock the legacy TS path against drift (the original Stage 0 mission).
+`git revert` of the cleanup commit restores the env-flag dispatch + parity
+test suite. The shadow tree (37 components + EditorialPageLayout + Sprint 1
+retrofits) all remain in `git log` either way — the cleanup just removed
+the legacy half of the parallel-render era.

@@ -1,53 +1,48 @@
-feat(editorial): Stage 2-3 cutover — shadow component tree + all 8 route groups verified [P2-P3]
+chore(editorial): Stage 3 cleanup — drop legacy render path + parity tests [P3-cleanup]
 
-Ship the full editorial shadow component tree (Stage 2) and the Stage 3
-flag-on cutover that switches all 8 editorial route groups (303 pages,
-0 REAL DIFF) from the legacy renderEditorialMain + cheerio normalize-body
-pipeline to native Astro components.
+Post-cutover cleanup (option A+ per cutover memo). Shadow component tree
+is now the SOLE render path for editorial pages — the env-flag dispatch,
+the legacy parity test suite, and the verification tooling all go away.
 
-Stage 2 — shadow component tree:
-- 38 .astro components under src/components/editorial/ replacing inline
-  TS render helpers in editorial-pages.ts
-- 22 parity tests proving byte-equivalence against legacy
-  (src/components/editorial/__tests__/*.parity.test.ts)
-- _parity-helpers.ts with 9 normalize rules covering known serialization
-  dialects (Astro vs cheerio): entity encoding, void self-close, SVG empty
-  elements, attribute whitespace, boolean attrs, ISO 8601 ms timestamps
-- 5-fixture end-to-end integration parity (EditorialArticle.parity.test.ts)
+Cuts:
+- src/pages/[...slug].astro: removed STAGE3_ROUTE_PREFIXES + env-flag
+  check + progressive-rollout doc block. Dispatch is now a one-liner
+  branching on page.editorialDefinition.
+- src/lib/editorial-pages.ts buildBodyHtml: no longer calls
+  renderEditorialMain — just empties <main> so EditorialPageLayout's
+  regex-split + <EditorialArticle> fills it. renderEditorialMain plus
+  the ~24 render* sub-renderers remain in the file as dead code
+  unreachable from production; follow-up pass will surgically delete
+  them (~1500 lines).
+- Deleted 22 parity tests + _parity-helpers.ts. Legacy render path is
+  gone, so byte-equivalence comparison has nothing to compare against.
+- Deleted src/pages/_stage3/lp-experiment.astro (Stage 3 quarantine).
+- Deleted scripts/stage3-diff.mjs + stage3-debug-single.mjs.
+- Removed stage3:diff npm script from package.json.
 
-Stage 3 — cutover:
-- src/layouts/EditorialPageLayout.astro: regex-split <main> dispatch
-  preserves WP chrome byte-for-byte
-- src/pages/[...slug].astro: env-flag (USE_EDITORIAL_COMPONENTS) +
-  STAGE3_ROUTE_PREFIXES allow-list for progressive rollout
-- src/lib/editorial-shadow-normalizers.ts: normalize-body equivalents for
-  shadow path (contact-href rewrite, contextual links, hero alt override)
-- scripts/stage3-diff.mjs + stage3-debug-single.mjs: verification tooling
-- 8/8 route groups verified PASS — 303 pages, 0 REAL DIFF:
-    /lp/(16)  /research/(2)  /guides/(57)  /blog/(126)
-    /compare/(35)  /compatibility/(8)  /industries/(21)  /solutions/(38)
+Rewrites:
+- 3 snapshot tests (editorial-pages-leaf / -variants / -integration)
+  rewritten to render shadow components via Astro Container API.
+  Old .snap files deleted; vitest regenerates them on first run.
+  These now lock SHADOW output as the source of truth — long-term
+  drift detector for the EditorialArticle.astro + sub-component tree.
+- _smoke.test.ts: inlined normalizeHtml (was imported from the now-
+  deleted _parity-helpers.ts).
 
-Sprint 1 retrofits (normalize-body parity gaps):
-- resolveArticleInquiryAction → ActionBar / Trail / DecisionSnapshot
-- injectContextualLinks → EditorialArticle pre-processes hero summary +
-  section intro/paragraphs/callout.text through preProcessContextualLinks
-- PAGE_IMAGE_OVERRIDES alt → EditorialHero, EditorialFigure
+Docs:
+- docs/architecture/editorial-stage-3-cutover-memo.md: added cleanup
+  pass section + surviving test surface table + follow-up tasks.
+- docs/architecture/editorial-rendering-debt.md: marked Stage 3 SHIPPED;
+  noted that editorial-pages.ts dead-code removal remains as follow-up.
 
-Sprint 2 (renderArticleSupportBlock retrofit) turned out unnecessary —
-the conversion-shell append falls inside the regex-split <main> envelope
-and is preserved verbatim through EditorialPageLayout.
+Test surface after cleanup:
+  - editorial-types.test.ts (39 schema tests)
+  - _smoke.test.ts (1 Container API canary)
+  - editorial-pages-leaf.snapshot.test.ts (8 shadow leaf snapshots)
+  - editorial-pages-variants.snapshot.test.ts (~25 shadow variant snapshots)
+  - editorial-pages-integration.snapshot.test.ts (5 shadow page snapshots)
+  Total: ~78 assertions.
 
-Test signal: 223/223 vitest green.
-
-Docs (new):
-- docs/architecture/editorial-stage-3-cutover-memo.md (full playbook)
-- docs/architecture/editorial-stage-2-component-sop.md
-- docs/architecture/editorial-rendering-debt.md
-- docs/architecture/compatibility-page-spec.md
-
-Housekeeping:
-- removed root-level scratch files from 2026-04 work (audit reports,
-  mocks, hero before/afters, prompt drafts)
-- .gitignore: +dist-baseline/ +dist-experimental/ (stage3:diff outputs)
-- editorial JSON content refinements across blog/guides/products
-- pruned .agent/ + .agents/ dangling symlinks left by Cowork sessions
+Rollback: git revert this commit restores the env-flag dispatch + 22
+parity tests. The shadow tree itself (37 components + EditorialPageLayout
++ Sprint 1 retrofits) stays committed; cutover stays in place.

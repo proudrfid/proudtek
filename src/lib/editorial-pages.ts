@@ -697,7 +697,15 @@ function buildBodyAttrs(baseAttrs: Record<string, string>, definition: Editorial
   };
 }
 
-function buildBodyHtml(templateBodyHtml: string, definition: EditorialDefinition, illustration: { src: string; alt: string } | null): string {
+/**
+ * Stage 3 cutover (2026-05-12): empty the WP template's `<main>` so
+ * `EditorialPageLayout.astro` can fill it via `<EditorialArticle>`. Returns
+ * `templateBodyHtml` unchanged if no `<main>` was found (defensive — WP
+ * templates always carry one). The `definition` / `illustration` params are
+ * retained for the function signature stability but no longer used here —
+ * editorial content rendering moved entirely to the shadow component tree.
+ */
+function buildBodyHtml(templateBodyHtml: string, _definition: EditorialDefinition, _illustration: { src: string; alt: string } | null): string {
   const $ = load(`<body>${templateBodyHtml}</body>`);
   const main = $("main#main, main.site-main").first();
 
@@ -705,7 +713,7 @@ function buildBodyHtml(templateBodyHtml: string, definition: EditorialDefinition
     return templateBodyHtml;
   }
 
-  main.html(renderEditorialMain(definition, illustration));
+  main.empty();
   return $("body").html() ?? templateBodyHtml;
 }
 
