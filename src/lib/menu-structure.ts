@@ -244,14 +244,75 @@ export const RESOURCES_MENU: MenuDropdown = {
   href: "/resources/",
   groups: [
     {
+      heading: "Decide",
       links: [
         { href: "/blog/", label: "Blog — Industry Articles" },
         { href: "/guides/", label: "Buying Guides" },
         { href: "/compare/", label: "Product Comparisons" },
         { href: "/compatibility/", label: "Hotel Lock Compatibility" },
-        { href: "/case-studies/", label: "Case Studies" },
+        { href: "/case-studies/", label: "Case Studies — Real Deployments" },
         { href: "/research/", label: "Research & Industry Reports" },
         { href: "/faq/", label: "FAQ" },
+      ],
+    },
+    {
+      heading: "Downloads",
+      links: [
+        { href: "/resources/downloads/", label: "Resource Center — All Downloads" },
+        { href: "/downloads/gs1-sgtin-96-encoding-template.xlsx", label: "GS1 SGTIN-96 Template (XLSX)" },
+        { href: "/downloads/hotel-key-card-artwork-template.pdf", label: "Hotel Key Card Artwork Template" },
+        { href: "/downloads/dscsa-item-level-rfid-brief.pdf", label: "DSCSA Compliance Brief" },
+      ],
+    },
+    {
+      heading: "Get started",
+      links: [
+        { href: "/sample-pack/", label: "Free Sample Pack" },
+        { href: "/rfq/", label: "Request a Quote (5-step wizard)" },
+        { href: "/contact/?intent=engineering", label: "Talk to Engineering" },
+      ],
+    },
+  ],
+};
+
+// ---------------------------------------------------------------------------
+// ABOUT — trust / credibility pages
+// ---------------------------------------------------------------------------
+
+/**
+ * Top-level "About" dropdown for the primary nav bar (added 2026-05-12 when
+ * the /about/ hub was rewritten for B2B procurement audience and four new
+ * trust pages — factory / certifications / leadership / case-studies — were
+ * added alongside the original five E-E-A-T transparency pages).
+ *
+ * Two-column structure:
+ *   - "Who we are" — credibility-forward pages procurement buyers visit
+ *     during supplier qualification.
+ *   - "Editorial standards" — transparency / audit pages procurement
+ *     compliance teams look at to verify content integrity.
+ */
+export const ABOUT_MENU: MenuDropdown = {
+  label: "About",
+  href: "/about/",
+  groups: [
+    {
+      heading: "Who we are",
+      links: [
+        { href: "/about/", label: "About Proud Tek" },
+        { href: "/about/factory/", label: "Factory & Production" },
+        { href: "/about/certifications/", label: "Certifications & Compliance" },
+        { href: "/about/leadership/", label: "Leadership & Team" },
+        { href: "/about/case-studies/", label: "Case Studies" },
+      ],
+    },
+    {
+      heading: "Editorial standards",
+      links: [
+        { href: "/about/editorial-policy/", label: "Editorial Policy" },
+        { href: "/about/methodology/", label: "Testing Methodology" },
+        { href: "/about/review-board/", label: "Editorial & Review Board" },
+        { href: "/about/disclosures/", label: "Disclosures" },
+        { href: "/about/corrections/", label: "Corrections Log" },
       ],
     },
   ],
@@ -307,6 +368,10 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/guides/", label: "Guides" },
       { href: "/compare/", label: "Comparisons" },
       { href: "/compatibility/", label: "Hotel Lock Compatibility" },
+      { href: "/case-studies/", label: "Case Studies" },
+      { href: "/resources/downloads/", label: "Resource Center" },
+      { href: "/sample-pack/", label: "Free Sample Pack" },
+      { href: "/rfq/", label: "Request a Quote" },
       { href: "/faq/", label: "FAQ" },
     ],
   },
@@ -329,6 +394,10 @@ export const FOOTER_SECTIONS: FooterSection[] = [
     heading: "Company",
     links: [
       { href: "/about/", label: "About Proud Tek" },
+      { href: "/about/factory/", label: "Factory & Production" },
+      { href: "/about/certifications/", label: "Certifications & Compliance" },
+      { href: "/about/leadership/", label: "Leadership & Team" },
+      { href: "/about/case-studies/", label: "Case Studies" },
       { href: "/about/editorial-policy/", label: "Editorial Policy" },
       { href: "/about/methodology/", label: "Testing Methodology" },
       { href: "/about/review-board/", label: "Editorial & Review Board" },
@@ -348,4 +417,5 @@ export const PRIMARY_MENU_DROPDOWNS: MenuDropdown[] = [
   INDUSTRIES_MENU,
   SOLUTIONS_MENU,
   RESOURCES_MENU,
+  ABOUT_MENU,
 ];

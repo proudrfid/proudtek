@@ -531,7 +531,11 @@ export function resolveFaqEntries($body: CheerioAPI): FaqEntry[] {
 
 export function buildDocumentTitle(route: string, contentTitle: string, kind: PageKind): string {
   if (route === "/") {
-    return "Custom RFID & NFC Manufacturer | Proud Tek";
+    // Homepage SEO title — keyword-loaded for "RFID/NFC manufacturer China",
+    // "RFID cards / tags / labels / readers / wristbands / keyfobs" and the
+    // OEM/ODM intent. Replaces the legacy generic "Custom RFID & NFC
+    // Manufacturer | Proud Tek" (P0 T1, 2026-05-13).
+    return "Custom RFID & NFC Manufacturer in China — Cards, Tags, Labels, Wristbands, Keyfobs, Readers (OEM/ODM) | Proud Tek";
   }
 
   if (kind === "product") {

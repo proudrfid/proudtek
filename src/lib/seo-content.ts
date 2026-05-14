@@ -279,6 +279,8 @@ export const PAGE_IMAGE_OVERRIDES: Record<string, { url: string; alt: string }> 
 };
 
 export const PAGE_DESCRIPTION_OVERRIDES: Record<string, string> = {
+  "/":
+    "Proud Tek is a custom RFID & NFC manufacturer in China since 2008. Two Shenzhen factories, 10 automated production lines, 305+ pieces of equipment, OEM/ODM cards, tags, labels, wristbands, keyfobs and readers shipped to 60+ countries.",
   "/product/125khz-rfid-sticker/":
     "125 kHz RFID stickers for compact LF access-control or identification projects where adhesive labels work better than cards or keyfobs.",
   "/product/em4200-card/":

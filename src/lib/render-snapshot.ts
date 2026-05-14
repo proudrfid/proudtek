@@ -178,6 +178,14 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
     redesignContactPage($body);
   }
 
+  // ── Page-specific: homepage H1 + stat H2 keyword enhancement (P0 T1) ──
+  // The legacy WP H1 "Custom RFID and NFC manufacturing for global buyers"
+  // and standalone numeric H2s ("10", "305+", "8+", "12+") are reshaped
+  // to carry the product-family keywords search engines and LLMs key off.
+  if (page.route === "/" || page.route === "") {
+    enhanceHomepageHeadings($body);
+  }
+
   // ── Defang testimonial Splide carousel ──
   // Kadence's splide-init JS queries `.wp-block-kadence-testimonials .kt-blocks-carousel-init`
   // and restructures the DOM into a <div class="splide__track"><div class="splide__list">…</div></div>.
@@ -432,13 +440,15 @@ function injectCustomNav($body: ReturnType<typeof load>): void {
       .toLowerCase();
 
   // Top-level items we'll replace with the new mega-menus (Industries) or cover
-  // from the new Resources dropdown (Blog + FAQ). Strip these before injection
-  // to avoid the duplicate top-level items visible to the user.
+  // from the new Resources / About dropdowns (Blog + FAQ + the existing flat
+  // About link). Strip these before injection to avoid duplicate top-level
+  // items visible to the user.
   const REPLACED_PATHS = new Set([
     "/industries/",
     "/blog/",
     "/faq/",
     "/case-studies/",
+    "/about/", // covered by the new ABOUT_MENU dropdown (added 2026-05-13)
   ]);
 
   const stripReplacedItems = (list: ReturnType<typeof $body>): void => {
@@ -722,6 +732,95 @@ function renderFooterBottomStrip(): string {
 }
 
 /**
+/**
+ * Homepage H1 + stat-H2 keyword enhancer (P0 T1).
+ *
+ * The legacy Kadence-baked H1 ("Custom RFID and NFC manufacturing for
+ * global buyers") is keyword-thin — no product-family nouns, no China
+ * geography, no OEM/ODM intent. Likewise, the "Our Capabilities" stat
+ * block carries four orphan-numeric H2s ("10", "305+", "8+", "12+")
+ * whose context lives in adjacent <p> siblings, so search engines /
+ * LLMs treat them as low-signal noise.
+ *
+ * This function:
+ *   - Rewrites the first <h1> to surface the manufacturer + product
+ *     family keywords (cards, tags, labels, wristbands, keyfobs,
+ *     readers + OEM/ODM + China).
+ *   - For each orphan numeric H2 in the stat strip, merges the
+ *     descriptor from the following <p> into the heading so the H2
+ *     reads "10 Automated Production Lines" instead of bare "10".
+ *
+ * Mutations are guarded by a content match so the function is a no-op
+ * if the snapshot drifts (defensive — we don't want to silently change
+ * unrelated H1/H2 if the homepage is re-themed upstream).
+ */
+function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
+  // ── H1: keyword-load the hero heading ──
+  // The WP-snapshot H1 has drifted between "Custom RFID and NFC manufacturing
+  // for global buyers" and "RFID and NFC from a leading China manufacturer".
+  // Match on the leading "RFID" + "NFC" + "manufactur" pattern so we catch
+  // both phrasings (and any future drift that keeps the same intent) without
+  // touching unrelated H1s.
+  const h1 = $body("h1").first();
+  if (h1.length) {
+    const original = (h1.text() || "").trim();
+    if (/^(?:Custom\s+)?RFID\s+and\s+NFC\b/i.test(original) && /\bmanufactur/i.test(original)) {
+      h1.text(
+        "Custom RFID & NFC Manufacturer in China — Cards, Tags, Labels, Wristbands, Keyfobs & Readers for OEM/ODM Buyers",
+      );
+    }
+  }
+
+  // ── Stat H2s: merge orphan number into descriptor ──
+  // Each stat is `<h2>10</h2><p>Automated Production Lines</p>`. We rewrite
+  // the H2 text to "10 Automated Production Lines" so the heading carries
+  // its own context. The <p> is kept (visual layout) but with an
+  // expanded marketing line that adds product-family keywords.
+  const STAT_KEYWORD_EXPANSIONS: Record<string, string> = {
+    "Years of Industry Experience":
+      "Years of industry experience manufacturing custom RFID & NFC cards, tags, labels, wristbands, keyfobs and readers in China.",
+    "Self-owned Factories":
+      "Self-owned RFID & NFC factories in Shenzhen — vertically integrated from inlay to printing to encoding.",
+    "Automated Production Lines":
+      "Automated production lines for RFID cards, tags, labels, wristbands, keyfobs and readers.",
+    "Advanced Production Equipments":
+      "Advanced production equipments across LF (125 kHz), HF (13.56 MHz) and UHF (860–960 MHz) RFID/NFC manufacturing.",
+    "Certified Patents":
+      "Certified patents covering antenna design, inlay lamination and form-factor innovations across the RFID/NFC catalog.",
+    "International Certifications":
+      "International certifications — ISO 9001, ISO 14001, RoHS, REACH, CE, FCC and Disney FAMA audited.",
+    "Strict Inspection Procedures":
+      "Strict inspection procedures across raw material, inlay, lamination, encoding and finished-goods testing.",
+    "Inspection Procedures":
+      "Inspection procedures across raw material, inlay, lamination, encoding and finished-goods testing.",
+  };
+
+  $body("h2.wp-block-heading").each((_, el) => {
+    const $h2 = $body(el);
+    const text = ($h2.text() || "").trim();
+    // Match orphan stat values like "10", "305+", "8+", "12+".
+    if (!/^\d{1,4}\+?$/.test(text)) return;
+
+    // Locate the next <p> sibling that carries the descriptor.
+    const desc = $h2.nextAll("p").first();
+    if (!desc.length) return;
+    const descText = (desc.text() || "").trim();
+    if (!descText) return;
+
+    // Rewrite the H2 to "<number> <descriptor>" for self-contained context.
+    $h2.text(`${text} ${descText}`);
+
+    // Replace the original <p> with an expanded marketing line that adds
+    // product-family / standards keywords (boosts term density without
+    // breaking the visual rhythm). Fall back to descText if not mapped.
+    const expansion = STAT_KEYWORD_EXPANSIONS[descText];
+    if (expansion) {
+      desc.text(expansion);
+    }
+  });
+}
+
+/**
  * Replace the legacy WordPress / Kadence contact page body with a single
  * clean two-column layout: contact methods on the left, message form on
  * the right, plus a single Google-Maps embed pinned to the actual office
@@ -734,6 +833,34 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
   // Pull the existing form (preserve hidden fields + endpoint) so the
   // backend wiring keeps working — only re-skin the field markup.
   const legacyForm = article.find("form.kb-form").first();
+
+  // ── P0 T6: B2B-orient the 5 form labels ──
+  // The form already has 5 visible fields. For a B2B procurement audience,
+  // Country and Quantity carry more signal than the legacy Phone + Subject
+  // pairing. Backend field names (kb_field_2 / kb_field_3) are unchanged so
+  // WordPress wiring continues to work — the sales team just maps the
+  // semantic of those two fields in their CRM rules.
+  if (legacyForm.length) {
+    const FIELD_LABEL_REWRITES: Record<string, { label: string; placeholder: string }> = {
+      kb_field_2: { label: "Country", placeholder: "e.g. United States, Germany, UAE" },
+      kb_field_3: { label: "Estimated quantity", placeholder: "e.g. 50,000 cards / year" },
+      kb_field_4: { label: "Project notes (chip, application, timing)", placeholder: "Tell us the chip family or application — MIFARE / NTAG / UHF, hotel / laundry / retail, target launch date." },
+    };
+
+    for (const [name, rewrite] of Object.entries(FIELD_LABEL_REWRITES)) {
+      const field = legacyForm.find(`[name="${name}"]`).first();
+      if (!field.length) continue;
+      field.attr("data-label", rewrite.label);
+      field.attr("aria-label", rewrite.label);
+      field.attr("placeholder", rewrite.placeholder);
+      // The Kadence form pairs each input with a <label for="..."> just before it.
+      const fieldId = field.attr("id");
+      if (fieldId) {
+        legacyForm.find(`label[for="${fieldId}"]`).first().text(rewrite.label);
+      }
+    }
+  }
+
   const formHtml = legacyForm.length
     ? legacyForm.prop("outerHTML")
     : "";

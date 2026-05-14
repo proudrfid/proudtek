@@ -141,6 +141,62 @@ export function renderHomeQuoteBrief(): string {
   );
 }
 
+/* ── Home resource trio — surfaces P0 entry pages ──────────────── */
+
+/**
+ * Three-card strip injected on the homepage between the hero and the
+ * industry selector. Surfaces the highest-intent entry pages added in
+ * the P0 lift (case studies, sample pack, comparison library) so they
+ * are discoverable from the homepage, not just the Resources menu.
+ */
+export function renderHomeResourceTrio(): string {
+  const cards = [
+    {
+      eyebrow: "Real deployments",
+      title: "Case Studies — 6 industries",
+      description:
+        "Documented Proud Tek programmes across hospitality, industrial laundry, events, retail apparel, libraries, pharmaceuticals and restaurants. Chip choice, alternatives rejected, volume, and measured operational results.",
+      href: "/case-studies/",
+      accent: "#3d6b6b",
+    },
+    {
+      eyebrow: "Free, 5-field form",
+      title: "Sample Pack & RFQ Wizard",
+      description:
+        "Hold the chip first: a free 8–12-SKU sample pack (LF / HF / UHF) ships in 5–10 days. Or skip to a structured quote with the 5-step RFQ wizard — product family, frequency, quantity, printing, contact — under 2 minutes.",
+      href: "/sample-pack/",
+      accent: "#2d6a4f",
+    },
+    {
+      eyebrow: "Settle the chip question",
+      title: "Compare 31+ chip & material pairs",
+      description:
+        "MIFARE Classic vs Plus vs DESFire EV3, NTAG213/215/216, UCODE 8/9 vs Monza R6 vs Higgs-9, EM4100 vs T5577, PPS vs silicone laundry tag, UHF vs HF — side-by-side specifications, cloning economics, deployment fit.",
+      href: "/compare/",
+      accent: "#c39a5f",
+    },
+  ];
+
+  return `<section class="codex-industry-selector codex-industry-selector--resources" aria-label="Resources for your project">
+    <div class="codex-industry-selector__header">
+      <h2>Skip the catalog — start with what your peers already chose</h2>
+      <p>Case studies, a free sample pack and 31+ comparison pages drive most decisions before a quote conversation begins.</p>
+    </div>
+    <div class="codex-industry-selector__grid">
+      ${cards
+        .map(
+          (card) => `<a class="codex-industry-selector__card" href="${escapeXml(card.href)}" style="--accent: ${card.accent}">
+            <span class="codex-industry-selector__eyebrow">${escapeXml(card.eyebrow)}</span>
+            <strong>${escapeXml(card.title)}</strong>
+            <span>${escapeXml(card.description)}</span>
+            <span class="codex-industry-selector__arrow">&rarr;</span>
+          </a>`,
+        )
+        .join("")}
+    </div>
+  </section>`;
+}
+
 export function renderHomeGrowthHub(): string {
   return renderHomeIndustrySelector();
 }

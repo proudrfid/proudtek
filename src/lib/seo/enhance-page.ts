@@ -101,6 +101,7 @@ import {
   renderTrustBar,
   renderHomeGrowthHub,
   renderHomeQuoteBrief,
+  renderHomeResourceTrio,
   renderBlogGrowthHub,
 } from "./render-blocks";
 
@@ -242,9 +243,14 @@ export function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context
   // injections when an editorial body is detected.
   const isEditorialBody = $body(".codex-editorial-page").length > 0;
   const trustBarHtml = context.kind === "home" && !isEditorialBody ? renderTrustBar() : "";
+  // P0-N2 (2026-05-13): home resource trio surfaces the P0 entry pages
+  // (Case Studies / Sample Pack / Compare Library) right under the hero,
+  // before the existing industry selector. Without this strip the three
+  // pages are reachable only from the nav, not from the homepage flow.
+  const resourceTrioHtml = context.kind === "home" && !isEditorialBody ? renderHomeResourceTrio() : "";
   const growthHtml =
     context.kind === "home" && !isEditorialBody
-      ? renderHomeGrowthHub() + trustBarHtml
+      ? resourceTrioHtml + renderHomeGrowthHub() + trustBarHtml
       : context.kind === "blog" && page.route !== "/blog/" && !isEditorialBody
         ? renderBlogGrowthHub()
         : "";
@@ -327,14 +333,25 @@ export function enhanceHomeHero($body: CheerioAPI): void {
     return;
   }
 
-  heroHeading.text("Custom RFID and NFC manufacturing for global buyers");
+  // P0 T1 (2026-05-13): the homepage hero H1 + lead paragraph carry the
+  // primary keyword surface for search / LLM retrieval, so they must name
+  // the product families (cards, tags, labels, wristbands, keyfobs,
+  // readers), the China manufacturing geography and the OEM/ODM buyer
+  // intent. Replaces the legacy "Custom RFID and NFC manufacturing for
+  // global buyers" / "Samples, compatibility checks, and production
+  // support." pair, which was keyword-thin.
+  heroHeading.text(
+    "Custom RFID & NFC Manufacturer in China — Cards, Tags, Labels, Wristbands, Keyfobs & Readers for OEM/ODM Buyers",
+  );
   const heroLead = heroHeading
     .nextAll("p")
     .filter((_, element) => cleanText($body(element).text()).length > 0)
     .first();
 
   if (heroLead.length) {
-    heroLead.text("Samples, compatibility checks, and production support.");
+    heroLead.text(
+      "Two Shenzhen factories. 18+ years manufacturing custom RFID cards, NFC tags, RFID labels, wristbands, keyfobs and readers. ISO 9001 audited. OEM / ODM samples, compatibility checks and production support within one business day.",
+    );
   }
 
   heroHeading

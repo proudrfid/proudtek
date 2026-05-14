@@ -15,7 +15,7 @@ export type PageLoader = (route: string) => Promise<SnapshotPage>;
  * indexes ARE in siteData.pages) — only `/compare/` and `/guides/` are
  * missing because they were added as native hubs later.
  */
-const NATIVE_HUB_ROUTES: ReadonlyArray<string> = ["/compare/", "/guides/"];
+const NATIVE_HUB_ROUTES: ReadonlyArray<string> = ["/compare/", "/guides/", "/rfq/"];
 
 export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader): Promise<string> {
   const indexable = getIndexablePages(siteData);
@@ -126,7 +126,7 @@ Sitemap: ${SITE_ORIGIN}/image-sitemap.xml
 }
 
 export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Promise<string> {
-  const mainRoutes = ["/", "/products/all/", "/about/", "/contact/", "/faq/", "/blog/", "/solutions/", "/compare/", "/compatibility/", "/guides/"];
+  const mainRoutes = ["/", "/products/all/", "/about/", "/contact/", "/faq/", "/blog/", "/solutions/", "/compare/", "/compatibility/", "/guides/", "/case-studies/", "/sample-pack/", "/rfq/", "/resources/downloads/"];
   const collectionRoutes = [
     "/products/rfid-tags/",
     "/products/rfid-labels/",
@@ -157,6 +157,9 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
   const contactRoutes = siteData.pages
     .filter((page) => page.route.startsWith("/contact/") && page.route !== "/contact/")
     .map((page) => page.route);
+  const caseStudyRoutes = siteData.pages
+    .filter((page) => page.route.startsWith("/case-studies/") && page.route !== "/case-studies/")
+    .map((page) => page.route);
 
   const mainSection = await renderLlmsSection("Primary pages", await loadPages(siteData, mainRoutes, loadPage));
   const collectionSection = await renderLlmsSection("Product collections", await loadPages(siteData, collectionRoutes, loadPage));
@@ -167,6 +170,7 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
   const compatibilitySection = await renderLlmsSection("Compatibility pages", await loadPages(siteData, compatibilityRoutes, loadPage));
   const guideSection = await renderLlmsSection("Buying guides", await loadPages(siteData, guideRoutes, loadPage));
   const contactSection = await renderLlmsSection("Contact paths", await loadPages(siteData, contactRoutes, loadPage));
+  const caseStudySection = await renderLlmsSection("Case studies — documented deployments", await loadPages(siteData, caseStudyRoutes, loadPage));
 
   return [
     "# Proud Tek",
@@ -207,6 +211,8 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     compatibilitySection,
     "",
     guideSection,
+    "",
+    caseStudySection,
     "",
     contactSection,
     "",
