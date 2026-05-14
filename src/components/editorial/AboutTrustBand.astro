@@ -1,0 +1,95 @@
+---
+/**
+ * AboutTrustBand — the 3-row credibility strip that sits immediately under
+ * the hero on `/about/` and on the four trust pages
+ * (`/about/factory/`, `/about/certifications/`, `/about/leadership/`,
+ * `/about/case-studies/`).
+ *
+ * Design intent (2026-05-12):
+ *   - Row 1 — four large display numbers (founded / countries / product
+ *     families / QC standard). Mirrors the statBar variant visually but
+ *     gets prime real-estate immediately under the hero so procurement
+ *     buyers see the credibility anchors before they scroll.
+ *   - Row 2 — chip-vendor name strip (NXP / Infineon / Impinj / Alien /
+ *     EM / Quanray). Buyers care that we are NOT locked to one inlay
+ *     supplier; this strip is the visual answer to that question. Text-
+ *     based treatment (uppercase wordmarks, generous tracking) rather
+ *     than real brand logos — avoids trademark issues and stays clean.
+ *   - Row 3 — compliance badge strip (ISO 9001 / RoHS / REACH / FCC /
+ *     CE). Same text-based treatment; pill-shaped containers signal
+ *     "credentialed" without claiming brand marks we don't own.
+ *
+ * Composition: rendered ONCE per page, immediately after `<EditorialHero>`
+ * and before `<DecisionSnapshot>`. Conditionally rendered by
+ * EditorialArticle.astro when `definition.group === "about"`.
+ *
+ * No props — content is hardcoded. The trust band content is the same
+ * on every /about/* page (factory / certifications / leadership /
+ * case-studies all share the same credibility anchors). If we ever
+ * need per-page variation, lift the items to props and read from
+ * definition's `trustBand` field (schema extension required).
+ */
+---
+<section class="codex-trust-band" aria-label="Proud Tek at a glance">
+  <ol class="codex-trust-band__row codex-trust-band__row--stats" aria-label="Key facts">
+    <li class="codex-trust-band__stat">
+      <span class="codex-trust-band__stat-value">2008</span>
+      <span class="codex-trust-band__stat-label">Founded — 18 yrs continuous operation</span>
+    </li>
+    <li class="codex-trust-band__stat">
+      <span class="codex-trust-band__stat-value">40<sup>+</sup></span>
+      <span class="codex-trust-band__stat-label">Countries shipped to</span>
+    </li>
+    <li class="codex-trust-band__stat">
+      <span class="codex-trust-band__stat-value">6</span>
+      <span class="codex-trust-band__stat-label">Product families in-house</span>
+    </li>
+    <li class="codex-trust-band__stat">
+      <span class="codex-trust-band__stat-value">100<span class="codex-trust-band__stat-value-unit">%</span></span>
+      <span class="codex-trust-band__stat-label">Functional read-test on every encoded unit</span>
+    </li>
+  </ol>
+
+  <div class="codex-trust-band__row codex-trust-band__row--vendors">
+    <span class="codex-trust-band__row-label">Chip vendors supported</span>
+    <ul class="codex-trust-band__vendor-list" aria-label="Chip families we manufacture for">
+      <li class="codex-trust-band__vendor">NXP</li>
+      <li class="codex-trust-band__vendor-sep" aria-hidden="true"></li>
+      <li class="codex-trust-band__vendor">Infineon</li>
+      <li class="codex-trust-band__vendor-sep" aria-hidden="true"></li>
+      <li class="codex-trust-band__vendor">Impinj</li>
+      <li class="codex-trust-band__vendor-sep" aria-hidden="true"></li>
+      <li class="codex-trust-band__vendor">Alien</li>
+      <li class="codex-trust-band__vendor-sep" aria-hidden="true"></li>
+      <li class="codex-trust-band__vendor">EM Micro</li>
+      <li class="codex-trust-band__vendor-sep" aria-hidden="true"></li>
+      <li class="codex-trust-band__vendor">Quanray</li>
+    </ul>
+  </div>
+
+  <div class="codex-trust-band__row codex-trust-band__row--certs">
+    <span class="codex-trust-band__row-label">Compliance shipped with every order</span>
+    <ul class="codex-trust-band__cert-list" aria-label="Compliance certifications and approvals">
+      <li class="codex-trust-band__cert">
+        <span class="codex-trust-band__cert-mark">ISO</span>
+        <span class="codex-trust-band__cert-name">9001:2015</span>
+      </li>
+      <li class="codex-trust-band__cert">
+        <span class="codex-trust-band__cert-mark">RoHS</span>
+        <span class="codex-trust-band__cert-name">2011/65/EU</span>
+      </li>
+      <li class="codex-trust-band__cert">
+        <span class="codex-trust-band__cert-mark">REACH</span>
+        <span class="codex-trust-band__cert-name">SVHC</span>
+      </li>
+      <li class="codex-trust-band__cert">
+        <span class="codex-trust-band__cert-mark">FCC</span>
+        <span class="codex-trust-band__cert-name">Part 15 / 18</span>
+      </li>
+      <li class="codex-trust-band__cert">
+        <span class="codex-trust-band__cert-mark">CE</span>
+        <span class="codex-trust-band__cert-name">EN 300 330</span>
+      </li>
+    </ul>
+  </div>
+</section>

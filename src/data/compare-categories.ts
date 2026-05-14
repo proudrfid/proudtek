@@ -38,18 +38,20 @@ export const COMPARE_CATEGORIES: CompareCategory[] = [
     icon: "💾",
     description:
       "Side-by-side chip-family comparisons for the HF, NFC and UHF silicon that ships in 99% of card, label and tag deployments. Use these to settle the chip-selection question before you spec a sample.",
-    seoTitle: "Chip vs Chip Comparisons — MIFARE, NTAG, UCODE, Monza, Higgs | Proud Tek",
+    seoTitle: "Chip vs Chip Comparisons — MIFARE, NTAG, UCODE, Monza, Higgs, EM4100 vs T5577 | Proud Tek",
     pillars: [
       "MIFARE Classic vs Plus vs DESFire EV3 selection for hotel-lock retrofits",
       "NXP NTAG213 vs NTAG215 vs NTAG216 memory and price ladder",
       "MIFARE Plus EV2 vs DESFire EV3 family-level decision",
       "UHF RAIN comparison — UCODE 8 / 9 vs Impinj Monza R6 vs Alien Higgs-9",
+      "EM4100 vs T5577 — read-only vs rewritable 125 kHz LF chip choice",
     ],
     slugs: [
       "mifare-classic-vs-plus-vs-desfire-hotel-locks",
       "mifare-plus-ev2-vs-desfire-ev3",
       "ntag213-vs-ntag215-vs-ntag216",
       "ucode8-vs-ucode9-vs-monza-r6-vs-higgs9",
+      "em4100-vs-t5577",
     ],
   },
 

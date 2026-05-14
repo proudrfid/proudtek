@@ -1,0 +1,279 @@
+---
+/**
+ * /rfq/ — Request-for-Quote wizard.
+ *
+ * A 5-step procurement wizard that walks B2B buyers through the four
+ * questions Proud Tek's specialists ask on every first call (product
+ * family, frequency, quantity, printing/encoding), then collects the
+ * contact info on step 5. All five steps live in one <form>; JS toggles
+ * step visibility and serializes the structured answers into the
+ * existing Kadence backend's `kb_field_4` (project notes) so no backend
+ * change is required.
+ *
+ * Architecture note: this is a native Astro page (not editorial /
+ * snapshot) because the wizard needs raw <form> + <fieldset> markup +
+ * inline JS. The page still gets the standard BaseLayout chrome
+ * (header, footer, sticky CTA, WhatsApp FAB) and a proper SEO payload
+ * derived by buildPageSeo() from a minimal SnapshotPage stub.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { buildPageSeo, buildMachineRoute } from "../lib/seo";
+import type { SnapshotPage } from "../lib/site-data";
+
+const route = "/rfq/";
+const pageStub: SnapshotPage = {
+  route,
+  sourceUrl: `https://proudtek.com${route}`,
+  title: "Request a Quote — Custom RFID & NFC Manufacturing | Proud Tek",
+  htmlAttrs: { lang: "en-US" },
+  bodyAttrs: {},
+  headHtml: "",
+  bodyHtml:
+    `<main id="main">` +
+    `<h1>Request a quote for custom RFID &amp; NFC manufacturing</h1>` +
+    `<p>A 5-step wizard that captures the four answers Proud Tek's specialists need before they can return a real quote — product family, frequency, annual quantity, printing &amp; encoding. Submit once and a Proud Tek RFID specialist replies within one business day with a unit price, MOQ ladder, lead time and the matching sample-pack subset.</p>` +
+    `</main>`,
+};
+const seo = buildPageSeo(pageStub);
+const machineJsonPath = buildMachineRoute(route, "json");
+const machineTextPath = buildMachineRoute(route, "txt");
+---
+
+<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
+  <Fragment set:html={seo.bodyHtml.split("<main")[0]} />
+
+  <main id="main" class="codex-rfq-main">
+    <section class="codex-rfq-hero">
+      <p class="codex-rfq-hero__eyebrow">Quote in one form</p>
+      <h1 class="codex-rfq-hero__title">Request a quote for custom RFID &amp; NFC manufacturing</h1>
+      <p class="codex-rfq-hero__lede">Five short steps. Five fields. Most buyers finish in under two minutes. A Proud Tek RFID specialist replies within one business day with a unit price, MOQ ladder, lead time and a matching sample-pack subset.</p>
+      <ul class="codex-rfq-hero__pill-row">
+        <li>1. Product family</li>
+        <li>2. Frequency band</li>
+        <li>3. Annual quantity</li>
+        <li>4. Printing &amp; encoding</li>
+        <li>5. Contact</li>
+      </ul>
+    </section>
+
+    <form id="rfq-wizard" class="codex-rfq" action="/contact/" method="POST" novalidate>
+      <input type="hidden" name="_kb_form_id" value="proudtek-rfq" />
+      <input type="hidden" name="action" value="kb_form_submit" />
+      <input type="hidden" id="rfq-payload" name="kb_field_4" value="" />
+
+      <ol class="codex-rfq__progress" aria-label="Wizard progress" id="rfq-progress">
+        <li class="is-active" data-step="1"><span>1</span>Product</li>
+        <li data-step="2"><span>2</span>Frequency</li>
+        <li data-step="3"><span>3</span>Quantity</li>
+        <li data-step="4"><span>4</span>Printing</li>
+        <li data-step="5"><span>5</span>Contact</li>
+      </ol>
+
+      <!-- Step 1 — product family -->
+      <fieldset class="codex-rfq__step is-active" data-step="1" aria-label="Step 1 of 5: product family">
+        <legend>What product family do you need?</legend>
+        <p class="codex-rfq__help">Pick the closest match. We'll narrow further on step 4.</p>
+        <div class="codex-rfq__grid">
+          <label><input type="radio" name="rfq_product" value="RFID Cards" required /> <span><strong>RFID Cards</strong><em>MIFARE / NTAG / EM4100 / Hotel keys / Membership / Smart cards</em></span></label>
+          <label><input type="radio" name="rfq_product" value="RFID Tags" /> <span><strong>RFID Tags</strong><em>Anti-metal · High-temp · Animal ear · Laundry · Tool · Asset</em></span></label>
+          <label><input type="radio" name="rfq_product" value="RFID Labels / Inlays" /> <span><strong>RFID Labels / Inlays</strong><em>NFC stickers · Windshield · Apparel hang tag · Brand authentication</em></span></label>
+          <label><input type="radio" name="rfq_product" value="RFID Wristbands" /> <span><strong>RFID Wristbands</strong><em>Silicone · Tyvek / Fabric · Hotel · Event · Hospital</em></span></label>
+          <label><input type="radio" name="rfq_product" value="RFID Keyfobs" /> <span><strong>RFID Keyfobs</strong><em>Proximity · DESFire · T5577 · Multi-protocol</em></span></label>
+          <label><input type="radio" name="rfq_product" value="RFID Readers / Encoders" /> <span><strong>RFID Readers / Encoders</strong><em>ACR122U · Desktop · Fixed UHF · Handheld · Bluetooth</em></span></label>
+          <label><input type="radio" name="rfq_product" value="Not sure yet" /> <span><strong>Not sure yet</strong><em>We'll help you scope it on the follow-up call.</em></span></label>
+        </div>
+      </fieldset>
+
+      <!-- Step 2 — frequency -->
+      <fieldset class="codex-rfq__step" data-step="2" aria-label="Step 2 of 5: frequency band">
+        <legend>Which frequency band?</legend>
+        <p class="codex-rfq__help">If you already have a reader fleet, match its band. If not, pick the closest application; we'll confirm.</p>
+        <div class="codex-rfq__grid">
+          <label><input type="radio" name="rfq_frequency" value="LF 125 kHz" required /> <span><strong>LF — 125 kHz</strong><em>EM4100 · EM4305 · T5577 · HID Prox · Hotel proximity · Animal ID · Legacy access</em></span></label>
+          <label><input type="radio" name="rfq_frequency" value="HF 13.56 MHz / NFC" /> <span><strong>HF — 13.56 MHz / NFC</strong><em>MIFARE Classic / Plus / DESFire · NTAG21x · NTAG424 DNA · ICODE SLIX · Hotel · Library · Smartphone tap</em></span></label>
+          <label><input type="radio" name="rfq_frequency" value="UHF RAIN 860–960 MHz" /> <span><strong>UHF — 860–960 MHz RAIN</strong><em>Impinj Monza · NXP UCODE · Alien Higgs · Retail apparel · Industrial laundry · Logistics · Events</em></span></label>
+          <label><input type="radio" name="rfq_frequency" value="Dual-frequency (LF+HF)" /> <span><strong>Dual-frequency (LF + HF)</strong><em>Migration deployments · Multi-reader buildings</em></span></label>
+          <label><input type="radio" name="rfq_frequency" value="Not sure" /> <span><strong>Not sure</strong><em>We'll recommend based on your application.</em></span></label>
+        </div>
+      </fieldset>
+
+      <!-- Step 3 — quantity -->
+      <fieldset class="codex-rfq__step" data-step="3" aria-label="Step 3 of 5: annual quantity">
+        <legend>Estimated annual quantity?</legend>
+        <p class="codex-rfq__help">Pick the tier closest to year 1. Multi-year volume commitments unlock additional pricing.</p>
+        <div class="codex-rfq__grid codex-rfq__grid--tight">
+          <label><input type="radio" name="rfq_quantity" value="Under 5,000" required /> <span><strong>&lt; 5,000</strong><em>Pilot / proof of concept</em></span></label>
+          <label><input type="radio" name="rfq_quantity" value="5,000 – 50,000" /> <span><strong>5k – 50k</strong><em>Single-site or single-event programme</em></span></label>
+          <label><input type="radio" name="rfq_quantity" value="50,000 – 250,000" /> <span><strong>50k – 250k</strong><em>Multi-site / regional rollout</em></span></label>
+          <label><input type="radio" name="rfq_quantity" value="250,000 – 1,000,000" /> <span><strong>250k – 1M</strong><em>Mid-tier enterprise programme</em></span></label>
+          <label><input type="radio" name="rfq_quantity" value="1,000,000+" /> <span><strong>1M+</strong><em>Tier-1 enterprise / mass-volume</em></span></label>
+        </div>
+      </fieldset>
+
+      <!-- Step 4 — printing & encoding -->
+      <fieldset class="codex-rfq__step" data-step="4" aria-label="Step 4 of 5: printing and encoding">
+        <legend>Printing &amp; encoding requirements?</legend>
+        <p class="codex-rfq__help">Tick all that apply. We'll quote each item explicitly in the response.</p>
+        <div class="codex-rfq__checkbox-grid">
+          <label><input type="checkbox" name="rfq_options" value="CMYK 1-side printing" /> <span>CMYK 1-side printing</span></label>
+          <label><input type="checkbox" name="rfq_options" value="CMYK 2-side printing" /> <span>CMYK 2-side printing</span></label>
+          <label><input type="checkbox" name="rfq_options" value="Spot UV / specialty finish" /> <span>Spot UV / specialty finish</span></label>
+          <label><input type="checkbox" name="rfq_options" value="Variable data / serial number print" /> <span>Variable data / serial number print</span></label>
+          <label><input type="checkbox" name="rfq_options" value="Sector / EPC pre-encoding" /> <span>Sector / EPC pre-encoding</span></label>
+          <label><input type="checkbox" name="rfq_options" value="NDEF / NFC URL programming" /> <span>NDEF / NFC URL programming</span></label>
+          <label><input type="checkbox" name="rfq_options" value="GS1 SGTIN-96 encoding" /> <span>GS1 SGTIN-96 encoding</span></label>
+          <label><input type="checkbox" name="rfq_options" value="Magnetic stripe" /> <span>Magnetic stripe</span></label>
+          <label><input type="checkbox" name="rfq_options" value="Hole punch / lanyard slot" /> <span>Hole punch / lanyard slot</span></label>
+          <label><input type="checkbox" name="rfq_options" value="None — chip + blank body only" /> <span>None — chip + blank body only</span></label>
+        </div>
+        <label class="codex-rfq__text-field">
+          <span>Target launch date <em>(optional)</em></span>
+          <input type="text" name="rfq_launch" placeholder="e.g. Q3 2026, or 8 weeks from PO" />
+        </label>
+      </fieldset>
+
+      <!-- Step 5 — contact -->
+      <fieldset class="codex-rfq__step" data-step="5" aria-label="Step 5 of 5: contact details">
+        <legend>How should the specialist reach you?</legend>
+        <p class="codex-rfq__help">Five fields, business email accepted. We do not share contact data with third parties.</p>
+        <label class="codex-rfq__text-field">
+          <span>Your name <em>*</em></span>
+          <input type="text" name="kb_field_0" autocomplete="name" required />
+        </label>
+        <label class="codex-rfq__text-field">
+          <span>Business email <em>*</em></span>
+          <input type="email" name="kb_field_1" autocomplete="email" required />
+        </label>
+        <label class="codex-rfq__text-field">
+          <span>Country / region <em>*</em></span>
+          <input type="text" name="kb_field_2" autocomplete="country-name" placeholder="e.g. United States, Germany, UAE" required />
+        </label>
+        <label class="codex-rfq__text-field">
+          <span>Company name <em>(optional)</em></span>
+          <input type="text" name="kb_field_3" autocomplete="organization" />
+        </label>
+        <label class="codex-rfq__text-field">
+          <span>Anything else we should know? <em>(optional)</em></span>
+          <textarea name="rfq_notes" rows="3" placeholder="Reader vendor, lock platform, chip preference, regulatory regime, or any constraint that should shape the quote."></textarea>
+        </label>
+        <!-- Honeypot, mirrors Kadence's expected verify field -->
+        <input class="codex-rfq__hp" type="text" name="_kb_verify_email" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      </fieldset>
+
+      <div class="codex-rfq__actions">
+        <button type="button" class="codex-rfq__btn codex-rfq__btn--back" id="rfq-back" disabled>← Back</button>
+        <button type="button" class="codex-rfq__btn codex-rfq__btn--next" id="rfq-next">Continue →</button>
+        <button type="submit" class="codex-rfq__btn codex-rfq__btn--submit" id="rfq-submit" hidden>Send my quote request</button>
+      </div>
+
+      <p class="codex-rfq__small">Reply window: one business day, Mon–Sat, GMT+8. For an urgent reply WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
+    </form>
+
+    <aside class="codex-rfq-aside" aria-label="Before you send">
+      <h2>Before you send</h2>
+      <ul>
+        <li><a href="/sample-pack/">Request a free sample pack</a> first if you haven't held a chip in your hand. Most procurement teams short-list with samples in week 1 and send the RFQ in week 2.</li>
+        <li><a href="/case-studies/">Read a case study</a> in your industry — chip choice, alternatives rejected, volume and measured results from a comparable deployment.</li>
+        <li><a href="/compare/">Settle the chip-family question</a> first in the compare library. Saves a round of clarifying email.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <script is:inline>
+    (function () {
+      const wizard = document.getElementById("rfq-wizard");
+      if (!wizard) return;
+      const steps = Array.from(wizard.querySelectorAll(".codex-rfq__step"));
+      const progress = Array.from(document.querySelectorAll("#rfq-progress li"));
+      const backBtn = document.getElementById("rfq-back");
+      const nextBtn = document.getElementById("rfq-next");
+      const submitBtn = document.getElementById("rfq-submit");
+      const payloadInput = document.getElementById("rfq-payload");
+
+      let current = 0;
+      const total = steps.length;
+
+      function show(index) {
+        steps.forEach((s, i) => s.classList.toggle("is-active", i === index));
+        progress.forEach((p, i) => p.classList.toggle("is-active", i <= index));
+        backBtn.disabled = index === 0;
+        nextBtn.hidden = index === total - 1;
+        submitBtn.hidden = index !== total - 1;
+        const firstField = steps[index].querySelector("input, textarea");
+        if (firstField) setTimeout(() => firstField.focus({ preventScroll: false }), 30);
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: "rfq_step_view", rfq_step: index + 1 });
+      }
+
+      function validateCurrent() {
+        const step = steps[current];
+        const requiredRadios = step.querySelectorAll('input[type="radio"][required]');
+        if (requiredRadios.length) {
+          const name = requiredRadios[0].name;
+          if (!step.querySelector('input[name="' + name + '"]:checked')) {
+            step.classList.add("has-error");
+            return false;
+          }
+        }
+        const requiredText = step.querySelectorAll("input[required], textarea[required]");
+        for (const f of requiredText) {
+          if (!f.value.trim()) {
+            f.classList.add("has-error");
+            f.focus();
+            return false;
+          }
+        }
+        step.classList.remove("has-error");
+        return true;
+      }
+
+      function collectAnswers() {
+        const fd = new FormData(wizard);
+        const lines = [
+          "── Proud Tek RFQ Wizard submission ──",
+          "Product family: " + (fd.get("rfq_product") || "(skipped)"),
+          "Frequency band: " + (fd.get("rfq_frequency") || "(skipped)"),
+          "Annual quantity: " + (fd.get("rfq_quantity") || "(skipped)"),
+          "Printing & encoding: " + (fd.getAll("rfq_options").join(", ") || "None selected"),
+          "Target launch: " + (fd.get("rfq_launch") || "(not specified)"),
+          "Company: " + (fd.get("kb_field_3") || "(not specified)"),
+          "",
+          "Additional notes:",
+          (fd.get("rfq_notes") || "(none)"),
+        ];
+        payloadInput.value = lines.join("\n");
+      }
+
+      nextBtn.addEventListener("click", () => {
+        if (!validateCurrent()) return;
+        if (current < total - 1) {
+          current += 1;
+          show(current);
+        }
+      });
+
+      backBtn.addEventListener("click", () => {
+        if (current > 0) {
+          current -= 1;
+          show(current);
+        }
+      });
+
+      wizard.addEventListener("submit", (e) => {
+        if (!validateCurrent()) {
+          e.preventDefault();
+          return;
+        }
+        collectAnswers();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: "rfq_submit", rfq_step: total });
+      });
+
+      wizard.addEventListener("input", (e) => {
+        if (e.target instanceof HTMLElement) e.target.classList.remove("has-error");
+      });
+
+      show(0);
+    })();
+  </script>
+</BaseLayout>

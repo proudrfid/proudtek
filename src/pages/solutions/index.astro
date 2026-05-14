@@ -1,0 +1,255 @@
+---
+/**
+ * /solutions/ — RFID & NFC solutions hub.
+ *
+ * Native .astro hub mirroring /blog/, /guides/ and /compare/. Reads the
+ * editorial collection (group === "solutions"), classifies each entry into
+ * one of the SOLUTIONS_TOPICS (route-based taxonomy), and renders:
+ *   - Left rail with topic navigation (count per topic)
+ *   - .codex-blog-index-style header (H1 + one-line count description)
+ *   - Single flat 3-column grid of every solution card
+ *   - Inline filter script (rail link click → hide non-matching cards)
+ *
+ * Replaces the previous WP-snapshot rendering of /solutions/. Individual
+ * solution pages (/solutions/{slug}/) are unaffected — they still render
+ * through [...slug].astro + the editorial pipeline (EDITORIAL_OVERRIDE_PATTERNS
+ * already matches /solutions/{slug}/).
+ *
+ * /solutions/ must also be added to NATIVE_HUB_ROUTES in [...slug].astro
+ * so the catch-all slug generator doesn't try to also build it.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+import { SOLUTIONS_TOPICS, classifySolutionRoute } from "../../data/solutions-topics";
+import type { PageSeoData } from "../../lib/seo";
+import { buildRailHtml } from "../../lib/seo/rail";
+import { buildRailFilterScript } from "../../lib/seo/rail";
+import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { getPageByRoute } from "../../lib/site-data";
+import { truncateText } from "../../lib/seo/utils";
+
+const SITE_ORIGIN = "https://www.proudtek.com";
+const ROUTE = "/solutions/";
+const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
+
+// ── Pull every solution editorial entry ──
+// Filter rules:
+//   - skip _unused/
+//   - require group === "solutions"
+//   - skip the hub itself
+const allEditorial = await getCollection("editorial");
+const solutionEntries = allEditorial
+  .filter(
+    (e) =>
+      !e.id.startsWith("_unused/") &&
+      e.data.group === "solutions" &&
+      e.data.route !== "/solutions/",
+  )
+  .map((e) => ({
+    route: e.data.route,
+    title: e.data.title,
+    summary: e.data.summary,
+    kicker: e.data.kicker || "RFID Solution",
+    topicId: classifySolutionRoute(e.data.route),
+    heroImage: e.data.heroImage ?? "",
+  }));
+
+// Display order: topic order first (SOLUTIONS_TOPICS order), then editorial-
+// collection order within each topic. Keeps the topic-rail flow visually
+// coherent when the user scrolls top-to-bottom on the flat grid.
+const topicOrder = new Map<string, number>(
+  SOLUTIONS_TOPICS.map((t, idx) => [t.id, idx]),
+);
+solutionEntries.sort((a, b) => {
+  const ai = topicOrder.get(a.topicId) ?? Number.MAX_SAFE_INTEGER;
+  const bi = topicOrder.get(b.topicId) ?? Number.MAX_SAFE_INTEGER;
+  return ai - bi;
+});
+
+const allSolutions = solutionEntries;
+const TOTAL_SOLUTIONS = allSolutions.length;
+
+// ── Build the topic rail ──
+// Compute counts per topic so the rail shows accurate "(N)" badges.
+const topicCounts: Record<string, number> = {};
+for (const sol of allSolutions) {
+  topicCounts[sol.topicId] = (topicCounts[sol.topicId] ?? 0) + 1;
+}
+
+const railItems = SOLUTIONS_TOPICS
+  .filter((t) => (topicCounts[t.id] ?? 0) > 0)
+  .map((t) => ({
+    id: t.id,
+    label: t.label,
+    icon: t.icon,
+    count: topicCounts[t.id] ?? 0,
+    // Anchor links so the inline filter script picks them up
+    href: `#topic-${t.id}`,
+  }));
+
+const railHtml = buildRailHtml({
+  modifier: "solutions",
+  groupLabel: "Topics",
+  toggleIcon: "🧩",
+  toggleAriaLabel: "Show solution topics",
+  asideAriaLabel: "Solution topics",
+  closeAriaLabel: "Close topics",
+  items: railItems,
+  allLink: {
+    label: "All solutions",
+    icon: "🧩",
+    href: "#topic-all",
+    count: TOTAL_SOLUTIONS,
+  },
+  activeId: undefined,
+});
+
+const filterScript = buildRailFilterScript({
+  filterMode: "in-place",
+  hubAnchorId: "topic-all",
+  hubPath: "/solutions/",
+});
+
+// ── Build SEO ──
+const breadcrumbLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_ORIGIN + "/" },
+    { "@type": "ListItem", position: 2, name: "Solutions", item: CANONICAL_URL },
+  ],
+});
+
+const collectionLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "@id": CANONICAL_URL,
+  name: "Proud Tek RFID & NFC Solutions",
+  description: `${TOTAL_SOLUTIONS} use-case-led RFID and NFC solution pages organized into ${railItems.length} topical categories.`,
+  url: CANONICAL_URL,
+  isPartOf: { "@type": "WebSite", name: "Proud Tek", url: SITE_ORIGIN + "/" },
+  hasPart: allSolutions.map((p) => ({
+    "@type": "WebPage",
+    url: `${SITE_ORIGIN}${p.route}`,
+    name: p.title,
+  })),
+});
+
+const seo: PageSeoData = {
+  htmlAttrs: { lang: "en" },
+  bodyAttrs: { class: "page-solutions-hub" },
+  headHtml: "",
+  bodyHtml: "",
+  kind: "core",
+  contentTitle: "RFID & NFC Solutions",
+  title: `Proud Tek RFID & NFC Solutions — ${TOTAL_SOLUTIONS} use-case landing pages`,
+  description: `Browse ${TOTAL_SOLUTIONS} Proud Tek RFID and NFC solution pages — access control, inventory, hotels, laundry, events, healthcare, NFC branding, Google review cards and more.`,
+  canonicalUrl: CANONICAL_URL,
+  robots: "index, follow",
+  indexable: true,
+  jsonLd: [breadcrumbLd, collectionLd],
+  imageUrl: "",
+  imageAlt: "Proud Tek RFID and NFC solutions catalog",
+  imageGallery: [],
+  faqEntries: [],
+  procurementFields: [],
+  collectionSummary: [],
+  collectionGuidanceFields: [],
+  collectionRelatedPages: [],
+  collectionSourceLinks: [],
+  coreSummary: [
+    `${TOTAL_SOLUTIONS} solution landing pages organized into ${railItems.length} topics`,
+    "Access control, inventory, hotels, laundry, events, healthcare, NFC branding",
+    "Each page covers the chip family, form factor, encoding and deployment shape",
+  ],
+  coreGuidanceFields: [],
+  coreRelatedPages: [],
+  coreSourceLinks: [],
+  articleSummary: [],
+  articleGuidanceFields: [],
+  articleRelatedPages: [],
+  articleSourceLinks: [],
+  productRelatedPages: [],
+  productSourceLinks: [],
+  ogType: "website",
+  articleMeta: null,
+};
+
+// ── WP chrome donor ──
+// Prefer the /solutions/ snapshot so the masthead + footer match what users
+// see on the rest of the site. Fall back to /resources/ then /about/.
+const donorPage =
+  (await getPageByRoute("/solutions/")) ||
+  (await getPageByRoute("/resources/")) ||
+  (await getPageByRoute("/about/"));
+if (!donorPage) {
+  throw new Error(
+    "solutions/index.astro: no chrome donor snapshot (/solutions/, /resources/, /about/ all missing)",
+  );
+}
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
+seo.bodyAttrs = {
+  ...chrome.bodyAttrs,
+  ...seo.bodyAttrs,
+  class: [chrome.bodyAttrs.class, seo.bodyAttrs.class].filter(Boolean).join(" "),
+};
+seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
+---
+
+<BaseLayout seo={seo}>
+  <Fragment set:html={chrome.beforeMainHtml} />
+
+  <main id="main" class="site-main" role="main">
+    <Fragment set:html={railHtml} />
+
+    <section
+      class="codex-blog-index codex-blog-index--with-rail"
+      id="topic-all"
+      aria-label="RFID and NFC solutions"
+    >
+      <div class="codex-blog-index__header">
+        <h1>RFID &amp; NFC Solutions</h1>
+        <p>
+          {TOTAL_SOLUTIONS} use-case landing pages for procurement teams sourcing RFID cards,
+          tags, labels, readers, keyfobs and wristbands by application.
+        </p>
+      </div>
+      <div class="codex-blog-index__grid">
+        {allSolutions.map((sol) => (
+          <a
+            class="codex-card codex-blog-grid-card"
+            href={sol.route}
+            data-rail-key={sol.topicId}
+            data-kicker={sol.kicker}
+          >
+            {sol.heroImage && (
+              <img
+                class="codex-blog-grid-card__thumb"
+                src={sol.heroImage}
+                alt={sol.title}
+                width="1200"
+                height="675"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+            <span class="codex-blog-grid-card__tag">{sol.kicker}</span>
+            <strong>{sol.title}</strong>
+            <p>{truncateText(sol.summary, 120)}</p>
+            <span class="codex-blog-grid-card__cta">View solution →</span>
+          </a>
+        ))}
+      </div>
+      <div class="codex-blog-index__empty" hidden>
+        <div class="codex-blog-index__empty-icon" aria-hidden="true">🔍</div>
+        <h3>No solutions in this topic yet</h3>
+        <p>Try another topic, or view all solutions.</p>
+        <button type="button" class="codex-blog-index__empty-clear">Show all solutions</button>
+      </div>
+      <script is:inline set:html={filterScript} />
+    </section>
+  </main>
+
+  <Fragment set:html={chrome.afterMainHtml} />
+</BaseLayout>
