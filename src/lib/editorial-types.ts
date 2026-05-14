@@ -5,7 +5,7 @@
  * and Astro components can import them without circular dependencies.
  */
 
-export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "lp" | "markets" | "about" | "resources" | "home" | "faq" | "research";
+export type EditorialGroup = "solutions" | "compare" | "contact" | "compatibility" | "guides" | "blog" | "products" | "lp" | "markets" | "about" | "resources" | "home" | "faq" | "research" | "case-studies";
 
 export interface EditorialLink {
   href: string;
@@ -294,7 +294,7 @@ export function isWorkflowSection(title: string): boolean {
 }
 
 export function isSectionRoot(route: string): boolean {
-  return route === "/" || route === "/solutions/" || route === "/compare/" || route === "/compatibility/" || route === "/guides/" || route === "/contact/" || route === "/resources/" || route === "/about/" || route === "/blog/" || route === "/faq/" || route === "/products/all/" || route === "/industries/" || route === "/markets/" || route === "/lp/" || route === "/research/";
+  return route === "/" || route === "/solutions/" || route === "/compare/" || route === "/compatibility/" || route === "/guides/" || route === "/contact/" || route === "/resources/" || route === "/about/" || route === "/blog/" || route === "/faq/" || route === "/products/all/" || route === "/industries/" || route === "/markets/" || route === "/lp/" || route === "/research/" || route === "/case-studies/";
 }
 
 export function resolvePageType(group: EditorialGroup): string {
@@ -313,6 +313,7 @@ export function resolvePageType(group: EditorialGroup): string {
     case "markets": return "markets";
     case "lp": return "lp";
     case "research": return "research";
+    case "case-studies": return "case-studies";
     default: return "";
   }
 }

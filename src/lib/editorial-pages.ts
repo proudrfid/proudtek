@@ -228,6 +228,9 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
   "/products/rfid-keyfobs/",
   "/industries/",
   "/resources/",
+  // /about/ hub: WP snapshot replaced by src/content/editorial/about.json
+  // (B2B procurement-focused rewrite, 2026-05-12).
+  "/about/",
 ]);
 
 /**
