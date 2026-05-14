@@ -50,6 +50,65 @@ export const ORGANIZATION_CONTACT = {
   addressCountry: "CN",
 };
 
+/**
+ * P0-G2 (PR `audit/p0-schema-upgrades`): external authority profiles used
+ * for Organization.sameAs[]. These power Google Knowledge Graph entity
+ * disambiguation and LLM entity-grounding (ChatGPT/Perplexity/Claude all
+ * check sameAs links when deciding which "Proud Tek" is being referenced).
+ *
+ * Leave entries empty ("") when a channel doesn't exist — jsonld.ts
+ * filters out falsy values so empty strings never reach the schema output.
+ * Add new authority profiles here whenever you create a new external
+ * presence (Alibaba storefront, Made-in-China, Crunchbase, X/Twitter, etc.)
+ * and they automatically flow into every page's Organization JSON-LD.
+ */
+export const ORGANIZATION_SOCIAL: Record<string, string> = {
+  // Canonical LinkedIn company page — confirmed by product owner on
+  // 2026-05-14 during PR `audit/p0-schema-upgrades`.
+  linkedin: "https://www.linkedin.com/company/proud-tek-co-ltd/",
+
+  // Canonical YouTube channel (handle `@protekrfid875`) — note the
+  // historical handle slug doesn't match the brand string; that's
+  // intentional and reflects the real channel URL.
+  youtube: "https://www.youtube.com/@protekrfid875",
+
+  // Click-to-WhatsApp wa.me deep-link, derived from ORGANIZATION_CONTACT.
+  whatsapp: `https://wa.me/${ORGANIZATION_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`,
+};
+
+/**
+ * Alternate brand spellings Google should recognise as the same entity.
+ * P0-G2: helps Knowledge Graph match queries like "ProudTek" or
+ * "Proud Tek Co Limited" (no comma) to the canonical Organization node.
+ */
+export const ORGANIZATION_ALTERNATE_NAMES: ReadonlyArray<string> = [
+  "ProudTek",
+  "Proud Tek Co. Limited",
+];
+
+/**
+ * Publicly disclosable operational facts. Surfaced in:
+ *   - Organization JSON-LD (foundingDate, numberOfEmployees)
+ *   - llms.txt "Quick facts" block (P0-G3) — LLM-citation-friendly hard data
+ */
+export const ORGANIZATION_OPERATIONS = {
+  foundingDate: "2008",
+  foundingLocation: "Shenzhen, Guangdong, China",
+  numberOfEmployees: "100+",
+  /** Typical MOQ per product family — used in llms.txt Quick facts (P0-G3). */
+  moq: {
+    nfcCards: "100 pcs",
+    rfidLabels: "500 pcs",
+    rfidWristbands: "200 pcs",
+    rfidReaders: "10 pcs",
+  },
+  /** Lead time for stock vs custom orders — used in llms.txt Quick facts. */
+  leadTime: {
+    stockChip: "7-15 working days",
+    customArtwork: "20-30 working days",
+  },
+};
+
 /** Expert author profiles for E-E-A-T authority signals */
 export interface ExpertAuthor {
   name: string;

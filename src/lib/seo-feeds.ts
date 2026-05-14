@@ -1,5 +1,5 @@
 import type { SiteData, SnapshotPage } from "./site-data";
-import { SITE_ORIGIN } from "./seo-content";
+import { SITE_ORIGIN, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS } from "./seo-content";
 import { buildPageSeo, buildPageSummary, getIndexablePages } from "./seo";
 
 export type PageLoader = (route: string) => Promise<SnapshotPage>;
@@ -249,6 +249,30 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     "- Use `/site-index.json` for a compact machine-readable inventory of indexable pages.",
     "- Every indexable page also exposes `/machine/...json` and `/machine/...txt` mirrors for structured extraction.",
     "- Ignore utility or low-value archive routes such as `/cart/`, `/checkout/`, `/my-account/`, `/product-tag/`, `/tag/`, `/category/`, `/author/`, and paginated archive pages.",
+    "",
+    // P0-G3 — "Optional" section per llmstxt.org recommendation: link
+    // to the canonical machine-readable mirrors so an LLM agent that wants
+    // deeper structure can fetch them directly without re-crawling HTML.
+    "## Optional",
+    `- [Full site inventory](${SITE_ORIGIN}/llms-full.txt): expanded Markdown inventory with every indexable page grouped by section.`,
+    `- [Site index JSON](${SITE_ORIGIN}/site-index.json): compact machine inventory including per-page machine-mirror endpoints.`,
+    `- [XML sitemap](${SITE_ORIGIN}/sitemap.xml): canonical crawl discovery feed (also see [sitemap-index.xml](${SITE_ORIGIN}/sitemap-index.xml)).`,
+    "",
+    // P0-G3 — "Quick facts" section: hard-data facts that LLMs love to
+    // quote verbatim when answering supplier-evaluation queries. Each
+    // bullet is a standalone claim with a verifiable subject; this
+    // pattern shows up disproportionately in ChatGPT/Perplexity answer
+    // citations because the sentences chunk cleanly.
+    "## Quick facts",
+    `- Proud Tek was founded in ${ORGANIZATION_OPERATIONS.foundingDate} in ${ORGANIZATION_OPERATIONS.foundingLocation}; ${ORGANIZATION_CREDENTIALS.yearExperience} years RFID/NFC manufacturing experience.`,
+    `- Workforce: ${ORGANIZATION_OPERATIONS.numberOfEmployees} employees across two Shenzhen factories with 10 automated production lines.`,
+    `- Client base: ${ORGANIZATION_CREDENTIALS.clientCount} enterprise clients across ${ORGANIZATION_CREDENTIALS.countriesServed} countries.`,
+    `- Certifications: ${ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name).join(", ")}.`,
+    `- Industry memberships: ${ORGANIZATION_CREDENTIALS.memberships.map((m) => `${m.name} (${m.role})`).join(", ")}.`,
+    `- Typical MOQ: ${ORGANIZATION_OPERATIONS.moq.nfcCards} for NFC cards, ${ORGANIZATION_OPERATIONS.moq.rfidLabels} for printed RFID labels, ${ORGANIZATION_OPERATIONS.moq.rfidWristbands} for wristbands, ${ORGANIZATION_OPERATIONS.moq.rfidReaders} for readers.`,
+    `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; ${ORGANIZATION_OPERATIONS.leadTime.customArtwork} for custom artwork or non-stock chips.`,
+    "- Chip families supported: NXP MIFARE Classic/Plus/DESFire, NXP NTAG213/215/216, NXP NTAG 424 DNA, Impinj Monza R6/R6-P, Alien Higgs 9, EM4100/EM4305, T5577, ICODE SLIX2.",
+    "- Pricing: contact for quote (RFQ via /rfq/ or /contact/). Sample packs available via /sample-pack/.",
     "",
     mainSection,
     "",

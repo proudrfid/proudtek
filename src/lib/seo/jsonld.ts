@@ -22,6 +22,9 @@ import {
   DEFAULT_IMAGE,
   ORGANIZATION_CONTACT,
   ORGANIZATION_KNOWS_ABOUT,
+  ORGANIZATION_SOCIAL,
+  ORGANIZATION_ALTERNATE_NAMES,
+  ORGANIZATION_OPERATIONS,
 } from "../seo-content";
 
 import { EDITORIAL_KEYWORDS_MAP } from "../editorial-pages";
@@ -275,9 +278,21 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
           "query-input": "required name=search_term_string",
         },
       ],
-      sameAs: [
-        `https://wa.me/${ORGANIZATION_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`,
-      ],
+      // P0-G2: alternate brand spellings + founding/employee facts +
+      // expanded sameAs[] for Knowledge Graph entity disambiguation.
+      // sameAs filters empty strings so unset social profiles in
+      // ORGANIZATION_SOCIAL (LinkedIn, YouTube, …) don't pollute output.
+      alternateName: ORGANIZATION_ALTERNATE_NAMES,
+      foundingDate: ORGANIZATION_OPERATIONS.foundingDate,
+      foundingLocation: {
+        "@type": "Place",
+        name: ORGANIZATION_OPERATIONS.foundingLocation,
+      },
+      numberOfEmployees: {
+        "@type": "QuantitativeValue",
+        value: ORGANIZATION_OPERATIONS.numberOfEmployees,
+      },
+      sameAs: Object.values(ORGANIZATION_SOCIAL).filter((url) => url && url.length > 0),
     },
     {
       "@context": "https://schema.org",
