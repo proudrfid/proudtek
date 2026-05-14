@@ -71,7 +71,10 @@ export async function buildImageSitemapXml(siteData: SiteData, loadPage: PageLoa
           "    <image:image>",
           `      <image:loc>${escapeXml(image.url)}</image:loc>`,
           `      <image:title>${escapeXml(image.alt)}</image:title>`,
-          `      <image:caption>${escapeXml(seo.description)}</image:caption>`,
+          // P0-S3: caption uses image's own alt (preferred) rather than the
+          // shared seo.description — Google Images de-prioritises images
+          // whose captions all match the same page-level description.
+          `      <image:caption>${escapeXml(image.alt || seo.description)}</image:caption>`,
           "    </image:image>",
         ].join("\n"),
       )
@@ -95,33 +98,84 @@ ${urlEntries.join("\n")}
 `;
 }
 
+/**
+ * AI search-engine crawler user-agents we explicitly allow.
+ *
+ * P0-G1 (PR `audit/p0-seo-indexability`): expanded from the original 5
+ * (GPTBot, Google-Extended, PerplexityBot, ClaudeBot, Applebot-Extended)
+ * to the full known set as of 2026-05.
+ *
+ * The most critical additions are:
+ *   - OAI-SearchBot / ChatGPT-User  → required for inclusion in ChatGPT
+ *     Search answers (distinct from GPTBot which only governs training)
+ *   - Perplexity-User                → required for live Perplexity citations
+ *   - Claude-Web / anthropic-ai      → Anthropic's retrieval-time crawlers
+ *   - CCBot                          → Common Crawl, upstream for many models
+ *   - Bytespider / Amazonbot         → ByteDance/Doubao + Amazon Rufus
+ *   - Meta-ExternalAgent / DuckAssistBot → emerging aggregators
+ */
+const AI_ALLOW_BOTS: ReadonlyArray<string> = [
+  "GPTBot",
+  "ChatGPT-User",
+  "OAI-SearchBot",
+  "ClaudeBot",
+  "Claude-Web",
+  "anthropic-ai",
+  "PerplexityBot",
+  "Perplexity-User",
+  "Google-Extended",
+  "Applebot-Extended",
+  "Amazonbot",
+  "CCBot",
+  "Bytespider",
+  "Meta-ExternalAgent",
+  "DuckAssistBot",
+];
+
 export function buildRobotsTxt(): string {
   const disallowedPrefixes = ["ar", "da", "de", "es", "fa", "fr", "he", "it", "ja", "pt", "ru", "tr", "zh"]
     .map((prefix) => `Disallow: /${prefix}/`)
     .join("\n");
 
+  const aiSections = AI_ALLOW_BOTS.map((ua) => `User-agent: ${ua}\nAllow: /`).join("\n\n");
+
   return `User-agent: *
 Allow: /
 ${disallowedPrefixes}
+# P0-S2: hide machine-readable mirrors from generic crawlers — they're
+# discoverable for AI bots via <link rel="alternate"> on each page head,
+# so emitting them in robots/sitemap for Googlebot wastes crawl budget.
+Disallow: /machine/
 
-# AI search engine crawlers — allow full access
-User-agent: GPTBot
-Allow: /
+# AI search engine crawlers — allow full access (incl. /machine/ mirrors)
+${aiSections}
 
-User-agent: Google-Extended
-Allow: /
+Sitemap: ${SITE_ORIGIN}/sitemap-index.xml
+`;
+}
 
-User-agent: PerplexityBot
-Allow: /
+/**
+ * P0-S3: sitemap-index.xml references both the URL sitemap and the image
+ * sitemap so search engines discover them in one shot. Currently both are
+ * announced separately in robots.txt; keeping a single sitemap-index lets
+ * us add more sub-sitemaps (videos, news, etc.) later without touching
+ * robots.txt and is the format Google Search Console expects when you
+ * declare a "Sitemaps index" property.
+ */
+export function buildSitemapIndexXml(generatedAt: string): string {
+  const lastmod = (generatedAt ?? new Date().toISOString()).slice(0, 10);
+  const entry = (path: string) => [
+    "  <sitemap>",
+    `    <loc>${escapeXml(`${SITE_ORIGIN}${path}`)}</loc>`,
+    `    <lastmod>${lastmod}</lastmod>`,
+    "  </sitemap>",
+  ].join("\n");
 
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Applebot-Extended
-Allow: /
-
-Sitemap: ${SITE_ORIGIN}/sitemap.xml
-Sitemap: ${SITE_ORIGIN}/image-sitemap.xml
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${entry("/sitemap.xml")}
+${entry("/image-sitemap.xml")}
+</sitemapindex>
 `;
 }
 

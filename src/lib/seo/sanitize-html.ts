@@ -39,6 +39,17 @@ export function sanitizeHead($head: CheerioAPI): void {
     'style[id="wp-emoji-styles-inline-css"]',
     'meta[name="generator"]',
     'meta[name^="google-adsense-platform"]',
+    // P0-HEAD-BLOAT-SAFE (PR audit/p0-seo-indexability): drop pure duplicates
+    // emitted by both Astro <SeoHead> AND the WP chrome snapshot. Astro
+    // already emits these via partials/SeoHead.astro, so the second copy
+    // is dead bytes (~150-300 B per page across 605 pages = ~100 KB total).
+    "meta[charset]",
+    'meta[name="viewport"]',
+    'meta[http-equiv="X-UA-Compatible"]',
+    // WP injects `<link rel="dns-prefetch" href="https://www.googletagmanager.com/">`
+    // duplicating the `<link rel="preconnect">` we declare in SeoHead. preconnect
+    // already includes DNS resolution so the prefetch is strictly redundant.
+    'link[rel="dns-prefetch"]',
   ].forEach((selector) => {
     $head(selector).remove();
   });

@@ -198,11 +198,17 @@ export function buildWebPageJsonLd(
       : {}),
     speakable: {
       "@type": "SpeakableSpecification",
+      // Selectors target editorial summary/answer blocks rendered by the
+      // Astro component tree. WP-residual selectors (e.g.
+      // `.woocommerce-product-details__short-description`) and meta[name]
+      // were removed in PR `audit/p0-seo-indexability` — they no longer
+      // match anything in the Astro-rendered DOM, and Google Assistant
+      // does not narrate <meta> content.
       cssSelector: [
         ".codex-editorial-summary",
         ".codex-editorial-answer",
-        ".woocommerce-product-details__short-description",
-        "meta[name='description']",
+        ".codex-decision-snapshot",
+        ".codex-editorial-faq summary",
       ],
     },
   };
