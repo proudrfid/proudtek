@@ -28,8 +28,14 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     P0-P2 / baseline finding: preconnect already includes DNS resolution
     in all evergreen browsers, so an additional dns-prefetch to the same
     origin is redundant. sanitize-html.ts strips dns-prefetch hints from
-    the WP chrome snapshot for the same reason. */}
+    the WP chrome snapshot for the same reason.
+
+    PR-3 P0-P2 — also preconnect to region1.google-analytics.com.
+    gtag.js loads from googletagmanager.com but beacon requests for
+    GA4 actually POST to region1.google-analytics.com; preconnecting
+    here saves a separate TLS handshake when the first event fires. */}
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+<link rel="preconnect" href="https://region1.google-analytics.com" crossorigin />
 
 {/* Preload critical fonts (Latin subsets for Inter body + Lora headings) */}
 <link rel="preload" href="/site-assets/wp-content/fonts/inter/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2" as="font" type="font/woff2" crossorigin />
@@ -41,12 +47,21 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     the WebP variant via imagesrcset+imagetype so the browser
     downloads the smaller file (~30–55% byte savings). Browsers
     without WebP ignore the imagesrcset hint and the <picture>
-    fallback in the <body> still works. */}
+    fallback in the <body> still works.
+
+    PR-3 P0-P1 — also emit `href` pointing at the original JPG/PNG.
+    Safari and Firefox versions older than 2023 drop the entire
+    preload when imagesrcset is the only source, leaving LCP to
+    wait for the <img> tag to be discovered. Including href as a
+    canonical fallback gives those browsers something to fetch —
+    modern Chromium-based browsers still prefer the WebP via the
+    imagesrcset+imagetype hint. */}
 {seo.imageUrl && seo.kind !== "home" && seo.kind !== "contact" ? (
   seo.imageUrl.startsWith("/landing-images/") ? (
     <link
       rel="preload"
       as="image"
+      href={seo.imageUrl}
       imagesrcset={seo.imageUrl.replace(/\.(jpe?g|png)$/i, ".webp")}
       imagetype="image/webp"
       fetchpriority="high"
@@ -70,14 +85,33 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
 
 <Fragment set:html={seo.headHtml} />
 
-{/* GA4 */}
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-30013548"></script>
+{/* GA4 — PR-3 P0-P2:
+    Order matters. dataLayer + Consent Mode v2 defaults MUST execute
+    before gtag.js loads (`async` script could arrive first otherwise).
+    Consent Mode v2 is GDPR-required: without `default { ad_storage:
+    'denied', analytics_storage: 'denied' }` we leak PII to Google
+    Analytics before the user has any chance to opt out. Update this
+    block to call `gtag('consent', 'update', { ... })` from your
+    cookie-consent UI when the user accepts. Once that's wired,
+    Lighthouse Best Practices (currently warning on the /blog/ hub)
+    should green up. */}
 <script is:inline>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    analytics_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    functionality_storage: 'denied',
+    personalization_storage: 'denied',
+    security_storage: 'granted',
+    wait_for_update: 500
+  });
   gtag('js', new Date());
   gtag('config', 'G-30013548');
 </script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-30013548"></script>
 
 {seo.indexable && machineJsonPath ? <link rel="alternate" type="application/json" href={machineJsonPath} /> : null}
 {seo.indexable && machineTextPath ? <link rel="alternate" type="text/plain" href={machineTextPath} /> : null}

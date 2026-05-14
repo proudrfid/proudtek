@@ -74,7 +74,14 @@ def main() -> int:
         print(f"FATAL: {TARGET_DIR} not found", file=sys.stderr)
         return 1
 
-    sources = sorted(p for p in TARGET_DIR.iterdir() if p.suffix.lower() in EXTENSIONS)
+    # PR-3 P0-P4: walk subdirectories too. The original `iterdir()` only
+    # returned top-level files, so anything dropped into
+    # `public/landing-images/hero/` or `public/landing-images/contact/`
+    # quietly stopped generating WebP variants — degrading LCP for those
+    # routes. rglob() with the same extension filter restores
+    # comprehensive coverage and remains idempotent (already-encoded
+    # files are skipped unless --force).
+    sources = sorted(p for p in TARGET_DIR.rglob("*") if p.suffix.lower() in EXTENSIONS)
     if not sources:
         print(f"No source images found in {TARGET_DIR}")
         return 0

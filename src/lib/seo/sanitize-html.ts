@@ -50,6 +50,33 @@ export function sanitizeHead($head: CheerioAPI): void {
     // duplicating the `<link rel="preconnect">` we declare in SeoHead. preconnect
     // already includes DNS resolution so the prefetch is strictly redundant.
     'link[rel="dns-prefetch"]',
+    // PR-3 P0-HEAD-BLOAT (conservative tier): strip WP/WooCommerce style blocks
+    // that the Astro editorial tree never uses. KEEP every Kadence stylesheet
+    // and `kadence-*-inline-css` block — `codex-tokens.css` references the
+    // Kadence palette vars (`--global-palette1..9`, `--global-content-width`
+    // etc.) and visual regressions would surface site-wide. Aggressive Kadence
+    // theme stripping (with a brand-palette critical-CSS stub) is deferred to
+    // a follow-up PR pending visual diffing.
+    //
+    //   - wp-block-library-css → Gutenberg block editor base CSS; Astro
+    //     editorial components emit `codex-*` classes, not `wp-block-*`.
+    //   - classic-theme-styles-inline-css → block editor classic-theme
+    //     shims; never matched by Astro-rendered DOM.
+    //   - woocommerce-inline-inline-css → e-commerce UI (no shop here).
+    //   - wc-blocks-style → WooCommerce blocks (no shop here).
+    //   - wp-block-* → all remaining individual WP block CSS bundles.
+    //
+    // Each WP page typically ships 5–15 KB of these blocks; with 605 pages
+    // that's 3–10 MB of dead transfer per crawl. Lighthouse "Unused CSS"
+    // also flags these in the Performance score breakdown.
+    'link[id="wp-block-library-css"]',
+    'link[id="wp-block-library-theme-css"]',
+    'link[id^="wp-block-"]',
+    'link[id="wc-blocks-style-css"]',
+    'link[id="classic-theme-styles-css"]',
+    'style[id="classic-theme-styles-inline-css"]',
+    'style[id="woocommerce-inline-inline-css"]',
+    'style[id="wc-blocks-style-inline-css"]',
   ].forEach((selector) => {
     $head(selector).remove();
   });
