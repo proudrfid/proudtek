@@ -2,8 +2,21 @@
 /**
  * PageScript — global client-side JavaScript bootstrap.
  *
- * Inlined as <script is:inline> so it runs synchronously at parse
- * time (no defer/async). Contains 19 small client-side modules:
+ * PR-4 (audit/p0-pagescript-refactor): the script is now Astro-bundled
+ * (removed `is:inline`). Astro emits it as `<script type="module">`,
+ * which the browser fetches in parallel with HTML parsing and executes
+ * after DOMContentLoaded. Trade-offs:
+ *   - HTML size:  -22 KB per page (script moves to external .js).
+ *   - First page paint: marginally faster (less HTML to parse).
+ *   - Repeat pageviews: external .js is HTTP-cached across the session.
+ *   - Init timing: every feature here is event-driven (addEventListener
+ *     / MutationObserver / IntersectionObserver), so deferred execution
+ *     doesn't break behaviour. Only `updateHeaderScrolled()` runs once
+ *     at init to set initial scroll state — between page parse and
+ *     DOMContentLoaded the user might already have scrolled, so the
+ *     header could miss its first transition by a frame. Acceptable.
+ *
+ * Contains 19 small client-side modules:
  *
  *   - Sticky site header scroll detection
  *   - Mobile drawer focus management
@@ -27,8 +40,19 @@
  * Extracted from BaseLayout.astro on 2026-05-08. Logic unchanged.
  */
 ---
-    <script is:inline>
+    {/* PR-4: removed `is:inline` so Astro bundles + defers via type="module".
+        Repeat the IIFE wrapper anyway for legacy-compat (older browsers
+        without ESM still parse the script body even if the module
+        loader rejects type="module"). */}
+    <script>
     (function() {
+      /* PR-4 — hoisted from the duplicate declarations at the reveal and
+         briefDetails sites. Wrapped in try/catch because some older
+         WebViews return null from matchMedia and we don't want a runtime
+         exception to kill the entire IIFE. */
+      var prefersReducedMotion = false;
+      try { prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+
       /* Sticky site header — toggle `.is-scrolled` for the shadow effect.
          CSS does the actual sticky positioning; this just adds a visual
          cue once the user has scrolled past the very top. Threshold of 8px
@@ -136,8 +160,10 @@
         }
       }
 
-      /* Scroll-triggered reveal: IntersectionObserver for section fade-in */
-      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      /* Scroll-triggered reveal: IntersectionObserver for section fade-in.
+         PR-4: relies on the hoisted prefersReducedMotion declared near the
+         top of the IIFE. The old `var prefersReducedMotion = window.matchMedia(...).matches`
+         here was a duplicate that could throw on legacy WebViews. */
       var revealTargets = document.querySelectorAll(
         '.codex-editorial-section, .codex-editorial-card, .codex-editorial-action-bar, .codex-editorial-jump-nav'
       );
@@ -680,8 +706,8 @@
          auto-expand entirely. Manual click still works. */
       var briefDetails2 = document.querySelector('[data-collapsible-brief] details');
       if (briefDetails2) {
-        var prefersReducedMotion = false;
-        try { prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+        // PR-4: use the hoisted prefersReducedMotion (declared near the top
+        // of this IIFE) instead of re-querying matchMedia here.
         if (prefersReducedMotion && briefDetails2.open && !briefDetails2.dataset.userToggled) {
           // If the earlier auto-expand handler already opened it, undo —
           // but only if the user hasn't clicked the summary themselves.
