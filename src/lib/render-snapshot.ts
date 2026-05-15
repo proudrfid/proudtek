@@ -762,13 +762,16 @@ function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
   // Match on the leading "RFID" + "NFC" + "manufactur" pattern so we catch
   // both phrasings (and any future drift that keeps the same intent) without
   // touching unrelated H1s.
+  // 2026-05-15 update: shortened H1 (product list moved to subtitle <p>) per
+  // user feedback that the long single-line H1 was visually overwhelming.
+  // The product-family keywords now live in the .codex-hero-subtitle (set
+  // upstream by enhanceHomeHero in seo/enhance-page.ts) so no SEO surface
+  // is lost — the H1 just stops carrying every keyword in one breath.
   const h1 = $body("h1").first();
   if (h1.length) {
     const original = (h1.text() || "").trim();
     if (/^(?:Custom\s+)?RFID\s+and\s+NFC\b/i.test(original) && /\bmanufactur/i.test(original)) {
-      h1.text(
-        "Custom RFID & NFC Manufacturer in China — Cards, Tags, Labels, Wristbands, Keyfobs & Readers for OEM/ODM Buyers",
-      );
+      h1.text("Custom RFID & NFC Manufacturer in China");
     }
   }
 
@@ -821,12 +824,6 @@ function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
   });
 }
 
-/**
- * Replace the legacy WordPress / Kadence contact page body with a single
- * clean two-column layout: contact methods on the left, message form on
- * the right, plus a single Google-Maps embed pinned to the actual office
- * coordinates in Shenzhen (the legacy embed had San Francisco lat/lng).
- */
 /**
  * Restructure the homepage "Our Capabilities" section into a true 2×2
  * grid so the four logical blocks align row-by-row.
@@ -893,6 +890,12 @@ function restructureCapabilitiesSection($body: ReturnType<typeof load>): void {
   section.addClass("codex-cap-restructured");
 }
 
+/**
+ * Replace the legacy WordPress / Kadence contact page body with a single
+ * clean two-column layout: contact methods on the left, message form on
+ * the right, plus a single Google-Maps embed pinned to the actual office
+ * coordinates in Shenzhen (the legacy embed had San Francisco lat/lng).
+ */
 function redesignContactPage($body: ReturnType<typeof load>): void {
   const article = $body("article#post-15, main#main article").first();
   if (!article.length) return;

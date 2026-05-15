@@ -333,25 +333,32 @@ export function enhanceHomeHero($body: CheerioAPI): void {
     return;
   }
 
-  // P0 T1 (2026-05-13): the homepage hero H1 + lead paragraph carry the
-  // primary keyword surface for search / LLM retrieval, so they must name
-  // the product families (cards, tags, labels, wristbands, keyfobs,
-  // readers), the China manufacturing geography and the OEM/ODM buyer
-  // intent. Replaces the legacy "Custom RFID and NFC manufacturing for
-  // global buyers" / "Samples, compatibility checks, and production
-  // support." pair, which was keyword-thin.
-  heroHeading.text(
-    "Custom RFID & NFC Manufacturer in China — Cards, Tags, Labels, Wristbands, Keyfobs & Readers for OEM/ODM Buyers",
-  );
+  // P0 T1 (2026-05-13, refined 2026-05-15): the homepage hero carries the
+  // primary keyword surface for search / LLM retrieval. Original P0 stuffed
+  // the full product-family list into a single multi-line H1 + long lead
+  // paragraph ("Two Shenzhen factories. 18+ years...one business day."),
+  // which rendered as 6-line H1 + dense 4-line paragraph — visually
+  // overwhelming per user feedback 2026-05-15 (字太密了).
+  //
+  // Refined hierarchy (preserves all keywords across H1 + subtitle):
+  //   H1:       "Custom RFID & NFC Manufacturer in China"
+  //   subtitle: "— Cards, Tags, Labels, Wristbands, Keyfobs & Readers
+  //              for OEM/ODM Buyers"
+  // The dense description paragraph is dropped — its facts (Two Shenzhen
+  // factories, 18+ years, ISO 9001, OEM/ODM samples) all live in the
+  // Capabilities stat grid + About blocks below, so no keyword surface is
+  // lost. The subtitle is tagged with `codex-hero-subtitle` so CSS can
+  // render it bigger than body copy but smaller than H1.
+  heroHeading.text("Custom RFID & NFC Manufacturer in China");
+
   const heroLead = heroHeading
     .nextAll("p")
     .filter((_, element) => cleanText($body(element).text()).length > 0)
     .first();
 
   if (heroLead.length) {
-    heroLead.text(
-      "Two Shenzhen factories. 18+ years manufacturing custom RFID cards, NFC tags, RFID labels, wristbands, keyfobs and readers. ISO 9001 audited. OEM / ODM samples, compatibility checks and production support within one business day.",
-    );
+    heroLead.text("— Cards, Tags, Labels, Wristbands, Keyfobs & Readers for OEM/ODM Buyers");
+    heroLead.addClass("codex-hero-subtitle");
   }
 
   heroHeading

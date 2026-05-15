@@ -4647,6 +4647,159 @@ form[data-codex-rfq] .kb-forms-submit {
     padding: 0.35em 0.7em;
   }
 }
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Homepage hero — centred minimalist redesign (2026-05-14)
+ *
+ * Matches the reference proudtek.com hero: a wide centred H1, a brief
+ * centred subtitle, two centred CTAs (cyan-blue primary + dark-outline
+ * secondary), and a lighter video overlay so the production footage
+ * stays visually present rather than buried in heavy darkness.
+ *
+ * Targets the existing WP-snapshot markup (.wp-block-cover.is-light
+ * + .kt-adv-heading_315959-3b + .kb-buttons-wrap) — no HTML changes,
+ * no content loss, only visual rebalancing via !important overrides.
+ *
+ * The CTAs use Kadence's own theme blue (--global-palette-btn-bg
+ * #1fcefb) so the design lands inside the existing brand palette
+ * rather than introducing a new colour.
+ * ─────────────────────────────────────────────────────────────────── */
+
+/* Cover: lighter overlay so the video subject remains visible */
+.wp-block-cover.is-light {
+  min-height: 72vh !important;
+}
+.wp-block-cover.is-light > .wp-block-cover__background.has-background-gradient {
+  /* Soft brand-tinted gradient at ~45% darkness — keeps video colour
+   * while still meeting 4.5:1 contrast on white text. */
+  background: linear-gradient(135deg,
+    rgba(15, 23, 35, 0.55) 0%,
+    rgba(31, 206, 251, 0.18) 45%,
+    rgba(155, 81, 224, 0.22) 100%) !important;
+}
+
+/* Inner column: full-width centred */
+.wp-block-cover.is-light .wp-block-cover__inner-container {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+}
+.wp-block-cover.is-light .kadence-column_0bcf25-63 {
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+.wp-block-cover.is-light .kadence-column_0bcf25-63 > .kt-inside-inner-col {
+  padding: 6rem 1.5rem 5rem !important;
+  max-width: 1040px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* H1: large centred serif, balanced wrap into ~2-3 lines */
+.wp-block-cover.is-light h1.kt-adv-heading_315959-3b {
+  font-size: clamp(2.4rem, 5vw, 4.5rem) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.015em !important;
+  margin: 0 auto 1.5rem !important;
+  text-align: center !important;
+  max-width: 22ch;
+  text-wrap: balance;
+  color: #ffffff !important;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  font-weight: 600 !important;
+}
+
+/* Subtitle: medium-weight tagline beneath the H1.
+ *
+ * 2026-05-15: lead paragraph was rewritten to the product-family tagline
+ * "— Cards, Tags, Labels, Wristbands, Keyfobs & Readers for OEM/ODM
+ * Buyers" (replaces the dense Two-Shenzhen-factories descriptor that
+ * was too text-heavy per user feedback). Rendered larger than body copy
+ * so it reads as a subtitle, not as caption text. The .codex-hero-subtitle
+ * class is added by enhanceHomeHero() in src/lib/seo/enhance-page.ts —
+ * either selector targets the same node so this rule survives if the
+ * Kadence inline-class id (kt-adv-heading_8f387e-bd) drifts. */
+.wp-block-cover.is-light p.kt-adv-heading_8f387e-bd,
+.wp-block-cover.is-light p.codex-hero-subtitle {
+  font-size: clamp(1.15rem, 1.9vw, 1.45rem) !important;
+  line-height: 1.45 !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.005em !important;
+  margin: 0 auto 2.5rem !important;
+  max-width: 48ch;
+  text-align: center !important;
+  color: rgba(255, 255, 255, 0.94) !important;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.28);
+  text-wrap: balance;
+}
+
+/* CTA row: centred, generous gap */
+.wp-block-cover.is-light .kb-buttons-wrap {
+  margin: 0 auto !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Buttons base — flat, modern */
+.wp-block-cover.is-light .kb-buttons-wrap .kb-button {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  padding: 1.1rem 2.4rem !important;
+  border-radius: 6px !important;
+  border: 1.5px solid transparent !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease !important;
+  background-image: none !important;
+}
+
+/* Primary CTA — Kadence cyan brand button (#1fcefb) */
+.wp-block-cover.is-light .kb-buttons-wrap .kb-button:nth-of-type(1) {
+  background-color: #1fcefb !important;
+  color: #0a1a2c !important;
+  border-color: #1fcefb !important;
+}
+.wp-block-cover.is-light .kb-buttons-wrap .kb-button:nth-of-type(1):hover {
+  background-color: #15bce8 !important;
+  border-color: #15bce8 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -10px rgba(31, 206, 251, 0.55) !important;
+}
+
+/* Secondary CTA — dark outline matching reference */
+.wp-block-cover.is-light .kb-buttons-wrap .kb-button:nth-of-type(2) {
+  background-color: transparent !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+}
+.wp-block-cover.is-light .kb-buttons-wrap .kb-button:nth-of-type(2):hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: #ffffff !important;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .wp-block-cover.is-light { min-height: 64vh !important; }
+  .wp-block-cover.is-light .kadence-column_0bcf25-63 > .kt-inside-inner-col {
+    padding: 4rem 1.25rem 3.5rem !important;
+  }
+  .wp-block-cover.is-light h1.kt-adv-heading_315959-3b {
+    max-width: 100%;
+  }
+  .wp-block-cover.is-light .kb-buttons-wrap .kb-button {
+    padding: 1rem 1.8rem !important;
+    font-size: 13px !important;
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────────────
  * "Our Capabilities" section redesign (2026-05-14)
  *
