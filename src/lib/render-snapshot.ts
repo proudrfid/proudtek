@@ -184,6 +184,7 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // to carry the product-family keywords search engines and LLMs key off.
   if (page.route === "/" || page.route === "") {
     enhanceHomepageHeadings($body);
+    restructureCapabilitiesSection($body);
   }
 
   // ── Defang testimonial Splide carousel ──
@@ -826,6 +827,72 @@ function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
  * the right, plus a single Google-Maps embed pinned to the actual office
  * coordinates in Shenzhen (the legacy embed had San Francisco lat/lng).
  */
+/**
+ * Restructure the homepage "Our Capabilities" section into a true 2×2
+ * grid so the four logical blocks align row-by-row.
+ *
+ * Source structure (WP-Kadence snapshot, 4 levels deep):
+ *   .kb-row-layout-id_7af224-af  ← section outer 2-col
+ *     ├─ .kadence-column_05f7f6-db (LEFT)
+ *     │   └─ .kb-row-layout-id_a85061-44 (1-col stack)
+ *     │       ├─ .kadence-column_50aa06-21  ← Our Capabilities + desc
+ *     │       └─ .kadence-column_a6dd7b-78  ← Comprehensive + 3-point list
+ *     └─ .kadence-column_dcc0dd-68 (RIGHT)
+ *         └─ .kb-row-layout-id_f2a65f-e2 (inner 2-col)
+ *             ├─ .kadence-column_52b00d-2f  ← 6 stat cards (nested rows)
+ *             └─ .kadence-column_befae7-b8  ← factory image
+ *
+ * Target structure:
+ *   .kb-row-layout-id_7af224-af.codex-cap-restructured
+ *     └─ .codex-cap-2x2  ← grid container (2col × 2row)
+ *         ├─ .codex-cap-cell--our-cap        (row 1, col 1)
+ *         ├─ .codex-cap-cell--stats          (row 1, col 2)
+ *         ├─ .codex-cap-cell--comprehensive  (row 2, col 1)
+ *         └─ .codex-cap-cell--image          (row 2, col 2)
+ *
+ * User feedback 2026-05-14: 请将"Our Capabilities + 描述"和"6 stat cards"
+ * 处于同一行，"Comprehensive Manufacturing Excellence + 3 点列表"和
+ * "factory 图"处于同一行 (per-row alignment). The CSS-only flex-
+ * space-between approach we tried earlier couldn't anchor the row-1/row-2
+ * boundary because the original nesting kept text and visuals in separate
+ * sub-columns; this restructure lifts the 4 inner blocks to siblings of a
+ * real CSS Grid so subgrid is no longer needed.
+ *
+ * Style: `.codex-cap-2x2 { display: grid; grid-template-columns: 5fr 8fr;
+ * grid-template-rows: auto auto; gap: ... }` — see codex-components.css.
+ */
+function restructureCapabilitiesSection($body: ReturnType<typeof load>): void {
+  const section = $body(".kb-row-layout-id_7af224-af").first();
+  if (!section.length) return;
+  // Guard against double-application (re-running on already-rewritten HTML).
+  if (section.hasClass("codex-cap-restructured")) return;
+
+  const cellSelectors: Array<{ cls: string; sel: string }> = [
+    { cls: "codex-cap-cell--our-cap", sel: ".kadence-column_50aa06-21" },
+    { cls: "codex-cap-cell--stats", sel: ".kadence-column_52b00d-2f" },
+    { cls: "codex-cap-cell--comprehensive", sel: ".kadence-column_a6dd7b-78" },
+    { cls: "codex-cap-cell--image", sel: ".kadence-column_befae7-b8" },
+  ];
+
+  // Collect outerHTML of each of the 4 blocks. Bail out if any are missing
+  // (snapshot may have changed structure — fall back to original layout).
+  const cells: string[] = [];
+  for (const { cls, sel } of cellSelectors) {
+    const el = section.find(sel).first();
+    if (!el.length) return; // defensive: structure changed, skip restructure
+    const outer = $body.html(el);
+    cells.push(`<div class="codex-cap-cell ${cls}">${outer}</div>`);
+  }
+
+  // Build the new flat 2×2 grid container.
+  const newInner = `<div class="codex-cap-2x2">${cells.join("")}</div>`;
+
+  // Replace the section's contents (preserve the outer wrapper for any
+  // global JS / CSS that targets kb-row-layout-id_7af224-af).
+  section.empty().append(newInner);
+  section.addClass("codex-cap-restructured");
+}
+
 function redesignContactPage($body: ReturnType<typeof load>): void {
   const article = $body("article#post-15, main#main article").first();
   if (!article.length) return;

@@ -4647,3 +4647,314 @@ form[data-codex-rfq] .kb-forms-submit {
     padding: 0.35em 0.7em;
   }
 }
+/* ─────────────────────────────────────────────────────────────────────
+ * "Our Capabilities" section redesign (2026-05-14)
+ *
+ * Root cause of the original layout collapse:
+ *   1. Each stat is a 2-col row (image | text) at 50/50 → text column
+ *      narrows to ~130 px on a 768 px outer wrapper.
+ *   2. The stat label is a default <h2 class="wp-block-heading"> which
+ *      WP renders at 38 px serif. 38 px in a 130 px column wraps every
+ *      3-4 characters, producing the "Years / Of / Indus / try / Exper /
+ *      ience" disaster from the screenshots.
+ *   3. The badge images have width="600" attribute and load lazily;
+ *      until they actually load they show alt-text at full natural
+ *      size, breaking the proportion further.
+ *
+ * Fix scope: limited to descendants of the Capabilities outer wrapper
+ * `.kb-row-layout-id_7af224-af` so the rest of the site is untouched.
+ * Uses `:has()` (Safari 15.4+, Chrome 105+, Firefox 121+) to identify
+ * the stat-row pattern by structure, not by per-row-id selectors that
+ * differ between the 6 stats.
+ * ─────────────────────────────────────────────────────────────────── */
+
+/* 1. Cap badge images at icon size — featured at top of each stat card.
+ *    User feedback 2026-05-14: icon 要放在文字的上面 (icon goes above text). */
+.kb-row-layout-id_7af224-af figure.wp-block-image {
+  margin: 0 0 0.75rem !important;
+  text-align: center;
+}
+.kb-row-layout-id_7af224-af figure.wp-block-image img {
+  max-width: 120px !important;
+  max-height: 120px !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-block !important;
+}
+
+/* 2. Stat card layout: collapse the INNER 2-col (image | text) into a
+ *    SINGLE column so the icon sits ON TOP of the text. The `>` direct-
+ *    child selector in the `:has()` clauses ensures only the per-stat
+ *    rows match — the OUTER 7af224-af wrap has figure/h2 only as deep
+ *    descendants, not as direct grandchildren of its kt-row-column-wrap,
+ *    so it stays in the 5fr 8fr split (rule 9b above). */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 0.5rem !important;
+  text-align: center !important;
+  justify-items: center !important;
+}
+
+/* The image column (first child) — make sure figure block is centred. */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:first-child > .kt-inside-inner-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 !important;
+}
+
+/* 3. Stat label <h2>: SINGLE LINE, fixed font size for cross-card
+ *    consistency. User feedback 2026-05-14: 单行同字号，超长用省略号截断.
+ *
+ *    BUG FIX 2026-05-14b: the previous selector required
+ *    `.kb-section-dir-horizontal` on the text column, but only 2 of
+ *    the 6 stat cards have that class — the other 4 use plain
+ *    `.wp-block-kadence-column` with no direction modifier. Result:
+ *    4 of 6 H2 stayed at default 38px while 2 got 17px. New selector
+ *    uses the STRUCTURAL pattern (any H2 inside the 2nd column of a
+ *    figure+h2 inner stat row) so it works on all 6 stat cards
+ *    regardless of which Kadence dir-modifier class they carry. */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > h2.wp-block-heading,
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > h3.wp-block-heading {
+  font-size: 17px !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+  margin: 0 0 0.5rem !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--global-palette3, #291c0e) !important;
+  text-align: center !important;
+  max-width: 100%;
+  width: 100%;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+}
+
+/* 4. Stat description <p>: small caption text, muted, centred under heading.
+ *    Same structural selector as #3 to catch all 6 cards. */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > p {
+  font-size: 13px !important;
+  line-height: 1.55 !important;
+  color: var(--global-palette4, #4f4f4f) !important;
+  margin: 0 auto !important;
+  text-align: center !important;
+  max-width: 36ch;
+}
+
+/* 5. Each stat card text column: centre-align internal content. */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col {
+  text-align: center !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0.5rem !important;
+}
+
+/* 6. Section-level breathing room — Our Capabilities row gets generous
+ *    vertical padding to anchor the redesign visually. */
+.kb-row-layout-id_7af224-af > .kt-row-column-wrap {
+  padding-top: 5rem;
+  padding-bottom: 5rem;
+}
+
+/* 7. Outer description/stats row: collapse to single-column flow so
+ *    "Our Capabilities" → description paragraphs → "Comprehensive
+ *    Manufacturing Excellence" → 3-point list → stats grid all read as
+ *    one vertical narrative instead of a 2-col split that placed the
+ *    Excellence subsection alongside the heading. Per user feedback
+ *    2026-05-14: 'comprehensive manufacturing excellence 应该和 our
+ *    capability 处于同一列，而不是同一行'. */
+.kb-row-layout-id_a85061-44 > .kt-row-column-wrap.kt-has-2-columns {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 2.5rem !important;
+  align-items: start !important;
+}
+
+/* 8. Reset the centred text-align on the Comprehensive Manufacturing
+ *    Excellence column so it visually flows in the same left-aligned
+ *    column as everything else. */
+.kb-row-layout-id_7af224-af .kadence-column_42cda8-65,
+.kb-row-layout-id_7af224-af .kadence-column_42cda8-65 .kt-inside-inner-col,
+.kb-row-layout-id_7af224-af .kadence-column_42cda8-65 h4,
+.kb-row-layout-id_7af224-af .kadence-column_42cda8-65 > .kt-inside-inner-col > p {
+  text-align: left !important;
+}
+
+/* 9. Stat outer rows: tighten gap between stats so they feel like a
+ *    grid rather than scattered. */
+.kb-row-layout-id_a63b0a-6e > .kt-row-column-wrap.kt-has-3-columns {
+  gap: 1.5rem !important;
+}
+
+/* 9a. EQUAL-HEIGHT STAT CARDS — all 6 cards have varying text length
+ *     (20-35 chars), so without stretch alignment each card auto-sizes
+ *     to its content and the row looks ragged. Stretch parent 3-col
+ *     grids so all stats in a row share the tallest card's height.
+ *     User feedback 2026-05-14: 每个 stat 卡格式对齐. */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-3-columns {
+  align-items: stretch !important;
+}
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-3-columns > .wp-block-kadence-column {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-3-columns > .wp-block-kadence-column > .kt-inside-inner-col {
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* 9b. Each inner stat row (the icon-above-text card itself) should
+ *     occupy the full height of its parent column with:
+ *     - icon pinned to the top (auto-size)
+ *     - heading just below the icon
+ *     - description flexed to fill so cards bottom-align consistently */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) {
+  height: 100% !important;
+  align-content: start !important;
+  padding: 1.5rem 0.75rem !important;
+}
+
+/* 9c. Text column flex grow: so descriptions of varying length still
+ *     leave the icons + headings vertically aligned across the row. */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 9d. (removed 2026-05-14b — was the multi-line clamp rule for the
+ *      old wrap-balanced layout. Replaced by single-line nowrap+ellipsis
+ *      handling in rule 3 above. Also it used the broken
+ *      `.kb-section-dir-horizontal` selector that only caught 2 of 6
+ *      cards.) */
+
+/* 9b. Section-level 2-col split: text content LEFT (narrower) / stats
+ *     grid RIGHT (wider). Was 50/50 in inline-css making the section
+ *     feel wide and unbalanced — narrowing the left text column to ~38%
+ *     gives the stats grid breathing room and a coherent visual rhythm.
+ *     User feedback 2026-05-14: 左列占比缩小，让这个 section 整体看起来协调. */
+.kb-row-layout-id_7af224-af > .kt-row-column-wrap.kt-has-2-columns {
+  display: grid !important;
+  grid-template-columns: 5fr 8fr !important;
+  gap: 3rem !important;
+  /* Stretch (not start) so both columns reach the same height, allowing
+   * the inner flex distributions below to actually push bottom-row
+   * content to the bottom edge in alignment with each other. */
+  align-items: stretch !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Capabilities 2×2 grid (build-time restructure, 2026-05-14)
+ *
+ * render-snapshot.ts's restructureCapabilitiesSection() rewrites the
+ * homepage Capabilities section's HTML so the 4 logical blocks (Our
+ * Cap, Stats, Comprehensive, Image) become direct grid children of
+ * `.codex-cap-2x2`. This produces TRUE row-by-row alignment that
+ * CSS-only on the original nested HTML couldn't achieve.
+ *
+ * Row 1: Our Cap heading ↔ 6 stat cards          (top-aligned)
+ * Row 2: Comprehensive Mfg + 3 pts ↔ Factory img (bottom-aligned)
+ *
+ * The outer `.kb-row-layout-id_7af224-af.codex-cap-restructured` keeps
+ * its original padding (rule above gives 5rem top/bottom). The inner
+ * `.codex-cap-2x2` is the actual grid. Each `.codex-cap-cell` wraps
+ * one of the 4 original kadence-columns — its content is unchanged so
+ * downstream selectors targeting `.kadence-column_XXXX` still apply.
+ * ─────────────────────────────────────────────────────────────────── */
+.codex-cap-restructured .codex-cap-2x2 {
+  display: grid;
+  grid-template-columns: 5fr 8fr;
+  grid-template-rows: auto auto;
+  column-gap: 3rem;
+  row-gap: 3.5rem;
+  align-items: start;
+}
+
+.codex-cap-cell {
+  min-width: 0;  /* prevent grid blowout from long content */
+}
+.codex-cap-cell--our-cap        { grid-column: 1; grid-row: 1; }
+.codex-cap-cell--stats          { grid-column: 2; grid-row: 1; }
+.codex-cap-cell--comprehensive  { grid-column: 1; grid-row: 2; }
+.codex-cap-cell--image          { grid-column: 2; grid-row: 2; }
+
+/* Mobile: collapse to single column, vertical flow */
+@media (max-width: 767px) {
+  .codex-cap-restructured .codex-cap-2x2 {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto auto;
+    row-gap: 2.5rem;
+  }
+  .codex-cap-cell--our-cap        { grid-column: 1; grid-row: 1; }
+  .codex-cap-cell--stats          { grid-column: 1; grid-row: 2; }
+  .codex-cap-cell--comprehensive  { grid-column: 1; grid-row: 3; }
+  .codex-cap-cell--image          { grid-column: 1; grid-row: 4; }
+}
+
+/* User feedback 2026-05-14: align "Our Capabilities + desc" row-wise
+ * with "6 stat cards", and "Comprehensive Manufacturing Excellence +
+ * 3-point list" row-wise with "factory image".
+ *
+ * CSS-only solution: stretch columns to equal heights (above), then
+ * make each column's content a flex column with justify-content:
+ * space-between — the FIRST child pins to the top, the LAST child
+ * pins to the bottom, and remaining space distributes between. Result:
+ *   LEFT-top  (Our Cap)        ⟷ RIGHT-top  (stats)
+ *   LEFT-bot  (Comprehensive)  ⟷ RIGHT-bot  (factory image)
+ */
+.kb-row-layout-id_7af224-af > .kt-row-column-wrap > .wp-block-kadence-column.kadence-column_05f7f6-db > .kt-inside-inner-col,
+.kb-row-layout-id_7af224-af > .kt-row-column-wrap > .wp-block-kadence-column.kadence-column_dcc0dd-68 > .kt-inside-inner-col {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  justify-content: space-between !important;
+}
+
+/* The LEFT column's content is wrapped in `a85061-44` 1-col row (set
+ * earlier). To allow flex distribution to push Comprehensive to the
+ * bottom, the row's grid container needs to fill its parent height
+ * and use flex column with space-between too. */
+.kb-row-layout-id_a85061-44 > .kt-row-column-wrap {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+  height: 100% !important;
+  gap: 2.5rem;
+}
+/* Mobile-only collapse to 1-col. Tablet (768-1023) keeps the side-by-
+ * side layout so 'description LEFT | stats RIGHT' stays aligned at
+ * iPad widths. User feedback 2026-05-14: 请将这两部分大致左右对齐. */
+@media (max-width: 767px) {
+  .kb-row-layout-id_7af224-af > .kt-row-column-wrap.kt-has-2-columns {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 2.5rem !important;
+  }
+}
+
+/* 10. Comprehensive Manufacturing Excellence heading: clearly demarcate
+ *     as a sub-section instead of a centred banner — add top margin and
+ *     a subtle accent rule so it reads as "section continues" rather
+ *     than "new isolated banner". */
+.kb-row-layout-id_7af224-af .kadence-column_42cda8-65 > .kt-inside-inner-col > h4.wp-block-heading {
+  font-size: clamp(1.4rem, 2.2vw, 1.75rem) !important;
+  line-height: 1.25 !important;
+  font-weight: 600 !important;
+  margin: 3rem 0 1rem !important;
+  color: var(--global-palette3, #291c0e) !important;
+  text-transform: none !important;
+  letter-spacing: -0.005em !important;
+  position: relative;
+  padding-left: 1rem;
+  border-left: 3px solid var(--global-palette1, #c39a5f);
+}
+.kb-row-layout-id_7af224-af .kadence-column_42cda8-65 > .kt-inside-inner-col > p:first-of-type {
+  font-size: 16px !important;
+  line-height: 1.65 !important;
+  color: var(--global-palette4, #4f4f4f) !important;
+  margin: 0 0 1.5rem !important;
+  max-width: 65ch;
+}
