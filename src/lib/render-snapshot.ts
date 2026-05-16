@@ -185,6 +185,12 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   if (page.route === "/" || page.route === "") {
     enhanceHomepageHeadings($body);
     restructureCapabilitiesSection($body);
+    // 2026-05-15: REPLACE WP/Kadence cover with a clean Astro-controlled
+    // hero. 7 prior CSS-only takes failed because the Kadence flex chain
+    // kept overriding inner-container width/position. Nuclear option:
+    // swap out the entire .wp-block-cover.is-light DOM subtree for a
+    // hand-built <section class="codex-home-hero"> that we fully control.
+    replaceHomepageHero($body);
   }
 
   // ── Defang testimonial Splide carousel ──
@@ -822,6 +828,70 @@ function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
       desc.text(expansion);
     }
   });
+}
+
+/**
+ * Replace the WP/Kadence cover-block hero with a hand-built clean
+ * <section class="codex-home-hero"> that we fully control.
+ *
+ * Why this exists (2026-05-15 take 8, after takes 1-7 all failed):
+ *   The WP Kadence cover block has a deep DOM chain
+ *   (.wp-block-cover > .__background span + <video> + .__inner-container
+ *    > .wp-block-kadence-column > .kt-inside-inner-col > h1 / p / btns)
+ *   where the inner-container is a flex item inside a flex container with
+ *   `justify-content: center; align-items: center`. Various Kadence rules
+ *   on the kadence-column / kt-inside-inner-col / inner-container kept
+ *   overriding our width/position attempts, leaving the H1 stuck in a
+ *   narrow off-centre column. Seven CSS-only takes were attempted with
+ *   progressively more aggressive overrides; debug outlines (red on
+ *   cover, yellow on inner-container) confirmed the cover went full-width
+ *   when tagged alignfull, but the inner-container stayed narrow + right-
+ *   anchored even with `width: 100% !important; flex: 1 1 100% !important`.
+ *
+ * The build-time fix: extract the video src from the snapshot and replace
+ * the entire cover element with a flat 3-child <section> that we style
+ * with simple CSS (no inheritance traps, no Kadence rules).
+ *
+ * Structure:
+ *   <section class="codex-home-hero">
+ *     <video class="codex-home-hero__video" autoplay muted loop playsinline src="...">
+ *     <div class="codex-home-hero__overlay">
+ *     <div class="codex-home-hero__content">
+ *       <h1>Custom RFID & NFC Manufacturer in China</h1>
+ *       <p class="codex-home-hero__subtitle">— Cards, Tags, ... </p>
+ *       <div class="codex-home-hero__cta">
+ *         <a class="codex-home-hero__btn codex-home-hero__btn--primary" ...>REQUEST QUOTE</a>
+ *         <a class="codex-home-hero__btn codex-home-hero__btn--ghost" ...>REQUEST SAMPLES</a>
+ *       </div>
+ *
+ * Guard: returns early if the cover or its video src can't be found,
+ * leaving the legacy cover intact (won't break the page).
+ */
+function replaceHomepageHero($body: ReturnType<typeof load>): void {
+  const cover = $body(".wp-block-cover.is-light").first();
+  if (!cover.length) return;
+  // Skip if already replaced (idempotent)
+  if (cover.hasClass("codex-replaced")) return;
+
+  // Extract video src (the homepage RFID production footage)
+  const videoSrc = cover.find("video.wp-block-cover__video-background").attr("src");
+  if (!videoSrc) return;
+
+  const html = `
+<section class="codex-home-hero">
+  <video class="codex-home-hero__video" autoplay muted loop playsinline preload="metadata" src="${videoSrc}"></video>
+  <div class="codex-home-hero__overlay" aria-hidden="true"></div>
+  <div class="codex-home-hero__content">
+    <h1 class="codex-home-hero__h1">Custom RFID &amp; NFC Manufacturer in China</h1>
+    <p class="codex-home-hero__subtitle">— Cards, Tags, Labels, Wristbands, Keyfobs &amp; Readers for OEM/ODM Buyers</p>
+    <div class="codex-home-hero__cta">
+      <a class="codex-home-hero__btn codex-home-hero__btn--primary" href="/contact/">REQUEST QUOTE</a>
+      <a class="codex-home-hero__btn codex-home-hero__btn--ghost" href="/contact/#contact-rfq-form">REQUEST SAMPLES</a>
+    </div>
+  </div>
+</section>`.trim();
+
+  cover.replaceWith(html);
 }
 
 /**
