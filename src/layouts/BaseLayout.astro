@@ -39,6 +39,12 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     <slot name="head" />
   </head>
   <body {...seo.bodyAttrs}>
+    {/* Skip-link (PR-5 a11y P0): WCAG 2.4.1 Bypass Blocks. Visually
+        hidden until focused; first Tab press lifts it into view at
+        the top-left. Targets #main which exists on every page (WP
+        snapshot bodyHtml has <main id="main">; native Astro pages
+        like /rfq/, /blog/, /compare/ all use the same id="main"). */}
+    <a class="codex-skip-link" href="#main">Skip to main content</a>
     <slot />
     <WhatsAppFab />
     <StickyCta />

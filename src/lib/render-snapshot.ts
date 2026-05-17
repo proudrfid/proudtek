@@ -193,6 +193,18 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
     replaceHomepageHero($body);
   }
 
+  // PR-5 a11y P0: enforce single-H1-per-page by demoting any H1 that
+  // sits OUTSIDE the <main> element to H2. Semantically the page H1
+  // belongs inside <main>; WP/Kadence archive pages occasionally
+  // ship a second H1 in the masthead/breadcrumb chrome (e.g.,
+  // /case-studies/ has a "Blog" masthead H1 + "Case Studies" content
+  // H1; /products/all/page/N/ has a "Products" masthead H1 + a
+  // "Redirecting" placeholder content H1). The rule is conservative:
+  // it never touches H1s inside <main>, so legitimate content
+  // headings stay intact. Runs after page-specific transforms so
+  // hub-specific H1 work isn't accidentally demoted.
+  demoteH1sOutsideMain($body);
+
   // ── Defang testimonial Splide carousel ──
   // Kadence's splide-init JS queries `.wp-block-kadence-testimonials .kt-blocks-carousel-init`
   // and restructures the DOM into a <div class="splide__track"><div class="splide__list">…</div></div>.
@@ -827,6 +839,51 @@ function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
     if (expansion) {
       desc.text(expansion);
     }
+  });
+}
+
+/**
+ * Demote H1 duplicates so the page ends up with exactly one H1.
+ * Enforces WCAG 1.3.1 (Info & Relationships).
+ *
+ * Two-phase rule:
+ *   1. If <main> contains zero H1s, leave the page alone — its
+ *      single H1 (wherever it is) is the canonical title. (This
+ *      covers product detail pages that put their H1 in the
+ *      masthead, no H1 inside main.)
+ *   2. If <main> contains at least one H1, demote any H1 OUTSIDE
+ *      <main> to H2. The in-main H1 is the canonical content title;
+ *      outside ones are masthead/breadcrumb leftovers.
+ *
+ * Why DOM position rather than text-pattern matching: archive pages
+ * across the codebase use different class names. Position is the
+ * cleanest invariant. The first-phase guard prevents stripping
+ * legitimate single H1s on pages where the entire H1 lives in chrome.
+ */
+function demoteH1sOutsideMain($body: ReturnType<typeof load>): void {
+  const main = $body("main").first();
+  if (!main.length) return;
+  const mainNode = main.get(0);
+  if (!mainNode) return;
+
+  // Count how many H1s are already inside <main>.
+  const h1sInsideMain = main.find("h1").length;
+
+  // No content H1 inside <main> → leave all H1s alone, even if they
+  // sit in the masthead. Demoting would leave the page with 0 H1s,
+  // which is worse than the duplicate case.
+  if (h1sInsideMain === 0) return;
+
+  // Otherwise demote every H1 outside <main> to H2.
+  $body("h1").each((_, el) => {
+    if ($body.contains(mainNode, el)) return; // keep H1s inside <main>
+    const $el = $body(el);
+    const classAttr = $el.attr("class");
+    const idAttr = $el.attr("id");
+    const inner = $el.html() ?? "";
+    const classPart = classAttr ? ` class="${classAttr}"` : "";
+    const idPart = idAttr ? ` id="${idAttr}"` : "";
+    $el.replaceWith(`<h2${classPart}${idPart}>${inner}</h2>`);
   });
 }
 

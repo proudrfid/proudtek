@@ -98,11 +98,34 @@ export function extractChromeFromSnapshot(
   }
   const mainCloseEnd = mainCloseStart + "</main>".length;
 
+  // PR-5 a11y P0: strip H1 elements from the pre-main chrome.
+  //
+  // Background: extractChromeFromSnapshot is called by hub pages
+  // (/blog/, /case-studies/, /products/all/page/N/, /compare/,
+  // /guides/, etc.) to reuse the WP masthead + footer of an archive
+  // donor. WP archive pages emit their own
+  //   <h1 class="page-title post-home-title archive-title">…</h1>
+  // in the pre-main region. Every Astro hub template then emits a
+  // second H1 inside its own content. Net result: 2 H1s per page,
+  // violating WCAG 1.3.1 (Info & Relationships).
+  //
+  // Chrome is intended to carry header / nav / breadcrumbs, NOT
+  // content headings — the consuming template owns the H1. Strip
+  // any <h1>…</h1> from before-main here so every consumer is safe
+  // without needing local regex (was previously fixed only in
+  // blog/index.astro; case-studies and products/all paginations
+  // were still emitting 2 H1s).
+  const beforeMainRaw = bodyHtml.slice(0, mainOpenStart);
+  const beforeMainStripped = beforeMainRaw.replace(
+    /<h1\b[^>]*>[\s\S]*?<\/h1>/gi,
+    "",
+  );
+
   return {
     htmlAttrs: snap.htmlAttrs,
     bodyAttrs: snap.bodyAttrs,
     headHtml: sanitizedHeadHtml,
-    beforeMainHtml: bodyHtml.slice(0, mainOpenStart),
+    beforeMainHtml: beforeMainStripped,
     afterMainHtml: bodyHtml.slice(mainCloseEnd),
   };
 }
