@@ -16,14 +16,22 @@ import { truncateEditorialText } from "../../lib/editorial-types";
 interface Props {
   items: HubEntry[];
   sectionLabel: string;
+  /** Override the default "Browse all N {sectionLabel}" h2 — used by
+   *  product-pillar pages where the section label is a cased noun phrase
+   *  ("RFID Cards") that shouldn't be auto-lowercased. */
+  titleOverride?: string;
+  /** Override the default intro copy — used by product-pillar pages. */
+  introOverride?: string;
 }
 
-const { items, sectionLabel } = Astro.props;
+const { items, sectionLabel, titleOverride, introOverride } = Astro.props;
 const lowerSection = sectionLabel.toLowerCase();
 const sectionId = `${lowerSection.replace(/[^a-z0-9]+/g, "-")}-hub-grid`;
-const introCopy = lowerSection === "industries"
-  ? "Pick the vertical closest to your project — each page lists the relevant SKUs, real-world deployments and any compliance notes."
-  : `Pick the ${lowerSection.replace(/s$/, "")} closest to your use case — each page covers the relevant SKUs, deployment notes and compatible hardware.`;
+const introCopy = introOverride
+  ?? (lowerSection === "industries"
+    ? "Pick the vertical closest to your project — each page lists the relevant SKUs, real-world deployments and any compliance notes."
+    : `Pick the ${lowerSection.replace(/s$/, "")} closest to your use case — each page covers the relevant SKUs, deployment notes and compatible hardware.`);
+const sectionTitle = titleOverride ?? `Browse all ${items.length} ${lowerSection}`;
 ---
 {items.length > 0 && (
   <section
@@ -31,7 +39,7 @@ const introCopy = lowerSection === "industries"
     id={sectionId}
     aria-label={`All ${lowerSection}`}
   >
-    <h2>Browse all {items.length}{" "}{lowerSection}</h2>
+    <h2>{sectionTitle}</h2>
     <p class="codex-editorial-section-intro">{introCopy}</p>
     <div class="codex-industries-hub-grid__list">
       {items.map((entry) => (

@@ -546,6 +546,42 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
     });
   }
 
+  /* Populate per-cluster product SKU grids. Each PILLAR_CLUSTER_LABELS
+     cluster gets an ordered HubEntry[] of every editorial product
+     definition whose route matches /products/<cluster>/<slug>/. The
+     pillar page hub-grid section then surfaces every SKU in the
+     cluster — so visiting /products/rfid-cards/ shows all 27 cards. */
+  for (const clusterId of Object.keys(_productsHubDataByCluster)) {
+    _productsHubDataByCluster[clusterId].length = 0;
+  }
+  const PRODUCT_SKU_ROUTE_RE = /^\/products\/([^/]+)\/([^/]+)\/$/;
+  for (const def of EDITORIAL_DEFINITIONS) {
+    const m = PRODUCT_SKU_ROUTE_RE.exec(def.route);
+    if (!m) continue;
+    const clusterId = m[1];
+    const slug = m[2];
+    if (!(clusterId in _productsHubDataByCluster)) continue;
+
+    // Compact card title: prefer the part before " — " / " – " / " | " /
+    // " : " for readability, same convention as resources rail.
+    const shortTitle = def.title.split(/—|–|\||:/, 1)[0]?.trim() || def.title;
+    const label = shortTitle.length > 70 ? shortTitle.slice(0, 67).trimEnd() + "…" : shortTitle;
+
+    _productsHubDataByCluster[clusterId].push({
+      slug,
+      route: def.route,
+      label,
+      emoji: "",
+      iconSlug: PRODUCT_CLUSTER_ICONS[clusterId] ?? "tag",
+      summary: def.summary,
+      heroImage: def.heroImage ?? "",
+    });
+  }
+  // Stable alphabetical-by-label order so card grid is predictable.
+  for (const clusterId of Object.keys(_productsHubDataByCluster)) {
+    _productsHubDataByCluster[clusterId].sort((a, b) => a.label.localeCompare(b.label));
+  }
+
   /* ─── Per-hub rail data populators (DS-9 2026-04-26) ─────────────────
      Build separate rail datasets so /guides/, /compare/, /compatibility/
      drill into their own subcategories instead of showing the cross-family
@@ -757,6 +793,34 @@ const INDUSTRY_HUB_META: Array<{ slug: string; label: string; emoji: string; ico
 export type HubEntry = { slug: string; route: string; label: string; emoji: string; iconSlug: string; summary: string; heroImage: string };
 type IndustryHubEntry = HubEntry;
 const _industriesHubData: HubEntry[] = [];
+
+/**
+ * Per-cluster SKU grids for the 6 product pillar pages.
+ * Each value is the ordered list of `/products/<cluster>/<slug>/` SKUs that
+ * belong to the cluster, surfaced as a HubGrid on the pillar so the pillar
+ * shows ALL its products (catalog discovery from the guide page).
+ *
+ * Populated in `buildEditorialPages` from EDITORIAL_DEFINITIONS by route
+ * prefix. Cluster ids mirror PILLAR_CLUSTER_LABELS.
+ */
+const _productsHubDataByCluster: Record<string, HubEntry[]> = {
+  "rfid-cards": [],
+  "rfid-keyfobs": [],
+  "rfid-wristbands": [],
+  "rfid-labels": [],
+  "rfid-readers": [],
+  "rfid-tags": [],
+};
+
+/** Fallback icon per cluster — used only when a product lacks heroImage. */
+const PRODUCT_CLUSTER_ICONS: Record<string, string> = {
+  "rfid-cards": "credit-card",
+  "rfid-keyfobs": "key",
+  "rfid-wristbands": "ticket",
+  "rfid-labels": "tag",
+  "rfid-readers": "radio",
+  "rfid-tags": "tag",
+};
 
 /**
  * Display metadata for solution sub-pages on the /solutions/ hub. Order in
@@ -1213,7 +1277,7 @@ export type EditorialRailDescriptor =
 
 /** Discriminated descriptor for the hub-grid block below the hero. Null when not on a hub page. */
 export type EditorialHubGridDescriptor =
-  | { kind: "flat"; items: HubEntry[]; sectionLabel: string }
+  | { kind: "flat"; items: HubEntry[]; sectionLabel: string; titleOverride?: string; introOverride?: string }
   | { kind: "resourcesCategory"; groups: GroupedHubData; sectionLabel: string };
 
 export interface EditorialScaffold {
@@ -1314,10 +1378,25 @@ export function buildEditorialScaffold(definition: EditorialDefinition): Editori
   const isResourcesHub = definition.route === "/resources/";
   const isResourcesPage = isResourcesHub || /^\/(?:blog|guides|compare|compatibility)\/(?:[^/]+\/)?$/.test(definition.route);
 
+  // Product pillar pages: surface every SKU in the cluster as a hub-grid
+  // below the hero. Detection mirrors getPillarClusterId() but is inlined
+  // here to keep the scaffold function self-contained.
+  const productPillarClusterId = getPillarClusterId(definition.route);
+
   let rail: EditorialRailDescriptor | null = null;
   let hubGrid: EditorialHubGridDescriptor | null = null;
 
-  if (isIndustriesPage) {
+  if (productPillarClusterId) {
+    const items = _productsHubDataByCluster[productPillarClusterId] ?? [];
+    const label = PILLAR_CLUSTER_LABELS[productPillarClusterId] ?? productPillarClusterId;
+    hubGrid = {
+      kind: "flat",
+      items,
+      sectionLabel: label.toLowerCase(),
+      titleOverride: `Browse all ${items.length} ${label}`,
+      introOverride: `Every ${label.replace(/^RFID /, "RFID ").replace(/s$/, "")} SKU we manufacture — click any card for spec sheets, chip options, MOQ and lead times, or send the inquiry form on the right to request a quote across multiple SKUs at once.`,
+    };
+  } else if (isIndustriesPage) {
     rail = { kind: "flat", items: _industriesHubData, currentRoute: definition.route, sectionLabel: "Industries" };
     if (isIndustriesHub) hubGrid = { kind: "flat", items: _industriesHubData, sectionLabel: "industries" };
   } else if (isSolutionsPage) {
