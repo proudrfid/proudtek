@@ -582,6 +582,26 @@ async function buildEditorialPages(siteData: SiteData): Promise<SnapshotPage[]> 
     _productsHubDataByCluster[clusterId].sort((a, b) => a.label.localeCompare(b.label));
   }
 
+  /* Build the 6-row Products rail. One entry per PILLAR_CLUSTER_LABELS
+     cluster, in PRODUCT_RAIL_ORDER. Summary + heroImage are pulled from
+     the cluster's _pillar.json definition so the rail tooltip / mobile
+     drawer matches what the pillar page shows. */
+  _productsRailData.length = 0;
+  for (const clusterId of PRODUCT_RAIL_ORDER) {
+    const route = `/products/${clusterId}/`;
+    const def = EDITORIAL_DEFINITIONS.find((d) => d.route === route);
+    const label = PILLAR_CLUSTER_LABELS[clusterId] ?? clusterId;
+    _productsRailData.push({
+      slug: clusterId,
+      route,
+      label: `${label} (${(_productsHubDataByCluster[clusterId] ?? []).length})`,
+      emoji: "",
+      iconSlug: PRODUCT_CLUSTER_ICONS[clusterId] ?? "tag",
+      summary: def?.summary ?? "",
+      heroImage: def?.heroImage ?? "",
+    });
+  }
+
   /* ─── Per-hub rail data populators (DS-9 2026-04-26) ─────────────────
      Build separate rail datasets so /guides/, /compare/, /compatibility/
      drill into their own subcategories instead of showing the cross-family
@@ -821,6 +841,23 @@ const PRODUCT_CLUSTER_ICONS: Record<string, string> = {
   "rfid-readers": "radio",
   "rfid-tags": "tag",
 };
+
+/** Display order for the 6-row sticky Products rail used by every
+ *  /products/<cluster>/ pillar page and every /products/<cluster>/<slug>/
+ *  SKU page. Order is curated rather than alphabetical so the most
+ *  prominent product families (Cards → Tags → Labels) sit at the top. */
+const PRODUCT_RAIL_ORDER: string[] = [
+  "rfid-cards",
+  "rfid-tags",
+  "rfid-labels",
+  "rfid-wristbands",
+  "rfid-keyfobs",
+  "rfid-readers",
+];
+
+/** Populated once per build from PILLAR_CLUSTER_LABELS + each pillar JSON.
+ *  Consumed by `buildEditorialScaffold` for pillar + SKU routes. */
+const _productsRailData: HubEntry[] = [];
 
 /**
  * Display metadata for solution sub-pages on the /solutions/ hub. Order in
@@ -1383,18 +1420,44 @@ export function buildEditorialScaffold(definition: EditorialDefinition): Editori
   // here to keep the scaffold function self-contained.
   const productPillarClusterId = getPillarClusterId(definition.route);
 
+  // Product SKU detail pages (/products/<cluster>/<slug>/) get the same
+  // sticky rail as the pillar — but the rail's currentRoute highlights
+  // the parent pillar so visitors keep their bearings inside a cluster.
+  // Matches every leaf product route whose cluster has an authored pillar
+  // (PILLAR_CLUSTER_LABELS). Routes outside that whitelist (legacy SKUs
+  // we haven't promoted to a cluster, or unrecognised second-level dirs)
+  // don't get the rail — they're rare enough that omitting them is safer
+  // than producing a rail with an invalid current-route highlight.
+  const productSkuMatch = /^\/products\/([^/]+)\/([^/]+)\/$/.exec(definition.route);
+  const productSkuClusterId = productSkuMatch && productSkuMatch[1] in PILLAR_CLUSTER_LABELS
+    ? productSkuMatch[1]
+    : null;
+
   let rail: EditorialRailDescriptor | null = null;
   let hubGrid: EditorialHubGridDescriptor | null = null;
 
   if (productPillarClusterId) {
     const items = _productsHubDataByCluster[productPillarClusterId] ?? [];
     const label = PILLAR_CLUSTER_LABELS[productPillarClusterId] ?? productPillarClusterId;
+    rail = {
+      kind: "flat",
+      items: _productsRailData,
+      currentRoute: definition.route,
+      sectionLabel: "Products",
+    };
     hubGrid = {
       kind: "flat",
       items,
       sectionLabel: label.toLowerCase(),
       titleOverride: `Browse all ${items.length} ${label}`,
       introOverride: `Every ${label.replace(/^RFID /, "RFID ").replace(/s$/, "")} SKU we manufacture — click any card for spec sheets, chip options, MOQ and lead times, or send the inquiry form on the right to request a quote across multiple SKUs at once.`,
+    };
+  } else if (productSkuClusterId) {
+    rail = {
+      kind: "flat",
+      items: _productsRailData,
+      currentRoute: `/products/${productSkuClusterId}/`,
+      sectionLabel: "Products",
     };
   } else if (isIndustriesPage) {
     rail = { kind: "flat", items: _industriesHubData, currentRoute: definition.route, sectionLabel: "Industries" };
