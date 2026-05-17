@@ -1,0 +1,57 @@
+---
+/**
+ * RelatedArticles — PR-S1-B. Renders a 4-card grid of related entries
+ * (same group / kicker / shared keywords) at the bottom of every
+ * editorial page that goes through EditorialPageLayout.
+ *
+ * The selection happens at build time via selectRelatedArticles() in
+ * src/lib/seo/related-articles.ts. Caller passes a pre-resolved array
+ * of RelatedArticleResult so we don't hit the content collection
+ * inside this component (Astro components can't `await getCollection`
+ * synchronously in the same render pass clean).
+ *
+ * Empty results render nothing (return-early at top) so we don't
+ * leak a heading-with-no-cards on edge-case pages.
+ */
+import type { RelatedArticleResult } from "../../lib/seo/related-articles";
+import { truncateText } from "../../lib/seo/utils";
+
+interface Props {
+  related: RelatedArticleResult[];
+  heading?: string;
+}
+
+const { related, heading = "Related guides" } = Astro.props;
+---
+{related.length > 0 && (
+  <aside class="codex-related-articles" aria-label={heading}>
+    <h2 class="codex-related-articles__heading">{heading}</h2>
+    <div class="codex-related-articles__grid">
+      {related.map((item) => (
+        <a class="codex-related-articles__card" href={item.route}>
+          {item.heroImage && (
+            <img
+              class="codex-related-articles__thumb"
+              src={item.heroImage}
+              alt={item.title}
+              width="600"
+              height="338"
+              loading="lazy"
+              decoding="async"
+            />
+          )}
+          {item.kicker && (
+            <span class="codex-related-articles__kicker">{item.kicker}</span>
+          )}
+          <strong class="codex-related-articles__title">{item.title}</strong>
+          {item.summary && (
+            <p class="codex-related-articles__summary">
+              {truncateText(item.summary, 120)}
+            </p>
+          )}
+          <span class="codex-related-articles__cta">Read more →</span>
+        </a>
+      ))}
+    </div>
+  </aside>
+)}

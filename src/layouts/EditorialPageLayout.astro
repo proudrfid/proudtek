@@ -24,11 +24,19 @@
  */
 import BaseLayout from "./BaseLayout.astro";
 import EditorialArticle from "../components/editorial/EditorialArticle.astro";
+import RelatedArticles from "../components/editorial/RelatedArticles.astro";
 import type { SnapshotPage } from "../lib/site-data";
 import type { EditorialDefinition } from "../lib/editorial-types";
 import { prepareSnapshot } from "../lib/render-snapshot";
 import { buildMachineRoute, buildPageSeo } from "../lib/seo";
 import { buildAuthorityLdForRoute } from "../lib/editorial-authority-ld";
+import { getCollection } from "astro:content";
+import {
+  selectRelatedArticles,
+  toRelatedCandidate,
+  type RelatedArticleCandidate,
+  type RelatedArticleResult,
+} from "../lib/seo/related-articles";
 
 const { page } = Astro.props as { page: SnapshotPage };
 
@@ -72,6 +80,44 @@ const illustration = page.editorialIllustration ?? null;
 const canSplit = Boolean(match && definition);
 const preMain = canSplit ? match![1] : "";
 const postMain = canSplit ? match![2] : "";
+
+// PR-S1-B: pick top-4 related editorial entries by group / kicker /
+// keywords / industries overlap. Selected at build time so the
+// component is fully static (no JS, no fetch). Only meaningful when
+// we actually have a definition — defensively returns [] for
+// non-editorial fallbacks.
+let relatedArticles: RelatedArticleResult[] = [];
+if (definition) {
+  const allEntries = await getCollection("editorial");
+  const candidates: RelatedArticleCandidate[] = allEntries
+    .filter((e) => !e.id.startsWith("_unused/") && e.data.route !== definition.route)
+    .map((e) =>
+      toRelatedCandidate({
+        route: e.data.route,
+        title: e.data.title,
+        summary: e.data.summary,
+        kicker: e.data.kicker ?? "",
+        group: e.data.group,
+        heroImage: e.data.heroImage,
+        keywords: e.data.keywords,
+        industriesDeployed: (e.data as { industriesDeployed?: string[] }).industriesDeployed,
+      }),
+    );
+  relatedArticles = selectRelatedArticles(
+    toRelatedCandidate({
+      route: definition.route,
+      title: definition.title,
+      summary: definition.summary,
+      kicker: definition.kicker,
+      group: definition.group,
+      heroImage: definition.heroImage,
+      keywords: definition.keywords,
+      industriesDeployed: (definition as { industriesDeployed?: string[] }).industriesDeployed,
+    }),
+    candidates,
+    4,
+  );
+}
 ---
 
 <BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
@@ -79,6 +125,7 @@ const postMain = canSplit ? match![2] : "";
     <>
       <Fragment set:html={preMain} />
       <EditorialArticle definition={definition!} illustration={illustration} />
+      <RelatedArticles related={relatedArticles} />
       <Fragment set:html={postMain} />
     </>
   ) : (
