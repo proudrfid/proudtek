@@ -1,4 +1,56 @@
 /* ═══════════════════════════════════════════
+   TYPOGRAPHY BASELINE (PR-6 P0)
+   ═══════════════════════════════════════════
+   Audit found body copy rendering at browser default line-height
+   (~1.2) site-wide, failing BBC GEL / Readability Foundation's
+   1.5-1.65 recommendation for long-form copy. Long paragraphs in
+   /case-studies/ and /solutions/ also had no max-width, so on wide
+   viewports lines ran to >100ch which exceeds the 45-75ch optimal-
+   measure window.
+
+   PR-6 sets a baseline:
+   • body line-height: 1.6 (long-form readability)
+   • h1-h6 line-height: 1.2 (headings stay tight, don't inherit body)
+   • content paragraphs / list-items max-width: 70ch (mid-window of
+     the 45-75ch optimal-measure range)
+
+   `:where()` keeps specificity at 0,0,0 so component-level rules
+   continue to win unchanged. Inter is already the body font via
+   Kadence's --global-body-font-family + Latin-subset woff2 preload
+   in SeoHead.astro — PR-6 doesn't re-import the font.
+   ───────────────────────────────────────────────────────────────── */
+:root {
+  --codex-line-height-base: 1.6;
+  --codex-line-height-tight: 1.2;
+  --codex-content-measure: 70ch;
+}
+
+body {
+  line-height: var(--codex-line-height-base);
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+  line-height: var(--codex-line-height-tight);
+}
+
+/* Content paragraphs: limit measure to 70ch for readability.
+ *
+ * Scope is intentionally narrow — only `.entry-content` (WP snapshot
+ * content area), `.codex-editorial-section` / `.codex-editorial-card`
+ * (native editorial pages), and the named hero/lede regions where
+ * long-form copy appears. Excludes nav, forms, buttons, footers,
+ * stat captions, table cells, etc. where 70ch would be wrong. */
+:where(
+  .entry-content,
+  .codex-editorial-section,
+  .codex-editorial-card,
+  .codex-blog-index,
+  .codex-rfq-hero
+) :where(p, li, dd) {
+  max-width: var(--codex-content-measure);
+}
+
+/* ═══════════════════════════════════════════
    A11Y — Skip link (PR-5 a11y P0)
    ═══════════════════════════════════════════
    WCAG 2.4.1 Bypass Blocks. Anchored as the first interactive element
