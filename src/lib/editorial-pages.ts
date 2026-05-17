@@ -226,6 +226,7 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
   "/products/rfid-cards/",
   "/products/rfid-wristbands/",
   "/products/rfid-keyfobs/",
+  "/products/rfid-readers/",
   "/industries/",
   "/resources/",
   // /about/ hub: WP snapshot replaced by src/content/editorial/about.json
