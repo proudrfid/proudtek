@@ -326,6 +326,22 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
     const material = findProductSpecValue(context.productSpecs, ["Material"]);
     const size = findProductSpecValue(context.productSpecs, ["Size", "Dimensions"]);
     const color = findProductSpecValue(context.productSpecs, ["Color", "Finish"]);
+    // PR-S1-C: derive a stable SKU from the route's last segment
+    // (the product slug). For /products/rfid-cards/mifare-classic-
+    // 1k-card/ → "PT-MIFARE-CLASSIC-1K-CARD". Prefixed with PT- so
+    // it's identifiable as a Proud Tek product code, not a generic
+    // industry-wide identifier.
+    const slugMatch = canonicalPath.match(/\/([^/]+)\/?$/);
+    const productSku = slugMatch ? `PT-${slugMatch[1].toUpperCase()}` : undefined;
+    // MPN: use the chip-family spec value if present (e.g. "MIFARE
+    // Classic 1K", "EM4100"), else fall back to the SKU.
+    const chipFamily = findProductSpecValue(context.productSpecs, [
+      "Chip",
+      "Chip family",
+      "Chip Family",
+      "Protocol",
+    ]);
+    const productMpn = chipFamily || productSku;
 
     entries.push({
       "@context": "https://schema.org",
@@ -343,6 +359,8 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
       mainEntityOfPage: context.canonicalUrl,
       keywords: buildSchemaKeywords(context.contentTitle, canonicalPath),
       countryOfOrigin: "CN",
+      ...(productSku ? { sku: productSku, productID: productSku } : {}),
+      ...(productMpn ? { mpn: productMpn } : {}),
       audience: {
         "@type": "Audience",
         geographicArea: {
@@ -457,6 +475,31 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
         url: item.url,
         name: item.name,
       })),
+    });
+  }
+
+  // PR-S1-C: VideoObject schema for the homepage hero video. Google
+  // Video search uses this for video carousel eligibility. The video
+  // src is the WP-snapshot Kadence cover background (preserved by
+  // replaceHomepageHero in render-snapshot.ts).
+  if (context.kind === "home") {
+    const HERO_VIDEO_PATH = "/site-assets/wp-content/uploads/2024/08/RFID_production_proudtek.mp4";
+    entries.push({
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "@id": `${context.canonicalUrl}#hero-video`,
+      name: "Proud Tek RFID & NFC Manufacturing — Production Floor",
+      description:
+        "On-site footage from Proud Tek's Shenzhen facility showing automated RFID & NFC card / tag / label production lines. Two ISO 9001 audited factories, 10 production lines, 305+ pieces of equipment serving 60+ countries.",
+      thumbnailUrl: [
+        absoluteUrl("/site-assets/wp-content/uploads/2024/08/rfid_factories.jpg"),
+      ],
+      uploadDate: "2024-08-15",
+      contentUrl: absoluteUrl(HERO_VIDEO_PATH),
+      // No embedUrl — the video plays as a CSS background, not embed.
+      publisher: { "@id": organizationId },
+      isFamilyFriendly: true,
+      inLanguage: "en-US",
     });
   }
 
