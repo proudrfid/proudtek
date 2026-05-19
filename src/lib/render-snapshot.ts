@@ -375,9 +375,14 @@ function renderMegaGroupHtml(g: MenuGroup): string {
         `<li class="menu-item"><a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a></li>`,
     )
     .join("");
-  const heading = g.heading
-    ? `<span class="codex-mega-heading">${escapeHtml(g.heading)}</span>`
-    : "";
+  // Heading: anchor when `headingHref` is set (lets users jump straight to
+  // the category pillar from the mega-menu), plain span otherwise.
+  let heading = "";
+  if (g.heading) {
+    heading = g.headingHref
+      ? `<a class="codex-mega-heading codex-mega-heading--link" href="${escapeHtml(g.headingHref)}">${escapeHtml(g.heading)}</a>`
+      : `<span class="codex-mega-heading">${escapeHtml(g.heading)}</span>`;
+  }
   return `<li class="codex-mega-group">${heading}<ul class="codex-mega-list">${links}</ul></li>`;
 }
 
@@ -912,7 +917,7 @@ function webpExists(webpUrlPath: string): boolean {
   const cached = webpExistsCache.get(webpUrlPath);
   if (cached !== undefined) return cached;
   const fsPath = path.join(PUBLIC_ROOT, webpUrlPath);
-  let exists = false;
+  let exists: boolean;
   try {
     exists = existsSync(fsPath) && statSync(fsPath).isFile();
   } catch {

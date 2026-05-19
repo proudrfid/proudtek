@@ -36,6 +36,21 @@ export function sanitizeHead($head: CheerioAPI): void {
     'script[id*="googlesitekit"]',
     'script[src*="wp-statistics"]',
     'script[id*="wp-statistics"]',
+    // External Google Tag / GTM containers leaking from the WP snapshot
+    // head. SeoHead.astro emits the canonical GA4 (G-30013548) tag once
+    // for every page; any *other* gtag/GTM container leaking through the
+    // WP `<Fragment set:html={seo.headHtml} />` is duplicate analytics —
+    // a second beacon stream, a second cookie set, a second consent
+    // surface. Pre-fix audit (2026-05-19) found GT-TWTG3JNV on 604/606
+    // built pages, double-counting every pageview and breaking the
+    // Consent Mode v2 defaults declared in SeoHead. The inline-script
+    // `content.includes("googletagmanager")` check below only fired on
+    // scripts with inline content; external `<script src="…">` tags
+    // were never matched. These selectors close that gap.
+    'script[src*="googletagmanager.com/gtag"]',
+    'script[src*="googletagmanager.com/gtm"]',
+    'script[id*="google_gtagjs"]',
+    'script[id*="google_gtmjs"]',
     'style[id="wp-emoji-styles-inline-css"]',
     'meta[name="generator"]',
     'meta[name^="google-adsense-platform"]',
