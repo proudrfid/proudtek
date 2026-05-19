@@ -9,6 +9,7 @@
  */
 import type { CheerioAPI } from "cheerio";
 
+import type { EditorialDefinition } from "../editorial-types";
 import { DEFAULT_IMAGE, PAGE_IMAGE_OVERRIDES, SITE_ORIGIN } from "../seo-content";
 
 import { absoluteUrl, cleanText, parseDimension, type PageKind } from "./utils";
@@ -228,10 +229,22 @@ export function resolveImageSelection(
   kind: PageKind,
   contentTitle: string,
   route: string,
+  editorialDef?: EditorialDefinition,
 ): ImageSelection {
   const imageOverride = resolveImageOverride(route);
   if (imageOverride) {
     return imageOverride;
+  }
+
+  // P0-4 (2026-05-19): if editorial JSON declares a heroImage, prefer it
+  // over the body-img scan. Editorial routes don't have a meaningful
+  // og:image in the WP snapshot head; without this fast-path, 585/605
+  // pages fall back to DEFAULT_IMAGE (the cropped corporate logo).
+  if (editorialDef?.heroImage) {
+    return {
+      url: absoluteUrl(editorialDef.heroImage),
+      alt: editorialDef.imageAlt || fallbackImageAlt(contentTitle, kind),
+    };
   }
 
   const candidates = collectImageCandidates($head, $body, kind, contentTitle, route);

@@ -114,7 +114,12 @@ export function resolveSeoSourceLinks(seo: PageSeoData): BreadcrumbItem[] {
 export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: CheerioAPI, kind: PageKind): PageContext {
   const contentTitle = resolveContentTitle(page, $body, kind);
   const description = resolveDescription(page, $head, $body, kind, contentTitle);
-  const image = resolveImageSelection($head, $body, kind, contentTitle, page.route);
+  // P0-4 (2026-05-19): thread editorialDefinition into image selection so
+  // resolveImageSelection() can prefer editorialDef.heroImage over the
+  // body-img scan (which otherwise falls back to the corporate logo on
+  // 585/605 editorial pages).
+  const editorialDef = page.editorialDefinition as EditorialDefinition | undefined;
+  const image = resolveImageSelection($head, $body, kind, contentTitle, page.route, editorialDef);
   const itemList = resolveItemList($body, page.route);
   const productSpecs = kind === "product" ? extractProductSpecs($body, contentTitle, page.route) : [];
   const collectionSummary = kind === "collection" ? buildCollectionSummary(page.route, description, $body) : [];
@@ -343,6 +348,17 @@ export function resolveDescription(
   const overrideDescription = PAGE_DESCRIPTION_OVERRIDES[page.route];
   if (overrideDescription) {
     return truncateText(overrideDescription, 155);
+  }
+
+  // P0-3 (2026-05-19): if this route has an editorial JSON with a non-empty
+  // summary, prefer it over both the WP head <meta name="description"> and
+  // the DEFAULT_DESCRIPTION fallback. Editorial pages (compare/solutions/
+  // industries/lp/markets) have no <meta name="description"> in the WP
+  // snapshot, so they would otherwise all share the same Org boilerplate
+  // — 316/605 pages before this fix.
+  const editorialDef = page.editorialDefinition as EditorialDefinition | undefined;
+  if (editorialDef?.summary) {
+    return truncateText(editorialDef.summary, 155);
   }
 
   const headDescription = cleanText($head('meta[name="description"]').attr("content") ?? "");
