@@ -171,6 +171,15 @@ const editorialSchema = z.object({
    *  array can be left out entirely. Defaults to []. */
   imageSourceRoutes: z.array(z.string()).optional().default([]),
   heroImage: z.string().optional(),
+  /** Optional attribution metadata for hero images sourced under Creative
+   *  Commons or similar licenses. EditorialHero.astro renders a small
+   *  caption beneath the figure when this is present. */
+  imageCredit: z.object({
+    author: z.string(),
+    sourceUrl: z.string().optional(),
+    license: z.string().optional(),
+    licenseUrl: z.string().optional(),
+  }).optional(),
   brief: z.array(briefFieldSchema).optional(),
   sections: z.array(sectionSchema),
   resourceCards: z.array(resourceCardSchema),

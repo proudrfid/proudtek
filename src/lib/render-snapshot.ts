@@ -1,6 +1,7 @@
 import type { SnapshotPage } from "./site-data";
 
-import { load } from "cheerio";
+import { load, type BasicAcceptedElems } from "cheerio";
+import type { AnyNode } from "domhandler";
 import { existsSync, statSync } from "node:fs";
 import path from "node:path";
 
@@ -12,6 +13,7 @@ import {
   type MenuGroup,
   type FooterSection,
 } from "./menu-structure";
+import { SITE_CONTACT, whatsappUrl } from "./seo-content";
 
 const TRANSLATE_SELECTORS = [
   'link[rel="alternate"][hreflang]',
@@ -281,7 +283,7 @@ function isPrunableHref(href: string): boolean {
   return NOISY_EXTERNAL_HREF_PATTERNS.some((pattern) => pattern.test(href));
 }
 
-function removeLowValueLink($body: ReturnType<typeof load>, element: unknown): void {
+function removeLowValueLink($body: ReturnType<typeof load>, element: BasicAcceptedElems<AnyNode>): void {
   const link = $body(element);
 
   for (const selector of LOW_VALUE_CONTAINERS) {
@@ -724,6 +726,7 @@ function renderFooterSection(s: FooterSection): string {
 }
 
 function renderFooterBrandRow(): string {
+  const addr = SITE_CONTACT.address;
   return (
     `<div class="codex-footer-brand">` +
       `<div class="codex-footer-brand__inner">` +
@@ -731,6 +734,11 @@ function renderFooterBrandRow(): string {
           `<img src="/site-assets/wp-content/uploads/2024/04/proudtek-logo.png" alt="Proud Tek" width="220" height="60" loading="lazy" decoding="async">` +
         `</a>` +
         `<p class="codex-footer-brand__tagline">Custom RFID &amp; NFC manufacturer — cards, tags, labels, wristbands, keyfobs and readers shipped worldwide from China since 2010.</p>` +
+        `<address class="codex-footer-brand__address" aria-label="Office address and hours">` +
+          `<span class="codex-footer-brand__address-line">${escapeHtml(addr.line1)}, ${escapeHtml(addr.line2)}</span>` +
+          `<span class="codex-footer-brand__address-line">${escapeHtml(addr.region)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.country)}</span>` +
+          `<span class="codex-footer-brand__address-line codex-footer-brand__hours">${escapeHtml(SITE_CONTACT.hours)}</span>` +
+        `</address>` +
         `<a class="codex-footer-brand__cta" href="/contact/">Request a quote <span aria-hidden="true">→</span></a>` +
       `</div>` +
     `</div>`
@@ -756,9 +764,9 @@ function renderFooterBottomStrip(): string {
       `<div class="codex-footer-bottom__inner">` +
         `<div class="codex-footer-bottom__copy">© ${year} Proud Tek — Custom RFID &amp; NFC manufacturer.</div>` +
         `<ul class="codex-footer-bottom__contact">` +
-          `<li><a href="tel:+8618665820632">Tel: +86 186 6582 0632</a></li>` +
-          `<li><a href="https://wa.me/8618665820632" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>` +
-          `<li><a href="mailto:info@proudtek.com">info@proudtek.com</a></li>` +
+          `<li><a href="tel:${SITE_CONTACT.phoneE164}">Tel: ${SITE_CONTACT.phoneDisplay}</a></li>` +
+          `<li><a href="${whatsappUrl()}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>` +
+          `<li><a href="mailto:${SITE_CONTACT.email}">${SITE_CONTACT.email}</a></li>` +
         `</ul>` +
         `<div class="codex-footer-bottom__social-row" aria-label="Social profiles">${socialHtml}</div>` +
       `</div>` +
@@ -1156,10 +1164,20 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
   // WordPress wiring continues to work — the sales team just maps the
   // semantic of those two fields in their CRM rules.
   if (legacyForm.length) {
-    const FIELD_LABEL_REWRITES: Record<string, { label: string; placeholder: string }> = {
-      kb_field_2: { label: "Country", placeholder: "e.g. United States, Germany, UAE" },
-      kb_field_3: { label: "Estimated quantity", placeholder: "e.g. 50,000 cards / year" },
-      kb_field_4: { label: "Project notes (chip, application, timing)", placeholder: "Tell us the chip family or application — MIFARE / NTAG / UHF, hotel / laundry / retail, target launch date." },
+    type FieldRewrite = {
+      label: string;
+      placeholder: string;
+      autocomplete?: string;
+      inputmode?: string;
+      type?: string;
+      required?: boolean;
+    };
+    const FIELD_LABEL_REWRITES: Record<string, FieldRewrite> = {
+      kb_field_0: { label: "Name", placeholder: "Your name", autocomplete: "name", required: true },
+      kb_field_1: { label: "Email", placeholder: "you@company.com", autocomplete: "email", type: "email", required: true },
+      kb_field_2: { label: "Country", placeholder: "e.g. United States, Germany, UAE", autocomplete: "country-name" },
+      kb_field_3: { label: "Estimated quantity", placeholder: "e.g. 50,000 cards / year", inputmode: "numeric" },
+      kb_field_4: { label: "Project notes (chip, application, timing)", placeholder: "Tell us the chip family or application — MIFARE / NTAG / UHF, hotel / laundry / retail, target launch date.", required: true },
     };
 
     for (const [name, rewrite] of Object.entries(FIELD_LABEL_REWRITES)) {
@@ -1168,11 +1186,32 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
       field.attr("data-label", rewrite.label);
       field.attr("aria-label", rewrite.label);
       field.attr("placeholder", rewrite.placeholder);
+      if (rewrite.autocomplete) field.attr("autocomplete", rewrite.autocomplete);
+      if (rewrite.inputmode) field.attr("inputmode", rewrite.inputmode);
+      if (rewrite.type && field.is("input")) field.attr("type", rewrite.type);
+      if (rewrite.required) field.attr("required", "");
       // The Kadence form pairs each input with a <label for="..."> just before it.
       const fieldId = field.attr("id");
       if (fieldId) {
         legacyForm.find(`label[for="${fieldId}"]`).first().text(rewrite.label);
       }
+    }
+
+    // Attach a <datalist> of the top 15 RFID-buying procurement markets to
+    // the Country field so users get suggestions while the field remains
+    // free-text (preserves legacy backend handling). Order roughly matches
+    // our outbound-quote distribution; covers ~85% of inquiries.
+    const countryField = legacyForm.find('[name="kb_field_2"]').first();
+    if (countryField.length && !countryField.attr("list")) {
+      countryField.attr("list", "codex-country-suggestions");
+      const COUNTRIES = [
+        "United States", "Germany", "United Kingdom", "France", "Italy",
+        "Spain", "Netherlands", "Belgium", "Sweden", "Switzerland",
+        "United Arab Emirates", "Saudi Arabia", "Australia", "Canada",
+        "Brazil", "Mexico", "Japan", "South Korea", "Singapore", "India",
+      ];
+      const optionsHtml = COUNTRIES.map(c => `<option value="${escapeHtml(c)}">`).join("");
+      countryField.after(`<datalist id="codex-country-suggestions">${optionsHtml}</datalist>`);
     }
   }
 
@@ -1199,27 +1238,27 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
           </span>
           <span class="codex-contact__channel-body">
             <span class="codex-contact__label">Email</span>
-            <span class="codex-contact__value">info@proudtek.com</span>
+            <span class="codex-contact__value">${SITE_CONTACT.email}</span>
           </span>
         </a>
 
-        <a class="codex-contact__channel" href="tel:+8618665820632">
+        <a class="codex-contact__channel" href="tel:${SITE_CONTACT.phoneE164}">
           <span class="codex-contact__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
           </span>
           <span class="codex-contact__channel-body">
             <span class="codex-contact__label">Phone</span>
-            <span class="codex-contact__value">+86 186 6582 0632</span>
+            <span class="codex-contact__value">${SITE_CONTACT.phoneDisplay}</span>
           </span>
         </a>
 
-        <a class="codex-contact__channel" href="https://wa.me/8618665820632" target="_blank" rel="noopener noreferrer">
+        <a class="codex-contact__channel" href="${whatsappUrl()}" target="_blank" rel="noopener noreferrer">
           <span class="codex-contact__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.247-.694.247-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.002-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>
           </span>
           <span class="codex-contact__channel-body">
             <span class="codex-contact__label">WhatsApp</span>
-            <span class="codex-contact__value">+86 186 6582 0632</span>
+            <span class="codex-contact__value">${SITE_CONTACT.phoneDisplay}</span>
           </span>
         </a>
 

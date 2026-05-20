@@ -29,6 +29,7 @@ import {
 } from "../seo-content";
 
 import { PRODUCT_SPEC_SHEETS } from "../product-specs";
+import { ROUTE_CANONICAL_OVERRIDES } from "../route-overrides";
 
 import {
   cleanText,

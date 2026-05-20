@@ -18,6 +18,8 @@
 import type { CheerioAPI } from "cheerio";
 import { getCollection } from "astro:content";
 
+import type { SnapshotPage } from "../site-data";
+import { EDITORIAL_TEAM_NAME } from "../seo-content";
 import { cleanText, escapeXml, normalizeRoute, slugToTitle, truncateText } from "./utils";
 import { buildRailHtml, buildRailFilterScript } from "./rail";
 import {

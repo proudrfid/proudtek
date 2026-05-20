@@ -108,9 +108,13 @@ export const minimalTable = {
 // lock both paths (with / without citations) for every variant that touches
 // `text` fields.
 
-export const noCitations = undefined;
+/** Citations metadata accepted by EditorialSection.astro — present when
+ *  the page has [^N] footnote markers that link to a sources block. */
+export type CitationsContext = { sourcesId: string; sourcesCount: number } | undefined;
 
-export const typicalCitations = {
+export const noCitations: CitationsContext = undefined;
+
+export const typicalCitations: CitationsContext = {
   sourcesId: "sources",
   sourcesCount: 3,
 };

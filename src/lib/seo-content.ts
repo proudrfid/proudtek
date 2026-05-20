@@ -24,6 +24,37 @@ function absoluteUrl(value: string): string {
 export const SITE_NAME = "Proud Tek";
 export const ORGANIZATION_NAME = "Proud Tek Co., Limited";
 export const EDITORIAL_TEAM_NAME = "Proud Tek Editorial Team";
+
+/**
+ * Single source of truth for the company's outward contact channels.
+ * Imported by WhatsAppFab.astro, render-snapshot.ts, footer templates,
+ * and any structured-data (sameAs / ContactPoint) generators. Editing
+ * a number here changes every render site-wide.
+ *
+ * `whatsappNumber` is the digits-only E.164 form used in wa.me URLs.
+ * `phoneDisplay` is the human-readable form used in tel: links and prose.
+ */
+export const SITE_CONTACT = {
+  email: "info@proudtek.com",
+  whatsappNumber: "8618665820632",
+  phoneE164: "+8618665820632",
+  phoneDisplay: "+86 186 6582 0632",
+  whatsappDefaultMessage:
+    "Hi Proud Tek, I'm interested in your RFID products. Can you help with my project?",
+  address: {
+    line1: "A210, Zhantao Building",
+    line2: "#1579 Minzhi Road",
+    city: "Shenzhen",
+    region: "Longhua District",
+    country: "China",
+  },
+  hours: "Mon–Fri, 09:00–18:00 (UTC+8)",
+} as const;
+
+/** Convenience builder for the wa.me URL with prefilled message. */
+export function whatsappUrl(message: string = SITE_CONTACT.whatsappDefaultMessage): string {
+  return `https://wa.me/${SITE_CONTACT.whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
 export const DEFAULT_IMAGE = "/site-assets/wp-content/uploads/2024/04/cropped-cropped-proudtek-logo.png";
 export const DEFAULT_DESCRIPTION =
   "Proud Tek manufactures custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for OEM, industrial, hotel and access-control use.";

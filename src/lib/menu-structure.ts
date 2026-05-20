@@ -19,6 +19,13 @@ export interface MenuLink {
 export interface MenuGroup {
   /** Optional heading shown above the column in the mega-menu. */
   heading?: string;
+  /**
+   * Optional href to make the heading clickable. When set, the heading
+   * renders as `<a>` linking here (desktop mega-menu only — mobile keeps
+   * the accordion toggle button). Used for the 6 product category columns
+   * so the heading itself is a direct shortcut to the category pillar.
+   */
+  headingHref?: string;
   links: MenuLink[];
 }
 
@@ -49,6 +56,7 @@ export const PRODUCTS_MENU: MenuDropdown = {
   groups: [
     {
       heading: "RFID Cards",
+      headingHref: "/products/rfid-cards/",
       links: [
         { href: "/products/rfid-cards/", label: "All RFID Cards" },
         { href: "/solutions/hotel-key-cards/", label: "Hotel Key Cards" },
@@ -60,16 +68,24 @@ export const PRODUCTS_MENU: MenuDropdown = {
     },
     {
       heading: "RFID Keyfobs",
+      headingHref: "/products/rfid-keyfobs/",
       links: [
         { href: "/products/rfid-keyfobs/", label: "All Keyfobs" },
         { href: "/products/rfid-keyfobs/", label: "Proximity Fobs" },
         { href: "/products/rfid-keyfobs/", label: "RFID Key Fobs" },
-        { href: "/products/rfid-wristbands/", label: "NFC Rings" },
-        { href: "/products/rfid-cards/mifare-desfire-ev3-card/", label: "DESFire Fobs" },
+        // NFC Rings and DESFire Fobs renamed to match their actual destinations.
+        // Until a dedicated /products/rfid-rings/ page exists the closest
+        // canonical destination is the Wristbands pillar (wearable form factor);
+        // labelling it "Wearable Tags" is honest about that. "DESFire Fobs"
+        // pointed at the DESFire EV3 *card* page, which surprised buyers
+        // expecting a fob — renamed to match the page H1.
+        { href: "/products/rfid-wristbands/", label: "Wearable Tags" },
+        { href: "/products/rfid-cards/mifare-desfire-ev3-card/", label: "DESFire EV3" },
       ],
     },
     {
       heading: "RFID Wristbands",
+      headingHref: "/products/rfid-wristbands/",
       links: [
         { href: "/products/rfid-wristbands/", label: "All Wristbands" },
         { href: "/solutions/rfid-event-wristbands/", label: "Event Wristbands" },
@@ -80,6 +96,7 @@ export const PRODUCTS_MENU: MenuDropdown = {
     },
     {
       heading: "RFID Labels",
+      headingHref: "/products/rfid-labels/",
       links: [
         { href: "/products/rfid-labels/", label: "All Labels" },
         { href: "/products/rfid-labels/ntag213-nfc-sticker/", label: "NFC Stickers" },
@@ -90,6 +107,7 @@ export const PRODUCTS_MENU: MenuDropdown = {
     },
     {
       heading: "RFID Readers",
+      headingHref: "/products/rfid-readers/",
       links: [
         { href: "/products/rfid-readers/", label: "All Readers" },
         { href: "/products/rfid-readers/desktop-nfc-reader-encoder/", label: "ACR122U USB Reader" },
@@ -99,6 +117,7 @@ export const PRODUCTS_MENU: MenuDropdown = {
     },
     {
       heading: "RFID Tags",
+      headingHref: "/products/rfid-tags/",
       links: [
         { href: "/products/rfid-tags/", label: "All Tags" },
         { href: "/solutions/rfid-laundry-tags/", label: "Laundry Tags" },

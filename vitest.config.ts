@@ -1,4 +1,5 @@
 import { getViteConfig } from "astro/config";
+import type { ViteUserConfig } from "vitest/config";
 
 /**
  * Vitest config — only runs unit tests under src/**\/__tests__/.
@@ -10,6 +11,11 @@ import { getViteConfig } from "astro/config";
  * inside tests — needed for Stage 2 parity tests that render shadow Astro
  * components via experimental_AstroContainer and compare them byte-for-byte
  * against the editorial-pages.ts template-literal renderers.
+ *
+ * `getViteConfig` types its argument as Vite's `UserConfig` which lacks
+ * vitest's `test` field. Casting through `ViteUserConfig` (re-exported by
+ * vitest/config with the `test` field merged in) lets TypeScript accept
+ * the config object without runtime change.
  */
 export default getViteConfig({
   test: {
@@ -28,4 +34,4 @@ export default getViteConfig({
       "astro:content": new URL("./src/lib/__tests__/stubs/astro-content.ts", import.meta.url).pathname,
     },
   },
-});
+} as ViteUserConfig);

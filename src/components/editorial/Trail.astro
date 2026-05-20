@@ -59,6 +59,19 @@ if (definition.route.startsWith("/products/rfid-cards/")) {
   links.push({ href: "/resources/#resources-hub-grid-blog", label: "Blog — Industry Articles" });
 } else if (definition.group === "resources") {
   links.push({ href: "/resources/", label: "Resources" });
+} else if (definition.route.startsWith("/about/")) {
+  // About hub and its sub-pages (factory, certifications, leadership, etc.).
+  // Sub-pages get an "About" parent crumb; the /about/ hub itself is a
+  // breadcrumb section root (via EDITORIAL_OVERRIDE_ROUTES) so the page
+  // title is suppressed and the "About" crumb shown above is the current
+  // page — yielding "Home / About".
+  links.push({ href: "/about/", label: "About" });
+} else if (definition.route === "/sample-pack/") {
+  // Sample-pack is a single CTA destination with no section above Home.
+  // No parent crumb is pushed; the page title is appended below to yield
+  // "Home / Free RFID & NFC Sample Pack".
+} else if (definition.route === "/contact/") {
+  // /contact/ is a breadcrumb section root — no parent crumb needed.
 } else {
   links.push({ href: "/contact/", label: "Contact" });
 }

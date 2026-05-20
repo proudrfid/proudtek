@@ -87,7 +87,7 @@ function buildArchiveBodyHtml(
   description: string,
   entries: Array<{ route: string; title: string; image: string; summary: string }>,
 ): string {
-  const $ = load(`<body>${templateBodyHtml}</body>`, { decodeEntities: false });
+  const $ = load(`<body>${templateBodyHtml}</body>`, { decodeEntities: false } as Parameters<typeof load>[1]);
   const main = $("main#main, main.site-main").first();
 
   if (!main.length) {
@@ -127,7 +127,7 @@ function renderEntryCard(entry: { route: string; title: string; image: string; s
 }
 
 function extractFirstImage(bodyHtml: string): string {
-  const $ = load(bodyHtml, { decodeEntities: false });
+  const $ = load(bodyHtml, { decodeEntities: false } as Parameters<typeof load>[1]);
   const selectors = [".entry-content img", ".woocommerce-product-gallery__image img", "img"];
 
   for (const selector of selectors) {
@@ -148,7 +148,7 @@ function extractFirstImage(bodyHtml: string): string {
 }
 
 function extractSummary(bodyHtml: string): string {
-  const $ = load(bodyHtml, { decodeEntities: false });
+  const $ = load(bodyHtml, { decodeEntities: false } as Parameters<typeof load>[1]);
   const paragraphs = $(".entry-content p, article p")
     .toArray()
     .map((element) => cleanText($(element).text()))

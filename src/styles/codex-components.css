@@ -101,13 +101,13 @@ body {
 }
 
 .codex-cta--primary {
-  background-color: var(--global-palette-btn-bg, #1fcefb);
+  background-color: var(--global-palette-btn-bg, var(--codex-cyan));
   color: #0a1a2c;
-  border-color: var(--global-palette-btn-bg, #1fcefb);
+  border-color: var(--global-palette-btn-bg, var(--codex-cyan));
 }
 .codex-cta--primary:hover {
-  background-color: #15bce8;
-  border-color: #15bce8;
+  background-color: var(--codex-cyan-hover);
+  border-color: var(--codex-cyan-hover);
   transform: translateY(-1px);
   box-shadow: 0 10px 24px -10px rgba(31, 206, 251, 0.55);
 }
@@ -289,8 +289,26 @@ body {
   border-radius: 0 0 6px 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   z-index: 100000;
-  outline: 3px solid #1fcefb;
+  outline: 3px solid var(--codex-cyan);
   outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════
+   Lazy image skeleton — light-grey background reservation so lazy-loaded
+   product photos (NEW IN / BEST COLLECTION carousels, sample-pack, etc.)
+   don't render as empty white boxes before the image arrives. Once the
+   image paints, the bg is hidden behind it. No layout shift, no shimmer,
+   just calm placeholder. Targets `loading="lazy"` so eager images aren't
+   tinted (their slot is already committed).
+   ═══════════════════════════════════════════ */
+
+img[loading="lazy"] {
+  background-color: rgba(41, 28, 14, 0.04);
+}
+
+img[loading="lazy"][src=""],
+img[loading="lazy"]:not([src]) {
+  background-color: rgba(41, 28, 14, 0.06);
 }
 
 /* ═══════════════════════════════════════════
@@ -341,6 +359,22 @@ body {
 
 .codex-editorial-hero h1 {
   animation: codex-fade-up 450ms cubic-bezier(0.25, 1, 0.5, 1) 180ms both;
+}
+
+/* Hero deck — the long SEO-keyword tail of solution titles, split off
+   from the H1 so the visible headline scans cleanly. Reads as a quiet
+   editorial subtitle: smaller than H1, italicized-feeling weight, muted
+   color, narrower max-width so it stays one or two lines on desktop. */
+.codex-editorial-hero-deck {
+  margin: var(--codex-space-2-plus) 0 var(--codex-space-1) 0;
+  max-width: 62ch;
+  color: var(--codex-text-muted);
+  font-family: var(--codex-font-serif);
+  font-size: var(--codex-text-md);
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+  animation: codex-fade-up 420ms cubic-bezier(0.25, 1, 0.5, 1) 220ms both;
 }
 
 .codex-editorial-hero .codex-editorial-answer {
@@ -816,6 +850,17 @@ a[href="#main"]:focus {
   padding: 0 var(--codex-space-4);
 }
 
+/* Hide the empty Kadence post-archive hero section on blog index — it
+   renders a ~293px brown band containing only a breadcrumb because the
+   archive title is unset in the snapshot. Our own codex-blog-index__header
+   below carries the real H1 + description, so the legacy hero contributes
+   nothing but vertical empty space. Scoped to the body class produced
+   by the WP snapshot for /blog/ so other archive pages are unaffected. */
+.blog .entry-hero.post-archive-hero-section,
+.archive .entry-hero.post-archive-hero-section {
+  display: none;
+}
+
 .codex-blog-index__header {
   margin-bottom: var(--codex-space-6);
 }
@@ -1204,6 +1249,7 @@ a[href="#main"]:focus {
   color: rgba(255, 255, 255, 0.9);
 }
 
+#site-navigation .codex-nav-rfq-link,
 #footer-navigation .codex-nav-rfq-link {
   display: inline-flex;
   align-items: center;
@@ -1220,6 +1266,7 @@ a[href="#main"]:focus {
   display: none !important;
 }
 
+#site-navigation .codex-nav-rfq-link:hover,
 #footer-navigation .codex-nav-rfq-link:hover {
   transform: translateY(-1px);
   background: var(--codex-gradient-gold-hover);
@@ -2778,6 +2825,32 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   border-radius: var(--codex-radius-card-lg);
 }
 
+/* Hero image attribution caption — rendered when definition.imageCredit
+   is present (Creative Commons / Wikimedia photography that requires
+   author credit + license link). Small quiet line beneath the figure,
+   doesn't compete with the H1 or summary. Links inherit the muted color
+   and only gain underline on hover. */
+.codex-editorial-hero-credit {
+  margin-top: var(--codex-space-1-plus);
+  font-size: var(--codex-text-2xs);
+  line-height: 1.4;
+  color: var(--codex-text-subtle);
+  letter-spacing: 0.02em;
+  text-align: right;
+}
+
+.codex-editorial-hero-credit a {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted currentColor;
+}
+
+.codex-editorial-hero-credit a:hover,
+.codex-editorial-hero-credit a:focus-visible {
+  color: var(--codex-text-muted);
+  border-bottom-style: solid;
+}
+
 .codex-editorial-section,
 .codex-editorial-card {
   --card-padding: var(--codex-space-6) var(--codex-space-6-plus);
@@ -3549,6 +3622,21 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   .codex-wa-fab.is-visible ~ .codex-sticky-cta.is-visible {
     bottom: 0;
     padding-right: 4.5rem;
+  }
+}
+
+/* On the smallest viewports the sticky bar's two-line message + button
+   layout swallowed ~87px (10% of an iPhone-SE viewport). The CTA alone
+   ("Talk to engineering") is self-explanatory; hide the lead-in message
+   below 480px so the bar collapses to a single tight row. The full
+   message remains in the DOM (still announced by screen readers) — only
+   visually suppressed. */
+@media (max-width: 479px) {
+  .codex-sticky-cta .codex-banner__message {
+    display: none;
+  }
+  .codex-sticky-cta {
+    justify-content: space-between;
   }
 }
 
@@ -5080,13 +5168,13 @@ form[data-codex-rfq] .kb-forms-submit {
 }
 
 .codex-home-hero__btn--primary {
-  background-color: #1fcefb;
+  background-color: var(--codex-cyan);
   color: #0a1a2c;
-  border-color: #1fcefb;
+  border-color: var(--codex-cyan);
 }
 .codex-home-hero__btn--primary:hover {
-  background-color: #15bce8;
-  border-color: #15bce8;
+  background-color: var(--codex-cyan-hover);
+  border-color: var(--codex-cyan-hover);
   transform: translateY(-1px);
   box-shadow: 0 10px 24px -10px rgba(31, 206, 251, 0.55);
 }

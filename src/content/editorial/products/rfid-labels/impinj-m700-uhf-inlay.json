@@ -25,7 +25,7 @@
     {
       "label": "Air interface and standards",
       "items": [
-        "ISO/IEC 18000-63 / EPC Gen2v2 air interface; ISO/IEC 18000-63:2015 Amendment 1 AUTHENTICATE command supported on M770 (and forward-compatible to M800).",
+        "ISO/IEC 18000-63 / EPC Gen2v2 air interface; full Gen2v2 base command set including Untraceable on M770.",
         "GS1 EPC Tag Data Standard (TDS) encoding for SGTIN, SSCC, GIAI, GLN identifiers.",
         "RAIN RFID Alliance certified across reader and infrastructure ecosystem."
       ]
@@ -99,10 +99,10 @@
     {
       "label": "M700 → M800 upgrade path",
       "items": [
-        "Pin- and protocol-compatible: inlays qualified on M700 antenna designs swap to M830 / M850 / M870 / M880 without antenna re-tune or reader-fleet re-qualification.",
-        "M800 adds ISO/IEC 18000-63:2015 Amendment 1 AUTHENTICATE command for backend cryptographic verification — pharmaceutical (DSCSA / EU FMD), luxury (anti-counterfeit), spare-parts programmes.",
-        "Most reader fleets installed since ~2022 support Gen2v2 AUTHENTICATE via firmware upgrade without hardware change.",
-        "Plan M700 → M800 transition 9-12 months ahead to run pilot encoding + backend key-management qualification in parallel with existing M700 production."
+        "Pin- and protocol-compatible: inlays qualified on M700 antenna designs swap to M830 (128-bit EPC, no user memory) or M850 (96-bit EPC + 32-bit user memory) without antenna re-tune or reader-fleet re-qualification.",
+        "M800 adds Gen2X protocol features (faster inventory, improved data integrity, optional Protected Mode for privacy / supply-chain serialisation control).",
+        "~1-2 dB sensitivity improvement (10-20% longer read range) and 30% lower power consumption at the chip level enable smaller / on-metal / on-liquid inlays that struggled on M700.",
+        "Plan M700 → M800 transition 4-8 weeks ahead for stock antenna designs (production line continues unchanged) — longer if new antenna tooling is required."
       ]
     },
     {
@@ -117,7 +117,7 @@
   "heroPoints": [
     "−23.5 dBm read sensitivity — 15-30% longer read range than M600-series predecessor at the same antenna footprint; the volume floor for new RAIN RFID deployments since 2018. Free-air bench 10-15 m with 6 dBic antenna at 4 W EIRP; real-world 5-10 m handheld retail, 3-8 m fixed-portal warehouse, 2-4 m healthcare small-item.",
     "M730 / M750 / M770 family — pure-EPC retail (M730), mainstream logistics + user memory (M750), high-memory + AutoTune mixed-surface (M770). All share the same sensitivity floor; antenna design and mounting surface dominate in-use range variation. ARC Master List + Walmart RFID + Auburn RFID Lab benchmark certified.",
-    "Dry / wet / converted-label form factors across 15+ standard antenna designs (general-purpose, compact pharma / jewellery, on-metal, on-liquid, windshield, tire, woven care label, hang-tag) + custom antenna engineering 4-8 weeks. Pin- and protocol-compatible upgrade path to M800-series for cryptographic AUTHENTICATE without antenna re-tune or reader-fleet re-qualification."
+    "Dry / wet / converted-label form factors across 15+ standard antenna designs (general-purpose, compact pharma / jewellery, on-metal, on-liquid, windshield, tire, woven care label, hang-tag) + custom antenna engineering 4-8 weeks. Pin- and protocol-compatible upgrade path to M800-series (M830 / M850) for Gen2X features, ~1-2 dB sensitivity gain, and ~30% lower chip power without antenna re-tune or reader-fleet re-qualification."
   ],
   "imageAlt": "Impinj M700-series UHF RFID inlay — chip and antenna for high-sensitivity RAIN RFID retail and supply-chain applications",
   "heroImage": "/landing-images/impinj-m700-uhf-inlay.jpg",
@@ -174,7 +174,7 @@
           "AutoTune adapts antenna match to mounting surface (metal, liquid, cardboard) without specifying surface-specific antenna",
           "Mixed-surface programmes: same SKU family across apparel + on-metal hang-tag + on-liquid gift set",
           "Premium per-unit cost vs M730 / M750 — earned by AutoTune flexibility",
-          "Forward-compatible with M800 AUTHENTICATE command via firmware upgrade"
+          "Pin- and protocol-compatible upgrade path to M800 (M830 / M850) for Gen2X features and lower power on the same antenna"
         ]
       }
     },
@@ -208,7 +208,7 @@
           },
           {
             "label": "2015",
-            "text": "ISO/IEC 18000-63 Amendment 1 publishes adding the AUTHENTICATE command for backend cryptographic verification — the foundation for the M700 → M800 upgrade path that arrives ~3 years later."
+            "text": "ISO/IEC 18000-63 Amendment 1 publishes, adding the optional AUTHENTICATE command framework to EPC Gen2v2. The standard framework exists; mainstream RAIN RFID silicon (Impinj M700 / M800, NXP UCODE 8 / 9, Alien Higgs-9) does not currently implement it as a shipping crypto feature — programmes needing per-tap cryptographic authentication today specify HF chips such as NXP NTAG 424 DNA."
           },
           {
             "label": "2018",
@@ -224,7 +224,7 @@
           },
           {
             "label": "2026 Today",
-            "text": "Operating-playbook notes for retail-apparel-item-level, supply-chain-pallet, healthcare-asset-tracking, manufacturing-WIP, and aerospace-MRO programmes converge on M730 (pure-EPC retail) / M750 (logistics + user memory) / M770 (mixed-surface) at the chip layer + ARC-certified antenna at the inlay layer + dry / wet / converted-label form factor matched to converter or end-user workflow as the operator-side template. M800 AUTHENTICATE upgrade path runs in parallel for pharmaceutical / luxury / spare-parts cryptographic-anti-counterfeit programmes."
+            "text": "Operating-playbook notes for retail-apparel-item-level, supply-chain-pallet, healthcare-asset-tracking, manufacturing-WIP, and aerospace-MRO programmes converge on M730 (pure-EPC retail) / M750 (logistics + user memory) / M770 (mixed-surface) at the chip layer + ARC-certified antenna at the inlay layer + dry / wet / converted-label form factor matched to converter or end-user workflow as the operator-side template. M800 (M830 / M850) upgrade path runs in parallel for next-gen power efficiency and Gen2X protocol features on the same antenna designs."
           }
         ]
       }
@@ -236,7 +236,7 @@
         "M750 — volume production with user memory; 128-bit EPC + on-tag lot / date codes; logistics / healthcare workhorse.",
         "M770 — high memory + AutoTune; mixed-surface flexibility; premium per-unit cost earned by surface-adaptive performance.",
         "All three share −23.5 dBm sensitivity floor — antenna design and mounting surface dominate in-use range variation.",
-        "Pin- and protocol-compatible upgrade to M800 (M830 / M850 / M870 / M880) for AUTHENTICATE cryptographic verification."
+        "Pin- and protocol-compatible upgrade to M800 (M830 / M850) for Gen2X features, ~30% lower power consumption, and ~1-2 dB sensitivity improvement on the same antenna design."
       ]
     }
   ],
@@ -255,7 +255,7 @@
         },
         {
           "href": "/products/rfid-labels/impinj-m800-uhf-inlay/",
-          "label": "Impinj M800 UHF inlay (next-gen + AUTHENTICATE)"
+          "label": "Impinj M800 UHF inlay (M830 / M850, next-gen, Gen2X)"
         },
         {
           "href": "/products/rfid-labels/alien-higgs-9-uhf-inlay/",
@@ -323,7 +323,7 @@
     },
     {
       "question": "What is the migration path from M700 to M800?",
-      "answer": "Pin- and protocol-compatible. Inlays qualified on M700 antenna designs rebuild with M830 / M850 / M870 / M880 chips on the identical antenna without antenna re-tune, reader-fleet re-qualification, or production-line encoding / print-apply re-validation. M800 family adds ISO/IEC 18000-63:2015 Amendment 1 AUTHENTICATE command for backend cryptographic verification — useful for pharmaceutical (DSCSA / EU FMD), luxury (anti-counterfeit), and spare-parts programmes. Most reader fleets installed since ~2022 support Gen2v2 AUTHENTICATE via firmware upgrade. Plan M700 → M800 transition 9-12 months ahead to run pilot encoding + backend key-management qualification in parallel with existing M700 production."
+      "answer": "Pin- and protocol-compatible. Inlays qualified on M700 antenna designs rebuild with M830 (128-bit EPC, no user memory) or M850 (96-bit EPC + 32-bit user memory) chips on the identical antenna without antenna re-tune, reader-fleet re-qualification, or production-line encoding / print-apply re-validation. M800 family adds Gen2X protocol features (faster inventory, improved data integrity), ~30% lower chip power consumption, ~1-2 dB sensitivity improvement, and optional Impinj Protected Mode for privacy / supply-chain serialisation control. Plan M700 → M800 transition 4-8 weeks ahead for stock antenna designs; longer if new antenna tooling is required."
     },
     {
       "question": "How does the M700 compare to NXP UCODE and Alien Higgs?",
@@ -409,7 +409,7 @@
       "publisher": "International Organization for Standardization",
       "publishedAt": "2018-04-01",
       "accessedAt": "2026-04-25",
-      "note": "AUTHENTICATE command extension underlying the M700 → M800 cryptographic-upgrade path for pharmaceutical / luxury / spare-parts anti-counterfeit programmes."
+      "note": "Defines the optional AUTHENTICATE command framework for EPC Gen2v2. The standard exists; mainstream RAIN RFID silicon does not currently implement it as a shipping feature."
     }
   ],
   "primaryAction": {
