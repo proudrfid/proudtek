@@ -690,7 +690,7 @@ function buildArchiveBodyHtml(
     products: CatalogProduct[];
   },
 ): string {
-  const $ = load(`<body>${templateBodyHtml}</body>`, { decodeEntities: false });
+  const $ = load(`<body>${templateBodyHtml}</body>`, { decodeEntities: false } as Parameters<typeof load>[1]);
   const main = $("main#main, main.site-main").first();
 
   if (!main.length) {
@@ -714,7 +714,7 @@ function buildArchiveBodyHtml(
 }
 
 function buildRedirectBodyHtml(templateBodyHtml: string, label: string, target: string): string {
-  const $ = load(`<body>${templateBodyHtml}</body>`, { decodeEntities: false });
+  const $ = load(`<body>${templateBodyHtml}</body>`, { decodeEntities: false } as Parameters<typeof load>[1]);
   const main = $("main#main, main.site-main").first();
 
   if (!main.length) {
@@ -1387,7 +1387,7 @@ function updateSidebarCounts($: ReturnType<typeof load>, products: CatalogProduc
 }
 
 function extractFirstImage(bodyHtml: string): string {
-  const $ = load(bodyHtml, { decodeEntities: false });
+  const $ = load(bodyHtml, { decodeEntities: false } as Parameters<typeof load>[1]);
   const selectors = [".woocommerce-product-gallery__image img", ".entry-content img", ".product img", "img"];
 
   for (const selector of selectors) {
@@ -1408,7 +1408,7 @@ function extractFirstImage(bodyHtml: string): string {
 }
 
 function extractProductSummary(bodyHtml: string): string {
-  const $ = load(bodyHtml, { decodeEntities: false });
+  const $ = load(bodyHtml, { decodeEntities: false } as Parameters<typeof load>[1]);
   const selectors = [
     ".woocommerce-product-details__short-description p",
     ".entry-summary p",
@@ -1821,7 +1821,7 @@ function buildIndustriesPage(
   template: SnapshotPage,
   allProducts: CatalogProduct[],
 ): SnapshotPage {
-  const $ = load(`<body>${template.bodyHtml}</body>`, { decodeEntities: false });
+  const $ = load(`<body>${template.bodyHtml}</body>`, { decodeEntities: false } as Parameters<typeof load>[1]);
   const main = $("main#main, main.site-main").first();
   if (!main.length) {
     return {

@@ -7,7 +7,8 @@
  *
  * Extracted from seo.ts during the P1 split (2026-05-08).
  */
-import type { CheerioAPI } from "cheerio";
+import type { CheerioAPI, BasicAcceptedElems } from "cheerio";
+import type { AnyNode } from "domhandler";
 
 import type { EditorialDefinition } from "../editorial-types";
 import { DEFAULT_IMAGE, PAGE_IMAGE_OVERRIDES, SITE_ORIGIN } from "../seo-content";
@@ -32,7 +33,7 @@ export function resolveImageOverride(route: string): ImageSelection | null {
 
 /* ── Image URL extraction ──────────────────────────────────────── */
 
-export function selectImageUrl($body: CheerioAPI, element: Parameters<CheerioAPI["attr"]>[0]): string {
+export function selectImageUrl($body: CheerioAPI, element: BasicAcceptedElems<AnyNode>): string {
   return cleanText(
     $body(element).attr("data-large_image") ??
       $body(element).attr("data-src") ??
@@ -82,7 +83,7 @@ export function isWeakImageAlt(value: string): boolean {
 
 export function guessImageAlt(
   $body: CheerioAPI,
-  element: Parameters<CheerioAPI["attr"]>[0],
+  element: BasicAcceptedElems<AnyNode>,
   contentTitle: string,
   kind: PageKind,
 ): string {
@@ -412,8 +413,9 @@ export function applyImageAccessibility($body: CheerioAPI, context: PageContext)
   });
 
   if (context.kind === "article" && context.articleMeta) {
+    const { modifiedLabel } = context.articleMeta;
     $body("time.updated").each((_, element) => {
-      $body(element).text(context.articleMeta.modifiedLabel);
+      $body(element).text(modifiedLabel);
     });
   }
 
