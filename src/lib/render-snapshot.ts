@@ -1156,10 +1156,20 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
   // WordPress wiring continues to work — the sales team just maps the
   // semantic of those two fields in their CRM rules.
   if (legacyForm.length) {
-    const FIELD_LABEL_REWRITES: Record<string, { label: string; placeholder: string }> = {
-      kb_field_2: { label: "Country", placeholder: "e.g. United States, Germany, UAE" },
-      kb_field_3: { label: "Estimated quantity", placeholder: "e.g. 50,000 cards / year" },
-      kb_field_4: { label: "Project notes (chip, application, timing)", placeholder: "Tell us the chip family or application — MIFARE / NTAG / UHF, hotel / laundry / retail, target launch date." },
+    type FieldRewrite = {
+      label: string;
+      placeholder: string;
+      autocomplete?: string;
+      inputmode?: string;
+      type?: string;
+      required?: boolean;
+    };
+    const FIELD_LABEL_REWRITES: Record<string, FieldRewrite> = {
+      kb_field_0: { label: "Name", placeholder: "Your name", autocomplete: "name", required: true },
+      kb_field_1: { label: "Email", placeholder: "you@company.com", autocomplete: "email", type: "email", required: true },
+      kb_field_2: { label: "Country", placeholder: "e.g. United States, Germany, UAE", autocomplete: "country-name" },
+      kb_field_3: { label: "Estimated quantity", placeholder: "e.g. 50,000 cards / year", inputmode: "numeric" },
+      kb_field_4: { label: "Project notes (chip, application, timing)", placeholder: "Tell us the chip family or application — MIFARE / NTAG / UHF, hotel / laundry / retail, target launch date.", required: true },
     };
 
     for (const [name, rewrite] of Object.entries(FIELD_LABEL_REWRITES)) {
@@ -1168,6 +1178,10 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
       field.attr("data-label", rewrite.label);
       field.attr("aria-label", rewrite.label);
       field.attr("placeholder", rewrite.placeholder);
+      if (rewrite.autocomplete) field.attr("autocomplete", rewrite.autocomplete);
+      if (rewrite.inputmode) field.attr("inputmode", rewrite.inputmode);
+      if (rewrite.type && field.is("input")) field.attr("type", rewrite.type);
+      if (rewrite.required) field.attr("required", "");
       // The Kadence form pairs each input with a <label for="..."> just before it.
       const fieldId = field.attr("id");
       if (fieldId) {
