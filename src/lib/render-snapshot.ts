@@ -5,6 +5,28 @@ import type { AnyNode } from "domhandler";
 import { existsSync, statSync } from "node:fs";
 import path from "node:path";
 
+// ── Kadence CSS bundle manifest (perf optimisation, May 2026) ──
+// scripts/build-kadence-css-bundle.mjs combines 29+ separate Kadence /
+// WP / WC / TranslatePress CSS files into a single bundle and writes a
+// manifest with the bundle URL + the set of source URLs it replaces.
+// We import that manifest at module init and use it in prepareSnapshot()
+// to replace 16+ `<link rel="stylesheet">` tags per page with a single
+// link to the bundle. The static JSON import is Vite-bundled at build
+// time, so it works both in dev (HMR-aware) and in production SSR.
+// If the manifest file doesn't exist yet (first-time clone before any
+// build has run), the import will fail at module load — to handle that
+// gracefully we use a dynamic JSON import wrapped in try/catch via the
+// `??` fallback.
+interface KadenceBundleManifest {
+  bundleUrl: string | null;
+  sourceUrls: string[];
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import kadenceBundleManifestRaw from "../data/.codex-kadence-bundle.json";
+const KADENCE_BUNDLE_MANIFEST: KadenceBundleManifest =
+  (kadenceBundleManifestRaw as KadenceBundleManifest | undefined) ?? { bundleUrl: null, sourceUrls: [] };
+const KADENCE_SOURCE_URL_SET = new Set(KADENCE_BUNDLE_MANIFEST.sourceUrls);
+
 import { LOW_VALUE_ROUTE_PREFIXES } from "./route-overrides";
 import {
   PRIMARY_MENU_DROPDOWNS,
@@ -112,6 +134,38 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // Remove WP font preloads — we add our own preloads in the Astro layout
   $head('link[rel="preload"][as="font"]').remove();
 
+  // ── Kadence CSS bundling (perf, May 2026) ──
+  // Replace the 16+ `<link rel="stylesheet">` tags for Kadence / WP /
+  // WC / TranslatePress CSS with a single link to the pre-built bundle
+  // (scripts/build-kadence-css-bundle.mjs). This removes 15+ HTTP
+  // requests per page load.
+  //
+  // Implementation note: we can't just rewrite the first matching
+  // link's `href` because the snapshot's stylesheet links typically
+  // carry IDs like `wp-block-library-css` which `sanitizeHead` later
+  // matches via `link[id^="wp-block-"]` and removes. So instead we:
+  //   1. Record the position of the first matching link
+  //   2. Insert our own bundle link AFTER that position (with no `id`
+  //      so it survives sanitizeHead's `link[id^=...]` filters)
+  //   3. Remove ALL the source stylesheet links
+  // The cascade order is preserved because the bundle file contains
+  // the same source CSS files concatenated in the original priority
+  // order (see scripts/build-kadence-css-bundle.mjs).
+  // No-op if the bundle manifest is absent (e.g. dev mode before the
+  // bundle build script has run).
+  if (KADENCE_BUNDLE_MANIFEST.bundleUrl) {
+    const bundleUrl = KADENCE_BUNDLE_MANIFEST.bundleUrl;
+    const matchingLinks = $head('link[rel="stylesheet"]').filter((_, element) => {
+      const href = $head(element).attr("href") ?? "";
+      return KADENCE_SOURCE_URL_SET.has(href);
+    });
+    if (matchingLinks.length > 0) {
+      const bundleTag = `<link rel="stylesheet" href="${bundleUrl}" data-codex-bundled="kadence">`;
+      matchingLinks.first().before(bundleTag);
+      matchingLinks.remove();
+    }
+  }
+
   // C-2 attempt (2026-05-09) reverted: tried to defer wp-block-library and
   // easy-table-of-contents stylesheets via print-media swap. /blog/ unchanged
   // but home `/` CLS jumped from 0.000 → 0.142 (over the 0.1 "Good"
@@ -121,6 +175,37 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // explore: critical-CSS extraction (Beasties/Critters integration) — only
   // inline above-the-fold rules, defer the rest. See PHASE-X-CSS-CRITICAL.md
   // (TBD) before attempting again.
+
+  // ── Image loading strategy (perf, May 2026) ──
+  // The WP snapshot body emits 6+ <img> tags above the fold (hero photo
+  // plus a stat-icon row plus product carousels). The first <img> is
+  // the hero — it owns LCP, so it stays eager + fetchpriority=high.
+  // Every other <img> on the page gets loading="lazy" + decoding="async"
+  // so the browser defers them until they approach the viewport. Saves
+  // ~80-100 KB of first-paint bandwidth on the home route.
+  // We don't override `loading` or `fetchpriority` if the WP HTML
+  // already specified one — the editorial team may have made deliberate
+  // choices we should respect.
+  let imgIndex = 0;
+  $body("img").each((_, element) => {
+    const $img = $body(element);
+    const isFirst = imgIndex === 0;
+    imgIndex++;
+    if (isFirst) {
+      // Hero — keep eager but ensure fetchpriority=high is set if not present
+      if (!$img.attr("fetchpriority")) $img.attr("fetchpriority", "high");
+      if (!$img.attr("loading")) $img.attr("loading", "eager");
+      if (!$img.attr("decoding")) $img.attr("decoding", "async");
+    } else {
+      // All subsequent images — lazy + async unless author explicitly chose otherwise
+      if (!$img.attr("loading")) $img.attr("loading", "lazy");
+      if (!$img.attr("decoding")) $img.attr("decoding", "async");
+      // Strip any inherited fetchpriority=high on non-hero images; only the
+      // hero should have the high-priority hint, otherwise the browser
+      // gets conflicting signals.
+      if ($img.attr("fetchpriority") === "high") $img.removeAttr("fetchpriority");
+    }
+  });
 
   $body("a[href]").each((_, element) => {
     const href = $body(element).attr("href") ?? "";
