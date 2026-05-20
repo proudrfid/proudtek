@@ -230,7 +230,32 @@
          was on screen — producing a double-CTA collision. */
       var stickyCta = document.querySelector('.codex-sticky-cta');
       if (stickyCta) {
-        var stickyDismissed = false;
+        /* Persist dismissal across page loads for 7 days so visitors who
+           explicitly closed the bar don't see it pop up on every page.
+           Keyed by 'engineering' since that's the only sticky variant
+           today; expand if more variants ship. Try/catch guards against
+           Safari private-mode where localStorage throws on read/write. */
+        var STICKY_DISMISS_KEY = 'codex.stickyCta.dismissed.engineering';
+        var STICKY_DISMISS_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+        function isStickyDismissedPersistent() {
+          try {
+            var raw = window.localStorage.getItem(STICKY_DISMISS_KEY);
+            if (!raw) return false;
+            var ts = parseInt(raw, 10);
+            if (!ts || isNaN(ts)) return false;
+            if (Date.now() - ts > STICKY_DISMISS_TTL_MS) {
+              window.localStorage.removeItem(STICKY_DISMISS_KEY);
+              return false;
+            }
+            return true;
+          } catch (e) { return false; }
+        }
+        function rememberStickyDismissed() {
+          try {
+            window.localStorage.setItem(STICKY_DISMISS_KEY, String(Date.now()));
+          } catch (e) { /* private mode — fall back to in-memory only */ }
+        }
+        var stickyDismissed = isStickyDismissedPersistent();
         var firstShowAllowed = false;
         /* DS-9 #3 fix v2 (2026-04-26): track which anchors are currently
            intersecting via a Set. The previous accumulator (visibleCount += /
@@ -259,6 +284,7 @@
         if (dismissBtn) {
           dismissBtn.addEventListener('click', function() {
             stickyDismissed = true;
+            rememberStickyDismissed();
             stickyCta.classList.remove('is-visible');
           });
         }
