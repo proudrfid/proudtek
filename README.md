@@ -31,3 +31,4 @@ This project mirrors `https://proudtek.com` into a static Astro site.
 - The generated site keeps the original HTML structure instead of rebuilding WordPress templates as bespoke Astro components.
 - Some external integrations and analytics scripts are intentionally sanitized for static local use.
 
+
