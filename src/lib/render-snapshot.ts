@@ -1,6 +1,7 @@
 import type { SnapshotPage } from "./site-data";
 
-import { load } from "cheerio";
+import { load, type BasicAcceptedElems } from "cheerio";
+import type { AnyNode } from "domhandler";
 import { existsSync, statSync } from "node:fs";
 import path from "node:path";
 
@@ -282,7 +283,7 @@ function isPrunableHref(href: string): boolean {
   return NOISY_EXTERNAL_HREF_PATTERNS.some((pattern) => pattern.test(href));
 }
 
-function removeLowValueLink($body: ReturnType<typeof load>, element: unknown): void {
+function removeLowValueLink($body: ReturnType<typeof load>, element: BasicAcceptedElems<AnyNode>): void {
   const link = $body(element);
 
   for (const selector of LOW_VALUE_CONTAINERS) {

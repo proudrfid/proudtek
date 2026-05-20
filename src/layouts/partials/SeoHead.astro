@@ -58,6 +58,10 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     imagesrcset+imagetype hint. */}
 {seo.imageUrl && seo.kind !== "home" && seo.kind !== "contact" ? (
   seo.imageUrl.startsWith("/landing-images/") ? (
+    // @ts-expect-error — Astro's LinkHTMLAttributes type predates the
+    // responsive-image preload attributes (imagesrcset, imagetype) per
+    // HTML Living Standard. Both attributes are valid; Astro emits them
+    // verbatim. Remove the suppression once the upstream types catch up.
     <link
       rel="preload"
       as="image"
