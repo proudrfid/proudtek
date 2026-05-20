@@ -725,6 +725,7 @@ function renderFooterSection(s: FooterSection): string {
 }
 
 function renderFooterBrandRow(): string {
+  const addr = SITE_CONTACT.address;
   return (
     `<div class="codex-footer-brand">` +
       `<div class="codex-footer-brand__inner">` +
@@ -732,6 +733,11 @@ function renderFooterBrandRow(): string {
           `<img src="/site-assets/wp-content/uploads/2024/04/proudtek-logo.png" alt="Proud Tek" width="220" height="60" loading="lazy" decoding="async">` +
         `</a>` +
         `<p class="codex-footer-brand__tagline">Custom RFID &amp; NFC manufacturer — cards, tags, labels, wristbands, keyfobs and readers shipped worldwide from China since 2010.</p>` +
+        `<address class="codex-footer-brand__address" aria-label="Office address and hours">` +
+          `<span class="codex-footer-brand__address-line">${escapeHtml(addr.line1)}, ${escapeHtml(addr.line2)}</span>` +
+          `<span class="codex-footer-brand__address-line">${escapeHtml(addr.region)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.country)}</span>` +
+          `<span class="codex-footer-brand__address-line codex-footer-brand__hours">${escapeHtml(SITE_CONTACT.hours)}</span>` +
+        `</address>` +
         `<a class="codex-footer-brand__cta" href="/contact/">Request a quote <span aria-hidden="true">→</span></a>` +
       `</div>` +
     `</div>`
