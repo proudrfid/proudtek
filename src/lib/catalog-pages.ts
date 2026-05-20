@@ -74,9 +74,12 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   // ── RFID Labels / Stickers / Inlays ─────────────────────────────────
   "/products/rfid-labels/alien-higgs-9-uhf-inlay/":              "/landing-images/alien-higgs-9-uhf-inlay.jpg",
   "/products/rfid-labels/impinj-m700-uhf-inlay/":                "/landing-images/impinj-m700-uhf-inlay.jpg",
-  // M730 is physically the same inlay as the M700 generic reference — the differences are at the silicon (96-bit EPC, no User memory, no Authenticate). Shares the M700 hero.
+  // M730 is physically the same inlay as the M700 generic reference — the differences are at the silicon (96-bit EPC, no User memory). Shares the M700 hero.
   "/products/rfid-labels/impinj-m730-uhf-inlay/":                "/landing-images/impinj-m700-uhf-inlay.jpg",
-  "/products/rfid-labels/impinj-m750-uhf-inlay/":                "/landing-images/rfid-wet-inlay-alt.jpg",
+  // M750 — own hero (Wikimedia textile inlay, CC BY-SA 4.0). Previous
+  // rfid-wet-inlay-alt.jpg showed copper antenna outlines that didn't
+  // match the page subject; backed up as .bad-frames.bak.
+  "/products/rfid-labels/impinj-m750-uhf-inlay/":                "/landing-images/impinj-m750-uhf-inlay.jpg",
   "/products/rfid-labels/impinj-m800-uhf-inlay/":                "/landing-images/impinj-m800-uhf-inlay.jpg",
   "/products/rfid-labels/nfc-pharmaceutical-label/":             "/landing-images/nfc-pharmaceutical-label.jpg",
   "/products/rfid-labels/rfid-asset-label/":                     "/landing-images/rfid-asset-label.jpg",
