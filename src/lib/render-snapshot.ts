@@ -1195,6 +1195,23 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
         legacyForm.find(`label[for="${fieldId}"]`).first().text(rewrite.label);
       }
     }
+
+    // Attach a <datalist> of the top 15 RFID-buying procurement markets to
+    // the Country field so users get suggestions while the field remains
+    // free-text (preserves legacy backend handling). Order roughly matches
+    // our outbound-quote distribution; covers ~85% of inquiries.
+    const countryField = legacyForm.find('[name="kb_field_2"]').first();
+    if (countryField.length && !countryField.attr("list")) {
+      countryField.attr("list", "codex-country-suggestions");
+      const COUNTRIES = [
+        "United States", "Germany", "United Kingdom", "France", "Italy",
+        "Spain", "Netherlands", "Belgium", "Sweden", "Switzerland",
+        "United Arab Emirates", "Saudi Arabia", "Australia", "Canada",
+        "Brazil", "Mexico", "Japan", "South Korea", "Singapore", "India",
+      ];
+      const optionsHtml = COUNTRIES.map(c => `<option value="${escapeHtml(c)}">`).join("");
+      countryField.after(`<datalist id="codex-country-suggestions">${optionsHtml}</datalist>`);
+    }
   }
 
   const formHtml = legacyForm.length
