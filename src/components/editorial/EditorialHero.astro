@@ -59,11 +59,32 @@ const heroAlt = illustration
 // composer level) materializes as an `<a>` tag. Plain summary text without
 // markdown links round-trips unchanged through the escape pass.
 const summaryHtml = renderInlineLinks(definition.summary);
+
+// Split SEO-stuffed titles into a clean H1 + editorial deck. Long pages
+// like solutions and hubs ship titles such as "Hotel Key Cards (2026):
+// Lock-Compatible RFID Cards — Saflok, Vingcard, SALTO, Onity, ... |
+// CVE-2024-29916 & Fudan FM11RF08 Procurement Guide" — the full string
+// stays in <title>/og:title/JSON-LD (those still drive SEO), but the
+// visible H1 takes only the first segment before `: — – |` and the rest
+// renders below as a sub-headline. If the title has no separator we
+// render only the H1 (no empty deck). Skipped for contact pages whose
+// titles are already short.
+const titleSeparator = /\s*(:\s|—|–|\|)\s*/;
+const [h1Title, ...deckParts] = definition.title.split(titleSeparator);
+// `split` with a capturing group includes the matched separators in the
+// array; skip them by taking every-other element starting at index 1.
+const deckSegments = deckParts.filter((_, i) => i % 2 === 1);
+const decoratedDeck = deckSegments.length > 0
+  ? deckSegments.join(" — ").trim()
+  : null;
+const cleanH1 = h1Title.trim();
+const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0;
 ---
 <section class="codex-editorial-hero" data-page-type={pageType}>
   <div class="codex-editorial-hero-copy">
     <p class="codex-editorial-kicker">{definition.kicker}</p>
-    <h1>{definition.title}</h1>
+    <h1>{cleanH1}</h1>
+    {shouldShowDeck && <p class="codex-editorial-hero-deck">{decoratedDeck}</p>}
     <div class="codex-editorial-answer" aria-label="Quick answer">
       <p class="codex-editorial-answer-label">Quick answer</p>
       <p class="codex-editorial-summary" set:html={summaryHtml} />
