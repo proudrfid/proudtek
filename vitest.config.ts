@@ -21,6 +21,15 @@ export default getViteConfig({
   test: {
     include: ["src/**/__tests__/**/*.test.ts"],
     environment: "node",
+    /**
+     * Registers the path-normalisation snapshot serializer (see
+     * src/lib/__tests__/setup/vitest-setup.ts) so committed `.snap`
+     * files don't carry the developer's home-directory path verbatim.
+     * Without this, Astro's `data-astro-source-file` attributes pin the
+     * snapshot content to whoever generated it — and CI on Ubuntu
+     * runners then fails on every PR with hundreds of path-only diffs.
+     */
+    setupFiles: ["./src/lib/__tests__/setup/vitest-setup.ts"],
     coverage: {
       provider: "v8",
       include: ["src/lib/editorial-pages.ts", "src/lib/editorial-types.ts"],
