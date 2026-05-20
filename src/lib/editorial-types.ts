@@ -86,6 +86,23 @@ export interface EditorialDefinition {
   imageAlt: string;
   imageSourceRoutes: string[];
   heroImage?: string;
+  /**
+   * Optional attribution metadata for the hero image. Required when the
+   * image is sourced under a Creative Commons or similar license that
+   * mandates author credit. Rendered as a small caption beneath the
+   * hero figure (`.codex-editorial-hero-credit`). Absent for in-house
+   * product photography.
+   */
+  imageCredit?: {
+    /** Photographer / author name. */
+    author: string;
+    /** Optional link to the original source page (Wikimedia, Flickr, etc.). */
+    sourceUrl?: string;
+    /** License identifier — e.g. "CC BY-SA 4.0", "CC0". */
+    license?: string;
+    /** Optional link to the license deed (e.g. https://creativecommons.org/licenses/by-sa/4.0/). */
+    licenseUrl?: string;
+  };
   brief?: EditorialBriefField[];
   sections: EditorialSectionData[];
   resourceCards: EditorialResourceCard[];
