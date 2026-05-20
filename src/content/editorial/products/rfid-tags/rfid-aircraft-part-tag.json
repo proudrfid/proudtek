@@ -26,7 +26,7 @@
   "brief": [
     {
       "label": "Chip options",
-      "text": "NXP UCODE DNA (3,072-bit user memory, AES-128 cryptographic authentication, EPC Gen2v2); Fujitsu MB97R803A / MB97R8110 (64 KB FRAM user memory, ISO/IEC 18000-63); Impinj M775 / M830 (4 kbit user memory, engineering-record on-tag). Memory choice driven by ATA 2000 Ch. 9-5 data-element set carried on-tag vs looked up in MRO system."
+      "text": "Fujitsu MB97R803A / MB97R8110 (64 KB FRAM user memory, ISO/IEC 18000-63 / EPC Gen2v2) — the volume choice for ATA 2000 Ch. 9-5 deployments because the on-tag memory holds the full engineering record without an MRO-system round-trip. Impinj M775 (UHF, cryptographic authentication via the Impinj Authentication Service) — the M700-family chip with a cryptographic engine for UHF-side anti-counterfeit. Impinj M730 / M830 — base UHF chips when the maintenance system, not the tag, is the source of truth for engineering data and the on-tag payload is just the SGTIN/serial. For per-tap cryptographic verification of high-value rotables, programmes typically also attach a companion HF NFC tag (NXP NTAG 424 DNA — real AES-128 SUN with read-counter binding) alongside the UHF inventory tag; the UHF tag drives portal-scale inventory, the HF tag is used by the inspector at incoming inspection."
     },
     {
       "label": "Frequency / air interface",
@@ -67,7 +67,7 @@
     },
     {
       "label": "Security & counterfeit resistance",
-      "text": "NXP UCODE DNA AES-128 tag authentication (RFC 3394 key wrap); SHA-256 digital-thread hash linking tag EPC to OEM pedigree record; locked user-memory banks with killable passwords; GS1 SGTIN-96 or OEM-private EPC scheme; optional ARINC 816-compatible airline part-numbering overlay."
+      "text": "Three layers, used together for high-value rotables: (1) UHF tag with locked user-memory banks + Gen2v2 access password gates writes after personalisation. (2) Impinj M775 with cryptographic engine + Impinj Authentication Service for UHF-side chip authenticity verification (the chip proves it is a genuine Impinj M775 with a registered key, defeating relabelled-chip counterfeit attempts). (3) Companion HF NXP NTAG 424 DNA tag for per-tap cryptographic verification at incoming inspection — real AES-128 SUN with read-counter binding, the cryptographic primitive that defeats sophisticated cloning. The UCODE DNA branding occasionally cited in trade press for UHF AES-128 is a marketing-press conflation: shipping UHF UCODE silicon (UCODE 8, UCODE 9) does NOT implement AES-128 chip-authentication. Programmes that need it specify HF NTAG 424 DNA on a second tag, not UHF."
     },
     {
       "label": "Compliance framework",
@@ -88,7 +88,7 @@
       "bullets": [
         "An aircraft contains 2-6 million individually serialized parts; manual identification using small data plates requires technicians to contort into confined spaces or use mirrors and lighting rigs, adding 5-15 minutes per part to incoming inspection and build documentation processes.",
         "Paper maintenance records and logbook entries for life-limited parts (LLPs) are lost, damaged or incorrectly transcribed at a rate that generates EASA/FAA findings in approximately 30% of airworthiness document audits. With consequences including grounded aircraft and unscheduled maintenance events.",
-        "Counterfeit aircraft parts entering the supply chain cost the industry an estimated $2 billion annually; without a direct digital link between the physical part and its authenticated pedigree, visual inspection is the only available check. One that sophisticated counterfeit parts can pass.",
+        "Counterfeit aircraft parts entering the supply chain cost the industry an estimated $2 billion annually; without a direct digital link between the physical part and its authenticated pedigree, visual inspection is the only available check — one that sophisticated counterfeit parts can pass.",
         "MRO shop turnaround time (TAT) for rotable components averages 15-30 days; a significant portion of that time is consumed by manual part identification, paper document retrieval and status verification that could be automated with on-tag data access.",
         "Modification status and applied service bulletin (SB/AD) records for fleet management require manual lookup in multiple systems per part number. Technicians spend 20-40 minutes per component reconciling physical part condition against database records before maintenance decisions can be made."
       ],
@@ -107,8 +107,8 @@
             "label": "FAA airworthiness approval"
           },
           {
-            "value": "AES-128",
-            "label": "UCODE DNA tag authentication"
+            "value": "M775 + NTAG 424 DNA",
+            "label": "Cryptographic verification stack"
           }
         ]
       }
@@ -117,10 +117,10 @@
       "title": "How Proud Tek ATA Spec 2000 RFID tags streamline aircraft part identification and compliance",
       "bullets": [
         "RTCA DO-160G / EUROCAE ED-14G qualification confirms tag survival through the full range of aircraft operational conditions (vibration Cat. S/U/B/R, temperature -55 to +200 °C, altitude, humidity Cat. A/B, fluids per §11 including Skydrol and Jet A) so the tag remains the part's permanent digital identity throughout its service life.",
-        "High-memory chip options (NXP UCODE DNA 3,072-bit with AES-128 authentication, Fujitsu MB97R 64 KB FRAM) store mandatory ATA 2000 Ch. 9-5 data elements (P/N, S/N, CAGE/DUNS manufacturer code, manufacture date) plus optional elements (modification / SB compliance status, LLP cycles / hours remaining, last shop visit, airworthiness status) directly on the tag — enabling offline data access without a network connection to the MRO system.",
+        "High-memory chip options (Fujitsu MB97R 64 KB FRAM, Impinj M775 4 kbit) store mandatory ATA 2000 Ch. 9-5 data elements (P/N, S/N, CAGE/DUNS manufacturer code, manufacture date) plus optional elements (modification / SB compliance status, LLP cycles / hours remaining, last shop visit, airworthiness status) directly on the tag — enabling offline data access without a network connection to the MRO system.",
         "On-metal optimised antenna designs achieve 1-7 m read range on metal aircraft components (tag size dependent), allowing technicians to identify parts in confined locations without physical access to the data plate.",
         "ATA Spec 2000 Chapter 9 compliance with FAA AC 20-162A and EASA CM-AS-002 Issue 01 means the tag is treated as a part-marking method under FAA 14 CFR Part 45 and EASA Part 21. No separate STC / TSO is required beyond the component's existing maintenance-data approval via OEM engineering order.",
-        "UCODE DNA AES-128 tag authentication plus SHA-256 digital-thread hashing creates a cryptographic link from the physical part to its authenticated OEM pedigree record — raising the counterfeit-detection bar beyond visual / data-plate inspection."
+        "Two-tag cryptographic stack for high-value rotables: UHF Impinj M775 + Impinj Authentication Service for chip-authenticity verification at warehouse / dock portal scale, paired with a companion HF NXP NTAG 424 DNA tag for per-tap AES-128 SUN verification at incoming inspection. Raises the counterfeit-detection bar beyond visual / data-plate inspection. Mainstream UHF chips (UCODE 8/9, Impinj M730/M750/M830) do NOT implement per-tap cryptographic authentication; the stack uses M775 and NTAG 424 DNA specifically because those are the chips that actually ship the crypto."
       ],
       "comparePanel": {
         "beforeHeading": "Commodity on-metal RFID tag",
@@ -129,14 +129,14 @@
           "IP-rated industrial tag with no DO-160G test evidence",
           "96-bit EPC only — no on-tag ATA 2000 data elements",
           "No aerospace fluids (Skydrol / Jet A) or lightning §22 testing",
-          "No cryptographic tag authentication → visual-check counterfeit gap",
+          "No cryptographic verification path → visual-check counterfeit gap",
           "No OEM engineering-order attachment method specification"
         ],
         "after": [
           "DO-160G / ED-14G test report (Sections 4, 5, 6, 7, 8, 11, 20, 22) per variant",
           "96-384 bit mandatory ATA 2000 Ch. 9-5 + 2-64 KB optional engineering record",
           "Aerospace fluid immersion §11, lightning indirect §22, RF susceptibility §20 data",
-          "NXP UCODE DNA AES-128 authentication + SHA-256 digital-thread pedigree hash",
+          "Impinj M775 chip-authenticity (UHF) + companion NTAG 424 DNA per-tap AES-128 (HF) stack — the chips that actually ship the crypto",
           "Attachment spec aligned to Boeing D6-81763 Rev E and Airbus A0094T0054, ready for OEM engineering order"
         ]
       }
@@ -145,31 +145,31 @@
       "title": "Cross-buyer reference notes — ATA Spec 2000 Chapter 9-5 flyable-RFID",
       "paragraphs": [
         "TAT compression, audit-finding reduction and counterfeit-detection outcomes all vary with fleet type, MRO shop footprint, reader infrastructure and the mix of ATA 2000 data elements carried on-tag versus looked up in the M&E system, so what follows is the shape of the work airline and OEM integrators sequence on a Chapter 9-5 deployment — not client-specific numbers. The sequencing is anchored to ATA Spec 2000 Chapter 9 (Automated Identification and Data Capture), FAA AC 20-162A (Airworthiness Approval and Operational Allowance of RFID Systems), EASA Certification Memorandum CM-AS-002 Issue 01, RTCA DO-160G / EUROCAE ED-14G, FAA 14 CFR Part 45 and SAE AS5678 Passive RFID for Aerospace Applications.",
-        "Directional benchmarks published in ATA Spec 2000 Ch. 9 implementation notes, the Boeing Insight Accelerator RFID programme references and Airbus Skywise Industry Insights describe incoming-inspection time on rotable LRUs moving from manual-data-plate retrieval to single-scan read, LLP logbook-transcription error from paper-driven audit findings to digital-thread hash verification, and counterfeit-pedigree detection moving from visual-only to cryptographic AES-128 — the direction programmes should expect, with magnitudes settled per shop during first-article qualification and pilot-line instrumentation."
+        "Directional benchmarks published in ATA Spec 2000 Ch. 9 implementation notes, the Boeing Insight Accelerator RFID programme references and Airbus Skywise Industry Insights describe incoming-inspection time on rotable LRUs moving from manual-data-plate retrieval to single-scan read, LLP logbook-transcription error from paper-driven audit findings to digital-thread hash verification, and counterfeit-pedigree detection moving from visual-only to a layered UHF-portal + HF-tap cryptographic stack (Impinj M775 + Impinj Authentication Service for the UHF tag, NXP NTAG 424 DNA AES-128 SUN for the companion HF tag). The direction programmes should expect; magnitudes settled per shop during first-article qualification and pilot-line instrumentation."
       ],
       "dataHighlight": {
         "value": "visual → cryptographic",
         "heading": "Counterfeit-pedigree verification on flyable RFID tagged rotables",
-        "text": "Qualitative shift published across ATA Spec 2000 Ch. 9 Authentication Framework, FAA SUP (Suspected Unapproved Parts) programme notes and the UCODE DNA AES-128 reference implementation. Detection rate per shop is settled during the pilot instrumentation and first-year SUP audit cycle; it is not a supplier warranty number.",
-        "source": "ATA Spec 2000 Ch. 9 Authentication; FAA AC 21-29D SUP guidance"
+        "text": "Qualitative shift published across ATA Spec 2000 Ch. 9 Authentication Framework, FAA SUP (Suspected Unapproved Parts) programme notes, the Impinj Authentication Service documentation, and NXP AN12196 (NTAG 424 DNA SUN reference implementation). The mainstream UHF inventory chips (Impinj M730 / M750 / M830, NXP UCODE 8 / 9) do not implement per-tap cryptographic chip-authentication as a shipping silicon feature today; programmes that need real chip-side crypto specify Impinj M775 on the UHF side (chip-authenticity via Impinj's cloud service) and NTAG 424 DNA on a companion HF tag (AES-128 SUN at every tap). Detection rate per shop is settled during the pilot instrumentation and first-year SUP audit cycle; it is not a supplier warranty number.",
+        "source": "ATA Spec 2000 Ch. 9 Authentication; FAA AC 21-29D SUP guidance; Impinj M775 + Authentication Service documentation; NXP AN12196"
       },
       "timeline": {
         "items": [
           {
             "label": "Weeks 1-4 · Component scope + engineering-order map",
-            "text": "Confirm tag targets (engine LRU / landing gear / avionics / cabin / wheel-brake), lock OEM engineering-order attach method against Boeing D6-81763 Rev E or Airbus A0094T0054, decide which ATA 2000 Ch. 9-5 data elements are carried on-tag vs looked up. Lodge SAE AS9100D supplier qualification if first-time OEM supply."
+            "text": "Confirm tag targets (engine LRU / landing gear / avionics / cabin / wheel-brake), lock OEM engineering-order attach method against Boeing D6-81763 Rev E or Airbus A0094T0054, decide which ATA 2000 Ch. 9-5 data elements are carried on-tag vs looked up. Decide whether the programme needs cryptographic counterfeit verification (M775 + companion NTAG 424 DNA stack) or only inventory/lifecycle data (Fujitsu FRAM single tag is enough). Lodge SAE AS9100D supplier qualification if first-time OEM supply."
           },
           {
             "label": "Weeks 5-12 · First Article + DO-160G test programme",
-            "text": "Issue first-article inspection (FAI) per AS9102, run DO-160G / ED-14G §4, §5, §6, §7, §8, §11, §20, §22 test report on the target variant, freeze chip option (UCODE DNA / Fujitsu FRAM / Impinj M775). Issue FAA AC 20-162A / EASA CM-AS-002 documentation pack."
+            "text": "Issue first-article inspection (FAI) per AS9102, run DO-160G / ED-14G §4, §5, §6, §7, §8, §11, §20, §22 test report on the target variant, freeze chip option (Fujitsu MB97R FRAM / Impinj M775 / Impinj M730 / M830). For programmes that include the companion HF NTAG 424 DNA tag, run a parallel DO-160G qualification on the HF tag and validate the AES-128 key-management workflow with the OEM's pedigree database. Issue FAA AC 20-162A / EASA CM-AS-002 documentation pack."
           },
           {
             "label": "Weeks 13-24 · Pilot line + MRO wiring",
-            "text": "Deploy on one component family (e.g., fleet of landing-gear LRUs), wire reader network (Zebra FX9600 / Impinj R700) into MRO platform (IFS Cloud for Aviation / Trax / AMOS / Ramco / Rusada), validate ATA 2000 element propagation into maintenance records, exercise UCODE DNA AES-128 authentication on incoming inspection."
+            "text": "Deploy on one component family (e.g., fleet of landing-gear LRUs), wire reader network (Zebra FX9600 / Impinj R700 for UHF dock portals, smartphone NFC stack for the HF tap at incoming inspection) into MRO platform (IFS Cloud for Aviation / Trax / AMOS / Ramco / Rusada), validate ATA 2000 element propagation into maintenance records, exercise the M775 chip-authenticity call against Impinj Authentication Service plus the NTAG 424 DNA SUN verification flow on incoming inspection."
           },
           {
             "label": "Month 7+ · Fleet scale-out + digital-thread loop",
-            "text": "Extend to remaining component families (engine LRU / wheel-brake / cabin), link tag lifecycle data into PTC Windchill or Aras Innovator configuration record, publish digital-thread hash into Boeing Insight Accelerator / Airbus Skywise and close the counterfeit-pedigree loop with OEM SUP audit."
+            "text": "Extend to remaining component families (engine LRU / wheel-brake / cabin), link tag lifecycle data into PTC Windchill or Aras Innovator configuration record, publish digital-thread hash into Boeing Insight Accelerator / Airbus Skywise and close the counterfeit-pedigree loop with OEM SUP audit using the M775 + NTAG 424 DNA cryptographic stack on high-risk rotables."
           }
         ]
       }
@@ -182,7 +182,7 @@
         "RFID enables instant identification: technician scans the part tag to pull up the complete maintenance record, modification status and remaining life.",
         "Regulatory acceptance: EASA (CM-AS-002 Issue 01) and FAA (AC 20-162A) accept RFID as an approved marking method alongside the data plate under ATA Spec 2000 Ch. 9-5.",
         "MRO efficiency: reduce turnaround time by automating incoming inspection, parts kitting and build documentation.",
-        "Counterfeit prevention: the RFID tag creates a cryptographically protected digital thread linking the physical part to its authenticated pedigree (AES-128 tag authentication + SHA-256 OEM-record hash)."
+        "Counterfeit prevention: a layered cryptographic stack (UHF Impinj M775 + Impinj Authentication Service for warehouse/dock-portal chip-authenticity verification; companion HF NXP NTAG 424 DNA tag for per-tap AES-128 SUN verification at incoming inspection) creates a digital thread linking the physical part to its authenticated pedigree. Mainstream UHF inventory chips do NOT implement per-tap cryptographic authentication as shipping silicon — M775 on the UHF side and NTAG 424 DNA on a companion HF tag are the chips that actually deliver the crypto."
       ]
     },
     {
@@ -235,8 +235,8 @@
             "Yes"
           ],
           [
-            "Digital-thread hash",
-            "SHA-256 link to OEM authenticated pedigree",
+            "Pedigree verification",
+            "Impinj M775 chip-authenticity + companion NTAG 424 DNA AES-128 SUN at incoming inspection",
             "Yes (high-security variant)"
           ]
         ]
@@ -308,6 +308,10 @@
         {
           "href": "/products/rfid-tags/rfid-anti-metal-tag/",
           "label": "Anti-metal RFID tags"
+        },
+        {
+          "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
+          "label": "NTAG 424 DNA tamper-evident NFC tag (HF companion for cryptographic verification)"
         }
       ]
     },
@@ -329,11 +333,15 @@
     },
     {
       "question": "How much data can be stored on the tag?",
-      "answer": "Standard tags with NXP UCODE DNA store 3,072 bits (384 bytes) of user memory — enough for mandatory ATA 2000 Ch. 9-5 elements (P/N, S/N, CAGE / DUNS manufacturer code, dates) plus a compact modification-status flag. High-memory tags with Fujitsu MB97R FRAM store up to 64 KB — enough for complete maintenance history, modification records and operational parameters. Choose the memory size based on how much data you want to carry on the part itself versus looking up in your MRO / M&E system (IFS Cloud for Aviation, Trax, AMOS, Ramco)."
+      "answer": "Standard tags with Impinj M775 (the M700-family authentication chip) store roughly 4 kbit of user memory — enough for mandatory ATA 2000 Ch. 9-5 elements (P/N, S/N, CAGE / DUNS manufacturer code, dates) plus a compact modification-status flag. High-memory tags with Fujitsu MB97R FRAM store up to 64 KB — enough for complete maintenance history, modification records and operational parameters. Choose the memory size based on how much data you want to carry on the part itself versus looking up in your MRO / M&E system (IFS Cloud for Aviation, Trax, AMOS, Ramco)."
     },
     {
       "question": "What read range do the tags achieve on metal aircraft parts?",
       "answer": "Our on-metal aerospace tags achieve 1-7 m read range with a handheld UHF reader on metal aircraft components. The compact 25 × 10 mm variant reads at 1-3 m, the standard 50 × 15 mm at 2-5 m, and the large 85 × 28 mm at 3-7 m on landing gear. Read range is sufficient for technicians to identify parts without physically accessing the data plate, which may be in a hard-to-reach location — and dock-portal readers at MRO shop entrances achieve stacked-LRU read at 3-5 m with high read-rate in pilot instrumentation."
+    },
+    {
+      "question": "How does cryptographic counterfeit detection work on these tags?",
+      "answer": "Two-layer stack. **UHF (M775 + Impinj Authentication Service):** the UHF inventory tag uses the Impinj M775 chip, which embeds a unique Impinj-programmed cryptographic key. At the dock portal or warehouse, the reader posts the chip's challenge-response to Impinj's Authentication Service, which validates that the chip is a genuine M775 with a registered key (defeats relabelled-chip counterfeits at portal speed). **HF (companion NTAG 424 DNA tag):** at incoming inspection the technician taps a smartphone or handheld NFC reader on the companion HF tag — NXP NTAG 424 DNA generates a SUN (Secure Unique NFC) message using AES-128 with a read-counter binding, defeating replay and clone attacks at the per-tap level. The two layers cover different operational scopes: UHF at portal scale (every chip-presence read), HF at human-inspection points (high-value rotables where the inspector wants per-tap cryptographic certainty). Mainstream UHF inventory chips (UCODE 8 / 9, Impinj M730 / M750 / M830) do NOT implement per-tap cryptographic authentication as shipping silicon — M775 on the UHF side and NTAG 424 DNA on a companion HF tag are the chips that actually deliver the crypto."
     }
   ],
   "primaryAction": {
@@ -348,13 +356,18 @@
     {
       "href": "/products/rfid-tags/rfid-high-temperature-ceramic-tag/",
       "label": "Ceramic high-temp tags"
+    },
+    {
+      "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
+      "label": "NTAG 424 DNA NFC tag (HF companion for cryptographic verification)"
     }
   ],
   "relatedIndustries": [
     "industrial"
   ],
   "chipFamilies": [
-    "mifare-desfire",
+    "impinj-m7",
+    "ntag424",
     "ucode"
   ],
   "envFamilies": [
@@ -432,18 +445,24 @@
       "publisher": "U.S. Federal Aviation Administration",
       "publishedAt": "2019-02-19",
       "accessedAt": "2026-04-23",
-      "note": "FAA guidance on Suspected Unapproved Parts (SUP) programme — the counterfeit-pedigree framework RFID digital-thread authentication supports."
+      "note": "FAA guidance on Suspected Unapproved Parts (SUP) programme — the counterfeit-pedigree framework the M775 + NTAG 424 DNA cryptographic stack supports."
     },
     {
-      "label": "NXP UCODE DNA — Cryptographic RFID IC reference implementation (AES-128 tag authentication)",
-      "url": "https://www.nxp.com/products/rfid-nfc/ucode-rfid/ucode-dna:UCODE-DNA",
+      "label": "Impinj M775 Product Brief / Datasheet",
+      "url": "https://support.impinj.com/hc/en-us/articles/9726381874195-Impinj-M775-Product-Brief-Datasheet",
+      "publisher": "Impinj Support",
+      "accessedAt": "2026-05-20",
+      "note": "Official datasheet for the Impinj M775 chip — the M700-family member with a cryptographic engine. Together with the Impinj Authentication Service, the only mainstream UHF chip that delivers per-chip cryptographic authentication today."
+    },
+    {
+      "label": "NXP NTAG 424 DNA — AES-128 SUN reference implementation (AN12196)",
+      "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-labels/ntag-424-dna-424-dna-tagtamper-advanced-security-and-privacy-for-trusted-iot-applications:NTAG424DNA",
       "publisher": "NXP Semiconductors",
-      "publishedAt": "2023-11-01",
-      "accessedAt": "2026-04-23",
-      "note": "UCODE DNA product reference defining AES-128 tag authentication per ISO/IEC 29167-10 — the cryptographic basis for aerospace digital-thread pedigree verification."
+      "accessedAt": "2026-05-20",
+      "note": "HF NFC chip with real per-tap AES-128 SUN + read-counter binding — the HF companion tag in the aerospace anti-counterfeit stack. (Note: NTAG 424 DNA is HF / 13.56 MHz. The 'UCODE DNA' name is a separate NXP brand that does NOT ship AES-128 on UHF; per-tap cryptographic authentication on UHF inventory tags is not a shipping silicon feature on UCODE 8, UCODE 9, or any other mainstream UHF chip today.)"
     }
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2025-12-21"
+  "reviewedAt": "2026-05-20"
 }
