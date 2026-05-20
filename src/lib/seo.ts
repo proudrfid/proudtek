@@ -393,6 +393,9 @@ export interface MachinePageData {
   reviewedBy?: string;
   lastReviewedDate?: string;
   credentials?: string[];
+  /** Site-build timestamp from siteData.generatedAt — useful for
+   *  bot crawlers / LLM scrapers to gauge content freshness. */
+  generatedAt?: string;
 }
 
 
@@ -467,7 +470,7 @@ export function buildPageSummary(page: SnapshotPage): { title: string; descripti
   };
 }
 
-export function buildMachinePageData(page: SnapshotPage): MachinePageData {
+export function buildMachinePageData(page: SnapshotPage, generatedAt?: string): MachinePageData {
   const seo = buildPageSeo(page);
   const $body = load(`<body>${seo.bodyHtml}</body>`);
   const route = normalizeRoute(page.route);
@@ -543,17 +546,19 @@ export function buildMachinePageData(page: SnapshotPage): MachinePageData {
     reviewedBy: seo.articleMeta?.reviewedBy,
     lastReviewedDate: seo.articleMeta?.lastReviewedDate,
     credentials: ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name),
+    generatedAt,
   };
 }
 
-export function buildMachinePageText(page: SnapshotPage): string {
-  const data = buildMachinePageData(page);
+export function buildMachinePageText(page: SnapshotPage, generatedAt?: string): string {
+  const data = buildMachinePageData(page, generatedAt);
 
   const sections = [
     `# ${data.title}`,
     "",
     `URL: ${data.url}`,
     `Source URL: ${data.sourceUrl}`,
+    ...(data.generatedAt ? [`Generated: ${data.generatedAt}`] : []),
     `Kind: ${data.kind}`,
     `Publisher: ${data.publisher}`,
     ...(data.author ? [`Author: ${data.author.name}${data.author.title ? ` (${data.author.title})` : ""}`] : []),
