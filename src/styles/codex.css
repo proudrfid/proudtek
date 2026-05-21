@@ -24,7 +24,12 @@
    Every line of the original codex.css ends up in exactly one of the
    four files. No content was changed during the split. */
 
-@import "./codex-tokens.css";
+/* codex-tokens.css was moved out of this bundle on 2026-05-20.
+   BaseLayout.astro inlines its contents in <head> via Vite's ?inline
+   import (which runs the file through the CSS pipeline for minification
+   + autoprefixing) so :root { --codex-* } tokens resolve before the
+   main stylesheet finishes downloading. This eliminates the dependency
+   window where the browser has HTML but not the token definitions. */
 @import "./codex-components.css";
 @import "./codex-layout.css";
 @import "./codex-pages.css";
