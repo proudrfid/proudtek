@@ -66,11 +66,14 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-wristbands/silicone-wristband-mifare-classic/": "/landing-images/silicone-wristband-mifare-classic.jpg",
   "/products/rfid-wristbands/uhf-rfid-wristband/":              "/landing-images/uhf-rfid-wristband.jpg",
   "/products/rfid-wristbands/rfid-nylon-wristband/":             "/landing-images/rfid-nylon-wristband.jpg",
-  // Hero/title mismatch round 2 2026-04-18: original landing image was a concert-crowd
-  // placeholder. Point at an on-disk adult multi-day RFID wristband trio (pink + black
-  // fabric strap w/ disc holder — suits "multi-day resort / cruise" framing).
-  "/products/rfid-wristbands/rfid-vinyl-wristband/":             "/site-assets/wp-content/uploads/2024/04/DESFire_EV2_Wristband.jpg",
-  "/products/rfid-wristbands/rfid-tyvek-wristband/":             "/landing-images/rfid-tyvek-wristband-alt.jpg",
+  // 2026-04-18 dedup pass mapped rfid-vinyl-wristband to DESFire_EV2_Wristband.jpg —
+  // but that image is actually a braided/woven adjustable fabric band with an
+  // AirTag-style disc holder. Vinyl wristbands are non-adjustable single-use
+  // plastic bands (festival / cruise day-pass type), not adjustable fabric.
+  // Removed 2026-05-21 so the catalog card uses heroImage from JSON
+  // (/landing-images/rfid-vinyl-wristband.jpg — actual green vinyl day band).
+  // rfid-tyvek-wristband override was redundant (JSON already points at
+  // /landing-images/rfid-tyvek-wristband-alt.jpg). Removed too.
   // ── RFID Labels / Stickers / Inlays ─────────────────────────────────
   "/products/rfid-labels/alien-higgs-9-uhf-inlay/":              "/landing-images/alien-higgs-9-uhf-inlay.jpg",
   "/products/rfid-labels/impinj-m700-uhf-inlay/":                "/landing-images/impinj-m700-uhf-inlay.jpg",
@@ -92,7 +95,8 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-labels/uhf-rfid-jewelry-label/":               "/landing-images/uhf-rfid-jewelry-label.jpg",
   "/products/rfid-labels/uhf-rfid-retail-price-label/":          "/landing-images/uhf-rfid-retail-price-label.jpg",
   "/products/rfid-labels/uhf-rfid-tire-label/":                  "/landing-images/uhf-rfid-tire-label.jpg",
-  "/products/rfid-labels/rfid-dry-inlay/":                       "/landing-images/rfid-dry-inlay-alt.jpg",
+  // rfid-dry-inlay override was redundant — JSON already points at the
+  // same /landing-images/rfid-dry-inlay-alt.jpg path. Removed 2026-05-21.
   // Title/hero mismatch 2026-04-18: rfid-wet-inlay-alt.jpg showed bare antennas
   // with no adhesive/liner context; a first swap to printed_NFC_sticker was
   // actually a finished wet LABEL, not a wet inlay. Now points at a real wet
@@ -176,15 +180,16 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-tags/rfid-tree-tag/":                          "/landing-images/rfid-tree-tag.jpg",
   // rfid-textile-laundry-tag.jpg group
   "/products/rfid-tags/rfid-pps-laundry-chip/":                  "/landing-images/rfid-pps-laundry-chip.png",
-  // ppc-nfc-business-cards.jpg group — point metal business card at a
-  // different NFC business card shot (reading scene) so it no longer
-  // collides with the PPC landing page hero.
-  "/products/rfid-cards/rfid-metal-business-card/":              "/site-assets/wp-content/uploads/2024/09/NFC_business_card_reading.jpg",
-  // ── Logo scrub 2026-04-18 ────────────────────────────────────────────
-  // Original /landing-images/rfid-textile-laundry-tag.jpg was a third-party
-  // supplier catalog sheet ("JYL-Tech" watermark). Swap to our own textile
-  // UHF laundry tag photo (unbranded hands-holding-tags shot).
-  "/products/rfid-tags/rfid-textile-laundry-tag/":               "/site-assets/wp-content/uploads/2024/04/textile_uhf_laundry_tag.jpg",
+  // 2026-04-18 dedup mapped rfid-metal-business-card to NFC_business_card_reading.jpg —
+  // but that file is an AI-generated phone+green-card promo shot, not a metal
+  // card at all. The JSON heroImage points at the real product (3 metal cards:
+  // brushed black, gloss black, brushed silver), which is correct.
+  // Removed 2026-05-21 so the catalog card uses JSON heroImage.
+  //
+  // rfid-textile-laundry-tag: previous override was correct (handled the
+  // "JYL-Tech" competitor watermark on the JSON's heroImage) — the JSON
+  // heroImage has been updated to the same unbranded path so this override
+  // entry is now redundant. Removed 2026-05-21.
 };
 
 /* ── WordPress product image overrides ──────────────────────────────────
