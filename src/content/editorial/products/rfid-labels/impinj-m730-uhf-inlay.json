@@ -67,9 +67,9 @@
     {
       "label": "Where M730 is NOT the right fit",
       "items": [
-        "Brand-protection / anti-counterfeiting: M730 doesn't implement EPC Gen2v2 AUTHENTICATE or Untraceable. For cryptographic chip-authenticity programmes, choose M750 (Monza R6-P) or NXP UCODE 9.",
+        "Brand-protection / anti-counterfeiting: M730 doesn't implement on-chip crypto. For cryptographic chip-authenticity programmes, mainstream UHF Gen2v2 silicon does NOT implement on-chip AES — specify Impinj M775 (PRESENT-80 on-chip crypto per ISO/IEC 29167-11) or pair the UHF tag with an HF NTAG 424 DNA / UCODE DNA companion tag. M750 / M770 do not have on-chip crypto either.",
         "Pharmaceutical serialisation with on-tag user data: M730 has 0 bits user memory. DSCSA / EU FMD encoded data must live in backend database keyed by EPC; for on-tag data choose M750 (32-bit user), Higgs-9 (688-bit user), or UCODE 9 (32-224 bit configurable).",
-        "EU Digital Product Passport (DPP): typically requires user memory + chip-level AUTHENTICATE — M730 insufficient on both counts; specify UCODE 9 or M750.",
+        "EU Digital Product Passport (DPP): typically requires user memory + chip-level authentication — M730 is insufficient on memory. For URL pointer + user memory, specify UCODE 9 or M750. For per-tap cryptographic authentication, specify M775 or pair with HF NTAG 424 DNA.",
         "Sensor / specialty applications: no sensor variant in M730 line; cold-chain moisture sensing requires UCODE 9xe; tamper detection at UHF requires different specialty silicon."
       ]
     },
@@ -143,19 +143,19 @@
       "title": "M730 vs M750 / M770 — when to specify which",
       "comparePanel": {
         "beforeHeading": "M730 (Monza R6) — cost-optimised retail source-tag",
-        "afterHeading": "M750 (Monza R6-P) / M770 — user memory + AUTHENTICATE / mixed-surface AutoTune",
+        "afterHeading": "M750 (Monza R6-P) / M770 — user memory + Protected Mode / mixed-surface AutoTune",
         "before": [
           "96-bit EPC, 96-bit serialised TID, 0 bits user memory",
-          "No AUTHENTICATE, no Untraceable command",
+          "No on-chip crypto, no Untraceable command response",
           "Lowest silicon ASP in M700 family",
           "Retail apparel + general-merchandise volume use case",
           "Pure-EPC handle into cloud item master"
         ],
         "after": [
-          "M750: 96-bit EPC + 32-bit user memory + AUTHENTICATE + Untraceable + Hide-EPC",
-          "M770: 96-bit EPC + 64-bit user memory + AutoTune + AUTHENTICATE",
+          "M750: 96-bit EPC + 32-bit user memory + Protected Mode (Gen2v2 Untraceable command response, NOT AES challenge-response)",
+          "M770: 96-bit EPC + 64-bit user memory + Protected Mode + AutoTune",
           "~30% silicon-ASP premium vs M730",
-          "Use cases: brand authentication, on-tag lot/date/serial, mixed-surface mounting, DPP",
+          "Use cases: on-tag lot/date/serial, mixed-surface mounting, retail privacy via Untraceable. NOT on-chip crypto — for that specify M775 (PRESENT-80 per ISO/IEC 29167-11) or HF NTAG 424 DNA.",
           "Same antenna designs as M730 — switching variants doesn't require antenna re-tune"
         ]
       }
@@ -165,13 +165,13 @@
       "dataHighlight": {
         "value": "0 bits",
         "heading": "User memory on M730 — by design",
-        "text": "The M730's defining cost-optimisation is the absence of user memory. Programmes that need on-tag data — pharmaceutical serialisation with batch / expiration on the tag, EU Digital Product Passport URL pointer, brand-authentication via cryptographic AUTHENTICATE, on-tag encrypted serial — must specify a different chip. M750 (Monza R6-P) adds 32-bit user memory + full AUTHENTICATE / Untraceable / Hide-EPC at ~30% silicon-ASP premium. UCODE 9 offers 32-224-bit configurable user memory. Higgs-9 offers 688-bit user memory (the largest in commodity UHF). The chip-family decision is not about read range (all four are within ~1 dB sensitivity of each other) — it's about whether the programme needs user memory and / or AUTHENTICATE. Choose M730 only when the answer is no on both.",
-        "source": "Impinj M730 / M750 product briefs + GS1 TDS 2.0 + RAIN Alliance retail source-tagging guidance"
+        "text": "The M730's defining cost-optimisation is the absence of user memory. Programmes that need on-tag data — pharmaceutical serialisation with batch / expiration on the tag, EU Digital Product Passport URL pointer, on-tag encrypted serial — must specify a different chip. M750 (Monza R6-P) adds 32-bit user memory + Protected Mode (Gen2v2 Untraceable) at ~30% silicon-ASP premium. UCODE 9 offers 32-224-bit configurable user memory. Higgs-9 offers 688-bit user memory (the largest in commodity UHF). For per-tap cryptographic authentication (the AUTHENTICATE silicon implementation, AES on-chip), no mainstream M700-family chip qualifies except M775 (PRESENT-80 per ISO/IEC 29167-11) — pair UHF inventory tags with HF NTAG 424 DNA on per-tap-crypto programmes. The chip-family decision is not about read range (all are within ~1 dB sensitivity of each other) — it's about whether the programme needs user memory and what privacy / crypto features it requires.",
+        "source": "Impinj M730 / M750 / M775 product briefs + GS1 TDS 2.0 + RAIN Alliance retail source-tagging guidance"
       },
       "bullets": [
-        "Brand protection / anti-counterfeit: choose M750 or UCODE 9 — M730 doesn't implement AUTHENTICATE.",
+        "On-chip cryptographic chip authentication: choose M775 (PRESENT-80) or pair UHF with HF NTAG 424 DNA / UCODE DNA — M730 / M750 / M770 do NOT carry on-chip crypto.",
         "Pharmaceutical with on-tag batch / expiry: choose M750 (32-bit user) or Higgs-9 (688-bit user) — M730 has 0 bits user memory.",
-        "EU Digital Product Passport: choose UCODE 9 or M750 — DPP needs URL pointer + AUTHENTICATE.",
+        "EU Digital Product Passport: choose UCODE 9 or M750 — DPP needs URL pointer + user memory. For per-tap crypto verification add HF NTAG 424 DNA.",
         "Sensor applications: choose UCODE 9xe — no sensor variant in M730 line."
       ]
     },
