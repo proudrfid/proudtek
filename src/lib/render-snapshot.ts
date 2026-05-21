@@ -240,11 +240,24 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // ── LCP optimization ──
   // Upgrade the first product/hero image in main content to eager loading.
   // Skip tiny badges/icons (width ≤ 100) — they're not LCP candidates.
+  // Also skip if a <video> appears in main BEFORE the candidate img — pages
+  // with autoplay hero video (e.g. home /) have the video as LCP, not the
+  // first body img (which is usually a stat badge well below the fold).
+  // Without this guard the homepage badge at scrollY ≈ 3888 was getting
+  // eager + fetchpriority="high", competing for bandwidth with the actual
+  // hero video and hurting LCP.
+  const heroVideo = $body("main video, [role='main'] video, .entry-content video").first();
+  const hasVideoHero = heroVideo.length > 0;
   const lcpCandidates = $body("main img, [role='main'] img, .entry-content img").toArray();
   for (const candidate of lcpCandidates) {
     const img = $body(candidate);
     const width = parseInt(img.attr("width") ?? "999", 10);
     if (width <= 100) continue; // Skip badges and icons
+    if (hasVideoHero) {
+      // Page already has a video hero (LCP candidate); skip the img upgrade
+      // entirely. The browser will pick up the video's intrinsic priority.
+      break;
+    }
     if (img.attr("loading") === "lazy") {
       img.attr("loading", "eager");
       img.attr("fetchpriority", "high");
