@@ -297,7 +297,15 @@
    Browser support for `clip`: Chrome 90+, Firefox 81+, Safari 16+. */
 body {
   overflow-x: clip;
-  scroll-padding-bottom: 3.5rem;
+}
+
+/* scroll-padding-bottom must sit on the scroll container, not on body.
+   `document.scrollingElement` resolves to <html> in standards mode, so
+   setting it on body is a no-op — anchor jumps to footnotes / TOC end
+   up hidden behind the 66px sticky CTA bar. The 4.5rem value matches
+   the real CTA height (66px) + a small clearance buffer. */
+html {
+  scroll-padding-bottom: 4.5rem;
 }
 
 /* Force font-display:swap on any @font-face loaded from snapshot */
