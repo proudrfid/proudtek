@@ -297,6 +297,15 @@
    Browser support for `clip`: Chrome 90+, Firefox 81+, Safari 16+. */
 body {
   overflow-x: clip;
+  /* Sticky CTA bar at the bottom of the viewport is 66px tall. Without
+     a matching body padding-bottom, the final footer line sits behind
+     the sticky bar when the user scrolls to the end of the document.
+     Verified on mobile (375×812): footer's last child bottom == 812
+     (viewport edge) but sticky bar occupies 746-812. The padding
+     reserves that 4.5rem buffer so the footer terminates ABOVE the
+     bar. Pair with html { scroll-padding-bottom } so anchor jumps and
+     scroll-to-end both clear the bar. */
+  padding-bottom: 4.5rem;
 }
 
 /* scroll-padding-bottom must sit on the scroll container, not on body.
