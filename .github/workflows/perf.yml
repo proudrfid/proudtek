@@ -1,0 +1,49 @@
+name: perf
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    # Lighthouse runs take longer than the lint-and-test job, but we still
+    # cap them so a hung Chromium can't burn billable minutes indefinitely.
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build site
+        run: npm run build
+        env:
+          ASTRO_TELEMETRY_DISABLED: "1"
+          CI: "true"
+
+      - name: Run Lighthouse CI (4 routes, 1 run each)
+        # `lhci autorun` exits 0 when only `warn`-tier assertions trip
+        # (every perf metric in lighthouserc.ci.cjs) and exits non-zero
+        # only when an `error`-tier assertion fires (currently just
+        # accessibility < 0.95). So this single step:
+        #   - logs perf regressions as warnings in the run output
+        #   - uploads HTML reports to ./reports/lighthouse-ci/
+        #   - blocks the PR only on a11y regression
+        run: npm run lh:ci
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: reports/lighthouse-ci/
+          retention-days: 14
