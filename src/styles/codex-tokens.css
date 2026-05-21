@@ -308,12 +308,25 @@ body {
   padding-bottom: 4.5rem;
 }
 
-/* scroll-padding-bottom must sit on the scroll container, not on body.
+/* scroll-padding must sit on the scroll container, not on body.
    `document.scrollingElement` resolves to <html> in standards mode, so
-   setting it on body is a no-op — anchor jumps to footnotes / TOC end
-   up hidden behind the 66px sticky CTA bar. The 4.5rem value matches
-   the real CTA height (66px) + a small clearance buffer. */
+   setting it on body is a no-op for anchor-jump behavior.
+
+   Two paddings work as a pair:
+     scroll-padding-top:    clears the 42px sticky header (.site-header
+                            is position: sticky; top: 0; z-index: 1000).
+                            Without this, anchor jumps to mid-page H2 /
+                            FAQ items / footnotes land with their top
+                            edge hidden BEHIND the header bar.
+                            4rem (64px) covers the 42px header + 22px
+                            breathing room so the heading reads cleanly
+                            below the header chrome.
+     scroll-padding-bottom: clears the 66px sticky CTA bar.
+                            Without this, jump links near the page end
+                            land partially behind the bottom bar.
+                            4.5rem (72px) covers the bar + 6px buffer. */
 html {
+  scroll-padding-top: 4rem;
   scroll-padding-bottom: 4.5rem;
 }
 
