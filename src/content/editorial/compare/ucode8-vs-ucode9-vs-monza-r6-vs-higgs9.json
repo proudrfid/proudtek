@@ -7,7 +7,7 @@
   "heroPoints": [
     "Read sensitivity is the primary range driver. Monza R6 and UCODE 9 both achieve −22.6 to −23.0 dBm, putting them at the front of the field; UCODE 8 sits at −22.5 dBm; Higgs-9 leads on paper at −24.0 dBm but real-world inlay performance is antenna-bound, so datasheet sensitivity rarely translates 1:1 to deployed range.",
     "Memory architectures diverge sharply. Monza R6 ships with 96-bit EPC and no User memory (cost-optimized for retail). UCODE 8 and UCODE 9 give 128/96-bit EPC + optional 32–224-bit User. Higgs-9 ships 96-bit EPC + 128-bit User as standard. Memory choice (not sensitivity) is what disqualifies most chips for User-data applications like pharma serialization or DPP.",
-    "EPC Gen2 v2 features split the field. Untraceable (privacy command), Authenticate (chip-level cryptographic challenge) and Hide-EPC are supported on UCODE 9 and Monza R6-P, partially on UCODE 8, and not on baseline Monza R6 or Higgs-9. For brand-protection, anti-counterfeit or retail-privacy programs this single line item often decides the chip family before any other spec is reviewed."
+    "EPC Gen2 v2 features split the field. Untraceable (privacy / protected-mode command) and Hide-EPC are supported on UCODE 9, partially on UCODE 8 and on Monza R6-P, and not on baseline Monza R6 or Higgs-9. Important: NONE of these four chips implement on-chip AES-128 cryptographic Authenticate — that lives only on NXP UCODE DNA (per ISO/IEC 29167-10) and Impinj M775 (PRESENT-80 per ISO/IEC 29167-11). For brand-protection programs needing per-tap cryptographic authentication, plan to pair UHF with HF NTAG 424 DNA, not rely on UHF crypto alone."
   ],
   "imageAlt": "UHF RFID chip comparison. NXP UCODE 8, UCODE 9, Impinj Monza R6, Alien Higgs-9",
   "heroImage": "/landing-images/alien-higgs-9-uhf-inlay.jpg",
@@ -37,8 +37,8 @@
       "title": "The four chip families at a glance",
       "bullets": [
         "NXP UCODE 8 (SL3S1205, SL3S1215). Released 2017, became the reference workhorse for retail apparel and global supply chain. 128-bit EPC default, optional 32-bit User, sensitivity −22.5 dBm read / −15.5 dBm write. Widely available in inlay form from Avery Dennison/Smartrac, Arizon, HID, Beontag and dozens of other licensees. The reference chip when no specific privacy/auth feature is required.",
-        "NXP UCODE 9 (SL3S1455, SL3S1456). Released 2020 as UCODE 8's successor. Same form factor and inlay compatibility; sensitivity bumped to −23.0 dBm read / −18.5 dBm write. Adds Self-Adjust feature (the chip auto-detunes to compensate for inlay-on-metal or inlay-on-liquid mounting). Full EPC Gen2 v2 support including Untraceable, Authenticate and Hide-EPC. The right choice for any new design where you also need cryptographic anti-counterfeit or retail privacy.",
-        "Impinj Monza R6 (M730), Monza R6-P (M750), Monza 4QT (legacy). Impinj's mass-volume retail chip. Baseline R6 is 96-bit EPC, no User memory, no privacy commands, sensitivity −22.6 dBm read / −16.7 dBm write. R6-P adds 64-bit serialized TID + 32-bit User + Untraceable + Authenticate. Both are Impinj's Autotune (auto-impedance-match) silicon. Dominant choice for retail source tagging because of aggressive silicon pricing at multi-million-unit tiers, proven yield and the Impinj reader-platform integration story.",
+        "NXP UCODE 9 (SL3S1455, SL3S1456). Released 2020 as UCODE 8's successor. Same form factor and inlay compatibility; sensitivity bumped to −23.0 dBm read / −18.5 dBm write. Adds Self-Adjust feature (the chip auto-detunes to compensate for inlay-on-metal or inlay-on-liquid mounting). Implements the Gen2 v2 Untraceable command framework + Hide-EPC. Important: UCODE 9 does NOT carry on-chip AES-128 — that lives only on UCODE DNA (per ISO/IEC 29167-10). UCODE 9 is the right choice for retail privacy (Untraceable submode); for cryptographic anti-counterfeit, specify UCODE DNA or pair UCODE 9 with HF NTAG 424 DNA.",
+        "Impinj Monza R6 (M730), Monza R6-P (M750), Monza 4QT (legacy). Impinj's mass-volume retail chip. Baseline R6 is 96-bit EPC, no User memory, no privacy commands, sensitivity −22.6 dBm read / −16.7 dBm write. R6-P adds 64-bit serialized TID + 32-bit User + Protected Mode (Gen2 v2 Untraceable / TID-based protocol response, NOT AES challenge-response). Both are Impinj's Autotune (auto-impedance-match) silicon. R6-P is NOT a cryptographic chip — for on-chip AES-128 in the Impinj family, specify M775 (PRESENT-80 per ISO/IEC 29167-11), not R6-P. Dominant choice for retail source tagging because of aggressive silicon pricing at multi-million-unit tiers, proven yield and the Impinj reader-platform integration story.",
         "Alien Technology Higgs-9 (ALN-9930, ALN-9940 inlays). Released 2021, succeeded Higgs-EC and Higgs-4. Highest datasheet sensitivity at −24.0 dBm read / −19.0 dBm write, 96-bit EPC + 128-bit User memory standard, FastID feature (singulation in EPC + TID single-shot). Strong fit when User memory is mandatory but full EPC Gen2 v2 privacy is not, and when supplier diversification away from NXP/Impinj is a procurement requirement.",
         "Beyond these four: Impinj M780 (sensor-pad variant), NXP UCODE 9xe (sensor variant for moisture / temperature), Alien Higgs-EC (legacy), Em Microelectronic em|echo-V (low-cost Asian supply) and Fudan FM13UF02 (China domestic) round out the field. They are not covered in this comparison because they either occupy a niche (sensor) or are not generally available in the global inlay supply chain at the scale of the four primary families."
       ]
@@ -122,10 +122,10 @@
           ],
           [
             "EPC Gen2 v2 Authenticate",
-            "Partial (challenge only)",
-            "Full",
             "—",
-            "Full (32-bit AES challenge)",
+            "Framework only (no on-chip crypto)",
+            "—",
+            "Framework only (TID-based, not AES)",
             "—"
           ],
           [
@@ -218,9 +218,9 @@
       "intro": "EPC Gen2 v2 (released by GS1 in 2014, ratified into ISO 18000-63:2015) added optional Untraceable, Authenticate, Hide-EPC and Crypto commands. Reader and chip must both implement the command for it to function. Adoption is silicon-dependent, not protocol-dependent. This is the single biggest area of divergence between these four chips.",
       "bullets": [
         "Untraceable: once invoked, the chip can return a shorter EPC, hide its TID, or hide all User memory until the next power cycle. UCODE 9 and Monza R6-P implement Untraceable fully; UCODE 8 implements a subset; Monza R6 baseline and Higgs-9 do not implement it. Used for retail privacy at point-of-sale (the EPC is shortened so it cannot be tracked outside the store) and EU GDPR-aware deployments.",
-        "Authenticate: a cryptographic challenge–response between reader and chip using a chip-internal AES-128 (or proprietary stream cipher) key. Validates that the tag is genuine NXP / Impinj silicon, not a counterfeit relabelled chip. UCODE 9 and Monza R6-P support full mutual authentication; UCODE 8 supports a one-way challenge only; Monza R6 baseline and Higgs-9 do not implement Authenticate. This is the typical anti-counterfeit foundation for high-value retail SKUs.",
-        "Hide-EPC: UCODE 9 only. Allows the EPC bank to be cryptographically hidden until a reader presents the right key, returning a generic 'masked' EPC otherwise. Used for high-confidentiality supply chain (defense, pharma controlled substances).",
-        "Crypto Suite negotiation: both UCODE 9 and Monza R6-P implement the GS1-Crypto-Suite-3 (AES-128) profile. UCODE 8 implements an earlier profile. Higgs-9 does not implement crypto-suite negotiation."
+        "Authenticate: the Gen2 v2 standard defines an Authenticate command, but on-chip AES-128 cryptographic challenge-response is NOT a shipping feature on any of these four chips. The genuine AES-on-chip UHF options are NXP UCODE DNA (ISO/IEC 29167-10, separate product family) and Impinj M775 (PRESENT-80 per ISO/IEC 29167-11, not in this comparison). UCODE 9 and Monza R6-P respond to the Authenticate command framework using TID-based identity verification — useful for clone detection by TID lookup, NOT for cryptographic authentication. For per-tap cryptographic anti-counterfeit, specify UCODE DNA or HF NTAG 424 DNA SUN.",
+        "Hide-EPC: UCODE 9 implements the Gen2 v2 Hide-EPC submode via Access PIN — when invoked, the EPC bank returns a masked value to readers that don't present the correct password. This is PIN-gated concealment, not AES encryption. Used for high-confidentiality supply chain (defense, pharma controlled substances) where the EPC itself reveals sensitive information.",
+        "Crypto Suite negotiation: None of these four chips implement the GS1-Crypto-Suite-3 (AES-128) profile on-chip. That capability is reserved for the UCODE DNA family (NXP) and M775 (Impinj). UCODE 9 / 8 and Monza R6 / R6-P advertise Gen2 v2 framework support, but the underlying silicon is non-cryptographic. Higgs-9 does not implement crypto-suite negotiation at all."
       ]
     },
     {
@@ -441,7 +441,7 @@
     },
     {
       "question": "When should we pick UCODE DNA over UCODE 9 for anti-counterfeit?",
-      "answer": "UCODE DNA implements full AES-128 mutual authentication and ECDSA signing, equivalent to NTAG424 DNA at HF. UCODE 9 with Authenticate provides cryptographic challenge–response sufficient to prove chip authenticity but not full message-level signing. The decision is usually a per-SKU economics question: at ~10× the silicon ASP, UCODE DNA fits luxury goods, regulated pharmaceuticals and high-value industrial spares; UCODE 9 with Authenticate is appropriate for mainstream retail brand protection where 'cryptographic but not bank-grade' is sufficient."
+      "answer": "UCODE DNA implements on-chip AES-128 mutual authentication (ISO/IEC 29167-10), equivalent to NTAG 424 DNA at HF. UCODE 9 does NOT implement on-chip AES — its 'Authenticate' response is TID-based identity verification (clone detection by lookup against an enrollment-time TID record), not cryptographic challenge-response. The decision is usually a per-SKU economics question: at ~10× the silicon ASP, UCODE DNA fits luxury goods, regulated pharmaceuticals and high-value industrial spares where per-tap cryptographic authentication is required; UCODE 9 with TID-based clone detection is appropriate for mainstream retail brand protection where 'detect re-encoded EPC but not bank-grade crypto' is sufficient."
     },
     {
       "question": "Are these chips backward-compatible with EPC Gen2 v1 readers?",
