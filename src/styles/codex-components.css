@@ -51,6 +51,31 @@ body {
 }
 
 /* ═══════════════════════════════════════════
+   Visited-link distinction (DESIGN.md compliance)
+   ═══════════════════════════════════════════
+   DESIGN.md mandates: "ALWAYS preserve visited vs unvisited link
+   distinction (visited links must have a different color)". B2B
+   procurement users research many pages over multiple sessions, so
+   tracking which guides / compare pages / product pages they've
+   already read is real value.
+
+   Kadence's stylesheet doesn't differentiate :visited, so content
+   links currently render the same color whether the user has been
+   to the destination or not. Add a scoped rule for editorial /
+   article content areas only — nav, CTAs, header / footer keep
+   their existing brand color since they always re-display the same
+   action target. */
+:where(
+  .entry-content,
+  .codex-editorial-section,
+  .codex-editorial-card,
+  .codex-blog-index,
+  .codex-faq
+) :where(p, li, dd) a:visited {
+  color: var(--codex-gold-muted);
+}
+
+/* ═══════════════════════════════════════════
    CTA HIERARCHY + DARK-MODE HINT (PR-7 P0)
    ═══════════════════════════════════════════
    The audit found CTAs used three different visual treatments
