@@ -279,7 +279,17 @@ body {
    here and the :focus rule lifts it back into normal flow at the
    top-left, with a prominent style. Targets #main which exists on
    every page (WP snapshot bodyHtml has <main id="main">; native
-   Astro pages /rfq/, /blog/, /compare/, etc. all use the same id). */
+   Astro pages /rfq/, /blog/, /compare/, etc. all use the same id).
+
+   The Kadence theme also emits its own .skip-link.screen-reader-text
+   inside the WP snapshot body. Without intervention keyboard users
+   would tab through TWO consecutive skip links (codex's "Skip to main
+   content" + Kadence's "Skip to content"), and screen readers would
+   announce both. Hide Kadence's so the codex one is the single,
+   canonical skip link. */
+.skip-link.screen-reader-text {
+  display: none !important;
+}
 .codex-skip-link {
   position: absolute;
   top: 0;
