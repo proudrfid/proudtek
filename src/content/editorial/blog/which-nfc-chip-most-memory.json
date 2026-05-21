@@ -100,7 +100,7 @@
         "Buying NTAG216 \"just in case\": NTAG216 (888 bytes) costs 2-3x more than NTAG213 (144 bytes). Most marketing URL applications fit comfortably in NTAG213. Only spec NTAG215/216 if your payload genuinely exceeds 130 chars.",
         "Forgetting NDEF overhead: each NDEF record carries 4-12 bytes of header. A single 100-char URL uses ~110 bytes; two 50-char URLs use ~120 bytes. Run a real encoding test before assuming the math.",
         "Confusing total memory with user memory: NTAG213 is sometimes described as 180 bytes (correct: total EEPROM) when only 144 bytes are user-writable. Always work with the user-memory number when sizing.",
-        "Overlooking the originality signature requirement: NTAG 424 DNA has only 256 bytes of user memory but adds tamper-evident SUN authentication. For brand-protection, the small-memory secure chip beats large-memory unsecured chips.",
+        "Overlooking the originality signature requirement: NTAG 424 DNA has 416 bytes of user memory and adds tamper-evident SUN authentication. For brand-protection, the secure chip beats large-memory unsecured chips even when payload fits both.",
         "Underestimating future payload growth: programs deployed with NTAG213 today often need NTAG215+ when adding a second NDEF record (e.g., adding offline contact info to a URL tag) in year 2. Spec one tier above today's minimum if the program is multi-year."
       ]
     },
@@ -112,7 +112,7 @@
         "Offline data needs on-tag memory: applications that must operate without network connectivity (industrial maintenance in basements, remote logistics, military / aviation maintenance records) need on-tag data. NTAG215, NTAG216 or NTAG I2C Plus carry vCard, configuration, equipment metadata that survives without backend access.",
         "Privacy and ephemeral payloads: short-lived tickets, temporary tokens, voucher codes are sometimes stored on-tag (NTAG213/215) so the system has no central log of who tapped what. Decision is regulatory-driven (transit, healthcare).",
         "Sensor and counter applications: NTAG I2C Plus interfaces with a microcontroller via I²C, letting smartphones read/write sensor data (temperature, status). This is on-tag memory used as a transient buffer, not a persistent record. Memory size matters because the buffer must hold the sensor reading window.",
-        "DPP / authentication payloads: NTAG 424 DNA's 256 bytes of user memory plus the SUN URL template are sufficient for a GS1 Digital Link with serial + cryptographic CMAC parameters. Any longer DPP payload should live in the cloud — putting full passport data on-tag is the most common over-engineering pattern in 2024-2026 EU DPP pilots."
+        "DPP / authentication payloads: NTAG 424 DNA's 416 bytes of user memory plus the SUN URL template are sufficient for a GS1 Digital Link with serial + cryptographic CMAC parameters. Any longer DPP payload should live in the cloud — putting full passport data on-tag is the most common over-engineering pattern in 2024-2026 EU DPP pilots."
       ]
     },
     {
