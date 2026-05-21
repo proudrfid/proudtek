@@ -123,7 +123,11 @@ const CATALOG_IMAGE_OVERRIDES: Record<string, string> = {
   "/products/rfid-tags/rfid-wedge-tag/":                         "/landing-images/rfid-wedge-tag.jpg",
   "/products/rfid-tags/rfid-silicone-flexible-tag/":             "/landing-images/rfid-silicone-flexible-tag.jpg",
   "/products/rfid-tags/waterproof-uhf-rfid-outdoor-tag/":        "/landing-images/waterproof-uhf-rfid-outdoor-tag.jpg",
-  "/products/rfid-tags/rfid-coin-tag/":                          "/landing-images/rfid-coin-tag-alt.jpg",
+  // 2026-04-18 dedup pass added an override pointing rfid-coin-tag at
+  // rfid-coin-tag-alt.jpg, but that file is actually a blue keyfob —
+  // not a coin tag at all. Removed 2026-05-21 so the catalog card uses
+  // the same product-page heroImage (/landing-images/rfid-coin-tag.jpg,
+  // white coin discs in a group + stack shot).
   // ── Deduplication pass 2026-04-18 ───────────────────────────────────
   // Each entry replaces a shared placeholder hero image with the product's
   // own dedicated photo (already on disk in /public/landing-images/).
