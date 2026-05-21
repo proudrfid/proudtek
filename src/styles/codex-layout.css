@@ -875,3 +875,134 @@ html body #masthead.site-header img.custom-logo {
   }
 }
 
+/* ═══════════════════════════════════════════
+   Print stylesheet — clean paper output
+   ═══════════════════════════════════════════
+   B2B procurement workflow includes printing product detail pages,
+   compare tables, and chip-spec encyclopedias to share with stake-
+   holders or PDF-attach to a quote thread. Without this, prints carry
+   the sticky CTA, WhatsApp FAB, mega-menu, inline RFQ form, and dark
+   footer — all dead weight on paper that wastes ink and clutters the
+   real content.
+
+   Strategy: hide all chrome + interactive panels. Show only the main
+   content, structural headings, brief / sections data, and sources.
+   Append href URLs after links so paper readers see where each link
+   goes. Force backgrounds to white and text to black for ink economy
+   + max contrast on paper. */
+@media print {
+  /* Reset color scheme for paper */
+  :root {
+    color-scheme: light;
+  }
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 11pt;
+  }
+
+  /* Hide all site chrome and interactive panels */
+  .codex-sticky-cta,
+  .codex-whatsapp-fab,
+  [class*="sticky-cta"],
+  [class*="whatsapp"],
+  .site-header,
+  header.site-header,
+  #site-header-inner,
+  #masthead,
+  .header-wrap,
+  .codex-mobile-toggle,
+  .menu-toggle-open-container,
+  #primary-menu,
+  #mobile-menu,
+  .codex-mega-dropdown,
+  .codex-quote-brief,
+  .codex-rfq-hero,
+  .codex-inline-rfq,
+  .codex-cta-banner,
+  form,
+  .codex-skip-link,
+  .codex-disclosure-summary svg,
+  .wp-block-cover__video-background,
+  iframe,
+  video,
+  .splide__arrows,
+  .splide__pagination,
+  /* Truncate footer to bare copyright */
+  .site-footer .codex-footer__nav,
+  .site-footer .codex-footer__brand,
+  .site-footer .codex-footer__social,
+  .codex-footer-bottom__regions,
+  .codex-footer-bottom__certs,
+  /* Pre-fold "Talk to engineering" CTAs and inline forms */
+  .codex-conversion-shell .codex-rfq__step,
+  [class*="cta-rail"] {
+    display: none !important;
+  }
+
+  /* Main content keeps a printable width */
+  main, .entry-content, .codex-editorial-section {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+
+  /* Tables print legibly with visible borders */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    page-break-inside: avoid;
+  }
+  th, td {
+    border: 1px solid #999 !important;
+    padding: 4pt 6pt !important;
+    background: #fff !important;
+  }
+
+  /* Headings — keep them readable but not chunky */
+  h1 { font-size: 18pt !important; margin: 0 0 8pt !important; }
+  h2 { font-size: 14pt !important; margin: 10pt 0 6pt !important; page-break-after: avoid; }
+  h3 { font-size: 12pt !important; margin: 8pt 0 4pt !important; page-break-after: avoid; }
+
+  /* Images — let figures shrink to page width; drop drop-shadows */
+  img {
+    max-width: 100% !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Append href URL after each link so paper readers see the target.
+     Skip pure anchor / mailto / tel — those don't help on paper. */
+  a[href^="http"]:after,
+  a[href^="/"]:after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  /* Don't print empty anchors or those wrapping images */
+  a[href]:has(img):after {
+    content: "";
+  }
+
+  /* Force background colours off for ink economy on warm-cream surfaces */
+  .codex-card,
+  .codex-editorial-card,
+  [class*="codex-bg-warm"] {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+  }
+
+  /* Avoid page-break orphans inside list items + paragraphs */
+  li, p {
+    orphans: 3;
+    widows: 3;
+  }
+}
+
