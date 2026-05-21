@@ -466,6 +466,29 @@ export function enhanceKadenceA11y($body: CheerioAPI): void {
     const className = $el.attr("class") ?? "";
     $el.replaceWith(`<p class="${className}">${html}</p>`);
   });
+
+  // (4) heading-order iter-3 — demote Kadence "stat pill" H2s on the
+  //     home page Capabilities grid ("18+ Years of Industry Experience",
+  //     "2 Self-owned Factories", etc.) to <p>. These render at 17px /
+  //     700 — visually a label, not a section heading — but Kadence
+  //     emits them as <h2>, which puts H2 17px AFTER H2 38px section
+  //     headings and skips H3/H4 levels. The result is a broken
+  //     heading outline that hurts SEO + a11y.
+  //
+  //     Filter is conservative: must be wp-block-heading H2 with
+  //     short numeric-prefix text (digit + optional +, space, then
+  //     a couple words). Nothing else on the site uses this exact
+  //     pattern as a heading. Keep class so existing CSS still
+  //     applies; drop the heading semantic.
+  $body("h2.wp-block-heading").each((_, element) => {
+    const $el = $body(element);
+    const text = ($el.text() ?? "").trim();
+    if (text.length === 0 || text.length > 60) return;
+    if (!/^\d+\+?\s+\S/.test(text)) return;
+    const html = $el.html() ?? "";
+    const className = $el.attr("class") ?? "";
+    $el.replaceWith(`<p class="${className}">${html}</p>`);
+  });
 }
 
 export function enhanceFaqPage($body: CheerioAPI): void {

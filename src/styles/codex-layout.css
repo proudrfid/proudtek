@@ -167,6 +167,42 @@
      4. Hero text bumped from 90% white to pure #fff for stronger contrast
         on the dark bg (also nudges WCAG AA contrast past 7:1 → AAA). */
 /* ═══════════════════════════════════════════
+   Nav touch targets — DESIGN.md compliance (WCAG 2.5.5)
+   Kadence defaults render header nav links at ~36px tall, below the
+   --codex-touch-min: 44px floor enforced by DESIGN.md. Add a minimum
+   tap area on top-level nav links so the touch target meets the WCAG
+   2.5.5 requirement without changing the visual padding rhythm.
+   The flex-center pattern keeps the existing line-height intact —
+   we only enlarge the hit box, not the rendered text. Applied to both
+   desktop primary-menu and mobile-menu so the fix carries to small
+   viewports where the rule actually bites users.
+   ═══════════════════════════════════════════ */
+:where(#primary-menu, #mobile-menu) > li > a,
+:where(#primary-menu, #mobile-menu) > li > .menu-item-link,
+:where(#primary-menu, #mobile-menu) > li > button {
+  min-height: var(--codex-touch-min);
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Dropdown carets (the small triangle buttons next to Products /
+   Industries / Solutions etc.) currently render 14×36 — way under
+   the 44px floor. Pad horizontally + match the min-height so they
+   become tappable on mobile. The real Kadence class is
+   `.dropdown-nav-special-toggle`; the other selectors are kept for
+   forward compat if Kadence renames or we override the markup. */
+:where(#primary-menu, #mobile-menu) .dropdown-nav-special-toggle,
+:where(#primary-menu, #mobile-menu) .codex-mega-toggle,
+:where(#primary-menu, #mobile-menu) .menu-item-toggle,
+:where(#primary-menu, #mobile-menu) > li > .dropdown-nav-toggle {
+  min-width: var(--codex-touch-min);
+  min-height: var(--codex-touch-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════════════════
    Codex Mega-Menu — Industries / Solutions / Resources dropdowns
    Injected by render-snapshot.ts into #primary-menu + #mobile-menu.
    ═══════════════════════════════════════════ */
