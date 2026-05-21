@@ -17,6 +17,12 @@
  */
 import type { PageSeoData } from "../lib/seo";
 import "../styles/codex.css";
+// Critical tokens inlined in <head> so :root { --codex-* } resolve before
+// the main BaseLayout.css finishes downloading. ?inline runs the file
+// through Vite's CSS pipeline (minification, autoprefixer) and returns
+// the result as a string literal embedded in the emitted HTML. No extra
+// HTTP request. See perf/critical-tokens-inline (May 2026).
+import codexTokensCss from "../styles/codex-tokens.css?inline";
 
 import SeoHead from "./partials/SeoHead.astro";
 import WhatsAppFab from "./partials/WhatsAppFab.astro";
@@ -36,6 +42,7 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
 <html {...seo.htmlAttrs}>
   <head>
     <SeoHead seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath} />
+    <style set:html={codexTokensCss}></style>
     <slot name="head" />
   </head>
   <body {...seo.bodyAttrs}>
