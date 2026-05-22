@@ -6,7 +6,7 @@
   "summary": "NFC chip memory ranges from 48 bytes on basic chips to 8 kilobytes or more on high-capacity models. Choosing the right memory size depends on what data you need to store: a short URL needs only 48-144 bytes.",
   "heroPoints": [
     "NTAG I2C Plus offers up to 1,912 bytes — the largest user memory in the popular NTAG family, designed for IoT applications requiring substantial on-tag data storage alongside NFC communication.",
-    "ICODE DNA offers up to 2,016 bytes — a high-memory NFC chip with advanced cryptographic features, suited for authentication and digital product passport applications.",
+    "ICODE DNA offers 256 bytes (2,048 bits in 64 blocks × 4 bytes per NXP ICODE DNA datasheet) — a cryptographically-authenticated NFC chip with AES-128 + 32-byte originality signature, suited for brand-protection and digital product passport applications on ISO/IEC 15693 / NFC Forum Type 5 infrastructure.",
     "For most applications, 144-888 bytes is sufficient. NTAG213 (144 bytes), NTAG215 (504 bytes), and NTAG216 (888 bytes) cover the vast majority of URL, vCard, and multi-record NFC use cases."
   ],
   "imageAlt": "NFC chip memory comparison chart showing storage capacity by chip model",
@@ -120,7 +120,7 @@
       "intro": "Memory is one of four variables procurement teams balance. The table-style summary below names the practical trade-offs that show up in vendor RFP responses.",
       "bullets": [
         "Memory vs price: at 10K MOQ, NTAG213 ($0.04-0.08) → NTAG215 ($0.06-0.12) → NTAG216 ($0.08-0.15) → NTAG 424 DNA ($0.15-0.40) → DESFire EV3 ($0.40-1.50). Each step up roughly 1.5-3x. Don't pay for memory you won't use.",
-        "Memory vs security: NTAG213/215/216 have only 32-bit password protection (brute-forceable in seconds). NTAG 424 DNA has AES-128 SUN/CMAC but trades down to 416 bytes user memory. ICODE DNA has both 2,016 bytes and AES-128 — but at higher cost and narrower smartphone support.",
+        "Memory vs security: NTAG213/215/216 have only 32-bit password protection (brute-forceable in seconds). NTAG 424 DNA has AES-128 SUN/CMAC with 416 bytes user memory. ICODE DNA has 256 bytes (2,048 bits per NXP datasheet) + AES-128 — at higher cost and narrower smartphone support (ISO 15693, not ISO 14443).",
         "Memory vs form factor: high-memory chips need more silicon area, which can constrain the smallest form factors. NTAG213 fits inside ring jewelry; NTAG216 needs a small inlay; DESFire EV3 typically lives in a card or larger sticker. For tiny form factors (e.g., 8-12 mm round inlays), NTAG213 is often the only realistic choice.",
         "Memory vs reader compatibility: NTAG 213 / 215 / 216 are NFC Forum Type 2 tags; NTAG 424 DNA is NFC Forum Type 4. Both are parsed by standard smartphone APIs (iOS Core NFC, Android NfcAdapter) with no special drivers. ICODE 15693 vicinity tags require NFC-V capability that not all readers expose; older Android handsets sometimes lack NFC-V handling. Confirm reader / phone support before committing on ICODE.",
         "Memory vs power harvesting: high-memory writes need more sustained RF power. Long-write operations on NTAG216 or DESFire occasionally fail at marginal range where short writes on NTAG213 succeed — this is one reason multi-record tags can feel less reliable in field tap tests even though the chip itself is fine."
@@ -160,7 +160,7 @@
   "faq": [
     {
       "question": "Which NFC chip has the most memory?",
-      "answer": "Among standard NFC Forum tags, MIFARE DESFire EV3 offers the most memory at up to 8 KB (8,192 bytes). For non-card NFC sticker format, NTAG I2C Plus offers 1,912 bytes and ICODE DNA offers 2,016 bytes. For the popular NTAG2xx family commonly used in stickers and labels, NTAG216 has the most memory at 888 bytes."
+      "answer": "Among standard NFC Forum tags, MIFARE DESFire EV3 offers the most memory at up to 8 KB (8,192 bytes). For non-card NFC sticker format, NTAG I2C Plus offers 1,912 bytes and ICODE DNA offers 256 bytes (2,048 bits per NXP datasheet) — the ICODE DNA value isn't best-in-class for memory; specify it when you need ISO 15693 AES-128. For the popular NTAG2xx family commonly used in stickers and labels, NTAG216 has the most memory at 888 bytes."
     },
     {
       "question": "Is 144 bytes enough for an NFC tag?",
