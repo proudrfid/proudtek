@@ -22,6 +22,7 @@ import {
   type EditorialLink,
   type EditorialDefinition,
 } from "./editorial-types";
+import { resolveChipPlaceholdersDeep } from "./chip-placeholders";
 
 export type { EditorialGroup, EditorialDefinition };
 
@@ -321,12 +322,18 @@ function rewriteEditorialLinks(links: EditorialLink[]): EditorialLink[] {
 }
 
 function normalizeEditorialDefinition(definition: EditorialDefinition): EditorialDefinition {
-  const primaryAction = rewriteEditorialLink(definition.primaryAction);
-  const secondaryActions = rewriteEditorialSecondaryActions(definition, primaryAction);
+  // Resolve {chip:slug:field} placeholders against src/data/chip-specs.json BEFORE
+  // any other normalization. This guarantees every downstream component sees
+  // verified chip-spec text. Pages can use placeholders in any string field
+  // (brief.text, brief.items, section.text, dataHighlight.text, etc.) and the
+  // schema is the single source of truth.
+  const resolved = resolveChipPlaceholdersDeep(definition);
+  const primaryAction = rewriteEditorialLink(resolved.primaryAction);
+  const secondaryActions = rewriteEditorialSecondaryActions(resolved, primaryAction);
 
   return {
-    ...definition,
-    brief: definition.brief?.map((field) =>
+    ...resolved,
+    brief: resolved.brief?.map((field) =>
       field.links && field.links.length > 0
         ? {
             ...field,
@@ -334,13 +341,13 @@ function normalizeEditorialDefinition(definition: EditorialDefinition): Editoria
           }
         : field,
     ),
-    resourceCards: definition.resourceCards.map((card) => ({
+    resourceCards: resolved.resourceCards.map((card) => ({
       ...card,
       links: rewriteEditorialLinks(card.links),
     })),
     primaryAction: {
       ...primaryAction,
-      label: EDITORIAL_PRIMARY_ACTION_LABELS[definition.route] ?? primaryAction.label,
+      label: EDITORIAL_PRIMARY_ACTION_LABELS[resolved.route] ?? primaryAction.label,
     },
     secondaryActions,
   };
