@@ -57,7 +57,7 @@
           ],
           [
             "NTAG 424 DNA",
-            "256 bytes",
+            "416 bytes",
             "Authenticated URLs, brand protection, DPP"
           ],
           [
@@ -120,7 +120,7 @@
       "intro": "Memory is one of four variables procurement teams balance. The table-style summary below names the practical trade-offs that show up in vendor RFP responses.",
       "bullets": [
         "Memory vs price: at 10K MOQ, NTAG213 ($0.04-0.08) → NTAG215 ($0.06-0.12) → NTAG216 ($0.08-0.15) → NTAG 424 DNA ($0.15-0.40) → DESFire EV3 ($0.40-1.50). Each step up roughly 1.5-3x. Don't pay for memory you won't use.",
-        "Memory vs security: NTAG213/215/216 have only 32-bit password protection (brute-forceable in seconds). NTAG 424 DNA has AES-128 SUN/CMAC but trades down to 256 bytes user memory. ICODE DNA has both 2,016 bytes and AES-128 — but at higher cost and narrower smartphone support.",
+        "Memory vs security: NTAG213/215/216 have only 32-bit password protection (brute-forceable in seconds). NTAG 424 DNA has AES-128 SUN/CMAC but trades down to 416 bytes user memory. ICODE DNA has both 2,016 bytes and AES-128 — but at higher cost and narrower smartphone support.",
         "Memory vs form factor: high-memory chips need more silicon area, which can constrain the smallest form factors. NTAG213 fits inside ring jewelry; NTAG216 needs a small inlay; DESFire EV3 typically lives in a card or larger sticker. For tiny form factors (e.g., 8-12 mm round inlays), NTAG213 is often the only realistic choice.",
         "Memory vs reader compatibility: NTAG 213 / 215 / 216 are NFC Forum Type 2 tags; NTAG 424 DNA is NFC Forum Type 4. Both are parsed by standard smartphone APIs (iOS Core NFC, Android NfcAdapter) with no special drivers. ICODE 15693 vicinity tags require NFC-V capability that not all readers expose; older Android handsets sometimes lack NFC-V handling. Confirm reader / phone support before committing on ICODE.",
         "Memory vs power harvesting: high-memory writes need more sustained RF power. Long-write operations on NTAG216 or DESFire occasionally fail at marginal range where short writes on NTAG213 succeed — this is one reason multi-record tags can feel less reliable in field tap tests even though the chip itself is fine."
@@ -172,11 +172,11 @@
     },
     {
       "question": "Does NTAG 424 DNA's smaller memory matter for EU Digital Product Passport use cases?",
-      "answer": "Almost never, if you encode correctly. The 256 bytes of user memory on NTAG 424 DNA is more than enough for a GS1 Digital Link URL with GTIN + serial (`https://id.gs1.org/01/{14-digit GTIN}/21/{serial}`) plus the SUN/CMAC dynamic parameters that the chip injects on tap. The full Digital Product Passport payload — material composition, carbon footprint, recyclability data, repair instructions — lives in the cloud and is fetched by URL resolution. Only choose a higher-memory chip for DPP if you genuinely need offline-readable passport data on the tag (rare; some industrial battery and aerospace use cases). For 95%+ of DPP pilots, NTAG 424 DNA's combination of cryptographic SUN authentication and 256 bytes is the right answer."
+      "answer": "Almost never, if you encode correctly. The 416 bytes of user memory on NTAG 424 DNA is more than enough for a GS1 Digital Link URL with GTIN + serial (`https://id.gs1.org/01/{14-digit GTIN}/21/{serial}`) plus the SUN/CMAC dynamic parameters that the chip injects on tap. The full Digital Product Passport payload — material composition, carbon footprint, recyclability data, repair instructions — lives in the cloud and is fetched by URL resolution. Only choose a higher-memory chip for DPP if you genuinely need offline-readable passport data on the tag (rare; some industrial battery and aerospace use cases). For 95%+ of DPP pilots, NTAG 424 DNA's combination of cryptographic SUN authentication and 416 bytes is the right answer."
     },
     {
       "question": "Why does NTAG 424 DNA have less user memory than NTAG216 if it's more advanced?",
-      "answer": "Because NTAG 424 DNA spends silicon area on cryptographic engines, secure key storage and the SDM/SUN message generator that NTAG216 doesn't need. The chip allocates more memory to internal security-critical structures (5 AES-128 keys, file system, secure counters, tamper status file) and less to open user memory. The trade-off makes sense: NTAG216 is the right answer when you need maximum NDEF payload (888 bytes for vCards / multi-record), and NTAG 424 DNA is the right answer when you need cryptographic anti-counterfeit (256 bytes is more than enough for a GS1 Digital Link URL plus SUN parameters). They're solving different problems."
+      "answer": "Because NTAG 424 DNA spends silicon area on cryptographic engines, secure key storage and the SDM/SUN message generator that NTAG216 doesn't need. The chip allocates more memory to internal security-critical structures (5 AES-128 keys, file system, secure counters, tamper status file) and less to open user memory. The trade-off makes sense: NTAG216 is the right answer when you need maximum NDEF payload (888 bytes for vCards / multi-record), and NTAG 424 DNA is the right answer when you need cryptographic anti-counterfeit (416 bytes is more than enough for a GS1 Digital Link URL plus SUN parameters). They're solving different problems."
     }
   ],
   "primaryAction": {
