@@ -31,7 +31,7 @@
 
 import { getChipSpec, formatMemorySummary, type ChipSpec } from './chip-specs.js';
 
-const PLACEHOLDER_RE = /\{chip:([a-z0-9\-]+):([a-z0-9_\.]+)\}/gi;
+const PLACEHOLDER_RE = /\{chip:([a-z0-9-]+):([a-z0-9_.]+)\}/gi;
 
 function formatRF(chip: ChipSpec): string {
   const rf = chip.rf;
