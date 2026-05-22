@@ -37,7 +37,7 @@
       "intro": "NXP ships a cluster of ICODE silicon variants that share the same ISO 15693 air interface but differ substantially in memory, security features and operating ranges. Choosing the right variant at the RFQ stage is worth getting correct because the inlay converters (Smartrac/Avery Dennison, LAB ID, Invengo, Identiv, HID Global) calibrate antenna tuning to the specific chip's input capacitance, and swapping from SLIX to SLIX2 mid-project typically forces an antenna re-layout. Library and laundry procurement teams routinely discover that their 'ICODE SLIX' spec was actually filled with SLIX-S or ICODE DNA UCODE downstream, each of which has its own subtle behaviour on EAS, password protection and tag-unlock workflows.",
       "bullets": [
         "ICODE SLIX: NXP part number SL2S2002. The reference ISO 15693 / ISO 18000-3 Mode 1 chip. 896 bits (112 bytes) of user memory organized as 28 × 4-byte blocks.",
-        "ICODE SLIX2 — SL2S2602. Launched 2013 as the capacity + security upgrade. 2,560 bits (320 bytes) of user memory organized as 80 × 4-byte blocks. Adds 64-bit password protection, PRIVACY mode, and Originality Signature.",
+        "ICODE SLIX2 — SL2S2602. Launched 2013 as the capacity + security upgrade. 2,528 bits (316 bytes) of user memory organized as 79 × 4-byte blocks (2,560-bit total EEPROM = 80 blocks; last block is system) per NXP SL2S2602 datasheet. Adds 64-bit password protection, PRIVACY mode, and Originality Signature.",
         "ICODE SLIX-S: SL2S5002. Larger-memory variant with 2,048 bits user memory + 32-bit destroy password. Between SLIX and SLIX2 in the lineup.",
         "ICODE SLIX-L: SL2S5502. Compact-memory variant optimized for the smallest inlays (laundry PPS chips, pharma blister tags). 320 bits user memory.",
         "ICODE SLI: the pre-SLIX generation (SL2ICS50). Still supported but with less user memory and without the password features of SLIX2. Phased out of NXP catalog but still present in some long-tail library installations.",
@@ -324,7 +324,7 @@
   "faq": [
     {
       "question": "What's the difference between ICODE SLIX and ICODE SLIX2?",
-      "answer": "Memory and security. SLIX has 896 bits (112 bytes) of user memory and no password protection. SLIX2 has 2,560 bits (320 bytes) of user memory plus 64-bit passwords for EAS, PRIVACY mode, and DESTROY. For most library deployments SLIX is sufficient. SLIX2 is the right choice when memory-constrained library schemas hit SLIX's 112-byte ceiling or when EAS/PRIVACY password protection is required by the library's threat model."
+      "answer": "Memory and security. SLIX has 896 bits (112 bytes) of user memory and no password protection. SLIX2 has 2,528 bits (316 bytes) of user memory (in 79 × 4-byte blocks per NXP SL2S2602 datasheet; 2,560-bit total EEPROM including system block) plus 64-bit passwords for EAS, PRIVACY mode, and DESTROY. For most library deployments SLIX is sufficient. SLIX2 is the right choice when memory-constrained library schemas hit SLIX's 112-byte ceiling or when EAS/PRIVACY password protection is required by the library's threat model."
     },
     {
       "question": "Can an NFC phone read ICODE SLIX tags?",
