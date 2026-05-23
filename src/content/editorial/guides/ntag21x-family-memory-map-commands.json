@@ -50,7 +50,7 @@
       "title": "Memory map — page-by-page reference",
       "intro": "NTAG21x memory is a flat 4-byte-page address space with a fixed layout: a handful of factory pages (UID, lock bytes, CC), a user NDEF region, and a configuration block at the top of memory. Every reader firmware (Android NFC APIs, iOS Core NFC, Proxmark3 scripts, embedded ACR122U drivers) reasons in page addresses (0x00, 0x04, 0x28, etc.) rather than byte offsets, because the WRITE and READ commands address pages, not bytes. The map below is exhaustive for NTAG213 and shows the NTAG215/216 offsets where they differ.",
       "bullets": [
-        "Memory is organized in 4-byte pages. NTAG213 has pages 0–44 (180 bytes), NTAG215 has pages 0–134 (540 bytes), NTAG216 has pages 0–230 (924 bytes). Page size is identical across the family.",
+        "Memory is organized in 4-byte pages. NTAG213 has pages 0–44 ({chip:nxp-ntag-213:memory.totalEEPROM_bytes} bytes), NTAG215 has pages 0–134 ({chip:nxp-ntag-215:memory.totalEEPROM_bytes} bytes), NTAG216 has pages 0–230 ({chip:nxp-ntag-216:memory.totalEEPROM_bytes} bytes). Page size is identical across the family.",
         "Pages 0–1 — UID (serial number). 7 bytes + 1 byte BCC (block check character). Read-only, factory-programmed, globally unique.",
         "Page 2 — internal use (byte 0) + static lock bytes (bytes 2–3). The lock bytes control per-page write-protection on pages 3–15; set a bit to permanently lock the corresponding page. Once locked, pages cannot be unlocked.",
         "Page 3 — Capability Container (CC). 4 bytes. Byte 0 = magic number (0xE1), byte 1 = version (0x10 for NTAG21x), byte 2 = total NDEF memory size / 8, byte 3 = read/write access byte. The CC is written once at personalization and typically locked.",
