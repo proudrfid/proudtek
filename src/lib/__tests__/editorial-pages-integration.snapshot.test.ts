@@ -37,6 +37,7 @@ import { dirname, resolve } from "node:path";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 
 import EditorialArticle from "../../components/editorial/EditorialArticle.astro";
+import { resolveChipPlaceholdersDeep } from "../chip-placeholders";
 import type { EditorialDefinition } from "../editorial-types";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -75,7 +76,7 @@ describe("EditorialArticle.astro — full-page integration snapshots", () => {
   it.each(FIXTURES)(
     "%s group: locks full page HTML for representative fixture (%s)",
     async (_group, path) => {
-      const definition = loadDefinition(path);
+      const definition = resolveChipPlaceholdersDeep(loadDefinition(path));
       const html = await container.renderToString(EditorialArticle, {
         props: { definition, illustration: null },
       });
