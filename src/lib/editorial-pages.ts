@@ -321,7 +321,7 @@ function rewriteEditorialLinks(links: EditorialLink[]): EditorialLink[] {
     });
 }
 
-function normalizeEditorialDefinition(definition: EditorialDefinition): EditorialDefinition {
+export function normalizeEditorialDefinition(definition: EditorialDefinition): EditorialDefinition {
   // Resolve {chip:slug:field} placeholders against src/data/chip-specs.json BEFORE
   // any other normalization. This guarantees every downstream component sees
   // verified chip-spec text. Pages can use placeholders in any string field
