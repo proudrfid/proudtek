@@ -14,6 +14,23 @@ describe('resolveChipPlaceholders', () => {
       .toBe('Use NXP UCODE 9xe for extended-EPC.');
   });
 
+  it('resolves :short_name to manufacturer-stripped form', () => {
+    expect(resolveChipPlaceholders('{chip:nxp-ntag-213:short_name} is fine for review URLs.'))
+      .toBe('NTAG 213 is fine for review URLs.');
+    expect(resolveChipPlaceholders('{chip:nxp-mifare-desfire-ev3:short_name} for AES-128.'))
+      .toBe('MIFARE DESFire EV3 for AES-128.');
+    // The shortName alias works too
+    expect(resolveChipPlaceholders('{chip:alien-higgs-9:shortName}'))
+      .toBe('Higgs-9');
+  });
+
+  it(':short_name falls back to displayName when chip has none declared', () => {
+    // impinj-monza-x-2k has no shortName field (only top drift chips got one
+    // in the initial pass) — should fall back to displayName.
+    expect(resolveChipPlaceholders('{chip:impinj-monza-x-2k:short_name}'))
+      .toBe('Impinj Monza X-2K');
+  });
+
   it('resolves :partNumber', () => {
     expect(resolveChipPlaceholders('{chip:nxp-ucode-9xe:partNumber}')).toBe('SL3S1216');
   });
