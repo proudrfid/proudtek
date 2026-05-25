@@ -68,6 +68,14 @@ function resolveField(chip: ChipSpec, field: string): string | undefined {
     case 'name':
     case 'displayName':
       return chip.displayName;
+    case 'short_name':
+    case 'shortName':
+      // Manufacturer-stripped short form. Falls back to displayName for chips
+      // that haven't declared a shortName (e.g. when the displayName is
+      // already short like "Impinj M750"). Authors should pick :name or
+      // :short_name based on which one byte-matches the surrounding prose;
+      // the chip-placeholder-drift lint catches mismatches at PR time.
+      return chip.shortName ?? chip.displayName;
     case 'partNumber':
     case 'part_number':
       return chip.partNumber;
