@@ -33,7 +33,7 @@
     {
       "label": "Sensitivity and read range",
       "items": [
-        "Read sensitivity -23.2 dBm typical (Alien Higgs-9 datasheet) — ~0.5 dB more sensitive than Impinj M770 (-22.7 dBm).",
+        "Read sensitivity {chip:alien-higgs-9:read_sensitivity_dbm} dBm typical ({chip:alien-higgs-9:name} datasheet) — ~0.5 dB more sensitive than {chip:impinj-m770:name} (-22.7 dBm).",
         "Free-air bench: 10-15 m read range with standard 6 dBic antenna at 4 W EIRP.",
         "Real-world: 8-12 m logistics dock door, 5-9 m warehouse portal, 4-7 m retail apparel, 2-4 m on-metal / on-liquid with appropriate antenna.",
         "Dense-reader mode (DRM) support ensures reliable operation in environments with multiple overlapping reader zones."
@@ -188,7 +188,7 @@
         "value": "32-48 bytes",
         "heading": "Typical RTI trip data fitting comfortably in Higgs-9 user memory",
         "text": "A returnable transit item (pallet, container, roll cage) typically carries trip-specific data: 4 bytes origin code + 4 bytes destination + 8 bytes consignee + 4 bytes weight + 4 bytes gross / tare + 4 bytes trip number + 8 bytes timestamp = 36 bytes. That fits comfortably in Higgs-9's 64-byte (688-bit) user memory with room for additional fields like temperature-log summary, sterilisation cycle counter, last-cleaning-cycle timestamp, or AI-encoded multi-party fields. The same 36 bytes does NOT fit in M700's 32-bit (4-byte) user memory or UCODE 9's small-config user memory, forcing those programmes to either truncate data, run a backend round-trip per scan, or use a different chip. Higgs-9's structural value is that the entire trip context lives on the tag, readable by any party with a standards-compliant reader, modifiable by authorised parties holding the access password — without backend dependency. For applications without that requirement (pure-EPC retail, simple inventory scan), M700 or UCODE 9 wins on cost. The chip-family decision pivots on whether the application reads on-tag data offline.",
-        "source": "GS1 EPC TDS 2.0 + EPCIS 2.0 + Alien Higgs-9 product brief + Proud Tek RTI deployment references"
+        "source": "GS1 EPC TDS 2.0 + EPCIS 2.0 + {chip:alien-higgs-9:name} product brief + Proud Tek RTI deployment references"
       },
       "bullets": [
         "RTI trip data: origin / destination / consignee / weight / trip number / timestamp = 32-48 bytes typical.",
@@ -220,7 +220,7 @@
           },
           {
             "label": "2018",
-            "text": "Alien Higgs-9 launches with 688-bit user memory + -23.2 dBm read sensitivity + DRM — the current-generation chip behind RTI / industrial / field-service deployments."
+            "text": "{chip:alien-higgs-9:name} launches with 688-bit user memory + {chip:alien-higgs-9:read_sensitivity_dbm} dBm read sensitivity + DRM — the current-generation chip behind RTI / industrial / field-service deployments."
           },
           {
             "label": "2020-2024",
@@ -245,11 +245,11 @@
         },
         {
           "href": "/products/rfid-labels/impinj-m730-uhf-inlay/",
-          "label": "Impinj M730 UHF inlay (volume retail)"
+          "label": "{chip:impinj-m730:name} UHF inlay (volume retail)"
         },
         {
           "href": "/products/rfid-labels/impinj-m750-uhf-inlay/",
-          "label": "Impinj M750 UHF inlay (M700-family, 128-bit EPC + user memory)"
+          "label": "{chip:impinj-m750:name} UHF inlay (M700-family, 128-bit EPC + user memory)"
         },
         {
           "href": "/products/rfid-labels/impinj-m800-uhf-inlay/",
@@ -292,12 +292,12 @@
   ],
   "faq": [
     {
-      "question": "What is the difference between Alien Higgs-9 and Impinj M700?",
+      "question": "What is the difference between {chip:alien-higgs-9:name} and Impinj M700?",
       "answer": "Both are high-performance RAIN RFID chips. Higgs-9 offers significantly larger user memory (688 bits / 64+ bytes vs M700's 0-32 bits) and slightly higher sensitivity (-23.2 dBm typical vs M770's -22.7 dBm) — better for applications needing on-tag data storage and longer raw read range. M700 (M730 / M750 / M770) offers smaller silicon footprint advantages on miniaturised antennas — better for small-antenna applications (jewellery, pharma vials, small-item retail). Choose by whether on-tag user memory dominates the use case (Higgs-9) or whether small-antenna read range matters more (M700)."
     },
     {
       "question": "Can I store custom application data on the Higgs-9 chip?",
-      "answer": "Yes — 688-bit (≥64-byte) user memory bank is fully read/write accessible. Store custom data fields: asset ID, maintenance date, calibration status, trip origin/destination, weight, temperature log summary, sterilisation cycle counter, GS1 Application Identifier multi-party fields. Data persists without power and reads on any standards-compliant UHF RFID reader. Authentication: standard 32-bit access password required for write access on locked memory blocks; not cryptographically secure (anyone with reader and the access password can read/write) — see anti-pattern guidance in the brief section."
+      "answer": "Yes — {chip:alien-higgs-9:user_bits}-bit (≥64-byte) user memory bank is fully read/write accessible. Store custom data fields: asset ID, maintenance date, calibration status, trip origin/destination, weight, temperature log summary, sterilisation cycle counter, GS1 Application Identifier multi-party fields. Data persists without power and reads on any standards-compliant UHF RFID reader. Authentication: standard 32-bit access password required for write access on locked memory blocks; not cryptographically secure (anyone with reader and the access password can read/write) — see anti-pattern guidance in the brief section."
     },
     {
       "question": "What antenna designs are available for the Higgs-9?",
@@ -309,7 +309,7 @@
     },
     {
       "question": "What is the lead time for a 5-10 million unit Higgs-9 order?",
-      "answer": "Production lead time typically 20-30 business days for standard antenna designs on 5-10M unit orders, allocated against Alien's chip-supply release schedule. Higher volumes (>20M) or chip-supply constraint periods: quote-to-ship can extend to 45-60 business days. Recommendation: blanket PO with call-off quantities rather than single spot buy for programmes >10M units / year — locks allocation, enables pitch / antenna fine-tuning during allocation window. For urgent needs, NXP UCODE 9 or Impinj M730 / M750 inlays on the same antenna design substitute with 2-4 week re-tune qualification."
+      "answer": "Production lead time typically 20-30 business days for standard antenna designs on 5-10M unit orders, allocated against Alien's chip-supply release schedule. Higher volumes (>20M) or chip-supply constraint periods: quote-to-ship can extend to 45-60 business days. Recommendation: blanket PO with call-off quantities rather than single spot buy for programmes >10M units / year — locks allocation, enables pitch / antenna fine-tuning during allocation window. For urgent needs, {chip:nxp-ucode-9:name} or {chip:impinj-m730:name} / M750 inlays on the same antenna design substitute with 2-4 week re-tune qualification."
     },
     {
       "question": "How do I encode GS1 Application Identifiers on Higgs-9 user memory?",
