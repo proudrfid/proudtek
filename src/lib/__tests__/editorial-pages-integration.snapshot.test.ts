@@ -37,19 +37,27 @@ import { dirname, resolve } from "node:path";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 
 import EditorialArticle from "../../components/editorial/EditorialArticle.astro";
+import { normalizeEditorialDefinition } from "../editorial-pages";
 import type { EditorialDefinition } from "../editorial-types";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CONTENT_ROOT = resolve(__dirname, "../../content/editorial");
 
-/** Load a production JSON fixture and pin time fields for determinism. */
+/** Load a production JSON fixture and pin time fields for determinism.
+ *  Runs the same `normalizeEditorialDefinition` pipeline that production uses
+ *  (loadEditorialDefinitions → editorial-pages.ts:211) so the snapshot reflects
+ *  what real pages render, including {chip:slug:field} placeholder resolution,
+ *  primaryAction-label overrides, and editorial-link rewrites. Without this
+ *  step the test diverges from production for any fixture that uses any of
+ *  those features. */
 function loadDefinition(relativePath: string): EditorialDefinition {
   const raw = JSON.parse(readFileSync(resolve(CONTENT_ROOT, relativePath), "utf8")) as EditorialDefinition;
-  return {
+  const pinned: EditorialDefinition = {
     ...raw,
     publishedAt: raw.publishedAt ?? "2026-01-15T00:00:00.000Z",
     modifiedAt: raw.modifiedAt ?? "2026-05-01T00:00:00.000Z",
   };
+  return normalizeEditorialDefinition(pinned);
 }
 
 /**
