@@ -62,6 +62,13 @@ function resolveField(chip, field) {
     case 'name':
     case 'displayName':
       return chip.displayName;
+    case 'short_name':
+    case 'shortName':
+      // Manufacturer-stripped short form (e.g. "NTAG 213"). Falls back to
+      // displayName if the chip didn't declare one. Mirrors the resolver in
+      // src/lib/chip-placeholders.ts so this lint stays in lockstep with
+      // what production renders.
+      return chip.shortName ?? chip.displayName;
     case 'partNumber':
     case 'part_number':
       return chip.partNumber;
