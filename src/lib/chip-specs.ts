@@ -72,6 +72,13 @@ export interface ChipLimits {
 export interface ChipSpec {
   manufacturer?: string;
   displayName: string;
+  /**
+   * Manufacturer-stripped short form (e.g. "NTAG 213" vs displayName
+   * "NXP NTAG 213"). Optional — only set for chips whose prose commonly
+   * elides the vendor prefix. Resolves via `{chip:slug:short_name}`.
+   * Falls back to `displayName` when absent.
+   */
+  shortName?: string;
   partNumber?: string;
   frequency?: ChipFrequency;
   standard?: string[];
