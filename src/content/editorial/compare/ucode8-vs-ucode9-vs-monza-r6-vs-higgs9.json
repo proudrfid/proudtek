@@ -5,7 +5,7 @@
   "kicker": "UHF RAIN RFID Chip Comparison",
   "summary": "These four silicon families dominate global passive UHF RAIN RFID inlay manufacturing. NXP UCODE 8 and UCODE 9, Impinj Monza R6 (and the R6-P / 4QT variants), and Alien Technology Higgs-9 each occupy a distinct point on the price–performance–feature curve. This comparison documents the read sensitivity, EPC and User memory layouts, EPC Gen2 v2 / ISO/IEC 18000-63 feature support, on-chip privacy commands, sensor variants, real-world read range under metal and liquid, and the application categories where each chip is the right engineering choice. From retail source tagging at sub-cent ASPs to industrial pallet tracking, pharma cold chain and brand-protected SKU traceability.",
   "heroPoints": [
-    "Read sensitivity is the primary range driver. Monza R6 and UCODE 9 both achieve −22.6 to −23.0 dBm, putting them at the front of the field; UCODE 8 sits at −22.5 dBm; Higgs-9 leads on paper at −24.0 dBm but real-world inlay performance is antenna-bound, so datasheet sensitivity rarely translates 1:1 to deployed range.",
+    "Read sensitivity is the primary range driver. Monza R6 and UCODE 9 both achieve −22.6 to −23.0 dBm, putting them at the front of the field; UCODE 8 sits at −22.5 dBm; Higgs-9 leads on paper at −23.2 dBm but real-world inlay performance is antenna-bound, so datasheet sensitivity rarely translates 1:1 to deployed range.",
     "Memory architectures diverge sharply. Monza R6 ships with 96-bit EPC and no User memory (cost-optimized for retail). UCODE 8 and UCODE 9 give 128/96-bit EPC + optional 32–224-bit User. Higgs-9 ships up to 96-496-bit EPC + 688-bit User memory (the largest user memory in commodity UHF). Memory choice (not sensitivity) is what disqualifies most chips for User-data applications like pharma serialization or DPP.",
     "EPC Gen2 v2 features split the field. Untraceable (privacy / protected-mode command) and Hide-EPC are supported on UCODE 9, partially on UCODE 8 and on Monza R6-P, and not on baseline Monza R6 or Higgs-9. Important: NONE of these four chips implement on-chip AES-128 cryptographic Authenticate — that lives only on NXP UCODE DNA (per ISO/IEC 29167-10) and Impinj M775 (PRESENT-80 per ISO/IEC 29167-11). For brand-protection programs needing per-tap cryptographic authentication, plan to pair UHF with HF NTAG 424 DNA, not rely on UHF crypto alone."
   ],
@@ -39,7 +39,7 @@
         "NXP UCODE 8 (SL3S1205, SL3S1215). Released 2017, became the reference workhorse for retail apparel and global supply chain. 128-bit EPC default, optional 32-bit User, sensitivity −22.5 dBm read / −15.5 dBm write. Widely available in inlay form from Avery Dennison/Smartrac, Arizon, HID, Beontag and dozens of other licensees. The reference chip when no specific privacy/auth feature is required.",
         "NXP UCODE 9 (SL3S1455, SL3S1456). Released 2020 as UCODE 8's successor. Same form factor and inlay compatibility; sensitivity bumped to −23.0 dBm read / −18.5 dBm write. Adds Self-Adjust feature (the chip auto-detunes to compensate for inlay-on-metal or inlay-on-liquid mounting). Implements the Gen2 v2 Untraceable command framework + Hide-EPC. Important: UCODE 9 does NOT carry on-chip AES-128 — that lives only on UCODE DNA (per ISO/IEC 29167-10). UCODE 9 is the right choice for retail privacy (Untraceable submode); for cryptographic anti-counterfeit, specify UCODE DNA or pair UCODE 9 with HF NTAG 424 DNA.",
         "Impinj Monza R6 (M730), Monza R6-P (M750), Monza 4QT (legacy). Impinj's mass-volume retail chip. Baseline R6 is 96-bit EPC, no User memory, no privacy commands, sensitivity −22.6 dBm read / −16.7 dBm write. R6-P adds 64-bit serialized TID + 32-bit User + Protected Mode (Gen2 v2 Untraceable / TID-based protocol response, NOT AES challenge-response). Both are Impinj's Autotune (auto-impedance-match) silicon. R6-P is NOT a cryptographic chip — for on-chip AES-128 in the Impinj family, specify M775 (PRESENT-80 per ISO/IEC 29167-11), not R6-P. Dominant choice for retail source tagging because of aggressive silicon pricing at multi-million-unit tiers, proven yield and the Impinj reader-platform integration story.",
-        "Alien Technology Higgs-9 (ALN-9930, ALN-9940 inlays). Released 2021, succeeded Higgs-EC and Higgs-4. Highest datasheet sensitivity at −24.0 dBm read / −19.0 dBm write, 96-bit EPC + 128-bit User memory standard, FastID feature (singulation in EPC + TID single-shot). Strong fit when User memory is mandatory but full EPC Gen2 v2 privacy is not, and when supplier diversification away from NXP/Impinj is a procurement requirement.",
+        "Alien Technology Higgs-9 (ALN-9930, ALN-9940 inlays). Released 2021, succeeded Higgs-EC and Higgs-4. Highest datasheet sensitivity at −23.2 dBm read / −19.0 dBm write, 96-bit EPC + 688-bit User memory standard (the largest in the commodity UHF tier), FastID feature (singulation in EPC + TID single-shot). Strong fit when User memory is mandatory but full EPC Gen2 v2 privacy is not, and when supplier diversification away from NXP/Impinj is a procurement requirement.",
         "Beyond these four: Impinj M780 (sensor-pad variant), NXP UCODE 9xe (sensor variant for moisture / temperature), Alien Higgs-EC (legacy), Em Microelectronic em|echo-V (low-cost Asian supply) and Fudan FM13UF02 (China domestic) round out the field. They are not covered in this comparison because they either occupy a niche (sensor) or are not generally available in the global inlay supply chain at the scale of the four primary families."
       ]
     },
@@ -78,7 +78,7 @@
             "32–224 bits configurable",
             "0 bits",
             "32 bits",
-            "128 bits"
+            "688 bits"
           ],
           [
             "TID memory",
@@ -94,7 +94,7 @@
             "−23.0 dBm",
             "−22.6 dBm",
             "−22.0 dBm",
-            "−24.0 dBm"
+            "−23.2 dBm"
           ],
           [
             "Write sensitivity",
@@ -429,7 +429,7 @@
   "faq": [
     {
       "question": "Which of these chips has the longest read range in practice?",
-      "answer": "On paper Higgs-9 leads at −24.0 dBm read sensitivity. In real-world deployments the gap closes considerably because read range is dominated by inlay antenna design, mounting substrate, reader EIRP and polarization match. UCODE 9 and Monza R6 both achieve ranges within 10–15% of Higgs-9 on equivalent inlays, and UCODE 9's Self-Adjust feature often outperforms Higgs-9 on metal or liquid substrates. Choose by the application's substrate and feature requirements first; raw sensitivity is rarely the deciding factor."
+      "answer": "On paper Higgs-9 leads at −23.2 dBm read sensitivity. In real-world deployments the gap closes considerably because read range is dominated by inlay antenna design, mounting substrate, reader EIRP and polarization match. UCODE 9 and Monza R6 both achieve ranges within 10–15% of Higgs-9 on equivalent inlays, and UCODE 9's Self-Adjust feature often outperforms Higgs-9 on metal or liquid substrates. Choose by the application's substrate and feature requirements first; raw sensitivity is rarely the deciding factor."
     },
     {
       "question": "If we already have an Impinj reader fleet, do we have to use Impinj Monza chips?",
@@ -437,7 +437,7 @@
     },
     {
       "question": "Why does User memory matter so much?",
-      "answer": "User memory holds application-defined data beyond the EPC. Typical examples are pharma serial numbers under GS1 DSCSA, EU Digital Product Passport URL pointers, batch and expiration dates, sensor calibration data, or maintenance history for industrial assets. If the application needs any of this on-tag rather than referenced from a database, baseline Monza R6 (zero User memory) is disqualified immediately. UCODE 9's configurable 32–224-bit User memory has the most flexibility; Higgs-9's standard 128 bits is sufficient for most serialization applications; UCODE 8's optional 32 bits is at the lower end."
+      "answer": "User memory holds application-defined data beyond the EPC. Typical examples are pharma serial numbers under GS1 DSCSA, EU Digital Product Passport URL pointers, batch and expiration dates, sensor calibration data, or maintenance history for industrial assets. If the application needs any of this on-tag rather than referenced from a database, baseline Monza R6 (zero User memory) is disqualified immediately. Higgs-9's standard 688-bit User memory is the largest in this group and comfortably covers serialization applications; UCODE 9's configurable 32–224-bit User memory offers moderate flexibility; UCODE 8's optional 32 bits is at the lower end."
     },
     {
       "question": "When should we pick UCODE DNA over UCODE 9 for anti-counterfeit?",
