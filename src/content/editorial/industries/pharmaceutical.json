@@ -3,7 +3,7 @@
   "group": "products",
   "title": "Pharmaceutical RFID — DSCSA + EU FMD + GS1 SGTIN-198 + Cold Chain + NTAG 424 DNA",
   "kicker": "Pharmaceutical RFID",
-  "summary": "Pharmaceutical RFID supports DSCSA (21 USC §360eee, full implementation 27 Nov 2024), EU Falsified Medicines Directive (Reg 2016/161 + Directive 2011/62/EU), GS1 SGTIN-198 / GIAI / GRAI / GDTI serialisation, vaccine + biologics cold-chain (USP <1079>, USP <800>, WHO PQS), hospital pharmacy automation, controlled-substance tracking and patient-tap authentication. Proud Tek supplies the NFC pharmaceutical label (NTAG 424 DNA + AES-128 SUN tamper authentication), UHF medication vial label, blood-bag label, cryogenic specimen label, semi-passive temperature logger tag (EM4325 + NXP UCODE 9xe + AS3955) and cold-chain logger pairing for Pfizer Controlant, Sensitech SensiWatch, ELPRO LIBERO, Berlinger Q-tag and Emerson ProAct platforms.",
+  "summary": "Pharmaceutical RFID supports DSCSA (21 USC §360eee, full implementation 27 Nov 2024), EU Falsified Medicines Directive (Reg 2016/161 + Directive 2011/62/EU), GS1 SGTIN-198 / GIAI / GRAI / GDTI serialisation, vaccine + biologics cold-chain (USP <1079>, USP <800>, WHO PQS), hospital pharmacy automation, controlled-substance tracking and patient-tap authentication. Proud Tek supplies the NFC pharmaceutical label (NTAG 424 DNA + {chip:nxp-ntag-424-dna:crypto.algorithm} SUN tamper authentication), UHF medication vial label, blood-bag label, cryogenic specimen label, semi-passive temperature logger tag (EM4325 + NXP UCODE 9xe + AS3955) and cold-chain logger pairing for Pfizer Controlant, Sensitech SensiWatch, ELPRO LIBERO, Berlinger Q-tag and Emerson ProAct platforms.",
   "keywords": [
     "pharmaceutical RFID",
     "DSCSA serialisation 2024",
@@ -14,7 +14,7 @@
   ],
   "heroPoints": [
     "DSCSA + EU FMD + Brazil ANVISA + China NMPA + India CDSCO compliance — GS1 SGTIN-198 + GTIN + Lot + Expiry pre-encoded; ASN-ready CSV manifest.",
-    "NTAG 424 DNA AES-128 SUN authentication — patient or pharmacist taps phone, server verifies tag silicon + tap freshness; brand revokes if reported counterfeit.",
+    "NTAG 424 DNA {chip:nxp-ntag-424-dna:crypto.algorithm} SUN authentication — patient or pharmacist taps phone, server verifies tag silicon + tap freshness; brand revokes if reported counterfeit.",
     "Cold-chain pairing — UHF EM4325 / UCODE 9xe + Sensitech / ELPRO / Berlinger / Emerson logger; vaccine 2-8 °C + ultra-cold -70 °C + ambient 15-25 °C trace."
   ],
   "imageAlt": "RFID pharmaceutical labels — NFC tamper-evident NTAG 424 DNA on prescription medicine carton with patient-tap authentication, plus UHF medication vial label and cold-chain temperature logger tag pre-encoded with GS1 SGTIN-198",
@@ -368,7 +368,7 @@
     },
     {
       "question": "Which chip should I specify for pharmaceutical brand authentication vs supply-chain visibility?",
-      "answer": "For brand authentication (patient or pharmacist taps phone to verify authenticity), specify {chip:nxp-ntag-424-dna:name} — AES-128 SUN + {chip:nxp-ntag-424-dna:user_bytes} byte memory + tamper-loop variant; works with iPhone XS+ Core NFC + Android HCE without an app. For tamper-evident packaging applications add NTAG 424 DNA TagTamper. For supply-chain visibility (receiving / shipping / dispensing portal scans), specify {chip:nxp-ucode-9:name} ({chip:nxp-ucode-9:read_sensitivity_dbm} dBm sensitivity for dense-reader DC environments) or UCODE 8m for cost-optimised secondary-pack tagging. For cold-chain temperature logging, specify {chip:axzon-magnus-s3:name} (passive UHF + built-in temperature sensor + 72 hr log), {chip:em-microelectronic-em4325:name} (BAP UHF with external thermistor on SPI port), or AMS AS3955 (HF + temperature). {chip:nxp-ucode-9xe:name} is the extended-EPC variant with no sensor port — NXP's UHF+sensor chip family is NHS3100 / UCODE I²C, not UCODE 9xe. For small-form-factor vials, specify Murata Magicstrap or STMicroelectronics ST25TV — sub-12 mm antenna with curved-surface adhesive. We supply factory-encoded with GS1 SGTIN-198 + Lot + Expiry per programme spec; specify your retailer / hospital / 3PL programme + the MAH (Marketing Authorisation Holder) regulatory framework and we route the matching chip + antenna + encoding combo."
+      "answer": "For brand authentication (patient or pharmacist taps phone to verify authenticity), specify NXP NTAG 424 DNA — {chip:nxp-ntag-424-dna:crypto.algorithm} SUN + {chip:nxp-ntag-424-dna:user_bytes} byte memory + tamper-loop variant; works with iPhone XS+ Core NFC + Android HCE without an app. For tamper-evident packaging applications add NTAG 424 DNA TagTamper. For supply-chain visibility (receiving / shipping / dispensing portal scans), specify NXP UCODE 9 ({chip:nxp-ucode-9:read_sensitivity_dbm} dBm sensitivity for dense-reader DC environments) or UCODE 8m for cost-optimised secondary-pack tagging. For cold-chain temperature logging, specify Axzon Magnus-S3 (passive UHF + built-in temperature sensor + 72 hr log), EM Microelectronic EM4325 (BAP UHF with external thermistor on SPI port), or AMS AS3955 (HF + temperature). NXP UCODE 9xe is the extended-EPC variant with no sensor port — NXP's UHF+sensor chip family is NHS3100 / UCODE I²C, not UCODE 9xe. For small-form-factor vials, specify Murata Magicstrap or STMicroelectronics ST25TV — sub-12 mm antenna with curved-surface adhesive. We supply factory-encoded with GS1 SGTIN-198 + Lot + Expiry per programme spec; specify your retailer / hospital / 3PL programme + the MAH (Marketing Authorisation Holder) regulatory framework and we route the matching chip + antenna + encoding combo."
     },
     {
       "question": "How does RFID integrate with hospital pharmacy automation — Omnicell, Pyxis, ARxIUM, Swisslog?",
@@ -457,7 +457,7 @@
       "publisher": "NXP Semiconductors N.V.",
       "publishedAt": "2023-04-12",
       "accessedAt": "2026-04-25",
-      "note": "AES-128 + CMAC SUN message + tamper-loop detection — the chip the IP-defended pharmaceutical anti-counterfeit market uses for patient-tap + pharmacist-tap authentication."
+      "note": "{chip:nxp-ntag-424-dna:crypto.algorithm} + CMAC SUN message + tamper-loop detection — the chip the IP-defended pharmaceutical anti-counterfeit market uses for patient-tap + pharmacist-tap authentication."
     },
     {
       "label": "EM Microelectronic — EM4325 UHF RFID with temperature sensor (BAP)",
