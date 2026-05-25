@@ -44,8 +44,8 @@
       "items": [
         "EM4100 / T5577 / HID Prox at 125 kHz LF — legacy attendance estates; no encryption; cheapest baseline.",
         "MIFARE Classic 1K / 4K at 13.56 MHz HF — most common attendance baseline; Crypto-1 broken since 2008 but still widely deployed.",
-        "MIFARE Plus EV1/EV2 SL3 — AES-128 with Classic backwards compatibility; transitional path.",
-        "MIFARE DESFire EV2/EV3 — {chip:nxp-mifare-desfire-ev3:crypto.algorithm} mutual auth; high-security workforce + healthcare estates.",
+        "MIFARE Plus EV1/EV2 SL3 — {chip:nxp-mifare-plus-ev2:crypto.algorithm} with Classic backwards compatibility; transitional path.",
+        "MIFARE DESFire EV2/EV3 — AES-128 mutual auth; high-security workforce + healthcare estates.",
         "HID iCLASS Seos — enterprise dual-purpose credential (access + attendance + cashless).",
         "NTAG213/215 NFC — for phone-tap attendance on mobile-first deployments without dedicated reader hardware.",
         "ICODE SLIX2 — long-range vicinity for hands-free turnstile / gate attendance.",
@@ -83,7 +83,7 @@
       "label": "Anti-fraud + buddy-punching prevention",
       "items": [
         "Unique factory-assigned UID per card — Crypto-1 cracked but UID itself sufficient for low-stakes attendance.",
-        "DESFire EV3 AES-128 mutual auth — defeats clone-and-share for high-stakes / high-fraud-risk environments.",
+        "DESFire EV3 {chip:nxp-mifare-desfire-ev3:crypto.algorithm} mutual auth — defeats clone-and-share for high-stakes / high-fraud-risk environments.",
         "Biometric + RFID dual-factor — face / fingerprint at high-fraud entry points (cash handling, security-sensitive).",
         "Photo-ID display on reader screen — operator visual check at point of tap.",
         "Geofence + IP-address validation on mobile NFC tap — prevents off-site clock-in.",
@@ -266,8 +266,8 @@
       "bullets": [
         "Tier-1 EM4100 / HID Prox 26-bit (125 kHz LF) — cheapest, lowest security. EM4100 read-only with hardcoded ID; HID Prox 26-bit Wiegand-format. Cloneable in <60s with Proxmark or Flipper Zero. Suitable for low-stakes attendance only (school field-trip, low-trust event) where buddy-punching liability is contained.",
         "Tier-2 MIFARE Classic 1K/4K (13.56 MHz HF) — most-deployed worldwide for attendance. Crypto-1 cipher broken in 2008 but still adequate for attendance applications where the attack surface is low. $0.80-$1.20 unit cost at scale. Compatible with virtually every attendance reader (ZKTeco, Hikvision, Suprema, Anviz, Realand, Granding).",
-        "Tier-3 MIFARE Plus SE/EV2 — AES-128 in SL3 + backwards-compatible Classic emulation in SL1 for staged migration. $1.50-$2.50 unit. Used by organisations refreshing readers without forklift swap.",
-        "Tier-4 MIFARE DESFire EV2/EV3 — {chip:nxp-mifare-desfire-ev3:crypto.algorithm} mutual auth + file-based directory + Random UID + Originality Signature. $2.80-$5.50 unit. Used in healthcare + government + high-security manufacturing where credential cloning has compliance impact (HIPAA, NIST 800-53, CMMC).",
+        "Tier-3 MIFARE Plus SE/EV2 — {chip:nxp-mifare-plus-ev2:crypto.algorithm} in SL3 + backwards-compatible Classic emulation in SL1 for staged migration. $1.50-$2.50 unit. Used by organisations refreshing readers without forklift swap.",
+        "Tier-4 MIFARE DESFire EV2/EV3 — AES-128 mutual auth + file-based directory + Random UID + Originality Signature. $2.80-$5.50 unit. Used in healthcare + government + high-security manufacturing where credential cloning has compliance impact (HIPAA, NIST 800-53, CMMC).",
         "Tier-4 HID iCLASS Seos — equivalent AES-128 + file-format-agnostic credential, programmed via HID Origo. Common in enterprises that already standardise on HID Signo / multiCLASS SE readers for combined access control + attendance.",
         "NTAG 213 / 215 / 216 (NFC Type 2) — used in NFC wristband + sticker form factors for event attendance, fitness check-in and meeting-room tap. Lower security than DESFire but cheaper ($0.20-$0.50) and supports smartphone tap.",
         "NTAG 424 DNA — AES-CMAC SUN message for tap-to-verify attendance with anti-cloning. Used in premium employee badge + executive credentialing where each tap generates a unique signed timestamp.",
@@ -446,7 +446,7 @@
   "faq": [
     {
       "question": "Can RFID attendance systems prevent buddy punching?",
-      "answer": "Yes. Each RFID card has a unique, factory-assigned identifier that cannot be duplicated with consumer-grade equipment. For high-security environments, MIFARE DESFire EV3 cards use AES-128 encryption that makes cloning computationally infeasible. Some organizations combine RFID cards with biometric verification (fingerprint or face) at key entry points for dual-factor attendance verification."
+      "answer": "Yes. Each RFID card has a unique, factory-assigned identifier that cannot be duplicated with consumer-grade equipment. For high-security environments, MIFARE DESFire EV3 cards use {chip:nxp-mifare-desfire-ev3:crypto.algorithm} encryption that makes cloning computationally infeasible. Some organizations combine RFID cards with biometric verification (fingerprint or face) at key entry points for dual-factor attendance verification."
     },
     {
       "question": "What RFID cards work with ZKTeco, Hikvision and other attendance terminals?",
