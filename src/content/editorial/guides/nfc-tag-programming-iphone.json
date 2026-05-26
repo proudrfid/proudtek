@@ -20,7 +20,7 @@
   "heroPoints": [
     "iPhone XS and later support full NFC tag writing through Apple's Core NFC framework. Every iPhone since 2018 can read tag UIDs, write NDEF records, interact with ISO 14443 Type A/B and ISO 15693 tags, and increasingly tap native iOS features (Shortcuts automation, Apple Wallet passes, AirDrop-style app invocations). This makes iPhone the most-widely-deployed consumer NFC writer on the planet, and a first-class target for tag programming workflows that need broad reach.",
     "The iOS NFC stack has matured deliberately. From iOS 11 (read-only NDEF tag detection inside apps via NFCNDEFReaderSession) through iOS 13 (full NFCTagReaderSession read/write, ISO 7816 / 15693 / FeliCa / MIFARE tag protocols, and background NDEF URL detection on iPhone XS / XR / 11 and later) to iOS 14-15 (App Clip NFC invocations, Shortcuts-triggered automation per tag) and iOS 17.4 / 18 (CardSession host card emulation for in-app contactless transactions, initially for banking and wallet apps in the European Economic Area and expanded with iOS 18.1 to additional regions and use cases). Knowing which capability shipped in which iOS version is the foundation of any iPhone NFC programming project.",
-    "Proud Tek ships iPhone-tested NFC products across the full NFC Forum Type 2/4/5 family — NTAG 213/215/216 for general-purpose NDEF programmes, NTAG 424 DNA for tamper-evident authentication and SUN-message anti-counterfeiting, MIFARE Ultralight variants for memory-optimized deployments, and ISO 15693 (ICODE SLIX) tags for industrial and pharmaceutical traceability programmes. All tags are supplied blank, unlocked and ready for iPhone NDEF writing, with chip-family documentation and iOS-specific caveats provided to customers during sample and pilot stages."
+    "Proud Tek ships iPhone-tested NFC products across the full NFC Forum Type 2/4/5 family — {chip:nxp-ntag-213:short_name}/215/216 for general-purpose NDEF programmes, {chip:nxp-ntag-424-dna:short_name} for tamper-evident authentication and SUN-message anti-counterfeiting, MIFARE Ultralight variants for memory-optimized deployments, and ISO 15693 ({chip:nxp-icode-slix:short_name}) tags for industrial and pharmaceutical traceability programmes. All tags are supplied blank, unlocked and ready for iPhone NDEF writing, with chip-family documentation and iOS-specific caveats provided to customers during sample and pilot stages."
   ],
   "imageAlt": "iPhone tapping NFC tag — Core NFC NDEF writing and Shortcuts programming reference",
   "heroImage": "/blog-images/tap-phone-nfc.jpg",
@@ -49,7 +49,7 @@
       "intro": "For customers programming NFC tags without writing any code (marketing teams, small business owners, hotel/restaurant operators, event planners) the App Store provides several free, well-maintained apps that handle the NDEF encoding, memory management and iPhone antenna interaction. This section surveys the apps most commonly used for iPhone-based NFC tag writing.",
       "bullets": [
         "NFC Tools (wakdev): the most popular free NFC writer on iOS. Supports writing URL, text, phone number, email, SMS, geolocation, Wi-Fi credentials (via custom MIME type), Bluetooth pairing, vCard, application launch and custom raw NDEF records. Read mode reveals tag chip type, memory size, UID and NDEF content. Provides a paid Pro tier with advanced features (lock, password, MIFARE DESFire support, batch operations).",
-        "NXP TagWriter: official app from NXP, the manufacturer of NTAG and MIFARE chips. Optimized for NTAG 21x and NTAG 424 DNA programming with guided workflows. Strong support for NDEF Wi-Fi records, Bluetooth pairing and contact vCard. The app is free and trustworthy for programmes specifically using NXP-chip tags (which includes most NFC stickers in market).",
+        "NXP TagWriter: official app from NXP, the manufacturer of NTAG and MIFARE chips. Optimized for NTAG 21x and {chip:nxp-ntag-424-dna:short_name} programming with guided workflows. Strong support for NDEF Wi-Fi records, Bluetooth pairing and contact vCard. The app is free and trustworthy for programmes specifically using NXP-chip tags (which includes most NFC stickers in market).",
         "Simply NFC: clean, minimalist app focused on rapid URL and text encoding. Good choice for non-technical users who need a straightforward experience for programming hundreds of tags with the same URL template (e.g., restaurant menus per table). Some advanced features behind in-app purchases.",
         "NXP TagInfo: diagnostic-focused app that reads and dissects NFC tag content in detail (chip type, memory dump, NDEF record parsing, NFC Forum compliance validation). Free from NXP and valuable as a companion app for verifying programmed tags before deployment. Essential for QA workflows.",
         "GoToTags iOS: commercial app with strong enterprise focus, supporting batch programming, CSV import of tag content, and advanced NDEF record types. Used by customers programming thousands of tags from spreadsheet data without needing custom development.",
@@ -65,7 +65,7 @@
         "Step 3 — Enter your data with iOS character-encoding considerations in mind. URLs should be URL-encoded; text records handle UTF-8 natively; Wi-Fi passwords can include special characters but need to be entered exactly matching the router configuration. Many apps preview the NDEF byte count so you can verify the payload fits within the tag's memory budget.",
         "Step 4 — Position the iPhone antenna over the tag for writing. The NFC antenna is at the top-center of the iPhone's back (note this is slightly different per-generation; on iPhone 15 Pro it's around the Apple logo area). Best-practice: align the top third of the iPhone back directly over the tag's antenna coil, press gently (phone-to-tag gap of 1-2 mm ideal), and hold still for 2-3 seconds.",
         "Step 5 — Verify the write before moving on. The app will typically display a success message; then read the tag back to confirm the content. Bring the programmed tag into proximity of the iPhone (phone still awake/unlocked); for URL records, iOS should display the URL-open notification automatically, confirming the background NDEF detection path works end-to-end.",
-        "Step 6 — Optionally lock or password-protect the tag. NFC Forum Type 2 tags (NTAG 21x) support a one-way lock that permanently makes the tag read-only; NTAG 424 DNA supports password-protected writes. Locking prevents accidental overwrites in the field but makes future content updates impossible. For dynamic-content programmes (events, seasonal promotions), leave tags unlocked and rotate content on a scheduled basis."
+        "Step 6 — Optionally lock or password-protect the tag. NFC Forum Type 2 tags (NTAG 21x) support a one-way lock that permanently makes the tag read-only; {chip:nxp-ntag-424-dna:short_name} supports password-protected writes. Locking prevents accidental overwrites in the field but makes future content updates impossible. For dynamic-content programmes (events, seasonal promotions), leave tags unlocked and rotate content on a scheduled basis."
       ]
     },
     {
@@ -86,23 +86,23 @@
       "bullets": [
         "Core NFC framework overview. Introduced in iOS 11 (read-only NDEF), expanded in iOS 13 (full read/write, tag-level access to ISO 14443 and ISO 15693), refined across iOS 14-17 (better error handling, background invocation, Shortcut integration). The framework runs in an entitled foreground app with user-initiated session activation; Apple does not allow background continuous NFC reading for custom apps (background NDEF URL detection is a system-level behavior, not an app feature).",
         "NFCNDEFReaderSession: the simplest session type for apps that only need to read or write NDEF content. Invoke via `let session = NFCNDEFReaderSession(delegate: self, queue: nil, invalidateAfterFirstRead: true)`; session presents a system sheet to the user, reads/writes the tag, and invalidates. Good fit for consumer apps that need one-tap NFC interaction.",
-        "NFCTagReaderSession: lower-level session for apps that need access to the raw tag interface. Supports polling options for ISO 14443 Type A/B (MIFARE, NTAG), ISO 15693 (ICODE, ST25), FeliCa (Sony Type F) and MIFARE Ultralight. Apps can send APDU commands directly to MIFARE DESFire for authenticated access, read NTAG 424 DNA SUN messages, or interact with contactless credit cards in ISO 14443-4 mode (subject to Apple's payment-interoperability restrictions).",
+        "NFCTagReaderSession: lower-level session for apps that need access to the raw tag interface. Supports polling options for ISO 14443 Type A/B (MIFARE, NTAG), ISO 15693 (ICODE, ST25), FeliCa (Sony Type F) and MIFARE Ultralight. Apps can send APDU commands directly to MIFARE DESFire for authenticated access, read {chip:nxp-ntag-424-dna:short_name} SUN messages, or interact with contactless credit cards in ISO 14443-4 mode (subject to Apple's payment-interoperability restrictions).",
         "Entitlements and Info.plist configuration. Core NFC apps require the `com.apple.developer.nfc.readersession.formats` entitlement declaring which tag types the app will read, plus `NFCReaderUsageDescription` in Info.plist with a user-facing usage rationale. For apps that need to bind to specific NDEF record types (AAR, URL prefix matching), additional Info.plist entries define the URI prefixes. Apple reviews NFC apps under the usual App Store guidelines; legitimate B2B and consumer-brand use cases are approved routinely.",
         "NDEF writing pattern: read the tag's NDEF status (supported, read-only), build an `NFCNDEFMessage` with one or more `NFCNDEFPayload` records, and call `tag.writeNDEF(message) { ... }`. Error handling covers full-memory cases, read-only tags, tag-out-of-range during write, and session invalidation. Production apps should implement retry logic with appropriate user messaging.",
         "Background NDEF URL detection. iPhone automatically detects NDEF URL tags in the background without any app installed, displaying a system notification that opens the URL in Safari or triggers Universal Links to deep-link into an installed app. Developers building a brand app should register Universal Links for the domains encoded on tags, so tap interactions deep-link into the app seamlessly. A core pattern for consumer NFC programmes at scale.",
         "APDU-level access for DESFire and ISO 7816 tags — with `NFCISO7816Tag` returned by `NFCTagReaderSession` when the tag is ISO 14443-4, apps can send raw APDUs: a DESFire SelectApplication becomes `NFCISO7816APDU(instructionClass: 0x90, instructionCode: 0x5A, p1Parameter: 0x00, p2Parameter: 0x00, data: Data([0x00, 0x00, 0x00]), expectedResponseLength: -1)`, and `tag.sendCommand(apdu:) { response, sw1, sw2, error in ... }` returns the 0x9100 status and response payload. Apple's SDK does not expose MIFARE Classic Crypto1, so DESFire (AES authentication) is the authenticated-access path on iOS.",
-        "ISO 15693 access for industrial tags. `NFCISO15693Tag` from `NFCTagReaderSession` with polling option `.iso15693` supports ICODE SLIX, ST25DV and similar ISO 15693 chips used in pharmaceutical, library and industrial workflows. Commands include `readMultipleBlocks(requestFlags:blockRange:)`, `writeSingleBlock(requestFlags:blockNumber:dataBlock:)` and `customCommand(requestFlags:customCommandCode:customRequestParameters:)`. Range is generally better than 13.56 MHz ISO 14443 (up to 1m with appropriate readers, though still ~2-4cm on iPhone itself)."
+        "ISO 15693 access for industrial tags. `NFCISO15693Tag` from `NFCTagReaderSession` with polling option `.iso15693` supports {chip:nxp-icode-slix:short_name}, ST25DV and similar ISO 15693 chips used in pharmaceutical, library and industrial workflows. Commands include `readMultipleBlocks(requestFlags:blockRange:)`, `writeSingleBlock(requestFlags:blockNumber:dataBlock:)` and `customCommand(requestFlags:customCommandCode:customRequestParameters:)`. Range is generally better than 13.56 MHz ISO 14443 (up to 1m with appropriate readers, though still ~2-4cm on iPhone itself)."
       ]
     },
     {
       "title": "Swift code patterns for production iPhone NFC apps",
-      "intro": "Custom iPhone NFC apps share a small number of reusable code patterns. Session setup, NDEF read/write, APDU send for DESFire and ISO 7816, SUN URL verification for NTAG 424 DNA, and error handling. Teams building iOS NFC apps typically codify these patterns in a shared NFC service layer. This section captures the patterns most relevant to production consumer and enterprise NFC apps.",
+      "intro": "Custom iPhone NFC apps share a small number of reusable code patterns. Session setup, NDEF read/write, APDU send for DESFire and ISO 7816, SUN URL verification for {chip:nxp-ntag-424-dna:short_name}, and error handling. Teams building iOS NFC apps typically codify these patterns in a shared NFC service layer. This section captures the patterns most relevant to production consumer and enterprise NFC apps.",
       "bullets": [
         "Info.plist and entitlement configuration. Every Core NFC app needs `NFCReaderUsageDescription` in Info.plist with a user-facing string (e.g., 'This app reads NFC tags to verify product authenticity'), the `com.apple.developer.nfc.readersession.formats` entitlement listing the tag formats (values: `NDEF`, `TAG` for raw tag access), and for domain-bound NDEF URL records an `com.apple.developer.associated-domains` entry for Universal Links. The entitlement must be enabled in the Apple Developer portal under the app's App ID before Xcode will sign the app.",
         "NFCNDEFReaderSession for simple reads. The minimum viable NDEF reader is a class conforming to `NFCNDEFReaderSessionDelegate`, implementing `readerSession(_:didDetectNDEFs:)` to receive `[NFCNDEFMessage]`, and starting a session with `let session = NFCNDEFReaderSession(delegate: self, queue: nil, invalidateAfterFirstRead: true); session.alertMessage = \"Hold your iPhone near the tag\"; session.begin()`. For reads-and-writes a `NFCNDEFReaderSession` with `invalidateAfterFirstRead: false` plus `readerSession(_:didDetect:)` taking `[NFCNDEFTag]` gives access to `tag.writeNDEF(message)`.",
         "NDEF writing pattern: build a message from records, then connect and write: `let urlRecord = NFCNDEFPayload.wellKnownTypeURIPayload(url: URL(string: \"https://proudtek.com/tag/abc123\")!)!; let message = NFCNDEFMessage(records: [urlRecord]); session.connect(to: tag) { error in tag.writeNDEF(message) { error in session.alertMessage = error == nil ? \"Written\" : \"Write failed\"; session.invalidate() } }`. Handle `.tagConnectionLost`, `.ndefReaderSessionErrorTagNotWritable`, `.ndefReaderSessionErrorTagSizeTooSmall` in your error switch.",
-        "NFCTagReaderSession for ISO 7816 tag access. For DESFire, NTAG 424 DNA, or any ISO 14443-4 tag, use `NFCTagReaderSession(pollingOption: [.iso14443, .iso15693], delegate: self)` and in `tagReaderSession(_:didDetect:)` switch on `.iso7816(let tag)`, `.miFare(let tag)`, `.iso15693(let tag)`, `.feliCa(let tag)`. Always `session.connect(to: genericTag)` before sending commands. Connection failures should trigger a user-facing retry, not silent invalidation.",
-        "NTAG 424 DNA SUN URL verification. The tag URL contains CMAC and UID parameters (e.g., `?picc_data=XXXX&cmac=YYYY`). Verification flow: capture the URL from `NFCNDEFPayload.wellKnownTypeURIPayload`, extract `picc_data` and `cmac`, post to your backend which holds the AES-128 application key, decrypt picc_data to recover UID+counter+random, recompute CMAC, compare. Only the backend sees the key; the iPhone app is a thin transport. Reference: NXP AN12196 SUN message verification.",
+        "NFCTagReaderSession for ISO 7816 tag access. For DESFire, {chip:nxp-ntag-424-dna:short_name}, or any ISO 14443-4 tag, use `NFCTagReaderSession(pollingOption: [.iso14443, .iso15693], delegate: self)` and in `tagReaderSession(_:didDetect:)` switch on `.iso7816(let tag)`, `.miFare(let tag)`, `.iso15693(let tag)`, `.feliCa(let tag)`. Always `session.connect(to: genericTag)` before sending commands. Connection failures should trigger a user-facing retry, not silent invalidation.",
+        "{chip:nxp-ntag-424-dna:short_name} SUN URL verification. The tag URL contains CMAC and UID parameters (e.g., `?picc_data=XXXX&cmac=YYYY`). Verification flow: capture the URL from `NFCNDEFPayload.wellKnownTypeURIPayload`, extract `picc_data` and `cmac`, post to your backend which holds the AES-128 application key, decrypt picc_data to recover UID+counter+random, recompute CMAC, compare. Only the backend sees the key; the iPhone app is a thin transport. Reference: NXP AN12196 SUN message verification.",
         "Background NDEF URL deep-linking. To make iPhone background tag taps open your app instead of Safari, register a Universal Link for the tag URL's domain: Apple App Site Association JSON at `https://yourdomain.com/.well-known/apple-app-site-association`, your app's `com.apple.developer.associated-domains` includes `applinks:yourdomain.com`, and `SceneDelegate.scene(_:continue:)` handles the incoming `NSUserActivity` with `activity.webpageURL`. Users who don't have the app installed still get the Safari fallback. The URL is usable either way.",
         "Error handling patterns: Core NFC errors come as `NFCReaderError` with codes like `.readerSessionInvalidationErrorUserCanceled`, `.readerSessionInvalidationErrorSessionTimeout`, `.readerSessionInvalidationErrorFirstNDEFTagRead`, `.readerTransceiveErrorTagConnectionLost`. Production apps should distinguish between user-cancel (no error to the user) and actual failure (show retry). A common retry pattern: on `.tagConnectionLost` during write, attempt a single reconnect+rewrite before surfacing failure. Always set a meaningful `session.alertMessage` before `session.invalidate(errorMessage:)` so the system sheet explains what happened.",
         "Testing and debugging iOS NFC apps. Test with XS/11/13/15 generation iPhones to verify antenna location variations; use NXP TagInfo (free App Store) to verify what's actually on the tag after writes; use an ACR1252U USB reader with macOS CCID tools (`pcsc_scan`, `scriptor`) to triple-verify tag content; log APDU traffic to a local file during development (the session provides `.description` on APDU responses) and strip the logging for production. Simulator does not emulate NFC, so all testing is on-device."
@@ -128,7 +128,7 @@
         "NTAG 213 stickers — most cost-effective NFC chip for URL and simple-text programmes, with {chip:nxp-ntag-213:user_bytes} bytes of user memory. Ideal for Google Review cards, business cards, restaurant menus, smart posters, event wristbands and promotional campaigns. Fully iPhone-compatible including background NDEF URL detection on iPhone 7+.",
         "NTAG 215 stickers — {chip:nxp-ntag-215:user_bytes} bytes of user memory, roughly 4x NTAG 213 capacity. Good fit for vCards with full contact detail, multi-record tags (URL + text + Wi-Fi), or longer URL strings. Also used for Amiibo-compatible NFC programmes (though iPhone support for Amiibo depends on the specific game app).",
         "NTAG 216 stickers — {chip:nxp-ntag-216:user_bytes} bytes, the largest memory in the NTAG 21x family. Use for complex vCards, multi-language text records, or extended smart-poster content. iPhone programming works identically to NTAG 213/215.",
-        "NTAG 424 DNA tags. Advanced chip with per-scan SUN-message cryptographic authentication and dynamic URL features (each tap produces a unique signature). Used for luxury-authentication (handbags, wine, cosmetics), anti-counterfeit programmes and high-value-product digital-passport use cases. iPhone reads DNA tags natively with Core NFC; programming DNA features requires NXP TagWriter or a custom app with NFCTagReaderSession.",
+        "{chip:nxp-ntag-424-dna:short_name} tags. Advanced chip with per-scan SUN-message cryptographic authentication and dynamic URL features (each tap produces a unique signature). Used for luxury-authentication (handbags, wine, cosmetics), anti-counterfeit programmes and high-value-product digital-passport use cases. iPhone reads DNA tags natively with Core NFC; programming DNA features requires NXP TagWriter or a custom app with NFCTagReaderSession.",
         "NFC cards (CR80 PVC). Full-color printed PVC cards with NFC chips. Used for business cards, membership cards, access-control credentials, loyalty programmes. iPhone reads and writes identically to stickers. Commonly branded with customer logos and per-card URL serialization.",
         "NFC fobs and wristbands. Keychain fobs (plastic or silicone), silicone wristbands (events, cashless payments), leather straps (luxury accessories). Form-factor selection depends on the use case; iPhone compatibility is consistent across form factors because the underlying chip is the same. Proud Tek provides iOS-tested sample kits for use-case evaluation.",
         "Engagement model: Proud Tek's sample programme starts with free iPhone-tested sample kits for evaluation (100-500 tags). Pilot programmes scale to 1k-10k tags per SKU, with pre-encoding services available when the URL or NDEF content is known up-front. Production orders scale to 100k-1M+ tags per run for large consumer programmes, with full QA workflow including iPhone-specific read-verification on a sampled basis."
@@ -142,15 +142,15 @@
       "links": [
         {
           "href": "/products/rfid-labels/ntag213-nfc-sticker/",
-          "label": "NTAG 213 NFC stickers"
+          "label": "{chip:nxp-ntag-213:short_name} NFC stickers"
         },
         {
           "href": "/products/rfid-labels/ntag216-nfc-sticker/",
-          "label": "NTAG 216 NFC stickers"
+          "label": "{chip:nxp-ntag-216:short_name} NFC stickers"
         },
         {
           "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
-          "label": "NTAG 424 DNA tags"
+          "label": "{chip:nxp-ntag-424-dna:short_name} tags"
         }
       ]
     },
@@ -198,7 +198,7 @@
     },
     {
       "question": "Do I need a developer account or coding skills to program NFC tags with iPhone?",
-      "answer": "No. Free App Store apps (NFC Tools, NXP TagWriter, Simply NFC) let any iPhone user program NFC tags without writing code or having a developer account. These apps handle NDEF encoding, iPhone antenna interaction and tag verification. Coding is only required for custom workflows. Building your own branded NFC app with Core NFC, creating advanced authentication flows (NTAG 424 DNA SUN verification), or integrating NFC reads into a larger enterprise application. Most commercial NFC programmes start with App Store apps and only move to custom development when the use case requires it."
+      "answer": "No. Free App Store apps (NFC Tools, NXP TagWriter, Simply NFC) let any iPhone user program NFC tags without writing code or having a developer account. These apps handle NDEF encoding, iPhone antenna interaction and tag verification. Coding is only required for custom workflows. Building your own branded NFC app with Core NFC, creating advanced authentication flows ({chip:nxp-ntag-424-dna:short_name} SUN verification), or integrating NFC reads into a larger enterprise application. Most commercial NFC programmes start with App Store apps and only move to custom development when the use case requires it."
     },
     {
       "question": "What's the difference between Core NFC and iOS Shortcuts for NFC interaction?",
@@ -206,7 +206,7 @@
     },
     {
       "question": "Can iPhone write to MIFARE Classic tags?",
-      "answer": "No. Apple Core NFC does not provide access to the MIFARE Classic air-interface protocol (which uses NXP's proprietary Crypto1 authentication). iPhone cannot read or write MIFARE Classic 1K / 4K tags. For NFC programmes that need iPhone compatibility, use NTAG 21x (NFC Forum Type 2), MIFARE Ultralight or Ultralight C (NFC Forum Type 2), MIFARE DESFire EV1/EV2/EV3 (NFC Forum Type 4 via ISO 7816-4 APDUs, readable on iPhone XS+), or NTAG 424 DNA. These chips are universally supported across iOS and Android. Programmes with existing MIFARE Classic infrastructure typically need to migrate to DESFire or NTAG for cross-platform compatibility."
+      "answer": "No. Apple Core NFC does not provide access to the MIFARE Classic air-interface protocol (which uses NXP's proprietary Crypto1 authentication). iPhone cannot read or write {chip:nxp-mifare-classic-1k:short_name} / 4K tags. For NFC programmes that need iPhone compatibility, use NTAG 21x (NFC Forum Type 2), MIFARE Ultralight or Ultralight C (NFC Forum Type 2), MIFARE DESFire EV1/EV2/EV3 (NFC Forum Type 4 via ISO 7816-4 APDUs, readable on iPhone XS+), or {chip:nxp-ntag-424-dna:short_name}. These chips are universally supported across iOS and Android. Programmes with existing MIFARE Classic infrastructure typically need to migrate to DESFire or NTAG for cross-platform compatibility."
     },
     {
       "question": "How does iPhone background NDEF URL detection work?",
@@ -245,7 +245,7 @@
       "url": "https://developer.apple.com/documentation/corenfc/nfctagreadersession",
       "publisher": "Apple",
       "accessedAt": "2026-04-20",
-      "note": "API reference for the raw tag reader session (iOS 13+). Authority for the NFC entitlement-gated low-level APDU exchange used to drive DESFire / NTAG 424 DNA / MIFARE Classic commands from iPhone apps."
+      "note": "API reference for the raw tag reader session (iOS 13+). Authority for the NFC entitlement-gated low-level APDU exchange used to drive DESFire / {chip:nxp-ntag-424-dna:short_name} / MIFARE Classic commands from iPhone apps."
     },
     {
       "label": "Apple Developer — Core NFC Background Tag Reading (iOS 13)",
@@ -280,7 +280,7 @@
       "url": "https://nfc-forum.org/our-work/specification-releases/",
       "publisher": "NFC Forum",
       "accessedAt": "2026-04-20",
-      "note": "NFC Forum specifications that iPhone Core NFC framework ingests: NDEF, RTD (URI, Text, Smart Poster), Type 2 Tag (NTAG 21x), Type 4 Tag (NTAG 424 DNA / DESFire) and Type 5 Tag (ISO 15693)."
+      "note": "NFC Forum specifications that iPhone Core NFC framework ingests: NDEF, RTD (URI, Text, Smart Poster), Type 2 Tag (NTAG 21x), Type 4 Tag ({chip:nxp-ntag-424-dna:short_name} / DESFire) and Type 5 Tag (ISO 15693)."
     },
     {
       "label": "ISO/IEC 14443-3:2018 — Initialization and anticollision",
@@ -296,7 +296,7 @@
       "publisher": "ISO",
       "publishedAt": "2018-07-01",
       "accessedAt": "2026-04-20",
-      "note": "T=CL transport used by NFCISO7816Tag APDU exchanges from iPhone applications to DESFire / NTAG 424 DNA chips."
+      "note": "T=CL transport used by NFCISO7816Tag APDU exchanges from iPhone applications to DESFire / {chip:nxp-ntag-424-dna:short_name} chips."
     }
   ],
   "primaryAction": {
@@ -306,7 +306,7 @@
   "secondaryActions": [
     {
       "href": "/products/rfid-labels/ntag213-nfc-sticker/",
-      "label": "NTAG 213 NFC stickers"
+      "label": "{chip:nxp-ntag-213:short_name} NFC stickers"
     },
     {
       "href": "/guides/nfc-tag-programming-android-guide/",
