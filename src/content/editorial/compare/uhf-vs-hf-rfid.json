@@ -44,10 +44,10 @@
       "title": "Protocol families — EPC Gen2, ISO 14443, ISO 15693",
       "intro": "The band is only half the story. The protocol determines command set, data rate, memory structure, and what security primitives are available to the application.",
       "bullets": [
-        "UHF EPC Gen2 v2 (ISO 18000-63): 96-480 bit EPC memory, optional 32-byte user memory, optional 32-byte TID, 40-160 kbps downlink, 40-640 kbps uplink, anti-collision by Q-algorithm slotted ALOHA. This is the protocol behind every modern retail apparel tag, every warehouse pallet tag, every race-timing chip. Silicon: NXP UCODE 8/9, Impinj Monza R6/R6-P/M730/M750, Alien Higgs-9, EM Microelectronic.",
-        "HF ISO 14443 Type A/B (proximity): 106-848 kbps, polling distance 0-10 cm, cryptographic authentication (MIFARE, DESFire, JCOP, iCLASS). This is the protocol behind every contactless payment card, every MIFARE access card, every NTAG smartphone tap. Silicon: NXP MIFARE Classic/Plus/DESFire EV1/EV2/EV3, NXP NTAG 213/215/216/424 DNA, Infineon SECORA, STMicro ST25.",
-        "HF ISO 15693 (vicinity): 26.5-106 kbps, polling distance 10-100 cm, UID-based anti-collision, smaller memory (up to 2 kbit typically). This is the protocol behind ICODE SLIX library tags and vicinity industrial tags. Less common than ISO 14443 in consumer applications but widely deployed in libraries and certain industrial asset-tracking niches.",
-        "NFC Forum Types 1-5 sit on top of ISO 14443 and ISO 15693. NFC Type 2 (NTAG 213/215/216) is the smartphone-readable format that drives 99% of consumer-facing NFC applications: business cards, marketing stickers, product authentication, digital brand experience.",
+        "UHF EPC Gen2 v2 (ISO 18000-63): 96-480 bit EPC memory, optional 32-byte user memory, optional 32-byte TID, 40-160 kbps downlink, 40-640 kbps uplink, anti-collision by Q-algorithm slotted ALOHA. This is the protocol behind every modern retail apparel tag, every warehouse pallet tag, every race-timing chip. Silicon: {chip:nxp-ucode-8:name}/9, {chip:impinj-monza-r6:name}/R6-P/{chip:impinj-m730:short_name}/{chip:impinj-m750:short_name}, {chip:alien-higgs-9:name}, EM Microelectronic.",
+        "HF ISO 14443 Type A/B (proximity): 106-848 kbps, polling distance 0-10 cm, cryptographic authentication (MIFARE, DESFire, JCOP, iCLASS). This is the protocol behind every contactless payment card, every MIFARE access card, every NTAG smartphone tap. Silicon: NXP MIFARE Classic/Plus/DESFire EV1/EV2/EV3, {chip:nxp-ntag-213:name}/215/216/424 DNA, Infineon SECORA, STMicro ST25.",
+        "HF ISO 15693 (vicinity): 26.5-106 kbps, polling distance 10-100 cm, UID-based anti-collision, smaller memory (up to 2 kbit typically). This is the protocol behind {chip:nxp-icode-slix:short_name} library tags and vicinity industrial tags. Less common than ISO 14443 in consumer applications but widely deployed in libraries and certain industrial asset-tracking niches.",
+        "NFC Forum Types 1-5 sit on top of ISO 14443 and ISO 15693. NFC Type 2 ({chip:nxp-ntag-213:short_name}/215/216) is the smartphone-readable format that drives 99% of consumer-facing NFC applications: business cards, marketing stickers, product authentication, digital brand experience.",
         "UHF has no direct equivalent to NFC smartphone read. Apple's Background Tag Reading in iOS 14+ reads only NFC Type 1-5, not Gen2. A handful of Android phones have shipped with UHF readers (Unitech EA630, CipherLab RK25), but these are enterprise handhelds, not consumer phones.",
         "A common misconception is that 'UHF is newer and HF is old'. In fact ISO 14443 predates EPC Gen2 by several years, and both protocols have been through multiple revisions. They target different workflows by design, not by generation."
       ]
@@ -101,7 +101,7 @@
           ],
           [
             "Cryptography",
-            "AES (M730/M750), CRYPTO (UCODE DNA)",
+            "AES ({chip:impinj-m730:short_name}/{chip:impinj-m750:short_name}), CRYPTO (UCODE DNA)",
             "AES-128 (DESFire), 3DES (JCOP)",
             "Password (SLIX2), no mutual auth"
           ],
@@ -153,7 +153,7 @@
         "Asset tracking: tools, IT equipment, medical devices, returnable containers and vehicles tracked at long range across facilities with fixed portal readers, handheld readers for cycle counts, and zone readers for location inference. Hospital asset-tracking deployments published by AHA, ECRI and individual health-systems routinely report substantial avoided-loss figures on IV pumps, crash carts and telemetry devices against a UHF tag and reader budget that is an order of magnitude smaller; run the ROI against your own device inventory before quoting a number.",
         "Race timing: ground-mat UHF timing tags on runners and cyclists read by high-speed portal antennas at start-line, split points and finish line. MYLAPS, ChronoTrack, RFID Race Timing Systems, and Time Freedom all operate on Gen2 UHF with sub-100 ms timing resolution.",
         "Laundry management: UHF laundry tags (PPS, silicone, textile-embedded) read at tunnel-washer entry and exit portals. Handles 1,000-3,000 pieces per hour with 99.5%+ read accuracy when correctly tuned for water and load density.",
-        "Pharmaceuticals and blood banks. Item-level UHF tagging on vials, blood bags and syringes for chain-of-custody tracking. Often paired with temperature-logging UHF tags (Axzon Magnus-S3, RFMicron 3D) that include on-chip temperature sensors.",
+        "Pharmaceuticals and blood banks. Item-level UHF tagging on vials, blood bags and syringes for chain-of-custody tracking. Often paired with temperature-logging UHF tags ({chip:axzon-magnus-s3:name}, RFMicron 3D) that include on-chip temperature sensors.",
         "Parking and tolling: UHF windshield tags read at 10-15 meters from overhead antennas, enabling hands-free parking access and electronic toll collection. ISO 18000-63 dominates newer systems; legacy 915 MHz active tags persist in some markets."
       ]
     },
@@ -161,10 +161,10 @@
       "title": "HF / NFC application breakdown",
       "intro": "Where HF wins. In every one of these applications the deciding features are tap-to-intent user experience, smartphone compatibility, or cryptographic authentication.",
       "bullets": [
-        "Access control: MIFARE Classic, MIFARE Plus, MIFARE DESFire EV3, LEGIC advant and iCLASS SEOS cards and fobs for physical door access. Tap-to-enter interaction is culturally expected by every office worker; a hands-free meter-range read would be a confusing user experience for access, not an improvement.",
+        "Access control: MIFARE Classic, MIFARE Plus, {chip:nxp-mifare-desfire-ev3:short_name}, LEGIC advant and iCLASS SEOS cards and fobs for physical door access. Tap-to-enter interaction is culturally expected by every office worker; a hands-free meter-range read would be a confusing user experience for access, not an improvement.",
         "Contactless payments: Visa payWave, Mastercard Contactless, American Express Contactless, JCB Contactless and equivalent national schemes all run on ISO 14443 Type A/B at 13.56 MHz. Apple Pay, Google Pay and Samsung Pay present the same protocol from the phone's secure element via NFC.",
-        "Product authentication: NFC Type 2 tags (NTAG 424 DNA in particular) embedded in luxury goods, pharmaceuticals, spirits and spare parts for consumer tap-to-verify brand authenticity, serialized warranty registration, and digital product passports (EU DPP rolling out through 2027).",
-        "Libraries and archives: ICODE SLIX and SLIX2 vicinity tags on books, media and archived materials. Self-checkout stations, automated sorter belts, and handheld shelf-reading wands all run on 13.56 MHz HF. Long wavelength tolerance to wet binding glue is the reason UHF never replaced HF in the library vertical.",
+        "Product authentication: NFC Type 2 tags ({chip:nxp-ntag-424-dna:short_name} in particular) embedded in luxury goods, pharmaceuticals, spirits and spare parts for consumer tap-to-verify brand authenticity, serialized warranty registration, and digital product passports (EU DPP rolling out through 2027).",
+        "Libraries and archives: {chip:nxp-icode-slix:short_name} and SLIX2 vicinity tags on books, media and archived materials. Self-checkout stations, automated sorter belts, and handheld shelf-reading wands all run on 13.56 MHz HF. Long wavelength tolerance to wet binding glue is the reason UHF never replaced HF in the library vertical.",
         "NFC marketing: NFC tap-to-open URL stickers, smart posters, digital business cards, tap-to-pair Bluetooth speakers, loyalty cards. Every iPhone since the iPhone 7 and every NFC-enabled Android phone reads these natively without an app.",
         "Event wristbands with cashless payments. Silicone NFC wristbands for festival F&B charging, resort amenity charging, and corporate event access. Single tap replaces plastic cards and wallets; the wristband survives water and sunscreen for a four-day event.",
         "Electronic identification: ISO/IEC 14443-compliant ePassports, national ID cards, residence permits. Every biometric passport issued globally since 2007 contains a 13.56 MHz NFC chip with the cardholder's face, fingerprint and biographic data."
@@ -174,7 +174,7 @@
       "title": "Dual-frequency deployments — when both bands live on the same asset",
       "intro": "A surprising number of real deployments put both a UHF tag and an HF tag on the same physical item. This is not indecision. It is the correct design when the asset moves through both bulk-scan workflows and tap-scan workflows in its lifetime.",
       "bullets": [
-        "Retail apparel with consumer authentication. UHF Gen2 inlay in the hangtag for store inventory and supply-chain visibility, plus NFC NTAG 424 DNA sticker inside the garment for consumer tap-to-verify authenticity through the brand's app. LVMH, Kering and Richemont operate this model across several luxury lines.",
+        "Retail apparel with consumer authentication. UHF Gen2 inlay in the hangtag for store inventory and supply-chain visibility, plus NFC {chip:nxp-ntag-424-dna:short_name} sticker inside the garment for consumer tap-to-verify authenticity through the brand's app. LVMH, Kering and Richemont operate this model across several luxury lines.",
         "Hospital medication carts: UHF tag for cart-level location through the facility, plus HF tag on each medication tray for tap-to-dispense verification at the nursing station.",
         "Hotel staff uniforms: UHF laundry tag for tunnel-washer cycle counting and par-level inventory, plus HF access tag sewn into the garment for staff member identification at back-of-house doors (hybrid of textile RFID and access control).",
         "Returnable containers and pallets. UHF tag for warehouse portal reads and gate scans, plus HF tag for forklift operator tap-to-commit at put-away or pick station. Dual-frequency models keep the bulk-scan and intentional-scan workflows on the tools best suited to each.",
@@ -189,7 +189,7 @@
       "bullets": [
         "Step 1 — identify the dominant user workflow. If the workflow is 'walk past a reader with many items', it is UHF. If the workflow is 'one user taps one item at one reader', it is HF. If both exist, plan for dual-band.",
         "Step 2 — identify the deciding environment constraint. If the tag must work on direct contact with liquid or on wet textile, HF has the advantage. If the tag must work at meter range through partial occlusion, UHF has the advantage. If the tag must work on bare metal, both need specialized designs and the cost is comparable. Decide on other criteria.",
-        "Step 3 — identify the smartphone-read requirement. If consumers, auditors or field workers need to scan the tag with a bare phone, HF (NFC Type 2, NTAG 213/215/216 or NTAG 424 DNA) is the only option.",
+        "Step 3 — identify the smartphone-read requirement. If consumers, auditors or field workers need to scan the tag with a bare phone, HF (NFC Type 2, {chip:nxp-ntag-213:short_name}/215/216 or {chip:nxp-ntag-424-dna:short_name}) is the only option.",
         "Step 4 — identify the security requirement. If the tag carries a credential worth cloning (access control, payment, authenticated identity), HF ISO 14443 with DESFire EV3 or NTAG 424 DNA provides cryptographic authentication. UHF Gen2 has authenticated variants — NXP UCODE DNA (on-chip {chip:nxp-ucode-dna:crypto.algorithm} per {chip:nxp-ucode-dna:crypto.standard}) and Impinj M775 (PRESENT-80 per ISO/IEC 29167-11) — but they are less widely supported by reader infrastructure than DESFire on the HF side. Note: M730 / M750 / M770 and the rest of the M700 family do NOT carry on-chip crypto.",
         "Step 5 — sanity-check with a real pilot before committing capex. Run a forty-tag pilot in the real environment, on real fixtures, with a representative reader, at the real read distance, with the real item density. 95% of frequency-choice mistakes get caught in this pilot and not in the spec review.",
         "Step 6 — confirm regional regulation if the deployment is global. UHF deployments in Europe must use ETSI 865-868 MHz readers, in North America 902-928 MHz readers, and in the Middle East and APAC region-specific allocations. Tags (with modern broadband silicon) are global; readers are regional.",
@@ -226,11 +226,11 @@
       "links": [
         {
           "href": "/guides/ucode-9-uhf-chip-encyclopedia/",
-          "label": "NXP UCODE 9 UHF chip encyclopedia"
+          "label": "{chip:nxp-ucode-9:name} UHF chip encyclopedia"
         },
         {
           "href": "/guides/monza-r6-family-chip-encyclopedia/",
-          "label": "Impinj Monza R6 family encyclopedia"
+          "label": "{chip:impinj-monza-r6:name} family encyclopedia"
         },
         {
           "href": "/guides/ntag21x-family-memory-map-commands/",
@@ -238,7 +238,7 @@
         },
         {
           "href": "/guides/icode-slix-chip-encyclopedia/",
-          "label": "NXP ICODE SLIX encyclopedia (HF vicinity)"
+          "label": "{chip:nxp-icode-slix:name} encyclopedia (HF vicinity)"
         }
       ]
     },
@@ -270,7 +270,7 @@
       "links": [
         {
           "href": "/products/rfid-cards/mifare-classic-1k-card/",
-          "label": "MIFARE Classic 1K card"
+          "label": "{chip:nxp-mifare-classic-1k:short_name} card"
         },
         {
           "href": "/products/rfid-cards/mifare-plus-se-card/",
@@ -278,15 +278,15 @@
         },
         {
           "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 card"
+          "label": "{chip:nxp-mifare-desfire-ev3:short_name} card"
         },
         {
           "href": "/products/rfid-cards/ntag424-dna-tt-card/",
-          "label": "NTAG 424 DNA TT card"
+          "label": "{chip:nxp-ntag-424-dna:short_name} TT card"
         },
         {
           "href": "/products/rfid-cards/em4100-rfid-card/",
-          "label": "EM4100 125 kHz card (LF baseline)"
+          "label": "{chip:em-microelectronic-em4100:short_name} 125 kHz card (LF baseline)"
         }
       ]
     },
@@ -308,7 +308,7 @@
         },
         {
           "href": "/industries/brand-protection/",
-          "label": "Brand protection — HF tap-to-verify with NTAG 424 DNA"
+          "label": "Brand protection — HF tap-to-verify with {chip:nxp-ntag-424-dna:short_name}"
         },
         {
           "href": "/industries/luxury-brands/",
@@ -360,7 +360,7 @@
       "url": "https://www.iso.org/standard/73602.html",
       "publisher": "ISO/IEC",
       "accessedAt": "2026-04-20",
-      "note": "Defines the 13.56 MHz HF vicinity air interface (up to ~1 m) used by ICODE SLIX and library/industrial HF tags."
+      "note": "Defines the 13.56 MHz HF vicinity air interface (up to ~1 m) used by {chip:nxp-icode-slix:short_name} and library/industrial HF tags."
     },
     {
       "label": "ISO/IEC 18000-63:2021 — Parameters for air interface communications at 860 MHz to 960 MHz Type C",
