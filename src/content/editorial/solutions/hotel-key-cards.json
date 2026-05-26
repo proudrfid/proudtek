@@ -3,17 +3,17 @@
   "group": "solutions",
   "title": "Hotel Key Cards (2026): Lock-Compatible RFID Cards — Saflok, Vingcard, SALTO, Onity, MIWA, Häfele Dialock, Be-Tech | CVE-2024-29916 & Fudan FM11RF08 Procurement Guide",
   "kicker": "Hotel Solution",
-  "summary": "Procurement-grade hotel key card guide for properties on the seven major hotel-lock platforms. Maps the chip-family decision (MIFARE Classic 1K / Plus EV1-EV2 / DESFire EV3 / Ultralight C) to the lock generation in scope, walks the encoder + PMS workflow (Oracle OPERA Cloud roomKeysOutbound, Mews open API, Apaleo), explains why CVE-2024-29916 \"Unsaflok\" (March 2024) and the Quarkslab FM11RF08 Fudan-clone backdoor (August 2024) make MIFARE Classic 1K stock a 2026 procurement risk on properties without confirmed firmware remediation, and covers the card material decision (PVC / FSC bamboo / FSC wood / PLA bio-based / metal / paper) including sustainability certifications (FSC chain-of-custody, GRS, OK biobased, ASTM D6868). Cross-links to /compatibility/{vendor}/ for each lock estate.",
+  "summary": "Procurement-grade hotel key card guide for properties on the seven major hotel-lock platforms. Maps the chip-family decision ({chip:nxp-mifare-classic-1k:short_name} / Plus EV1-EV2 / DESFire EV3 / Ultralight C) to the lock generation in scope, walks the encoder + PMS workflow (Oracle OPERA Cloud roomKeysOutbound, Mews open API, Apaleo), explains why CVE-2024-29916 \"Unsaflok\" (March 2024) and the Quarkslab FM11RF08 Fudan-clone backdoor (August 2024) make {chip:nxp-mifare-classic-1k:short_name} stock a 2026 procurement risk on properties without confirmed firmware remediation, and covers the card material decision (PVC / FSC bamboo / FSC wood / PLA bio-based / metal / paper) including sustainability certifications (FSC chain-of-custody, GRS, OK biobased, ASTM D6868). Cross-links to /compatibility/{vendor}/ for each lock estate.",
   "keywords": [
     "Hotel key card supplier",
     "Saflok Vingcard SALTO Onity hotel cards",
-    "MIFARE Plus EV2 DESFire EV3 hotel locks",
+    "{chip:nxp-mifare-plus-ev2:short_name} DESFire EV3 hotel locks",
     "Hotel PMS Oracle OPERA Mews encoding",
     "CVE-2024-29916 Unsaflok procurement",
     "FSC bamboo wood hotel key cards"
   ],
   "heroPoints": [
-    "Identify the lock platform and reader-head firmware before specifying a chip. Properties still on MIFARE Classic 1K with affected Saflok / Onity HT / Fudan-cloned Classic stock should treat chip upgrade as a security action, not just a refresh.",
+    "Identify the lock platform and reader-head firmware before specifying a chip. Properties still on {chip:nxp-mifare-classic-1k:short_name} with affected Saflok / Onity HT / Fudan-cloned Classic stock should treat chip upgrade as a security action, not just a refresh.",
     "Match the chip family to the encoder hardware and the back-end. The Encoder 4010 (Vingcard), Gen II 75720 (Saflok), EC904B0 NCoder (SALTO) and Encoder 4000 (Onity) each have a different chip-support envelope.",
     "Specify the PMS integration path before sample design. Oracle OPERA Cloud's `roomKeysOutbound` action enum (GUESTKEY_GENERIC type — New / Duplicate / One-shot / Read / Delete) and Mews Open API are the most common; document the connector version before scaling.",
     "Decide material + sustainability cert stack together. FSC chain-of-custody (FSC-STD-40-004), GRS ≥50% recycled, OK biobased and ASTM D6868 / D6400 compostable are the four claims chain procurement actually audits."
@@ -41,7 +41,7 @@
       "label": "Decision sequence",
       "items": [
         "Lock vendor + generation + firmware (drives chip-family envelope).",
-        "Chip family: MIFARE Classic 1K / Plus SL1 / Plus SL3 / DESFire EV3 / Ultralight C / Ultralight AES.",
+        "Chip family: {chip:nxp-mifare-classic-1k:short_name} / Plus SL1 / Plus SL3 / DESFire EV3 / Ultralight C / Ultralight AES.",
         "Encoder hardware + back-end + PMS connector version.",
         "Card material: standard PVC, recycled PVC (GRS), FSC bamboo, FSC wood, PLA, metal, paper, dual-interface."
       ]
@@ -49,13 +49,13 @@
     {
       "label": "Lock-platform compatibility map — seven major estates",
       "items": [
-        "ASSA ABLOY Vingcard (Classic / Essence / Signature / Allure / Flex) — MIFARE Classic 1K + Plus EV1 4K + DESFire EV3 4K/8K + 2024 Ultralight AES; Vision / Visionline / Vostio back-ends; Apple Wallet + Google Wallet on Signature.",
-        "dormakaba Saflok (MT / Confidant / Quantum IV-RT / Messenger LENS / Quantum Plus / Quantum Pixel) — MIFARE Classic 1K legacy + DESFire EV2/EV3 on current generations; System 6000 → Ambiance migration; CVE-2024-29916 firmware remediation since November 2023.",
+        "ASSA ABLOY Vingcard (Classic / Essence / Signature / Allure / Flex) — {chip:nxp-mifare-classic-1k:short_name} + Plus EV1 4K + DESFire EV3 4K/8K + 2024 Ultralight AES; Vision / Visionline / Vostio back-ends; Apple Wallet + Google Wallet on Signature.",
+        "dormakaba Saflok (MT / Confidant / Quantum IV-RT / Messenger LENS / Quantum Plus / Quantum Pixel) — {chip:nxp-mifare-classic-1k:short_name} legacy + DESFire EV2/EV3 on current generations; System 6000 → Ambiance migration; CVE-2024-29916 firmware remediation since November 2023.",
         "SALTO Systems (XS4 Original / One / Mini / Locker / AElement Fusion / Neo BLE / XS4 GEO) — MIFARE family + iCLASS Seos + JustIN BLE; SALTO Space → SALTO KS cloud; Apple/Google Wallet via Vostio-like wallet bridge.",
-        "Onity / Honeywell Building Automation (HT-series + ADVANCE + integra + Trillium) — MIFARE Classic 1K + Plus SL1/SL3; DirectKey BLE; 2012 Brocious port-shield remediation status still relevant on legacy HT properties.",
+        "Onity / Honeywell Building Automation (HT-series + ADVANCE + integra + Trillium) — {chip:nxp-mifare-classic-1k:short_name} + Plus SL1/SL3; DirectKey BLE; 2012 Brocious port-shield remediation status still relevant on legacy HT properties.",
         "MIWA (ALV2 / ALV3 / V3HTM / AL5H hybrid / PiACK) — MIFARE family + FeliCa IDm (uniquely Japan / APAC); KEYMO BLE mobile key.",
         "Häfele Dialock (DT 100 → DT 750 + WT wall + FT furniture + EFL / LL locker terminals) — Tag-it HF-I + MIFARE Classic EV1 + DESFire EV2 on the same multi-chip reader; single-credential door + furniture + locker integration.",
-        "Be-Tech (BASE / SHADOW / VISUAL / GUARDIAN) — MIFARE Classic 1K with documented 11 free sectors reserved for All-in-One programmes; budget hotels APAC, MEA, Africa."
+        "Be-Tech (BASE / SHADOW / VISUAL / GUARDIAN) — {chip:nxp-mifare-classic-1k:short_name} with documented 11 free sectors reserved for All-in-One programmes; budget hotels APAC, MEA, Africa."
       ]
     },
     {
@@ -75,15 +75,15 @@
   "sections": [
     {
       "title": "Hotel key card procurement in 2026 — what changed since 2023",
-      "intro": "The 2024 disclosure of the Unsaflok master-key attack (CVE-2024-29916) and the August 2024 Quarkslab analysis of the Fudan FM11RF08 / FM11RF08S MIFARE Classic clone backdoor changed the procurement-narrative for hotel key cards. A 2026 buyer can no longer treat \"MIFARE Classic 1K, same as last time\" as a safe default — it now needs an explicit security-posture conversation alongside the standard compatibility check.",
+      "intro": "The 2024 disclosure of the Unsaflok master-key attack (CVE-2024-29916) and the August 2024 Quarkslab analysis of the Fudan FM11RF08 / FM11RF08S MIFARE Classic clone backdoor changed the procurement-narrative for hotel key cards. A 2026 buyer can no longer treat \"{chip:nxp-mifare-classic-1k:short_name}, same as last time\" as a safe default — it now needs an explicit security-posture conversation alongside the standard compatibility check.",
       "paragraphs": [
         "Three structural shifts are driving the change. First, the Unsaflok researchers (Lennert Wouters of KU Leuven COSIC and Ian Carroll) demonstrated that the Saflok proprietary key-derivation function for MIFARE Classic sectors used only the card UID as input, allowing an attacker who could read any legitimate guest card to forge a write-pair that opened every door at the property. Roughly three million doors at 13,000+ properties in 131 countries were affected; remediation requires a door-controller firmware update that dormakaba began shipping in November 2023. As of disclosure in March 2024 the researchers estimated 36% of locks were remediated.",
         "Second, Quarkslab's August 2024 disclosure of a hardware backdoor in the Fudan FM11RF08 and FM11RF08S MIFARE Classic clones widely used in the hospitality supply chain meant that even a fully-remediated Saflok property could still be exposed if the card stock itself was Fudan-cloned. The Fudan backdoor allows brute-force recovery of sector keys in roughly two minutes on consumer hardware.",
-        "Third, the Crypto-1 cipher used to authenticate every MIFARE Classic card across every hotel-lock vendor (not just Saflok) has been publicly broken for over a decade — independent of either the Unsaflok or Fudan disclosures. The procurement consequence is that any new hotel-key card programme in 2026 that wants AES-128-grade security in its physical card stack needs to specify either MIFARE Plus EV2 in SL3 mode, MIFARE DESFire EV3, or MIFARE Ultralight AES (Common Criteria EAL3+, announced 2024)."
+        "Third, the Crypto-1 cipher used to authenticate every MIFARE Classic card across every hotel-lock vendor (not just Saflok) has been publicly broken for over a decade — independent of either the Unsaflok or Fudan disclosures. The procurement consequence is that any new hotel-key card programme in 2026 that wants AES-128-grade security in its physical card stack needs to specify either {chip:nxp-mifare-plus-ev2:short_name} in SL3 mode, {chip:nxp-mifare-desfire-ev3:short_name}, or MIFARE Ultralight AES (Common Criteria EAL3+, announced 2024)."
       ],
       "callout": {
         "label": "2026 procurement checklist",
-        "text": "Before approving any MIFARE Classic 1K reorder in 2026: (1) confirm the lock vendor and any 2024 firmware remediation status; (2) verify the card supplier ships NXP-fab MIFARE Classic 1K rather than Fudan FM11RF08 clones (request the wafer-source attestation in writing); (3) document the migration path to MIFARE Plus or DESFire EV3 so the Classic order is a transitional step, not a permanent target.",
+        "text": "Before approving any {chip:nxp-mifare-classic-1k:short_name} reorder in 2026: (1) confirm the lock vendor and any 2024 firmware remediation status; (2) verify the card supplier ships NXP-fab {chip:nxp-mifare-classic-1k:short_name} rather than Fudan FM11RF08 clones (request the wafer-source attestation in writing); (3) document the migration path to MIFARE Plus or DESFire EV3 so the Classic order is a transitional step, not a permanent target.",
         "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/"
       }
     },
@@ -91,16 +91,16 @@
       "title": "Chip-family decision — Classic, Plus, DESFire, Ultralight C, Ultralight AES",
       "intro": "Five chip families ship on hotel key cards today. The decision matrix below maps each chip to its security tier, the lock generations that accept it, the encoder firmware required, and the price-per-card range. For non-trivial estates this is rarely a single-chip choice — most properties run a phased migration that issues two or three chip families in parallel for 12–24 months.",
       "bullets": [
-        "MIFARE Classic 1K (ISO/IEC 14443A, 13.56 MHz, Crypto-1 cipher) — the historical default across every major hotel-lock vendor. 1 KB memory, 16 sectors of 4 blocks. Crypto-1 is broken industry-wide. Lowest cost (~$0.30–0.60/card MOQ 500). Specify only as a transitional refresh on properties with a documented migration plan.",
+        "{chip:nxp-mifare-classic-1k:short_name} (ISO/IEC 14443A, 13.56 MHz, Crypto-1 cipher) — the historical default across every major hotel-lock vendor. 1 KB memory, 16 sectors of 4 blocks. Crypto-1 is broken industry-wide. Lowest cost (~$0.30–0.60/card MOQ 500). Specify only as a transitional refresh on properties with a documented migration plan.",
         "MIFARE Classic 4K — same Crypto-1 surface as 1K, 4 KB memory, 40 sectors. Used where the property's encoder writes additional data (loyalty, room-spend, amenity-zone access).",
         "MIFARE Plus EV1 / EV2 — accepted by Saflok (Quantum RT and later), Vingcard (current eStore SKU is Plus EV1 4K), SALTO (XS4 Original+ and later), Onity (integra and Trillium). SL1 mode is Classic-compatible (still Crypto-1 surface); SL3 mode brings AES-128 authenticated sessions. Practical migration step from Classic.",
         "MIFARE DESFire EV1 / EV2 / EV3 — the recommended target for new estates on Saflok Messenger LENS / Quantum Plus / Quantum Pixel, Vingcard Signature / Allure / Essence reader-type 3G or newer, SALTO XS4 One / Mini / AElement Fusion / Neo BLE, MIWA ALV3M / ALV3MA / V3HTM. EV3 ships in EV2/EV1 backwards-compatible default per the NXP datasheet. AES-128 authenticated sessions; Common Criteria EAL5+.",
-        "MIFARE Ultralight C — supported on most modern reader heads; standard choice for hotel paper guest-key cards (lowest cost, single-use disposable). 3DES authentication (weaker than DESFire).",
+        "{chip:nxp-mifare-ultralight-c:short_name} — supported on most modern reader heads; standard choice for hotel paper guest-key cards (lowest cost, single-use disposable). 3DES authentication (weaker than DESFire).",
         "MIFARE Ultralight AES — announced 2024. Common Criteria EAL3+ certified; 128-bit AES key length; secure messaging over RF. Vingcard documented compatibility 2024; first vendor to publicly support. Same paper-card form factor as Ultralight C, materially higher security."
       ],
       "image": {
         "src": "/blog-images/mifare-cards.jpg",
-        "alt": "MIFARE Classic 1K, MIFARE Plus EV2, MIFARE DESFire EV3 and MIFARE Ultralight AES hotel key card variants — chip-family decision matrix"
+        "alt": "{chip:nxp-mifare-classic-1k:short_name}, {chip:nxp-mifare-plus-ev2:short_name}, {chip:nxp-mifare-desfire-ev3:short_name} and MIFARE Ultralight AES hotel key card variants — chip-family decision matrix"
       }
     },
     {
@@ -121,7 +121,7 @@
       "intro": "The encoder at the front desk constrains which chips can actually be issued (not just which the lock accepts). The PMS connector version constrains whether issuance / extend / re-encode / cancel actions round-trip cleanly. Most card-sample failures trace back to one of these two pieces being out of sync, not to the chip itself.",
       "bullets": [
         "Vingcard — Encoder 4010 (current, USB + Ethernet) supersedes the model 681001025C1 on FCC record. Drives Visionline on-premise or Vostio Access Management cloud back-ends.",
-        "Saflok — RFID Encoder Gen II (model 75720) supersedes Gen I (74750). Supports MIFARE Ultralight C, Plus EV2, DESFire EV3. Pairs with Ambiance or Messenger LENS; System 6000 properties typically still issue MIFARE Classic.",
+        "Saflok — RFID Encoder Gen II (model 75720) supersedes Gen I (74750). Supports {chip:nxp-mifare-ultralight-c:short_name}, Plus EV2, DESFire EV3. Pairs with Ambiance or Messenger LENS; System 6000 properties typically still issue MIFARE Classic.",
         "SALTO — EC904B0 NCoder is current; EC90ENUS is the predecessor; legacy PPD covers Classic / Plus SL1 only.",
         "Onity — Encoder 4000 (current desktop, PC/SC, BLE mobile-key issuance) supersedes Encoder 2100 (integra-era) and 1100 (Classic-only). PP32 portable programmer commissions Trillium / HT24 / HT28 / ADVANCE.",
         "MIWA — Card Issuing System USB encoder (single SKU; no Gen I / Gen II distinction; supports MIFARE 1K + 4K + optional BLE).",
@@ -185,9 +185,9 @@
       "table": {
         "columns": ["Configuration", "MOQ floor", "Indicative cost/card", "Lead time (weeks)"],
         "rows": [
-          ["Standard PVC + MIFARE Classic 1K, plain stock", "500", "$0.30–0.60", "2–3"],
+          ["Standard PVC + {chip:nxp-mifare-classic-1k:short_name}, plain stock", "500", "$0.30–0.60", "2–3"],
           ["Standard PVC + MIFARE Plus EV1 4K, full-colour CMYK", "500", "$0.80–1.40", "2–3"],
-          ["Standard PVC + MIFARE DESFire EV3 4K, full-colour", "500", "$1.20–2.20", "3–4"],
+          ["Standard PVC + {chip:nxp-mifare-desfire-ev3:short_name} 4K, full-colour", "500", "$1.20–2.20", "3–4"],
           ["Recycled PVC (GRS ≥50%) + DESFire EV3, full-colour", "1,000", "$1.40–2.60", "3–4"],
           ["FSC bamboo + DESFire EV3, laser-etched logo", "1,000", "$1.80–3.20", "3–4"],
           ["FSC wood (birch / maple / walnut) + DESFire EV3", "1,000", "$2.20–3.80", "4–5"],
@@ -221,9 +221,9 @@
       "description": "Starting points for the per-vendor card-stock order. Chip choice should follow the security-tier analysis above, not the historical default.",
       "links": [
         {"href": "/products/rfid-cards/rfid-card-assa-abloy-compatible/", "label": "ASSA ABLOY-compatible hotel key cards"},
-        {"href": "/products/rfid-cards/mifare-desfire-ev3-card/", "label": "MIFARE DESFire EV3 card"},
+        {"href": "/products/rfid-cards/mifare-desfire-ev3-card/", "label": "{chip:nxp-mifare-desfire-ev3:short_name} card"},
         {"href": "/products/rfid-cards/mifare-plus-se-card/", "label": "MIFARE Plus card"},
-        {"href": "/products/rfid-cards/mifare-classic-1k-card/", "label": "MIFARE Classic 1K card"},
+        {"href": "/products/rfid-cards/mifare-classic-1k-card/", "label": "{chip:nxp-mifare-classic-1k:short_name} card"},
         {"href": "/products/rfid-cards/rfid-wooden-card/", "label": "Wooden RFID hotel cards (FSC)"},
         {"href": "/products/rfid-cards/rfid-bamboo-card/", "label": "Bamboo RFID hotel cards (FSC)"},
         {"href": "/products/rfid-cards/nfc-card-custom-printing/", "label": "Printed RFID / NFC cards"}
@@ -248,7 +248,7 @@
       "description": "Decision-tool pages for chip family, material and frequency choices.",
       "links": [
         {"href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/", "label": "MIFARE Classic vs Plus vs DESFire for hotel locks"},
-        {"href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "MIFARE Plus EV2 vs DESFire EV3"},
+        {"href": "/compare/mifare-plus-ev2-vs-desfire-ev3/", "label": "{chip:nxp-mifare-plus-ev2:short_name} vs DESFire EV3"},
         {"href": "/compare/pvc-vs-wood-vs-pla-hotel-key-cards/", "label": "PVC vs wood vs PLA hotel key cards"},
         {"href": "/compare/rfid-vs-magnetic-hotel-key-cards/", "label": "RFID vs magnetic hotel key cards"},
         {"href": "/guides/hotel-key-card-encoding/", "label": "Hotel key card encoding guide"},
@@ -272,8 +272,8 @@
       "answer": "Three indicators usually settle it: (1) the visible lock-face badge — Saflok Quantum, Vingcard Signature, SALTO XS4 One, Onity Trillium each have distinct branding; (2) the encoder at the front desk (Encoder 4010, Saflok 75720, SALTO NCoder, Onity Encoder 4000); (3) the back-end software console (Visionline / Vostio / Ambiance / SALTO Space / OnPortal). If all three are unclear, send a current guest card sample to the supplier for an inspection read before committing to a production chip. The per-vendor compatibility guides at /compatibility/ give the full taxonomy."
     },
     {
-      "question": "Should new hotel estates still order MIFARE Classic 1K stock in 2026?",
-      "answer": "Only as a documented transitional step, not as a long-term target. Three converging issues make Classic a 2026 procurement risk: (1) the Crypto-1 cipher is publicly broken industry-wide; (2) the August 2024 Quarkslab disclosure of a hardware backdoor in Fudan FM11RF08 / FM11RF08S MIFARE Classic clones means cloned card stock can be cracked in roughly two minutes; (3) the March 2024 Unsaflok disclosure (CVE-2024-29916) exposed properties on unpatched Saflok firmware. New estates should standardise on MIFARE DESFire EV3 (AES-128, EAL5+) or MIFARE Plus in SL3 mode (AES-128). For paper guest cards, MIFARE Ultralight AES (CC EAL3+, announced 2024) is the new low-cost AES option."
+      "question": "Should new hotel estates still order {chip:nxp-mifare-classic-1k:short_name} stock in 2026?",
+      "answer": "Only as a documented transitional step, not as a long-term target. Three converging issues make Classic a 2026 procurement risk: (1) the Crypto-1 cipher is publicly broken industry-wide; (2) the August 2024 Quarkslab disclosure of a hardware backdoor in Fudan FM11RF08 / FM11RF08S MIFARE Classic clones means cloned card stock can be cracked in roughly two minutes; (3) the March 2024 Unsaflok disclosure (CVE-2024-29916) exposed properties on unpatched Saflok firmware. New estates should standardise on {chip:nxp-mifare-desfire-ev3:short_name} (AES-128, EAL5+) or MIFARE Plus in SL3 mode (AES-128). For paper guest cards, MIFARE Ultralight AES (CC EAL3+, announced 2024) is the new low-cost AES option."
     },
     {
       "question": "Is the 2024 Saflok Unsaflok vulnerability still a concern for new card orders?",
@@ -281,7 +281,7 @@
     },
     {
       "question": "Can one card SKU cover multiple lock vendors in a mixed-vendor estate?",
-      "answer": "Partially. MIFARE Classic 1K reads on every hotel-lock vendor's current reader heads (subject to the security caveats above). MIFARE Plus in SL1 mode is Classic-compatible across major vendors. MIFARE DESFire EV3 reads on Saflok Messenger LENS / Quantum Plus / Pixel, Vingcard Signature / Allure / Essence reader-type 3G+, SALTO XS4 One / Mini / AElement Fusion / Neo BLE, Onity Trillium (where Onity confirms), MIWA ALV3 / V3HTM. EV3 does NOT read on Vingcard E100 / C100 reader variants. The pragmatic multi-vendor strategy: MIFARE Plus EV2 in SL3 mode for the broadest envelope, or a phased per-vendor rollout that targets DESFire EV3 where supported."
+      "answer": "Partially. {chip:nxp-mifare-classic-1k:short_name} reads on every hotel-lock vendor's current reader heads (subject to the security caveats above). MIFARE Plus in SL1 mode is Classic-compatible across major vendors. {chip:nxp-mifare-desfire-ev3:short_name} reads on Saflok Messenger LENS / Quantum Plus / Pixel, Vingcard Signature / Allure / Essence reader-type 3G+, SALTO XS4 One / Mini / AElement Fusion / Neo BLE, Onity Trillium (where Onity confirms), MIWA ALV3 / V3HTM. EV3 does NOT read on Vingcard E100 / C100 reader variants. The pragmatic multi-vendor strategy: {chip:nxp-mifare-plus-ev2:short_name} in SL3 mode for the broadest envelope, or a phased per-vendor rollout that targets DESFire EV3 where supported."
     },
     {
       "question": "Will FSC bamboo or FSC wood hotel cards read reliably with DESFire EV3 inlays?",
@@ -319,11 +319,11 @@
     {"label": "ISO/IEC 7810:2019 — Identification cards — Physical characteristics", "url": "https://www.iso.org/standard/70483.html", "publisher": "ISO", "publishedAt": "2019", "accessedAt": "2026-05-11", "note": "Defines ID-1 hotel-card form factor: 85.60 × 53.98 mm, 0.76 mm ± 0.08 mm thickness."},
     {"label": "ISO/IEC 14443 — Identification cards — Contactless integrated circuit cards (reference)", "url": "https://en.wikipedia.org/wiki/ISO/IEC_14443", "publisher": "Wikipedia (ISO reference)", "accessedAt": "2026-05-11", "note": "13.56 MHz Type A / Type B air interface used by MIFARE Classic, Plus, DESFire, Ultralight."},
     {"label": "ISO/IEC 7816-4 (Wikipedia reference)", "url": "https://en.wikipedia.org/wiki/ISO/IEC_7816", "publisher": "Wikipedia (ISO reference)", "accessedAt": "2026-05-11", "note": "APDU command-set layer used by DESFire over the contactless interface."},
-    {"label": "NXP MIFARE DESFire EV3 datasheet (MF3D(H)x3)", "url": "https://www.nxp.com/docs/en/data-sheet/MF3D_H_X3_SDS.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "DESFire EV3 air interface (ISO/IEC 14443-4); AES-128 authenticated sessions; Common Criteria EAL5+; 2K/4K/8K memory variants; EV2 / EV1 backwards-compatible default."},
-    {"label": "NXP MIFARE Classic EV1 1K datasheet (MF1S50YYX_V1)", "url": "https://www.nxp.com/docs/en/data-sheet/MF1S50YYX_V1.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "Authoritative reference for the legitimate NXP-fab Classic 1K sector / block layout — use to distinguish from Fudan FM11RF08 clones. (MF1S50YYX = 1K; MF1S70YYX = 4K — easy to confuse.)"},
+    {"label": "{chip:nxp-mifare-desfire-ev3:name} datasheet (MF3D(H)x3)", "url": "https://www.nxp.com/docs/en/data-sheet/MF3D_H_X3_SDS.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "DESFire EV3 air interface (ISO/IEC 14443-4); AES-128 authenticated sessions; Common Criteria EAL5+; 2K/4K/8K memory variants; EV2 / EV1 backwards-compatible default."},
+    {"label": "{chip:nxp-mifare-classic-1k:name} datasheet (MF1S50YYX_V1)", "url": "https://www.nxp.com/docs/en/data-sheet/MF1S50YYX_V1.pdf", "publisher": "NXP Semiconductors", "accessedAt": "2026-05-11", "note": "Authoritative reference for the legitimate NXP-fab Classic 1K sector / block layout — use to distinguish from Fudan FM11RF08 clones. (MF1S50YYX = 1K; MF1S70YYX = 4K — easy to confuse.)"},
     {"label": "MIFARE Ultralight AES — Vingcard compatibility announcement", "url": "https://www.traveldailynews.com/technology/vingcard-enhances-hotel-security-with-mifare-ultralight-aes-compatibility/", "publisher": "Travel Daily News", "publishedAt": "2024", "accessedAt": "2026-05-11", "note": "Common Criteria EAL3+, 128-bit AES, secure messaging over RF — newest credential in hospitality."},
     {"label": "dormakaba Saflok Quantum RFID — product page", "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/electronic-hotel-locks/quantum-rfid--ka_117755", "publisher": "dormakaba", "accessedAt": "2026-05-11", "note": "Authoritative product reference for Quantum RFID modular two-piece design and BLE + digital-wallet support."},
-    {"label": "dormakaba RFID Encoder Gen II — model 75720 product page", "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/peripherals/rfid-encoder-gen-ii--dk_77100", "publisher": "dormakaba", "accessedAt": "2026-05-11", "note": "Gen II encoder model 75720 supersedes Gen I 74750; supports MIFARE Ultralight C + Plus EV2 + DESFire EV3."},
+    {"label": "dormakaba RFID Encoder Gen II — model 75720 product page", "url": "https://www.dormakaba.com/us-en/offering/products/lodging-systems/peripherals/rfid-encoder-gen-ii--dk_77100", "publisher": "dormakaba", "accessedAt": "2026-05-11", "note": "Gen II encoder model 75720 supersedes Gen I 74750; supports {chip:nxp-mifare-ultralight-c:short_name} + Plus EV2 + DESFire EV3."},
     {"label": "ASSA ABLOY Vingcard rebranding (April 2024)", "url": "https://www.assaabloyglobalsolutions.com/en/about-us/customer-news/vingcard-rebranding", "publisher": "ASSA ABLOY Global Solutions", "publishedAt": "2024-04", "accessedAt": "2026-05-11", "note": "Formal consolidation of hospitality business under the single Vingcard master brand."},
     {"label": "Vingcard Apple Wallet support page", "url": "https://www.vingcard.com/en/solutions/mobile-access-and-wallet-solutions/apple-wallet", "publisher": "Vingcard", "accessedAt": "2026-05-11", "note": "iPhone and Apple Watch unlock; Find My remote disable; remote credential delivery from Vostio."},
     {"label": "SALTO XS4 One datasheet", "url": "https://www.tlg-solution.com/wp-content/uploads/2024/04/XS4-One-Datasheet.pdf", "publisher": "SALTO Systems", "publishedAt": "2024", "accessedAt": "2026-05-11", "note": "Chip support for MIFARE DESFire EV2, Classic, Plus, Ultralight C, HID iCLASS Seos."},
