@@ -3,13 +3,13 @@
   "group": "compare",
   "title": "125 kHz Vs 13.56 MHz RFID — LF Vs HF Frequency Comparison For Access Control",
   "kicker": "125 kHz vs 13.56 MHz",
-  "summary": "125 kHz (low frequency) and 13.56 MHz (high frequency) are the two RFID bands still fighting each other in the access-control cabinet. 125 kHz is the world of EM4100, T5577, HID ProxCard II and Indala. Cheap, simple, read-only or sector-writeable, and cloneable in under five seconds with a $25 handheld. 13.56 MHz is the world of MIFARE Classic, MIFARE Plus, MIFARE DESFire EV3, LEGIC advant, iCLASS SEOS and NFC. AES-128 mutual authentication, multi-application filesystems, and native compatibility with every smartphone shipped since 2015. Choosing between them is less a technology decision and more a question about the true cost of an unauthorized entry and the realistic cost of reader replacement. This page walks through the physics, the cloning attack economics, reader market pricing, migration patterns using dual-frequency cards, and the specific inflection points where the 13.56 MHz upgrade pays back fastest.",
+  "summary": "125 kHz (low frequency) and 13.56 MHz (high frequency) are the two RFID bands still fighting each other in the access-control cabinet. 125 kHz is the world of {chip:em-microelectronic-em4100:short_name}, {chip:atmel-t5577:name}, HID ProxCard II and Indala. Cheap, simple, read-only or sector-writeable, and cloneable in under five seconds with a $25 handheld. 13.56 MHz is the world of MIFARE Classic, MIFARE Plus, {chip:nxp-mifare-desfire-ev3:short_name}, LEGIC advant, iCLASS SEOS and NFC. AES-128 mutual authentication, multi-application filesystems, and native compatibility with every smartphone shipped since 2015. Choosing between them is less a technology decision and more a question about the true cost of an unauthorized entry and the realistic cost of reader replacement. This page walks through the physics, the cloning attack economics, reader market pricing, migration patterns using dual-frequency cards, and the specific inflection points where the 13.56 MHz upgrade pays back fastest.",
   "heroPoints": [
     "Security gap is absolute — 125 kHz cards broadcast a 40-bit ID in the clear and clone in under five seconds with a $20-$50 Proxmark3-class handheld; DESFire EV3 uses AES-128 mutual authentication with no known practical attack path after eighteen years of public scrutiny.",
-    "Card cost delta is small. EM4100 cards land at $0.08-$0.15 FOB, MIFARE Classic 1K at $0.12-$0.25, DESFire EV3 at $0.40-$0.80. Reader cost is typically the bigger budget line, and dual-frequency readers at $80-$250 allow phased migration without stranding installed 125 kHz credentials overnight.",
+    "Card cost delta is small. {chip:em-microelectronic-em4100:short_name} cards land at $0.08-$0.15 FOB, {chip:nxp-mifare-classic-1k:short_name} at $0.12-$0.25, DESFire EV3 at $0.40-$0.80. Reader cost is typically the bigger budget line, and dual-frequency readers at $80-$250 allow phased migration without stranding installed 125 kHz credentials overnight.",
     "Smartphone and mobile-wallet compatibility only exists on 13.56 MHz — NFC Type A/B/F in every iPhone and Android phone shipped in the last decade reads ISO 14443 but cannot read 125 kHz at all, so mobile credentials via Apple Wallet, Google Wallet, HID Mobile Access and LEGIC mobile require a 13.56 MHz reader footprint."
   ],
-  "imageAlt": "125 kHz EM4100 card compared with 13.56 MHz MIFARE DESFire card",
+  "imageAlt": "125 kHz {chip:em-microelectronic-em4100:short_name} card compared with 13.56 MHz MIFARE DESFire card",
   "heroImage": "/landing-images/dual-frequency-rfid-card.webp",
   "imageSourceRoutes": [
     "/products/rfid-cards/em4100-rfid-card/",
@@ -18,8 +18,8 @@
   "keywords": [
     "125 kHz vs 13.56 MHz RFID",
     "LF vs HF access control",
-    "EM4100 cloning",
-    "MIFARE DESFire EV3",
+    "{chip:em-microelectronic-em4100:short_name} cloning",
+    "{chip:nxp-mifare-desfire-ev3:short_name}",
     "dual frequency RFID card",
     "RFID upgrade migration"
   ],
@@ -34,9 +34,9 @@
       "intro": "Before the security conversation, it is worth understanding why these two frequencies exist at all and why they behave the way they do in the reader lane. The two bands were never chosen for security reasons. They were chosen for propagation and regulatory reasons, and their security profiles emerged as a consequence of the silicon that got built into each era.",
       "bullets": [
         "125 kHz sits in the LF (low frequency) band, 30 kHz to 300 kHz. It uses near-field magnetic coupling. The reader antenna pushes energy into the card's copper coil through induction, similar to a transformer. Wavelengths are roughly 2400 m, so the entire coupling happens in the magnetic near field and is effectively unaffected by body tissue, concrete walls or wooden doors. LF penetrates metal poorly but penetrates water and human flesh well enough to work through a jacket pocket or a gloved hand.",
-        "13.56 MHz sits in the HF (high frequency) band, 3 MHz to 30 MHz. It also uses near-field magnetic coupling but at a much higher carrier, which allows far greater data bandwidth (106-848 kbps for ISO 14443 vs roughly 2 kbps for EM4100). The shorter wavelength (~22 m) shrinks antenna dimensions, so a 13.56 MHz antenna can be etched directly into a card lamination rather than wound as a discrete coil.",
+        "13.56 MHz sits in the HF (high frequency) band, 3 MHz to 30 MHz. It also uses near-field magnetic coupling but at a much higher carrier, which allows far greater data bandwidth (106-848 kbps for ISO 14443 vs roughly 2 kbps for {chip:em-microelectronic-em4100:short_name}). The shorter wavelength (~22 m) shrinks antenna dimensions, so a 13.56 MHz antenna can be etched directly into a card lamination rather than wound as a discrete coil.",
         "Read range follows antenna geometry and field strength, not frequency per se. Typical production values are 5-15 cm for 125 kHz ISO-compliant cards and 3-10 cm for 13.56 MHz cards. Higher-power 13.56 MHz 'vicinity' readers conforming to ISO 15693 reach 50-100 cm — useful for library self-checkout and hands-free access — but the overwhelming majority of access-control deployments stay in the proximity range.",
-        "Bandwidth is the hidden gap. 125 kHz supports one-way broadcast of a 40-64 bit serial number and, on T5577 and similar chips, a handful of write cycles. 13.56 MHz ISO 14443 supports full bidirectional challenge-response transactions, multi-sector file systems, and cryptographic authentication in under 100 ms — the runway on which every modern secure credential is built.",
+        "Bandwidth is the hidden gap. 125 kHz supports one-way broadcast of a 40-64 bit serial number and, on {chip:atmel-t5577:name} and similar chips, a handful of write cycles. 13.56 MHz ISO 14443 supports full bidirectional challenge-response transactions, multi-sector file systems, and cryptographic authentication in under 100 ms — the runway on which every modern secure credential is built.",
         "Regional regulation is uniform for both bands. 125 kHz and 13.56 MHz are globally allocated as license-free ISM bands, so the same credentials work identically in North America, Europe, China, Japan, India and the Middle East. This is the reason 125 kHz remains so entrenched. A single SKU works everywhere the tenant operates, and a 1990s-era 125 kHz reader in Detroit still reads a card issued yesterday in Riyadh."
       ]
     },
@@ -44,11 +44,11 @@
       "title": "Security reality — cloning attack economics",
       "intro": "Security discussions about LF vs HF often devolve into abstractions about 'encryption strength'. The practical question is different. How cheap and how fast is a working clone? That is the number a building owner should weigh against the cost of credential and reader replacement.",
       "bullets": [
-        "EM4100 / EM4102 / EM4200 (125 kHz): no encryption, no authentication, UID broadcast in plain Manchester-encoded ASK. Clone time with a $25 Keysy-class handheld: under three seconds, including the time to press the button. The resulting T5577 copy works on every reader the original works on, forever.",
-        "HID ProxCard II and Indala (125 kHz with proprietary modulation): marginally more resistant than EM4100 because the bit encoding is non-standard, but a Proxmark3 RDV4 at about $350 breaks them in under thirty seconds and writes the captured data to a T5577 blank. HID Prox cloning has been routinely demonstrated at public security conferences (DEF CON, Black Hat, ShmooCon) since the early 2010s; treat it as a commodity attack, not a rare one.",
-        "MIFARE Classic 1K/4K (13.56 MHz, Crypto-1): the Crypto-1 stream cipher was reverse-engineered in 2008 by researchers at Radboud University and TU Berlin. A nested or darkside attack extracts all sixteen sector keys from a live card in under ten minutes using a Proxmark3 or ACR122U; cloned onto a Gen2 magic UID card, the copy is indistinguishable from the original. Roughly 70% of access-control cards sold before 2018 were MIFARE Classic.",
+        "{chip:em-microelectronic-em4100:short_name} / EM4102 / EM4200 (125 kHz): no encryption, no authentication, UID broadcast in plain Manchester-encoded ASK. Clone time with a $25 Keysy-class handheld: under three seconds, including the time to press the button. The resulting {chip:atmel-t5577:name} copy works on every reader the original works on, forever.",
+        "HID ProxCard II and Indala (125 kHz with proprietary modulation): marginally more resistant than {chip:em-microelectronic-em4100:short_name} because the bit encoding is non-standard, but a Proxmark3 RDV4 at about $350 breaks them in under thirty seconds and writes the captured data to a {chip:atmel-t5577:name} blank. HID Prox cloning has been routinely demonstrated at public security conferences (DEF CON, Black Hat, ShmooCon) since the early 2010s; treat it as a commodity attack, not a rare one.",
+        "{chip:nxp-mifare-classic-1k:short_name}/4K (13.56 MHz, Crypto-1): the Crypto-1 stream cipher was reverse-engineered in 2008 by researchers at Radboud University and TU Berlin. A nested or darkside attack extracts all sixteen sector keys from a live card in under ten minutes using a Proxmark3 or ACR122U; cloned onto a Gen2 magic UID card, the copy is indistinguishable from the original. Roughly 70% of access-control cards sold before 2018 were MIFARE Classic.",
         "MIFARE Plus (13.56 MHz, AES-128 in security level 3): the Plus family closes the Crypto-1 vulnerability by using AES-128 mutual authentication. No known practical attack exists against Plus SL3 after a decade of public research. Migration from Classic to Plus can often be done on the existing reader population with a firmware update.",
-        "MIFARE DESFire EV3 (13.56 MHz, AES-128, 3DES, ISO 7816-4 filesystem): the current gold standard for enterprise and government access. CC EAL 5+ certified silicon, secure messaging, and a full multi-application filesystem. No known practical attack. Card cost $0.40-$0.80 at volume.",
+        "{chip:nxp-mifare-desfire-ev3:short_name} (13.56 MHz, AES-128, 3DES, ISO 7816-4 filesystem): the current gold standard for enterprise and government access. CC EAL 5+ certified silicon, secure messaging, and a full multi-application filesystem. No known practical attack. Card cost $0.40-$0.80 at volume.",
         "LEGIC advant and iCLASS SEOS (13.56 MHz, proprietary AES-based): comparable security level to DESFire EV3 but tied to a closed ecosystem. Typically chosen when the access-control OEM mandates it rather than on pure technical merit.",
         "The takeaway for a building owner: the cloning gap between LF and HF is not a question of whether a clone is feasible, it is a question of how trivially available the tools are. LF cloning tools sell on Amazon for less than the price of a restaurant lunch. HF DESFire cloning tools, if they existed, would be nation-state research projects."
       ]
@@ -59,13 +59,13 @@
       "table": {
         "columns": [
           "Specification",
-          "125 kHz LF (EM4100/T5577/HID Prox)",
+          "125 kHz LF ({chip:em-microelectronic-em4100:short_name}/{chip:atmel-t5577:name}/HID Prox)",
           "13.56 MHz HF (MIFARE/DESFire/NTAG)"
         ],
         "rows": [
           [
             "Encryption",
-            "None (EM4100) or weak (proprietary)",
+            "None ({chip:em-microelectronic-em4100:short_name}) or weak (proprietary)",
             "AES-128 (DESFire EV3, Plus SL3)"
           ],
           [
@@ -90,7 +90,7 @@
           ],
           [
             "Memory options",
-            "40-264 bits (read-only) to 1 kB (T5577 writeable)",
+            "40-264 bits (read-only) to 1 kB ({chip:atmel-t5577:name} writeable)",
             "1 kB to 8 kB file system, multi-application"
           ],
           [
@@ -110,7 +110,7 @@
           ],
           [
             "Card cost FOB (10k qty)",
-            "$0.08-$0.15 (EM4100), $0.20-$0.35 (T5577)",
+            "$0.08-$0.15 ({chip:em-microelectronic-em4100:short_name}), $0.20-$0.35 ({chip:atmel-t5577:name})",
             "$0.12-$0.25 (Classic), $0.40-$0.80 (DESFire EV3)"
           ],
           [
@@ -137,16 +137,16 @@
       "bullets": [
         "Major 125 kHz reader lines still in production: HID ProxPoint Plus, Indala, AWID, Keri Systems Proximity. Price band $50-$150, wiring on Wiegand 26-bit or 32-bit output. Shipment volumes have declined every year since 2017 as customers migrate.",
         "Major 13.56 MHz reader lines: HID iCLASS SE and Signo, LEGIC advant, NXP SAM-based OEM integrations, Allegion aptiQ, Schlage ENGAGE. Output now commonly OSDP v2 over RS-485 (secure channel) rather than the clear-text Wiegand used on legacy LF readers.",
-        "Dual-frequency reader lines that read both LF and HF simultaneously: HID iCLASS SE R10/R40 multiClass, LEGIC connect.id, Farpointe Data Delta-Extend. These read EM4100, HID Prox, MIFARE Classic and DESFire in a single package at $120-$280, which is the single most useful product category during a phased migration.",
+        "Dual-frequency reader lines that read both LF and HF simultaneously: HID iCLASS SE R10/R40 multiClass, LEGIC connect.id, Farpointe Data Delta-Extend. These read {chip:em-microelectronic-em4100:short_name}, HID Prox, MIFARE Classic and DESFire in a single package at $120-$280, which is the single most useful product category during a phased migration.",
         "OSDP v2 vs Wiegand 26 is a separate but parallel security upgrade. Wiegand's unencrypted two-wire output can be sniffed and replayed with a $10 ESPKey device; OSDP Secure Channel uses AES-128 between reader and panel. A serious security upgrade combines the move from 125 kHz to 13.56 MHz with the move from Wiegand to OSDP SCP, and both tend to be done on the same reader swap.",
-        "Installed base skew matters for project planning: a meaningful share of the North American access-control installed base is still 125 kHz (EM4100 or HID Prox), with industry surveys and SIA commentary typically putting the legacy LF share in the majority as of recent years — verify with current SIA or integrator data before citing a specific percentage. Europe skews heavier toward 13.56 MHz (MIFARE in particular) because of earlier consumer banking NFC adoption. Middle East and APAC new builds go almost exclusively to DESFire EV3 or LEGIC advant."
+        "Installed base skew matters for project planning: a meaningful share of the North American access-control installed base is still 125 kHz ({chip:em-microelectronic-em4100:short_name} or HID Prox), with industry surveys and SIA commentary typically putting the legacy LF share in the majority as of recent years — verify with current SIA or integrator data before citing a specific percentage. Europe skews heavier toward 13.56 MHz (MIFARE in particular) because of earlier consumer banking NFC adoption. Middle East and APAC new builds go almost exclusively to DESFire EV3 or LEGIC advant."
       ]
     },
     {
       "title": "Migration pattern with dual-frequency cards",
       "intro": "The cleanest migration path is a one-card, phased-reader approach. It avoids the logistical disaster of reissuing ten thousand cards on a single weekend, and it lets the security team sequence reader replacement by risk.",
       "bullets": [
-        "Phase 1 — issue dual-frequency cards to the entire population. Each card contains both a 125 kHz chip (EM4100 or T5577, programmed with the legacy facility code and card number) and a 13.56 MHz chip (typically DESFire EV3, programmed with a new encrypted credential). During this phase the dual-frequency cards work with every existing 125 kHz reader. Card cost FOB is typically $0.55-$1.10 depending on volume and chip choice.",
+        "Phase 1 — issue dual-frequency cards to the entire population. Each card contains both a 125 kHz chip ({chip:em-microelectronic-em4100:short_name} or {chip:atmel-t5577:name}, programmed with the legacy facility code and card number) and a 13.56 MHz chip (typically DESFire EV3, programmed with a new encrypted credential). During this phase the dual-frequency cards work with every existing 125 kHz reader. Card cost FOB is typically $0.55-$1.10 depending on volume and chip choice.",
         "Phase 2 — replace readers on highest-risk doors first: server rooms, HR file rooms, executive floors, pharmacy, data-center cages. Use dual-frequency readers so tenants with legacy 125 kHz-only cards keep working while the new DESFire credentials activate on upgraded doors.",
         "Phase 3 — bulk replace remaining doors by floor or by zone. At this point the majority of doors are reading DESFire credentials, and the LF chip in the dual-frequency card is dormant on upgraded doors but still live on the remaining legacy doors.",
         "Phase 4 — after the last reader is swapped, all doors are reading the DESFire credential. The LF chip in the dual-frequency card becomes dead silicon. New card issuance can move to DESFire-only cards at $0.40-$0.80 FOB.",
@@ -185,11 +185,11 @@
       "links": [
         {
           "href": "/products/rfid-cards/em4100-rfid-card/",
-          "label": "EM4100 125 kHz cards"
+          "label": "{chip:em-microelectronic-em4100:short_name} 125 kHz cards"
         },
         {
           "href": "/products/rfid-cards/mifare-classic-1k-card/",
-          "label": "MIFARE Classic 1K cards"
+          "label": "{chip:nxp-mifare-classic-1k:short_name} cards"
         },
         {
           "href": "/products/rfid-cards/mifare-plus-se-card/",
@@ -197,11 +197,11 @@
         },
         {
           "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-          "label": "MIFARE DESFire EV3 cards"
+          "label": "{chip:nxp-mifare-desfire-ev3:short_name} cards"
         },
         {
           "href": "/products/rfid-cards/ntag424-dna-tt-card/",
-          "label": "NTAG 424 DNA TT card (NFC tap-to-verify, not access)"
+          "label": "{chip:nxp-ntag-424-dna:short_name} TT card (NFC tap-to-verify, not access)"
         },
         {
           "href": "/products/rfid-cards/dual-frequency-rfid-card/",
@@ -219,7 +219,7 @@
         },
         {
           "href": "/industries/education/",
-          "label": "Education — student IDs on MIFARE, EM4100 only for unsupervised doors"
+          "label": "Education — student IDs on MIFARE, {chip:em-microelectronic-em4100:short_name} only for unsupervised doors"
         },
         {
           "href": "/industries/healthcare/",
@@ -227,7 +227,7 @@
         },
         {
           "href": "/industries/brand-protection/",
-          "label": "Brand protection — HF NTAG 424 DNA tap-to-verify (not an access job)"
+          "label": "Brand protection — HF {chip:nxp-ntag-424-dna:short_name} tap-to-verify (not an access job)"
         }
       ]
     },
@@ -237,15 +237,15 @@
       "links": [
         {
           "href": "/guides/em4100-em4305-t5577-lf-chip-encyclopedia/",
-          "label": "EM4100 / EM4305 / T5577 LF chip encyclopedia"
+          "label": "{chip:em-microelectronic-em4100:short_name} / {chip:em-microelectronic-em4305:short_name} / {chip:atmel-t5577:name} LF chip encyclopedia"
         },
         {
           "href": "/guides/mifare-classic-1k-4k-chip-encyclopedia/",
-          "label": "MIFARE Classic 1K / 4K encyclopedia"
+          "label": "{chip:nxp-mifare-classic-1k:short_name} / 4K encyclopedia"
         },
         {
           "href": "/guides/mifare-desfire-ev3-commands-reference/",
-          "label": "MIFARE DESFire EV3 commands reference"
+          "label": "{chip:nxp-mifare-desfire-ev3:short_name} commands reference"
         }
       ]
     },
@@ -255,7 +255,7 @@
       "links": [
         {
           "href": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
-          "label": "MIFARE Plus EV2 vs DESFire EV3 compare"
+          "label": "{chip:nxp-mifare-plus-ev2:short_name} vs DESFire EV3 compare"
         },
         {
           "href": "/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/",
@@ -275,14 +275,14 @@
   "faq": [
     {
       "question": "Can we use dual-frequency cards during a 125 kHz to 13.56 MHz migration?",
-      "answer": "Yes, and it is the only sane way to migrate a deployment larger than about fifty doors. A dual-frequency card contains both a 125 kHz chip (EM4100 or T5577) and a 13.56 MHz chip (MIFARE Classic, MIFARE Plus, or DESFire EV3) in the same ISO 7810 CR80 card body. During the migration the card works on every legacy 125 kHz reader and on every new 13.56 MHz reader simultaneously. After the last reader swap, the LF chip becomes dormant. Proud Tek manufactures dual-frequency cards in volumes from 500 to 500,000 per order."
+      "answer": "Yes, and it is the only sane way to migrate a deployment larger than about fifty doors. A dual-frequency card contains both a 125 kHz chip ({chip:em-microelectronic-em4100:short_name} or {chip:atmel-t5577:name}) and a 13.56 MHz chip (MIFARE Classic, MIFARE Plus, or DESFire EV3) in the same ISO 7810 CR80 card body. During the migration the card works on every legacy 125 kHz reader and on every new 13.56 MHz reader simultaneously. After the last reader swap, the LF chip becomes dormant. Proud Tek manufactures dual-frequency cards in volumes from 500 to 500,000 per order."
     },
     {
       "question": "How easily can 125 kHz access cards be cloned?",
-      "answer": "Standard EM4100 125 kHz cards clone in under three seconds using handheld RFID copiers that cost $20-$50 on Amazon or Alibaba. The card broadcasts its 40-bit serial number as unencrypted Manchester-encoded ASK, so any device within range reads and duplicates it without the owner noticing. HID ProxCard II is marginally harder. A Proxmark3 RDV4 at $350 breaks it in about thirty seconds. This cloning attack is the single strongest argument for migrating any security-sensitive 125 kHz deployment to DESFire EV3 on 13.56 MHz."
+      "answer": "Standard {chip:em-microelectronic-em4100:short_name} 125 kHz cards clone in under three seconds using handheld RFID copiers that cost $20-$50 on Amazon or Alibaba. The card broadcasts its 40-bit serial number as unencrypted Manchester-encoded ASK, so any device within range reads and duplicates it without the owner noticing. HID ProxCard II is marginally harder. A Proxmark3 RDV4 at $350 breaks it in about thirty seconds. This cloning attack is the single strongest argument for migrating any security-sensitive 125 kHz deployment to DESFire EV3 on 13.56 MHz."
     },
     {
-      "question": "Is MIFARE Classic 1K secure enough for access control?",
+      "question": "Is {chip:nxp-mifare-classic-1k:short_name} secure enough for access control?",
       "answer": "For practical purposes, no. The Crypto-1 cipher MIFARE Classic uses has been publicly broken since 2008. A Proxmark3 plus free software extracts all sixteen sector keys in about ten minutes, and the cloned credential is indistinguishable from the original. MIFARE Classic is acceptable for very low-value applications (campus vending, library cards) but should never be used for physical access control to anywhere with valuable assets, regulated data, or staff safety concerns. For genuinely secure access control use MIFARE DESFire EV3 with {chip:nxp-mifare-desfire-ev3:crypto.algorithm} encryption or MIFARE Plus SL3."
     },
     {
@@ -304,14 +304,14 @@
   ],
   "sources": [
     {
-      "label": "EM Microelectronic EM4100/EM4102 — Read-Only 125 kHz Transponder",
+      "label": "{chip:em-microelectronic-em4100:name}/EM4102 — Read-Only 125 kHz Transponder",
       "url": "https://www.emmicroelectronic.com/product/read-only/em4100",
       "publisher": "EM Microelectronic",
       "accessedAt": "2026-04-20",
       "note": "Canonical silicon source for the 125 kHz LF read-only protocol that anchors this comparison."
     },
     {
-      "label": "EM Microelectronic EM4305 — Read/Write 125 kHz Transponder",
+      "label": "{chip:em-microelectronic-em4305:name} — Read/Write 125 kHz Transponder",
       "url": "https://www.emmicroelectronic.com/product/lf-read-write/em4305",
       "publisher": "EM Microelectronic",
       "accessedAt": "2026-04-20",
@@ -322,7 +322,7 @@
       "url": "https://www.microchip.com/en-us/product/ATA5577C",
       "publisher": "Microchip Technology",
       "accessedAt": "2026-04-20",
-      "note": "Datasheet for the T5577 (ATA5577C) writable LF chip cited in access-control migration discussions."
+      "note": "Datasheet for the {chip:atmel-t5577:name} (ATA5577C) writable LF chip cited in access-control migration discussions."
     },
     {
       "label": "ISO/IEC 14443 series — Identification cards — Contactless ICs — Proximity cards",
@@ -339,7 +339,7 @@
       "note": "Defines the 13.56 MHz HF vicinity air interface (up to ~1 m) referenced for ICODE-class HF tags."
     },
     {
-      "label": "NXP MIFARE DESFire EV3 Product Page",
+      "label": "{chip:nxp-mifare-desfire-ev3:name} Product Page",
       "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-desfire/mifare-desfire-ev3-secure-and-flexible-contactless-ic:MIFARE-DESFIRE-EV3",
       "publisher": "NXP Semiconductors",
       "accessedAt": "2026-04-20",
@@ -351,7 +351,7 @@
       "publisher": "Radboud University Nijmegen",
       "publishedAt": "2008-10-06",
       "accessedAt": "2026-04-20",
-      "note": "Academic cryptanalysis cited for the security motivation behind moving off MIFARE Classic (and further off LF EM4100)."
+      "note": "Academic cryptanalysis cited for the security motivation behind moving off MIFARE Classic (and further off LF {chip:em-microelectronic-em4100:short_name})."
     },
     {
       "label": "SIA OSDP — Open Supervised Device Protocol",
@@ -372,7 +372,7 @@
     },
     {
       "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
-      "label": "MIFARE DESFire EV3 cards"
+      "label": "{chip:nxp-mifare-desfire-ev3:short_name} cards"
     },
     {
       "href": "/solutions/rfid-access-control/",
