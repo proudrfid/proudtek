@@ -23,6 +23,33 @@ datasheet. See `memory/feedback-verify-chip-claims.md` and
 `memory/rfid-chip-facts-verified.md` for the verified-truth table that informed
 the May 2026 corrective work in [proudtek#7](https://github.com/proudrfid/proudtek/pull/7).
 
+## Chip-specs migration — dispatcher first
+
+When asked to migrate a vendor-prefixed chip name in
+`src/content/editorial/**/*.json` to a `{chip:slug:name}` placeholder
+(any "next chip-specs PR" / "continue chip migration" request), the
+first step is **always** the dispatcher:
+
+```bash
+npm run chip-specs:next             # top 10 unclaimed targets
+npm run chip-specs:next -- --heavy  # heavy files first
+npm run chip-specs:next -- --json   # machine-readable
+```
+
+The dispatcher scans current `origin/main` for remaining mentions and
+filters out anything touched by an open PR via `gh pr list`, so two
+concurrent agents don't pick the same file. Do not pick from
+`MIGRATION_PUNCH_LIST.md` directly — it's a static snapshot and is
+already stale on most singletons.
+
+Off-limits rules still apply (see `MIGRATION_PUNCH_LIST.md`):
+- Skip lines that already contain ANY `{chip:...}` placeholder (drift
+  lint blind spot — `memory/feedback-drift-lint-mixed-placeholder-line.md`).
+- Short-form names like `NTAG 213` or `Monza R6` are out of migration scope.
+- The two schema-blocked forms (`NXP NTAG 224 DNA`, `NXP MIFARE DESFire
+  EV2`) need schema entries first; the dispatcher filters them out
+  automatically.
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
