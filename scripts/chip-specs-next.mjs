@@ -45,8 +45,48 @@ const wantJson = args.includes('--json');
 const wantHeavy = args.includes('--heavy');
 const noFetch = args.includes('--no-fetch');
 const noPrs = args.includes('--no-prs');
+const force = args.includes('--force'); // bypass STOP sentinel; trip signals still printed
 const countArg = args.find((a) => a.startsWith('--count='));
 const count = countArg ? Math.max(1, parseInt(countArg.split('=')[1], 10) || 10) : 10;
+
+// Advisory trip threshold: when fewer than this many unclaimed files remain,
+// the 1-line-per-PR ROI is poor — agents should halt and ask the user whether
+// to batch the rest or declare the migration done. Tunable via env.
+const FEW_FILES_THRESHOLD = parseInt(process.env.CHIP_SPECS_STOP_AT_FILES || '60', 10);
+
+// ── 0. Hard kill switch ─────────────────────────────────────────────────────
+// Drop a `STOP_CHIP_MIGRATION` file at repo root to halt all dispatchers
+// instantly. Optional file content becomes the reason printed in output.
+const STOP_FILE = join(ROOT, 'STOP_CHIP_MIGRATION');
+let stopReason = null;
+try {
+  stopReason = readFileSync(STOP_FILE, 'utf8').trim() || 'STOP_CHIP_MIGRATION sentinel present';
+} catch {
+  // No sentinel file. Continue.
+}
+
+if (stopReason && !force) {
+  if (wantJson) {
+    console.log(JSON.stringify({
+      halted: true,
+      haltReason: stopReason,
+      claimedFileCount: 0,
+      unclaimedFileCount: 0,
+      totalUnclaimedMentions: 0,
+      targets: [],
+    }, null, 2));
+  } else {
+    console.log('');
+    console.log('🛑 chip-specs migration HALTED');
+    console.log('────────────────────────────────────────────────────────────');
+    console.log(`reason: ${stopReason}`);
+    console.log('');
+    console.log('Do NOT open another migration PR. Report back to the user.');
+    console.log('To resume: delete STOP_CHIP_MIGRATION at repo root (or pass --force).');
+    console.log('');
+  }
+  process.exit(0);
+}
 
 // ── 1. Refresh main (best-effort) ───────────────────────────────────────────
 if (!noFetch) {
@@ -154,6 +194,30 @@ unclaimedFiles.sort(([fa, a], [fb, b]) => {
   return a.length - b.length || fa.localeCompare(fb);
 });
 
+// ── 4b. Compute advisory stop signals ───────────────────────────────────────
+// These do NOT halt the dispatcher — they tell agents (and the human) that the
+// remaining work is in the low-ROI tail. CLAUDE.md instructs agents to stop
+// and report when any signal trips, not silently pick the next target.
+const totalUnclaimedMentions = unclaimedFiles.reduce((n, [, h]) => n + h.length, 0);
+const remainingSingletons = unclaimedFiles.filter(([, h]) => h.length === 1).length;
+const remainingHeavyFiles = unclaimedFiles.filter(([, h]) => h.length >= 5).length;
+const allSingletons = unclaimedFiles.length > 0 && remainingSingletons === unclaimedFiles.length;
+const fewFilesRemain = unclaimedFiles.length > 0 && unclaimedFiles.length <= FEW_FILES_THRESHOLD;
+
+const stopSignals = [];
+if (allSingletons) {
+  stopSignals.push({
+    code: 'ALL_SINGLETONS_REMAIN',
+    detail: `every remaining file has exactly 1 mention — long tail, low ROI per PR`,
+  });
+}
+if (fewFilesRemain && !allSingletons) {
+  stopSignals.push({
+    code: 'FEW_FILES_REMAIN',
+    detail: `${unclaimedFiles.length} unclaimed files <= threshold ${FEW_FILES_THRESHOLD}`,
+  });
+}
+
 const top = unclaimedFiles.slice(0, count).map(([file, hits]) => ({
   file,
   mentions: hits.length,
@@ -179,9 +243,14 @@ function suggestBranch(file, slug) {
 
 if (wantJson) {
   console.log(JSON.stringify({
+    halted: false,
+    haltReason: null,
+    stopSignals,
     claimedFileCount: claimedFiles.size,
     unclaimedFileCount: unclaimedFiles.length,
-    totalUnclaimedMentions: unclaimedFiles.reduce((n, [, h]) => n + h.length, 0),
+    totalUnclaimedMentions,
+    remainingHeavyFiles,
+    remainingSingletons,
     prFetchError,
     targets: top,
   }, null, 2));
@@ -199,8 +268,21 @@ if (prFetchError) {
   console.log(`  files with vendor-prefixed mentions: ${candidatesByFile.size}`);
   console.log(`  files claimed by open PRs:           ${claimedFiles.size}`);
   console.log(`  files unclaimed and available:       ${unclaimedFiles.length}`);
+  console.log(`    of which heavy (>=5 mentions):     ${remainingHeavyFiles}`);
+  console.log(`    of which singletons (1 mention):   ${remainingSingletons}`);
+  console.log(`  total unclaimed mentions:            ${totalUnclaimedMentions}`);
 }
 console.log('');
+
+if (stopSignals.length > 0) {
+  console.log('🟡 STOP SIGNALS TRIPPED — see CLAUDE.md "Chip-specs migration — when to STOP"');
+  for (const s of stopSignals) {
+    console.log(`   • ${s.code}: ${s.detail}`);
+  }
+  console.log('   → do NOT pick the next target on autopilot; halt and report to user');
+  console.log('     so they can choose: batch the rest, declare done, or continue.');
+  console.log('');
+}
 
 if (top.length === 0) {
   console.log('✓ no unclaimed targets — either migration is done, or every remaining');
