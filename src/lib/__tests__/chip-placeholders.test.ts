@@ -123,7 +123,7 @@ describe('resolveChipPlaceholdersDeep', () => {
     const out = resolveChipPlaceholdersDeep(input);
     expect(out.title).toBe('NXP UCODE 9xe datasheet');
     expect(out.brief[0].text).toContain('128-bit EPC');
-    expect(out.brief[1].items[0]).toBe('no longer manufactured');
+    expect(out.brief[1].items![0]).toBe('no longer manufactured');
   });
 
   it('leaves non-string leaves unchanged', () => {
