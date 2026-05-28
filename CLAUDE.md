@@ -50,6 +50,34 @@ Off-limits rules still apply (see `MIGRATION_PUNCH_LIST.md`):
   EV2`) need schema entries first; the dispatcher filters them out
   automatically.
 
+## Chip-specs migration — when to STOP
+
+The migration has produced 1000+ PRs at 1-line-per-PR granularity. Two
+stop mechanisms exist; both are checked by `npm run chip-specs:next`:
+
+**Hard stop (sentinel file).** If `STOP_CHIP_MIGRATION` exists at repo
+root, the dispatcher refuses to hand out targets. Drop that file to
+halt all parallel agents at once; delete it (or pass `--force`) to
+resume. The file's contents become the printed halt reason — use it
+to leave a note for future you ("declared done 2026-05-27", "pausing
+to batch the tail", etc.).
+
+**Soft stop (trip signals).** The dispatcher prints stop signals when
+the remaining work hits the low-ROI tail:
+
+- `ALL_SINGLETONS_REMAIN` — every remaining file has exactly 1 mention.
+  The long tail. At this point, 1-line-per-PR review cost > the value
+  of a centralized placeholder.
+- `FEW_FILES_REMAIN` — fewer than 60 unclaimed files (tunable via
+  `CHIP_SPECS_STOP_AT_FILES`). Even with multi-mention files, the
+  tail is short enough that a single batched PR beats N tiny ones.
+
+**When you see any stop signal in the dispatcher output, do NOT pick
+the top target.** Halt, summarize the remaining work to the user, and
+ask which path they want: batch the rest into ≥5-file PRs, declare the
+migration done (drop `STOP_CHIP_MIGRATION` with a reason), or continue
+the 1-line cadence anyway. The decision is the user's, not yours.
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
