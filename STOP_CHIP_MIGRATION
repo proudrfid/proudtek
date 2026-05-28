@@ -1,14 +1,25 @@
-2026-05-28 — chip-specs migration complete.
+2026-05-28 — chip-specs migration complete (corrected).
 
-Final tail (2 files / 3 substitutions) landed in PR #1284 on top of the
-2026-05-27 closeout cluster (#1283 + #1276–#1282). Dispatcher --force now
-reports unclaimedFileCount=0, totalUnclaimedMentions=0 across src/content/editorial.
+The mass-mergeable inventory is empty: `node scripts/chip-specs-next.mjs
+--no-prs` reports unclaimedFileCount=0, totalUnclaimedMentions=0 across
+src/content/editorial. Every remaining vendor-prefixed mention sits on a
+line that already carries a {chip:...} placeholder (the mixed-placeholder
+drift-lint blind spot, memory/feedback-drift-lint-mixed-placeholder-line.md)
+and is intentionally out of scope.
 
 History:
   2026-05-27 — first "declared done" at ~2 files / ~3 mentions remaining.
-  2026-05-28 — PR #1284 closed the remaining 2 lines:
-    - solutions/rfid-supply-chain-management.json L416 (NXP UCODE 9 + Impinj M730)
-    - products/rfid-tags/_pillar.json L54 (Impinj Monza R6 longest-match)
+  2026-05-28 — PR #1284 closed 2 lines (supply-chain L416, rfid-tags/_pillar L54).
+  2026-05-28 — corrective tail batch (this PR). The 2026-05-27 closeout was
+    premature: the #1276–#1282 partial passes each left a label-field mention
+    behind, and at closeout those files were still claimed by open PRs so the
+    dispatcher counted them as 0. Once the merge queue drained, 5 clean-line
+    label mentions resurfaced across 4 files and were swept here:
+      - products/rfid-wristbands/uhf-rfid-wristband.json L326 (Impinj Monza R6)
+      - products/rfid-wristbands/rfid-tyvek-wristband.json L428 (NXP MIFARE
+        Ultralight C) + L444 (Impinj Monza R6)
+      - solutions/rfid-inventory-tracking.json L293 (NXP UCODE 9)
+      - solutions/rfid-library-management.json L445 (NXP ICODE SLIX2)
 
 Sentinel kept in place to prevent future autopilot picks. To resume migration
 (e.g. when new vendor-prefixed chip names appear in newly-added editorial files),
