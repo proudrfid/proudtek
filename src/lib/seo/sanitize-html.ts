@@ -21,6 +21,10 @@ export function sanitizeHead($head: CheerioAPI): void {
     'meta[name="description"]',
     'meta[name="robots"]',
     'meta[name="msapplication-TileImage"]',
+    // Favicons: SeoHead.astro emits the canonical icon links for every page,
+    // so strip the WP snapshot's copies to avoid duplicate <link rel="icon">.
+    'link[rel="icon"]',
+    'link[rel="apple-touch-icon"]',
     'link[rel="canonical"]',
     'meta[property^="og:"]',
     'meta[name^="twitter:"]',
