@@ -24,7 +24,6 @@ import type { PageContext } from "./types";
 import {
   PRODUCT_BEST_FIT_OVERRIDES,
   PRODUCT_HEADING_OVERRIDES,
-  PRODUCT_LEAD_PARAGRAPH_OVERRIDES,
   PRODUCT_SOURCE_LINKS,
 } from "../seo-content";
 
@@ -39,7 +38,6 @@ import {
   escapeXml,
   absoluteUrl,
   findProductSpecValue,
-  parseDimension,
 } from "./utils";
 
 export function buildProductTitleQualifier(route: string, contentTitle: string): string {

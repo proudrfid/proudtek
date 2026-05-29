@@ -21,7 +21,7 @@ interface KadenceBundleManifest {
   bundleUrl: string | null;
   sourceUrls: string[];
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 import kadenceBundleManifestRaw from "../data/.codex-kadence-bundle.json";
 const KADENCE_BUNDLE_MANIFEST: KadenceBundleManifest =
   (kadenceBundleManifestRaw as KadenceBundleManifest | undefined) ?? { bundleUrl: null, sourceUrls: [] };
