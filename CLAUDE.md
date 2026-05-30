@@ -78,6 +78,26 @@ ask which path they want: batch the rest into ≥5-file PRs, declare the
 migration done (drop `STOP_CHIP_MIGRATION` with a reason), or continue
 the 1-line cadence anyway. The decision is the user's, not yours.
 
+## Blog-voice rewrite — dispatcher first
+
+When asked to enliven blog posts (any "continue the blog-voice rewrite" /
+"`/blog-voice next`" request), a parallel fleet may be running, so the first
+step is **always** the claim dispatcher — never hand-pick a slug:
+
+```bash
+npm run blog-voice:next             # top 10 available Tier A targets
+npm run blog-voice:next -- --tier-b # the medical (Tier B) pool, run as its own batch
+npm run blog-voice:report           # machine-readable JSON
+```
+
+It excludes any post already done (merged `enliven` commit), claimed by an open
+PR, committed on a remote `blog-voice/*` branch, or being edited in a local
+worktree (committed **or** uncommitted) — so two agents never collide. Claim
+your pick by creating its worktree+branch immediately. Stop mechanisms mirror
+chip-specs: a `STOP_BLOG_VOICE` sentinel (hard) plus `FEW_POSTS_REMAIN` /
+`ALL_DONE_OR_CLAIMED` trip signals (soft → halt and ask the user). Full recipe,
+tiering rule, and guardrails live in `.claude/skills/blog-voice/SKILL.md`.
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.

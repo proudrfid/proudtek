@@ -18,9 +18,15 @@
 // Exit code is always 0 — this is advisory. Tier B is the safe default when in
 // doubt; a human may override a borderline call, but never silently downgrade a
 // medical/safety post to Tier A.
+//
+// IMPORTABLE: `classify(nameOrPath)` is a pure function and is re-used by
+// scripts/blog-voice-next.mjs (the claim dispatcher). The CLI block at the
+// bottom only runs when this file is executed directly, so importing it has no
+// side effects (no argv parsing, no stdout).
 
 import { readdirSync } from "node:fs";
 import { basename } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const BLOG_DIR = "src/content/editorial/blog";
 
@@ -55,29 +61,32 @@ function listBlogSlugs() {
     .sort();
 }
 
-const args = process.argv.slice(2);
+// ── CLI (only when run directly, not when imported) ──────────────────────────
+if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
+  const args = process.argv.slice(2);
 
-if (args.length > 0) {
-  for (const a of args) {
-    const { tier, reason } = classify(a);
-    const slug = basename(a).replace(/\.json$/i, "");
-    console.log(`TIER_${tier}\t${slug}${reason ? `\t(${reason})` : ""}`);
+  if (args.length > 0) {
+    for (const a of args) {
+      const { tier, reason } = classify(a);
+      const slug = basename(a).replace(/\.json$/i, "");
+      console.log(`TIER_${tier}\t${slug}${reason ? `\t(${reason})` : ""}`);
+    }
+  } else {
+    let a = 0;
+    let b = 0;
+    let files;
+    try {
+      files = listBlogSlugs();
+    } catch {
+      console.error(`Could not read ${BLOG_DIR} — run from the repo root.`);
+      process.exit(0);
+    }
+    for (const f of files) {
+      const { tier, reason } = classify(f);
+      if (tier === "B") b += 1;
+      else a += 1;
+      console.log(`TIER_${tier}\t${f.replace(/\.json$/, "")}${reason ? `\t(${reason})` : ""}`);
+    }
+    console.log(`\n${files.length} posts: ${a} Tier A, ${b} Tier B`);
   }
-} else {
-  let a = 0;
-  let b = 0;
-  let files;
-  try {
-    files = listBlogSlugs();
-  } catch {
-    console.error(`Could not read ${BLOG_DIR} — run from the repo root.`);
-    process.exit(0);
-  }
-  for (const f of files) {
-    const { tier, reason } = classify(f);
-    if (tier === "B") b += 1;
-    else a += 1;
-    console.log(`TIER_${tier}\t${f.replace(/\.json$/, "")}${reason ? `\t(${reason})` : ""}`);
-  }
-  console.log(`\n${files.length} posts: ${a} Tier A, ${b} Tier B`);
 }

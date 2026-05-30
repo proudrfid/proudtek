@@ -124,12 +124,46 @@ Then **re-score** with `references/rubric.md` and meet the acceptance bar.
 | facts diff | = 0 | = 0 |
 | lint / check / snapshots | all green | all green |
 
-## Step 6 — Batch rollout (when doing many)
+## Step 6 — Batch rollout + claiming (when doing many)
 
-Pilot 1 → calibrate on a small batch (5–8 Tier A) → then fan out. Run Tier B as
-its own batch with heavier human review. Claim files by scanning `origin/main`
-and filtering open PRs (mirror `chip-specs:next`) so two agents never pick the
-same file. Ship **≥5 posts per PR or one-per-PR — never 125 in one PR**.
+A fleet of agents runs this skill in parallel, so the cardinal rule is **never
+let two agents pick the same post.** Don't hand-pick a slug — use the dispatcher
+(the blog-voice analogue of `chip-specs:next`):
+
+```bash
+npm run blog-voice:next               # top 10 available Tier A, lightest-first
+npm run blog-voice:next -- --heavy    # heaviest posts first
+npm run blog-voice:next -- --tier-b   # the Tier B (medical) pool — run as its own batch
+npm run blog-voice:report             # JSON, for tooling
+```
+
+It unions four claim signals, so a post drops out of the pool the moment any
+agent starts on it — **before a PR exists**, which is exactly where naive
+PR-only detection fails (it let two agents collide on `reader-not-detecting`):
+
+1. **done** — files in a merged `enliven` commit on `origin/main`.
+2. **open PRs** — `gh pr list` files.
+3. **remote `blog-voice/*` branches** — committed blog diffs (pushed, PR pending).
+4. **local worktrees** on `blog-voice/*` — committed *and uncommitted* edits
+   (an agent mid-rewrite). This is the case PR-only detection misses entirely.
+
+The "claim" you make is the worktree+branch you create right after picking — so
+create it immediately (`git worktree add /tmp/bv-<slug> -b blog-voice/<slug>
+origin/main`), and the next dispatcher run sees the post is taken. A small race
+window remains; run dispatchers ~minutes apart, not seconds.
+
+**Cadence:** Pilot 1 → calibrate on a small batch (5–8 Tier A) → then fan out.
+Run Tier B as its own batch with heavier human review. Ship **≥5 posts per PR
+or one-per-PR — never 125 in one PR**.
+
+**When to STOP.** Two mechanisms, both checked by the dispatcher:
+- **Hard stop:** drop a `STOP_BLOG_VOICE` file at repo root and every dispatcher
+  refuses to hand out a post (the file's contents become the printed reason).
+  Delete it — or pass `--force` — to resume.
+- **Soft stop (trip signals):** `FEW_POSTS_REMAIN` (≤15 available, tunable via
+  `BLOG_VOICE_STOP_AT_FILES`) or `ALL_DONE_OR_CLAIMED`. On any signal, do **not**
+  pick the top target — halt and ask the user whether to batch the tail, run the
+  Tier B batch, or declare the pass done.
 
 ## Per-post checklist
 
