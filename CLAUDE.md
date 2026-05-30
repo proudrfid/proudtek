@@ -78,6 +78,28 @@ ask which path they want: batch the rest into ≥5-file PRs, declare the
 migration done (drop `STOP_CHIP_MIGRATION` with a reason), or continue
 the 1-line cadence anyway. The decision is the user's, not yours.
 
+## blog-voice rollout — dispatcher first
+
+When asked for the "next" `/blog-voice` post (any "continue blog-voice" /
+"next blog post to enliven" request), the first step is **always** the
+dispatcher:
+
+```bash
+npm run blog-voice:next             # top 10 unclaimed Tier A, tail-first
+npm run blog-voice:next -- --json   # machine-readable
+```
+
+It cross-references every claim signal so two agents never pick the same post:
+already-enlivened (touched by a merged blog-voice commit), open-PR files (by
+path, so multi-file batch PRs count), in-flight `blog-voice/*` branches
+(token-matched to the slug), and local WIP. **Tier B (medical / patient-safety
+/ pharma) is excluded by default** — those need a human, not autopilot
+(`--include-tier-b` to surface). Claim via the printed `git worktree add -b`
+recipe (the race gate) and work in that `/tmp` worktree — never edit in the main
+worktree. If a stop signal trips (`NO_TIER_A_REMAIN`, `FEW_FILES_REMAIN`) or a
+`STOP_BLOG_VOICE` file exists at repo root, halt and report to the user. See
+`memory/feedback-blog-voice-next-claim-filtering.md`.
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.

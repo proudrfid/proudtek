@@ -127,9 +127,13 @@ Then **re-score** with `references/rubric.md` and meet the acceptance bar.
 ## Step 6 — Batch rollout (when doing many)
 
 Pilot 1 → calibrate on a small batch (5–8 Tier A) → then fan out. Run Tier B as
-its own batch with heavier human review. Claim files by scanning `origin/main`
-and filtering open PRs (mirror `chip-specs:next`) so two agents never pick the
-same file. Ship **≥5 posts per PR or one-per-PR — never 125 in one PR**.
+its own batch with heavier human review. **Claim the next post with `npm run
+blog-voice:next`** — it excludes already-enlivened posts, open-PR files (by
+path), in-flight `blog-voice/*` branches, and local WIP, defaults to Tier A,
+orders tail-first to dodge the alphabet herd, and prints the worktree recipe
+(its `git worktree add -b` is the race gate). Manual `origin/main` + `gh pr
+list` scanning is the fallback if the script is absent. Ship **≥5 posts per PR
+or one-per-PR — never 125 in one PR**.
 
 ## Per-post checklist
 
