@@ -3,7 +3,7 @@
   "group": "blog",
   "title": "How NFC Door Locks Work with RFID Cards",
   "kicker": "Access Control",
-  "summary": "A technical guide to NFC-based door-lock systems. Covering lock architectures, card-authentication protocols, credential encoding, lock-management software and security best practices for B2B access-control buyers deploying smart locks in hotels, offices and multi-tenant buildings.",
+  "summary": "A technical guide to NFC-based door-lock systems — and how to tell a genuinely secure lock from one running on hope. Covers lock architectures, card-authentication protocols, credential encoding, lock-management software and security best practices for B2B access-control buyers deploying smart locks in hotels, offices and multi-tenant buildings.",
   "heroPoints": [
     "NFC door locks authenticate RFID cards using cryptographic challenge-response protocols, preventing the replay and cloning attacks that compromise legacy magnetic-stripe and 125 kHz proximity systems.",
     "Offline NFC locks store authorization data on the card itself, eliminating the need for real-time network connectivity at every door. Critical for hotels and remote facilities.",
@@ -18,7 +18,7 @@
   "sections": [
     {
       "title": "How NFC door locks authenticate an RFID card",
-      "intro": "When a guest or employee presents an RFID card to an NFC door lock, a multi-step authentication and authorization process occurs within milliseconds. Understanding this process helps B2B buyers evaluate lock-system security claims.",
+      "intro": "Every hotel guest has run the same ritual: tap the card, wait for the little green light, push the door open. The whole thing feels like nothing happened. But in that one tap, the lock and the card either ran a real cryptographic conversation or they didn't — and that difference decides whether an off-the-shelf cloning gadget is enough to open the door. When a guest or employee presents an RFID card to an NFC door lock, a multi-step authentication and authorization process occurs within milliseconds. Understanding this process helps B2B buyers evaluate lock-system security claims.",
       "image": {
         "src": "/blog-images/nfc-door-lock.jpg",
         "alt": "NFC-enabled door lock reading an RFID access card"
@@ -27,7 +27,7 @@
         "The lock's NFC reader powers the card via the 13.56 MHz field and reads the card's UID (unique identifier). For basic systems, the UID alone may be checked against a whitelist. For secure systems using MIFARE DESFire or similar smart cards, the lock initiates a mutual-authentication handshake: both the lock and the card prove knowledge of a shared secret key using AES-128, without the key ever being transmitted over the air."
       ],
       "bullets": [
-        "UID-only authentication is insecure. UIDs can be cloned with inexpensive NFC tools. Never rely on UID alone for access control in production.",
+        "UID-only authentication is insecure. UIDs can be cloned with inexpensive NFC tools — a UID is a name tag, not a password, and checking it proves only that the card is willing to say who it is. Never rely on UID alone for access control in production.",
         "Mutual authentication (AES challenge-response) ensures both the lock and the card verify each other's identity before granting access.",
         "After authentication, the lock reads authorization data from the card (room number, validity period, access-level flags) and makes a grant/deny decision locally.",
         "The entire authentication and read process completes in 100–300 ms, perceived by the user as instantaneous."
@@ -99,7 +99,7 @@
     },
     {
       "title": "What are the security best practices for NFC lock deployments?",
-      "intro": "Deploying NFC locks securely requires attention to key management, card lifecycle, firmware maintenance and physical security of the lock hardware.",
+      "intro": "Deploying NFC locks securely requires attention to key management, card lifecycle, firmware maintenance and physical security of the lock hardware. The cryptography is usually the easy part; it's the master key on a sticky note in the back office that quietly undoes most deployments.",
       "bullets": [
         "Use [MIFARE DESFire EV2](/guides/mifare-desfire-ev3-commands-reference/) or EV3 for all new lock deployments. Avoid MIFARE Classic (Crypto-1 is compromised) and UID-only authentication.",
         "Implement diversified keys using AES CMAC key derivation. Never use the same static key across multiple locks.",
@@ -201,5 +201,6 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-05-09"
+  "reviewedAt": "2026-05-09",
+  "modifiedAt": "2026-05-30"
 }
