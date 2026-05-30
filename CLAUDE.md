@@ -92,6 +92,7 @@ Key routing rules:
 - QA/testing site behavior → invoke /qa or /qa-only
 - Code review/diff check → invoke /review
 - Visual polish → invoke /design-review
+- Blog rewrite for enjoyability/humor (Tier A/B voice) → invoke /blog-voice
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore
