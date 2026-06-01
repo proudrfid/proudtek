@@ -27,13 +27,14 @@
     "ISO 14443-A"
   ],
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-05-10",
+  "modifiedAt": "2026-06-01",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
   "sections": [
     {
       "title": "Family and part numbers",
+      "intro": "Most contactless chips are designed to live for years on a lanyard or in a wallet. Ultralight C was designed to be thrown away by Tuesday — it put genuine cryptographic authentication onto the kind of paper ticket you crumple into a pocket on the way out of a stadium. The family below is small, but worth getting straight: the part numbers look nearly identical and behave nothing alike.",
       "bullets": [
         "MIFARE Ultralight C: NXP part number {chip:nxp-mifare-ultralight-c:partNumber}. The 3DES-capable variant. {chip:nxp-mifare-ultralight-c:memory.totalEEPROM_bytes} bytes total memory, of which {chip:nxp-mifare-ultralight-c:user_bytes} bytes are user-writable (36 × 4-byte pages). Launched 2008, still in volume production as of 2026. SAK 0x00, ATQA 0x0044, 7-byte UID, manufacturer ID 0x04 (NXP) in UID byte 0.",
         "MIFARE Ultralight (original): MF0ICU1. 64 bytes total, 48 bytes user. No crypto, no counter, UID-only. Was the original paper-ticket chip for transit and events (Deutsche Bahn Handy-Ticket, London Oyster single-ride paper card generation 1, New York MTA disposable MetroCard paper overlay trial); mostly superseded by Ultralight EV1 or NTAG213 in new deployments since 2014.",
@@ -57,6 +58,7 @@
     },
     {
       "title": "3DES authentication protocol",
+      "intro": "It helps to be honest about what this cryptography is for. Nobody picks Ultralight C to keep a determined adversary out of a vault; the job is to make casual ticket-copying more trouble than it is worth. Measured against that bar — the person who photographs a friend's ticket and hopes — the handshake below is comfortably overbuilt, which is exactly where you want to be.",
       "bullets": [
         "3DES — Triple DES with three 56-bit keys (K1, K2, K3) for 112 bits effective security under the 3-key TDEA-EDE3 variant. NIST SP 800-67 Rev. 2 compliant. Per NIST SP 800-131A Rev. 2, 3DES is deprecated for new US-government systems as of 2024 but remains acceptable for legacy interoperability through 2030 (the NIST disallowed-after date is 2023-12-31 for key-wrapping, 2030-12-31 for legacy data). The 112-bit effective security assumes no practical meet-in-the-middle attack on the 3-key variant, which as of 2026 remains computationally infeasible outside nation-state resources.",
         "Mutual-authentication handshake — 2-message protocol. (1) Reader sends AUTHENTICATE (0x1A) with key-slot selector 0x00 (Ultralight C only has one key slot). (2) Tag generates 8-byte nonce RndB, encrypts it with the 3DES key in CBC mode (IV = all-zeros), returns enc(RndB) in the response. (3) Reader decrypts to recover RndB, generates its own 8-byte RndA, concatenates RndA + RndB' (where RndB' is RndB left-rotated by one byte), encrypts the 16-byte concatenation with 3DES-CBC, sends to tag. (4) Tag decrypts, verifies its RndB' matches the expected left-rotation of the nonce it originally sent, returns enc(RndA') as confirmation (RndA' being RndA left-rotated by one byte).",
@@ -89,6 +91,7 @@
     },
     {
       "title": "Commercial deployments and application fit",
+      "intro": "Read the deployment history and a theme emerges: plenty of famous programs ran on Ultralight C, then migrated off once they scaled up or wanted AES. That is not the insult it sounds like. The chip's whole job is the unglamorous middle — too important for a bare UID, not valuable enough to justify a full file system — and it has quietly held that ground ever since.",
       "bullets": [
         "Event tickets: concerts, sports matches, conferences. Paper or PVC tickets with Ultralight C print at ~€0.10-0.20 per unit at 1M volume; the 3DES gives enough cloning resistance to deter opportunistic counterfeiting (which is the 95th-percentile attack vector. Professional counterfeiters go after DESFire or custom silicon, not Ultralight C). Monotonic counter enables single-use validation. Volume deployers: Ticketmaster on select high-value events, large festival operators (Tomorrowland NFC wristbands, historically Ultralight C before migrating to NTAG424 DNA in 2022), national-league sports clubs in Bundesliga and La Liga.",
         "Transit single-ride tickets. Paper tickets for subway and bus single rides. Original Ultralight dominated this segment 2004-2015; Ultralight C has grown share where single-ride revenue warrants tamper-resistance (typically €2-5 per ticket). City-scale deployments exist in the Netherlands (OV-chipkaart disposable paper ticket), Japan (several prefecture-level regional operators), Germany (Berlin BVG Touristen-Ticket, Hamburg HVV single-ride paper), and selected Eastern European metro systems.",
