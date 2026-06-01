@@ -27,14 +27,14 @@
     "ISO 14443-A"
   ],
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-05-10",
+  "modifiedAt": "2026-06-01",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
   "sections": [
     {
       "title": "Family and part numbers",
-      "intro": "NXP ships MIFARE Classic under a small cluster of part numbers that look confusing at first but resolve into two capacity tiers (1K and 4K), two silicon generations (pre-EV1 and EV1), and a Mini variant that most modern programs have already migrated off. Getting the part number right at procurement time matters because counterfeit and clone silicon is widespread in the 13.56 MHz HF market. The bill-of-materials line that says 'MIFARE Classic 1K' can silently land as Fudan FM11RF08 or Huahong SHC1102 from an unauthorised distributor, and while the air-interface compatibility is often adequate, edge-case behaviour around UID writability, authentication timing and counterfeit detection can diverge in ways that audit teams and access-control integrators notice later.",
+      "intro": "Few chips have been pronounced dead as often, or as publicly — and fewer still have been so cheerfully unbothered by the obituaries. MIFARE Classic has a broken cipher and a well-signposted migration path, and it is nonetheless still riding in hotel key cards, office badges and student IDs the world over. This encyclopedia treats it as what it actually is: a legacy workhorse you will keep meeting in the field for years, and one whose every quirk rewards being understood before you specify it. NXP ships MIFARE Classic under a small cluster of part numbers that look confusing at first but resolve into two capacity tiers (1K and 4K), two silicon generations (pre-EV1 and EV1), and a Mini variant that most modern programs have already migrated off. Getting the part number right at procurement time matters because counterfeit and clone silicon is widespread in the 13.56 MHz HF market. The bill-of-materials line that says 'MIFARE Classic 1K' can silently land as Fudan FM11RF08 or Huahong SHC1102 from an unauthorised distributor, and while the air-interface compatibility is often adequate, edge-case behaviour around UID writability, authentication timing and counterfeit detection can diverge in ways that audit teams and access-control integrators notice later.",
       "bullets": [
         "MIFARE Classic 1K — NXP part number MF1S50 (or MF1ICS50 on older silicon). {chip:nxp-mifare-classic-1k:memory.totalEEPROM_bytes} bytes of user-accessible EEPROM organized as {chip:nxp-mifare-classic-1k:memory.sectors} sectors of {chip:nxp-mifare-classic-1k:memory.blocks_per_sector} blocks each. The volume chip for hotel key cards, building access, student ID, and low-end loyalty.",
         "MIFARE Classic 4K — MF1S70 / MF1ICS70. 4096 bytes organized as 32 small sectors (4 blocks each) plus 8 large sectors (16 blocks each). Used when a single card carries multiple independent applications (building access + canteen payment + printer quota).",
@@ -92,7 +92,7 @@
     },
     {
       "title": "Antenna, physical, and environmental",
-      "intro": "The chip itself is only half the story. The antenna tuning, substrate and environmental exposure determine whether the card works at the tap point every time or only sometimes. Classic's electrical parameters have been frozen long enough that the antenna libraries in every major inlay converter (Smartrac/Avery Dennison, Invengo, LAB ID, Identiv, Xindeco) ship with well-characterised designs for standard form factors. The failure modes in the field are almost never about chip behaviour; they are about substrate choice, environmental exposure, and operator mistakes at lamination or laser-engraving stages that detune the antenna.",
+      "intro": "The chip itself is only half the story. The antenna tuning, substrate and environmental exposure determine whether the card works at the tap point every time or only sometimes. Classic's electrical parameters have been frozen long enough that the antenna libraries in every major inlay converter (Smartrac/Avery Dennison, Invengo, LAB ID, Identiv, Xindeco) ship with well-characterised designs for standard form factors. The failure modes in the field are almost never about chip behaviour; they are about substrate choice, environmental exposure, and operator mistakes at lamination or laser-engraving stages that detune the antenna. When a card fails at the tap point, the chip is rarely the guilty party; the laminator, the foil-stamp artwork, and the RFQ that quietly skipped the environment question do most of the damage.",
       "bullets": [
         "Chip impedance at 13.56 MHz — approximately 17 pF effective capacitance + series ESR around 50 ohms at the chip pad. Standard ISO ID-1 PVC inlays use a 3.5-turn rectangular antenna tuned to resonate with this capacitance.",
         "Form factors: ID-1 card (85.6 × 54 × 0.76 mm), keyfob, wristband silicone/PPS, sticker (38 mm circular for HF is common). The chip is identical across form factors; the antenna is retuned for each substrate.",
