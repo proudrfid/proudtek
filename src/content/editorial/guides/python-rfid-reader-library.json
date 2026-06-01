@@ -5,7 +5,7 @@
   "kicker": "Python RFID Library Guide",
   "summary": "A Python developer's guide to the RFID reader library ecosystem. Nfcpy for NFC/HF reading and writing with PC/SC and USB readers, sllurp for LLRP-based UHF fixed-reader integration, pyscard for smart-card APDU communication, MFRC522 and PN532 libraries for Raspberry Pi and microcontroller-scale projects, libnfc Python bindings for low-level NFC control, and vendor-specific Python SDKs (python-mercuryapi, Impinj Octane bindings, Chainway Android Python bridges). This page covers the full Python RFID landscape with code patterns, reader hardware compatibility, tag-chip selection for prototyping and the Proud Tek sample kits sized for Python developers, researchers and makers.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-05-10",
+  "modifiedAt": "2026-06-01",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -31,7 +31,7 @@
   "sections": [
     {
       "title": "NFC and HF RFID with nfcpy — reading, writing and the PC/SC ecosystem",
-      "intro": "For NFC and 13.56 MHz HF RFID development, nfcpy is the most popular and best-supported Python library. It covers NFC Forum Type 1-5 tags, supports the most common USB NFC readers and exposes a clean, Pythonic API. This section surveys nfcpy and the PC/SC-compatible reader ecosystem it works with.",
+      "intro": "Every Python RFID project begins with the same quiet humbling: you buy a cheap USB reader, plug it in, write your first few lines of code, and then spend the rest of the afternoon convincing the operating system to let Python anywhere near the device. The reading was always the easy part. For NFC and 13.56 MHz HF RFID development, nfcpy is the most popular and best-supported Python library. It covers NFC Forum Type 1-5 tags, supports the most common USB NFC readers and exposes a clean, Pythonic API. This section surveys nfcpy and the PC/SC-compatible reader ecosystem it works with.",
       "bullets": [
         "nfcpy library overview: open-source Python library (https://github.com/nfcpy/nfcpy) supporting NFC communication with Type 1 (Topaz), Type 2 (NTAG, MIFARE Ultralight), Type 3 (FeliCa), Type 4 (MIFARE DESFire via ISO 7816-4 APDUs) and Type 5 (ISO 15693) tags. Provides tag discovery, NDEF read/write, card emulation and peer-to-peer NFC. Runs on Linux, macOS and Windows (with appropriate USB driver setup).",
         "Supported NFC readers: ACR122U (the most common USB NFC reader, ~US$25-35), Sony RC-S380/P and RC-S380/S, SCL3711 (ACS legacy), PN532 (via USB, UART or SPI breakout boards). ACR122U is the recommended starting point for nfcpy development because of its low cost, wide availability and broad library support. For FeliCa-heavy projects, RC-S380 gives better FeliCa performance.",
@@ -122,7 +122,7 @@
     },
     {
       "title": "Proud Tek Python-developer sample kits and production tag supply",
-      "intro": "Python developers building RFID projects need tags that work cleanly with their library of choice. Standard-compliant chips, well-documented memory layouts, and sample content suited to library testing. Proud Tek's developer sample kits and production tag supply are designed to fit into Python workflows from prototype through production.",
+      "intro": "Python developers building RFID projects need tags that work cleanly with their library of choice: standard-compliant chips, well-documented memory layouts, and sample content suited to library testing. Proud Tek's developer sample kits and production tag supply are designed to fit into Python workflows from prototype through production.",
       "bullets": [
         "Python-developer sample kits. Assorted NFC stickers (NTAG 213/215/216), MIFARE cards (Classic 1K, DESFire EV3), ISO 15693 tags (ICODE SLIX) and UHF RFID inlays (Impinj Monza or M700-series). Typical kit: 50-200 tags across chip families, shipped with a TID-to-EPC mapping CSV for UHF tags and chip-family documentation (memory maps, default keys, NDEF pre-encoding status).",
         "Pre-encoded sample tags. For customers whose Python projects will parse specific NDEF content patterns (URL redirects, vCards, custom MIME types, GS1 EPC schemes), Proud Tek can pre-encode sample tags at production time with the target content. Developers can then skip the encoding step during prototyping and focus on read-path library work.",
@@ -136,7 +136,7 @@
     },
     {
       "title": "Debugging and common gotchas — Python RFID project failure modes",
-      "intro": "Python RFID projects fail in recognizable ways, and most failures are hardware or configuration issues rather than library bugs. This section collects the most common debugging scenarios and their resolutions, based on the issues we see most often in customer pilot programmes.",
+      "intro": "Python RFID projects fail in recognizable ways, and the failure is almost never where you first look. You will suspect the library; it will turn out to be a USB permission, a detuned antenna, or a tag lying too flat against the coil. Most failures are hardware or configuration issues rather than library bugs. This section collects the most common debugging scenarios and their resolutions, based on the issues we see most often in customer pilot programmes.",
       "bullets": [
         "Reader not detected: on Linux, check `lsusb` for the reader's USB ID; if present but inaccessible, add a udev rule granting user access (e.g., `SUBSYSTEM==\"usb\",ATTRS{idVendor}==\"072f\",ATTRS{idProduct}==\"2200\",MODE=\"0666\"` for ACR122U) and `udevadm control --reload-rules`. On macOS, no permissions issue but the reader must not be claimed by another process (macOS's built-in CCID driver can intercept PC/SC readers. Kext override may be needed). On Windows, use Zadig to install WinUSB for nfcpy, or leave stock ACS drivers for pyscard.",
         "Intermittent read failures at close range. Counterintuitive but common: placing the tag directly on the reader coil can cause the antenna to detune and reads fail. Move the tag 3-10 mm above the coil surface. Metal surfaces near the coil also detune; use on-metal-rated tags (ferrite-backed) for metal-heavy deployments.",
