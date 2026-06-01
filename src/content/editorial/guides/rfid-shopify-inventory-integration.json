@@ -5,7 +5,7 @@
   "kicker": "Shopify RFID Integration",
   "summary": "An e-commerce and omnichannel merchant's guide to integrating RFID with Shopify for real-time inventory accuracy across the online store, Shopify POS locations, wholesale channels and external marketplaces. This page covers Shopify's multi-location inventory model, the Shopify Admin REST and GraphQL APIs (in particular the Inventory Levels mutations and inventoryAdjustQuantity mutations), Shopify POS integration with RFID readers for retail stores, the Shopify App Store ecosystem of RFID-inventory apps, webhook-driven event patterns, multi-channel inventory sync including Amazon / eBay / TikTok Shop / Walmart Marketplace via Shopify Markets and third-party channel connectors, and how Proud Tek delivers pre-encoded RFID tags sized for DTC brands, Shopify Plus retailers and fast-growing omnichannel businesses.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-05-10",
+  "modifiedAt": "2026-06-01",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -31,7 +31,7 @@
   "sections": [
     {
       "title": "Shopify's multi-location inventory model — the foundation of omnichannel RFID",
-      "intro": "To design an RFID programme that works with Shopify, start with understanding Shopify's inventory and channel architecture. Products, variants, SKUs, locations and inventory levels compose a specific data model that RFID integration needs to respect. This section maps the model against the operational reality of a growing DTC or omnichannel retailer.",
+      "intro": "The last unit of a hero SKU has a genius for selling everywhere at once — the online store, the marketplace channels and a walk-in at the flagship counter all claim it in the same breath — and the customers who lose that race get an apology email instead of a parcel. That gap between what is physically on the shelf and what every channel believes is on the shelf is the entire problem RFID exists to close. On Shopify, closing it starts with respecting how the platform actually models inventory: products, variants, SKUs, locations and inventory levels compose a specific data model an RFID programme has to speak fluently. This section maps that model against the operational reality of a growing DTC or omnichannel retailer.",
       "bullets": [
         "Products, variants and SKUs. A Shopify product can have up to 100 variants (size, colour, material combinations). Each variant has its own SKU, its own barcode (typically UPC/EAN/ISBN matching the GS1 GTIN) and its own inventory levels per location. RFID tag encoding must resolve to the variant SKU level, not just the product level, because inventory, pricing and fulfillment all happen per variant.",
         "Multi-location inventory: per Shopify's official location limits as of 2025-2026, Shopify Plus supports up to 200 locations (or up to 1,000 with Shopify POS Pro on the Shopify plan or higher); Basic / Shopify / Advanced plans support up to 10 locations; Starter is capped at 2. Deactivated locations and 3PL-app-managed inventory locations do not count against the cap. A 'location' represents a physical warehouse, a retail store with Shopify POS, a 3PL fulfillment partner or a drop-ship supplier. Inventory is tracked per-variant-per-location, and inventory levels (available quantity and committed quantity) propagate to every connected sales channel.",
@@ -56,7 +56,7 @@
     },
     {
       "title": "Shopify POS integration — RFID in the retail store",
-      "intro": "For omnichannel retailers with physical stores running Shopify POS, the RFID opportunity is as much about in-store operations (count accuracy, self-service fitting-room counts, endless-aisle fulfillment) as it is about backroom receiving. This section covers the Shopify POS side of RFID integration.",
+      "intro": "For omnichannel retailers with physical stores running Shopify POS, the RFID opportunity is as much about in-store operations (count accuracy, self-service fitting-room counts, endless-aisle fulfillment) as it is about backroom receiving. Every store has a backroom where inventory quietly turns into a rumour; RFID is what turns the rumour back into a count you can sell against. This section covers the Shopify POS side of RFID integration.",
       "bullets": [
         "Shopify POS app and extensions. Shopify POS runs as an iOS / Android app on store terminals. POS UI extensions (built with Shopify's POS UI Kit) can integrate RFID reader output directly into the checkout and inventory workflows, letting store associates perform RFID-driven transactions inside the POS app.",
         "Handheld RFID readers for retail. Common retail readers include Zebra MC3330xR, Chainway C72, TSL 1166 Bluetooth UHF reader and Nordic ID Stix. These connect to the POS iPad/Android device via Bluetooth and are paired with a companion app (built by the merchant or provided by a Shopify App Store vendor) that translates RFID reads into Shopify Admin API calls.",
@@ -143,7 +143,7 @@
     },
     {
       "title": "Common Shopify RFID integration pitfalls and field-tested fixes",
-      "intro": "Shopify-specific RFID integrations fail in recognizable ways. Usually at the boundaries between Shopify's data model, the middleware's tag-to-variant resolver and the merchant's operational reality. This section covers the failure modes that show up in the first 2-4 weeks of production and how to resolve them.",
+      "intro": "Shopify-specific RFID integrations fail in recognizable ways — almost always at the boundaries between Shopify's data model, the middleware's tag-to-variant resolver and the merchant's operational reality. None of these failure modes are exotic; they are the same handful of boundary mismatches every integration rediscovers, usually the hard way. The ones below tend to surface in the first 2-4 weeks of production. Get them right early and the integration settles into the most underrated state in retail operations — boring — which is exactly what inventory infrastructure is supposed to be.",
       "bullets": [
         "Barcode field collisions: Shopify's `barcode` field is technically free-text, and merchants sometimes populate it with SKU, vendor code, or mixed formats. If RFID middleware queries `productVariants(query: \"barcode:...\")` and multiple variants share the same barcode, the first match wins silently. Enforce barcode uniqueness with a pre-flight audit query before go-live: GraphQL `products(first: 250)` paged with a local dedupe check, surface collisions to the merchandising team for cleanup.",
         "Location ID stability: Shopify location IDs are stable but are sometimes renumbered during store moves or account consolidations. Middleware that hardcodes location IDs breaks when a store is re-created. Query locations dynamically at middleware startup: `query { locations(first: 50, includeInactive: false) { edges { node { id name } } } }` and resolve by name-to-ID mapping each time.",
