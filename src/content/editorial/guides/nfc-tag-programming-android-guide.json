@@ -5,7 +5,7 @@
   "kicker": "NFC Programming Android",
   "summary": "A comprehensive guide to NFC tag programming on Android. Covering App Store apps for code-free tag writing, the android.nfc framework for developers, tag dispatch and intent filter patterns, NDEF message construction, foreground dispatch for dedicated scanner apps, Host-based Card Emulation (HCE), MIFARE Classic and DESFire programming, Tasker automation and the Android-versus-iPhone capability delta. This page serves both non-technical users who need to program NFC stickers and cards with their Android phone and Android developers integrating NFC into custom apps.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-05-10",
+  "modifiedAt": "2026-06-01",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -31,7 +31,7 @@
   "sections": [
     {
       "title": "Android NFC hardware landscape and compatibility considerations",
-      "intro": "Unlike iPhone where NFC hardware and API capability advance lockstep across generations, Android devices vary significantly by manufacturer, model year and OS version. Understanding the landscape is the first step for any NFC programme targeting Android users at scale.",
+      "intro": "Programming an NFC tag on Android is gloriously easy. Supporting NFC across every Android phone your customers actually own is the part that builds character. The platform rewards you with an unusually open NFC stack and then hands you a thousand slightly different phones to run it on — different antenna spots, different skins, different ideas about which settings menu NFC lives in. Unlike iPhone where NFC hardware and API capability advance lockstep across generations, Android devices vary significantly by manufacturer, model year and OS version. Understanding the landscape is the first step for any NFC programme targeting Android users at scale.",
       "bullets": [
         "NFC hardware prevalence: essentially all flagship Android phones from 2015 onward include NFC hardware (Samsung Galaxy S and Note series, Google Pixel all generations, OnePlus flagship and Nord series, Xiaomi flagship, Sony Xperia, Huawei Mate/P series pre-sanction, Motorola Edge). Budget Android phones are inconsistent. Some include NFC, some don't; customers in emerging markets frequently have NFC-less budget devices.",
         "Android OS version distribution. Android 4.0+ (Ice Cream Sandwich, 2011) introduced android.nfc; Android 5.0 (Lollipop, 2014) added Host-based Card Emulation (HCE); Android 10+ (2019) added Default Wallet app preferences; Android 13+ added refined NFC-reader mode APIs. Modern consumer programmes can safely target Android 9 (Pie) or Android 10 as baseline, covering 95%+ of active devices.",
@@ -70,7 +70,7 @@
     },
     {
       "title": "android.nfc developer framework — NfcAdapter, Tag, NdefMessage, intent filters and tag dispatch",
-      "intro": "For Android developers building custom NFC-integrated apps, the android.nfc package provides full access to the NFC subsystem. This section surveys the core classes, the tag dispatch system and the common implementation patterns.",
+      "intro": "For Android developers building custom NFC-integrated apps, the android.nfc package provides full access to the NFC subsystem — which is to say it gives you enough rope to build something excellent or to spend an afternoon wondering why your activity launches twice. This section surveys the core classes, the tag dispatch system and the common implementation patterns that keep you on the excellent side of that line.",
       "bullets": [
         "NfcAdapter: the entry point for NFC operations in an Android app. Access via `NfcAdapter.getDefaultAdapter(context)`. Returns null on devices without NFC hardware; check `isEnabled()` to verify NFC is currently turned on. Used to enable foreground dispatch, reader mode, and for NDEF push (deprecated; Android Beam removed in Android 10).",
         "Tag and TagTechnology classes. When an NFC tag is discovered, Android creates a Tag object containing the chip's UID and supported technologies. TagTechnology subclasses represent the different protocols: Ndef (generic NDEF read/write), MifareClassic (MIFARE Classic sector access), MifareUltralight (Ultralight reads, NTAG family), NfcA / NfcB (low-level ISO 14443 Type A/B), NfcF (FeliCa), NfcV (ISO 15693), IsoDep (ISO 14443-4 for DESFire, JavaCard, EMV).",
@@ -101,7 +101,7 @@
     },
     {
       "title": "Tasker, Automate and NFC-triggered automation on Android",
-      "intro": "Android's more permissive system access lets end users build rich NFC-triggered automation without writing code. Tasker, Automate and similar apps are popular for personal productivity, home automation, accessibility and small-business workflows. This section covers the automation layer.",
+      "intro": "Android's more permissive system access lets end users build rich NFC-triggered automation without writing a line of code — the rare corner of the platform where a sticker by the bed can do more than most apps. Tasker, Automate and similar apps are popular for personal productivity, home automation, accessibility and small-business workflows. This section covers the automation layer.",
       "bullets": [
         "Tasker NFC profiles: Tasker is a long-standing Android automation app. Create a profile with \"NFC Tag\" trigger (matched by tag UID or NDEF content), and attach task actions: launch app, navigate to specific app screen via deep link, toggle Wi-Fi/Bluetooth/Mobile Data, set volume/sound profile, run HTTP request to a webhook, send SMS, dim screen brightness, run Tasker scene. Extremely flexible; supports complex conditional logic via Tasker variables.",
         "Automate (LlamaLab): visual flowchart-based automation app. NFC tag triggers similarly bind to UID or NDEF content. Designed to be more approachable than Tasker's text-based configuration; used by less-technical users and for quickly prototyping automation flows.",
