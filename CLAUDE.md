@@ -100,6 +100,31 @@ worktree. If a stop signal trips (`NO_TIER_A_REMAIN`, `FEW_FILES_REMAIN`) or a
 `STOP_BLOG_VOICE` file exists at repo root, halt and report to the user. See
 `memory/feedback-blog-voice-next-claim-filtering.md`.
 
+## page-voice rollout — dispatcher first
+
+When asked for the "next" `/page-voice` page (any "continue page-voice" / "next
+solution/guide page to enliven" request), the first step is **always** the
+dispatcher:
+
+```bash
+npm run page-voice:next               # top 10 unclaimed RICH·STANDARD, tail-first
+npm run page-voice:next -- --group solutions
+npm run page-voice:next -- --json     # machine-readable
+```
+
+Sibling of blog-voice for **Solutions (37) + Guides (49)** pages. It classifies
+every page on two axes — a **prose budget** (RICH / LEAN / SKIP — is there enough
+editable, chip-free prose to be worth a cold-open?) and the same medical
+**sensitivity** check — and serves only RICH·STANDARD by default. It excludes
+already-enlivened pages, open-PR files (by path), in-flight `page-voice/*`
+branches, and local WIP. **SENSITIVE (medical/patient-safety) pages and LEAN
+(spec-dense) pages are excluded by default** (`--include-sensitive` /
+`--include-lean` to surface). Claim via the printed `git worktree add -b
+page-voice/<slug>` recipe (the race gate) and work in that `/tmp` worktree. If a
+stop signal trips (`NO_TARGETS_REMAIN`, `FEW_FILES_REMAIN`) or a `STOP_PAGE_VOICE`
+file exists at repo root, halt and report to the user. Products and Industries
+are out of scope for this skill. For blog posts use `/blog-voice`.
+
 ## Skill routing
 
 When the user's request matches an available skill, invoke it via the Skill tool. When in doubt, invoke the skill.
@@ -115,6 +140,7 @@ Key routing rules:
 - Code review/diff check → invoke /review
 - Visual polish → invoke /design-review
 - Blog rewrite for enjoyability/humor (Tier A/B voice) → invoke /blog-voice
+- Solutions/Guides page rewrite for enjoyability/humor → invoke /page-voice
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore
