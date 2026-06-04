@@ -85,6 +85,84 @@ const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0
     <p class="codex-editorial-kicker">{definition.kicker}</p>
     <h1>{cleanH1}</h1>
     {shouldShowDeck && <p class="codex-editorial-hero-deck">{decoratedDeck}</p>}
+    {illustration && (
+      isLandingImage && webpSrc ? (
+        <figure class="codex-editorial-figure">
+          <picture>
+            <source srcset={webpSrc} type="image/webp" />
+            <img
+              src={illustration.src}
+              alt={heroAlt ?? illustration.alt}
+              width="1200"
+              height="675"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
+          {definition.imageCredit && (
+            <figcaption class="codex-editorial-hero-credit">
+              Photo:{" "}
+              {definition.imageCredit.sourceUrl ? (
+                <a href={definition.imageCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  {definition.imageCredit.author}
+                </a>
+              ) : (
+                <span>{definition.imageCredit.author}</span>
+              )}
+              {definition.imageCredit.license && (
+                <>
+                  {" / "}
+                  {definition.imageCredit.licenseUrl ? (
+                    <a href={definition.imageCredit.licenseUrl} target="_blank" rel="noopener noreferrer">
+                      {definition.imageCredit.license}
+                    </a>
+                  ) : (
+                    <span>{definition.imageCredit.license}</span>
+                  )}
+                </>
+              )}
+            </figcaption>
+          )}
+        </figure>
+      ) : (
+        <figure class="codex-editorial-figure">
+          <img
+            src={illustration.src}
+            alt={heroAlt ?? illustration.alt}
+            width="1200"
+            height="675"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+          {definition.imageCredit && (
+            <figcaption class="codex-editorial-hero-credit">
+              Photo:{" "}
+              {definition.imageCredit.sourceUrl ? (
+                <a href={definition.imageCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  {definition.imageCredit.author}
+                </a>
+              ) : (
+                <span>{definition.imageCredit.author}</span>
+              )}
+              {definition.imageCredit.license && (
+                <>
+                  {" / "}
+                  {definition.imageCredit.licenseUrl ? (
+                    <a href={definition.imageCredit.licenseUrl} target="_blank" rel="noopener noreferrer">
+                      {definition.imageCredit.license}
+                    </a>
+                  ) : (
+                    <span>{definition.imageCredit.license}</span>
+                  )}
+                </>
+              )}
+            </figcaption>
+          )}
+        </figure>
+      )
+    )}
     <div class="codex-editorial-answer" aria-label="Quick answer">
       <p class="codex-editorial-answer-label">Quick answer</p>
       <p class="codex-editorial-summary" set:html={summaryHtml} />
@@ -113,82 +191,4 @@ const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0
       </>
     )}
   </div>
-  {illustration && (
-    isLandingImage && webpSrc ? (
-      <figure class="codex-editorial-figure">
-        <picture>
-          <source srcset={webpSrc} type="image/webp" />
-          <img
-            src={illustration.src}
-            alt={heroAlt ?? illustration.alt}
-            width="1200"
-            height="675"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-          />
-        </picture>
-        {definition.imageCredit && (
-          <figcaption class="codex-editorial-hero-credit">
-            Photo:{" "}
-            {definition.imageCredit.sourceUrl ? (
-              <a href={definition.imageCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
-                {definition.imageCredit.author}
-              </a>
-            ) : (
-              <span>{definition.imageCredit.author}</span>
-            )}
-            {definition.imageCredit.license && (
-              <>
-                {" / "}
-                {definition.imageCredit.licenseUrl ? (
-                  <a href={definition.imageCredit.licenseUrl} target="_blank" rel="noopener noreferrer">
-                    {definition.imageCredit.license}
-                  </a>
-                ) : (
-                  <span>{definition.imageCredit.license}</span>
-                )}
-              </>
-            )}
-          </figcaption>
-        )}
-      </figure>
-    ) : (
-      <figure class="codex-editorial-figure">
-        <img
-          src={illustration.src}
-          alt={heroAlt ?? illustration.alt}
-          width="1200"
-          height="675"
-          loading="eager"
-          fetchpriority="high"
-          decoding="async"
-        />
-        {definition.imageCredit && (
-          <figcaption class="codex-editorial-hero-credit">
-            Photo:{" "}
-            {definition.imageCredit.sourceUrl ? (
-              <a href={definition.imageCredit.sourceUrl} target="_blank" rel="noopener noreferrer">
-                {definition.imageCredit.author}
-              </a>
-            ) : (
-              <span>{definition.imageCredit.author}</span>
-            )}
-            {definition.imageCredit.license && (
-              <>
-                {" / "}
-                {definition.imageCredit.licenseUrl ? (
-                  <a href={definition.imageCredit.licenseUrl} target="_blank" rel="noopener noreferrer">
-                    {definition.imageCredit.license}
-                  </a>
-                ) : (
-                  <span>{definition.imageCredit.license}</span>
-                )}
-              </>
-            )}
-          </figcaption>
-        )}
-      </figure>
-    )
-  )}
 </section>
