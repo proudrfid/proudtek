@@ -125,6 +125,12 @@ try { stopReason = readFileSync(STOP_FILE, "utf8").trim() || "STOP_IMAGE_AUDIT s
 function readResult(key) {
   try { return JSON.parse(readFileSync(resultPath(key), "utf8")); } catch { return null; }
 }
+// Verdict booleans are JSON `true`/`false` (canonical, per SKILL.md), but be
+// tolerant of legacy "true"/"false" strings too so a real finding is never
+// silently bucketed as clean. Only an EXPLICIT value counts — a missing field
+// is neither true nor false (so an absent checkA.match isn't read as a mismatch).
+const isTrue = (v) => v === true || v === "true";
+const isFalse = (v) => v === false || v === "false";
 
 // ── RELEASE / RESET-STALE ─────────────────────────────────────────────────────
 if (mode === "release") {
@@ -183,8 +189,8 @@ if (mode === "status") {
 // ── REPORT ───────────────────────────────────────────────────────────────────
 if (mode === "report") {
   const results = inspectable.map((t) => ({ t, r: readResult(keyOf(t)) })).filter((x) => x.r);
-  const mism = results.filter((x) => x.r.checkA && x.r.checkA.match === false);
-  const logos = results.filter((x) => x.r.checkB && x.r.checkB.competitorLogo === true);
+  const mism = results.filter((x) => x.r.checkA && isFalse(x.r.checkA.match));
+  const logos = results.filter((x) => x.r.checkB && isTrue(x.r.checkB.competitorLogo));
   const clean = results.length - new Set([...mism, ...logos].map((x) => x.t.slug)).size;
   const out = [];
   out.push(`# Image Audit — aggregated results`);
@@ -202,7 +208,7 @@ if (mode === "report") {
       out.push(`- shows: ${r.checkA.imageShows || "?"}`);
       out.push(`- why: ${r.checkA.reason || "?"}`);
       const rep = r.replacement;
-      if (rep && (rep.applied === true || rep.applied === "true")) {
+      if (rep && isTrue(rep.applied)) {
         out.push(`- ✅ replaced → ${rep.newHero || "?"}  (${rep.license || "?"} · ${rep.creator || "?"} · ${rep.source || "?"})`);
       } else if (rep && rep.source) {
         out.push(`- candidate (not applied): ${rep.source} ${rep.license || ""}`);
@@ -274,9 +280,9 @@ const page = {
 const resultSchema = {
   slug: served.slug, group: served.group, file: served.file, heroImage: served.heroImage,
   auditedAt: "<ISO timestamp>",
-  checkA: { match: "true|false", imageShows: "<one objective sentence>", reason: "<if false: image shows X; page is about Y>" },
-  checkB: { competitorLogo: "false|true", brand: "<if true>", confidence: "clear|possible" },
-  replacement: { applied: "false|true", newHero: "<if applied>", source: "", license: "", creator: "" },
+  checkA: { match: true, imageShows: "<one objective sentence>", reason: "<if match=false: image shows X; page is about Y>" },
+  checkB: { competitorLogo: false, brand: "<if competitorLogo=true>", confidence: "clear|possible" },
+  replacement: { applied: false, newHero: "<if applied=true>", source: "", license: "", creator: "" },
   queries: ["", ""],
 };
 
