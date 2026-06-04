@@ -44,6 +44,12 @@ on-metal / specialty tags) that compete with Proudtek:
 - William Frick & Company
 - GAO RFID
 - Trace-ID
+- PCS Systemtechnik (INTUS access-control / time-recording terminals & RFID
+  readers — added Jun 2026 from image audit; seen on
+  access-card-copied-security-upgrade + rfid-frequencies-lf-hf-uhf-explained)
+- RFIDCard (rfidcard.com — RFID/NFC cards & inlays — added Jun 2026 from image
+  audit; seen on uhf-vs-hf-rfid-frequency-choice + the two mifare-ultralight-c
+  pages)
 
 ## ALLOW — chip/silicon suppliers, standards, platforms, own brand
 
