@@ -50,6 +50,13 @@ on-metal / specialty tags) that compete with Proudtek:
 - RFIDCard (rfidcard.com — RFID/NFC cards & inlays — added Jun 2026 from image
   audit; seen on uhf-vs-hf-rfid-frequency-choice + the two mifare-ultralight-c
   pages)
+- ACS / Advanced Card Systems (ACR-series NFC / smart-card readers — added Jun
+  2026 from image audit; an ACR122U reader appears on the elastic-rfid-wristband
+  product hero)
+- Axess AG (ski-resort access gates & RFID ski-pass media — added Jun 2026 from
+  image audit; seen on rfid-ski-pass-card-season)
+- race result / raceresult (RFID race-timing transponders, decoders & timing
+  bibs — added Jun 2026 from image audit; seen on rfid-marathon-race-timing-setup)
 
 ## ALLOW — chip/silicon suppliers, standards, platforms, own brand
 
