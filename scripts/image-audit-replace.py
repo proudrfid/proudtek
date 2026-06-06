@@ -187,6 +187,7 @@ def cmd_apply(a):
 
     data = json.loads(page.read_text(encoding="utf-8"))
     old_hero = data.get("heroImage")
+    old_credit = data.get("imageCredit")
     now = a.now or datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     credit = None
@@ -203,6 +204,7 @@ def cmd_apply(a):
         "oldHero": old_hero, "newHero": rel,
         "writes": [rel, rel.replace(".jpg", ".webp")],
         "imageCredit": credit, "modifiedAt": now,
+        "clearsStaleCredit": bool(old_credit and not credit),
         "sharedOldHeroKept": True,
     }
     if a.dry_run:
@@ -218,6 +220,10 @@ def cmd_apply(a):
     data["heroImage"] = rel
     if credit:
         data = set_after(data, "heroImage", "imageCredit", credit)
+    else:
+        # In-repo source carries no attribution — drop any pre-existing imageCredit
+        # so the page never renders a stale "Photo: …" caption from a former hero.
+        data.pop("imageCredit", None)
     # set_after replaces in place if modifiedAt exists, else inserts it after the
     # credit (or heroImage) block — clean diff either way.
     data = set_after(data, "imageCredit" if credit else "heroImage", "modifiedAt", now)

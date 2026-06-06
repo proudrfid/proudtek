@@ -7,7 +7,7 @@
  * Extracted from seo.ts during the P1 split (2026-05-08).
  */
 import { ROUTE_CANONICAL_OVERRIDES } from "../route-overrides";
-import { SITE_ORIGIN } from "../seo-content";
+import { SITE_ORIGIN, IS_CANONICAL_ORIGIN } from "../seo-content";
 // Type-only imports — erased at compile time, no runtime cycle.
 import type { BreadcrumbItem, ProductSpec } from "../seo";
 import type { PageContext } from "./types";
@@ -217,8 +217,17 @@ export function parseDimension(value: string | undefined): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-export function buildRobotsValue(indexable: boolean): string {
-  return `${indexable ? "index" : "noindex"},follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1`;
+export function buildRobotsValue(
+  indexable: boolean,
+  isCanonicalOrigin: boolean = IS_CANONICAL_ORIGIN,
+): string {
+  // Index only on the canonical production origin. Any other origin (e.g. a
+  // staging/preview *.vercel.app build of the in-progress rebuild) is forced
+  // to `noindex` so it stays out of search and never competes with the live
+  // site. A page that is already non-indexable stays noindex. The origin flag
+  // is a parameter (defaulting to the build's resolved origin) for testability.
+  const effectiveIndexable = indexable && isCanonicalOrigin;
+  return `${effectiveIndexable ? "index" : "noindex"},follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1`;
 }
 
 /* ── Indexability + machine-readable route helpers ─────────────── */

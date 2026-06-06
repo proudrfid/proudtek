@@ -6,7 +6,25 @@ import type {
   ProductSourceProfile,
 } from "./seo";
 
-export const SITE_ORIGIN = process.env.SITE_ORIGIN ?? "https://proudtek.com";
+/**
+ * The canonical production origin this site is meant to be served from.
+ * Indexing is allowed only when the build's resolved SITE_ORIGIN matches
+ * this. Any other origin (e.g. a *.vercel.app staging/preview deployment) is
+ * treated as non-production and every page is forced to `noindex`, so the
+ * in-progress rebuild stays out of search and never competes with the live
+ * site. At cutover, point DNS at this deployment and leave SITE_ORIGIN unset
+ * (or set it to CANONICAL_ORIGIN); production then indexes normally with no
+ * code change.
+ */
+export const CANONICAL_ORIGIN = "https://proudtek.com";
+
+export const SITE_ORIGIN = process.env.SITE_ORIGIN ?? CANONICAL_ORIGIN;
+
+const stripTrailingSlash = (origin: string): string => origin.replace(/\/+$/, "");
+
+/** True only when this build's origin is the canonical production origin. */
+export const IS_CANONICAL_ORIGIN =
+  stripTrailingSlash(SITE_ORIGIN) === stripTrailingSlash(CANONICAL_ORIGIN);
 
 function absoluteUrl(value: string): string {
   if (!value) {
