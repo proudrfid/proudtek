@@ -1877,6 +1877,57 @@ body.codex-catalog-rail-locked { overflow: hidden; }
     margin-left: 272px;
     margin-right: var(--codex-space-6);
   }
+  /* The wrap widens, but the real width cap lives on the nested Kadence .entry
+     (computed max-width: min(content-width, 100% - edge)). Reset it too, or the
+     hub grid stays boxed (~768px) and centered inside the widened wrap, leaving a
+     wide blank gutter on the right (the symptom on /industries/ + /resources/).
+     Prose stays readable via the 70ch --codex-content-measure on p/li/dd. */
+  .content-wrap.codex-editorial-pillar--with-rail .entry.content-bg {
+    max-width: none;
+  }
+  /* Full-width hero: single column, collage stacked below the title, spanning the
+     full content width like the hub grid below. Note: the composite image is only
+     1200px wide natively, so it upscales (and gets ~1000px tall) at full width. */
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero {
+    grid-template-columns: 1fr;
+  }
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-figure {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-figure :is(picture, img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Let the QUICK ANSWER paragraph and key-points list span the full width too —
+     the 70ch reading cap otherwise leaves a wide blank gutter beside them. */
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-answer :is(p, li, dd),
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-points :is(p, li, dd) {
+    max-width: none;
+  }
+}
+
+/* /products/all/ inherited a boxed + has-left-sidebar Kadence template, so its
+   .content-container is a 2fr/5fr grid capped at the boxed width — but the 2fr
+   slot is empty: the category nav is the position:fixed .codex-catalog-rail, not
+   an in-flow sidebar. Past 1280px the boxed grid centers and detaches from the
+   viewport-pinned rail, leaving a dead gutter on the left, a cramped right-shifted
+   product grid, and a wide right margin. Neutralize the grid + clear the 272px
+   rail to get the full-width catalog the .codex-catalog-rail rule above intends.
+   Scoped to .has-left-sidebar so the already-unboxed /products/<category>/ pages
+   (which render full-width) stay untouched. */
+@media (min-width: 1280px) {
+  body.tax-product_cat.has-left-sidebar .content-container.site-container {
+    display: block;
+    max-width: none;
+  }
+  body.tax-product_cat.has-left-sidebar .site-main {
+    margin-left: 272px;
+    margin-right: var(--codex-space-6);
+  }
 }
 
 /* ═══════════════════════════════════════════
