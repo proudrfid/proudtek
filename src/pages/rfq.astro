@@ -6,9 +6,14 @@
  * questions Proud Tek's specialists ask on every first call (product
  * family, frequency, quantity, printing/encoding), then collects the
  * contact info on step 5. All five steps live in one <form>; JS toggles
- * step visibility and serializes the structured answers into the
- * existing Kadence backend's `kb_field_4` (project notes) so no backend
- * change is required.
+ * step visibility and serializes the structured answers into a hidden
+ * `message` field, then submits via fetch() to Formspree (same endpoint
+ * as InlineRfqForm.astro — this is a static site, there is no WP/Kadence
+ * backend). No-JS fallback: a <noscript> style override reveals all five
+ * steps + the submit button and the form posts natively to Formspree
+ * (Formspree renders its own thank-you page). If the fetch fails, an
+ * on-page error note offers a prefilled mailto: draft so the lead is
+ * never lost.
  *
  * Architecture note: this is a native Astro page (not editorial /
  * snapshot) because the wizard needs raw <form> + <fieldset> markup +
@@ -64,10 +69,25 @@ const machineTextPath = buildMachineRoute(route, "txt");
       </ul>
     </section>
 
-    <form id="rfq-wizard" class="codex-rfq" action="/contact/" method="POST" novalidate>
-      <input type="hidden" name="_kb_form_id" value="proudtek-rfq" />
-      <input type="hidden" name="action" value="kb_form_submit" />
-      <input type="hidden" id="rfq-payload" name="kb_field_4" value="" />
+    {/* novalidate is set by JS at init (custom per-step validation). Without
+        JS it stays off, so the browser's native required/email validation
+        guards the visible-all-steps fallback before the native POST. */}
+    <form id="rfq-wizard" class="codex-rfq" action="https://formspree.io/f/mpqelrep" method="POST">
+      <input type="hidden" name="_subject" value="RFQ — proudtek.com" />
+      <input type="hidden" id="rfq-payload" name="message" value="" />
+
+      <noscript>
+        {/* No-JS fallback: reveal every step + the real submit button and
+            let the form POST natively to Formspree (its hosted thank-you
+            page is the confirmation). The Continue/Back buttons and the
+            progress rail are JS-only chrome, so hide them. */}
+        <style is:inline>
+          .codex-rfq__step { display: block !important; padding: 0 0 24px !important; }
+          #rfq-progress, #rfq-next, #rfq-back { display: none !important; }
+          #rfq-submit { display: inline-block !important; }
+        </style>
+        <p class="codex-rfq__help">All five steps are shown below as one form. After you press “Send my quote request” you'll see a confirmation page.</p>
+      </noscript>
 
       <ol class="codex-rfq__progress" aria-label="Wizard progress" id="rfq-progress">
         <li class="is-active" data-step="1"><span>1</span>Product</li>
@@ -146,26 +166,27 @@ const machineTextPath = buildMachineRoute(route, "txt");
         <p class="codex-rfq__help">Five fields, business email accepted. We do not share contact data with third parties.</p>
         <label class="codex-rfq__text-field">
           <span>Your name <em>*</em></span>
-          <input type="text" name="kb_field_0" autocomplete="name" required />
+          <input type="text" name="name" autocomplete="name" required />
         </label>
         <label class="codex-rfq__text-field">
           <span>Business email <em>*</em></span>
-          <input type="email" name="kb_field_1" autocomplete="email" required />
+          <input type="email" name="email" autocomplete="email" required />
         </label>
         <label class="codex-rfq__text-field">
           <span>Country / region <em>*</em></span>
-          <input type="text" name="kb_field_2" autocomplete="country-name" placeholder="e.g. United States, Germany, UAE" required />
+          <input type="text" name="country" autocomplete="country-name" placeholder="e.g. United States, Germany, UAE" required />
         </label>
         <label class="codex-rfq__text-field">
           <span>Company name <em>(optional)</em></span>
-          <input type="text" name="kb_field_3" autocomplete="organization" />
+          <input type="text" name="company" autocomplete="organization" />
         </label>
         <label class="codex-rfq__text-field">
           <span>Anything else we should know? <em>(optional)</em></span>
           <textarea name="rfq_notes" rows="3" placeholder="Reader vendor, lock platform, chip preference, regulatory regime, or any constraint that should shape the quote."></textarea>
         </label>
-        <!-- Honeypot, mirrors Kadence's expected verify field -->
-        <input class="codex-rfq__hp" type="text" name="_kb_verify_email" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <!-- Honeypot — `_gotcha` is Formspree's native trap: submissions
+             that fill it are silently discarded server-side, JS or no JS. -->
+        <input class="codex-rfq__hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
       </fieldset>
 
       <div class="codex-rfq__actions">
@@ -174,8 +195,27 @@ const machineTextPath = buildMachineRoute(route, "txt");
         <button type="submit" class="codex-rfq__btn codex-rfq__btn--submit" id="rfq-submit" hidden>Send my quote request</button>
       </div>
 
-      <p class="codex-rfq__small">Reply window: one business day, Mon–Sat, GMT+8. For an urgent reply WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
+      {/* Shown only if the Formspree fetch fails — keeps the form intact and
+          offers a mailto: draft prefilled with the wizard answers (the
+          no-backend safety net; href is set by JS just before reveal). */}
+      <p class="codex-rfq__error-note" id="rfq-error" role="alert" hidden>
+        Sorry — your request couldn't be sent just now. Please try again in a minute, or
+        <a id="rfq-error-mailto" href="mailto:info@proudtek.com">email your answers to info@proudtek.com</a>
+        (the link opens a draft with everything you entered already filled in).
+      </p>
+
+      <p class="codex-rfq__small">Reply window: one business day, Mon–Fri, GMT+8. For an urgent reply WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
     </form>
+
+    {/* Success panel — swapped in for the form after a confirmed Formspree
+        202/200 response. tabindex=-1 lets JS move focus here for SR users. */}
+    <section class="codex-rfq codex-rfq-success" id="rfq-success" tabindex="-1" aria-label="Request received" hidden>
+      <h2>Request received</h2>
+      <p>Thanks — your RFQ is with our specialists. We reply within <strong>one business day</strong> (Mon–Fri, GMT+8) with a unit price, MOQ ladder, lead time and the matching sample-pack subset.</p>
+      <p>Need it faster, or want to attach artwork or specs?
+        <a id="rfq-success-mailto" href="mailto:info@proudtek.com">Email info@proudtek.com</a> or
+        WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
+    </section>
 
     <aside class="codex-rfq-aside" aria-label="Before you send">
       <h2>Before you send</h2>
@@ -191,6 +231,9 @@ const machineTextPath = buildMachineRoute(route, "txt");
     (function () {
       const wizard = document.getElementById("rfq-wizard");
       if (!wizard) return;
+      // JS path owns validation (per-step, custom error styling) — switch
+      // off the browser's native bubbles. No-JS keeps native validation.
+      wizard.setAttribute("novalidate", "novalidate");
       const steps = Array.from(wizard.querySelectorAll(".codex-rfq__step"));
       const progress = Array.from(document.querySelectorAll("#rfq-progress li"));
       const backBtn = document.getElementById("rfq-back");
@@ -201,6 +244,20 @@ const machineTextPath = buildMachineRoute(route, "txt");
       let current = 0;
       const total = steps.length;
 
+      // dataLayer push + guarded gtag bridge. The site loads plain gtag.js
+      // (no GTM container), and gtag.js ignores plain-object dataLayer
+      // pushes — mirror each event through gtag() so GA4 actually records
+      // the funnel. Strict no-op when gtag is absent.
+      function pushRfqEvent(eventName, payload) {
+        try {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push(Object.assign({ event: eventName }, payload));
+        } catch (err) { /* ignore */ }
+        try {
+          if (typeof window.gtag === "function") window.gtag("event", eventName, payload || {});
+        } catch (err) { /* ignore */ }
+      }
+
       function show(index) {
         steps.forEach((s, i) => s.classList.toggle("is-active", i === index));
         progress.forEach((p, i) => p.classList.toggle("is-active", i <= index));
@@ -209,8 +266,7 @@ const machineTextPath = buildMachineRoute(route, "txt");
         submitBtn.hidden = index !== total - 1;
         const firstField = steps[index].querySelector("input, textarea");
         if (firstField) setTimeout(() => firstField.focus({ preventScroll: false }), 30);
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "rfq_step_view", rfq_step: index + 1 });
+        pushRfqEvent("rfq_step_view", { rfq_step: index + 1 });
       }
 
       function validateCurrent() {
@@ -244,12 +300,29 @@ const machineTextPath = buildMachineRoute(route, "txt");
           "Annual quantity: " + (fd.get("rfq_quantity") || "(skipped)"),
           "Printing & encoding: " + (fd.getAll("rfq_options").join(", ") || "None selected"),
           "Target launch: " + (fd.get("rfq_launch") || "(not specified)"),
-          "Company: " + (fd.get("kb_field_3") || "(not specified)"),
+          "Company: " + (fd.get("company") || "(not specified)"),
           "",
           "Additional notes:",
           (fd.get("rfq_notes") || "(none)"),
         ];
         payloadInput.value = lines.join("\n");
+      }
+
+      // mailto: safety net — a prefilled draft carrying the structured
+      // answers + contact fields, used by both the fetch-error note and
+      // the success panel's "attach artwork" link. Works with zero backend.
+      function buildMailtoHref() {
+        const fd = new FormData(wizard);
+        const body =
+          (payloadInput.value || "") +
+          "\n\nName: " + (fd.get("name") || "") +
+          "\nEmail: " + (fd.get("email") || "") +
+          "\nCountry / region: " + (fd.get("country") || "");
+        return (
+          "mailto:info@proudtek.com" +
+          "?subject=" + encodeURIComponent("RFQ — proudtek.com") +
+          "&body=" + encodeURIComponent(body)
+        );
       }
 
       nextBtn.addEventListener("click", () => {
@@ -268,13 +341,59 @@ const machineTextPath = buildMachineRoute(route, "txt");
       });
 
       wizard.addEventListener("submit", (e) => {
-        if (!validateCurrent()) {
-          e.preventDefault();
+        // JS path: always intercept and fetch() to Formspree so the buyer
+        // stays on-page. (No-JS uses the native POST via the <noscript>
+        // override — Formspree then shows its own thank-you page.)
+        e.preventDefault();
+        if (!validateCurrent()) return;
+        collectAnswers();
+
+        const errorNote = document.getElementById("rfq-error");
+        if (errorNote) errorNote.hidden = true;
+        const originalLabel = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Sending…";
+
+        let request;
+        try {
+          request = fetch(wizard.getAttribute("action"), {
+            method: "POST",
+            body: new FormData(wizard),
+            headers: { Accept: "application/json" },
+          });
+        } catch (err) {
+          // fetch unavailable (very old browser): degrade to the native
+          // POST — Formspree renders its hosted thank-you page instead.
+          wizard.submit();
           return;
         }
-        collectAnswers();
-        window.dataLayer = window.dataLayer || [];
-        window.dataLayer.push({ event: "rfq_submit", rfq_step: total });
+        request
+          .then((res) => {
+            if (!res.ok) throw new Error("Formspree HTTP " + res.status);
+            // Confirmed delivery: swap the form for the success panel.
+            const success = document.getElementById("rfq-success");
+            const successMailto = document.getElementById("rfq-success-mailto");
+            if (successMailto) successMailto.setAttribute("href", buildMailtoHref());
+            wizard.hidden = true;
+            if (success) {
+              success.hidden = false;
+              success.focus();
+            }
+            // Funnel event fires on CONFIRMED delivery, not on attempt.
+            pushRfqEvent("rfq_submit", { rfq_step: total });
+          })
+          .catch(() => {
+            // Network / endpoint failure: keep the form (nothing the buyer
+            // typed is lost) and surface the mailto fallback.
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalLabel;
+            const errorMailto = document.getElementById("rfq-error-mailto");
+            if (errorMailto) errorMailto.setAttribute("href", buildMailtoHref());
+            if (errorNote) {
+              errorNote.hidden = false;
+              errorNote.scrollIntoView({ block: "nearest" });
+            }
+          });
       });
 
       wizard.addEventListener("input", (e) => {

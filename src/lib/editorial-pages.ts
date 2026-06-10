@@ -202,6 +202,15 @@ const EDITORIAL_PRIMARY_ACTION_LABELS: Record<string, string> = {
 
 let _editorialDefsCache: EditorialDefinition[] | null = null;
 
+/**
+ * Route → definition index, populated when loadEditorialDefinitions() first
+ * resolves — i.e. during getSiteData(), before any page render. Gives
+ * synchronous consumers (seo/jsonld.ts via editorial-authority-ld.ts's
+ * hasAuthorityArticle()) route-level access to editorial definitions.
+ * Same populate-once pattern as EDITORIAL_KEYWORDS_MAP below.
+ */
+export const EDITORIAL_ROUTE_INDEX: Map<string, EditorialDefinition> = new Map();
+
 export async function loadEditorialDefinitions(): Promise<EditorialDefinition[]> {
   if (_editorialDefsCache) return _editorialDefsCache;
   const entries = await getCollection("editorial");
@@ -209,6 +218,10 @@ export async function loadEditorialDefinitions(): Promise<EditorialDefinition[]>
     .filter((e) => !e.id.startsWith("_unused/"))
     .map((e) => e.data as unknown as EditorialDefinition);
   _editorialDefsCache = active.map((d) => normalizeEditorialDefinition(d));
+  EDITORIAL_ROUTE_INDEX.clear();
+  for (const def of _editorialDefsCache) {
+    EDITORIAL_ROUTE_INDEX.set(def.route, def);
+  }
   return _editorialDefsCache;
 }
 

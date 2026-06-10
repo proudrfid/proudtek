@@ -1,6 +1,7 @@
 import type { SiteData, SnapshotPage } from "./site-data";
+import type { EditorialDefinition } from "./editorial-types";
 import { SITE_ORIGIN, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS } from "./seo-content";
-import { buildPageSeo, buildPageSummary, getIndexablePages } from "./seo";
+import { buildPageSeo, buildPageSummary, getIndexablePages, isIndexableRoute } from "./seo";
 
 export type PageLoader = (route: string) => Promise<SnapshotPage>;
 
@@ -150,6 +151,8 @@ Disallow: /machine/
 # AI search engine crawlers — allow full access (incl. /machine/ mirrors)
 ${aiSections}
 
+# LLM guidance: ${SITE_ORIGIN}/llms.txt (full inventory: ${SITE_ORIGIN}/llms-full.txt)
+
 Sitemap: ${SITE_ORIGIN}/sitemap-index.xml
 `;
 }
@@ -189,12 +192,17 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     "/products/rfid-keyfobs/",
     "/products/rfid-wristbands/",
   ];
+  // Real SKU landings live at /products/{collection}/{sku}/ — the legacy
+  // /product/* WP stubs are 301-redirected via ROUTE_CANONICAL_OVERRIDES,
+  // so they must never be advertised here. isIndexableRoute() filters both
+  // redirect stubs and utility/archive routes (buildLlmsTxt works on the
+  // raw siteData.pages list, unlike buildLlmsFullTxt's getIndexablePages).
   const productRoutes = siteData.pages
-    .filter((page) => page.route.startsWith("/product/"))
+    .filter((page) => /^\/products\/[^/]+\/[^/]+\/$/.test(page.route) && isIndexableRoute(page.route))
     .slice(0, 10)
     .map((page) => page.route);
   const articleRoutes = siteData.pages
-    .filter((page) => /^\/20\d{2}\//.test(page.route))
+    .filter((page) => /^\/blog\/[^/]+\/$/.test(page.route) && isIndexableRoute(page.route))
     .map((page) => page.route);
   const solutionRoutes = siteData.pages
     .filter((page) => page.route.startsWith("/solutions/") && page.route !== "/solutions/")
@@ -309,12 +317,19 @@ export async function buildLlmsFullTxt(siteData: SiteData, loadPage: PageLoader)
       routes: pages.filter((page) => /^\/products\/[^/]+\/$/.test(page.route)).map((page) => page.route),
     },
     {
+      // SKU landings live at /products/{collection}/{sku}/ — the legacy
+      // /product/* WP stubs are redirected and already filtered out by
+      // getIndexablePages above.
       heading: "Products",
-      routes: pages.filter((page) => page.route.startsWith("/product/")).map((page) => page.route),
+      routes: pages.filter((page) => /^\/products\/[^/]+\/[^/]+\/$/.test(page.route)).map((page) => page.route),
     },
     {
       heading: "Articles",
       routes: pages.filter((page) => /^\/20\d{2}\//.test(page.route)).map((page) => page.route),
+    },
+    {
+      heading: "Blog posts",
+      routes: pages.filter((page) => /^\/blog\/[^/]+\/$/.test(page.route)).map((page) => page.route),
     },
     {
       heading: "Solutions",
@@ -331,6 +346,30 @@ export async function buildLlmsFullTxt(siteData: SiteData, loadPage: PageLoader)
     {
       heading: "Buying guides",
       routes: pages.filter((page) => page.route.startsWith("/guides/")).map((page) => page.route),
+    },
+    {
+      heading: "Industries",
+      routes: pages.filter((page) => page.route.startsWith("/industries/")).map((page) => page.route),
+    },
+    {
+      heading: "Case studies",
+      routes: pages.filter((page) => page.route.startsWith("/case-studies/")).map((page) => page.route),
+    },
+    {
+      heading: "Markets",
+      routes: pages.filter((page) => page.route.startsWith("/markets/")).map((page) => page.route),
+    },
+    {
+      heading: "Research",
+      routes: pages.filter((page) => page.route.startsWith("/research/")).map((page) => page.route),
+    },
+    {
+      heading: "Landing pages",
+      routes: pages.filter((page) => page.route.startsWith("/lp/")).map((page) => page.route),
+    },
+    {
+      heading: "Resources",
+      routes: pages.filter((page) => page.route.startsWith("/resources/")).map((page) => page.route),
     },
     {
       heading: "Contact paths",
@@ -395,6 +434,16 @@ async function renderLlmsSection(heading: string, pages: SnapshotPage[]): Promis
 }
 
 function getLastModified(page: SnapshotPage, generatedAt: string): string {
+  // Prefer the authored editorial modifiedAt (falling back to publishedAt)
+  // so <lastmod> reflects per-page content freshness instead of resetting
+  // to the build date on every deploy. Synthetic editorial pages carry
+  // their definition on the page object (attached by mergeEditorialPages).
+  const editorialDef = page.editorialDefinition as EditorialDefinition | undefined;
+  const editorialDate = editorialDef?.modifiedAt || editorialDef?.publishedAt;
+  if (editorialDate) {
+    return editorialDate.slice(0, 10);
+  }
+
   const route = page.route;
   const dateMatch = route.match(/^\/(\d{4})\/(\d{2})\/(\d{2})\//);
 

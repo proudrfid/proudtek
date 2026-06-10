@@ -19,7 +19,9 @@
  */
 import { getCollection } from "astro:content";
 import type { EditorialAuthor, EditorialDefinition } from "./editorial-types";
-import { loadEditorialDefinitions } from "./editorial-pages";
+import { EDITORIAL_ROUTE_INDEX, loadEditorialDefinitions } from "./editorial-pages";
+import { SITE_ORIGIN } from "./seo-content";
+import { absoluteUrl } from "./seo/utils";
 
 let _authorsCache: Map<string, EditorialAuthor> | null = null;
 async function loadAuthors(): Promise<Map<string, EditorialAuthor>> {
@@ -34,14 +36,35 @@ async function loadAuthors(): Promise<Map<string, EditorialAuthor>> {
   return map;
 }
 
-let _routeIndexCache: Map<string, EditorialDefinition> | null = null;
 async function loadRouteIndex(): Promise<Map<string, EditorialDefinition>> {
-  if (_routeIndexCache) return _routeIndexCache;
-  const defs = await loadEditorialDefinitions();
-  const idx = new Map<string, EditorialDefinition>();
-  for (const d of defs) idx.set(d.route, d);
-  _routeIndexCache = idx;
-  return idx;
+  await loadEditorialDefinitions(); // populates EDITORIAL_ROUTE_INDEX
+  return EDITORIAL_ROUTE_INDEX;
+}
+
+/**
+ * Shared authority-signal predicate: a route gets a standalone authority
+ * Article when its editorial definition carries at least one authority
+ * field. Single source of truth for both buildAuthorityLdForRoute() (the
+ * emitter) and hasAuthorityArticle() (the skip-gate in seo/jsonld.ts) so
+ * the two can never drift apart.
+ */
+function hasAuthoritySignals(def: EditorialDefinition | undefined): boolean {
+  if (!def) return false;
+  return !!def.authorSlug || !!def.reviewedBySlug || !!def.author || !!def.reviewedBy || (def.sources ?? []).length > 0;
+}
+
+/**
+ * Sync lookup used by seo/jsonld.ts buildJsonLd: when true, the layouts
+ * (EditorialPageLayout / SnapshotLayout) append the authority Article for
+ * this route, so buildJsonLd must skip its own Article entity — otherwise
+ * the page emits two Article nodes sharing the same @id.
+ *
+ * Backed by EDITORIAL_ROUTE_INDEX, which loadEditorialDefinitions()
+ * populates during getSiteData() — always before any buildPageSeo() call
+ * in a page build.
+ */
+export function hasAuthorityArticle(route: string): boolean {
+  return hasAuthoritySignals(EDITORIAL_ROUTE_INDEX.get(route));
 }
 
 function buildPersonLd(author: EditorialAuthor): Record<string, unknown> {
@@ -66,8 +89,9 @@ export async function buildAuthorityLdForRoute(route: string): Promise<string | 
 
   // Only emit when we have at least one authority signal. Routes without an
   // authorSlug and without sources fall through to the default seo.ts JSON-LD.
-  const hasSignal = !!def.authorSlug || !!def.reviewedBySlug || !!def.author || !!def.reviewedBy || (def.sources && def.sources.length > 0);
-  if (!hasSignal) return null;
+  // Must stay in lockstep with hasAuthorityArticle() — buildJsonLd skips its
+  // Article exactly when this function emits one.
+  if (!hasAuthoritySignals(def)) return null;
 
   const authors = await loadAuthors();
 
@@ -107,19 +131,22 @@ export async function buildAuthorityLdForRoute(route: string): Promise<string | 
     ...(src.note ? { description: src.note } : {}),
   }));
 
-  const hasAuthority = !!authorLd || !!reviewerLd || citationLd.length > 0;
-  if (!hasAuthority) return null;
+  // NOTE: no second "did the signals resolve?" bail here. buildJsonLd
+  // (seo/jsonld.ts) skips its own Article whenever hasAuthoritySignals()
+  // is true, so this function MUST emit on the same condition — bailing
+  // when e.g. an authorSlug fails to resolve would leave the page with no
+  // Article at all. A minimal Article (headline/description/publisher)
+  // is still valid without an author node.
 
   // Truncate headline to 110 chars per Google Article structured-data guidance.
   const headline =
     def.title.length > 110 ? `${def.title.slice(0, 107).trimEnd()}...` : def.title;
 
-  // Stable @id ties this Article entity to the page so Schema.org validators
-  // and Google can dedupe / merge with the seo.ts-emitted Article on routes
-  // where inferPageKind() returns "article" (/solutions, /compare, /guides,
-  // /compatibility, /blog/{slug}, /20XX/...). Both emitters now share the
-  // same canonical Article identity instead of representing two separate ones.
-  const articleId = `${def.route}#article`;
+  // This is the page's single canonical Article entity (buildJsonLd skips
+  // its duplicate when authority signals exist — see hasAuthorityArticle).
+  // @id / image / mainEntityOfPage must be absolute URLs per schema.org
+  // guidance; def.route and def.heroImage are root-relative paths.
+  const articleId = `${absoluteUrl(def.route)}#article`;
 
   const articleLd: Record<string, unknown> = {
     "@context": "https://schema.org",
@@ -127,13 +154,16 @@ export async function buildAuthorityLdForRoute(route: string): Promise<string | 
     "@id": articleId,
     headline,
     description: def.summary,
-    ...(def.heroImage ? { image: def.heroImage } : {}),
+    ...(def.heroImage ? { image: absoluteUrl(def.heroImage) } : {}),
     ...(authorLd ? { author: authorLd } : {}),
     ...(reviewerLd ? { reviewedBy: reviewerLd, ...(def.reviewedAt ? { lastReviewed: def.reviewedAt } : {}) } : {}),
     ...(citationLd.length ? { citation: citationLd } : {}),
     ...(def.publishedAt ? { datePublished: def.publishedAt } : {}),
     ...(def.modifiedAt ? { dateModified: def.modifiedAt } : {}),
-    mainEntityOfPage: def.route,
+    // Same @id as the Organization node buildJsonLd emits on every page —
+    // validators merge the two by id, giving the Article a full publisher.
+    publisher: { "@id": `${SITE_ORIGIN}/#organization` },
+    mainEntityOfPage: absoluteUrl(def.route),
   };
 
   return JSON.stringify(articleLd);

@@ -589,17 +589,43 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
     }
   });
 
-  const form = $body(".wp-block-kadence-form .kb-form").first();
+  // The form lives in one of two structures: the legacy snapshot keeps it
+  // inside .wp-block-kadence-form, while redesignContactPage (render-
+  // snapshot.ts, runs FIRST via prepareSnapshot) re-parents the bare
+  // form.kb-form into .codex-contact__form-card and drops the Kadence
+  // wrapper. Match both — with only the legacy selector this early-returned
+  // on the redesigned page and the Formspree rewrite below silently never
+  // ran, leaving action="" (POST to a static route → 405, lead lost).
+  const form = $body(
+    ".wp-block-kadence-form .kb-form, .codex-contact__form-card form.kb-form, form.kb-form",
+  ).first();
   if (!form.length) {
     return;
   }
 
   // Point the form to Formspree for submission
-  form.attr("action", "https://formspree.io/f/xlgorlog");
+  form.attr("action", "https://formspree.io/f/mpqelrep");
   form.attr("method", "POST");
 
+  // Strip the WP-era AJAX router fields — junk data in a Formspree
+  // submission ("action: kb_process_ajax_submit" in every lead email),
+  // and an input named "action" shadows form.action in DOM scripting.
+  form.find('input[name="_kb_form_id"], input[name="_kb_form_post_id"], input[name="action"]').remove();
+
+  // Kadence's honeypot → Formspree's native `_gotcha` trap so spam is
+  // discarded server-side. Visual hiding + aria-hidden stay as-is.
+  form.find('input[name="_kb_verify_email"]').attr("name", "_gotcha");
+
   const formWrap = form.closest(".wp-block-kadence-form");
-  formWrap.attr("id", "contact-rfq-form");
+  if (formWrap.length) {
+    formWrap.attr("id", "contact-rfq-form");
+  } else {
+    // Redesigned layout: anchor the form card (or the form itself) so
+    // /contact/#contact-rfq-form deep links (homepage hero "REQUEST
+    // SAMPLES", inquiry-rewrite buttons) still land on the form.
+    const card = form.closest(".codex-contact__form-card");
+    (card.length ? card : form).attr("id", "contact-rfq-form");
+  }
 
   const nameInput = form.find('input[id*="_0"]').first();
   const emailInput = form.find('input[type="email"]').first();
@@ -618,14 +644,27 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
     emailInput.attr("name", "email");
   }
 
+  // redesignContactPage may have already relabeled kb_field_2/kb_field_3
+  // for the B2B audience (Country / Estimated quantity, via data-label +
+  // <label> text + placeholder). Respect that: give the fields matching
+  // Formspree names and keep its placeholders. Legacy markup (data-label
+  // still "Phone Number" / "Subject") keeps the original mapping.
   if (phoneInput.length) {
-    phoneInput.attr("placeholder", "+1 555 123 4567");
-    phoneInput.attr("name", "phone");
+    if ((phoneInput.attr("data-label") ?? "") === "Country") {
+      phoneInput.attr("name", "country");
+    } else {
+      phoneInput.attr("placeholder", "+1 555 123 4567");
+      phoneInput.attr("name", "phone");
+    }
   }
 
   if (subjectInput.length) {
-    subjectInput.attr("placeholder", "Example: Hotel RFID card sample request - Saflok - 5,000 pcs");
-    subjectInput.attr("name", "_subject");
+    if (/quantity/i.test(subjectInput.attr("data-label") ?? "")) {
+      subjectInput.attr("name", "quantity");
+    } else {
+      subjectInput.attr("placeholder", "Example: Hotel RFID card sample request - Saflok - 5,000 pcs");
+      subjectInput.attr("name", "_subject");
+    }
   }
 
   if (messageInput.length) {
@@ -646,6 +685,13 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
 
   if (submitButton.length) {
     submitButton.text("Send Inquiry");
+  }
+
+  // Guarantee a stable Formspree email subject. The legacy path renames
+  // the visible Subject field to _subject; the redesigned path has no
+  // Subject field, so inject a hidden one.
+  if (!form.find('[name="_subject"]').length) {
+    form.prepend('<input type="hidden" name="_subject" value="Contact form — proudtek.com" />');
   }
 
   // DS-11 #5b — Bring the Kadence form up to the same a11y bar as the
@@ -679,8 +725,8 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
         const labelText = ($el.attr("data-label") || "").toLowerCase();
         const hintCopy =
           labelText.includes("email") ? "We'll only use this to reply to your inquiry."
-          : labelText.includes("message") ? "Include application, quantity, environment and timing for the fastest reply."
-          : "This field is required.";
+          : labelText.includes("message") || labelText.includes("note") ? "Include application, quantity, environment and timing for the fastest reply."
+          : "Required.";
         fieldWrap.append(`<span id="${hintId}" class="codex-inline-rfq-hint">${hintCopy}</span>`);
       }
       if (!fieldWrap.find(`#${errId}`).length) {

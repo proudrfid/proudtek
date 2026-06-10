@@ -45,7 +45,7 @@ export function buildLegacyRedirectSeo(page: SnapshotPage, $head: CheerioAPI, ta
     htmlAttrs: sanitizeHtmlAttrs(page.htmlAttrs),
     bodyAttrs: sanitizeBodyAttrs(page.bodyAttrs),
     headHtml: `${stripNoiseHtmlComments($head("head").html() ?? "")}
-<meta http-equiv="refresh" content="0;url=${escapeXml(canonicalUrl)}">`,
+<meta http-equiv="refresh" content="0;url=${escapeXml(normalizedTarget)}">`,
     bodyHtml: buildLegacyRedirectBody(page.route, normalizedTarget, profile),
     kind: "page",
     contentTitle: profile.title,

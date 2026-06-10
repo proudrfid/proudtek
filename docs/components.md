@@ -368,7 +368,7 @@ The inline RFQ form rendered at the bottom of every editorial page (`renderInlin
 
 ### HTML skeleton (inline RFQ)
 ```html
-<form action="https://formspree.io/f/xlgorlog" method="POST"
+<form action="https://formspree.io/f/mpqelrep" method="POST"
       class="codex-inline-rfq-form" data-codex-rfq novalidate>
   <input type="hidden" name="_subject" value="Inquiry: Product Name" />
   <div class="codex-inline-rfq-row">

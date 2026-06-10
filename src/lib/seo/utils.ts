@@ -150,11 +150,21 @@ export function normalizeRoute(route: string): string {
 
   let normalized = route.startsWith("/") ? route : `/${route}`;
 
+  // The trailing slash belongs on the path only — split off any ?query /
+  // #fragment first so `/about/#peter-zhang` normalizes to
+  // `/about/#peter-zhang`, not `/about/#peter-zhang/`.
+  let suffix = "";
+  const suffixIndex = normalized.search(/[?#]/);
+  if (suffixIndex !== -1) {
+    suffix = normalized.slice(suffixIndex);
+    normalized = normalized.slice(0, suffixIndex);
+  }
+
   if (!normalized.endsWith("/") && !/\.[a-z0-9]+$/i.test(normalized)) {
     normalized = `${normalized}/`;
   }
 
-  return normalized;
+  return `${normalized}${suffix}`;
 }
 
 export function resolveCanonicalRoute(route: string): string {

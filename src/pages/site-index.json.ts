@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 
 import { getSiteData, getPageByRoute } from "../lib/site-data";
 import { buildMachineRoute, buildPageSeo, buildPageSummary, getIndexablePages } from "../lib/seo";
+import { absoluteUrl } from "../lib/seo/utils";
 
 export const prerender = true;
 
@@ -21,8 +22,8 @@ export const GET: APIRoute = async () => {
       ...summary,
       imageUrl: seo.imageUrl,
       imageAlt: seo.imageAlt,
-      machineJson: `https://proudtek.com${buildMachineRoute(page.route, "json")}`,
-      machineText: `https://proudtek.com${buildMachineRoute(page.route, "txt")}`,
+      machineJson: absoluteUrl(buildMachineRoute(page.route, "json")),
+      machineText: absoluteUrl(buildMachineRoute(page.route, "txt")),
     });
   }
 
