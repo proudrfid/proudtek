@@ -20,7 +20,7 @@ import type { CheerioAPI } from "cheerio";
 import { load } from "cheerio";
 
 import type { SiteData, SnapshotPage } from "../site-data";
-import { loadPageFromDisk } from "../site-data";
+import { getSiteGeneratedAt, loadPageFromDisk } from "../site-data";
 import type { EditorialDefinition } from "../editorial-types";
 
 import type {
@@ -164,7 +164,7 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
   const articleSourceLinks = kind === "article" ? buildArticleSourceLinks(page.route, $body) : [];
   const productRelatedPages = kind === "product" ? buildProductRelatedPages(page.route) : [];
   const productSourceLinks = kind === "product" ? buildProductSourceLinks(page.route) : [];
-  const articleMeta = kind === "article" ? resolveArticleMeta($body, page.route) : null;
+  const articleMeta = kind === "article" ? resolveArticleMeta($body, page.route, editorialDef) : null;
 
   return {
     canonicalUrl: absoluteUrl(resolveCanonicalRoute(page.route)),
@@ -451,10 +451,14 @@ export function resolveDescription(
   return truncateText(DEFAULT_DESCRIPTION, 155);
 }
 
-export function resolveArticleMeta($body: CheerioAPI, route: string): ArticleMeta {
-  const fallback = getArticleDate(route);
+export function resolveArticleMeta($body: CheerioAPI, route: string, editorialDef?: EditorialDefinition): ArticleMeta {
+  // Authored editorial dates take priority in the fallback chain: editorial
+  // bodies carry no WP <time> markup, so without `publishedAt`/`modifiedAt`
+  // from the definition every editorial article fell through to
+  // getArticleDate()'s build-time fallback (dates churned on each rebuild).
+  const fallback = editorialDef?.publishedAt || getArticleDate(route);
   const publishedAt = normalizeDateTime(cleanText($body("time.entry-date.published, time.published").first().attr("datetime") ?? ""), fallback);
-  const modifiedAt = normalizeDateTime(cleanText($body("time.updated").first().attr("datetime") ?? ""), publishedAt);
+  const modifiedAt = normalizeDateTime(cleanText($body("time.updated").first().attr("datetime") ?? ""), editorialDef?.modifiedAt || publishedAt);
 
   const authorKey = ARTICLE_AUTHOR_MAP[route] ?? "default";
   const author = EXPERT_AUTHORS[authorKey] ?? EXPERT_AUTHORS["default"];
@@ -558,12 +562,16 @@ export function buildDocumentTitle(route: string, contentTitle: string, kind: Pa
     return `${contentTitle} | ${buildProductTitleQualifier(route, contentTitle)} | Proud Tek`;
   }
 
+  // Compare pages are editorial (kind === "article") but they're product
+  // comparisons, not blog posts — suffix them with the plain brand.
+  const isComparePage = route.startsWith("/compare/");
+
   if (/\bProud Tek\b/i.test(contentTitle)) {
-    return kind === "article" ? `${contentTitle} Blog` : contentTitle;
+    return kind === "article" && !isComparePage ? `${contentTitle} Blog` : contentTitle;
   }
 
   if (kind === "article") {
-    return `${contentTitle} | Proud Tek Blog`;
+    return isComparePage ? `${contentTitle} | Proud Tek` : `${contentTitle} | Proud Tek Blog`;
   }
 
   return `${contentTitle} | Proud Tek`;
@@ -1042,7 +1050,11 @@ export function getArticleDate(route: string): string {
   const match = route.match(/^\/(\d{4})\/(\d{2})\/(\d{2})\//);
 
   if (!match) {
-    return new Date().toISOString();
+    // Stable fallback: the snapshot build timestamp (siteData.generatedAt),
+    // not the wall clock — `new Date()` rewrote datePublished/dateModified
+    // on every rebuild. The wall clock remains only as a last-ditch guard
+    // for contexts where getSiteData() never ran (unit tests).
+    return getSiteGeneratedAt() ?? new Date().toISOString();
   }
 
   return `${match[1]}-${match[2]}-${match[3]}T00:00:00+08:00`;

@@ -60,9 +60,9 @@ export const SITE_CONTACT = {
   whatsappDefaultMessage:
     "Hi Proud Tek, I'm interested in your RFID products. Can you help with my project?",
   address: {
-    line1: "A210, Zhantao Building",
-    line2: "#1579 Minzhi Road",
-    city: "Shenzhen",
+    line1: "A2109, Zhantao Building",
+    line2: "#1079 Minzhi Rd.",
+    city: "Shenzhen City, Guangdong",
     region: "Longhua District",
     country: "China",
   },
@@ -92,7 +92,7 @@ export const ORGANIZATION_CONTACT = {
   email: "info@proudtek.com",
   telephone: "+86 15815501857",
   whatsapp: "+86 18665820632",
-  streetAddress: "A2110, Zhantao Building, #1079 Minzhi Rd, Longhua",
+  streetAddress: "A2109, Zhantao Building, #1079 Minzhi Rd., Longhua District",
   addressLocality: "Shenzhen",
   addressRegion: "Guangdong",
   postalCode: "518131",
@@ -388,7 +388,7 @@ export const PAGE_IMAGE_OVERRIDES: Record<string, { url: string; alt: string }> 
 
 export const PAGE_DESCRIPTION_OVERRIDES: Record<string, string> = {
   "/":
-    "Proud Tek is a custom RFID & NFC manufacturer in China since 2008. Two Shenzhen factories, 10 automated production lines, 305+ pieces of equipment, OEM/ODM cards, tags, labels, wristbands, keyfobs and readers shipped to 60+ countries.",
+    "Proud Tek is a custom RFID & NFC manufacturer in China since 2008. Two Shenzhen factories, 10 automated production lines, 305+ pieces of equipment, OEM/ODM cards, tags, labels, wristbands, keyfobs and readers shipped to 50+ countries.",
   "/product/125khz-rfid-sticker/":
     "125 kHz RFID stickers for compact LF access-control or identification projects where adhesive labels work better than cards or keyfobs.",
   "/product/em4200-card/":

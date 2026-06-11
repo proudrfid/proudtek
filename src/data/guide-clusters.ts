@@ -39,7 +39,7 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     icon: "⭐",
     description:
       "Tap-to-review NFC cards that lift Google Business Profile review volume by 5–10× with zero staff training overhead. Vertical playbooks for restaurants, hotels, dental, fitness, salons, auto dealers, and multi-location brands.",
-    seoTitle: "Google Review NFC Cards — Design, Placement & Vertical Playbooks | Proud Tek",
+    seoTitle: "Google Review NFC Cards — Design & Placement Guides | Proud Tek",
     pillars: [
       "Design & copy templates that respect Google's review-solicitation policy",
       "Placement maps for table-tents, host stands, checkout counters, and exit gates",
@@ -67,7 +67,7 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     icon: "🏨",
     description:
       "Procurement-ready guides for hotel RFID keycards: artwork files, encoding workflow, substrate selection, and supplier sample planning. Compatible with Salto, dormakaba, ASSA ABLOY VingCard, and Onity Saflok lock systems.",
-    seoTitle: "Hotel Keycard Buyer's Guides — Artwork, Encoding, Materials, Samples | Proud Tek",
+    seoTitle: "Hotel Keycard Buyer's Guides — Artwork to Samples | Proud Tek",
     pillars: [
       "ISO 7810 ID-1 artwork files with 3 mm bleed and Pantone-vs-CMYK guidance",
       "Encoding workflow for MIFARE Classic, DESFire EV3, and Ultralight C",
@@ -88,7 +88,7 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     icon: "🔬",
     description:
       "Datasheet-grade technical references for the chip families that ship in 99% of RFID and NFC deployments: NXP MIFARE / NTAG / UCODE / ICODE, Impinj Monza, EM Microelectronic LF chips, and the NTAG 424 DNA SUN+CMAC authentication flow.",
-    seoTitle: "RFID & NFC Chip Encyclopedias — Memory Maps, Commands, Cost Profiles | Proud Tek",
+    seoTitle: "RFID & NFC Chip Encyclopedias — Memory Maps & Costs | Proud Tek",
     pillars: [
       "Memory maps with hex addresses verified against NXP / Impinj / EM Micro datasheets",
       "Command-set tables and authentication flow diagrams",
@@ -115,7 +115,7 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     icon: "📐",
     description:
       "Authoritative explainers for the air-interface standards and encoding schemes that govern interoperable RFID and NFC: EPC Gen2 v3, ISO/IEC 14443 + 18000-63, RAIN RFID Alliance, NFC NDEF, and the GS1 EPC Tag Data Standard.",
-    seoTitle: "RFID Standards & Encoding Guides — EPC Gen2, ISO 14443, RAIN, NDEF, GS1 | Proud Tek",
+    seoTitle: "RFID Standards & Encoding Guides — EPC Gen2 to NDEF | Proud Tek",
     pillars: [
       "EPC Gen2 v3 (2025) air-interface walkthrough",
       "ISO/IEC 14443 Type A vs Type B + ISO/IEC 18000-63:2021",
@@ -138,7 +138,7 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     icon: "⚖️",
     description:
       "Compliance officer references for the eight regulations that touch every RFID program: Walmart's mandate, Target T2/T3, FDA DSCSA, EU Digital Product Passport (ESPR 2024/1781), CE / RoHS / REACH, California CCPA, and FSMA 204 food traceability.",
-    seoTitle: "RFID Compliance & Regulatory Guides — Walmart, FDA, EU DPP, CE, RoHS, FSMA 204 | Proud Tek",
+    seoTitle: "RFID Compliance & Regulatory Guides — Walmart to CE | Proud Tek",
     pillars: [
       "Walmart RFID mandate by department + Target T2/T3 vendor requirements",
       "FDA DSCSA Phase 3 (Nov 2025) and EU FMD comparison",
@@ -163,7 +163,7 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     icon: "🛠️",
     description:
       "Engineering integration guides covering UHF RFID reader APIs (LLRP + vendor SDKs), Android / iPhone NFC programming, the Python RFID toolchain, and ERP integrations for SAP S/4HANA EWM, Oracle NetSuite, and Shopify.",
-    seoTitle: "RFID Integration & Tooling Guides — SDKs, ERP, NFC Programming | Proud Tek",
+    seoTitle: "RFID Integration & Tooling Guides — SDKs, ERP, NFC | Proud Tek",
     pillars: [
       "LLRP + Impinj Octane / Zebra IoT Connector / Honeywell SDK reference",
       "Android NFC API, iPhone Core NFC, Apple Wallet HCE",
@@ -187,7 +187,7 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     icon: "📚",
     description:
       "General-purpose buyer's references that don't fit one vertical: how to choose RFID readers and writers, how long RFID tags last in different environments, and iPhone-vs-Android NFC business card compatibility.",
-    seoTitle: "RFID Buyer's References — Reader Selection, Lifespan, NFC Compatibility | Proud Tek",
+    seoTitle: "RFID Buyer's References — Readers, Lifespan & NFC | Proud Tek",
     pillars: [
       "Reader / writer selection across handheld, fixed, USB desktop, and BLE",
       "Tag, card, and wristband lifespan benchmarks by environment",

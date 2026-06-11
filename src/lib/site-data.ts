@@ -142,6 +142,17 @@ export async function getSiteData(): Promise<SiteData> {
 }
 
 /**
+ * Sync accessor for the snapshot build timestamp (siteData.generatedAt).
+ * Populated once `getSiteData()` has resolved — which is always the case
+ * during page builds (every render path loads its page via getSiteData /
+ * getPageByRoute first). Used by sync SEO helpers (seo/page-data.ts
+ * getArticleDate) that need a stable date fallback instead of `new Date()`.
+ */
+export function getSiteGeneratedAt(): string | null {
+  return siteDataCache?.generatedAt ?? null;
+}
+
+/**
  * Load a complete page by route. For synthetic pages the in-memory version is
  * returned; for WP snapshots the on-disk JSON file is read.
  */

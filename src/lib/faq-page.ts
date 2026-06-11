@@ -491,7 +491,7 @@ export const FAQ_CATEGORIES: FaqCategory[] = [
       {
         question: "Does Proud Tek offer OEM and white-label manufacturing?",
         answer:
-          "Yes. Many of our customers are system integrators, distributors, and brand owners who sell under their own labels. We provide full white-label service including custom packaging (boxes, bags, blister packs), branded user manuals, custom product labels, and private-label invoicing. NDAs are available upon request. We currently white-label for over 100 brands across 40+ countries and maintain strict confidentiality between competing customers.",
+          "Yes. Many of our customers are system integrators, distributors, and brand owners who sell under their own labels. We provide full white-label service including custom packaging (boxes, bags, blister packs), branded user manuals, custom product labels, and private-label invoicing. NDAs are available upon request. We currently white-label for over 100 brands across 50+ countries and maintain strict confidentiality between competing customers.",
       },
       {
         question: "What quality control process does Proud Tek follow?",

@@ -124,7 +124,16 @@ export function optimizeProductHeading(value: string, route: string): string {
         return token;
       }
 
-      return token.charAt(0).toUpperCase() + token.slice(1).toLowerCase();
+      // Don't lowercase what we don't recognize: tokens that already carry
+      // uppercase letters (acronyms like ASME / ISO / NFPA, mixed-case names
+      // like COBie / IECEx) keep their source casing — title-casing them
+      // mangled standards bodies into "Asme" / "Iso". Only plain
+      // all-lowercase words get title-cased.
+      if (token !== token.toLowerCase()) {
+        return token;
+      }
+
+      return token.charAt(0).toUpperCase() + token.slice(1);
     })
     .join(" ");
 }

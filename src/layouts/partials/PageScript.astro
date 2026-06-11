@@ -569,6 +569,18 @@
           window.dataLayer = window.dataLayer || [];
           window.dataLayer.push(Object.assign({ event: eventName }, payload));
         } catch (err) { /* ignore */ }
+        /* gtag bridge (2026-06-09): the site loads plain gtag.js, not a GTM
+           container, and gtag.js ignores plain-object dataLayer pushes — so
+           none of the funnel events above ever reached GA4. Mirror each
+           event through gtag() (payload minus the event key). gtag() pushes
+           an `arguments` object, which gtag.js DOES process, and which GTM
+           would ignore — so no double-count if a container is added later.
+           Strict no-op when gtag is absent; measurement ID untouched. */
+        try {
+          if (typeof window.gtag === 'function' && eventName) {
+            window.gtag('event', eventName, payload || {});
+          }
+        } catch (err) { /* ignore */ }
         try {
           document.dispatchEvent(new CustomEvent('codex:event', {
             detail: Object.assign({ event: eventName }, payload),
@@ -786,6 +798,48 @@
           if (btn && typeof btn.click === 'function') btn.click();
         });
       });
+
+      /* Cookie-consent banner — 2026-06-10.
+         Consent Mode v2 defaults to denied (SeoHead.astro); without a way
+         for visitors to grant consent, GA4 never records full sessions.
+         Minimal two-button banner on the shared .codex-banner pattern
+         (DS-12 Phase 4 lists "privacy / cookie consent" as a use case).
+         Accept → localStorage 'codex-consent'='granted' + gtag consent
+         update (SeoHead re-applies it on every later page load before
+         gtag.js). Decline → store 'denied', never show again. × dismiss →
+         no storage, banner returns next visit. Escape-to-dismiss comes
+         free from the DS-13 #4a handler above. */
+      try {
+        var consentChoice = null;
+        try { consentChoice = localStorage.getItem('codex-consent'); } catch (e) {}
+        if (consentChoice !== 'granted' && consentChoice !== 'denied') {
+          var cb = document.createElement('div');
+          cb.className = 'codex-banner codex-banner--consent';
+          cb.id = 'codex-consent';
+          cb.setAttribute('role', 'complementary');
+          cb.setAttribute('aria-label', 'Cookie notice');
+          cb.innerHTML =
+            '<span class="codex-banner__message">We use cookies for anonymous analytics to improve this site. No marketing trackers.</span>' +
+            '<button type="button" class="codex-banner__action" data-codex-consent="granted">Accept</button>' +
+            '<button type="button" class="codex-banner__action" data-codex-consent="denied" style="background:transparent;border:1px solid currentColor;">Decline</button>' +
+            '<button type="button" class="codex-banner__dismiss" aria-label="Dismiss cookie notice">×</button>';
+          document.body.appendChild(cb);
+          requestAnimationFrame(function() { cb.classList.add('is-visible'); });
+          cb.addEventListener('click', function(ev) {
+            var btn = ev.target && ev.target.closest ? ev.target.closest('[data-codex-consent], .codex-banner__dismiss') : null;
+            if (!btn) return;
+            var choice = btn.getAttribute('data-codex-consent');
+            if (choice) {
+              try { localStorage.setItem('codex-consent', choice); } catch (e) {}
+              if (choice === 'granted' && typeof window.gtag === 'function') {
+                window.gtag('consent', 'update', { analytics_storage: 'granted' });
+              }
+            }
+            cb.classList.remove('is-visible');
+            window.setTimeout(function() { if (cb.parentNode) cb.parentNode.removeChild(cb); }, 350);
+          });
+        }
+      } catch (e) { /* never block the page on consent UI */ }
 
       /* DS-13 #4b — dev-only sanity check for banner role attribute.
          Pattern docs require role="complementary" / "status" / "alert" per

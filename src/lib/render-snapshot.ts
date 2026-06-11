@@ -90,6 +90,13 @@ const UNUSED_HEAD_ASSET_PATTERNS: Array<string | RegExp> = [
   // Native expand/collapse + keyboard semantics come free from the
   // platform; the 13 KB Kadence runtime is dead weight on /faq/.
   'script[src*="kt-accordion"]',
+  // 2026-06-10 — kb-form-block hijacks form submits: preventDefault +
+  // three-dot loading state + XHR to the WP admin-ajax endpoint that no
+  // longer exists, so the Formspree-rewritten contact/faq/home forms hang
+  // forever and the lead is lost. With it stripped, the native POST to
+  // formspree.io (set by enhancePrimaryContactPage) proceeds; client-side
+  // validation is covered by the BaseLayout [data-codex-rfq] script.
+  'script[src*="kb-form-block"]',
 ];
 
 const NOISY_EXTERNAL_HREF_PATTERNS = [
@@ -1366,7 +1373,7 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
           </span>
           <span class="codex-contact__channel-body">
             <span class="codex-contact__label">Office</span>
-            <span class="codex-contact__value">A2110, Zhantao Building, #1079 Minzhi Road, Longhua District, Shenzhen, China</span>
+            <span class="codex-contact__value">A2109, Zhantao Building, #1079 Minzhi Rd., Longhua District, Shenzhen City, Guangdong, China</span>
           </span>
         </div>
 

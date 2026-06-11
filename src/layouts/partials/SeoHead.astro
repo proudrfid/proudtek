@@ -12,6 +12,7 @@
  * file focused on structure rather than meta-tag plumbing.
  */
 import type { PageSeoData } from "../../lib/seo";
+import { SITE_ORIGIN } from "../../lib/seo-content";
 
 interface Props {
   seo: PageSeoData;
@@ -20,6 +21,31 @@ interface Props {
 }
 
 const { seo, machineJsonPath, machineTextPath } = Astro.props;
+
+// seo.imageUrl is ABSOLUTE (image-utils wraps every selection in
+// absoluteUrl()), so gates on a "/landing-images/" prefix must parse the
+// pathname first — a startsWith() on the full URL never matches and left
+// the WebP-preload branch below dead (the page preloaded the .jpg while
+// <picture> served the .webp = double download).
+const imagePathname = (() => {
+  try {
+    return new URL(seo.imageUrl ?? "", `${SITE_ORIGIN}/`).pathname;
+  } catch {
+    return "";
+  }
+})();
+const isLandingHeroImage = imagePathname.startsWith("/landing-images/");
+
+// og:image:type from the file extension. Hero source dimensions vary per
+// page (no fixed 16:9 contract), so width/height are deliberately not
+// emitted — a wrong declared size is worse than none.
+const ogImageType = /\.jpe?g$/i.test(imagePathname)
+  ? "image/jpeg"
+  : /\.png$/i.test(imagePathname)
+    ? "image/png"
+    : /\.webp$/i.test(imagePathname)
+      ? "image/webp"
+      : "";
 ---
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -57,7 +83,7 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     modern Chromium-based browsers still prefer the WebP via the
     imagesrcset+imagetype hint. */}
 {seo.imageUrl && seo.kind !== "home" && seo.kind !== "contact" ? (
-  seo.imageUrl.startsWith("/landing-images/") ? (
+  isLandingHeroImage ? (
     // @ts-expect-error — Astro's LinkHTMLAttributes type predates the
     // responsive-image preload attributes (imagesrcset, imagetype) per
     // HTML Living Standard. Both attributes are valid; Astro emits them
@@ -120,10 +146,17 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     security_storage: 'granted',
     wait_for_update: 500
   });
+  // Re-apply a previously saved cookie-banner choice before gtag.js loads.
+  // The banner UI itself lives in PageScript.astro (#codex-consent).
+  try {
+    if (localStorage.getItem('codex-consent') === 'granted') {
+      gtag('consent', 'update', { analytics_storage: 'granted' });
+    }
+  } catch (e) {}
   gtag('js', new Date());
-  gtag('config', 'G-30013548');
+  gtag('config', 'G-QB63MNYN52');
 </script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-30013548"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QB63MNYN52"></script>
 
 {seo.indexable && machineJsonPath ? <link rel="alternate" type="application/json" href={machineJsonPath} /> : null}
 {seo.indexable && machineTextPath ? <link rel="alternate" type="text/plain" href={machineTextPath} /> : null}
@@ -136,6 +169,7 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
 <meta property="og:url" content={seo.canonicalUrl} />
 <meta property="og:image" content={seo.imageUrl} />
 <meta property="og:image:alt" content={seo.imageAlt} />
+{ogImageType ? <meta property="og:image:type" content={ogImageType} /> : null}
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={seo.title} />

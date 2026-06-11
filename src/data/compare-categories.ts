@@ -38,7 +38,7 @@ export const COMPARE_CATEGORIES: CompareCategory[] = [
     icon: "💾",
     description:
       "Side-by-side chip-family comparisons for the HF, NFC and UHF silicon that ships in 99% of card, label and tag deployments. Use these to settle the chip-selection question before you spec a sample.",
-    seoTitle: "Chip vs Chip Comparisons — MIFARE, NTAG, UCODE, Monza, Higgs, EM4100 vs T5577 | Proud Tek",
+    seoTitle: "Chip vs Chip Comparisons — MIFARE, NTAG & UCODE | Proud Tek",
     pillars: [
       "MIFARE Classic vs Plus vs DESFire EV3 selection for hotel-lock retrofits",
       "NXP NTAG213 vs NTAG215 vs NTAG216 memory and price ladder",
@@ -80,7 +80,7 @@ export const COMPARE_CATEGORIES: CompareCategory[] = [
     icon: "🎨",
     description:
       "Form-factor and material comparisons for the cards, wristbands, keyfobs, labels and review-collection devices that actually reach end users. Use these pages to pick the right shell before deciding on the chip inside.",
-    seoTitle: "Form Factor & Material Comparisons — Cards, Wristbands, Keyfobs, Labels | Proud Tek",
+    seoTitle: "Form Factor & Material Comparisons — Cards to Labels | Proud Tek",
     pillars: [
       "Hotel keycards vs hotel wristbands — credential program design",
       "Keyfob vs card vs wristband for access control",
@@ -108,7 +108,7 @@ export const COMPARE_CATEGORIES: CompareCategory[] = [
     icon: "📊",
     description:
       "Frequency-band and technology comparisons — LF vs HF vs UHF RFID, RFID vs barcode, RFID vs BLE, NFC vs Bluetooth — written to settle the air-interface question before you start sourcing readers and tags.",
-    seoTitle: "Frequency & Technology Comparisons — LF, HF, UHF, BLE, NFC, Barcode | Proud Tek",
+    seoTitle: "Frequency & Technology Comparisons — LF, HF & UHF | Proud Tek",
     pillars: [
       "125 kHz vs 13.56 MHz vs 860-960 MHz frequency-band selection",
       "Active vs passive RFID — range, cost, refresh cycle",

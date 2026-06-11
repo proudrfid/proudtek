@@ -28,6 +28,7 @@ import {
 } from "../seo-content";
 
 import { EDITORIAL_KEYWORDS_MAP } from "../editorial-pages";
+import { hasAuthorityArticle } from "../editorial-authority-ld";
 import type { EditorialDefinition } from "../editorial-types";
 import { isWorkflowSection } from "../editorial-types";
 
@@ -397,7 +398,12 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
     });
   }
 
-  if (context.kind === "article" && context.articleMeta) {
+  // Skip this Article when the route's editorial definition carries
+  // authority signals — the layouts (EditorialPageLayout / SnapshotLayout)
+  // append the richer authority Article from editorial-authority-ld.ts for
+  // exactly those routes, and emitting both produced two Article entities
+  // with the same @id on every editorial page.
+  if (context.kind === "article" && context.articleMeta && !hasAuthorityArticle(canonicalPath)) {
     const authorSchema: Record<string, unknown> = {
       "@type": "Person",
       name: context.articleMeta.authorName,
@@ -412,8 +418,6 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
     entries.push({
       "@context": "https://schema.org",
       "@type": "Article",
-      // Shared @id with editorial-authority-ld so the two emitter paths
-      // describe a single Article entity rather than two duplicates.
       "@id": `${canonicalPath}#article`,
       headline: context.contentTitle,
       description: context.description,
@@ -490,7 +494,7 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
       "@id": `${context.canonicalUrl}#hero-video`,
       name: "Proud Tek RFID & NFC Manufacturing — Production Floor",
       description:
-        "On-site footage from Proud Tek's Shenzhen facility showing automated RFID & NFC card / tag / label production lines. Two ISO 9001 audited factories, 10 production lines, 305+ pieces of equipment serving 60+ countries.",
+        "On-site footage from Proud Tek's Shenzhen facility showing automated RFID & NFC card / tag / label production lines. Two ISO 9001 audited factories, 10 production lines, 305+ pieces of equipment serving 50+ countries.",
       thumbnailUrl: [
         absoluteUrl("/site-assets/wp-content/uploads/2024/08/rfid_factories.jpg"),
       ],

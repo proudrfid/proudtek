@@ -1877,6 +1877,43 @@ body.codex-catalog-rail-locked { overflow: hidden; }
     margin-left: 272px;
     margin-right: var(--codex-space-6);
   }
+  .content-wrap.codex-editorial-pillar--with-rail .entry.content-bg {
+    max-width: none;
+  }
+  /* Full-width hero: single column, collage stacked below the title, spanning the
+     full content width like the hub grid below. Note: the composite image is only
+     1200px wide natively, so it upscales (and gets ~1000px tall) at full width. */
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero {
+    grid-template-columns: 1fr;
+  }
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-figure {
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-figure :is(picture, img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* Let the QUICK ANSWER paragraph and key-points list span the full width too —
+     the 70ch reading cap otherwise leaves a wide blank gutter beside them. */
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-answer :is(p, li, dd),
+  .content-wrap.codex-editorial-pillar--with-rail .codex-editorial-hero .codex-editorial-points :is(p, li, dd) {
+    max-width: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  body.tax-product_cat.has-left-sidebar .content-container.site-container {
+    display: block;
+    max-width: none;
+  }
+  body.tax-product_cat.has-left-sidebar .site-main {
+    margin-left: 272px;
+    margin-right: var(--codex-space-6);
+  }
 }
 
 /* ═══════════════════════════════════════════
@@ -2400,7 +2437,13 @@ body.codex-catalog-rail-locked { overflow: hidden; }
    ═══════════════════════════════════════════ */
 
 .codex-editorial-page {
-  max-width: min(1160px, calc(100% - var(--codex-space-8)));
+  /* Narrow the whole editorial article to one comfortable reading column and
+     center it. Body text (capped at the 70ch reading measure) then fills its
+     container instead of hugging the left with a lopsided right gutter, and the
+     hero, jump-nav, sections and grids all share one width down the page. Wide
+     blocks (tables, feature grids, compare panels, snapshot grids) reflow within
+     this column. Matches the narrowed hero. */
+  max-width: min(48rem, calc(100% - var(--codex-space-8)));
   margin: 0 auto var(--codex-space-12);
 }
 
@@ -2436,8 +2479,17 @@ body.codex-catalog-rail-locked { overflow: hidden; }
 .codex-editorial-hero {
   display: grid;
   gap: var(--codex-space-6);
-  align-items: center;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
+  /* Single column: title block + main image stack vertically, image sits
+     directly under the title (it now renders inside .codex-editorial-hero-copy
+     between the deck and the Quick Answer box). The column is capped to a
+     comfortable reading measure and centered, so the Quick Answer box and hero
+     points don't stretch full-width — their text caps at the 70ch reading
+     measure, which would otherwise leave a large lopsided gutter on the right.
+     Capping the column at one content-measure (70ch) makes the box hug its own
+     text (no internal gutter), the outer whitespace symmetric and intentional,
+     and keeps the main image the same width as the copy. */
+  grid-template-columns: minmax(0, var(--codex-content-measure));
+  justify-content: center;
   padding: var(--codex-space-7);
   border: 1px solid rgba(41, 28, 14, 0.1);
   border-radius: var(--codex-radius-card-xl);

@@ -41,12 +41,12 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/product/mifare-classic-card/":           "/products/rfid-cards/mifare-classic-1k-card/",
   "/product/mifare-4k-card/":                "/products/rfid-cards/mifare-classic-1k-card/",
   "/product/mifare-plus-card/":              "/products/rfid-cards/mifare-plus-se-card/",
-  "/product/mifare-desfire-cards/":          "/products/rfid-cards/mifare-desfire-ev3-cards/",
+  "/product/mifare-desfire-cards/":          "/products/rfid-cards/mifare-desfire-ev3-card/",
   "/product/mifare-desfire-ev2-cards/":      "/products/rfid-cards/mifare-desfire-ev3-card/",
   "/product/desfire-tag/":                   "/products/rfid-cards/mifare-desfire-ev3-card/",
   "/product/java-card/":                     "/products/rfid-cards/mifare-desfire-ev3-card/",
-  "/product/dual-interface-card/":           "/products/rfid-cards/rfid-dual-frequency-card/",
-  "/product/combi-card/":                    "/products/rfid-cards/rfid-dual-frequency-card/",
+  "/product/dual-interface-card/":           "/products/rfid-cards/dual-frequency-rfid-card/",
+  "/product/combi-card/":                    "/products/rfid-cards/dual-frequency-rfid-card/",
   "/product/metal-nfc-card/":                "/products/rfid-cards/rfid-metal-business-card/",
   "/product/wooden-rfid-card/":              "/products/rfid-cards/rfid-wooden-card/",
   "/product/eco_rfid_card/":                 "/products/rfid-cards/rfid-bamboo-card/",
@@ -105,4 +105,38 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/product/acr122u/":                       "/products/rfid-readers/desktop-nfc-reader-encoder/",
   "/product/bluetooth-rfid-scanner/":        "/products/rfid-readers/handheld-uhf-rfid-reader/",
   "/product/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/desktop-nfc-reader-encoder/",
+
+  /* Batch 40 / wristband-card dedup collapses — mirror vercel.json + _redirects
+     so rewriteLegacyInternalLinks fixes in-content links too. */
+  "/products/rfid-wristbands/nfc-payment-wristband/":  "/products/rfid-wristbands/cashless-payment-rfid-wristband/",
+  "/products/rfid-wristbands/tyvek-rfid-wristband/":   "/products/rfid-wristbands/rfid-tyvek-wristband/",
+  "/products/rfid-cards/mifare-ultralight-c-cards/":   "/products/rfid-cards/mifare-ultralight-c-card/",
+  "/products/rfid-cards/mifare-desfire-ev3-cards/":    "/products/rfid-cards/mifare-desfire-ev3-card/",
+  "/products/rfid-cards/rfid-dual-frequency-card/":    "/products/rfid-cards/dual-frequency-rfid-card/",
+  "/products/rfid-cards/transparent-clear-nfc-card/":  "/products/rfid-cards/transparent-nfc-card/",
+
+  /* Cannibalization collapses — same-intent twins → strongest page
+     (2026-06-10, user-approved; unique loser content folded into survivors).
+     Mirrored in vercel.json + public/_redirects. */
+  "/blog/ntag213-vs-ntag215-vs-ntag216/":              "/compare/ntag213-vs-ntag215-vs-ntag216/",
+  "/blog/em4100-vs-t5577-125khz-comparison/":          "/compare/em4100-vs-t5577/",
+  "/blog/magnetic-stripe-vs-rfid-hotel-cards/":        "/compare/rfid-vs-magnetic-hotel-key-cards/",
+  "/compare/rfid-hotel-card-vs-magnetic-stripe/":      "/compare/rfid-vs-magnetic-hotel-key-cards/",
+  "/blog/pps-vs-silicone-vs-textile-laundry-tags/":    "/compare/pps-vs-silicone-vs-textile-rfid-laundry-tags/",
+  "/blog/silicone-vs-fabric-vs-tyvek-wristbands/":     "/compare/silicone-vs-fabric-vs-woven-rfid-wristbands/",
+  "/blog/how-to-choose-rfid-wristband-material/":      "/compare/silicone-vs-fabric-vs-woven-rfid-wristbands/",
+  "/blog/hotel-key-card-encoding-explained/":          "/guides/hotel-key-card-encoding/",
+  "/blog/hotel-key-card-design-printing/":             "/guides/hotel-key-card-artwork-and-printing-checklist/",
+  "/blog/walmart-rfid-mandate-2026-supplier-compliance/": "/guides/walmart-rfid-tagging-mandate/",
+  "/solutions/rfid-laundry-tracking/":                 "/solutions/rfid-laundry-management/",
+  "/blog/rfid-laundry-system-payback-period/":         "/blog/rfid-laundry-system-roi/",
+  "/blog/rfid-wristbands-music-festival-2026/":        "/blog/rfid-wristbands-festivals-events/",
+  "/about/case-studies/":                              "/case-studies/",
+
+  /* lp doorway-cluster consolidation — 16 → 12 pages (2026-06-10,
+     user-approved option (a): merge near-duplicates, expand survivors). */
+  "/lp/rfid-factory-direct-china/":                    "/lp/rfid-manufacturer-shenzhen/",
+  "/lp/rfid-solution-provider/":                       "/lp/rfid-manufacturer-shenzhen/",
+  "/lp/nfc-tag-supplier/":                             "/lp/nfc-tag-manufacturer-china/",
+  "/lp/uhf-rfid-tag-manufacturer/":                    "/lp/rfid-tag-factory/",
 };
