@@ -551,11 +551,14 @@ export function resolveFaqEntries($body: CheerioAPI): FaqEntry[] {
 
 export function buildDocumentTitle(route: string, contentTitle: string, kind: PageKind): string {
   if (route === "/") {
-    // Homepage SEO title — keyword-loaded for "RFID/NFC manufacturer China",
-    // "RFID cards / tags / labels / readers / wristbands / keyfobs" and the
-    // OEM/ODM intent. Replaces the legacy generic "Custom RFID & NFC
-    // Manufacturer | Proud Tek" (P0 T1, 2026-05-13).
-    return "Custom RFID & NFC Manufacturer in China — Cards, Tags, Labels, Wristbands, Keyfobs, Readers (OEM/ODM) | Proud Tek";
+    // Homepage SEO title — compressed 2026-06-11 (user-approved) from the
+    // 115-char P0-T1 keyword string: >65-char titles get rewritten by Google
+    // ~70% of the time, surrendering CTR control. Keeps the head query
+    // ("custom RFID & NFC manufacturer China") + the 2008 trust signal, and
+    // now matches index.json's title/H1 exactly. Product-family keywords
+    // live in the meta description (PAGE_DESCRIPTION_OVERRIDES["/"]) and
+    // the homepage body. Renders at 62 chars.
+    return "Custom RFID & NFC Manufacturer in China since 2008 | Proud Tek";
   }
 
   if (kind === "product") {

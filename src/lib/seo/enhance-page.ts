@@ -489,6 +489,30 @@ export function enhanceKadenceA11y($body: CheerioAPI): void {
     const className = $el.attr("class") ?? "";
     $el.replaceWith(`<p class="${className}">${html}</p>`);
   });
+
+  // (5) heading-order iter-4 (PSI 2026-06-11) — the home Capabilities
+  //     column emits <h4 class="wp-block-heading">Comprehensive
+  //     Manufacturing Excellence</h4> directly after a section <h2>,
+  //     skipping h3. Promote that one to <h3>; the legacy-bridge CSS
+  //     ladder styles h3.wp-block-heading appropriately. Text-matched
+  //     to stay surgical (same conservatism as (4)).
+  $body("h4.wp-block-heading").each((_, element) => {
+    const $el = $body(element);
+    const text = cleanText($el.text());
+    if (text !== "Comprehensive Manufacturing Excellence") return;
+    const html = $el.html() ?? "";
+    const className = $el.attr("class") ?? "";
+    $el.replaceWith(`<h3 class="${className}">${html}</h3>`);
+  });
+
+  // (6) responsive-image sizes (PSI 2026-06-11) — the "18 years badge"
+  //     ships a 600px-slot sizes attr but renders at ~210px, so mobile
+  //     Lighthouse downloads the 600w original (-24.6 KiB est.). An
+  //     honest sizes lets the browser pick the 300w/150w variant. The
+  //     srcset (600/300/150/100/12w) already exists in the snapshot.
+  $body('img[src*="18-years-badge"]').each((_, element) => {
+    $body(element).attr("sizes", "(max-width: 767px) 40vw, 210px");
+  });
 }
 
 export function enhanceFaqPage($body: CheerioAPI): void {

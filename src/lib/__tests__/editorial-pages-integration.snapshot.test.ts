@@ -1,6 +1,6 @@
 /**
  * Integration snapshot tests — full-page EditorialArticle.astro output for
- * 5 representative production fixtures (one per major route group).
+ * 6 representative production fixtures (one per major route group).
  *
  * Post-cutover (2026-05-12). Replaces the legacy `renderEditorialMain`-based
  * snapshots. EditorialArticle.astro is the only render path now; this file
@@ -12,9 +12,10 @@
  * each section variant in isolation. This file complements that by locking
  * the full-page composition wiring that variant tests don't exercise.
  *
- * The 5 fixtures are deliberately drawn from disjoint content groups so any
+ * The 6 fixtures are deliberately drawn from disjoint content groups so any
  * group-specific branch (e.g. `definition.route === "/industries/"` adds a
- * hub-rail; `group === "lp"` strips trail; etc.) gets locked somewhere.
+ * hub-rail; `group === "lp"` strips trail; the products SKU route renders
+ * the CommercialTerms strip; etc.) gets locked somewhere.
  * Picked the smallest-file fixture in each group to keep the snapshot file
  * from ballooning.
  *
@@ -72,6 +73,9 @@ const FIXTURES = [
   ["compare", "compare/google-review-nfc-card-vs-nfc-sticker.json"],
   ["guides", "guides/icode-slix-chip-encyclopedia.json"],
   ["blog", "blog/case-study-restaurant-group-nfc-review-cards-google-reviews-320-percent.json"],
+  // Products SKU leaf route — locks the C-10 CommercialTerms strip that
+  // renders between DecisionSnapshot and JumpNav on /products/<c>/<sku>/.
+  ["products", "products/rfid-keyfobs/rfid-wooden-keyfob.json"],
 ] as const;
 
 let container: AstroContainer;

@@ -790,7 +790,7 @@ function markActiveNav($body: ReturnType<typeof load>, currentRoute: string): vo
  * Replace the entire legacy footer body with a unified single-layer footer:
  *   1. Brand row: logo + tagline + Request-quote CTA
  *   2. Nav grid: 6 columns (Products / Industries / Solutions / Resources / Markets / Company)
- *   3. Bottom strip: copyright + contact + social icons
+ *   3. Bottom strip: copyright + contact + legal links (Privacy / Terms) + social icons
  *
  * The legacy `.site-bottom-footer-wrap` (logo strip + product nav + contact +
  * social) is removed because every piece of content has been folded into the
@@ -872,6 +872,10 @@ function renderFooterBottomStrip(): string {
           `<li><a href="tel:${SITE_CONTACT.phoneE164}">Tel: ${SITE_CONTACT.phoneDisplay}</a></li>` +
           `<li><a href="${whatsappUrl()}" target="_blank" rel="noopener noreferrer">WhatsApp</a></li>` +
           `<li><a href="mailto:${SITE_CONTACT.email}">${SITE_CONTACT.email}</a></li>` +
+        `</ul>` +
+        `<ul class="codex-footer-bottom__contact codex-footer-bottom__legal" aria-label="Legal">` +
+          `<li><a href="/about/privacy-policy/">Privacy Policy</a></li>` +
+          `<li><a href="/about/terms-of-use/">Terms of Use</a></li>` +
         `</ul>` +
         `<div class="codex-footer-bottom__social-row" aria-label="Social profiles">${socialHtml}</div>` +
       `</div>` +
@@ -1162,12 +1166,26 @@ function replaceHomepageHero($body: ReturnType<typeof load>): void {
   if (cover.hasClass("codex-replaced")) return;
 
   // Extract video src (the homepage RFID production footage)
-  const videoSrc = cover.find("video.wp-block-cover__video-background").attr("src");
-  if (!videoSrc) return;
+  const rawVideoSrc = cover.find("video.wp-block-cover__video-background").attr("src");
+  if (!rawVideoSrc) return;
+  // Perf (2026-06-11): serve the 24 s / 2.4 MB CRF-30 re-encode instead of
+  // the original 97 s / 10.8 MB upload the snapshot still references.
+  // Mapped here (not in the snapshot JSON) so a future snapshot refresh
+  // can't silently reintroduce the heavy file. Original kept on disk.
+  const videoSrc = rawVideoSrc.replace(
+    "RFID_production_proudtek.mp4",
+    "RFID_production_proudtek-24s.mp4",
+  );
 
   const html = `
 <section class="codex-home-hero">
-  <video class="codex-home-hero__video" autoplay muted loop playsinline preload="metadata" src="${videoSrc}"></video>
+  <!-- Perf (launch-day fix, 2026-06-11): the 10.8 MB hero video previously
+       shipped with autoplay+src, which forces the full download during first
+       paint (autoplay defeats preload="metadata"). Now: the 30 KB poster
+       (same image the VideoObject LD declares as thumbnailUrl) renders
+       instantly, and PageScript swaps data-src -> src after window load,
+       so the loop still autoplays but entirely off the critical path. -->
+  <video class="codex-home-hero__video" autoplay muted loop playsinline preload="none" poster="/site-assets/wp-content/uploads/2024/08/rfid_factories.jpg" data-src="${videoSrc}"></video>
   <div class="codex-home-hero__overlay" aria-hidden="true"></div>
   <div class="codex-home-hero__content">
     <h1 class="codex-home-hero__h1">Custom RFID &amp; NFC Manufacturer in China</h1>

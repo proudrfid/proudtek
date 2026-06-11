@@ -35,7 +35,9 @@ export interface EditorialSectionData {
     after: string[];
   };
   featureGrid?: {
-    features: Array<{ icon: string; title: string; text: string }>;
+    /** `id` is an optional stable anchor (e.g. author slug on the
+     *  review-board page) rendered as the feature card's `id` attribute. */
+    features: Array<{ icon: string; title: string; text: string; id?: string }>;
   };
   dataHighlight?: {
     value: string;
@@ -157,6 +159,14 @@ export interface EditorialOutline {
   nextStepId: string;
   jumpLinks: Array<{ id: string; label: string }>;
 }
+
+/** Stable anchor id for the inline quick-quote RFQ form (audit C-11).
+ *  InlineRfqForm.astro stamps it on its outer section; EditorialArticle.astro
+ *  points the hero primary CTA at `#quick-quote` and appends the "Get a
+ *  quote" jump-nav entry. Outline ids below are slug-generated from labels —
+ *  no current section label slugifies to "quick-quote"; avoid introducing
+ *  one (it would produce a duplicate id on the page). */
+export const QUICK_QUOTE_ID = "quick-quote";
 
 export function buildEditorialOutline(definition: EditorialDefinition): EditorialOutline {
   const used = new Set<string>();

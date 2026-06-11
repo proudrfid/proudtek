@@ -309,9 +309,12 @@
           });
         }
 
-        /* Hide sticky whenever ANY in-page conversion anchor is in view. */
+        /* Hide sticky whenever ANY in-page conversion anchor is in view.
+           CRO 2026-06-11: .codex-inline-rfq added — on editorial pages the
+           sticky now deep-links to that very form (#quick-quote), so it must
+           yield while the form itself is on screen. */
         var conversionAnchors = document.querySelectorAll(
-          '.codex-hero-cta, .codex-editorial-action-bar, .codex-conversion-shell, [data-conversion-anchor]'
+          '.codex-hero-cta, .codex-editorial-action-bar, .codex-conversion-shell, .codex-inline-rfq, [data-conversion-anchor]'
         );
         if (conversionAnchors.length > 0) {
           var stickyObserver = new IntersectionObserver(function(entries) {
@@ -655,6 +658,30 @@
             codexPushEvent('contact_map_open', { route: route });
           }
         }
+
+        /* Contact-channel + file-download attribution — CRO 2026-06-11.
+           Same delegated listener as cta_click so a phone / WhatsApp /
+           email tap or a datasheet download shows up in the funnel next
+           to the CTA events. Channels are detected from the href; the
+           file_download branch uses the anchor's resolved pathname so
+           relative links report a stable site path. */
+        var channelLink = e.target.closest('a[href]');
+        if (channelLink) {
+          var chHref = channelLink.getAttribute('href') || '';
+          if (/^tel:/i.test(chHref)) {
+            codexPushEvent('contact_click', { channel: 'phone', href: chHref, route: route });
+          } else if (chHref.indexOf('wa.me') !== -1) {
+            codexPushEvent('contact_click', { channel: 'whatsapp', href: chHref, route: route });
+          } else if (/^mailto:/i.test(chHref)) {
+            codexPushEvent('contact_click', { channel: 'email', href: chHref, route: route });
+          } else {
+            var dlPath = '';
+            try { dlPath = channelLink.pathname || ''; } catch (err) { dlPath = ''; }
+            if (dlPath.indexOf('/downloads/') === 0 || /\.(pdf|docx|xlsx)$/i.test(dlPath)) {
+              codexPushEvent('file_download', { file: dlPath, route: route });
+            }
+          }
+        }
       }, { capture: true });
 
       /* RFQ form analytics — DS-12 #6B (2026-04-27).
@@ -707,11 +734,15 @@
           });
         });
 
-        form.addEventListener('submit', function() {
-          // Validation runs in the existing submit handler; this listener
-          // fires regardless because it doesn't preventDefault. Analytics
-          // platforms downstream can filter to "successful" submits via
-          // the form's own redirect target.
+        form.addEventListener('submit', function(e) {
+          // CRO 2026-06-11: only count submits that pass validation. The
+          // DS-11 #5c validation handler is registered earlier on this same
+          // form (same file, codexForms loop above), so an invalid submit
+          // arrives here already defaultPrevented; checkValidity() is the
+          // order-independent double-guard. Net effect: exactly ONE
+          // form_submit per valid (actually posted) submit, zero for
+          // attempts the validation handler blocked.
+          if (e.defaultPrevented || !form.checkValidity()) return;
           codexPushEvent('form_submit', {
             form_id: formId,
             route: window.location.pathname,
@@ -821,10 +852,21 @@
           cb.innerHTML =
             '<span class="codex-banner__message">We use cookies for anonymous analytics to improve this site. No marketing trackers.</span>' +
             '<button type="button" class="codex-banner__action" data-codex-consent="granted">Accept</button>' +
-            '<button type="button" class="codex-banner__action" data-codex-consent="denied" style="background:transparent;border:1px solid currentColor;">Decline</button>' +
+            /* Decline is the ghost variant: transparent fill needs an explicit
+               light ink — without it the button inherits the gold-CTA's dark
+               text on the dark banner (~1:1 contrast, PSI a11y fail 2026-06-11). */
+            '<button type="button" class="codex-banner__action" data-codex-consent="denied" style="background:transparent;color:var(--banner-color,#fff);border:1px solid rgba(255,255,255,0.7);">Decline</button>' +
             '<button type="button" class="codex-banner__dismiss" aria-label="Dismiss cookie notice">×</button>';
           document.body.appendChild(cb);
-          requestAnimationFrame(function() { cb.classList.add('is-visible'); });
+          requestAnimationFrame(function() {
+            cb.classList.add('is-visible');
+            /* Consent ↔ sticky-CTA collision (CRO 2026-06-11): both are
+               fixed to the bottom edge. While the banner is open, flag the
+               body and publish the measured banner height so the sticky CTA
+               can lift above it (CSS in codex-components.css). */
+            document.body.classList.add('codex-consent-open');
+            try { document.body.style.setProperty('--codex-consent-offset', cb.offsetHeight + 'px'); } catch (e) {}
+          });
           cb.addEventListener('click', function(ev) {
             var btn = ev.target && ev.target.closest ? ev.target.closest('[data-codex-consent], .codex-banner__dismiss') : null;
             if (!btn) return;
@@ -836,10 +878,42 @@
               }
             }
             cb.classList.remove('is-visible');
+            document.body.classList.remove('codex-consent-open');
+            try { document.body.style.removeProperty('--codex-consent-offset'); } catch (e) {}
             window.setTimeout(function() { if (cb.parentNode) cb.parentNode.removeChild(cb); }, 350);
           });
         }
       } catch (e) { /* never block the page on consent UI */ }
+
+      /* Deferred hero video (launch-day perf fix, 2026-06-11).
+         The homepage hero <video> ships with poster + data-src and NO src,
+         so the 10.8 MB loop costs nothing during first paint. After the
+         window load event (idle-deferred), swap data-src into src — the
+         autoplay/muted/loop attributes then start the loop seamlessly over
+         the poster. Guarded so non-homepage routes (no match) are free. */
+      try {
+        var deferredVideos = document.querySelectorAll('video[data-src]');
+        if (deferredVideos.length) {
+          var startDeferredVideos = function() {
+            deferredVideos.forEach(function(v) {
+              if (v.src) return;
+              v.src = v.getAttribute('data-src');
+              v.removeAttribute('data-src');
+              var p = v.play();
+              if (p && typeof p.catch === 'function') p.catch(function() { /* autoplay blocked — poster stays */ });
+            });
+          };
+          var scheduleVideos = function() {
+            if (typeof window.requestIdleCallback === 'function') {
+              window.requestIdleCallback(startDeferredVideos, { timeout: 4000 });
+            } else {
+              window.setTimeout(startDeferredVideos, 800);
+            }
+          };
+          if (document.readyState === 'complete') scheduleVideos();
+          else window.addEventListener('load', scheduleVideos, { once: true });
+        }
+      } catch (e) { /* never block the page on the hero video */ }
 
       /* DS-13 #4b — dev-only sanity check for banner role attribute.
          Pattern docs require role="complementary" / "status" / "alert" per

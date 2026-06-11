@@ -56,12 +56,11 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
     origin is redundant. sanitize-html.ts strips dns-prefetch hints from
     the WP chrome snapshot for the same reason.
 
-    PR-3 P0-P2 — also preconnect to region1.google-analytics.com.
-    gtag.js loads from googletagmanager.com but beacon requests for
-    GA4 actually POST to region1.google-analytics.com; preconnecting
-    here saves a separate TLS handshake when the first event fires. */}
+    PSI 2026-06-11: the former region1.google-analytics.com preconnect
+    was flagged "unused" — GA4 beacons only fire after consent/interaction,
+    long past the preconnect's ~10s TTL, so the early TLS handshake was
+    wasted work on every load. Keep only the gtag.js origin. */}
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
-<link rel="preconnect" href="https://region1.google-analytics.com" crossorigin />
 
 {/* Preload critical fonts (Latin subsets for Inter body + Lora headings) */}
 <link rel="preload" href="/site-assets/wp-content/fonts/inter/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2" as="font" type="font/woff2" crossorigin />

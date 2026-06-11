@@ -17,6 +17,9 @@ interface Feature {
   icon: string;
   title: string;
   text: string;
+  /** Optional stable anchor id (e.g. author slug on the review-board page)
+   *  so deep links like /about/review-board/#peter-zhang resolve here. */
+  id?: string;
 }
 
 interface Props {
@@ -29,7 +32,7 @@ const { features, citations } = Astro.props;
 {features.length > 0 && (
   <div class="codex-editorial-feature-grid">
     {features.map((feature) => (
-      <article class="codex-editorial-feature">
+      <article class="codex-editorial-feature" id={feature.id}>
         <FeatureIcon icon={feature.icon} />
         <h3 class="codex-editorial-feature__title">{feature.title}</h3>
         <p class="codex-editorial-feature__text" set:html={renderInlineLinks(feature.text, citations)} />

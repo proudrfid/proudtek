@@ -5,6 +5,7 @@ import type {
   CoreSupportProfile,
   ProductSourceProfile,
 } from "./seo";
+import { getAuthorRecord } from "./authors";
 
 /**
  * The canonical production origin this site is meant to be served from.
@@ -73,6 +74,63 @@ export const SITE_CONTACT = {
 export function whatsappUrl(message: string = SITE_CONTACT.whatsappDefaultMessage): string {
   return `https://wa.me/${SITE_CONTACT.whatsappNumber}?text=${encodeURIComponent(message)}`;
 }
+
+/**
+ * Single source of truth for the standard commercial terms shown on product
+ * SKU pages (audit item C-10). US/EU procurement teams filter suppliers on
+ * MOQ / lead time / Incoterms / payment terms BEFORE inquiring, so these
+ * render as a visible "Commercial terms" strip (CommercialTerms.astro,
+ * directly under the At-a-glance block) and flow into Product JSON-LD
+ * additionalProperty entries (seo/jsonld.ts) so the machine surface and the
+ * reader-visible strip never drift.
+ *
+ * Every value below is repo-verified against authored content — when terms
+ * change, update the cited source first, then this constant:
+ *  - MOQ: lp/nfc-tag-manufacturer-china.json (stock program "minimums from
+ *    100 pieces"; printed stickers 500 / inlays 1,000 pcs),
+ *    lp/rfid-wristband-manufacturer.json (silicone 500 / fabric + Tyvek
+ *    1,000 pcs; stock Tyvek from 100 pcs), lp/bulk-rfid-cards.json
+ *    (custom card runs from 1,000 pcs).
+ *  - Lead time: about.json procurement-workflow Step 3 + lead-time FAQ
+ *    (pilot 2-3 weeks after artwork/encoding sign-off; reorders 3-4 weeks).
+ *  - Samples: TrustSignals.astro trust note + about.json Step 2
+ *    (sampling free for qualified B2B inquiries; test reports per shipment).
+ *  - Payment: about.json payment-terms FAQ (50/50 T/T; Net 30/60; LC).
+ *  - Shipping: about.json logistics FAQ + packaging feature (FOB Shenzhen /
+ *    Yantian; DHL / FedEx / EMS air; sea LCL / FCL).
+ *  - Response: about.json Step 1 + quote FAQ; hours per SITE_CONTACT.
+ */
+export const COMMERCIAL_TERMS = {
+  title: "Commercial terms",
+  items: [
+    {
+      label: "MOQ",
+      value: "Varies by SKU — stock items from 100 pcs; custom production typically 500-1,000 pcs",
+    },
+    {
+      label: "Lead time",
+      value: "Production 2-3 weeks after artwork and encoding sign-off; reorders on a 3-4 week cycle",
+    },
+    {
+      label: "Samples",
+      value: "Free samples and RF test report with every order; courier at customer cost",
+    },
+    {
+      label: "Payment",
+      value: "50% T/T deposit, 50% before shipment; Net 30/60 for established accounts; LC for large orders",
+    },
+    {
+      label: "Shipping",
+      value: "FOB Shenzhen / Yantian; DHL, FedEx or EMS air freight; sea LCL / FCL for volume",
+    },
+    {
+      label: "Response",
+      value: "Itemized quote within one business day, Mon-Fri (UTC+8)",
+    },
+  ],
+  link: { href: "/rfq/", label: "Full terms in your quote" },
+} as const;
+
 export const DEFAULT_IMAGE = "/site-assets/wp-content/uploads/2024/04/cropped-cropped-proudtek-logo.png";
 export const DEFAULT_DESCRIPTION =
   "Proud Tek manufactures custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for OEM, industrial, hotel and access-control use.";
@@ -90,7 +148,10 @@ export const ORGANIZATION_KNOWS_ABOUT = [
 ];
 export const ORGANIZATION_CONTACT = {
   email: "info@proudtek.com",
-  telephone: "+86 15815501857",
+  // 2026-06-11 unified to the customer-facing line. Owner confirmed
+  // 2026-06-11: the old +86 15815501857 line is retired from display —
+  // do not list it anywhere (site, JSON-LD, directories).
+  telephone: "+86 18665820632",
   whatsapp: "+86 18665820632",
   streetAddress: "A2109, Zhantao Building, #1079 Minzhi Rd., Longhua District",
   addressLocality: "Shenzhen",
@@ -144,11 +205,15 @@ export const ORGANIZATION_OPERATIONS = {
   foundingDate: "2008",
   foundingLocation: "Shenzhen, Guangdong, China",
   numberOfEmployees: "100+",
-  /** Typical MOQ per product family — used in llms.txt Quick facts (P0-G3). */
+  /** Typical MOQ per product family — used in llms.txt Quick facts (P0-G3).
+   *  Reconciled 2026-06-11 with COMMERCIAL_TERMS + the lp sourcing pages
+   *  (stock items from 100 pcs; custom production typically 500-1,000):
+   *  wristbands corrected from the unsourced "200 pcs" to the lp-verified
+   *  silicone-500 / stock-Tyvek-100 figures. */
   moq: {
-    nfcCards: "100 pcs",
-    rfidLabels: "500 pcs",
-    rfidWristbands: "200 pcs",
+    nfcCards: "100 pcs (stock); 1,000 custom-printed",
+    rfidLabels: "500 pcs printed; inlays by the roll (1,000+)",
+    rfidWristbands: "500 pcs custom; stock Tyvek from 100 pcs",
     rfidReaders: "10 pcs",
   },
   /** Lead time for stock vs custom orders — used in llms.txt Quick facts. */
@@ -166,37 +231,46 @@ export interface ExpertAuthor {
   url: string;
 }
 
+/**
+ * Derive an ExpertAuthor entry from the canonical author registry
+ * (src/lib/authors.ts ← src/content/authors/*.json). This registry used to
+ * carry its own hand-written copies of each person — names/titles drifted
+ * from the JSON records and the urls pointed at anchors that didn't exist
+ * (`/about/#peter-zhang`). Deriving keeps one source of truth: edit the JSON
+ * record, and snapshot-page JSON-LD (page-data.ts → resolveArticleMeta) and
+ * machine-text author lines follow.
+ *
+ * Throws at module init when a slug has no record — a deleted/renamed author
+ * file should fail the build loudly, not silently byline pages to undefined.
+ */
+function expertAuthorFromRegistry(slug: string): ExpertAuthor {
+  const record = getAuthorRecord(slug);
+  if (!record) {
+    throw new Error(
+      `EXPERT_AUTHORS: no canonical record for author slug "${slug}" — expected a JSON file in src/content/authors/ registered in src/lib/authors.ts`,
+    );
+  }
+  return {
+    name: record.name,
+    title: record.jobTitle,
+    expertise: record.expertise,
+    url: record.url ?? "/about/review-board/",
+  };
+}
+
 export const EXPERT_AUTHORS: Record<string, ExpertAuthor> = {
+  // Team fallback for unmapped routes — an institutional byline, not a
+  // person; deliberately has no src/content/authors/ record.
   default: {
     name: EDITORIAL_TEAM_NAME,
     title: "RFID & NFC Technical Content Team",
     expertise: ["RFID manufacturing", "NFC technology", "Access control systems", "Smart card engineering"],
     url: "/about/",
   },
-  "peter-zhang": {
-    name: "Peter Zhang",
-    title: "Founder & CEO",
-    expertise: ["RFID/NFC industry strategy", "Technology standards (ISO 14443, ISO 18000-63)", "Market trends", "System architecture"],
-    url: "/about/#peter-zhang",
-  },
-  "nancy-wu": {
-    name: "Nancy Wu",
-    title: "NFC Product Specialist",
-    expertise: ["NFC business cards", "Google Review NFC cards", "NFC tag programming", "Digital product authentication"],
-    url: "/about/#nancy-wu",
-  },
-  "sam-yao": {
-    name: "Sam Yao",
-    title: "RFID Solutions Architect",
-    expertise: ["UHF RFID systems", "Inventory & warehouse management", "Supply chain RFID", "Event access control"],
-    url: "/about/#sam-yao",
-  },
-  "mia-li": {
-    name: "Mia Li",
-    title: "Quality & Manufacturing Engineer",
-    expertise: ["RFID card materials", "Hotel key card manufacturing", "Compliance (ISO, CE, RoHS)", "Laundry tag durability"],
-    url: "/about/#mia-li",
-  },
+  "peter-zhang": expertAuthorFromRegistry("peter-zhang"),
+  "nancy-wu": expertAuthorFromRegistry("nancy-wu"),
+  "sam-yao": expertAuthorFromRegistry("sam-yao"),
+  "mia-li": expertAuthorFromRegistry("mia-li"),
 };
 
 /** Article author assignment — maps routes to expert authors */

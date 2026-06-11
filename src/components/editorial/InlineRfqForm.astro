@@ -1,9 +1,17 @@
 ---
 /**
- * Inline RFQ form — top-of-page quick-quote block.
+ * Inline RFQ form — end-of-article quick-quote block.
  *
- * Shadow component (Stage 2 optimization). Mirrors `renderInlineRfqForm` in
- * editorial-pages.ts (~line 2346).
+ * Shadow component (Stage 2 optimization). The legacy template-literal twin
+ * (`renderInlineRfqForm` in editorial-pages.ts) was removed in the Stage 3
+ * cutover — this component is now the single source of the inline RFQ markup.
+ *
+ * Reach fix (audit C-11): the outer section carries the stable
+ * `id="quick-quote"` anchor (QUICK_QUOTE_ID). The hero primary CTA and the
+ * final jump-nav entry deep-link here so readers can reach the form without
+ * scrolling 70% of the page or bouncing to /contact/. Sticky-header offset
+ * comes from the shared `.codex-inline-rfq[id]` scroll-margin rule in
+ * codex-components.css (same 6rem mechanism as anchored editorial sections).
  *
  * DS-11 #5a a11y contract preserved verbatim: each field has a real `<label>`,
  * required-marker span, hint span, error span (role=alert, aria-live=polite),
@@ -20,7 +28,7 @@
  * `/contact/` anchor, so no rewrite applies. See sibling `ActionBar.astro`
  * for the routed-inquiry retrofit.
  */
-import type { EditorialDefinition } from "../../lib/editorial-types";
+import { QUICK_QUOTE_ID, type EditorialDefinition } from "../../lib/editorial-types";
 
 interface Props {
   definition: EditorialDefinition;
@@ -53,12 +61,13 @@ const fields: FieldOpts[] = [
   { name: "company",     type: "text",     label: "Company name",       hint: "Optional, but helps us route your inquiry faster.", autocomplete: "organization" },
   { name: "quantity",    type: "text",     label: "Quantity",           hint: "e.g. 5,000 pcs", inputmode: "numeric" },
   { name: "application", type: "text",     label: "Application",        hint: "e.g. hotel, event, asset tracking" },
+  { name: "country",     type: "text",     label: "Country",            hint: "Helps us quote shipping and compliance correctly", autocomplete: "country-name" },
   { name: "message",     type: "textarea", label: "Additional details", hint: "Chip preference, timeline, special requirements...", rows: 3 },
 ];
 
 function idOf(name: string): string { return `codex-rfq-${seed}-${name}`; }
 ---
-<section class="codex-inline-rfq">
+<section class="codex-inline-rfq" id={QUICK_QUOTE_ID}>
   <h2>Get a Quick Quote</h2>
   <p>Tell us about your project and we'll respond within one business day. Fields marked <span class="codex-rfq-required" aria-hidden="true">*</span><span class="codex-sr-only">(asterisk)</span> are required.</p>
   <form action="https://formspree.io/f/mpqelrep" method="POST" class="codex-inline-rfq-form" data-codex-rfq novalidate>
@@ -108,8 +117,30 @@ function idOf(name: string): string { return `codex-rfq-${seed}-${name}`; }
         );
       })}
     </div>
+    <div class="codex-inline-rfq-row">
+      {fields.slice(4, 5).map((f) => {
+        const id = idOf(f.name);
+        return (
+          <div class="codex-inline-rfq-field">
+            <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
+            <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
+            <input
+              id={id}
+              name={f.name}
+              type={f.type as "text" | "email"}
+              required={f.required}
+              aria-required={f.required ? "true" : undefined}
+              aria-describedby={`${id}-hint ${id}-error`}
+              autocomplete={f.autocomplete}
+              inputmode={f.inputmode}
+            />
+            <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
+          </div>
+        );
+      })}
+    </div>
     {(() => {
-      const f = fields[4]; // message textarea
+      const f = fields[5]; // message textarea
       const id = idOf(f.name);
       return (
         <div class="codex-inline-rfq-field">
@@ -127,6 +158,6 @@ function idOf(name: string): string { return `codex-rfq-${seed}-${name}`; }
         </div>
       );
     })()}
-    <button type="submit" class="codex-inline-rfq-submit">Send Inquiry</button>
+    <button type="submit" class="codex-inline-rfq-submit">Get My Quote</button>
   </form>
 </section>

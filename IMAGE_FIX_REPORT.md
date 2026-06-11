@@ -12,7 +12,7 @@ Follow-up to `IMAGE_AUDIT_REPORT.md` (this morning's 400-image audit). This pass
 | — broken heroes repaired (file was missing on disk) | 10 |
 | — PII remediation repoints | 11 |
 | + 1 code fix: `compatibility/index.astro` fallback pointed at a PII image | |
-| **Pending — run `bash apply-image-fixes.sh`** (downloads 7 Commons images → 8 pages, crops 1, deletes PII files) | 8 pages |
+| ✅ Web applies completed 2026-06-11 (commit 3007e21): 7 Commons images → 8 pages, specimen hero cropped to 16:10, PII file pairs deleted from worktree | 8 pages |
 | No-swap: too niche for free imagery, needs own product photo | 4 pages |
 | Borderline, noted not changed (house guardrail) | ~15 pages |
 

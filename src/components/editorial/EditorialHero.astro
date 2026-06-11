@@ -11,6 +11,10 @@
  * Branching:
  *   - `group === "contact"` → suppress CTA + trust bar (contact pages have
  *     their own ContactChannels block)
+ *   - `quickQuoteHref` prop set (audit C-11) → primary CTA deep-links to the
+ *     in-page quick-quote form instead of navigating away to /contact/.
+ *     Label and data-cta-tier are unchanged; when the prop is absent the
+ *     routed `/contact/?intent=samples&route=...` href is preserved.
  *   - `getPillarClusterId(route)` returns a cluster id → emit ghost CTA
  *     linking to `/products/all/#<cluster>` with `data-pillar-bridge`
  *   - illustration source starts with `/landing-images/` → emit `<picture>`
@@ -28,16 +32,44 @@ interface Illustration {
   alt: string;
 }
 
+/** Resolved byline person — name plus optional profile URL (root-relative
+ *  anchor on /about/review-board/). Resolution happens in
+ *  EditorialArticle.astro via resolveEditorialByline() so the visible names
+ *  always match the authority Article JSON-LD. */
+interface BylinePerson {
+  name: string;
+  url?: string;
+}
+
+interface Byline {
+  author: BylinePerson;
+  reviewer: BylinePerson | null;
+  updated: { iso: string; label: string } | null;
+}
+
 interface Props {
   definition: EditorialDefinition;
   illustration: Illustration | null;
+  /** Optional visible byline strip rendered under the H1/deck. Absent when
+   *  the page declares no authorSlug (e.g. snapshot-derived pages). */
+  byline?: Byline | null;
+  /** In-page anchor for the inline quick-quote RFQ form (audit C-11). Set by
+   *  EditorialArticle.astro on pages that render <InlineRfqForm> so the
+   *  primary CTA keeps readers on the page. Leave unset on pages without the
+   *  form to fall back to the routed /contact/ link. */
+  quickQuoteHref?: string | null;
 }
 
-const { definition, illustration } = Astro.props;
+const { definition, illustration, byline = null, quickQuoteHref = null } = Astro.props;
 
 const pageType = resolvePageType(definition.group);
 const isContact = definition.group === "contact";
 const samplesHref = `/contact/?intent=samples&route=${encodeURIComponent(definition.route)}`;
+// C-11: prefer the in-page quick-quote anchor when the composer says the
+// form is on this page. The cta_click handler in PageScript.astro reads the
+// href off the element at click time, so analytics attribution is unchanged
+// (cta_href simply becomes "#quick-quote").
+const primaryCtaHref = quickQuoteHref ?? samplesHref;
 const pillarClusterId = getPillarClusterId(definition.route);
 const pillarLabel = pillarClusterId ? PILLAR_CLUSTER_LABELS[pillarClusterId] : null;
 
@@ -85,6 +117,21 @@ const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0
     <p class="codex-editorial-kicker">{definition.kicker}</p>
     <h1>{cleanH1}</h1>
     {shouldShowDeck && <p class="codex-editorial-hero-deck">{decoratedDeck}</p>}
+    {byline && (
+      <p class="codex-editorial-byline">By {byline.author.url ? (
+        <a class="codex-byline-name" href={byline.author.url}>{byline.author.name}</a>
+      ) : (
+        <span class="codex-byline-name">{byline.author.name}</span>
+      )}{byline.reviewer && (
+        <Fragment> · Reviewed by {byline.reviewer.url ? (
+          <a class="codex-byline-name" href={byline.reviewer.url}>{byline.reviewer.name}</a>
+        ) : (
+          <span class="codex-byline-name">{byline.reviewer.name}</span>
+        )}</Fragment>
+      )}{byline.updated && (
+        <Fragment> · Updated <time datetime={byline.updated.iso}>{byline.updated.label}</time></Fragment>
+      )}</p>
+    )}
     {illustration && (
       isLandingImage && webpSrc ? (
         <figure class="codex-editorial-figure">
@@ -173,7 +220,7 @@ const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0
     {!isContact && (
       <>
         <div class="codex-hero-cta">
-          <a class="codex-hero-cta-btn" data-cta-tier="hero" href={samplesHref}>Request samples</a>
+          <a class="codex-hero-cta-btn" data-cta-tier="hero" href={primaryCtaHref}>Request samples</a>
           {pillarClusterId && pillarLabel && (
             <a
               class="codex-hero-cta-btn codex-hero-cta-btn--ghost"
@@ -183,7 +230,7 @@ const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0
           )}
         </div>
         <div class="codex-hero-trust-bar">
-          <span><strong>10+</strong> Years</span>
+          <span><strong>Since 2008</strong></span>
           <span><strong>ISO 9001</strong></span>
           <span><strong>500+</strong> Clients</span>
           <span><strong>50+</strong> Countries</span>

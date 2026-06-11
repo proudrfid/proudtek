@@ -205,6 +205,14 @@ CSS custom properties can't be used inside `@media` queries, so these are declar
 | `--codex-bp-lg` | 1024px |
 | `--codex-bp-xl` | 1280px |
 
+Plus one in-between tier in active use: **600px** (small-phone / large-phone
+boundary — blog-index single-column, compare-panel collapse, cluster-grid
+two-up). The 2026-06-11 typography audit consolidated 19 scattered query
+archetypes (420/479/560/640/720/880/900/960/1000/1100px…) onto this 5-stop
+family: `max-width` 480 / 600 / 767 / 1024, `min-width` 600 / 768 / 1025 /
+1280 (+ the 1279 complement). Do not introduce new boundaries without
+updating this table.
+
 ## Motion
 
 **Approach:** Intentional — meaningful state transitions, no decorative animation. Hover/focus feedback prioritized.

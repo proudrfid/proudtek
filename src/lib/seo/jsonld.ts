@@ -25,6 +25,7 @@ import {
   ORGANIZATION_SOCIAL,
   ORGANIZATION_ALTERNATE_NAMES,
   ORGANIZATION_OPERATIONS,
+  COMMERCIAL_TERMS,
 } from "../seo-content";
 
 import { EDITORIAL_KEYWORDS_MAP } from "../editorial-pages";
@@ -373,15 +374,22 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
       ...(material ? { material } : {}),
       ...(size ? { size } : {}),
       ...(color ? { color } : {}),
-      ...(context.productSpecs.length > 0
-        ? {
-            additionalProperty: context.productSpecs.map((entry) => ({
-              "@type": "PropertyValue",
-              name: entry.name,
-              value: entry.value,
-            })),
-          }
-        : {}),
+      // C-10: standard commercial terms (MOQ / lead time / Incoterms /
+      // payment) ride along as PropertyValue entries so machine readers
+      // see them without parsing the FAQ. Same constant as the visible
+      // CommercialTerms.astro strip — single source of truth.
+      additionalProperty: [
+        ...context.productSpecs.map((entry) => ({
+          "@type": "PropertyValue",
+          name: entry.name,
+          value: entry.value,
+        })),
+        ...COMMERCIAL_TERMS.items.map((term) => ({
+          "@type": "PropertyValue",
+          name: term.label,
+          value: term.value,
+        })),
+      ],
       url: context.canonicalUrl,
       offers: {
         "@type": "Offer",
@@ -487,7 +495,9 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
   // src is the WP-snapshot Kadence cover background (preserved by
   // replaceHomepageHero in render-snapshot.ts).
   if (context.kind === "home") {
-    const HERO_VIDEO_PATH = "/site-assets/wp-content/uploads/2024/08/RFID_production_proudtek.mp4";
+    // 2026-06-11: points at the 24 s re-encode served by the hero (see
+    // render-snapshot.ts videoSrc mapping); duration declared below.
+    const HERO_VIDEO_PATH = "/site-assets/wp-content/uploads/2024/08/RFID_production_proudtek-24s.mp4";
     entries.push({
       "@context": "https://schema.org",
       "@type": "VideoObject",
@@ -499,6 +509,7 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
         absoluteUrl("/site-assets/wp-content/uploads/2024/08/rfid_factories.jpg"),
       ],
       uploadDate: "2024-08-15",
+      duration: "PT24S",
       contentUrl: absoluteUrl(HERO_VIDEO_PATH),
       // No embedUrl — the video plays as a CSS background, not embed.
       publisher: { "@id": organizationId },

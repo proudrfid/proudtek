@@ -85,7 +85,19 @@ const sectionSchema = z.object({
     .optional(),
   featureGrid: z
     .object({
-      features: z.array(z.object({ icon: z.string(), title: z.string(), text: z.string() })),
+      features: z.array(
+        z.object({
+          icon: z.string(),
+          title: z.string(),
+          text: z.string(),
+          /** Optional stable anchor id rendered on the feature card. Used by
+           *  the review-board page to give each author/reviewer a permanent
+           *  `/about/review-board/#<author-slug>` URL that bylines and
+           *  Person JSON-LD link to. Must match the record slug in
+           *  src/content/authors/. */
+          id: z.string().optional(),
+        }),
+      ),
     })
     .optional(),
   dataHighlight: z
@@ -231,6 +243,14 @@ const editorialSchema = z.object({
 
 /* ── Authors collection schema (added 2026-04) ─────────────────────── */
 
+/**
+ * NOTE (2026-06): runtime resolution of author records does NOT go through
+ * `getCollection("authors")` anymore — src/lib/authors.ts imports the same
+ * JSON files statically so plain-ts modules (seo-content.ts) and vitest can
+ * share one registry. This collection definition stays as the build-time
+ * schema gate for those files. When adding an author, also register the
+ * import in src/lib/authors.ts.
+ */
 const authorSchema = z.object({
   /** Slug used as the `authorSlug` / `reviewedBySlug` foreign key from editorial pages. */
   slug: z.string(),
@@ -250,7 +270,8 @@ const authorSchema = z.object({
   credentials: z.array(z.string()).optional(),
   /** Portrait path under /public. */
   avatar: z.string().optional(),
-  /** Canonical URL (the author detail page). Usually /about/authors/{slug}/. */
+  /** Canonical profile URL — the author's anchor on the review-board page:
+   *  /about/review-board/#{slug}. Byline links and Person JSON-LD use this. */
   url: z.string().optional(),
   /** External profiles that prove identity for EEAT — LinkedIn, ORCID, GitHub, company-about. */
   sameAs: z.array(z.string()).optional(),

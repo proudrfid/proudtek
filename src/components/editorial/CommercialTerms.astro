@@ -1,0 +1,39 @@
+---
+/**
+ * Commercial terms strip — compact MOQ / lead-time / samples / payment /
+ * Incoterms / response def-list for product SKU pages (audit item C-10).
+ *
+ * US/EU procurement buyers filter suppliers on commercial terms before
+ * inquiring; before this strip, MOQ and lead time lived only in collapsed
+ * FAQ entries and Incoterms / payment terms were absent from SKU pages.
+ *
+ * Data is the COMMERCIAL_TERMS constant (src/lib/seo-content.ts). The same
+ * constant feeds Product JSON-LD additionalProperty entries (seo/jsonld.ts),
+ * so the visible strip and the machine surface never drift.
+ *
+ * Rendered by EditorialArticle.astro directly after DecisionSnapshot
+ * ("At a glance") on routes matching /products/<cluster>/<sku>/ only —
+ * pillars and the catalog hub stay clean.
+ *
+ * Markup reuses the established editorial patterns wholesale:
+ * codex-editorial-section shell, codex-editorial-brief-grid def-list cards
+ * (same pattern as DecisionSnapshot's extra brief fields), the
+ * codex-editorial-answer-label micro-label, and the gold
+ * codex-editorial-snapshot-link for the trailing RFQ link.
+ */
+import { COMMERCIAL_TERMS } from "../../lib/seo-content";
+---
+<section class="codex-editorial-section codex-commercial-terms" id="commercial-terms">
+  <h2>{COMMERCIAL_TERMS.title}</h2>
+  <dl class="codex-editorial-brief-grid codex-commercial-terms__grid">
+    {COMMERCIAL_TERMS.items.map((item) => (
+      <div class="codex-card codex-editorial-brief-card codex-commercial-terms__item">
+        <dt class="codex-editorial-answer-label">{item.label}</dt>
+        <dd>{item.value}</dd>
+      </div>
+    ))}
+  </dl>
+  <p class="codex-commercial-terms__note">
+    <a class="codex-editorial-snapshot-link" href={COMMERCIAL_TERMS.link.href}>{COMMERCIAL_TERMS.link.label} →</a>
+  </p>
+</section>

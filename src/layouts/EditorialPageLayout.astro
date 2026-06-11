@@ -26,7 +26,7 @@ import BaseLayout from "./BaseLayout.astro";
 import EditorialArticle from "../components/editorial/EditorialArticle.astro";
 import RelatedArticles from "../components/editorial/RelatedArticles.astro";
 import type { SnapshotPage } from "../lib/site-data";
-import type { EditorialDefinition } from "../lib/editorial-types";
+import { QUICK_QUOTE_ID, type EditorialDefinition } from "../lib/editorial-types";
 import { prepareSnapshot } from "../lib/render-snapshot";
 import { buildMachineRoute, buildPageSeo } from "../lib/seo";
 import { buildAuthorityLdForRoute } from "../lib/editorial-authority-ld";
@@ -120,7 +120,18 @@ if (definition) {
 }
 ---
 
-<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
+{/* CRO 2026-06-11: every editorial page renders <InlineRfqForm> (the
+    `#quick-quote` anchor) unconditionally, so the sticky CTA converts
+    on-page instead of bouncing to /contact/. The `canSplit` guard keeps
+    the engineering default on the defensive legacy-fallback path, where
+    the editorial main (and thus the anchor) is not rendered. */}
+<BaseLayout
+  seo={seo}
+  machineJsonPath={machineJsonPath}
+  machineTextPath={machineTextPath}
+  stickyCtaHref={canSplit ? `#${QUICK_QUOTE_ID}` : undefined}
+  stickyCtaLabel={canSplit ? "Get a quick quote" : undefined}
+>
   {canSplit ? (
     <>
       <Fragment set:html={preMain} />

@@ -720,7 +720,7 @@ export function injectFaqPageContent($body: CheerioAPI): void {
           <div class="codex-faq-hero__stats">
             <span><strong>${totalQuestions}</strong> Questions</span>
             <span><strong>${FAQ_CATEGORIES.length}</strong> Categories</span>
-            <span><strong>10+</strong> Years Expertise</span>
+            <span><strong>Since 2008</strong> RFID Expertise</span>
           </div>
         </div>
       </section>

@@ -26,7 +26,7 @@ import { escapeXml } from "./utils";
 export function renderTrustBar(): string {
   return `<section class="codex-trust-bar" aria-label="Manufacturing credentials">
     <div class="codex-trust-bar__item">
-      <strong>10+</strong><span>Years RFID Manufacturing</span>
+      <strong>Since 2008</strong><span>RFID Manufacturing</span>
     </div>
     <div class="codex-trust-bar__item">
       <strong>ISO 9001</strong><span>Certified Factory</span>

@@ -20,6 +20,8 @@ import { getCollection } from "astro:content";
 
 import type { SnapshotPage } from "../site-data";
 import { EDITORIAL_TEAM_NAME } from "../seo-content";
+import { getAuthorRecord } from "../authors";
+import { ARTICLE_AUTHOR_MAP } from "../../data/article-author-map";
 import { cleanText, escapeXml, normalizeRoute, slugToTitle, truncateText } from "./utils";
 import { buildRailHtml, buildRailFilterScript } from "./rail";
 import {
@@ -223,11 +225,23 @@ export function normalizeBlogArchiveCards($body: CheerioAPI): void {
       card.find(".post-thumbnail img").first().attr("alt", title);
     }
 
+    // 2026-06-11: archive cards previously flattened every byline to the
+    // institutional team name while the page's Article JSON-LD credited the
+    // mapped expert (sam-yao / mia-li / peter-zhang) — a visible-vs-LD
+    // mismatch. Resolve the SAME map the LD uses so reader-visible bylines
+    // and structured data agree; fall back to the editorial board record
+    // (and its review-board anchor) when a route has no mapping.
+    const cardRoute = normalizeRoute(href);
+    const mappedAuthor = getAuthorRecord(cardRoute ? ARTICLE_AUTHOR_MAP[cardRoute] : undefined);
+    const boardRecord = getAuthorRecord("editorial-board");
+    const bylineName = mappedAuthor?.name ?? boardRecord?.name ?? EDITORIAL_TEAM_NAME;
+    const bylineHref = mappedAuthor?.url ?? boardRecord?.url ?? "/about/review-board/";
+
     const authorLink = card.find(".posted-by .author a, .posted-by a, .author.vcard a").first();
     if (authorLink.length) {
-      authorLink.attr("href", "/about/").text(EDITORIAL_TEAM_NAME);
+      authorLink.attr("href", bylineHref).text(bylineName);
     } else {
-      card.find(".posted-by .author, .author.vcard").first().text(EDITORIAL_TEAM_NAME);
+      card.find(".posted-by .author, .author.vcard").first().text(bylineName);
     }
   });
 }

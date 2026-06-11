@@ -321,7 +321,8 @@ export const ABOUT_MENU: MenuDropdown = {
         { href: "/about/factory/", label: "Factory & Production" },
         { href: "/about/certifications/", label: "Certifications & Compliance" },
         { href: "/about/leadership/", label: "Leadership & Team" },
-        { href: "/about/case-studies/", label: "Case Studies" },
+        // 2026-06-11: /about/case-studies/ 301s to the standalone hub now.
+        { href: "/case-studies/", label: "Case Studies" },
       ],
     },
     {
@@ -332,6 +333,11 @@ export const ABOUT_MENU: MenuDropdown = {
         { href: "/about/review-board/", label: "Editorial & Review Board" },
         { href: "/about/disclosures/", label: "Disclosures" },
         { href: "/about/corrections/", label: "Corrections Log" },
+        // Legal pages (added 2026-06-11 with the C-9 privacy/terms work) —
+        // surfaced here as well as the footer Legal row for supplier-
+        // qualification reviewers who navigate via the About dropdown.
+        { href: "/about/privacy-policy/", label: "Privacy Policy" },
+        { href: "/about/terms-of-use/", label: "Terms of Use" },
       ],
     },
   ],

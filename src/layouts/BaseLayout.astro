@@ -33,9 +33,14 @@ interface Props {
   seo: PageSeoData;
   machineJsonPath?: string;
   machineTextPath?: string;
+  /** Sticky-CTA overrides (CRO 2026-06-11): EditorialPageLayout points the
+   *  bar at the on-page inline RFQ; undefined keeps the engineering default
+   *  declared in StickyCta.astro. */
+  stickyCtaHref?: string;
+  stickyCtaLabel?: string;
 }
 
-const { seo, machineJsonPath, machineTextPath } = Astro.props;
+const { seo, machineJsonPath, machineTextPath, stickyCtaHref, stickyCtaLabel } = Astro.props;
 ---
 
 <!doctype html>
@@ -54,7 +59,7 @@ const { seo, machineJsonPath, machineTextPath } = Astro.props;
     <a class="codex-skip-link" href="#main">Skip to main content</a>
     <slot />
     <WhatsAppFab />
-    <StickyCta />
+    <StickyCta href={stickyCtaHref} label={stickyCtaLabel} />
     <PageScript />
   </body>
 </html>

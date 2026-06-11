@@ -23,10 +23,12 @@
  */
 import {
   buildEditorialOutline,
+  QUICK_QUOTE_ID,
   type EditorialDefinition,
   type CitationCtx,
 } from "../../lib/editorial-types";
 import { buildEditorialScaffold } from "../../lib/editorial-pages";
+import { resolveEditorialByline } from "../../lib/editorial-authority-ld";
 import {
   preProcessContextualLinks,
   rewriteResourceCardsContactLinks,
@@ -36,6 +38,7 @@ import {
 import Trail from "./Trail.astro";
 import EditorialHero from "./EditorialHero.astro";
 import AboutTrustBand from "./AboutTrustBand.astro";
+import CommercialTerms from "./CommercialTerms.astro";
 import DecisionSnapshot from "./DecisionSnapshot.astro";
 import JumpNav from "./JumpNav.astro";
 import EditorialSection from "./EditorialSection.astro";
@@ -107,6 +110,32 @@ const modified = definition.modifiedAt || published;
 const publishedLabel = new Date(published).toISOString().slice(0, 10);
 const modifiedLabel = new Date(modified).toISOString().slice(0, 10);
 
+// Visible byline strip (E-E-A-T) — "By <author> · Reviewed by <reviewer> ·
+// Updated <Mon YYYY>" under the hero H1. Resolution is shared with the
+// authority Article JSON-LD (resolveEditorialByline in
+// editorial-authority-ld.ts) so the reader-visible author always matches
+// Article.author. Rendered ONLY when the definition declares an authorSlug
+// that resolves (or carries a free-text author fallback); reviewer/date
+// segments degrade independently when missing. The date deliberately uses
+// only authored fields (no build-time fallback) so the visible claim never
+// shows a rebuild timestamp.
+const MONTH_ABBREV = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const bylineDateIso = definition.modifiedAt || definition.publishedAt || null;
+let bylineUpdated: { iso: string; label: string } | null = null;
+if (bylineDateIso) {
+  const d = new Date(bylineDateIso);
+  if (!Number.isNaN(d.getTime())) {
+    bylineUpdated = {
+      iso: d.toISOString().slice(0, 10),
+      label: `${MONTH_ABBREV[d.getUTCMonth()]} ${d.getUTCFullYear()}`,
+    };
+  }
+}
+const resolvedByline = definition.authorSlug ? resolveEditorialByline(definition) : null;
+const byline = resolvedByline?.author
+  ? { author: resolvedByline.author, reviewer: resolvedByline.reviewer, updated: bylineUpdated }
+  : null;
+
 // Citation context for inline [^N] markers inside section bodies.
 const citationCtx: CitationCtx | undefined =
   outline.sourcesId && (definition.sources?.length ?? 0) > 0
@@ -118,6 +147,28 @@ const contentWrapClass = scaffold.hasRail
   : "content-wrap";
 
 const isContact = definition.group === "contact";
+
+// Commercial-terms strip (audit C-10): product SKU detail pages only —
+// /products/<cluster>/<sku>/ leaf routes in the products group. Pillar
+// pages (/products/<cluster>/) and the catalog (/products/all/) have only
+// two path segments so the regex excludes them. Mirrors the 3-segment rule
+// page-data.ts uses to classify these routes as kind "product".
+const isProductSku =
+  definition.group === "products" && /^\/products\/[^/]+\/[^/]+\/$/.test(definition.route);
+
+// Quick-quote reach fix (audit C-11). <InlineRfqForm> renders UNCONDITIONALLY
+// on every editorial page (see the composition below), but it sits at ~70%
+// page depth — so on every page we (a) point the hero primary CTA at its
+// `#quick-quote` anchor instead of bouncing to /contact/, and (b) append a
+// final "Get a quote" jump-nav entry after "Next step". The bottom ActionBar
+// keeps its full /contact/ routes on purpose. If the form ever becomes
+// conditional, gate BOTH wires below on the same condition (pages without
+// the form must keep the routed /contact/ hero href).
+const quickQuoteHref = `#${QUICK_QUOTE_ID}`;
+const jumpLinksWithQuickQuote = [
+  ...outline.jumpLinks,
+  { id: QUICK_QUOTE_ID, label: "Get a quote" },
+];
 ---
 <div class="woocommerce kadence-woo-messages-none-woo-pages woocommerce-notices-wrapper" />
 {scaffold.rail?.kind === "flat" && (
@@ -143,7 +194,7 @@ const isContact = definition.group === "contact";
           <time class="updated" datetime={modified}>{modifiedLabel}</time>
         </div>
         <Trail definition={definition} />
-        <EditorialHero definition={heroDefinition} illustration={illustration} />
+        <EditorialHero definition={heroDefinition} illustration={illustration} byline={byline} quickQuoteHref={quickQuoteHref} />
         {definition.group === "about" && <AboutTrustBand />}
         {isContact && <ContactChannels definition={definition} />}
         {scaffold.hubGrid?.kind === "flat" && (
@@ -173,7 +224,8 @@ const isContact = definition.group === "contact";
           <RelatedIndustriesGrid cards={scaffold.relatedIndustries.cards} />
         )}
         <DecisionSnapshot definition={definition} id={outline.snapshotId} />
-        <JumpNav links={outline.jumpLinks} />
+        {isProductSku && <CommercialTerms />}
+        <JumpNav links={jumpLinksWithQuickQuote} />
         {filteredSectionsWithContextualLinks.map((section, index) => (
           <EditorialSection
             section={section}
