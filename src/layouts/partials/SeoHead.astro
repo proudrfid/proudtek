@@ -66,8 +66,12 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
 <link rel="preload" href="/site-assets/wp-content/fonts/inter/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/site-assets/wp-content/fonts/lora/0QIvMX1D_JOuMwr7Iw.woff2" as="font" type="font/woff2" crossorigin />
 
-{/* DS-15 #1 — preload hero image to accelerate LCP. Skipped on home
-    (video hero, not image) and contact (form-only, no hero figure).
+{/* DS-15 #1 — preload hero image to accelerate LCP. Skipped on contact
+    (form-only, no hero figure). Home WAS skipped ("video hero, not
+    image") — reversed 2026-06-11: with the video deferred behind
+    data-src, the LCP element on home is the video's poster jpg, which
+    equals seo.imageUrl (rfid_factories.jpg); PSI flagged it as needing
+    fetchpriority=high + early discovery.
     DS-15 #6 — when the image lives in /landing-images/, prefer
     the WebP variant via imagesrcset+imagetype so the browser
     downloads the smaller file (~30–55% byte savings). Browsers
@@ -81,7 +85,7 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
     canonical fallback gives those browsers something to fetch —
     modern Chromium-based browsers still prefer the WebP via the
     imagesrcset+imagetype hint. */}
-{seo.imageUrl && seo.kind !== "home" && seo.kind !== "contact" ? (
+{seo.imageUrl && seo.kind !== "contact" ? (
   isLandingHeroImage ? (
     // @ts-expect-error — Astro's LinkHTMLAttributes type predates the
     // responsive-image preload attributes (imagesrcset, imagetype) per
@@ -154,8 +158,32 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
   } catch (e) {}
   gtag('js', new Date());
   gtag('config', 'G-QB63MNYN52');
+
+  /* PSI 2026-06-11: gtag.js (156 KiB, ~65 KiB unused) was the largest
+     third-party on the critical window. Load it on first interaction —
+     or after a 3.5 s idle fallback — instead of at parse time. All
+     gtag()/codexPushEvent calls made before the script arrives queue
+     safely in window.dataLayer and flush when it loads, so no events
+     are lost; only the network fetch is deferred. */
+  (function () {
+    var loaded = false;
+    function loadGtag() {
+      if (loaded) return;
+      loaded = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=G-QB63MNYN52';
+      document.head.appendChild(s);
+      ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function (t) {
+        removeEventListener(t, loadGtag, true);
+      });
+    }
+    ['pointerdown', 'keydown', 'touchstart', 'scroll'].forEach(function (t) {
+      addEventListener(t, loadGtag, { capture: true, passive: true, once: false });
+    });
+    setTimeout(loadGtag, 3500);
+  })();
 </script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QB63MNYN52"></script>
 
 {seo.indexable && machineJsonPath ? <link rel="alternate" type="application/json" href={machineJsonPath} /> : null}
 {seo.indexable && machineTextPath ? <link rel="alternate" type="text/plain" href={machineTextPath} /> : null}

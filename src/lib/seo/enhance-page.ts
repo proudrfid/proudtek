@@ -505,13 +505,27 @@ export function enhanceKadenceA11y($body: CheerioAPI): void {
     $el.replaceWith(`<h3 class="${className}">${html}</h3>`);
   });
 
-  // (6) responsive-image sizes (PSI 2026-06-11) — the "18 years badge"
-  //     ships a 600px-slot sizes attr but renders at ~210px, so mobile
-  //     Lighthouse downloads the 600w original (-24.6 KiB est.). An
-  //     honest sizes lets the browser pick the 300w/150w variant. The
-  //     srcset (600/300/150/100/12w) already exists in the snapshot.
+  // (6) responsive-image fix (PSI 2026-06-11, iter-2) — the "18 years
+  //     badge" had two problems:
+  //       a. The <picture> carried a webp <source> whose srcset listed a
+  //          single 600px file with NO width descriptor — browsers always
+  //          downloaded it regardless of slot size. Remove that source:
+  //          for this flat-art badge the palette PNG ladder compresses
+  //          better than sharp's webp/avif at the sizes that matter.
+  //       b. sizes claimed a 600px slot for a ~210px render. Set honest
+  //          sizes and add a 480w rung (Moto G class @ DPR 2.6 needs
+  //          ≥433px; the old 300→600 gap forced the 600w pick).
   $body('img[src*="18-years-badge"]').each((_, element) => {
-    $body(element).attr("sizes", "(max-width: 767px) 40vw, 210px");
+    const $img = $body(element);
+    $img.attr("sizes", "(max-width: 767px) 40vw, 210px");
+    const srcset = $img.attr("srcset") ?? "";
+    if (srcset && !srcset.includes("18-years-badge-480x480")) {
+      $img.attr(
+        "srcset",
+        `/site-assets/wp-content/uploads/2025/12/18-years-badge-480x480.png 480w, ${srcset}`,
+      );
+    }
+    $img.closest("picture").find('source[type="image/webp"]').remove();
   });
 }
 
