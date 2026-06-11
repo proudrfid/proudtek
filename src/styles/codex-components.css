@@ -5533,7 +5533,13 @@ form[data-codex-rfq] .kb-forms-submit {
  *    rows match — the OUTER 7af224-af wrap has figure/h2 only as deep
  *    descendants, not as direct grandchildren of its kt-row-column-wrap,
  *    so it stays in the 5fr 8fr split (rule 9b above). */
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) {
+/* SELECTOR REPAIR 2026-06-11: enhance-page (heading-order iter-3) demotes
+ * the stat-label <h2 class="wp-block-heading"> to <p class="wp-block-heading">
+ * for a11y, which silently broke every `:has(... > h2.wp-block-heading)`
+ * clause below — the cards reverted to Kadence's default image|text 2-col
+ * (user report: 图标应该在每个区域的顶部). All clauses now match the label
+ * as :is(h2, h3, p).wp-block-heading so the layout survives the demotion. */
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading) {
   grid-template-columns: minmax(0, 1fr) !important;
   gap: var(--codex-space-2) !important;
   text-align: center !important;
@@ -5541,7 +5547,7 @@ form[data-codex-rfq] .kb-forms-submit {
 }
 
 /* The image column (first child) — make sure figure block is centred. */
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:first-child > .kt-inside-inner-col {
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading) > .wp-block-kadence-column:first-child > .kt-inside-inner-col {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -5559,8 +5565,7 @@ form[data-codex-rfq] .kb-forms-submit {
  *    uses the STRUCTURAL pattern (any H2 inside the 2nd column of a
  *    figure+h2 inner stat row) so it works on all 6 stat cards
  *    regardless of which Kadence dir-modifier class they carry. */
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > h2.wp-block-heading,
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > h3.wp-block-heading {
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading {
   font-size: var(--codex-text-base-plus) !important;
   line-height: 1.3 !important;
   font-weight: 700 !important;
@@ -5579,7 +5584,7 @@ form[data-codex-rfq] .kb-forms-submit {
 
 /* 4. Stat description <p>: small caption text, muted, centred under heading.
  *    Same structural selector as #3 to catch all 6 cards. */
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > p {
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col > p:not(.wp-block-heading) {
   font-size: var(--codex-text-xs-plus) !important;
   line-height: 1.55 !important;
   color: var(--global-palette4, #4f4f4f) !important;
@@ -5589,7 +5594,7 @@ form[data-codex-rfq] .kb-forms-submit {
 }
 
 /* 5. Each stat card text column: centre-align internal content. */
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col {
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading) > .wp-block-kadence-column:nth-child(2) > .kt-inside-inner-col {
   text-align: center !important;
   display: flex;
   flex-direction: column;
@@ -5657,7 +5662,7 @@ form[data-codex-rfq] .kb-forms-submit {
  *     - icon pinned to the top (auto-size)
  *     - heading just below the icon
  *     - description flexed to fill so cards bottom-align consistently */
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) {
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading) {
   height: 100% !important;
   align-content: start !important;
   padding: var(--codex-space-6) var(--codex-space-3) !important;
@@ -5665,7 +5670,7 @@ form[data-codex-rfq] .kb-forms-submit {
 
 /* 9c. Text column flex grow: so descriptions of varying length still
  *     leave the icons + headings vertically aligned across the row. */
-.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > h2.wp-block-heading) > .wp-block-kadence-column:nth-child(2) {
+.kb-row-layout-id_7af224-af .kt-row-column-wrap.kt-has-2-columns:has(> .wp-block-kadence-column > .kt-inside-inner-col > figure.wp-block-image):has(> .wp-block-kadence-column > .kt-inside-inner-col > :is(h2, h3, p).wp-block-heading) > .wp-block-kadence-column:nth-child(2) {
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
