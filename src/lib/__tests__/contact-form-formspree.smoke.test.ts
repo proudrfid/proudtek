@@ -38,7 +38,7 @@ describe("contact form Formspree wiring (post-redesign)", () => {
   });
 
   it("points the form at Formspree", () => {
-    expect(form.attr("action")).toBe("https://formspree.io/f/mpqelrep");
+    expect(form.attr("action")).toBe("https://formspree.io/f/xlgorlog");
     expect((form.attr("method") ?? "").toUpperCase()).toBe("POST");
   });
 

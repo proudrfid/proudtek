@@ -642,7 +642,7 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
   }
 
   // Point the form to Formspree for submission
-  form.attr("action", "https://formspree.io/f/mpqelrep");
+  form.attr("action", "https://formspree.io/f/xlgorlog");
   form.attr("method", "POST");
 
   // Strip the WP-era AJAX router fields — junk data in a Formspree
