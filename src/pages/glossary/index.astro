@@ -1,0 +1,355 @@
+---
+/**
+ * /glossary/ — RFID & NFC glossary (citation magnet for definitional queries).
+ *
+ * A single-page glossary of the chips, standards and concepts procurement
+ * teams meet when speccing tags ("what is NTAG215", "what is EPC Gen2").
+ * Each term gets a stable `#slug` anchor for deep-linking, and the page emits
+ * a schema.org DefinedTermSet (one DefinedTerm per entry, linked back to the
+ * Organization) so AI answer engines and search can cite specific definitions.
+ *
+ * ACCURACY: chip definitions are composed from the datasheet-verified
+ * registry `src/data/chip-specs.json` (factsSource + verifyRule in its
+ * _meta) — NOT from model priors. Standards/concept definitions are
+ * established industry terms kept deliberately conservative. Per CLAUDE.md,
+ * any future edit to a chip spec here must be re-verified against the
+ * vendor datasheet.
+ *
+ * Native Astro page (like rfq.astro): standard BaseLayout chrome + SEO from a
+ * minimal SnapshotPage stub via buildPageSeo(); the DefinedTermSet is inlined.
+ * Registered in seo-feeds.ts (NATIVE_HUB_ROUTES for sitemap, mainRoutes for
+ * llms.txt).
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { buildPageSeo, buildMachineRoute } from "../../lib/seo";
+import type { SnapshotPage } from "../../lib/site-data";
+
+const route = "/glossary/";
+
+interface Term {
+  slug: string;
+  term: string;
+  group: "chips" | "standards" | "concepts";
+  def: string;
+  href?: string;
+  hrefLabel?: string;
+}
+
+// Chip definitions composed from src/data/chip-specs.json (verified fields:
+// frequency, standard, memory, crypto). Do not edit specs without re-verifying
+// against the vendor datasheet (CLAUDE.md / chip-specs verifyRule).
+const TERMS: Term[] = [
+  // ── RFID & NFC chips ──────────────────────────────────────────────
+  {
+    slug: "ntag-213", term: "NTAG 213", group: "chips",
+    def: "NXP's entry-tier NTAG 21x HF NFC chip (ISO/IEC 14443A, NFC Forum Type 2) with 144 bytes of user memory. Common in NFC stickers and tap-to-link labels where a single URL or short record is enough.",
+    href: "/blog/which-nfc-chip-most-memory/", hrefLabel: "Compare NTAG memory",
+  },
+  {
+    slug: "ntag-215", term: "NTAG 215", group: "chips",
+    def: "The mid-tier NTAG 21x chip (ISO/IEC 14443A, NFC Forum Type 2) with 504 bytes of user memory. The most popular NFC chip for business cards, tap-to-review tags and collectibles — room for a URL plus extra records.",
+    href: "/blog/which-nfc-chip-most-memory/", hrefLabel: "Compare NTAG memory",
+  },
+  {
+    slug: "ntag-216", term: "NTAG 216", group: "chips",
+    def: "The top-tier NTAG 21x chip (ISO/IEC 14443A, NFC Forum Type 2) with 888 bytes of user memory, for tags that store longer NDEF payloads such as multi-record vCards or larger URLs.",
+    href: "/blog/which-nfc-chip-most-memory/", hrefLabel: "Compare NTAG memory",
+  },
+  {
+    slug: "ntag-424-dna", term: "NTAG 424 DNA", group: "chips",
+    def: "NXP's secure NFC chip (ISO/IEC 14443A, NFC Forum Type 4, 416 bytes) with AES-128 SUN authentication: every tap returns a fresh, server-verifiable cryptographic URL. Used for anti-counterfeit, tamper-evidence and digital product passports.",
+    href: "/products/rfid-cards/ntag424-dna-tt-card/", hrefLabel: "NTAG 424 DNA cards",
+  },
+  {
+    slug: "mifare-classic-1k", term: "MIFARE Classic 1K", group: "chips",
+    def: "A legacy 13.56 MHz access/transit card (ISO/IEC 14443A) with 1 KB EEPROM in 16 sectors. Its CRYPTO-1 cipher has been publicly broken since 2008, so it is not recommended for new security-sensitive deployments.",
+    href: "/guides/mifare-classic-1k-4k-chip-encyclopedia/", hrefLabel: "MIFARE Classic encyclopedia",
+  },
+  {
+    slug: "mifare-desfire-ev3", term: "MIFARE DESFire EV3", group: "chips",
+    def: "NXP's high-security smart-card chip (ISO/IEC 14443A + ISO 7816-4 APDU) in 2/4/8 KB variants with AES-128 (and legacy 3DES) cryptography. The default choice for secure access control, transit and campus credentials.",
+    href: "/products/rfid-cards/mifare-desfire-ev3-card/", hrefLabel: "DESFire EV3 cards",
+  },
+  {
+    slug: "mifare-ultralight-c", term: "MIFARE Ultralight C", group: "chips",
+    def: "A low-cost ticketing chip (ISO/IEC 14443A) with 144 bytes of user memory and 3DES authentication — used for limited-use transit tickets and event wristbands.",
+    href: "/guides/mifare-ultralight-c-chip-encyclopedia/", hrefLabel: "Ultralight C encyclopedia",
+  },
+  {
+    slug: "mifare-plus-ev2", term: "MIFARE Plus EV2", group: "chips",
+    def: "A security-upgrade card (ISO/IEC 14443A) with AES-128, designed as a drop-in migration path from MIFARE Classic to a modern cipher while keeping a Classic-compatible memory layout.",
+    href: "/products/rfid-cards/mifare-plus-se-card/", hrefLabel: "MIFARE Plus cards",
+  },
+  {
+    slug: "icode-slix", term: "ICODE SLIX", group: "chips",
+    def: "NXP's ISO/IEC 15693 (NFC Forum Type 5) vicinity chip with 112 bytes of user memory and longer read range than ISO 14443. Common in library books, laundry tags and tamper labels.",
+    href: "/guides/icode-slix-chip-encyclopedia/", hrefLabel: "ICODE SLIX encyclopedia",
+  },
+  {
+    slug: "em4100", term: "EM4100", group: "chips",
+    def: "A read-only 125 kHz LF chip (ISO/IEC 18000-2) that broadcasts a fixed 40-bit ID in the clear. Ubiquitous in legacy proximity fobs and cards; trivially cloned, so not for security.",
+    href: "/guides/em4100-em4305-t5577-lf-chip-encyclopedia/", hrefLabel: "LF chip encyclopedia",
+  },
+  {
+    slug: "em4305", term: "EM4305", group: "chips",
+    def: "A writable 125 kHz LF chip (ISO/IEC 18000-2; ISO 11784/11785 FDX-B) with 512-bit EEPROM and password protection — used for animal ID and programmable LF credentials.",
+    href: "/guides/em4100-em4305-t5577-lf-chip-encyclopedia/", hrefLabel: "LF chip encyclopedia",
+  },
+  {
+    slug: "t5577", term: "T5577", group: "chips",
+    def: "A widely-used writable 125 kHz LF transponder (ISO/IEC 18000-2) with roughly 330 rewritable bits that can emulate many LF formats. Common in programmable hotel and access fobs.",
+    href: "/compare/em4100-vs-t5577/", hrefLabel: "EM4100 vs T5577",
+  },
+  {
+    slug: "ucode-8", term: "UCODE 8", group: "chips",
+    def: "NXP's mainstream UHF chip (EPC Gen2v2 / ISO 18000-63) with a 128-bit EPC — a high-sensitivity workhorse for retail item-level and supply-chain labels.",
+    href: "/guides/ucode-8-uhf-chip-encyclopedia/", hrefLabel: "UCODE 8 encyclopedia",
+  },
+  {
+    slug: "ucode-9", term: "UCODE 9", group: "chips",
+    def: "NXP's latest mainstream UHF chip (EPC Gen2v2 / ISO 18000-63, 96-bit EPC) with improved read sensitivity and a unique TID for serialization and brand protection.",
+    href: "/guides/ucode-9-uhf-chip-encyclopedia/", hrefLabel: "UCODE 9 encyclopedia",
+  },
+  {
+    slug: "monza-r6", term: "Impinj Monza R6", group: "chips",
+    def: "Impinj's high-volume UHF chip (EPC Gen2v2 / ISO 18000-63, 96-bit EPC) with AutoTune for consistent performance across varied label antennas; common in retail apparel tags.",
+    href: "/guides/monza-r6-family-chip-encyclopedia/", hrefLabel: "Monza R6 encyclopedia",
+  },
+  {
+    slug: "higgs-3", term: "Alien Higgs-3", group: "chips",
+    def: "Alien's UHF chip (EPC Gen2v2 / ISO 18000-63) with a 96-bit EPC and 512-bit user memory — used where on-tag user data storage is needed in asset and supply-chain tags.",
+  },
+  // ── Standards & protocols ─────────────────────────────────────────
+  {
+    slug: "rfid", term: "RFID", group: "standards",
+    def: "Radio-Frequency Identification — reading a unique ID (and sometimes data) from a tag over radio, without contact or line of sight. Spans LF (125 kHz), HF (13.56 MHz) and UHF (860–960 MHz) bands.",
+    href: "/compare/active-vs-passive-rfid/", hrefLabel: "Active vs passive RFID",
+  },
+  {
+    slug: "nfc", term: "NFC", group: "standards",
+    def: "Near-Field Communication — a 13.56 MHz subset of HF RFID (ISO/IEC 14443 / 15693) standardized by the NFC Forum for short-range, phone-readable interactions such as tap-to-link and tap-to-pay.",
+  },
+  {
+    slug: "iso-14443", term: "ISO/IEC 14443", group: "standards",
+    def: "The HF (13.56 MHz) proximity standard, roughly 10 cm range, underlying MIFARE, DESFire and NTAG chips and NFC card emulation. Defined in Type A and Type B variants.",
+  },
+  {
+    slug: "iso-15693", term: "ISO/IEC 15693", group: "standards",
+    def: "The HF (13.56 MHz) vicinity standard, up to roughly 1 m range, behind ICODE chips and NFC Forum Type 5 tags — longer range but lower data rate than ISO 14443.",
+  },
+  {
+    slug: "iso-18000-63", term: "ISO/IEC 18000-63", group: "standards",
+    def: "The UHF (860–960 MHz) passive air-interface standard, functionally equivalent to EPC Gen2 — the protocol behind passive UHF supply-chain and retail tags.",
+  },
+  {
+    slug: "epc-gen2", term: "EPC Gen2", group: "standards",
+    def: "EPCglobal UHF Class-1 Generation-2 (current revision Gen2v2), aligned with ISO 18000-63 — the dominant passive-UHF protocol defining the EPC memory bank plus inventory and security commands.",
+  },
+  {
+    slug: "ndef", term: "NDEF", group: "standards",
+    def: "NFC Data Exchange Format — the standard message format (records for URLs, text, vCards and more) that lets any NFC phone read and write a tag's payload interoperably.",
+    href: "/guides/nfc-ndef-format-explained/", hrefLabel: "NDEF format explained",
+  },
+  {
+    slug: "nfc-forum-types", term: "NFC Forum tag types", group: "standards",
+    def: "The NFC Forum's tag-type profiles (Type 1–5) mapping chips to capabilities: Type 2 covers NTAG 21x, Type 4 covers DESFire and NTAG 424 DNA, and Type 5 covers ICODE / ISO 15693 chips.",
+  },
+  // ── Core concepts ─────────────────────────────────────────────────
+  {
+    slug: "lf", term: "LF (Low Frequency)", group: "concepts",
+    def: "RFID at 125–134 kHz — short range with good tolerance of liquids and metal proximity, but low data rate. The band for EM4100, EM4305, T5577 and animal ID.",
+    href: "/compare/125khz-vs-13.56mhz-rfid/", hrefLabel: "125 kHz vs 13.56 MHz",
+  },
+  {
+    slug: "hf", term: "HF (High Frequency)", group: "concepts",
+    def: "RFID/NFC at 13.56 MHz — roughly 10 cm to 1 m range and phone-readable. The band for NFC, MIFARE, NTAG and ICODE.",
+    href: "/compare/hf-vs-uhf-rfid-for-asset-tracking/", hrefLabel: "HF vs UHF",
+  },
+  {
+    slug: "uhf", term: "UHF (Ultra-High Frequency)", group: "concepts",
+    def: "RFID at 860–960 MHz — multi-metre range and fast bulk reads. The band for EPC Gen2 supply-chain, retail and asset tracking.",
+    href: "/compare/hf-vs-uhf-rfid-for-asset-tracking/", hrefLabel: "HF vs UHF",
+  },
+  {
+    slug: "inlay", term: "RFID inlay", group: "concepts",
+    def: "The functional core of a tag: the chip plus its etched or printed antenna on a thin substrate, before it is converted into a finished label, card or hard tag.",
+  },
+  {
+    slug: "antenna", term: "Antenna", group: "concepts",
+    def: "The conductive coil (HF/LF) or dipole (UHF) that couples the chip to the reader's field. How well it is tuned to the chip and the carrier band largely determines read range.",
+  },
+  {
+    slug: "moq", term: "MOQ (Minimum Order Quantity)", group: "concepts",
+    def: "The smallest production run a manufacturer will accept for a given product or customization. Proud Tek publishes an MOQ ladder per product family in its quotes.",
+    href: "/rfq/", hrefLabel: "Request a quote",
+  },
+];
+
+const GROUPS: Array<{ id: "chips" | "standards" | "concepts"; title: string; note: string }> = [
+  { id: "chips", title: "RFID & NFC chips", note: "The silicon inside a tag. Memory, frequency band and cryptography decide what a chip can do — and what it costs. Specs below come from Proud Tek's datasheet-verified registry." },
+  { id: "standards", title: "Standards & protocols", note: "The air-interface and data-format standards that decide which readers and phones can talk to a tag." },
+  { id: "concepts", title: "Core concepts", note: "The vocabulary buyers meet when speccing a tag or comparing quotes." },
+];
+
+const pageStub: SnapshotPage = {
+  route,
+  sourceUrl: `https://proudtek.com${route}`,
+  title: "RFID & NFC Glossary — Chips, Standards & Terms | Proud Tek",
+  htmlAttrs: { lang: "en-US" },
+  bodyAttrs: {},
+  headHtml: "",
+  bodyHtml:
+    `<main id="main">` +
+    `<h1>RFID &amp; NFC glossary</h1>` +
+    `<p>Plain-English definitions of the RFID and NFC chips, standards and terms procurement teams meet when speccing tags — NTAG, MIFARE, ICODE, EM4100, UCODE, EPC Gen2, NDEF and more. Chip specs are drawn from Proud Tek's datasheet-verified registry, not marketing copy.</p>` +
+    `</main>`,
+};
+
+const seo = buildPageSeo(pageStub);
+const machineJsonPath = buildMachineRoute(route, "json");
+const machineTextPath = buildMachineRoute(route, "txt");
+const ORIGIN = new URL(seo.canonicalUrl).origin;
+
+const definedTermSet = {
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  "@id": `${ORIGIN}${route}#definedtermset`,
+  name: "RFID & NFC Glossary",
+  url: `${ORIGIN}${route}`,
+  inLanguage: "en",
+  publisher: { "@id": `${ORIGIN}/#organization` },
+  hasDefinedTerm: TERMS.map((t) => ({
+    "@type": "DefinedTerm",
+    "@id": `${ORIGIN}${route}#${t.slug}`,
+    name: t.term,
+    description: t.def,
+    inDefinedTermSet: `${ORIGIN}${route}#definedtermset`,
+    url: `${ORIGIN}${route}#${t.slug}`,
+  })),
+};
+---
+
+<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
+  <main id="main" class="codex-glossary-main">
+    <nav class="codex-glossary-breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li aria-current="page">Glossary</li>
+      </ol>
+    </nav>
+
+    <header class="codex-glossary-hero">
+      <p class="codex-editorial-kicker">Reference</p>
+      <h1>RFID &amp; NFC glossary</h1>
+      <p class="codex-glossary-lede">
+        Plain-English definitions of the RFID and NFC chips, standards and terms procurement
+        teams meet when speccing tags. Chip specs are drawn from Proud Tek's datasheet-verified
+        registry — not marketing copy. Each entry has its own link, so you can deep-link a
+        definition (for example <code>/glossary/#ntag-215</code>).
+      </p>
+    </header>
+
+    {GROUPS.map((g) => (
+      <section class="codex-editorial-section codex-glossary-section" id={g.id}>
+        <h2>{g.title}</h2>
+        <p class="codex-glossary-note">{g.note}</p>
+        <dl class="codex-glossary">
+          {TERMS.filter((t) => t.group === g.id).map((t) => (
+            <div class="codex-glossary__item" id={t.slug}>
+              <dt class="codex-glossary__term">{t.term}</dt>
+              <dd class="codex-glossary__def">
+                {t.def}
+                {t.href && (
+                  <a class="codex-glossary__link" href={t.href}>{" "}{t.hrefLabel ?? "Learn more"} →</a>
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    ))}
+  </main>
+
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(definedTermSet)} />
+</BaseLayout>
+
+<style>
+  .codex-glossary-main {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: var(--codex-space-12) var(--codex-space-6) var(--codex-space-20);
+  }
+  .codex-glossary-breadcrumb ol {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--codex-space-2);
+    padding: 0;
+    margin: 0 0 var(--codex-space-6);
+    font-size: var(--codex-text-sm);
+    color: var(--codex-text-muted);
+  }
+  .codex-glossary-breadcrumb li + li::before { content: "/"; margin-right: var(--codex-space-2); color: var(--codex-text-subtle); }
+  .codex-glossary-breadcrumb a { color: var(--codex-text-muted); text-decoration: none; }
+  .codex-glossary-breadcrumb a:hover { color: var(--codex-gold); }
+
+  .codex-glossary-hero { margin: 0 0 var(--codex-space-12); }
+  .codex-glossary-hero h1 {
+    font-family: var(--codex-font-heading);
+    font-size: var(--codex-text-3xl);
+    line-height: var(--codex-leading-tight);
+    margin: var(--codex-space-2) 0 var(--codex-space-4);
+  }
+  .codex-glossary-lede {
+    font-size: var(--codex-text-md);
+    line-height: var(--codex-leading-relaxed);
+    color: var(--codex-text-muted);
+    max-width: 70ch;
+  }
+  .codex-glossary-lede code {
+    font-family: var(--codex-font-mono);
+    font-size: 0.9em;
+    background: var(--codex-surface-muted);
+    padding: 0 var(--codex-space-1);
+    border-radius: var(--codex-radius-sm);
+  }
+
+  .codex-glossary-section { margin-bottom: var(--codex-space-12); }
+  .codex-glossary-note {
+    color: var(--codex-text-muted);
+    margin: 0 0 var(--codex-space-6);
+    max-width: 70ch;
+  }
+
+  .codex-glossary { margin: 0; }
+  .codex-glossary__item {
+    padding: var(--codex-space-5) 0;
+    border-top: 1px solid var(--codex-border-light);
+  }
+  .codex-glossary__item:first-child { border-top: 0; }
+  .codex-glossary__term {
+    font-weight: var(--codex-weight-bold);
+    font-size: var(--codex-text-lg);
+    color: var(--codex-text-strong);
+    margin: 0 0 var(--codex-space-2);
+  }
+  .codex-glossary__def {
+    margin: 0;
+    line-height: var(--codex-leading-relaxed);
+    max-width: 75ch;
+  }
+  .codex-glossary__link {
+    color: var(--codex-color-accent);
+    font-weight: var(--codex-weight-semibold);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .codex-glossary__link:hover { text-decoration: underline; }
+
+  /* Deep-linked term gets a brief highlight so the cited definition is obvious. */
+  .codex-glossary__item:target {
+    background: var(--codex-surface-muted);
+    box-shadow: 0 0 0 var(--codex-space-4) var(--codex-surface-muted);
+    border-radius: var(--codex-radius-sm);
+  }
+</style>

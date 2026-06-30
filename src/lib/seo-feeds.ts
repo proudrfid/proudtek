@@ -16,7 +16,7 @@ export type PageLoader = (route: string) => Promise<SnapshotPage>;
  * indexes ARE in siteData.pages) — only `/compare/` and `/guides/` are
  * missing because they were added as native hubs later.
  */
-const NATIVE_HUB_ROUTES: ReadonlyArray<string> = ["/compare/", "/guides/", "/rfq/"];
+const NATIVE_HUB_ROUTES: ReadonlyArray<string> = ["/compare/", "/guides/", "/rfq/", "/glossary/"];
 
 export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader): Promise<string> {
   const indexable = getIndexablePages(siteData);
@@ -183,7 +183,7 @@ ${entry("/image-sitemap.xml")}
 }
 
 export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Promise<string> {
-  const mainRoutes = ["/", "/products/all/", "/about/", "/contact/", "/faq/", "/blog/", "/solutions/", "/compare/", "/compatibility/", "/guides/", "/case-studies/", "/sample-pack/", "/rfq/", "/resources/downloads/"];
+  const mainRoutes = ["/", "/products/all/", "/about/", "/contact/", "/faq/", "/blog/", "/solutions/", "/compare/", "/compatibility/", "/guides/", "/glossary/", "/case-studies/", "/sample-pack/", "/rfq/", "/resources/downloads/"];
   const collectionRoutes = [
     "/products/rfid-tags/",
     "/products/rfid-labels/",
