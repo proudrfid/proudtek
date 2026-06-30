@@ -241,7 +241,7 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     "",
     "## Authority & credentials",
     "- ISO 9001:2015 certified manufacturing (SGS audited)",
-    "- RAIN RFID Alliance member · NFC Forum implementer member",
+    "- Products built to RAIN RFID (EPC Gen2v2 / ISO 18000-63) and NFC Forum Type 2 / 4 / 5 tag specifications",
     "- RoHS, CE, REACH compliant products",
     "- 17+ years RFID/NFC manufacturing experience (founded 2008)",
     "- Technical content reviewed by in-house RFID solutions architects and NFC product engineers",
@@ -276,8 +276,20 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     `- Workforce: ${ORGANIZATION_OPERATIONS.numberOfEmployees} employees across two Shenzhen factories with 10 automated production lines.`,
     `- Client base: ${ORGANIZATION_CREDENTIALS.clientCount} enterprise clients across ${ORGANIZATION_CREDENTIALS.countriesServed} countries.`,
     `- Certifications: ${ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name).join(", ")}.`,
-    `- Industry memberships: ${ORGANIZATION_CREDENTIALS.memberships.map((m) => `${m.name} (${m.role})`).join(", ")}.`,
-    `- Typical MOQ: ${ORGANIZATION_OPERATIONS.moq.nfcCards} for NFC cards, ${ORGANIZATION_OPERATIONS.moq.rfidLabels} for printed RFID labels, ${ORGANIZATION_OPERATIONS.moq.rfidWristbands} for wristbands, ${ORGANIZATION_OPERATIONS.moq.rfidReaders} for readers.`,
+    // Owner-confirmed 2026-06-22: no Alliance/Forum memberships held — omit
+    // the line entirely rather than emit an empty or false membership claim.
+    ...(ORGANIZATION_CREDENTIALS.memberships.length > 0
+      ? [`- Industry memberships: ${ORGANIZATION_CREDENTIALS.memberships.map((m) => `${m.name} (${m.role})`).join(", ")}.`]
+      : []),
+    // MOQ values themselves contain semicolon-separated sub-clauses, so a
+    // single run-on bullet chunked poorly for LLM extraction. Emit one
+    // nested bullet per product family — each is a standalone, cleanly
+    // attributable claim (the pattern AI answer engines quote verbatim).
+    "- Typical minimum order quantities (MOQ):",
+    `  - NFC cards: ${ORGANIZATION_OPERATIONS.moq.nfcCards}.`,
+    `  - Printed RFID labels: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
+    `  - RFID wristbands: ${ORGANIZATION_OPERATIONS.moq.rfidWristbands}.`,
+    `  - RFID readers: ${ORGANIZATION_OPERATIONS.moq.rfidReaders}.`,
     `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; ${ORGANIZATION_OPERATIONS.leadTime.customArtwork} for custom artwork or non-stock chips.`,
     "- Chip families supported: NXP MIFARE Classic/Plus/DESFire, NXP NTAG213/215/216, NXP NTAG 424 DNA, Impinj Monza R6/R6-P, Alien Higgs 9, EM4100/EM4305, T5577, ICODE SLIX2.",
     "- Pricing: contact for quote (RFQ via /rfq/ or /contact/). Sample packs available via /sample-pack/.",

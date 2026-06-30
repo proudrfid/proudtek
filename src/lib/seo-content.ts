@@ -184,6 +184,15 @@ export const ORGANIZATION_SOCIAL: Record<string, string> = {
 
   // Click-to-WhatsApp wa.me deep-link, derived from ORGANIZATION_CONTACT.
   whatsapp: `https://wa.me/${ORGANIZATION_CONTACT.whatsapp.replace(/[^0-9]/g, "")}`,
+
+  // Confirmed-owned external authority profiles (owner-confirmed 2026-06-22):
+  // marketplace storefront + social page, used for Organization.sameAs entity
+  // disambiguation. Deliberately EXCLUDES the legacy parallel domains
+  // proudrfid.com / protekrfid.com / rfidak.com — owner decided 2026-06-22 to
+  // keep those separate rather than consolidate, so linking them as the same
+  // entity would muddy disambiguation rather than help it.
+  madeInChina: "https://rfid-tag.en.made-in-china.com",
+  facebook: "https://www.facebook.com/RFIDTRANSPONDER/",
 };
 
 /**
@@ -285,10 +294,15 @@ export const ORGANIZATION_CREDENTIALS = {
     { name: "CE Marking", issuer: "EU", description: "European Conformity" },
     { name: "REACH Compliant", issuer: "ECHA", description: "Registration, Evaluation, Authorisation and Restriction of Chemicals" },
   ],
-  memberships: [
-    { name: "RAIN RFID Alliance", role: "Member", url: "https://rainrfid.org/" },
-    { name: "NFC Forum", role: "Implementer Member", url: "https://nfc-forum.org/" },
-  ],
+  // Owner confirmed 2026-06-22: Proud Tek is NOT a RAIN RFID Alliance or
+  // NFC Forum member. Do NOT assert either membership anywhere (site,
+  // JSON-LD, llms.txt, external directories) — an unverifiable membership
+  // claim fed to AI answer engines is a credibility liability. Product pages
+  // still cite the NFC Forum *Type 2 / 4 / 5 Tag specifications* and RAIN /
+  // EPC Gen2v2 standards — those are true standards references, distinct from
+  // Alliance membership. Re-add entries here only if membership is actually
+  // obtained (see GROWTH_ROADMAP: NFC Forum Adopter is a free join).
+  memberships: [] as Array<{ name: string; role: string; url: string }>,
   founded: "2008",
   employeeCount: "100+",
   clientCount: "500+",
