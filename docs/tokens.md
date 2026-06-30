@@ -286,7 +286,7 @@ This file documents every `--codex-*` token: what it is, what it resolves to, wh
 
 **Migration target**: 3 legacy tokens (`--codex-shadow`, `-light`, `-heavy`) still exist for backward compat. New rules should use the `--codex-elevation-*` ladder.
 
-**A sweep is NOT recommended** — DS-12 #9 analysis ([SHADOW-MIGRATION-CHECKLIST.md](../reports/ds-12-token-consolidation/SHADOW-MIGRATION-CHECKLIST.md)) found the 9 legacy callsites split:
+**A sweep is NOT recommended** — the DS-12 #9 analysis (summarized inline in `src/styles/codex-tokens.css`; the standalone SHADOW-MIGRATION-CHECKLIST.md is no longer in the repo as of 2026-06-29) found the 9 legacy callsites split:
 - **5 stay legacy** (rest-heavier-hover CTAs with intentional "press release" optical design)
 - **2 need design review** (single-callsite hover + footer pill — visual change is meaningful)
 - **0 auto-migratable**
@@ -464,7 +464,7 @@ Already applied globally — most components inherit. Override with `--codex-rin
 
 ## Changelog
 
-- **2026-04-27 (DS-12 #9 — shadow migration analysis)** — Per-site analysis of 9 `var(--codex-shadow*)` callsites in [SHADOW-MIGRATION-CHECKLIST.md](../reports/ds-12-token-consolidation/SHADOW-MIGRATION-CHECKLIST.md). Finding: 0 callsites are mechanically migratable to the new elevation scale; 5 stay legacy (rest-heavier-hover pattern), 2 need design review. Tightened `:root` deprecation note to reflect the rest-heavier pattern as the primary blocker. Future Phase 5 design review needed to either add a missing tier or accept the legacy convention.
+- **2026-04-27 (DS-12 #9 — shadow migration analysis)** — Per-site analysis of 9 `var(--codex-shadow*)` callsites (summarized inline in `src/styles/codex-tokens.css`; standalone SHADOW-MIGRATION-CHECKLIST.md no longer in the repo as of 2026-06-29). Finding: 0 callsites are mechanically migratable to the new elevation scale; 5 stay legacy (rest-heavier-hover pattern), 2 need design review. Tightened `:root` deprecation note to reflect the rest-heavier pattern as the primary blocker. Future Phase 5 design review needed to either add a missing tier or accept the legacy convention.
 - **2026-04-27 (DS-12 #8 — z-index deprecation)** — Marked 5 z-index tokens as deprecated (`surface`, `header`, `toast`, `tooltip`, `overlay`). Migrated 1 raw `z-index: 1000 !important` literal at masthead to `var(--codex-z-dropdown)`. Canonical 5-tier scale recommended for new code (`base / raised / sticky / dropdown / modal`).
 - **2026-04-27 (DS-12 #1)** — Added 22 tokens: `--codex-text-strong`, `--codex-touch-min`, `--codex-gold-light`, motion scale (5 + 3 easings), elevation scale (5), `--codex-error-tint`, `--codex-success-tint`, `--codex-warning`, `--codex-ring-error`, `--codex-ring-focus-glow`, `--codex-ring-error-glow`. Reconciled `--codex-success` (`#27ae60` → `#1f6f3a`) and `--codex-error` (`#c0392b` → `#8b2d2d`) to AA-compliant values.
 - **2026-04-26 (DS-11)** — `--codex-error` and `--codex-success` first written into DS-11 form rules as raw hex; tokenized in DS-12.

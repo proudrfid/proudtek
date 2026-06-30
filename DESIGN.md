@@ -129,6 +129,27 @@ Each status color has a `-tint` partner (10-12% alpha) for soft-fill backgrounds
 - `--codex-gradient-dark: linear-gradient(135deg, #291c0e, #6c5127)` — dark-mode hero / footer
 - `--codex-gradient-gold` / `--codex-gradient-gold-hover` — gold CTAs / chips
 
+### Surfaces & reclaimed tokens (DS-17, 2026-06-29)
+
+Names for colors that previously shipped as raw hex literals (100 callsites reclaimed, **zero visual change** — each token equals the exact value it replaced). Extends the RFQ/procurement cool sub-palette and adds the missing white surface/inverse and dark-gradient-partner tokens. Proposal + per-callsite map: `COLOR_TOKEN_PROPOSAL_2026-06-29.md`.
+
+| Token | Hex | Role |
+| --- | --- | --- |
+| `--codex-surface` | `#ffffff` | White panel / card background |
+| `--codex-surface-cool` | `#fcfdfe` | Cool-tinted form card surface |
+| `--codex-surface-muted` | `#fafafa` | Neutral light surface (contact) |
+| `--codex-text-inverse` | `#ffffff` | White text on dark / coloured bg |
+| `--codex-color-ink-strong` | `#0a1a2c` | Deeper ink than `--codex-color-ink` |
+| `--codex-steel-muted` | `#55687a` | Steel-blue secondary text |
+| `--codex-steel-soft` | `#7a8690` | Steel-blue tertiary text |
+| `--codex-steel-subtle` | `#8a949c` | Steel-blue placeholder / faint text |
+| `--codex-border-cool` | `#e5e9ed` | Cool form border / divider |
+| `--codex-border-cool-light` | `#eef1f4` | Cool hairline divider |
+| `--codex-teal-dark` | `#2c5454` | Dark partner for `--codex-teal` gradients |
+| `--codex-forest-dark` | `#1b4332` | Dark partner for `--codex-forest` gradients |
+
+Near-neighbour values (`#f5f9fc`, warm creams, generic greys) and the WhatsApp brand green (`#25d366`) were intentionally left raw (zero-regression-only scope).
+
 ### Dark mode
 
 Not implemented as a full theme. Strategy: `color-scheme: light dark` is declared so the UA auto-adapts scrollbars, form controls, default checkbox/radio, and date pickers. Full Kadence palette inversion is explicitly out of scope.
@@ -250,7 +271,7 @@ updating this table.
 | `--codex-elevation-modal` | `0 16px 48px rgba(41, 28, 14, 0.18)` | Floating modal |
 
 **Legacy tokens (do not use in new code):**
-- `--codex-shadow` / `--codex-shadow-light` / `--codex-shadow-heavy`. Migration policy and 5 known-good legacy callsites documented in `reports/ds-12-token-consolidation/SHADOW-MIGRATION-CHECKLIST.md`. Two prominent shells (`.codex-editorial-hero`, `.codex-conversion-shell`) need design review before swap — there's no in-flow surface tier between `-hover` and `-modal`.
+- `--codex-shadow` / `--codex-shadow-light` / `--codex-shadow-heavy`. Migration policy and the legacy callsites are documented inline in `src/styles/codex-tokens.css` and `docs/tokens.md` (the standalone `reports/ds-12-token-consolidation/SHADOW-MIGRATION-CHECKLIST.md` is no longer in the repo as of 2026-06-29). Two prominent shells (`.codex-editorial-hero`, `.codex-conversion-shell`) need design review before swap — there's no in-flow surface tier between `-hover` and `-modal`.
 
 ## Focus rings (WCAG 2.1 AA)
 
@@ -309,3 +330,4 @@ These appeared during the design audit (May 2026) and were removed. Don't reintr
 | 2026-04-27 (DS-12 #8B) | Z-index scale audited down to canonical 5; 5 tiers deprecated | Over-stratified original 10-tier scale |
 | 2026-05-08 | `codex.css` split into 4 sub-files by responsibility | Original 6581-line file became unreadable |
 | 2026-05-20 | DESIGN.md created via `/design-consultation` (codify path) | Document the system that already exists; provide future agents a reference |
+| 2026-06-29 (DS-17) | 12 color tokens reclaimed from raw hex (white `surface`/`text-inverse`, RFQ cool-palette `steel-*` + `surface-cool`/`border-cool`, `color-ink-strong`, `teal-dark`/`forest-dark`) | 100 raw literals → `var(--codex-*)`, zero-regression (token == value, verified); ~30 near-neighbour/singleton/brand values left raw on purpose |

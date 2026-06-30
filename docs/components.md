@@ -854,7 +854,7 @@ Examples of why each "WP-flavored" rule earns its keep:
 
 **Future audit rule:** prefix-based audits (counting `kadence-` selectors) are leading indicators only. Real audit requires emitter ↔ consumer cross-reference, otherwise you'll double-count "removable debt" that's actually system. This is the third audit (after DS-12 #9 shadows and DS-12 #10 page-type palette) where syntactic foreignness was mistaken for semantic deadness; the methodology now requires verification before the conclusion.
 
-Full diagnostic: `reports/ds-12-token-consolidation/DS-16-KADENCE-DIAGNOSTIC.md`.
+Full diagnostic: `reports/ds-12-token-consolidation/DS-16-KADENCE-DIAGNOSTIC.md` — note: this standalone file is no longer in the repo as of 2026-06-29; the summary above is retained.
 
 A **pattern** is a parameterized shape that gets composed with a context class. The context class lives at the leaf and provides the use-case context; the pattern provides the shape. `.codex-card .codex-blog-grid-card` is the canonical example.
 
