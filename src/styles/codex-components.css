@@ -906,7 +906,13 @@ a[href="#main"]:focus {
 
 .codex-blog-index__header h1 {
   margin: 0 0 var(--codex-space-1-plus);
-  font-size: var(--codex-text-xl-plus);
+  /* Page H1 was --codex-text-xl-plus (~22px) — smaller than every sibling
+     hub title (cluster-hero h1 is clamp(1.75rem … 2.75rem)) and below the
+     DESIGN.md h1 tier. Promote to the documented hero tier + heading serif
+     so the blog hub title carries the same weight as /guides/, /compare/. */
+  font-family: var(--codex-font-heading);
+  font-size: var(--codex-text-3xl);
+  line-height: var(--codex-leading-tight);
   color: var(--codex-text);
 }
 
@@ -971,9 +977,12 @@ a[href="#main"]:focus {
 }
 
 .codex-blog-grid-card {
-  --card-padding: var(--codex-space-5) 1.35rem;
-  --card-hover-border: rgba(195, 154, 95, 0.35);
-  --card-elevation-hover: 0 10px 28px rgba(41, 28, 14, 0.07);
+  /* Inherits the canonical .codex-card tokens for padding, hover border and
+     hover elevation. The previous overrides drifted off-system — raw 1.35rem
+     padding, a raw gold rgba border, and an ad-hoc box-shadow outside the
+     elevation scale (a DESIGN.md anti-pattern) — so blog cards now hover
+     identically to every other card. Padding pinned to the half-step token. */
+  --card-padding: var(--codex-space-5) var(--codex-space-5-plus, 1.35rem);
 }
 
 .codex-blog-grid-card__thumb {
@@ -1011,7 +1020,7 @@ a[href="#main"]:focus {
   margin: 0;
   color: var(--codex-text-muted);
   font-size: var(--codex-text-sm-plus);
-  line-height: 1.55;
+  line-height: var(--codex-leading-normal);
   flex-grow: 1;
 }
 
