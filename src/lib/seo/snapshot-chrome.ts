@@ -29,6 +29,7 @@ import { load } from "cheerio";
 import type { SnapshotPage } from "../site-data";
 import { prepareSnapshot } from "../render-snapshot";
 import { sanitizeHead, sanitizeBody } from "./sanitize-html";
+import { stripNoiseHtmlComments } from "./utils";
 
 export interface SnapshotChrome {
   htmlAttrs: Record<string, string>;
@@ -73,7 +74,15 @@ export function extractChromeFromSnapshot(
   // silently override the cluster page's title.
   const $head = load(`<head>${snap.headHtml}</head>`);
   sanitizeHead($head);
-  const sanitizedHeadHtml = $head("head").html() ?? "";
+  // sanitizeHead's selectors remove the *elements* (script/meta tags), but a
+  // CSS selector can't touch the HTML comment markers Site Kit wraps around
+  // them (e.g. `<!-- Google tag (gtag.js) snippet added by Site Kit -->`) —
+  // those are sibling text nodes, not part of the element being matched.
+  // buildPageSeo() already runs its head/body output through this same
+  // stripNoiseHtmlComments() pass for exactly that reason; this helper
+  // didn't, so donor chrome carried a few dozen dead comment bytes per hub
+  // page even after the "real" element was gone.
+  const sanitizedHeadHtml = stripNoiseHtmlComments($head("head").html() ?? "");
 
   // sanitizeBody strips WP/WooCommerce admin remnants, tracking pixels, and
   // dead third-party embeds (e.g. the "Sign in with Google" button Site Kit
@@ -86,7 +95,7 @@ export function extractChromeFromSnapshot(
   // these artifacts leaked it into every hub page consuming that chrome.
   const $body = load(`<body>${snap.bodyHtml}</body>`);
   sanitizeBody($body);
-  const bodyHtml = $body("body").html() ?? "";
+  const bodyHtml = stripNoiseHtmlComments($body("body").html() ?? "");
 
   // Find the <main> opening tag. Naive but reliable: snapshots have exactly
   // one <main> and it's at top level under the wrapper / inner-wrap / primary

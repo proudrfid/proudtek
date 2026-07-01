@@ -98,6 +98,17 @@ export function stripNoiseHtmlComments(value: string): string {
     .replace(/<!--\s*Google Analytics snippet added by Site Kit\s*-->/gi, "")
     .replace(/<!--\s*Google AdSense meta tags added by Site Kit\s*-->/gi, "")
     .replace(/<!--\s*End Google AdSense meta tags added by Site Kit\s*-->/gi, "")
+    // 2026-07-01: the fourth (and last — audited exhaustively against every
+    // "added by Site Kit" comment string across src/data/pages/**/*.json)
+    // Site Kit block. sanitizeBody/sanitizeHead remove the *functional*
+    // <script src="accounts.google.com/gsi/client"> element via a CSS
+    // selector, but a CSS selector can only ever remove elements — the
+    // surrounding HTML comment markers are separate sibling nodes and
+    // survive untouched. Harmless (no request, not rendered) but still
+    // dead bytes shipped on every page that carries this WP admin-login
+    // leftover — closing it here for consistency with the other three.
+    .replace(/<!--\s*Sign in with Google button added by Site Kit\s*-->/gi, "")
+    .replace(/<!--\s*End Sign in with Google button added by Site Kit\s*-->/gi, "")
     .replace(/<!--\s*Analytics by WP Statistics[\s\S]*?-->/gi, "")
     .replace(/\n\s*\n\s*\n+/g, "\n\n");
 }
