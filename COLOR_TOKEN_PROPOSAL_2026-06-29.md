@@ -1,6 +1,8 @@
 # 色彩令牌方案草案 — 收编 130 处无令牌裸色
 
-**日期:** 2026-06-29 · **状态:待你审批** · **目标:** 把 `src/styles` 里 130 处"无对应令牌"的裸 hex 收编进 `--codex-*` 体系(`SITE_AUDIT_2026-06-29.md` §二① 的剩余决策项)· **不改 DESIGN.md / tokens.css,直到你批**
+> **2026-06-30 更新:本提案已全部执行**(提交 `12d87db`)。12 个新令牌(`--codex-surface/-cool/-muted`、`--codex-text-inverse`、`--codex-color-ink-strong`、`--codex-steel-muted/-soft/-subtle`、`--codex-border-cool/-light`、`--codex-teal-dark/-forest-dark`)已加入 `src/styles/codex-tokens.css`,100 处裸 hex 已替换为零回归的 `var(--codex-*)`,`DESIGN.md` 颜色表 + 变更日志已同步。下文保留作为决策依据存档,无需再审批。
+
+**日期:** 2026-06-29 · **状态:✅ 已执行(2026-06-30)** · **目标(已达成):** 把 `src/styles` 里 130 处"无对应令牌"的裸 hex 收编进 `--codex-*` 体系(`SITE_AUDIT_2026-06-29.md` §二① 的剩余决策项)
 
 ---
 
