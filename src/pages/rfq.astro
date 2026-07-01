@@ -244,6 +244,66 @@ const machineTextPath = buildMachineRoute(route, "txt");
       let current = 0;
       const total = steps.length;
 
+      // Query-param prefill: /rfq/?product=rfid-cards&freq=uhf&qty=mid
+      // Lets a product/solution page deep-link into the wizard pre-answered
+      // (see CommercialTerms.astro, which passes ?product=<cluster slug> from
+      // every SKU page's "Full terms in your quote" link) so the buyer sees
+      // "we already know what you're looking at" instead of re-entering it.
+      // Each param is checked independently and silently ignored if missing
+      // or unrecognized — this only ever helps, never blocks the manual flow.
+      // The wizard only jumps PAST a step once every step before it is also
+      // answered (steps are sequential radios, all required), so a lone
+      // ?freq= or ?qty= with no ?product= still pre-selects that radio for
+      // whenever the buyer manually reaches it, without skipping step 1.
+      const PRODUCT_PARAM_MAP = {
+        "rfid-cards": "RFID Cards",
+        "rfid-tags": "RFID Tags",
+        "rfid-labels": "RFID Labels / Inlays",
+        "rfid-wristbands": "RFID Wristbands",
+        "rfid-keyfobs": "RFID Keyfobs",
+        "rfid-readers": "RFID Readers / Encoders",
+      };
+      const FREQ_PARAM_MAP = {
+        lf: "LF 125 kHz",
+        hf: "HF 13.56 MHz / NFC",
+        uhf: "UHF RAIN 860–960 MHz",
+        dual: "Dual-frequency (LF+HF)",
+      };
+      const QTY_PARAM_MAP = {
+        pilot: "Under 5,000",
+        small: "5,000 – 50,000",
+        mid: "50,000 – 250,000",
+        large: "250,000 – 1,000,000",
+        enterprise: "1,000,000+",
+      };
+
+      function checkRadioByValue(name, value) {
+        if (!value) return false;
+        const el = wizard.querySelector(
+          'input[name="' + name + '"][value="' + value + '"]',
+        );
+        if (!el) return false;
+        el.checked = true;
+        return true;
+      }
+
+      const searchParams = new URLSearchParams(window.location.search);
+      const productPrefilled = checkRadioByValue(
+        "rfq_product",
+        PRODUCT_PARAM_MAP[searchParams.get("product")],
+      );
+      const freqPrefilled = checkRadioByValue(
+        "rfq_frequency",
+        FREQ_PARAM_MAP[searchParams.get("freq")],
+      );
+      const qtyPrefilled = checkRadioByValue(
+        "rfq_quantity",
+        QTY_PARAM_MAP[searchParams.get("qty")],
+      );
+      if (productPrefilled && freqPrefilled && qtyPrefilled) current = 3;
+      else if (productPrefilled && freqPrefilled) current = 2;
+      else if (productPrefilled) current = 1;
+
       // dataLayer push + guarded gtag bridge. The site loads plain gtag.js
       // (no GTM container), and gtag.js ignores plain-object dataLayer
       // pushes — mirror each event through gtag() so GA4 actually records
@@ -400,7 +460,7 @@ const machineTextPath = buildMachineRoute(route, "txt");
         if (e.target instanceof HTMLElement) e.target.classList.remove("has-error");
       });
 
-      show(0);
+      show(current);
     })();
   </script>
 </BaseLayout>

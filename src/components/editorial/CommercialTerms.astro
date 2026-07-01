@@ -20,8 +20,29 @@
  * (same pattern as DecisionSnapshot's extra brief fields), the
  * codex-editorial-answer-label micro-label, and the gold
  * codex-editorial-snapshot-link for the trailing RFQ link.
+ *
+ * 2026-07-01: the trailing link now deep-links into the /rfq/ wizard with
+ * ?product=<cluster slug> (rfid-cards, rfid-tags, rfid-labels, rfid-
+ * wristbands, rfid-keyfobs, rfid-readers — read straight off this page's own
+ * route, which is already namespaced /products/<cluster>/<sku>/) so the
+ * wizard's step 1 arrives pre-answered. See the matching PRODUCT_PARAM_MAP
+ * decode table in rfq.astro. Falls back to the plain /rfq/ link for any
+ * route this regex doesn't recognize (defensive — should never happen for a
+ * page this component even renders on, but a silent fallback beats a broken
+ * link).
  */
 import { COMMERCIAL_TERMS } from "../../lib/seo-content";
+
+interface Props {
+  /** The consuming SKU page's own route, e.g. /products/rfid-cards/some-sku/ */
+  route?: string;
+}
+const { route = "" } = Astro.props;
+
+const clusterMatch = route.match(/^\/products\/(rfid-[a-z]+)\//);
+const rfqHref = clusterMatch
+  ? `${COMMERCIAL_TERMS.link.href}?product=${clusterMatch[1]}`
+  : COMMERCIAL_TERMS.link.href;
 ---
 <section class="codex-editorial-section codex-commercial-terms" id="commercial-terms">
   <h2>{COMMERCIAL_TERMS.title}</h2>
@@ -34,6 +55,6 @@ import { COMMERCIAL_TERMS } from "../../lib/seo-content";
     ))}
   </dl>
   <p class="codex-commercial-terms__note">
-    <a class="codex-editorial-snapshot-link" href={COMMERCIAL_TERMS.link.href}>{COMMERCIAL_TERMS.link.label} →</a>
+    <a class="codex-editorial-snapshot-link" href={rfqHref}>{COMMERCIAL_TERMS.link.label} →</a>
   </p>
 </section>
