@@ -287,6 +287,7 @@ export const RESOURCES_MENU: MenuDropdown = {
       heading: "Get started",
       links: [
         { href: "/sample-pack/", label: "Free Sample Pack" },
+        { href: "/tools/rfid-tag-cost-estimator/", label: "Cost Estimator Tool" },
         { href: "/rfq/", label: "Request a Quote (5-step wizard)" },
         { href: "/contact/?intent=engineering", label: "Talk to Engineering" },
       ],
@@ -396,6 +397,7 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/case-studies/", label: "Case Studies" },
       { href: "/resources/downloads/", label: "Resource Center" },
       { href: "/sample-pack/", label: "Free Sample Pack" },
+      { href: "/tools/rfid-tag-cost-estimator/", label: "Cost Estimator Tool" },
       { href: "/rfq/", label: "Request a Quote" },
       { href: "/faq/", label: "FAQ" },
     ],

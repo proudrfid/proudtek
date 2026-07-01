@@ -1,0 +1,315 @@
+---
+/**
+ * /tools/rfid-tag-cost-estimator/ — interactive RFID/NFC cost estimator.
+ *
+ * A client-side reference-range calculator covering the same three
+ * product families as the buying-reference guide cluster: cards,
+ * wristbands, and readers. It applies the exact preset ranges and
+ * volume multipliers documented in /guides/rfid-card-cost/ and
+ * /guides/rfid-wristband-cost/ (reader figures are quoted directly from
+ * /guides/rfid-reader-writer-selection/'s pricing section — no new
+ * reader guide was written; see that guide's decision note). All
+ * output is explicitly framed as an industry-reference planning band,
+ * not a Proud Tek quote, with every result linking to the RFQ wizard
+ * (query-param prefilled) for a real number.
+ *
+ * Architecture note: native Astro page (not editorial content) because
+ * this is a stateful client-side calculator, same rationale as
+ * /rfq.astro. Uses the same SnapshotPage-stub + buildPageSeo() pattern
+ * and reuses the .codex-rfq-* layout primitives (hero, grid, text-field,
+ * btn, aside) from src/styles/codex-rfq.css for visual consistency;
+ * only the tab switcher and result panel are new, minimal, token-only
+ * CSS additions.
+ */
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { buildPageSeo, buildMachineRoute } from "../../lib/seo";
+import type { SnapshotPage } from "../../lib/site-data";
+
+const route = "/tools/rfid-tag-cost-estimator/";
+const pageStub: SnapshotPage = {
+  route,
+  sourceUrl: `https://proudtek.com${route}`,
+  title: "RFID & NFC Cost Estimator — Cards, Wristbands, Readers | Proud Tek",
+  htmlAttrs: { lang: "en-US" },
+  bodyAttrs: {},
+  headHtml: "",
+  bodyHtml:
+    `<main id="main">` +
+    `<h1>RFID &amp; NFC cost estimator</h1>` +
+    `<p>Pick a product family, chip/material tier, and order volume to get an industry-reference cost-per-unit and total-order planning range for RFID and NFC cards, wristbands and readers, drawn from Proud Tek's own published cost breakdowns and independent 2026 industry pricing reports. This is a planning band, not a quote — use the linked RFQ wizard for a number specific to your exact specification.</p>` +
+    `</main>`,
+};
+const seo = buildPageSeo(pageStub);
+const machineJsonPath = buildMachineRoute(route, "json");
+const machineTextPath = buildMachineRoute(route, "txt");
+---
+
+<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
+  <Fragment set:html={seo.bodyHtml.split("<main")[0]} />
+
+  <main id="main" class="codex-rfq-main">
+    <nav class="codex-rfq-breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li><a href="/guides/">Guides</a></li>
+        <li aria-current="page">Cost Estimator</li>
+      </ol>
+    </nav>
+
+    <section class="codex-rfq-hero">
+      <p class="codex-rfq-hero__eyebrow">Reference-range calculator</p>
+      <h1 class="codex-rfq-hero__title">RFID &amp; NFC cost estimator</h1>
+      <p class="codex-rfq-hero__lede">Pick a product family, chip/material tier, and order volume for an instant cost-per-unit and total-order planning range. Figures are drawn from Proud Tek's own published cost breakdowns in the <a href="/guides/rfid-card-cost/">card</a> and <a href="/guides/rfid-wristband-cost/">wristband</a> cost guides, cross-checked against independent 2026 industry pricing reports. This is a directional planning band, not a quote.</p>
+    </section>
+
+    <div class="codex-rfq">
+      <div class="codex-estimator-tabs" role="tablist" aria-label="Product family">
+        <button type="button" class="codex-estimator-tab is-active" id="tab-cards" role="tab" aria-selected="true" aria-controls="panel-cards">RFID / NFC Cards</button>
+        <button type="button" class="codex-estimator-tab" id="tab-wristbands" role="tab" aria-selected="false" aria-controls="panel-wristbands">RFID Wristbands</button>
+        <button type="button" class="codex-estimator-tab" id="tab-readers" role="tab" aria-selected="false" aria-controls="panel-readers">RFID Readers</button>
+      </div>
+
+      <!-- Cards panel -->
+      <section class="codex-estimator-panel is-active" id="panel-cards" role="tabpanel" aria-labelledby="tab-cards">
+        <fieldset class="codex-rfq__step is-active">
+          <legend>Chip and material tier</legend>
+          <p class="codex-rfq__help">Each option is a finished-card range at first-production volume (5,000-10,000 units) — the volume tier below adjusts it up or down.</p>
+          <div class="codex-rfq__grid" id="card-tier-grid" data-field="tier">
+            <label><input type="radio" name="card_tier" value="lf-entry" checked /> <span><strong>LF / entry NFC, standard PVC</strong><em>EM4100/T5577 or Ultralight/NTAG 213 · US$0.20-0.45</em></span></label>
+            <label><input type="radio" name="card_tier" value="classic-pvc" /> <span><strong>Standard NFC, standard PVC</strong><em>MIFARE Classic 1K / NTAG 213 · US$0.30-0.70</em></span></label>
+            <label><input type="radio" name="card_tier" value="highsec-pvc" /> <span><strong>High-security, standard PVC</strong><em>DESFire EV3 / NTAG 424 DNA · US$1.00-4.00</em></span></label>
+            <label><input type="radio" name="card_tier" value="any-wood" /> <span><strong>Premium wood body</strong><em>Any chip tier · US$1.20-3.50</em></span></label>
+            <label><input type="radio" name="card_tier" value="any-poly" /> <span><strong>Polycarbonate body</strong><em>Any chip tier · US$2.40-6.20</em></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="codex-rfq__step is-active">
+          <legend>Order volume</legend>
+          <div class="codex-rfq__grid codex-rfq__grid--tight" id="card-volume-grid" data-field="volume">
+            <label><input type="radio" name="card_volume" value="pilot" /> <span><strong>Pilot</strong><em>500-1,000 units</em></span></label>
+            <label><input type="radio" name="card_volume" value="first-run" checked /> <span><strong>First production</strong><em>5,000-10,000 units</em></span></label>
+            <label><input type="radio" name="card_volume" value="established" /> <span><strong>Established</strong><em>50,000+ units</em></span></label>
+          </div>
+        </fieldset>
+
+        <label class="codex-rfq__text-field codex-estimator-qty">
+          <span>Order quantity</span>
+          <input type="number" id="card-qty" min="1" step="1" value="5000" inputmode="numeric" />
+        </label>
+
+        <div class="codex-estimator-result" id="card-result" aria-live="polite"></div>
+      </section>
+
+      <!-- Wristbands panel -->
+      <section class="codex-estimator-panel" id="panel-wristbands" role="tabpanel" aria-labelledby="tab-wristbands" hidden>
+        <fieldset class="codex-rfq__step is-active">
+          <legend>Material and chip tier</legend>
+          <p class="codex-rfq__help">Each option is a finished-wristband range at standard-order volume (5,000-10,000 units).</p>
+          <div class="codex-rfq__grid" id="wristband-tier-grid" data-field="tier">
+            <label><input type="radio" name="wristband_tier" value="tyvek" checked /> <span><strong>Single-use Tyvek / paper</strong><em>Event, one-time access · US$0.18-0.45</em></span></label>
+            <label><input type="radio" name="wristband_tier" value="silicone-standard" /> <span><strong>Standard silicone</strong><em>MIFARE Classic 1K / NTAG 213 · US$0.40-0.65</em></span></label>
+            <label><input type="radio" name="wristband_tier" value="silicone-premium" /> <span><strong>Premium / medical-grade silicone</strong><em>DESFire EV3 / UCODE UHF · US$0.70-2.00</em></span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="codex-rfq__step is-active">
+          <legend>Order volume</legend>
+          <div class="codex-rfq__grid codex-rfq__grid--tight" id="wristband-volume-grid" data-field="volume">
+            <label><input type="radio" name="wristband_volume" value="pilot" /> <span><strong>Pilot</strong><em>500-1,000 units</em></span></label>
+            <label><input type="radio" name="wristband_volume" value="first-run" checked /> <span><strong>Standard order</strong><em>5,000-10,000 units</em></span></label>
+            <label><input type="radio" name="wristband_volume" value="established" /> <span><strong>Established</strong><em>50,000+ units</em></span></label>
+          </div>
+        </fieldset>
+
+        <label class="codex-rfq__text-field codex-estimator-qty">
+          <span>Order quantity</span>
+          <input type="number" id="wristband-qty" min="1" step="1" value="5000" inputmode="numeric" />
+        </label>
+
+        <div class="codex-estimator-result" id="wristband-result" aria-live="polite"></div>
+      </section>
+
+      <!-- Readers panel (static reference — reader pricing doesn't compound with quantity the way consumables do) -->
+      <section class="codex-estimator-panel" id="panel-readers" role="tabpanel" aria-labelledby="tab-readers" hidden>
+        <p class="codex-rfq__help">Reader pricing doesn't scale linearly with quantity the way cards and wristbands do — it's driven by reader class, and volume discounts kick in around 50+ units through direct manufacturer or authorized-integrator pricing rather than a smooth per-unit curve. These bands are quoted directly from <a href="/guides/rfid-reader-writer-selection/">the reader &amp; writer selection guide's</a> procurement section.</p>
+        <table class="codex-estimator-reader-table">
+          <thead>
+            <tr><th scope="col">Reader class</th><th scope="col">Typical price</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Entry HF/NFC desktop (ACR122U-class)</td><td>US$30-80</td></tr>
+            <tr><td>Commercial HF/NFC desktop (OMNIKEY-class)</td><td>US$80-260</td></tr>
+            <tr><td>Entry UHF desktop / module</td><td>US$150-450</td></tr>
+            <tr><td>Enterprise fixed UHF reader</td><td>US$700-3,500 per reader</td></tr>
+            <tr><td>Handheld UHF reader</td><td>US$900-4,500</td></tr>
+            <tr><td>Industrial portal system, installed</td><td>US$8,000-24,000 per door</td></tr>
+          </tbody>
+        </table>
+        <p class="codex-rfq__small">Fixed and portal figures are hardware or installed-hardware only. Full 3-year total cost of ownership (antennas, cabling, middleware, labour, maintenance) typically runs 2.2-3.5x the reader hardware spend — see the guide's TCO breakdown for the category-by-category add-ons.</p>
+        <div class="codex-estimator-result is-static">
+          <a class="codex-rfq__btn codex-rfq__btn--next" href="/rfq/?product=rfid-readers">Get a real reader quote →</a>
+          <a class="codex-rfq__btn" href="/guides/rfid-reader-writer-selection/">Read the full reader selection guide</a>
+        </div>
+      </section>
+
+      <p class="codex-rfq__small codex-estimator-disclaimer">All card and wristband figures are industry-reference planning ranges assembled from Proud Tek's own published chip, material, and durability data plus independent 2026 industry pricing reports (see the <a href="/guides/rfid-card-cost/">card</a> and <a href="/guides/rfid-wristband-cost/">wristband</a> cost guides for full sourcing). They are not a quote, do not include tooling, freight, duties, or custom artwork setup, and will not match every supplier or spec exactly.</p>
+    </div>
+
+    <aside class="codex-rfq-aside" aria-label="Related resources">
+      <h2>Get a real number</h2>
+      <ul>
+        <li><a href="/rfq/">Request a quote</a> with your exact chip, material, printing and encoding spec — a specialist replies within one business day.</li>
+        <li><a href="/guides/rfid-card-cost/">RFID card cost guide</a> — the full chip, material and volume cost ladders behind this estimator.</li>
+        <li><a href="/guides/rfid-wristband-cost/">RFID wristband cost guide</a> — material class, chip tier and volume breakdown for wristbands.</li>
+        <li><a href="/sample-pack/">Request a free sample pack</a> to hold the material before committing to a volume order.</li>
+      </ul>
+    </aside>
+  </main>
+
+  <script is:inline>
+    (function () {
+      // ── Pricing tables ──────────────────────────────────────────────
+      // Base ranges are the "first production" (5,000-10,000 unit) anchor
+      // figures published in /guides/rfid-card-cost/ and
+      // /guides/rfid-wristband-cost/ — keep these two files in sync if
+      // either guide's numbers are ever revised.
+      var CARD_TIERS = {
+        "lf-entry": { low: 0.20, high: 0.45 },
+        "classic-pvc": { low: 0.30, high: 0.70 },
+        "highsec-pvc": { low: 1.00, high: 4.00 },
+        "any-wood": { low: 1.20, high: 3.50 },
+        "any-poly": { low: 2.40, high: 6.20 },
+      };
+      // Volume multipliers vs. the first-production baseline (1.0). Pilot
+      // runs price higher per unit (small-batch setup cost spread over few
+      // units); established/high-volume runs price lower (per the guide's
+      // "40-60% reduction pilot-to-100k+" volume-break language).
+      var CARD_VOLUME_MULT = { pilot: 1.35, "first-run": 1.0, established: 0.70 };
+
+      var WRISTBAND_TIERS = {
+        tyvek: { low: 0.18, high: 0.45 },
+        "silicone-standard": { low: 0.40, high: 0.65 },
+        "silicone-premium": { low: 0.70, high: 2.00 },
+      };
+      // Wristband volume spread is shallower than cards per the guide
+      // ("~10-20%, not 40-60%").
+      var WRISTBAND_VOLUME_MULT = { pilot: 1.15, "first-run": 1.0, established: 0.85 };
+
+      // Maps this tool's 3-tier volume model to rfq.astro's QTY_PARAM_MAP
+      // keys, so the "Get a real quote" link can hand off a matching
+      // pre-selected quantity radio. "established" (50k+) has no exact
+      // match in the RFQ's 5-tier model — "mid" (50k-250k) is the closest
+      // safe default (the true bucket could run higher, but this never
+      // overstates volume in a way that would mis-set buyer expectations).
+      var VOLUME_TO_RFQ_QTY = { pilot: "pilot", "first-run": "small", established: "mid" };
+
+      function fmtUsd(n) {
+        return "US$" + n.toFixed(2);
+      }
+      function fmtUsdWhole(n) {
+        return "US$" + Math.round(n).toLocaleString("en-US");
+      }
+
+      function getChecked(container) {
+        var el = container.querySelector("input:checked");
+        return el ? el.value : null;
+      }
+
+      function pushEstimatorEvent(eventName, payload) {
+        try {
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push(Object.assign({ event: eventName }, payload));
+        } catch (err) { /* ignore */ }
+        try {
+          if (typeof window.gtag === "function") window.gtag("event", eventName, payload || {});
+        } catch (err) { /* ignore */ }
+      }
+
+      function renderResult(resultEl, tierKey, tiers, volumeKey, volumeMult, qty, rfqProduct) {
+        var tier = tiers[tierKey];
+        var mult = volumeMult[volumeKey] || 1.0;
+        var low = tier.low * mult;
+        var high = tier.high * mult;
+        var q = Math.max(1, Math.round(Number(qty) || 0));
+        var totalLow = low * q;
+        var totalHigh = high * q;
+        var rfqQty = VOLUME_TO_RFQ_QTY[volumeKey] || "small";
+
+        resultEl.innerHTML =
+          '<div class="codex-estimator-result__unit">' +
+            '<span class="codex-estimator-result__label">Estimated per-unit range</span>' +
+            '<strong>' + fmtUsd(low) + ' – ' + fmtUsd(high) + '</strong>' +
+          '</div>' +
+          '<div class="codex-estimator-result__total">' +
+            '<span class="codex-estimator-result__label">Estimated total for ' + q.toLocaleString("en-US") + ' units</span>' +
+            '<strong>' + fmtUsdWhole(totalLow) + ' – ' + fmtUsdWhole(totalHigh) + '</strong>' +
+          '</div>' +
+          '<a class="codex-rfq__btn codex-rfq__btn--next codex-estimator-result__cta" href="/rfq/?product=' + rfqProduct + '&qty=' + rfqQty + '">Get a real quote for this spec →</a>';
+      }
+
+      function wireCalculator(panelId, tierGridId, volumeGridId, qtyId, resultId, tiers, volumeMult, rfqProduct) {
+        var panel = document.getElementById(panelId);
+        if (!panel) return;
+        var tierGrid = document.getElementById(tierGridId);
+        var volumeGrid = document.getElementById(volumeGridId);
+        var qtyInput = document.getElementById(qtyId);
+        var resultEl = document.getElementById(resultId);
+        if (!tierGrid || !volumeGrid || !qtyInput || !resultEl) return;
+
+        function recalc() {
+          var tierKey = getChecked(tierGrid) || Object.keys(tiers)[0];
+          var volumeKey = getChecked(volumeGrid) || "first-run";
+          renderResult(resultEl, tierKey, tiers, volumeKey, volumeMult, qtyInput.value, rfqProduct);
+        }
+
+        tierGrid.addEventListener("change", function () {
+          recalc();
+          pushEstimatorEvent("estimator_calculate", { estimator_panel: rfqProduct, estimator_field: "tier" });
+        });
+        volumeGrid.addEventListener("change", function () {
+          recalc();
+          pushEstimatorEvent("estimator_calculate", { estimator_panel: rfqProduct, estimator_field: "volume" });
+        });
+        qtyInput.addEventListener("input", recalc);
+
+        recalc();
+      }
+
+      wireCalculator(
+        "panel-cards", "card-tier-grid", "card-volume-grid", "card-qty", "card-result",
+        CARD_TIERS, CARD_VOLUME_MULT, "rfid-cards",
+      );
+      wireCalculator(
+        "panel-wristbands", "wristband-tier-grid", "wristband-volume-grid", "wristband-qty", "wristband-result",
+        WRISTBAND_TIERS, WRISTBAND_VOLUME_MULT, "rfid-wristbands",
+      );
+
+      // ── Tab switcher ─────────────────────────────────────────────────
+      var tabs = [
+        { btn: "tab-cards", panel: "panel-cards" },
+        { btn: "tab-wristbands", panel: "panel-wristbands" },
+        { btn: "tab-readers", panel: "panel-readers" },
+      ];
+      tabs.forEach(function (t) {
+        var btn = document.getElementById(t.btn);
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          tabs.forEach(function (other) {
+            var otherBtn = document.getElementById(other.btn);
+            var otherPanel = document.getElementById(other.panel);
+            var active = other.btn === t.btn;
+            if (otherBtn) {
+              otherBtn.classList.toggle("is-active", active);
+              otherBtn.setAttribute("aria-selected", active ? "true" : "false");
+            }
+            if (otherPanel) {
+              otherPanel.classList.toggle("is-active", active);
+              otherPanel.hidden = !active;
+            }
+          });
+          pushEstimatorEvent("estimator_tab_view", { estimator_panel: t.panel });
+        });
+      });
+    })();
+  </script>
+</BaseLayout>
