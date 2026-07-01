@@ -73,10 +73,22 @@ blogEntries.sort((a, b) => {
 });
 
 const thumbMap = getBlogThumbnails();
-const allPosts = blogEntries.map((post) => ({
-  ...post,
-  thumb: post.heroImage || thumbMap[post.route] || "",
-}));
+// 2026-07-01: pair every thumb with its WebP sibling when one is known to
+// exist. build-image-variants.py generates a `.webp` next to every
+// `.jpg/.jpeg/.png` under public/landing-images/ AND public/blog-images/ (the
+// two directories blog thumbnails are ever sourced from — see heroImage /
+// getBlogThumbnails()); this hub was the one place still shipping raw
+// JPG/PNG thumbnails at full hero-photo weight (Lighthouse: ~6.3MB across 28
+// cards, 3.6MB of it reclaimable purely from the format swap). Falls back to
+// the plain <img> below for anything outside those two directories.
+const WEBP_COVERED_DIR = /^\/(landing-images|blog-images)\/.*\.(jpe?g|png)$/i;
+const allPosts = blogEntries.map((post) => {
+  const thumb = post.heroImage || thumbMap[post.route] || "";
+  const thumbWebp = WEBP_COVERED_DIR.test(thumb)
+    ? thumb.replace(/\.(jpe?g|png)$/i, ".webp")
+    : null;
+  return { ...post, thumb, thumbWebp };
+});
 
 const TOTAL_POSTS = allPosts.length;
 
@@ -217,7 +229,20 @@ const filterScript = buildRailFilterScript({
             data-rail-key={post.topicId}
             data-kicker={post.kicker}
           >
-            {post.thumb && (
+            {post.thumb && (post.thumbWebp ? (
+              <picture>
+                <source srcset={post.thumbWebp} type="image/webp" />
+                <img
+                  class="codex-blog-grid-card__thumb"
+                  src={post.thumb}
+                  alt={post.title}
+                  width="1200"
+                  height="675"
+                  loading={i < 3 ? "eager" : "lazy"}
+                  decoding="async"
+                />
+              </picture>
+            ) : (
               <img
                 class="codex-blog-grid-card__thumb"
                 src={post.thumb}
@@ -227,7 +252,7 @@ const filterScript = buildRailFilterScript({
                 loading={i < 3 ? "eager" : "lazy"}
                 decoding="async"
               />
-            )}
+            ))}
             <span class="codex-blog-grid-card__tag">{post.kicker}</span>
             <strong>{post.title}</strong>
             <p>{truncateText(post.summary, 120)}</p>

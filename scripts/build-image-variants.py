@@ -2,11 +2,19 @@
 """
 DS-15 Phase 6 #6 — WebP variant generator.
 
-Walks `public/landing-images/` and generates a sibling `.webp` file for
-every `.jpg`/`.jpeg`/`.png`. Hero emit sites (editorial-pages.ts,
-EditorialPage.astro, catalog-pages.ts) ship `<picture>` markup with a
-`<source type="image/webp">` declaration that points at the sibling
-file plus a `<img>` JPG/PNG fallback.
+Walks `public/landing-images/` and `public/blog-images/` and generates a
+sibling `.webp` file for every `.jpg`/`.jpeg`/`.png`. Hero emit sites
+(editorial-pages.ts, EditorialPage.astro, catalog-pages.ts) ship `<picture>`
+markup with a `<source type="image/webp">` declaration that points at the
+sibling file plus a `<img>` JPG/PNG fallback.
+
+2026-07-01: added `public/blog-images/` alongside `landing-images/`. Lighthouse
+on /blog/ found the hub's thumbnail grid pulling ~6.3MB across 28 images with
+zero WebP coverage — `blog-images/` had never been in scope for this script,
+so every blog-post hero photo shipped as a raw JPG. blog/index.astro now
+renders the same <picture>+webp pattern EditorialHero.astro already uses for
+landing-images; this script just needs to cover the second source directory
+so the sibling files actually exist for it to point at.
 
 Usage:
     python3 scripts/build-image-variants.py            # only generate missing
@@ -27,7 +35,7 @@ from pathlib import Path
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
-TARGET_DIR = ROOT / "public" / "landing-images"
+TARGET_DIRS = [ROOT / "public" / "landing-images", ROOT / "public" / "blog-images"]
 EXTENSIONS = {".jpg", ".jpeg", ".png"}
 WEBP_QUALITY = 82
 WEBP_METHOD = 6
@@ -70,9 +78,13 @@ def main() -> int:
     ap.add_argument("--quiet", action="store_true", help="suppress per-file log lines")
     args = ap.parse_args()
 
-    if not TARGET_DIR.is_dir():
-        print(f"FATAL: {TARGET_DIR} not found", file=sys.stderr)
+    existing_dirs = [d for d in TARGET_DIRS if d.is_dir()]
+    if not existing_dirs:
+        print(f"FATAL: none of {TARGET_DIRS} exist", file=sys.stderr)
         return 1
+    for d in TARGET_DIRS:
+        if d not in existing_dirs:
+            print(f"  (skipping {d}, not found)", file=sys.stderr)
 
     # PR-3 P0-P4: walk subdirectories too. The original `iterdir()` only
     # returned top-level files, so anything dropped into
@@ -81,12 +93,17 @@ def main() -> int:
     # routes. rglob() with the same extension filter restores
     # comprehensive coverage and remains idempotent (already-encoded
     # files are skipped unless --force).
-    sources = sorted(p for p in TARGET_DIR.rglob("*") if p.suffix.lower() in EXTENSIONS)
+    sources = sorted(
+        p
+        for d in existing_dirs
+        for p in d.rglob("*")
+        if p.suffix.lower() in EXTENSIONS
+    )
     if not sources:
-        print(f"No source images found in {TARGET_DIR}")
+        print(f"No source images found in {existing_dirs}")
         return 0
 
-    print(f"Phase 6 #6 — generating WebP variants in {TARGET_DIR}")
+    print(f"Phase 6 #6 — generating WebP variants in {', '.join(str(d) for d in existing_dirs)}")
     print(f"  source count: {len(sources)} (extensions: {sorted(EXTENSIONS)})")
     print(f"  quality: {WEBP_QUALITY}, method: {WEBP_METHOD}, force: {args.force}\n")
 
