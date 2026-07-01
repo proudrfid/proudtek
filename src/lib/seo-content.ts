@@ -188,9 +188,22 @@ export const ORGANIZATION_SOCIAL: Record<string, string> = {
   // Confirmed-owned external authority profiles (owner-confirmed 2026-06-22):
   // marketplace storefront + social page, used for Organization.sameAs entity
   // disambiguation. Deliberately EXCLUDES the legacy parallel domains
-  // proudrfid.com / protekrfid.com / rfidak.com — owner decided 2026-06-22 to
-  // keep those separate rather than consolidate, so linking them as the same
-  // entity would muddy disambiguation rather than help it.
+  // proudrfid.com / protekrfid.com / rfidak.com. Re-litigated and
+  // re-confirmed 2026-07-01 with a specific reason per domain instead of a
+  // blanket "would muddy disambiguation":
+  //   - proudrfid.com / protekrfid.com: outsourced, owner has no actual
+  //     control over their content or NAP. sameAs is an assertion that a
+  //     profile reliably represents this entity going forward — that's not
+  //     something you can vouch for on a site you don't control.
+  //   - rfidak.com: owner-controlled, but a DELIBERATE second brand
+  //     ("Shenzhen RFIDAK Co., LTD" — different legal name, same WhatsApp
+  //     number + Shenzhen office address + ISO certs + founding year as
+  //     Proud Tek under the hood). Owner wants it to keep reading as an
+  //     independent company, not a Proud Tek alias — sameAs here would
+  //     directly undo that positioning, not just be unnecessary.
+  // If this ever needs re-litigating again: it won't change unless the
+  // owner's control status or brand strategy changes, not just because the
+  // question gets asked again.
   madeInChina: "https://rfid-tag.en.made-in-china.com",
   facebook: "https://www.facebook.com/RFIDTRANSPONDER/",
 };

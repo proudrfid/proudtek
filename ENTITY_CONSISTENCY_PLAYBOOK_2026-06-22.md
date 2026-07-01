@@ -71,10 +71,15 @@
 
 ## 4. 需要你拍板/核实(改之前先定)
 
-1. **法定名核对:** repo 写 `Proud Tek Co., Limited`,MIC 写 `Shenzhen Proud Tek Co., Ltd.`。以**营业执照英文名为准**;若执照是"…Co., Ltd.",应把 **repo 的 `ORGANIZATION_NAME` 改成执照名**(法定名要锚定执照,不是反过来)。告诉我哪个对,我改 `seo-content.ts`。
-2. **会籍核实:** `llms.txt` 已对 AI 声明 "RAIN RFID Alliance member · NFC Forum implementer member",但 `GROWTH_ROADMAP` 把这两项列为**待加入/待决策**。若尚未入会,这是**喂给 AI 的不实信誉声明**(违反站内事实准确性铁律)——对外发布前务必确认;未入会就先从 `llms.txt`/规范卡撤下。
-3. **工厂地址:** MIC 的 `#7 Shangwei Industrial Road…` 是否现行工厂?是→补进 repo 规范卡并三平台统一;否→更正。
-4. **域名收敛(最高价值决策):** `proudrfid.com` / `protekrfid.com` / `rfidak.com` 如何处置?推荐:确认归属后 **301 重定向到 proudtek.com 对应页**(把分散的权重/实体信号并入主站),或至少统一其 NAP+品牌叙事并互加 `sameAs`。这步决定 AI 是看到"1 个强 Proud Tek"还是"4 个弱 Proud Tek"。
+**以下 4 项已于 2026-07-01 全部拍板/核实完毕,状态见每条:**
+
+1. ✅ **法定名核对——维持 `Proud Tek Co., Limited`。** 用户确认这个是对的;MIC 后台写的 "Shenzhen Proud Tek Co., Ltd." 是该改的一方,但那是用户自己 MIC 账号后台操作,不在 repo 改动范围。`seo-content.ts` 的 `ORGANIZATION_NAME` 不变。
+2. ✅ **会籍核实——已确认无虚假声明。** `seo-content.ts:297-298` 已有 "Owner confirmed 2026-06-22: Proud Tek is NOT a RAIN RFID Alliance or NFC Forum member. Do NOT assert either membership anywhere" 的硬性注释,2026-07-01 复核代码库确认没有违反此规则的表述(其余 "RAIN RFID Alliance" 提及均为引用第三方标准/芯片认证信息,不是自我会籍声明)。**这条从一开始就是安全的,不是本轮新修的。**
+3. ✅ **工厂地址——MIC 上的 `#7 Shangwei Industrial Road…` 已确认失效/不准确。** 未补进 repo 规范实体卡(没有编造新地址)。等用户提供现行有效工厂地址后再补,同时提醒用户去更新 MIC 后台的这个字段。
+4. ✅ **域名收敛——最终决定:三个域名都不进 sameAs,也不做 301。** 逐个核实后原因各不相同,不是简单沿用旧决定:
+   - `proudrfid.com` / `protekrfid.com`:**外包运营,用户对内容/NAP 没有实际控制权**——sameAs 是"这个资料会持续准确代表本实体"的承诺,控制不了的站点没法做这个承诺。
+   - `rfidak.com`:用户自己有控制权,但**这是有意运营的第二品牌**("Shenzhen RFIDAK Co., LTD"——不同公司名,但 WhatsApp 号码 `+86 186 6582 0632`、深圳办公地址(A2109 Zhantao)、ISO 认证、2008 成立年份都和 Proud Tek 完全重合,明显是同一运营团队的第二个对外身份),用户明确要保持独立形象——加 sameAs 会直接破坏这个定位,不是"多此一举"那么简单。
+   - 结论已写入 `seo-content.ts` 的 `ORGANIZATION_SOCIAL` 注释,逐条列明原因,避免以后被重新问一遍。
 
 ---
 
