@@ -18,6 +18,7 @@
  * docs/architecture/editorial-rendering-debt.md.
  */
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import CardThumb from "../../components/editorial/CardThumb.astro";
 import "../../styles/codex-cluster-hub.css";
 import { getCollection } from "astro:content";
 import { GUIDE_CLUSTERS } from "../../data/guide-clusters";
@@ -185,17 +186,7 @@ seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
       <div class="codex-blog-index__grid">
         {clusterGuides.map(({ slug, data }) => (
           <a class="codex-card codex-blog-grid-card" href={`/guides/${slug}/`}>
-            {data.heroImage && (
-              <img
-                class="codex-blog-grid-card__thumb"
-                src={data.heroImage}
-                alt={data.imageAlt || data.title}
-                width="1200"
-                height="675"
-                loading="lazy"
-                decoding="async"
-              />
-            )}
+            {data.heroImage && <CardThumb src={data.heroImage} alt={data.imageAlt || data.title} />}
             <span class="codex-blog-grid-card__tag">{data.kicker || cluster.label}</span>
             <strong>{data.title}</strong>
             <p>{data.summary}</p>

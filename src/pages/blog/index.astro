@@ -18,6 +18,7 @@
  * render through [...slug].astro + the editorial pipeline.
  */
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import CardThumb from "../../components/editorial/CardThumb.astro";
 import { getCollection } from "astro:content";
 import {
   BLOG_TOPICS,
@@ -73,21 +74,12 @@ blogEntries.sort((a, b) => {
 });
 
 const thumbMap = getBlogThumbnails();
-// 2026-07-01: pair every thumb with its WebP sibling when one is known to
-// exist. build-image-variants.py generates a `.webp` next to every
-// `.jpg/.jpeg/.png` under public/landing-images/ AND public/blog-images/ (the
-// two directories blog thumbnails are ever sourced from — see heroImage /
-// getBlogThumbnails()); this hub was the one place still shipping raw
-// JPG/PNG thumbnails at full hero-photo weight (Lighthouse: ~6.3MB across 28
-// cards, 3.6MB of it reclaimable purely from the format swap). Falls back to
-// the plain <img> below for anything outside those two directories.
-const WEBP_COVERED_DIR = /^\/(landing-images|blog-images)\/.*\.(jpe?g|png)$/i;
+// 2026-07-01: resolve each post's thumbnail source path. WebP-sibling and
+// responsive-width srcset construction both now live in CardThumb.astro
+// (2026-07-01b) — this hub just needs to hand it the original image path.
 const allPosts = blogEntries.map((post) => {
   const thumb = post.heroImage || thumbMap[post.route] || "";
-  const thumbWebp = WEBP_COVERED_DIR.test(thumb)
-    ? thumb.replace(/\.(jpe?g|png)$/i, ".webp")
-    : null;
-  return { ...post, thumb, thumbWebp };
+  return { ...post, thumb };
 });
 
 const TOTAL_POSTS = allPosts.length;
@@ -229,30 +221,7 @@ const filterScript = buildRailFilterScript({
             data-rail-key={post.topicId}
             data-kicker={post.kicker}
           >
-            {post.thumb && (post.thumbWebp ? (
-              <picture>
-                <source srcset={post.thumbWebp} type="image/webp" />
-                <img
-                  class="codex-blog-grid-card__thumb"
-                  src={post.thumb}
-                  alt={post.title}
-                  width="1200"
-                  height="675"
-                  loading={i < 3 ? "eager" : "lazy"}
-                  decoding="async"
-                />
-              </picture>
-            ) : (
-              <img
-                class="codex-blog-grid-card__thumb"
-                src={post.thumb}
-                alt={post.title}
-                width="1200"
-                height="675"
-                loading={i < 3 ? "eager" : "lazy"}
-                decoding="async"
-              />
-            ))}
+            {post.thumb && <CardThumb src={post.thumb} alt={post.title} eager={i < 3} />}
             <span class="codex-blog-grid-card__tag">{post.kicker}</span>
             <strong>{post.title}</strong>
             <p>{truncateText(post.summary, 120)}</p>

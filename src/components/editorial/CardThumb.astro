@@ -1,0 +1,91 @@
+---
+/**
+ * CardThumb.astro — responsive card-grid thumbnail image.
+ *
+ * Shared by the 4 native hub pages that render `.codex-blog-grid-card__thumb`
+ * (blog/index.astro, compatibility/index.astro, solutions/index.astro,
+ * guides/[cluster].astro). All 4 previously inlined a plain `<img>` (or, on
+ * blog/index.astro only, a `<picture>+webp` after the 2026-07-01 WebP fix)
+ * pointing at the FULL hero-sized image — the same 1200x675 asset used as
+ * the page's own large hero photo — even though the card only ever displays
+ * it at ~279 CSS px wide (measured via Lighthouse on /blog/, which flagged
+ * 5,864 KiB of `uses-responsive-images` waste, 96% of it wasted on the
+ * single worst offender).
+ *
+ * This component points at the `{stem}-480w{ext}` / `{stem}-960w{ext}`
+ * (+ matching `.webp`) siblings that `scripts/build-image-variants.py`
+ * generates for every image in the scoped "thumbnail context" manifest
+ * (see `get_thumbnail_context_images()` in that script). No runtime
+ * existence check is done — this trusts the pipeline invariant, same as
+ * EditorialHero.astro already does for its own full-size `.webp` sibling.
+ * If you add a new heroImage to a blog/solutions/guides/compatibility
+ * entry, re-run `npm run images:build-webp` (or `python3
+ * scripts/build-image-variants.py`) before deploying so the siblings exist.
+ *
+ * `sizes` approximates the actual grid breakpoints in codex-components.css
+ * (`.codex-blog-index__grid`): 1 column ≤600px, 2 columns 601-1024px,
+ * 3 columns >1024px (desktop, with-rail layout).
+ */
+export interface Props {
+  /** Original image path, e.g. "/landing-images/foo.jpg" or "/blog-images/bar.jpg". */
+  src: string;
+  alt: string;
+  /** First N cards in a grid should load eager + no lazy — mirrors the
+   *  `i < 3` convention already used at each call site. */
+  eager?: boolean;
+}
+
+const { src, alt, eager = false } = Astro.props;
+
+const THUMB_SIZES = "(max-width: 600px) 100vw, (max-width: 1024px) 45vw, 30vw";
+
+const extMatch = src.match(/\.(jpe?g|png|webp)$/i);
+const ext = extMatch ? extMatch[0].toLowerCase() : null;
+const base = ext ? src.slice(0, -ext.length) : null;
+const isWebpSource = ext === ".webp";
+
+const webpSrcset = base ? `${base}-480w.webp 480w, ${base}-960w.webp 960w` : null;
+const fallbackSrcset =
+  base && !isWebpSource ? `${base}-480w${ext} 480w, ${base}-960w${ext} 960w` : null;
+---
+
+{base && !isWebpSource ? (
+  <picture>
+    <source type="image/webp" srcset={webpSrcset} sizes={THUMB_SIZES} />
+    <img
+      class="codex-blog-grid-card__thumb"
+      src={src}
+      srcset={fallbackSrcset}
+      sizes={THUMB_SIZES}
+      alt={alt}
+      width="1200"
+      height="675"
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+    />
+  </picture>
+) : base && isWebpSource ? (
+  <img
+    class="codex-blog-grid-card__thumb"
+    src={src}
+    srcset={webpSrcset}
+    sizes={THUMB_SIZES}
+    alt={alt}
+    width="1200"
+    height="675"
+    loading={eager ? "eager" : "lazy"}
+    decoding="async"
+  />
+) : (
+  // Unrecognized extension (shouldn't happen in practice) — safe plain-img
+  // fallback, matching the pre-existing unoptimized behavior.
+  <img
+    class="codex-blog-grid-card__thumb"
+    src={src}
+    alt={alt}
+    width="1200"
+    height="675"
+    loading={eager ? "eager" : "lazy"}
+    decoding="async"
+  />
+)}

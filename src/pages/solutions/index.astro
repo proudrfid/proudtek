@@ -19,6 +19,7 @@
  * so the catch-all slug generator doesn't try to also build it.
  */
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import CardThumb from "../../components/editorial/CardThumb.astro";
 import { getCollection } from "astro:content";
 import { SOLUTIONS_TOPICS, classifySolutionRoute } from "../../data/solutions-topics";
 import type { PageSeoData } from "../../lib/seo";
@@ -223,17 +224,7 @@ seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
             data-rail-key={sol.topicId}
             data-kicker={sol.kicker}
           >
-            {sol.heroImage && (
-              <img
-                class="codex-blog-grid-card__thumb"
-                src={sol.heroImage}
-                alt={sol.title}
-                width="1200"
-                height="675"
-                loading={i < 3 ? "eager" : "lazy"}
-                decoding="async"
-              />
-            )}
+            {sol.heroImage && <CardThumb src={sol.heroImage} alt={sol.title} eager={i < 3} />}
             <span class="codex-blog-grid-card__tag">{sol.kicker}</span>
             <strong>{sol.title}</strong>
             <p>{truncateText(sol.summary, 120)}</p>

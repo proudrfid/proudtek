@@ -23,6 +23,7 @@
  * as the blog/compare/guides single-pages.
  */
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import CardThumb from "../../components/editorial/CardThumb.astro";
 import { getCollection } from "astro:content";
 import {
   COMPATIBILITY_VENDORS,
@@ -208,14 +209,10 @@ const filterScript = buildRailFilterScript({
             data-rail-key={vendor.category}
             data-vendor={vendor.slug}
           >
-            <img
-              class="codex-blog-grid-card__thumb"
+            <CardThumb
               src={heroFor(data)}
               alt={data.imageAlt || `${vendor.displayName} hotel lock compatibility`}
-              width="1200"
-              height="675"
-              loading={i < 3 ? "eager" : "lazy"}
-              decoding="async"
+              eager={i < 3}
             />
             <span class="codex-blog-grid-card__tag">{vendor.parentCompany}</span>
             <strong>{vendor.displayName}</strong>
