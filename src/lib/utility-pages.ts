@@ -1,9 +1,49 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { load } from "cheerio";
 
 import type { SiteData, SnapshotPage } from "./site-data";
 import { loadPageFromDisk } from "./site-data";
 import { ROUTE_CANONICAL_OVERRIDES } from "./route-overrides";
 import { html, raw } from "./html";
+
+const PUBLIC_DIR = path.join(process.cwd(), "public");
+
+/**
+ * WordPress keeps the untouched original alongside every auto-generated crop
+ * (`name-300x300.jpg` etc.) but plain `<img src>` tags with no `srcset` point
+ * at whichever crop WP happened to insert as the default — often the
+ * smallest one. Rendered at card-thumbnail width (typically ~1200px), a
+ * 300x300 crop is a 4x upscale and looks visibly soft/blurry.
+ *
+ * If `src` looks like a WP size-suffixed crop and the bare original exists
+ * on disk, prefer it — same photo, no licensing question, just more pixels.
+ */
+function upgradeToOriginalIfExists(src: string): string {
+  const match = src.match(/^(.*)-\d+x\d+(\.\w+)$/);
+  if (!match) {
+    return src;
+  }
+  const original = `${match[1]}${match[2]}`;
+  const diskPath = path.join(PUBLIC_DIR, original.replace(/^\/+/, ""));
+  return fs.existsSync(diskPath) ? original : src;
+}
+
+/** Pick the widest candidate out of a `srcset` attribute, e.g. "a.jpg 300w, b.jpg 600w". */
+function widestFromSrcset(srcset: string): string | null {
+  const candidates = srcset
+    .split(",")
+    .map((entry) => entry.trim().split(/\s+/))
+    .filter((parts) => parts.length === 2 && parts[1].endsWith("w"))
+    .map(([url, descriptor]) => ({ url, width: parseInt(descriptor, 10) }))
+    .filter((c) => Number.isFinite(c.width));
+
+  if (!candidates.length) {
+    return null;
+  }
+  return candidates.reduce((best, c) => (c.width > best.width ? c : best)).url;
+}
 
 export async function mergeUtilityPages(siteData: SiteData): Promise<SiteData> {
   const utilityPages = await buildUtilityPages(siteData);
@@ -137,10 +177,16 @@ function extractFirstImage(bodyHtml: string): string {
       continue;
     }
 
-    const src = ($(element).attr("data-large_image") ?? $(element).attr("src") ?? "").trim();
+    const srcset = $(element).attr("srcset");
+    const src = (
+      $(element).attr("data-large_image") ??
+      (srcset ? widestFromSrcset(srcset) : null) ??
+      $(element).attr("src") ??
+      ""
+    ).trim();
 
     if (src.startsWith("/site-assets/")) {
-      return src;
+      return upgradeToOriginalIfExists(src);
     }
   }
 
