@@ -186,15 +186,18 @@ export const GUIDE_CLUSTERS: GuideCluster[] = [
     label: "Buying & Reference",
     icon: "📚",
     description:
-      "General-purpose buyer's references that don't fit one vertical: how to choose RFID readers and writers, how long RFID tags last in different environments, and iPhone-vs-Android NFC business card compatibility.",
-    seoTitle: "RFID Buyer's References — Readers, Lifespan & NFC | Proud Tek",
+      "General-purpose buyer's references that don't fit one vertical: how to choose RFID readers and writers, real-world card and wristband cost breakdowns, how long RFID tags last in different environments, and iPhone-vs-Android NFC business card compatibility.",
+    seoTitle: "RFID Buyer's References — Cost, Readers, Lifespan & NFC | Proud Tek",
     pillars: [
       "Reader / writer selection across handheld, fixed, USB desktop, and BLE",
+      "Card and wristband cost breakdowns by chip, material, and volume tier",
       "Tag, card, and wristband lifespan benchmarks by environment",
       "iPhone and Android NFC business card capability matrix (2026)",
     ],
     slugs: [
       "rfid-reader-writer-selection",
+      "rfid-card-cost",
+      "rfid-wristband-cost",
       "rfid-tag-card-wristband-lifespan",
       "nfc-business-card-iphone-android-compatibility",
     ],
@@ -209,7 +212,7 @@ export function getClusterForGuideSlug(slug: string): GuideCluster | undefined {
   return GUIDE_CLUSTERS.find((c) => c.slugs.includes(slug));
 }
 
-/** Total guide count across all clusters (sanity check, expected = 49). */
+/** Total guide count across all clusters (sanity check, expected = 51). */
 export function getTotalGuideCount(): number {
   return GUIDE_CLUSTERS.reduce((sum, c) => sum + c.slugs.length, 0);
 }
