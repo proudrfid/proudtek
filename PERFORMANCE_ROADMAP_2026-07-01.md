@@ -36,7 +36,9 @@
 
 **✅ 已完成(2026-07-01):** 1-1/1-2/1-3 全部修完(断链/自链提交 `ef5ef8a`,35 篇孤儿博客提交 `8df2888`,孤儿 42→7 且剩 7 个均为有意跳过项)。Lighthouse 沙盒里跑不了(无 Chrome 二进制),**由你在本机跑通** `npm run lh:baseline`(609 页构建 65.89s + 8 页×3 次 Lighthouse)。结果:**8 个代表页全部通过所有预算断言,`assertion-results.json` 为空数组(零警告零错误)**——CSS 稳定在 62KB/页(远低于 80KB 上限)、CLS 全部为 0(含 `compare/uhf-vs-hf-rfid` 历史遗留的 0.13 布局偏移,已彻底解决,不只是压线通过)、TBT 全为 0ms、FCP 全为 0.4s。唯一略突出的是 **`/blog/`**:performance 0.88(其余页 0.99–1.0)、LCP 2.3s(其余页 0.5–0.9s)——不是代码问题,是页面本身重:28 张图共 6.3MB + 唯一加载了 `accounts.google.com/gsi/client`(96KB Google Identity 脚本)。
 
-**✅ 追加修完(2026-07-01,同日第二轮):** gsi/client 泄漏根因是 `extractChromeFromSnapshot()` 只对 headHtml 做清理、bodyHtml 原样直出——已修(`cff8eb1`),并顺带发现清理逻辑漏删了包裹脚本的 HTML 注释,一并修掉(`b449a1c`,纯字节级、无功能影响)。28 张图的问题是 WebP 生成脚本从未覆盖 `blog-images/` 目录——已修(`025365f`),117 张图 15.04MB→9.94MB(-34%)。**未做、有意披露的后续项:** Lighthouse 同时标出的"uses-responsive-images"(多宽度 srcset,还能再省 5.86MB)——全站目前没有这套基建,新建属于新增架构而非套用现有模式,留作后续候选。四次提交本地已完成,`git push` 因沙盒无凭证失败,需你手动推。
+**✅ 追加修完(2026-07-01,同日第二轮):** gsi/client 泄漏根因是 `extractChromeFromSnapshot()` 只对 headHtml 做清理、bodyHtml 原样直出——已修(`cff8eb1`),并顺带发现清理逻辑漏删了包裹脚本的 HTML 注释,一并修掉(`b449a1c`,纯字节级、无功能影响)。28 张图的问题是 WebP 生成脚本从未覆盖 `blog-images/` 目录——已修(`025365f`),117 张图 15.04MB→9.94MB(-34%)。
+
+**✅ 响应式图片 srcset 已补完(2026-07-01,提交 `13107c2`):** 根因是 `.codex-blog-grid-card__thumb`(/blog/、/compatibility/、/solutions/、/guides/{cluster}/ 四个页面共用同一张卡片缩略图样式)一直在把整张 1200×675 的 hero 原图当缩略图用,而卡片实际显示宽度 Lighthouse 量出来只有 ~279 CSS px(brand-protection.png 一张图就浪费 96%)。`build-image-variants.py` 新增 Pass 2:给"实际被当缩略图用"的 240 张图(按 heroImage/BLOG_THUMBNAIL_MAP 引用精确圈定,不是对全部 ~550 张图片目录盲目处理)各生成 480w/960w 两档 × 原格式+WebP 共 4 个文件(878 个新文件,45MB,27 秒跑完);新建 `CardThumb.astro` 共享组件收敛 4 个页面的重复 img/picture 标记,`sizes` 属性对齐实际断点(≤600px 1 列/601-1024px 2 列/>1024px 3 列)。**已知不动的缺口(已披露,非遗漏):** 5 张 blog-images 源图本身已损坏(Pillow 读不了)+ 1 张引用了但磁盘上不存在——这是历史遗留的坏文件,需要用户提供替换图,不是代码问题;`/industries/` 的 HubGrid 卡片 + 旧 WP 快照正文内嵌图片占浪费总量较小的一部分(~732/6785 KiB),渲染路径完全不同,留作后续候选。验证:lint/146测试/astro check(0 error)/内链审计(孤儿数不变)全绿,外加一次独立 Python 交叉验证确认 240 张图对应的 srcset URL 全部落在磁盘真实文件上(20 个例外均对应上面那 6 张已知坏图)。
 
 ---
 
