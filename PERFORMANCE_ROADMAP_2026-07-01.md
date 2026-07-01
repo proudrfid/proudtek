@@ -6,6 +6,8 @@
 
 站内工程/设计/AI 可抓取性已是头部水平,真正卡住"表现"的是三件事:**① 询盘表单可能没人收到(收入直接归零)、② 结构性内链腐化在悄悄复发(35 篇博客含案例研究重新孤儿化)、③ 链下实体信号单薄(sameAs 仅 4 项)**。技术性能本身没有大问题,只是基线数据太旧,看不清现状。下面按"不做就流血"→"我能直接做"→"需要你"→"复利型"排序。
 
+**2026-07-01 状态更新:** 阶段1(内链/自链/Site Kit/图片瘦身/响应式 srcset)+ 阶段2(RFQ 预填/案例研究互链/价格指南+估算器/RFP+ROI 资产)+ 阶段3(实体一致性 4 项)**全部完成**。剩下全是阶段0(需要你的账号权限:Formspree/Vercel/GSC/Bing)和阶段4(90天复利节奏,持续性工作,非一次性任务)。我这边能独立完成的代码/内容工作已经到头——下一步的主动权在你手上。
+
 ---
 
 ## 阶段 0 — 本周,你必须做(否则后面全部空转)
@@ -49,7 +51,7 @@
 1. ✅ **已完成(2026-07-01,提交 `db32f4f`):** RFQ 向导查询参数预填(`/rfq/?product=&freq=&qty=`)+ SKU 页条款链接参数化。196 个 SKU 页的"Full terms in your quote"链接现在自动带 `?product=<cluster slug>`,进向导直接跳过第一步。
 2. ✅ **已完成(2026-07-01,提交 `84fe033`):** 7 个案例研究接入对应产品 SKU 的 resourceCards(0/196 → 7/196)。按每篇案例研究实际用到的芯片/材质精确匹配到唯一对应 SKU(不是泛主题匹配),新增"Proven in production"卡片组。
 3. ✅ **已完成(2026-07-01,提交 `c9410af` + `bfd5f44`):** 价格指南 + 估算器,范围较原计划收窄一项——写完 `/guides/rfid-card-cost/` 和 `/guides/rfid-wristband-cost/` 后发现 `rfid-reader-price-guide` 会与 `rfid-reader-writer-selection.json` 现有的"Procurement, pricing and volume economics"小节大面积重复,提请用户拍板后**跳过该页,改为在两处互相跳链**(用户确认)。`/tools/rfid-tag-cost-estimator/` 前端估算器同步建成:卡片/腕带各 3-5 档预设 × 3 档批量,读卡器为静态参考表(直接引用现有指南数字,原因同上——数量线性缩放对读卡器不成立)。数字来源:站内已发布的芯片百科/酒店卡指南 + 2 篇外部行业报告(cpcongroup.com、rfidhy.com),全程标注"参考区间非报价"。内链审计跑出的孤儿(`rfid-wristband-cost` 0 入链)已顺带修复。导航/sitemap/llms.txt 均已注册。
-4. ⏳ RFP 模板(.docx)+ ROI 模型(.xlsx)下载资产 + download 事件埋点。**尚未开始。**
+4. ✅ **已完成(2026-07-01,提交 `a865361`)——阶段2 至此全部完成。** RFP 模板(7 页可填写 DOCX:范围/技术要求表/合规清单/10 项供应商核实问题——直接复用已发布的 `/blog/rfid-rfp-template-questions-suppliers/` 那套框架而非另起炉灶/商务条款表/加权评估打分表/Incoterms 2020 附录)+ ROI 计算器(2 个 sheet 的 XLSX:蓝底黄字可编辑假设 + 黑字公式,payback/3年ROI 全走公式,已用 xlsx skill 的 recalc 脚本验证零公式错误)。ROI 默认值全部标注真实来源:Auburn University RFID Lab(库存准确率 63%→95%、损耗最高降 50%)、多篇行业来源的盘点耗时下降 90-95%、以及站内已发布的标签/读卡器成本区间——不是编造数字。Download 事件埋点**不需要新写代码**:`PageScript.astro` 已有站内全局委托监听,任何 `/downloads/` 或 `.pdf/.docx/.xlsx` 链接点击都会自动触发 `file_download` 事件(动手前先读了这段代码确认,不是假设)。两个文件已接入 `/resources/downloads/` 资源中心 + 与配套博客文章互相跳链。
 
 ---
 
