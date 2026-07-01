@@ -1695,7 +1695,7 @@ export const INDUSTRY_CATEGORIES: Array<{
     href: "/industries/education/",
     description: "Campus ID cards, staff badges, library tags and event wristbands for K-12, college and university operations.",
     emoji: "🎓",
-    heroImage: "/landing-images/ppc-custom-rfid-cards.jpg",
+    heroImage: "/landing-images/rfid-student-id-card.jpg",
     productRoutes: [
       "/products/rfid-cards/rfid-student-id-card/",
       "/products/rfid-cards/rfid-employee-badge/",
