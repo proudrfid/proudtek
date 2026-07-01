@@ -59,15 +59,15 @@
 
 **免费/低成本的实体信号**(直接影响 AI 答案引擎推荐概率):
 - NFC Forum Adopter 免费列名、Europages 免费供应商档案(均免费无年费)
-- Alibaba / Global Sources 后台资料对齐规范实体卡——但**先拍板两件事**:法定名以营业执照为准(repo 现用 `Proud Tek Co., Limited`,Made-in-China 用 `Shenzhen Proud Tek Co., Ltd.`,哪个对?)、Made-in-China 现填的工厂地址(`#7 Shangwei Industrial Road...`)是否现行有效。定了我就能把 `sameAs` 一次性回填进代码(当前只有 LinkedIn/YouTube/WhatsApp/Made-in-China/Facebook 共 5 项)
+- ✅ **法定名 + sameAs 域名收敛已拍板并落地(提交 `c1963cf`,详情见 `memory/proudtek-audit-trail-state.md`):** 法定名维持 `Proud Tek Co., Limited` 不变;sameAs 最终决定**三个候选域名(proudrfid.com/protekrfid.com/rfidak.com)一个都不加**——前两个是外包运营、无实际控制权,rfidak.com 实地核实后确认是有意运营的独立第二品牌,加 sameAs 会破坏这个定位。**唯一还开着的是工厂地址**:Made-in-China 现填的 `#7 Shangwei Industrial Road...` 已确认失效,等你提供现行有效地址后再补进规范实体卡(repo 侧没有写入任何生造地址)。
 - ⚠️ 顺带确认:代码里已经有"未入会,不得宣称 RAIN/NFC Forum 会员"的注释和 2026-06-22 拍板记录,这条风险已经被之前的会话堵住了,不用重新担心
 
 **需要素材:**
 - ISO 9001/RoHS/REACH/CE 证书扫描件上墙、客户证言加公司名/logo、工厂视频剪 60-90 秒版
 
-**需要战略决策:**
-- 价格带透明化(全行业不敢做,能当差异化 + PR 钩子)
-- RAIN RFID Alliance 付费会籍($1,500/年)值不值
+**需要战略决策——详见 `PHASE3_DECISION_BRIEF_2026-07-01.md`:**
+- 价格带透明化(全行业不敢做,能当差异化 + PR 钩子;注意价格三件套指南+估算器已发布,这里的决策颗粒度是"要不要从参考区间再进一步到固定报价单")
+- RAIN RFID Alliance 付费会籍——**⚠️ $1,500/年这个数字很可能不适用:** 那是 Community 1 档,要求年营收 <$100万或员工 <5 人,不像一家运营 18 年、200+ SKU 的工厂。实际大概率要走 Collaborator 档(按营收分级,<$1000万营收起价 $3,000/年,上不封顶到 $70,000/年),真实费用取决于你的实际年营收——决策简报里有完整分级表
 
 ---
 
