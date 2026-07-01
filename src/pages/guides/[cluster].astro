@@ -28,6 +28,7 @@ import { buildGuideClustersRailHtml } from "../../lib/seo/guides-rail";
 import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
+import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
 
 interface Props {
   cluster: GuideCluster;
@@ -115,12 +116,16 @@ export async function getStaticPaths() {
 const { cluster } = Astro.props as Props;
 
 // Pull every guide entry once and filter to this cluster.
+// Resolve {chip:slug:field} placeholders before storing — this page bypasses
+// loadEditorialDefinitions() (which normally does this in normalizeEditorial-
+// Definition()), so it needs its own resolve call. Same fix as
+// src/pages/guides/index.astro (the /guides/ hub these cluster pages sit under).
 const allEditorial = await getCollection("editorial");
 const guidesById = new Map<string, ReturnType<typeof Object>>();
 for (const entry of allEditorial) {
   // entry.id looks like "guides/some-slug" — strip the prefix.
   const m = entry.id.match(/^guides\/(.+)$/);
-  if (m) guidesById.set(m[1], entry.data);
+  if (m) guidesById.set(m[1], resolveChipPlaceholdersDeep(entry.data));
 }
 
 // Order matches cluster.slugs (curator-controlled). Skip any slug whose

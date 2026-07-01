@@ -24,6 +24,7 @@ import { getAuthorRecord } from "../authors";
 import { ARTICLE_AUTHOR_MAP } from "../../data/article-author-map";
 import { cleanText, escapeXml, normalizeRoute, slugToTitle, truncateText } from "./utils";
 import { buildRailHtml, buildRailFilterScript } from "./rail";
+import { resolveChipPlaceholdersDeep } from "../chip-placeholders";
 import {
   BLOG_TOPICS,
   classifyBlogKicker,
@@ -53,13 +54,22 @@ export async function initBlogDefinitions(): Promise<void> {
   const entries = await getCollection("editorial");
   _blogDefsCache = entries
     .filter((e) => !e.id.startsWith("_unused/") && e.data.group === "blog" && e.data.route !== "/blog/")
-    .map((e) => ({
-      route: e.data.route,
-      title: e.data.title,
-      summary: e.data.summary,
-      kicker: e.data.kicker,
-      heroImage: e.data.heroImage ?? "",
-    }));
+    .map((e) => {
+      // Resolve {chip:slug:field} placeholders before caching. Today's live
+      // consumers (buildBlogTopicsRailHtml, getBlogTopicForRoute) only read
+      // .kicker, so this cache isn't part of the confirmed /blog/ card-leak
+      // bug — but title/summary/heroImage are stored here too and the only
+      // other reader (injectBlogArticleGrid) reads them raw. Resolving up
+      // front keeps the cache safe for any future consumer.
+      const data = resolveChipPlaceholdersDeep(e.data);
+      return {
+        route: data.route,
+        title: data.title,
+        summary: data.summary,
+        kicker: data.kicker,
+        heroImage: data.heroImage ?? "",
+      };
+    });
 }
 
 /**

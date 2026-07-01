@@ -22,17 +22,22 @@ import { buildGuideClustersRailHtml } from "../../lib/seo/guides-rail";
 import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
+import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
 
 const ROUTE = "/guides/";
 const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
 const TOTAL_GUIDES = getTotalGuideCount();
 
 // ── Pull all guide entries from the editorial collection ──
+// Resolve {chip:slug:field} placeholders before storing so card titles/
+// summaries never leak raw placeholder text (same fix as catalog-pages.ts
+// loadLandingDefinitions() — this hub bypasses loadEditorialDefinitions()
+// entirely, so it needs its own resolve call).
 const allEditorial = await getCollection("editorial");
 const guidesById = new Map<string, ReturnType<typeof Object>>();
 for (const entry of allEditorial) {
   const m = entry.id.match(/^guides\/(.+)$/);
-  if (m) guidesById.set(m[1], entry.data);
+  if (m) guidesById.set(m[1], resolveChipPlaceholdersDeep(entry.data));
 }
 
 // Flatten: walk GUIDE_CLUSTERS to preserve curator order, attach cluster id

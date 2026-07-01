@@ -29,6 +29,7 @@ import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { truncateText } from "../../lib/seo/utils";
+import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
 
 const ROUTE = "/solutions/";
 const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
@@ -46,14 +47,20 @@ const solutionEntries = allEditorial
       e.data.group === "solutions" &&
       e.data.route !== "/solutions/",
   )
-  .map((e) => ({
-    route: e.data.route,
-    title: e.data.title,
-    summary: e.data.summary,
-    kicker: e.data.kicker || "RFID Solution",
-    topicId: classifySolutionRoute(e.data.route),
-    heroImage: e.data.heroImage ?? "",
-  }));
+  .map((e) => {
+    // Resolve {chip:slug:field} placeholders before reading any string field —
+    // this hub bypasses loadEditorialDefinitions() (which normally does this
+    // in normalizeEditorialDefinition()), so it needs its own resolve call.
+    const data = resolveChipPlaceholdersDeep(e.data);
+    return {
+      route: data.route,
+      title: data.title,
+      summary: data.summary,
+      kicker: data.kicker || "RFID Solution",
+      topicId: classifySolutionRoute(data.route),
+      heroImage: data.heroImage ?? "",
+    };
+  });
 
 // Display order: topic order first (SOLUTIONS_TOPICS order), then editorial-
 // collection order within each topic. Keeps the topic-rail flow visually

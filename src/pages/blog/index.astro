@@ -32,6 +32,7 @@ import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { truncateText } from "../../lib/seo/utils";
+import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
 
 const ROUTE = "/blog/";
 const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
@@ -50,14 +51,18 @@ const blogEntries = allEditorial
       e.data.route !== "/blog/",
   )
   .map((e) => {
-    const kicker = e.data.kicker || "RFID Technology";
+    // Resolve {chip:slug:field} placeholders before reading any string field —
+    // this hub bypasses loadEditorialDefinitions() (which normally does this
+    // in normalizeEditorialDefinition()), so it needs its own resolve call.
+    const data = resolveChipPlaceholdersDeep(e.data);
+    const kicker = data.kicker || "RFID Technology";
     return {
-      route: e.data.route,
-      title: e.data.title,
-      summary: e.data.summary,
+      route: data.route,
+      title: data.title,
+      summary: data.summary,
       kicker,
       topicId: classifyBlogKicker(kicker),
-      heroImage: e.data.heroImage ?? "",
+      heroImage: data.heroImage ?? "",
     };
   });
 

@@ -24,6 +24,7 @@ import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { truncateText } from "../../lib/seo/utils";
+import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
 
 /**
  * Compare-page titles are written long-form for SEO (e.g. "MIFARE Classic vs
@@ -42,11 +43,14 @@ const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
 const TOTAL_COMPARES = getTotalCompareCount();
 
 // ── Pull every compare entry from the editorial collection ──
+// Resolve {chip:slug:field} placeholders before storing — this hub bypasses
+// loadEditorialDefinitions() (which normally does this in normalizeEditorial-
+// Definition()), so it needs its own resolve call.
 const allEditorial = await getCollection("editorial");
 const comparesById = new Map<string, ReturnType<typeof Object>>();
 for (const entry of allEditorial) {
   const m = entry.id.match(/^compare\/(.+)$/);
-  if (m) comparesById.set(m[1], entry.data);
+  if (m) comparesById.set(m[1], resolveChipPlaceholdersDeep(entry.data));
 }
 
 // Flatten: walk COMPARE_CATEGORIES in curator order, attach category id

@@ -26,6 +26,7 @@ import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { truncateText } from "../../lib/seo/utils";
+import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
 
 /** See note in src/pages/compare/index.astro — strips SEO subtitle after em-dash. */
 function shortenCardTitle(title: string): string {
@@ -119,11 +120,15 @@ export async function getStaticPaths() {
 const { category } = Astro.props as Props;
 
 // Pull every compare entry once and filter to this category.
+// Resolve {chip:slug:field} placeholders before storing — this page bypasses
+// loadEditorialDefinitions() (which normally does this in normalizeEditorial-
+// Definition()), so it needs its own resolve call. Same fix as
+// src/pages/compare/index.astro (the /compare/ hub these category pages sit under).
 const allEditorial = await getCollection("editorial");
 const comparesById = new Map<string, ReturnType<typeof Object>>();
 for (const entry of allEditorial) {
   const m = entry.id.match(/^compare\/(.+)$/);
-  if (m) comparesById.set(m[1], entry.data);
+  if (m) comparesById.set(m[1], resolveChipPlaceholdersDeep(entry.data));
 }
 
 // Order matches category.slugs (curator-controlled). Skip any slug whose

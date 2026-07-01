@@ -5,6 +5,7 @@ import type { SiteData, SnapshotPage } from "./site-data";
 import { loadPageFromDisk } from "./site-data";
 import { html, raw } from "./html";
 import { ROUTE_CANONICAL_OVERRIDES } from "./route-overrides";
+import { resolveChipPlaceholdersDeep } from "./chip-placeholders";
 
 /* ── Catalog hero-image overrides ──────────────────────────────────────
  * Many WordPress product pages share the same generic banner image.
@@ -280,7 +281,15 @@ async function loadLandingDefinitions(): Promise<LandingDef[]> {
   _landingDefsCache = entries
     .filter((e) => !e.id.startsWith("_unused/"))
     .filter((e) => e.data.group === "products")
-    .map((e) => e.data as unknown as LandingDef);
+    // Resolve {chip:slug:field} placeholders BEFORE casting to LandingDef so
+    // catalog card titles/summaries never leak raw placeholder text. This
+    // mirrors the resolution normalizeEditorialDefinition() does in
+    // editorial-pages.ts — that path isn't reused here because LandingDef is
+    // a narrower shape than EditorialDefinition (see interface above), so a
+    // straight loadEditorialDefinitions() swap would require re-typing every
+    // downstream consumer of chipFamilies/envFamilies. Resolving in place on
+    // the raw entry.data keeps LandingDef's shape and typing unchanged.
+    .map((e) => resolveChipPlaceholdersDeep(e.data) as unknown as LandingDef);
   return _landingDefsCache;
 }
 
