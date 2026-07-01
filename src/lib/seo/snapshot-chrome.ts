@@ -28,7 +28,7 @@ import { load } from "cheerio";
 
 import type { SnapshotPage } from "../site-data";
 import { prepareSnapshot } from "../render-snapshot";
-import { sanitizeHead } from "./sanitize-html";
+import { sanitizeHead, sanitizeBody } from "./sanitize-html";
 
 export interface SnapshotChrome {
   htmlAttrs: Record<string, string>;
@@ -75,7 +75,18 @@ export function extractChromeFromSnapshot(
   sanitizeHead($head);
   const sanitizedHeadHtml = $head("head").html() ?? "";
 
-  const bodyHtml = snap.bodyHtml;
+  // sanitizeBody strips WP/WooCommerce admin remnants, tracking pixels, and
+  // dead third-party embeds (e.g. the "Sign in with Google" button Site Kit
+  // injects into every WP page's chrome — visitor-facing pages have no use
+  // for it, it's a WP-admin-login artifact, but it still cost every hub page
+  // borrowing this donor's chrome a live accounts.google.com/gsi/client
+  // fetch). buildPageSeo() already runs bodyHtml through sanitizeBody for
+  // pages that render their full snapshot body; this helper only ran
+  // sanitizeHead, so any donor whose pre-/post-main chrome carried one of
+  // these artifacts leaked it into every hub page consuming that chrome.
+  const $body = load(`<body>${snap.bodyHtml}</body>`);
+  sanitizeBody($body);
+  const bodyHtml = $body("body").html() ?? "";
 
   // Find the <main> opening tag. Naive but reliable: snapshots have exactly
   // one <main> and it's at top level under the wrapper / inner-wrap / primary
