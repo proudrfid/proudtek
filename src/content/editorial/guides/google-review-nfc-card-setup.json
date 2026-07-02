@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "Google Review NFC Card Setup Guide",
   "kicker": "Review Card Guide",
-  "summary": "A step-by-step setup guide for Google review NFC cards that covers the review-link source, redirect ownership, NFC payload choice, QR fallback, multi-device testing, multi-location URL strategy and the live checks that turn a good sample into a reliable rollout.",
+  "summary": "Google review NFC card setup is a 7-step workflow that takes under 30 minutes per location, from Place ID capture to a locked, tested tag. Encode the Place-ID writereview URL as a plain https URI record, add a QR fallback (30-50% of customers use it), and test across five devices before locking. Validate a 50-card pilot against the go-live checklist before any 5,000-card print run.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T11:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -34,6 +34,24 @@
     "/product/google-review-nfc-card/",
     "/product/nfc-stickers/",
     "/product/nfc-business-card/"
+  ],
+  "brief": [
+    {
+      "label": "Destination URL first",
+      "text": "Encode the Google Business Profile writereview URL built from the location's Place ID — not a Maps listing or homepage — and let new profiles index for at least 48 hours first."
+    },
+    {
+      "label": "Simple payload wins",
+      "text": "Use a plain https URI record on an NTAG213 (144 bytes, fits URLs under 130 characters), lock the tag after verification, and skip app records, MIME types and Smart Posters."
+    },
+    {
+      "label": "QR is the floor",
+      "text": "30-50% of customers use the QR path in practice. Print it at least 2 cm square with a 4 mm quiet zone, encoding the same per-location URL as the chip."
+    },
+    {
+      "label": "Pilot before print",
+      "text": "Test on at least five devices (current iPhone, Android flagship, three-year-old mid-range Android, older iOS, one with NFC off), then validate 50 pilot cards before the 5,000-card run."
+    }
   ],
   "sections": [
     {
@@ -265,7 +283,7 @@
     },
     {
       "question": "How many devices should setup testing cover?",
-      "answer": "At least five, spanning the realistic device population rather than the newest handsets only: a current iPhone (iOS 18+) with and without Express Mode, a current Android flagship, a mid-range Android from three years ago (typically Android 12 on a Samsung A-series or similar), an older iPhone still running iOS 15 or 16 if possible, and one device with NFC disabled to confirm the QR fallback works. For franchise and multi-location rollouts, extend testing to include at least one device with a thick case installed (wallet case, magnetic case) to confirm tap reliability through the case, and at least one device set to a non-English language to confirm Google's review sheet localises correctly for the expected customer base. More device coverage is always better; less is risky, because a setup that passes on one iPhone can fail on an old Android, on a phone with a wallet case, or on a device where Apple Pay is bound to the NFC reader and needs to be dismissed first, and each of these produces a quiet conversion leak that the team will not see in the data."
+      "answer": "At least five devices, spanning the realistic device population rather than the newest handsets only. The test set: a current iPhone (iOS 18+) with and without Express Mode, a current Android flagship, a mid-range Android from three years ago (typically Android 12 on a Samsung A-series or similar), an older iPhone still running iOS 15 or 16 if possible, and one device with NFC disabled to confirm the QR fallback works. For franchise and multi-location rollouts, extend testing to include at least one device with a thick case installed (wallet case, magnetic case) to confirm tap reliability through the case, and at least one device set to a non-English language to confirm Google's review sheet localises correctly for the expected customer base. More device coverage is always better; less is risky, because a setup that passes on one iPhone can fail on an old Android, on a phone with a wallet case, or on a device where Apple Pay is bound to the NFC reader and needs to be dismissed first, and each of these produces a quiet conversion leak that the team will not see in the data."
     },
     {
       "question": "Should the NFC tag be locked after encoding?",

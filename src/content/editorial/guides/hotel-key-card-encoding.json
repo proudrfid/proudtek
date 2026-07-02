@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "Hotel Key Card Encoding Guide",
   "kicker": "Hospitality Guide",
-  "summary": "A practical encoding guide for hotels that covers lock-estate discovery, chip family selection, pre-encoding brief structure, pilot validation, replacement workflow, mobile key integration, and the specific questions that separate a clean rollout from a renegotiation six months in.",
+  "summary": "Hotel key card encoding is a systems decision: chip family, lock firmware, encoder fleet and PMS integration must align before a 200-card pilot. This guide walks the lock-estate audit, chip selection from MIFARE Classic 1K to DESFire EV3 with AES-128, pre-encoding scope and pilot exit criteria. A complete brief gets supplier samples and pricing back in 10–14 days; a chain-greenfield rollout reaches its first issued card in 8–12 weeks.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-05-10",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
@@ -27,6 +27,24 @@
   "imageSourceRoutes": [
     "/product/hotel-key-cards/",
     "/product/printed-rfid-cards/"
+  ],
+  "brief": [
+    {
+      "label": "Chip family default",
+      "text": "MIFARE DESFire EV3 with AES-128 (2K size) is the 2026 default across major lock vendors; MIFARE Classic 1K survives as legacy support with a publicly broken Crypto1 cipher — plan a migration within 2–3 years."
+    },
+    {
+      "label": "Pre-encoding cost",
+      "text": "Partial pre-encoding adds US$0.05–0.15 per card, full key injection US$0.15–0.35. At 50,000 cards a year that is US$7,500–17,500 extra, usually paid back inside a year through faster check-in and reduced encoder wear."
+    },
+    {
+      "label": "Pilot exit criteria",
+      "text": "A 200-card pilot should hit 100% open rate on tested locks, sub-10-second issue time including PMS, under-60-second invalidation, under 0.5% encoder write failures and zero guest-facing incidents across two weeks."
+    },
+    {
+      "label": "Timeline to first card",
+      "text": "8–12 weeks for a chain greenfield, 12–20 weeks for a boutique retrofit, 20–32 weeks when a multi-property refresh needs lock firmware updates first."
+    }
   ],
   "sections": [
     {
@@ -277,11 +295,11 @@
   "faq": [
     {
       "question": "What should a hotel send before asking for pre-encoded card samples?",
-      "answer": "A one-page brief that covers the lock brand and firmware across every door type (guest rooms, back-of-house, lifts, pool, spa, garage), the encoder fleet at every front desk plus any mobile encoders, the PMS and middleware (Opera, Mews, Shiji, Shift4, in-house), the preferred chip family with fallback (DESFire EV3, Plus SL3, Classic 1K, Ultralight C), the pre-encoding scope (blank / partial / full key injection), any numbering or print rules with PMS alignment, the pilot quantity and delivery address, and the timeline for the full-order decision. Suppliers who receive this document reply with realistic samples in 10–14 days; suppliers who only receive a finish preference reply with a clarifying-questions email and the cycle stretches to 5–7 weeks. Include photographs of the existing lock and encoder if the supplier does not have the property on file."
+      "answer": "A single one-page brief is enough, and suppliers who receive it reply with realistic samples in 10–14 days. Cover the lock brand and firmware across every door type (guest rooms, back-of-house, lifts, pool, spa, garage), the encoder fleet at every front desk plus any mobile encoders, and the PMS and middleware (Opera, Mews, Shiji, Shift4, in-house). State the preferred chip family with fallback (DESFire EV3, Plus SL3, Classic 1K, Ultralight C), the pre-encoding scope (blank / partial / full key injection), any numbering or print rules with PMS alignment, the pilot quantity and delivery address, and the timeline for the full-order decision. Suppliers who only receive a finish preference reply with a clarifying-questions email and the cycle stretches to 5–7 weeks. Include photographs of the existing lock and encoder if the supplier does not have the property on file."
     },
     {
       "question": "What should an encoding pilot validate besides lock opening?",
-      "answer": "Issue speed at peak check-in against the real PMS integration (target: sub-10 seconds per card, measured at a simulated 20-arrival-hour load), re-issue and invalidation latency when a card is lost (target: under 60 seconds on cloud PMS, under 5 minutes on on-prem Opera), housekeeping override and master-card workflows, DND behaviour (does the master card open a DND-flagged room? should it?), expired-card handling, guest recovery when a card demagnetises mid-stay or at an unstaffed late-night lobby, encoder write failure rate at peak speed (target: <0.5%), and durability after two weeks of real staff-pocket handling including coins and phones. Door opening is the easiest test to pass and the least useful one to rely on. The pilot should validate the workflows that break under volume and exception pressure, not the headline flow that works in any demo."
+      "answer": "Validate the workflows that break under volume: issue speed, invalidation latency, exception handling, guest recovery, encoder failure rate and durability. Measure issue speed at peak check-in against the real PMS integration (target: sub-10 seconds per card, measured at a simulated 20-arrival-hour load). Measure re-issue and invalidation latency when a card is lost (target: under 60 seconds on cloud PMS, under 5 minutes on on-prem Opera). Test housekeeping override and master-card workflows, DND behaviour (does the master card open a DND-flagged room? should it?) and expired-card handling. Rehearse guest recovery when a card demagnetises mid-stay or at an unstaffed late-night lobby. Check encoder write failure rate at peak speed (target: <0.5%) and durability after two weeks of real staff-pocket handling including coins and phones. Door opening is the easiest test to pass and the least useful one to rely on. The pilot should validate the workflows that break under volume and exception pressure, not the headline flow that works in any demo."
     },
     {
       "question": "Can a hotel run encoded cards and mobile keys together?",
@@ -289,7 +307,7 @@
     },
     {
       "question": "When is full pre-encoding worth the extra setup cost?",
-      "answer": "When the property issues more than a few thousand cards a year (typical 50+ room property above 50% occupancy qualifies), when the front desk cannot afford 2–4 seconds of encoder time per check-in at peak (every full-service property above 100 rooms typically cannot), or when the property wants printed unique serials per card with PMS-aligned numbering. The cost is US$0.15–0.35 per card plus a signed key-handling agreement and a qualified key-injection path (DESFire DAM, supplier HSM, or external partner like Infineon/NXP/IDEMIA/HID). The benefit is faster desk issuance (sub-5 seconds per card), reduced encoder wear (typically 30–40% longer service intervals), cleaner audit trails for any security review, and zero encoder capacity planning for peak days. The break-even is typically under 12 months for any chain-scale property."
+      "answer": "Full pre-encoding pays off above a few thousand cards a year — typically a 50+ room property above 50% occupancy. It is also justified when the front desk cannot afford 2–4 seconds of encoder time per check-in at peak (every full-service property above 100 rooms typically cannot), or when the property wants printed unique serials per card with PMS-aligned numbering. The cost is US$0.15–0.35 per card plus a signed key-handling agreement and a qualified key-injection path (DESFire DAM, supplier HSM, or external partner like Infineon/NXP/IDEMIA/HID). The benefit is faster desk issuance (sub-5 seconds per card), reduced encoder wear (typically 30–40% longer service intervals), cleaner audit trails for any security review, and zero encoder capacity planning for peak days. The break-even is typically under 12 months for any chain-scale property."
     },
     {
       "question": "What is the safest migration path from MIFARE Classic to DESFire?",

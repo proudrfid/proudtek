@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "EPC Gen2 UHF RFID Protocol — Technical Guide",
   "kicker": "EPC Gen2 / RAIN RFID Protocol",
-  "summary": "A protocol-level technical guide to EPC Gen2, the air-interface specification that underlies every RAIN RFID deployment — covered across its three published versions: Gen2v1 (2004, baseline), Gen2v2 (2013, crypto-suite and untraceable mode) and Gen2v3 (January 2025, Query X / Query Y advanced selection, modulated-power inventory and the Read-Var memory command). Formally standardized at ISO as ISO/IEC 18000-63 (current edition: ISO/IEC 18000-63:2021). This page covers the reader-talks-first backscatter air interface, PIE / FM0 / Miller modulation, the four memory banks (Reserved / EPC / TID / User) and their addressing model, Q-algorithm slot-based anti-collision mechanics, session (S0-S3) and target (A/B) state management for dense-reader coexistence, access and kill password security, Gen2v2 crypto-suite identifiers (AES-128 suite 0x21, PRESENT-80 suite 0x22), the Gen2v3 selection and read-variable enhancements, backward-compatibility rules across all three versions, and practical implementation details that engineers building RAIN deployments need to understand.",
+  "summary": "EPC Gen2 is the air-interface protocol behind every RAIN RFID deployment, standardized as ISO/IEC 18000-63 across the 860-960 MHz UHF band. Three versions exist: Gen2v1 (2004), Gen2v2 (2013, crypto-suite and untraceable mode) and Gen2v3 (January 2025), all backward compatible. This guide covers the four memory banks, Q-algorithm anti-collision that reads 1,000-1,500+ tags per second, sessions S0-S3 and Gen2v2 AES-128 authentication.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
@@ -26,6 +26,24 @@
   "heroImage": "/landing-images/uhf-rfid-hard-tag.webp",
   "imageSourceRoutes": [
     "/products/rfid-labels/uhf-rfid-inlay/"
+  ],
+  "brief": [
+    {
+      "label": "Three protocol versions",
+      "text": "Gen2v1 (2004, baseline), Gen2v2 (2013, crypto-suite, file management, untraceable mode) and Gen2v3 (January 2025, Query X/Y, modulated-power inventory, Read-Var) — fully backward compatible, with Gen2v3 silicon rolling out 2026-2027."
+    },
+    {
+      "label": "Four memory banks",
+      "text": "Bank 0 Reserved (32-bit access and kill passwords), Bank 1 EPC (96-bit SGTIN-96 typical), Bank 2 TID (factory-programmed, read-only) and Bank 3 User (zero bits on low-cost chips up to 64 kbit)."
+    },
+    {
+      "label": "Throughput expectations",
+      "text": "Plan for 400-800 tags per second per reader in production, not the 1,500+ theoretical maximum; a well-tuned dock-door portal reads an 80-case pallet in a single 2-4 second pass."
+    },
+    {
+      "label": "Security tiers",
+      "text": "Baseline Gen2 gives 32-bit access and kill passwords but no encrypted reads; Gen2v2 adds crypto-suite authentication (AES-128 suite 0x21, PRESENT-80 suite 0x22) and the Untraceable privacy command."
+    }
   ],
   "sections": [
     {

@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "RFID Integration with SAP WMS and S/4HANA EWM",
   "kicker": "SAP WMS RFID Integration",
-  "summary": "An enterprise architect's guide to integrating RFID with SAP. Classic SAP WM, SAP Extended Warehouse Management (EWM), SAP S/4HANA embedded EWM, and the SAP ecosystem's integration surface (IDocs, BAPIs, SAP Integration Suite, SAP Gateway/OData, SAP Event Mesh). This page covers the SAP inventory and warehouse data model (material master, batch, serial, handling units, storage bins, warehouse orders and tasks), the integration interfaces available at each stack layer, SAP Auto-ID Infrastructure (AII) and the SAP Object Event Repository (OER), enterprise RFID integration scenarios (goods receipt, put-away, replenishment, pick, ship, cycle count, traceability, yard management), tag encoding patterns aligned with SAP master data, and the Proud Tek engagement model sized for large-enterprise SAP deployments with regulated-industry and retailer-mandate exposure.",
+  "summary": "RFID-to-SAP integration posts events three ways — IDocs (WMMBID02), synchronous BAPIs and OData — with typical rollouts spanning 12-36 months. This guide maps the SAP warehouse stacks (classic WM, EWM, S/4HANA embedded EWM), the master-data model behind tag encoding (SGTIN-96 to material master, SSCC-96 to handling units), and the scenarios from MIGO 101 goods receipt to cycle count. Proud Tek supplies 100k-10M tag runs aligned with customer GS1 prefixes.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -27,6 +27,24 @@
   "imageSourceRoutes": [
     "/products/rfid-labels/uhf-rfid-inlay/",
     "/products/rfid-labels/impinj-m700-uhf-inlay/"
+  ],
+  "brief": [
+    {
+      "label": "Three integration paths",
+      "text": "IDocs (WMMBID02, DELVRY07, DESADV) for transactional batch posting, synchronous BAPIs (BAPI_GOODSMVT_CREATE, BAPI_WAREHOUSE_TASK_CONFIRM) for real-time posts, and OData/SAP Event Mesh for cloud-native streams — enterprise programmes combine all three."
+    },
+    {
+      "label": "Know your stack",
+      "text": "Classic WM (IDoc/middleware-led), EWM and S/4HANA embedded EWM (native warehouse tasks, handling units, RF framework) need different architectures — run a stack census before designing anything."
+    },
+    {
+      "label": "Encoding maps to master data",
+      "text": "SGTIN-96 resolves to the material master via EAN1 (MARA/MARM), SSCC-96 matches handling-unit numbers, GRAI-96/GIAI-96 cover returnable assets, and batch IDs ride in user memory."
+    },
+    {
+      "label": "Rollout in phases",
+      "text": "Enterprise rollouts run 12-36 months across three phases: pilot (3-6 months, 50-500k tags, one process), single-site scale (6-12 months), then multi-site deployment across 5-50 warehouses."
+    }
   ],
   "sections": [
     {
@@ -212,7 +230,7 @@
     },
     {
       "question": "Which IDoc message types are most relevant for an RFID middleware integration?",
-      "answer": "The shortlist most enterprise SAP RFID middleware deployments touch is: WMMBXY (the message type, processed by L_IDOC_INPUT_WMMBXY using IDoc type WMMBID02 — equivalent to MIGO goods movements MB01/MB1A/MB1B/MB1C/MB31), DELVRY07 (delivery, both inbound and outbound), DESADV (advance ship notice for inbound and outbound flows), HUMSRV01 (handling unit service), WHSORD01 (warehouse order), MBGMCR03 (alternate goods-movement IDoc that calls BAPI_GOODSMVT_CREATE under the hood) and INVCON (inventory count). Use WE05 for IDoc list, WE02 for display, BD87 for reprocessing failed IDocs. For S/4HANA embedded EWM the synchronous goods-movement path is /SCWM/ERP_GM_SYNC_UPD_S4 calling /SPE/GOODSMVT_CREATE in the same Logical Unit of Work, which can be preferable to asynchronous IDoc batches when the RFID event needs immediate confirmation back to the warehouse operator."
+      "answer": "Seven message types cover most deployments: WMMBXY, DELVRY07, DESADV, HUMSRV01, WHSORD01, MBGMCR03 and INVCON. In detail: WMMBXY (the message type, processed by L_IDOC_INPUT_WMMBXY using IDoc type WMMBID02 — equivalent to MIGO goods movements MB01/MB1A/MB1B/MB1C/MB31), DELVRY07 (delivery, both inbound and outbound), DESADV (advance ship notice for inbound and outbound flows), HUMSRV01 (handling unit service), WHSORD01 (warehouse order), MBGMCR03 (alternate goods-movement IDoc that calls BAPI_GOODSMVT_CREATE under the hood) and INVCON (inventory count). Use WE05 for IDoc list, WE02 for display, BD87 for reprocessing failed IDocs. For S/4HANA embedded EWM the synchronous goods-movement path is /SCWM/ERP_GM_SYNC_UPD_S4 calling /SPE/GOODSMVT_CREATE in the same Logical Unit of Work, which can be preferable to asynchronous IDoc batches when the RFID event needs immediate confirmation back to the warehouse operator."
     },
     {
       "question": "How does Proud Tek support enterprise SAP customers differently from mid-market customers?",

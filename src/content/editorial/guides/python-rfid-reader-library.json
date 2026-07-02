@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "Python RFID Reader Library Guide",
   "kicker": "Python RFID Library Guide",
-  "summary": "A Python developer's guide to the RFID reader library ecosystem. Nfcpy for NFC/HF reading and writing with PC/SC and USB readers, sllurp for LLRP-based UHF fixed-reader integration, pyscard for smart-card APDU communication, MFRC522 and PN532 libraries for Raspberry Pi and microcontroller-scale projects, libnfc Python bindings for low-level NFC control, and vendor-specific Python SDKs (python-mercuryapi, Impinj Octane bindings, Chainway Android Python bridges). This page covers the full Python RFID landscape with code patterns, reader hardware compatibility, tag-chip selection for prototyping and the Proud Tek sample kits sized for Python developers, researchers and makers.",
+  "summary": "Three libraries do most Python RFID work: nfcpy for NFC reads in under 10 lines, sllurp for LLRP UHF readers, and pyscard for smart-card APDUs. MFRC522 and PN532 modules cover Raspberry Pi and microcontroller builds, and libnfc bindings unlock low-level control. This guide maps each library to frequency band, reader hardware and use case, with copy-paste snippets and Proud Tek sample kits for prototyping.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -33,6 +33,24 @@
   "imageSourceRoutes": [
     "/products/rfid-labels/ntag213-nfc-sticker/",
     "/products/rfid-labels/uhf-rfid-inlay/"
+  ],
+  "brief": [
+    {
+      "label": "NFC and HF",
+      "text": "nfcpy (`pip install nfcpy`) reads and writes NFC Forum Type 1-5 tags on USB readers like the ACR122U (~US$25-35); pyscard covers PC/SC APDU work for DESFire and JavaCard."
+    },
+    {
+      "label": "UHF at scale",
+      "text": "sllurp speaks LLRP to Impinj/Zebra/ThingMagic fixed readers; streaming starts in under 30 lines of Python, and a modern x86 server sustains 3,000-6,000 tag reads per second."
+    },
+    {
+      "label": "Embedded and maker",
+      "text": "MFRC522 modules (under US$5, ~1-3 cm range) and PN532 boards (~5-8 cm, NFC Forum Type 1-5) drive Raspberry Pi, ESP32 and RP2040 projects over SPI/I2C/UART."
+    },
+    {
+      "label": "Pick by three questions",
+      "text": "Match frequency (125 kHz LF, 13.56 MHz HF/NFC, 860-960 MHz UHF), reader hardware and use case before choosing a library — platform mismatches cost more than code."
+    }
   ],
   "sections": [
     {
@@ -220,7 +238,7 @@
     },
     {
       "question": "Can Python program NFC tags (write NDEF content) or only read them?",
-      "answer": "Python can both read and write NFC tags. nfcpy supports writing NDEF content to any NFC Forum Type 2-5 tag (NTAG 21x, NTAG 424 DNA, MIFARE Ultralight, ISO 15693 tags like ICODE SLIX, MIFARE DESFire via NDEF on Type 4). pyscard handles APDU-based writes for MIFARE DESFire application and file operations. MFRC522/PN532 libraries on Raspberry Pi support NTAG and MIFARE Classic writes. The writing pattern is consistent across libraries: discover the tag, check write capability, compose the NDEF message or raw command, execute the write, verify. Most library examples include write samples in their documentation."
+      "answer": "Yes — Python can both read and write NFC tags. Nfcpy supports writing NDEF content to any NFC Forum Type 2-5 tag (NTAG 21x, NTAG 424 DNA, MIFARE Ultralight, ISO 15693 tags like ICODE SLIX, MIFARE DESFire via NDEF on Type 4). Pyscard handles APDU-based writes for MIFARE DESFire application and file operations. MFRC522/PN532 libraries on Raspberry Pi support NTAG and MIFARE Classic writes. The writing pattern is consistent across libraries: discover the tag, check write capability, compose the NDEF message or raw command, execute the write, verify. Most library examples include write samples in their documentation."
     },
     {
       "question": "What's the difference between nfcpy and pyscard?",

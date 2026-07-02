@@ -3,7 +3,7 @@
   "group": "products",
   "title": "Complete guide to RFID readers",
   "kicker": "RFID Readers",
-  "summary": "In specification terms, RFID readers are the transmit-and-receive side of every RFID deployment. The radios, antennas, host interfaces and firmware that power tags and interpret their replies. A Proud Tek reader project splits into three form-factor classes: fixed readers (portal, dock-door, conveyor, overhead, zone) with external antennas and PoE/Ethernet/LLRP integration; handheld readers (pistol-grip and smartphone-sled) for asset audits, search-and-find and field work; and desktop NFC/HF encoders (ACR122U-class, ACR1252U-class, Omnikey 5xxx-class, uTrust 3x00-class) for card issuance, personalisation and bench-top development. This pillar indexes the full reader catalogue by form factor, frequency band, chip compatibility and software stack, and sits next to the solutions-side buyer's guide at `/solutions/rfid-readers-and-encoding/`.",
+  "summary": "RFID readers split into three form-factor classes: fixed portal readers, handheld UHF sleds and desktop NFC/HF encoders. Fixed readers run PoE/Ethernet with LLRP integration at +33 dBm typical EIRP; handhelds cover audits and search-and-find; desktop encoders (ACR122U / ACR1252U / Omnikey 5xxx class) handle issuance and personalisation. This pillar indexes the full catalogue by form factor, frequency band (125 kHz LF to 860-960 MHz UHF RAIN), chip compatibility and software stack, and sits next to the solutions-side buyer's guide at `/solutions/rfid-readers-and-encoding/`.",
   "heroPoints": [
     "Three reader families in one catalogue (fixed UHF portals (Impinj R700 / Zebra FX9600 / Alien F800 class), handheld UHF (Zebra RFD40/RFD90 sled and Chainway C72/C76 integrated class) and desktop NFC/HF encoders (ACR122U / ACR1252U / Omnikey 5022 class)) each with its own antenna, interface and SDK matrix.",
     "Covers every major air-interface standard a specifier encounters: ISO/IEC 18000-63 (EPC Gen2 v3) for UHF RAIN, ISO/IEC 14443 Type A/B for HF card readers, ISO/IEC 15693 for vicinity readers, ISO/IEC 18000-2 for 125 kHz LF, ISO/IEC 18092 / NFC Forum for NFC tap. Region-specific RF: FCC 47 CFR Part 15.247 (902-928 MHz), ETSI EN 302 208 v3.3.1 (865.6-867.6 MHz), SRRC 920-925 MHz, ARIB STD-T106 (Japan 916.7-920.9 MHz).",
@@ -29,7 +29,25 @@
     "RAIN RFID reader"
   ],
   "publishedAt": "2026-04-20",
-  "modifiedAt": "2026-03-09",
+  "modifiedAt": "2026-07-02",
+  "brief": [
+    {
+      "label": "Three reader families",
+      "text": "Fixed UHF portals (Impinj R700 / Zebra FX9600 class), handheld sleds (Zebra RFD40 / RFD90, Chainway C72 class) and desktop NFC/HF encoders (ACR122U / Omnikey 5022 class) — each with its own antenna, interface and SDK matrix."
+    },
+    {
+      "label": "Band decides the reader",
+      "text": "LF 125-134.2 kHz, HF 13.56 MHz and UHF 860-960 MHz RAIN do not overlap. A 13.56 MHz reader cannot read a 915 MHz tag, so frequency band is the first specification decision."
+    },
+    {
+      "label": "Software stack",
+      "text": "LLRP and Octane/ETK for fixed UHF; PC/SC (CCID) and libnfc for desktop NFC; vendor Android/iOS SDKs for handheld sleds; REST / MQTT telemetry on IoT-grade fixed readers."
+    },
+    {
+      "label": "Regional RF certification",
+      "text": "FCC 902-928 MHz (US), ETSI 865.6-867.6 MHz (EU), SRRC 920-925 MHz (China), ARIB 916.7-920.9 MHz (Japan) — readers are regulatory-certified and firmware-locked to their region."
+    }
+  ],
   "authorSlug": "editorial-board",
   "author": "Proud Tek Editorial Board",
   "reviewedBySlug": "peter-zhang",
@@ -40,7 +58,8 @@
       "title": "What is an RFID reader?",
       "intro": "An RFID reader is the active radio that powers passive tags (or talks to active tags) and decodes their replies into structured identifier, memory and sensor data the host application can use.",
       "paragraphs": [
-        "A passive UHF RFID reader performs four jobs in one enclosure: it transmits an unmodulated continuous-wave carrier at a legal EIRP (typically +30 to +36 dBm) to harvest energy into nearby tag chips; it modulates that carrier with Gen2 query/ACK commands to address tags and inventory them; it demodulates the tags' backscatter replies (modulated reflections of its own carrier); and it hands the resulting EPC, TID, user-memory and RSSI data up to the host over a transport like LLRP, MQTT, REST or a vendor SDK. A desktop HF/NFC reader does the electrically analogous job at 13.56 MHz in the near field. An oscillator drives a loop antenna, a card modulates the load, the reader demodulates and hands APDU responses up to PC/SC or libnfc.",
+        "A passive UHF RFID reader performs four jobs in one enclosure: it transmits an unmodulated continuous-wave carrier at a legal EIRP (typically +30 to +36 dBm) to harvest energy into nearby tag chips; it modulates that carrier with Gen2 query/ACK commands to address tags and inventory them; it demodulates the tags' backscatter replies (modulated reflections of its own carrier); and it hands the resulting EPC, TID, user-memory and RSSI data up to the host over a transport like LLRP, MQTT, REST or a vendor SDK.",
+        "A desktop HF/NFC reader does the electrically analogous job at 13.56 MHz in the near field. An oscillator drives a loop antenna, a card modulates the load, the reader demodulates and hands APDU responses up to PC/SC or libnfc.",
         "The reader (not the tag) is the limiting factor in most disappointed deployments. A perfect UCODE 9 tag at -22 dBm sensitivity still needs a reader transmitting at +33 dBm into a 6-9 dBi circularly polarised antenna to reach 8-12 m free-space range; a reader under-specified at +27 dBm into a 2 dBi antenna will miss the same tag at 2 m. Reader selection is therefore at least as decisive as tag selection for deployment KPI (read rate, throughput, miss rate, re-read latency)."
       ],
       "bullets": [

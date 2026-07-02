@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "RFID Integration with Shopify — Inventory Sync",
   "kicker": "Shopify RFID Integration",
-  "summary": "An e-commerce and omnichannel merchant's guide to integrating RFID with Shopify for real-time inventory accuracy across the online store, Shopify POS locations, wholesale channels and external marketplaces. This page covers Shopify's multi-location inventory model, the Shopify Admin REST and GraphQL APIs (in particular the Inventory Levels mutations and inventoryAdjustQuantity mutations), Shopify POS integration with RFID readers for retail stores, the Shopify App Store ecosystem of RFID-inventory apps, webhook-driven event patterns, multi-channel inventory sync including Amazon / eBay / TikTok Shop / Walmart Marketplace via Shopify Markets and third-party channel connectors, and how Proud Tek delivers pre-encoded RFID tags sized for DTC brands, Shopify Plus retailers and fast-growing omnichannel businesses.",
+  "summary": "RFID integrates with Shopify through the Admin GraphQL API and App Store middleware, syncing one count to every channel across up to 1,000 locations. This guide covers the multi-location inventory model, the inventoryAdjustQuantities and inventorySetQuantities mutations, Shopify POS reader workflows and webhook-driven sync. Marketplace channels such as Amazon sync within 15-30 minutes, and Proud Tek pre-encoded tags get stores live within a week of delivery.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -27,6 +27,24 @@
   "imageSourceRoutes": [
     "/products/rfid-labels/uhf-rfid-inlay/",
     "/products/rfid-labels/ntag213-nfc-sticker/"
+  ],
+  "brief": [
+    {
+      "label": "Location limits by plan",
+      "text": "Shopify Plus supports up to 200 locations (1,000 with POS Pro on Shopify plan or higher); Basic / Shopify / Advanced support 10; Starter is capped at 2. Inventory is tracked per-variant-per-location."
+    },
+    {
+      "label": "API write surface",
+      "text": "GraphQL is required for new apps since April 1, 2025: inventoryAdjustQuantities for deltas, inventorySetQuantities for absolute counts, with an @idempotent key directive that becomes mandatory in version 2026-04."
+    },
+    {
+      "label": "Channel sync latency",
+      "text": "Online store updates within seconds of an Admin API write; Amazon and Walmart marketplace channels lag 15-30 minutes, which matters during dock-door receives and aggressive campaign windows."
+    },
+    {
+      "label": "Pilot sizing",
+      "text": "DTC sample batches run 200-2000 tags per SKU and initial runs 500-10k per SKU, delivered pre-encoded with a TID-to-SKU mapping file that imports into the merchant's Shopify app or middleware."
+    }
   ],
   "sections": [
     {
@@ -246,7 +264,7 @@
     },
     {
       "question": "What does a Shopify RFID programme typically cost at DTC or Plus-merchant scale?",
-      "answer": "Programme cost has three components: tags (variable by SKU count and volume, typically a few cents per UHF label for retail apparel volumes), reader hardware (handhelds from USD 1,000-3,000 each, fixed portal infrastructure USD 5,000-15,000 per dock door, scaling with location count), and middleware / app subscription (App Store apps from USD 50-500/month depending on features; enterprise middleware platforms scale to thousands/month). For a DTC brand with one warehouse, a meaningful programme might start at USD 5,000-15,000 upfront plus USD 100-500/month ongoing. For a Shopify Plus retailer with multiple stores, costs scale with location count but so does the ROI from overselling reduction and fulfillment accuracy improvements. Proud Tek can provide tag-cost estimates alongside third-party hardware and software budgeting guidance as part of the sample-pass conversation."
+      "answer": "A meaningful one-warehouse DTC programme starts around USD 5,000-15,000 upfront plus USD 100-500/month ongoing. Programme cost has three components. Tags are variable by SKU count and volume, typically a few cents per UHF label for retail apparel volumes. Reader hardware runs USD 1,000-3,000 per handheld, and fixed portal infrastructure USD 5,000-15,000 per dock door, scaling with location count. Middleware / app subscription runs USD 50-500/month for App Store apps depending on features; enterprise middleware platforms scale to thousands/month. For a Shopify Plus retailer with multiple stores, costs scale with location count but so does the ROI from overselling reduction and fulfillment accuracy improvements. Proud Tek can provide tag-cost estimates alongside third-party hardware and software budgeting guidance as part of the sample-pass conversation."
     }
   ],
   "sources": [

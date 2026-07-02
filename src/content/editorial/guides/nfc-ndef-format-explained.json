@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "NFC NDEF Format Explained — Records and Encoding",
   "kicker": "NDEF Implementation Guide",
-  "summary": "A practical implementer's guide to the NFC Data Exchange Format (NDEF). The standard data structure NFC tags use to store URLs, vCards, Wi-Fi configs, SMS templates and application-launch records that iPhone and Android phones can read with a single tap. This page covers NDEF message and record structure, the well-known and external record type system, URI prefix compression, memory planning across {chip:nxp-ntag-213:short_name}/215/216 and {chip:nxp-ntag-424-dna:short_name}, encoding workflows (SDKs, bureau encoding, production-line pre-encoding), iOS Core NFC and Android Nfc behavior differences, locking and tamper-evidence strategies, and how Proud Tek delivers pre-encoded NDEF tags at production scale for consumer-facing NFC programmes.",
+  "summary": "NDEF (NFC Data Exchange Format) is the NFC Forum standard for on-tag data, formally adopted as IEC 63652-2:2026. Every modern smartphone — iPhone 7 and later on iOS 13+, Android 4.0+ — reads NDEF records with a single tap, no app installed. This guide covers record structure, URI prefix compression, memory planning from 144-byte tags upward, encoding workflows, locking and iPhone-versus-Android behaviour.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -28,6 +28,24 @@
     "/products/rfid-labels/ntag213-nfc-sticker/",
     "/products/rfid-labels/ntag215-nfc-sticker/",
     "/products/rfid-labels/ntag216-nfc-sticker/"
+  ],
+  "brief": [
+    {
+      "label": "One message, many records",
+      "text": "Each tag stores exactly one NDEF message containing one or more records; every record opens with a header byte carrying MB/ME/CF/SR/IL flags and a three-bit TNF value."
+    },
+    {
+      "label": "Memory budgets",
+      "text": "144 bytes of NDEF memory fits a URL of roughly 130 characters; 504 bytes fits ~490 characters; 888 bytes fits ~870. Tracking parameters consume budget at the same rate as path characters."
+    },
+    {
+      "label": "URI prefix compression",
+      "text": "URI prefix compression stores common URL prefixes in a single byte, saving 10-20 bytes on memory-constrained 144-byte tags."
+    },
+    {
+      "label": "Phone compatibility",
+      "text": "iPhone 7 and later (iOS 13+) and Android 4.0+ read NDEF without an app; iPhone XS and later on iOS 14+ read tags in the background."
+    }
   ],
   "sections": [
     {
@@ -200,7 +218,7 @@
     },
     {
       "question": "Do iPhones and Android phones both read NDEF records consistently?",
-      "answer": "Both platforms read NDEF records from background tag reading, but there are behavioural differences. iPhone XS and later running iOS 14+ read NDEF tags in the background with the screen unlocked; older iPhones (iPhone 7 through iPhone X on iOS 13) require Apple's NFC Tag Reader from Control Center or a Core NFC app. Android phones with NFC enabled have supported background reading since Android 4.0 (2011). URI records route to the default browser on both platforms. Wi-Fi records are handled inconsistently on iOS (better on Android). vCard records open Contacts on both. For cross-platform programmes, test on iPhone XS, iPhone 14, Pixel 6 and Samsung S22 before mass deployment to confirm behaviour on the devices your audience uses."
+      "answer": "Yes — both platforms read NDEF tags in the background, with minor behavioural differences. Apple's iPhone XS and later running iOS 14+ read NDEF tags in the background with the screen unlocked; older iPhones (iPhone 7 through iPhone X on iOS 13) require Apple's NFC Tag Reader from Control Center or a Core NFC app. Android phones with NFC enabled have supported background reading since Android 4.0 (2011). URI records route to the default browser on both platforms. Wi-Fi records are handled inconsistently on iOS (better on Android). vCard records open Contacts on both. For cross-platform programmes, test on iPhone XS, iPhone 14, Pixel 6 and Samsung S22 before mass deployment to confirm behaviour on the devices your audience uses."
     },
     {
       "question": "What happens if a consumer tries to modify a tag after it leaves the factory?",

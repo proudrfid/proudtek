@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "How To Choose RFID Readers And Writers",
   "kicker": "Reader Guide",
-  "summary": "A buyer's selection framework for RFID readers and writers. Covering how protocol choice, reader class (desktop encoder, fixed gateway, handheld, integrated), SDK and driver fit, operating-system constraints and use-case context (lab prototyping, desktop issuance, live operational) narrow the shortlist, plus the proof-of-workflow pilot that prevents buying hardware that never connects to production software.",
+  "summary": "Choose RFID readers in a fixed order — credential protocol, reader class, then SDK and OS fit — before comparing models across the $30-3,500 span. A reader that cannot talk to the production software is scrap, so SDK, driver and operating-system fit come before enclosure design. A 2-4 week proof-of-workflow pilot with 2-3 candidate readers against real credentials eliminates 90% of the risk before the order scales.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-10T01:00:43Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -34,6 +34,24 @@
     "/product/acr122u/",
     "/product/nfc-reader-writer-with-free-sdks/",
     "/products/rfid-readers/"
+  ],
+  "brief": [
+    {
+      "label": "Decision order",
+      "text": "Protocol first (LF 125-134 kHz, HF/NFC 13.56 MHz, UHF 860-960 MHz), then reader class (desktop, fixed, handheld, integrated), then SDK / driver / OS fit — model comparison comes last."
+    },
+    {
+      "label": "Price tiers",
+      "text": "Lab HF desktops run $30-80; commercial desktops $80-260; enterprise fixed UHF readers $700-3,500 plus $180-420 per antenna; handhelds $900-4,500; installed portals $8,000-24,000 per door."
+    },
+    {
+      "label": "Duty cycle separates tiers",
+      "text": "A $30-50 ACR122U survives 200-500 taps a day; hotel desks doing 1,500-3,500 daily taps need OMNIKEY 5022/5422-class readers rated 100,000-500,000 insertions."
+    },
+    {
+      "label": "Pilot before scaling",
+      "text": "Run 2-3 structurally different candidates through the real workflow for 2-4 weeks on the exact target OS build, measuring 500-1,000 operations per reader — it eliminates 90% of post-deployment regret."
+    }
   ],
   "sections": [
     {
@@ -234,7 +252,7 @@
   "faq": [
     {
       "question": "What should decide the first RFID reader test purchase?",
-      "answer": "Three filters in order: the credential family (LF, HF/NFC, UHF) and its air-interface standard (ISO/IEC 14443 Type A/B, ISO/IEC 15693, ISO/IEC 18000-63); the host operating system with the specific build number (Windows 11 24H2, Ubuntu 22.04 LTS, Android 13, iPadOS 17); and the SDK language the production application uses (.NET 6, Java 17, Python 3.11, Swift 5). A reader that cannot read the credential, install on the OS, or integrate with the codebase is useless regardless of price. Pick the reader that matches those three filters first, then compare cost and form factor among the survivors."
+      "answer": "Three filters in order: credential family, host operating system and the SDK language of the production application. The credential family means LF, HF/NFC or UHF with its air-interface standard (ISO/IEC 14443 Type A/B, ISO/IEC 15693, ISO/IEC 18000-63). The host operating system means the specific build number (Windows 11 24H2, Ubuntu 22.04 LTS, Android 13, iPadOS 17), and the SDK language means what the production application uses (.NET 6, Java 17, Python 3.11, Swift 5). A reader that cannot read the credential, install on the OS, or integrate with the codebase is useless regardless of price. Pick the reader that matches those three filters first, then compare cost and form factor among the survivors."
     },
     {
       "question": "When does a reader shortlist go wrong most often?",
@@ -254,7 +272,7 @@
     },
     {
       "question": "What should the proof-of-workflow pilot measure?",
-      "answer": "End-to-end integration with production software, per-operation latency at the 50th / 90th / 99th percentile across 500-1,000 real operations, SDK integration effort measured in developer-days, behaviour under failure modes (driver reinstall after Windows Feature Update, Bluetooth reconnect after phone sleep, low-battery drop on handhelds, firmware update mid-pilot), and read reliability on the exact target OS build and hardware. Read-distance benchmarking is the easy part; integration, failure-mode resilience and long-tail reliability are where reader projects actually fail."
+      "answer": "Five things: production-software integration, latency percentiles, SDK effort in developer-days, failure-mode behaviour and reliability on the target hardware. Measure end-to-end integration with production software and per-operation latency at the 50th / 90th / 99th percentile across 500-1,000 real operations. Measure SDK integration effort in developer-days, behaviour under failure modes (driver reinstall after Windows Feature Update, Bluetooth reconnect after phone sleep, low-battery drop on handhelds, firmware update mid-pilot), and read reliability on the exact target OS build and hardware. Read-distance benchmarking is the easy part; integration, failure-mode resilience and long-tail reliability are where reader projects actually fail."
     },
     {
       "question": "Is the Impinj R720 still a current procurement option?",

@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "Programming NFC Tags with iPhone — Core NFC Guide",
   "kicker": "NFC Programming iPhone",
-  "summary": "A practical guide to programming NFC tags with iPhone. Covering both consumer workflows (free App Store apps for URL, Wi-Fi, vCard and Shortcut encoding) and iOS developer workflows (the Core NFC framework, NFCTagReaderSession, NFCNDEFReaderSession, entitlements, background tag detection, Apple Wallet passes, NDEF URL integration and the Apple CardSession host card emulation surface introduced in iOS 17.4). This page details iPhone NFC hardware compatibility, the iOS Core NFC evolution from read-only in iOS 11 through full read/write in iOS 13 (the same release that added background NDEF URL detection on iPhone XS / XR / 11 and later), iOS 17.4 / 18 HCE for in-app contactless payments and tap-to-enter, the common NDEF record types, the Shortcuts automation that lets every iPhone user build NFC-triggered workflows without coding, and the Proud Tek NFC products tested on iOS devices from iPhone 7 through the latest generation.",
+  "summary": "Programming NFC tags with iPhone takes no code: every iPhone from the XS and XR onward writes NDEF on iOS 13+ with free App Store apps. Reading is broader still: background NDEF URL detection needs no app at all on XS and later. This guide covers the model-by-model compatibility matrix, Shortcuts automation, the Core NFC developer path (NFCNDEFReaderSession, NFCTagReaderSession, entitlements) and the iOS 17.4 CardSession HCE surface.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T11:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -27,6 +27,24 @@
   "imageSourceRoutes": [
     "/products/rfid-labels/ntag213-nfc-sticker/",
     "/products/rfid-labels/ntag216-nfc-sticker/"
+  ],
+  "brief": [
+    {
+      "label": "Write compatibility",
+      "text": "iPhone XS / XR and every later model write NFC tags on iOS 13+; iPhone 7, 8 and X are read-only inside apps; iPhone 6 and earlier have no third-party NFC."
+    },
+    {
+      "label": "No code required",
+      "text": "Free App Store apps — NFC Tools, NXP TagWriter, Simply NFC — handle NDEF encoding, antenna positioning and verification; hold the top third of the iPhone's back 1-2 mm over the tag for 2-3 seconds."
+    },
+    {
+      "label": "Chip picks",
+      "text": "NTAG 213 is the default for URLs; NTAG 215/216 for longer content; NTAG 424 DNA for per-tap cryptographic authentication. MIFARE Classic is not iPhone-accessible — migrate to NTAG or DESFire."
+    },
+    {
+      "label": "Capability timeline",
+      "text": "iOS 11 read-only in apps; iOS 13 full read/write plus background URL detection; iOS 14 App Clip taps; iOS 17.4 CardSession HCE in the EEA, expanded by iOS 18.1."
+    }
   ],
   "sections": [
     {
@@ -202,7 +220,7 @@
   "faq": [
     {
       "question": "Which iPhone models can write to NFC tags?",
-      "answer": "iPhone XS, iPhone XR, and every subsequent model (iPhone 11, 12, 13, 14, 15, 16 series and beyond) can write to NFC tags when running iOS 13 or later. iPhone 7, 8, and X can read NFC tags (via apps and background NDEF URL detection) but cannot write to them. iPhone 6 and earlier have no NFC capability. For a new NFC programme in 2026, you can assume the overwhelming majority of iPhone users are on iPhone XS or later and can both read and write tags."
+      "answer": "Every iPhone from the XS and XR onward writes NFC tags on iOS 13 or later. That includes the iPhone 11, 12, 13, 14, 15 and 16 series and beyond. Older models split: iPhone 7, 8, and X can read NFC tags (via apps and background NDEF URL detection) but cannot write to them, and iPhone 6 and earlier have no NFC capability. For a new NFC programme in 2026, you can assume the overwhelming majority of iPhone users are on iPhone XS or later and can both read and write tags."
     },
     {
       "question": "Do I need a developer account or coding skills to program NFC tags with iPhone?",
@@ -218,7 +236,7 @@
     },
     {
       "question": "How does iPhone background NDEF URL detection work?",
-      "answer": "Background NDEF URL detection was introduced with iOS 13 on iPhone XS, XS Max, XR and every later model (iPhone 11 / 12 / 13 / 14 / 15 / 16 series) — see Apple's 'Adding Support for Background Tag Reading' developer documentation. iPhone 7, 8 and X have NFC hardware but lack the system-level background reading capability. On supported devices, when the phone is awake (screen on) and unlocked, iOS continuously listens for NFC tags carrying NDEF URL records; on detection it displays a notification banner with the URL. Tapping the notification opens the URL in Safari, or triggers a Universal Link to deep-link into the installed app. No app needs to be open. The URL must be a standard https/http web URL; non-URL NDEF records (text, vCard, raw MIME) do not surface a background notification. This is the mechanism behind most consumer NFC experiences on iPhone — restaurant menus, smart posters, product authentication, hotel-room engagement and Apple Wallet pass distribution."
+      "answer": "When an awake, unlocked iPhone XS or later nears an NDEF URL tag, iOS surfaces a notification banner. Background detection was introduced with iOS 13 on iPhone XS, XS Max, XR and every later model (iPhone 11 / 12 / 13 / 14 / 15 / 16 series) — see Apple's 'Adding Support for Background Tag Reading' developer documentation. Older iPhone 7, 8 and X have NFC hardware but lack the system-level background reading capability. On supported devices, when the phone is awake (screen on) and unlocked, iOS continuously listens for NFC tags carrying NDEF URL records; on detection it displays a notification banner with the URL. Tapping the notification opens the URL in Safari, or triggers a Universal Link to deep-link into the installed app. No app needs to be open. The URL must be a standard https/http web URL; non-URL NDEF records (text, vCard, raw MIME) do not surface a background notification. This is the mechanism behind most consumer NFC experiences on iPhone — restaurant menus, smart posters, product authentication, hotel-room engagement and Apple Wallet pass distribution."
     },
     {
       "question": "Can iPhone act as an NFC card and emulate a contactless credential to a reader?",
