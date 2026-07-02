@@ -42,7 +42,34 @@ export function truncateText(value: string, maxLength: number): string {
     return value;
   }
 
-  const slice = value.slice(0, maxLength - 3);
+  const budget = maxLength - 3;
+  const slice = value.slice(0, budget);
+
+  // Prefer ending on a complete sentence when one falls in the back half of
+  // the budget — a shorter complete thought reads better in SERP/AI snippets
+  // than a longer cut-off one, and needs no ellipsis (2026-07-02: 204/315
+  // commercial pages had their meta description cut mid-clause).
+  const sentenceEnd = Math.max(
+    slice.lastIndexOf(". "),
+    slice.lastIndexOf("! "),
+    slice.lastIndexOf("? "),
+  );
+  if (sentenceEnd > budget * 0.55) {
+    return slice.slice(0, sentenceEnd + 1);
+  }
+
+  // Next best: a clause boundary (still ellipsised — thought is incomplete,
+  // but the cut lands somewhere a reader expects a pause).
+  const clauseEnd = Math.max(
+    slice.lastIndexOf("; "),
+    slice.lastIndexOf(" — "),
+    slice.lastIndexOf(": "),
+    slice.lastIndexOf(", "),
+  );
+  if (clauseEnd > budget * 0.6) {
+    return `${slice.slice(0, clauseEnd)}...`;
+  }
+
   const boundary = slice.lastIndexOf(" ");
 
   return `${slice.slice(0, boundary > 60 ? boundary : slice.length)}...`;
