@@ -91,8 +91,14 @@ function auditPage(file, d) {
       warn("SEO_DESC_CLAUSE_CUT", "meta description ends on a clause (ellipsis), not a complete sentence — front-load a short first sentence", 1);
   }
 
-  if (!d.keywords?.length) warn("SEO_NO_KEYWORDS", "keywords[] empty", 1);
-  if (!(d.sources?.length >= 3)) warn("SEO_FEW_SOURCES", `only ${d.sources?.length ?? 0} sources (citation discipline target ≥3)`, 2);
+  // Group-aware gates (2026-07-02): blog posts keep citations as body
+  // links (→ articleSourceLinks → Article.citation[] in JSON-LD), never in
+  // sources[]; keywords[] is likewise absent by schema convention across
+  // all 125 posts. Flagging either would mark the whole group — a
+  // convention, not 125 defects.
+  const isBlog = d.group === "blog";
+  if (!isBlog && !d.keywords?.length) warn("SEO_NO_KEYWORDS", "keywords[] empty", 1);
+  if (!isBlog && !(d.sources?.length >= 3)) warn("SEO_FEW_SOURCES", `only ${d.sources?.length ?? 0} sources (citation discipline target ≥3)`, 2);
 
   // Freshness — the "3-month citation cliff" (GEO plan §5).
   const mod = d.modifiedAt || d.publishedAt;
@@ -124,8 +130,11 @@ function auditPage(file, d) {
     warn("GEO_LOW_STAT_DENSITY", `${Math.round(numericShare * 100)}% of paragraphs/bullets carry a number (P1-3 target ≥50%)`, 2);
 
   // Key-takeaways block (P1-5): brief fields feed the At-a-glance snapshot.
+  // Blog exempt: article-format snapshot intentionally falls back to
+  // heroPoints[0] + first-section summary (buildDecisionSnapshotCards);
+  // procurement-style brief fields are a commercial-page convention.
   const briefN = d.brief?.length ?? 0;
-  if (d.group !== "compare" && briefN < 2)
+  if (d.group !== "compare" && !isBlog && briefN < 2)
     warn("GEO_NO_SNAPSHOT", `brief has ${briefN} fields — At-a-glance snapshot renders thin/empty (P1-5)`, 3);
 
   const faqN = d.faq?.length ?? 0;
