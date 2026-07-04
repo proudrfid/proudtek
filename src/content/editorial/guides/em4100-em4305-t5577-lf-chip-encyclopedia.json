@@ -3,7 +3,7 @@
   "group": "guides",
   "title": "{chip:em-microelectronic-em4100:short_name} / {chip:em-microelectronic-em4305:short_name} / {chip:atmel-t5577:name} — LF 125 kHz Chip Technical Encyclopedia (Read-Only, Writable, Emulator)",
   "kicker": "{chip:em-microelectronic-em4100:name} / {chip:em-microelectronic-em4305:short_name} / Atmel {chip:atmel-t5577:name} Reference",
-  "summary": "The 125 kHz LF (low-frequency) RFID chip family is the bedrock of legacy access control. Hotels, buildings, gates, car-park systems, pet microchips, and livestock tagging. {chip:em-microelectronic-em4100:short_name} is the read-only, Manchester-encoded 40-bit-ID reference chip shipping since the early 1990s. {chip:em-microelectronic-em4305:short_name} is its writable EEPROM cousin, still carrying the same air-interface compatibility. {chip:atmel-t5577:name} (originally Atmel, now part of Microchip) is the programmable 'universal LF emulator' that can be configured to impersonate {chip:em-microelectronic-em4100:short_name}, HID Prox, Indala, ioProx, AWID, and a dozen other proprietary LF formats. Together they cover the vast majority of deployed LF credentials worldwide.",
+  "summary": "The 125 kHz LF RFID chip family — read-only {chip:em-microelectronic-em4100:short_name}, writable {chip:em-microelectronic-em4305:short_name}, programmable {chip:atmel-t5577:name} — is the bedrock of legacy access control. {chip:em-microelectronic-em4100:short_name} is the read-only, Manchester-encoded 40-bit-ID reference chip shipping since the early 1990s; {chip:em-microelectronic-em4305:short_name} is its writable 512-bit-EEPROM sibling with optional 32-bit password protection and a 134.2 kHz animal-ID mode. {chip:atmel-t5577:name} is the programmable universal emulator that can impersonate {chip:em-microelectronic-em4100:short_name}, HID Prox, Indala, ioProx, AWID and other proprietary LF formats.",
   "heroPoints": [
     "125 kHz LF: inductively-coupled RFID operating at the unlicensed LF ISM band. Short read range (2-10 cm depending on form factor), robust against water, human tissue, and most non-ferrous materials. Not suitable for metal surfaces without a ferrite backing because the inductive field cancels at a conductive surface. No meaningful crypto on any of these chips; LF security depends entirely on the downstream backend. An attacker with ~€100 of Proxmark3 hardware can clone any LF credential in field-read range in minutes, so LF is a 'convenience token' technology rather than a security technology.",
     "{chip:em-microelectronic-em4100:short_name} vs {chip:em-microelectronic-em4305:short_name} vs {chip:atmel-t5577:name} — {chip:em-microelectronic-em4100:short_name} is read-only, factory-mask-programmed, 40-bit ID, EM/H2/H3 Manchester-encoded, ~€0.04-0.06 at 100k volume. {chip:em-microelectronic-em4305:short_name} is EEPROM-writable (512 bits user memory) while keeping {chip:em-microelectronic-em4100:short_name} air-interface compatibility, with optional 32-bit password protection and 134.2 kHz mode for ISO 11784/11785 animal-ID compliance, ~€0.08-0.12 at 100k volume. {chip:atmel-t5577:name} is the programmable 'universal LF emulator'. Configurable via 7 × 32-bit memory blocks plus a config-word register to emulate {chip:em-microelectronic-em4100:short_name}, HID Prox H10301 (26-bit), Indala ASP and LogE, ioProx (Kantech), AWID, HITAG 1, and most other common LF protocols, ~€0.10-0.15 at 100k volume.",
@@ -27,10 +27,28 @@
     "LF access control"
   ],
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-05-10",
+  "modifiedAt": "2026-07-02",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
+  "brief": [
+    {
+      "label": "Three-chip family",
+      "text": "EM4100 is the read-only, factory-programmed 40-bit-ID reference; EM4305 adds a writable 512-bit EEPROM, optional 32-bit password and a 134.2 kHz animal-ID mode; T5577 is the programmable emulator with 7 × 32-bit blocks plus a config word."
+    },
+    {
+      "label": "Read range by form factor",
+      "text": "Near-field coupling at 125 kHz gives 2-10 cm: 8-10 cm for an ID-1 card on a quality reader, 4-6 cm for a keyfob, 1-2 cm for a glass tag — field strength decays as 1/r³."
+    },
+    {
+      "label": "No cryptography",
+      "text": "None of these chips authenticates; each broadcasts its ID whenever it is in a reader's field. A ~€300 Proxmark3 or ~€170 Flipper Zero can clone the card in seconds, so LF is a convenience token, not a security technology."
+    },
+    {
+      "label": "Cost at 100k volume",
+      "text": "EM4100 runs ~€0.04-0.06 per chip, EM4305 ~€0.08-0.12 and T5577 ~€0.10-0.15; an HF AES migration budgets US$5-15 per credential plus reader-fleet refresh capex."
+    }
+  ],
   "sections": [
     {
       "title": "Family and part numbers",

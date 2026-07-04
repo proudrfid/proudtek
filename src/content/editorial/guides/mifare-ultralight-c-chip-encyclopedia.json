@@ -3,7 +3,7 @@
   "group": "guides",
   "title": "MIFARE Ultralight C — HF Chip Encyclopedia",
   "kicker": "MIFARE Ultralight C (MF0ICU2) / Ultralight EV1 / Ultralight Nano Reference",
-  "summary": "MIFARE Ultralight C (NXP MF0ICU2) is the low-cost, paper-ticket-oriented HF 13.56 MHz chip that brought triple-DES authentication to single-use and short-life credentials. Shipping since 2008, it extends the original Ultralight architecture with 144 bytes of user memory, 3DES mutual authentication (16-byte key, based on NIST SP 800-67 Triple DES), a one-way 24-bit counter for event-ticket validation, and the ISO 14443-A Part 3 layer. Used in event tickets, transport single-ride tickets, limited-edition gift cards, and any application where a paper-substrate HF chip with tamper-resistant authentication is needed.",
+  "summary": "MIFARE Ultralight C (MF0ICU2) is a 13.56 MHz paper-ticket chip with 144 bytes of user memory, 3DES authentication and a one-way 24-bit counter. Shipping since 2008, it brought triple-DES mutual authentication (16-byte key, NIST SP 800-67) to single-use and short-life credentials on the ISO 14443-A Part 3 layer. Used in event tickets, transit single-ride tickets, and limited-edition gift cards where paper-substrate tamper resistance matters.",
   "heroPoints": [
     "Paper-first form factor. The Ultralight family is the standard chip for printed event tickets, transit single-rides, and NFC business cards printed on paper/PVC. Ultralight C adds 3DES to the mix: 48 bytes more user memory than the original Ultralight (144 bytes total user), plus a proper cryptographic auth handshake based on two-message nonce-exchange that makes cloning meaningfully harder than raw Ultralight. At 1M-unit volume, paper-antenna Ultralight C inlays converted into event tickets land at US$0.10-0.18 each versus US$0.06-0.09 for baseline Ultralight, which is the cost-of-crypto delta event operators pay to reduce opportunistic counterfeiting.",
     "3DES mutual authentication — 16-byte (112-bit effective) key authenticated via a two-step challenge/response. NIST SP 800-67 Rev. 2 compliant Triple-DES with the 3-key TDEA-EDE3 variant (Encrypt-Decrypt-Encrypt with three independent 56-bit keys). Not as strong as AES-128 (NIST SP 800-131A deprecates 3DES for new US-government systems as of 2024 but permits legacy interoperability through 2030), but considerably stronger than Classic's broken CRYPTO1 and the original Ultralight's UID-only binding. Adequate for short-validity event tickets where the ticket ages out before any practical cryptanalysis is economic.",
@@ -27,10 +27,28 @@
     "ISO 14443-A"
   ],
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-02",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
+  "brief": [
+    {
+      "label": "Memory and counter",
+      "text": "192 bytes total EEPROM in 48 × 4-byte pages, 144 bytes user-writable (pages 4-39); plus a hardware one-way 24-bit counter (max ~16.7M) that no command can decrement or reset."
+    },
+    {
+      "label": "3DES, honestly scoped",
+      "text": "16-byte key, 112-bit effective security per NIST SP 800-67; deprecated for new US-government systems as of 2024 but permitted for legacy interoperability through 2030. Strong enough for tickets that expire before cryptanalysis pays."
+    },
+    {
+      "label": "Cost of crypto",
+      "text": "At 1M-unit volume, paper-antenna Ultralight C inlays land at US$0.10-0.18 each versus US$0.06-0.09 for baseline Ultralight — the delta event operators pay to deter opportunistic counterfeiting."
+    },
+    {
+      "label": "Watch the write endurance",
+      "text": "10,000 write cycles per page, roughly 10× less than Classic, NTAG21x or Ultralight EV1 (all 100k cycles). Fine for a ticket written once at issuance; wrong for frequently-written credentials."
+    }
+  ],
   "sections": [
     {
       "title": "Family and part numbers",

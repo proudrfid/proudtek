@@ -3,7 +3,7 @@
   "group": "guides",
   "title": "MIFARE Classic 1K / 4K — HF Chip Encyclopedia",
   "kicker": "MIFARE Classic 1K (MF1S50) / Classic 4K (MF1S70) Reference",
-  "summary": "The legacy 13.56 MHz access-control chip is the HF 13.56 MHz chip that defined the first two decades of contactless access control. Shipping in volume since 1996, the 1K (MF1S50) and 4K (MF1S70) variants use the proprietary CRYPTO1 stream cipher, a sector-based memory model with per-sector key-A / key-B authentication, and the ISO 14443-A Part 3 anti-collision/UID layer. CRYPTO1 has been publicly broken since 2008, so Classic is no longer appropriate for new greenfield security-critical deployments. But the installed base is enormous (hotels, transit, corporate access) and Classic remains the reference HF chip for low-cost loyalty, membership, and legacy-reader compatibility programs.",
+  "summary": "MIFARE Classic 1K (MF1S50) is a 13.56 MHz ISO 14443-A chip with 1,024 bytes of EEPROM in 16 sectors; the 4K (MF1S70) holds 4,096 bytes. Both use the proprietary CRYPTO1 stream cipher with 48-bit keys and per-sector Key A/Key B authentication. CRYPTO1 has been publicly broken since 2008, so Classic is wrong for new security-critical deployments; it survives on its enormous installed base — hotels, transit, student ID — and legacy-reader compatibility.",
   "heroPoints": [
     "Sector-and-block memory architecture — 1K = 16 sectors × 4 blocks × 16 bytes (1024 bytes total); 4K = 32 small sectors + 8 large sectors (4096 bytes total). Every sector's last block is the Sector Trailer containing Key A, access bits, Key B. This per-sector key separation is Classic's killer feature for multi-application cards.",
     "CRYPTO1 stream cipher — 48-bit key authenticated via a 3-pass nested-authentication handshake. Publicly cryptanalyzed since 2008 (Nohl / Plötz / Starbug). Nested / hardnested / darkside attacks recover keys in seconds to minutes on commodity hardware. Hence the migration path to MIFARE Plus / DESFire EV3 for any deployment where card cloning has a meaningful cost.",
@@ -27,10 +27,28 @@
     "ISO 14443-A"
   ],
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-02",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
+  "brief": [
+    {
+      "label": "Memory at a glance",
+      "text": "1K (MF1S50): 1,024 bytes as 16 sectors × 4 blocks × 16 bytes. 4K (MF1S70): 4,096 bytes as 32 small sectors plus 8 large 16-block sectors. Every sector's last block is the trailer holding Key A, access bits, Key B."
+    },
+    {
+      "label": "CRYPTO1 is broken",
+      "text": "The 48-bit stream cipher has been publicly cryptanalyzed since 2008; darkside recovers a key from a default-keyed card in 30-90 seconds on a Proxmark3 RDV4, and a full card dump takes under 15 minutes."
+    },
+    {
+      "label": "Migration path",
+      "text": "MIFARE Plus EV2 in SL1 mode is byte-for-byte CRYPTO1-compatible, so card fleets swap first and readers upgrade to AES-128 SL3 later; DESFire EV3 is the greenfield choice. NXP AN1305 documents the recipe."
+    },
+    {
+      "label": "Where it still fits",
+      "text": "Legacy hotel locks, student ID, loyalty stamp counters and festival wristbands where a cloned card costs little. Authentic silicon answers SAK 0x08 (1K) or 0x18 (4K) with ATQA 0x0004 / 0x0002."
+    }
+  ],
   "sections": [
     {
       "title": "Family and part numbers",

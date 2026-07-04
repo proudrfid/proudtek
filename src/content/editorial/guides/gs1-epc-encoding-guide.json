@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "GS1 EPC Encoding Guide — SGTIN-96 and SSCC-96",
   "kicker": "GS1 EPC Encoding Handbook",
-  "summary": "A buyer's and integrator's handbook for GS1 Electronic Product Code (EPC) encoding on UHF RFID tags, current to GS1 TDS 2.3 (October 2025). This page covers GS1 organization governance and Company Prefix acquisition, the Tag Data Standard (TDS) family of encoding schemes (SGTIN-96 for serialized GTINs, SSCC-96 for shipping container codes, GRAI-96 for returnable assets, GIAI-96 for fixed assets, SGLN-96 for location identifiers, plus the TDS 2.x EPC+ inline-AIDC and DSGTIN+ date-prioritised additions), the bit-level memory layout of the EPC memory bank, partition tables that map Company Prefix length to encoding width, filter-value semantics, alignment with EPCIS 2.0 for event-driven supply-chain visibility, the new TDS 2.3 web-native encoding family that maps directly to GS1 Digital Link Web URIs, and the Proud Tek production-line pre-encoding workflow that delivers ready-to-apply GS1-compliant tags with per-tag TID-to-EPC mapping files.",
+  "summary": "GS1 EPC encoding maps GS1 keys (GTIN, SSCC, GRAI, GIAI, SGLN) into the 96-bit EPC memory bank per Tag Data Standard 2.3 (October 2025). SGTIN-96 splits its 96 bits into an 8-bit header, 3-bit filter, 3-bit partition, Company Prefix, Item Reference and a 38-bit serial; the partition (0-6) matches Company Prefix length. Proud Tek pre-encoding ships 25-100 tag samples in 5-7 business days, then read-verified production runs with a per-tag TID-to-EPC mapping file.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
@@ -27,6 +27,24 @@
   "imageSourceRoutes": [
     "/products/rfid-labels/uhf-rfid-inlay/",
     "/products/rfid-labels/impinj-m700-uhf-inlay/"
+  ],
+  "brief": [
+    {
+      "label": "Five encoding schemes",
+      "text": "SGTIN-96 serializes GTINs for item-level retail and pharmaceutical tracking; SSCC-96 identifies shipping containers and pallets; GRAI-96 tracks returnable assets; GIAI-96 covers fixed assets; SGLN-96 identifies locations. All fit the 96-bit EPC memory bank."
+    },
+    {
+      "label": "Partition and filter",
+      "text": "The 3-bit partition value (0-6) maps Company Prefix length to bit width — a 9-digit prefix means partition 3, a 7-digit prefix partition 5. Filter value 1 marks point-of-sale items, 2 full cases; retailers validate both at receiving."
+    },
+    {
+      "label": "Serial strategy",
+      "text": "The 38-bit serial gives about 2.74 x 10^11 values per GTIN. Sequential serials are simple but predictable; randomized serials defeat counterfeit prediction and hide production volumes — Walmart and Target apparel programmes typically use randomized."
+    },
+    {
+      "label": "Factory pre-encoding",
+      "text": "Proud Tek programs Company Prefix, partition, filter and serial per tag during label manufacturing, read-verifies every tag, and ships a 25-100 tag sample in 5-7 business days; each batch includes a TID-to-EPC CSV/JSON mapping file."
+    }
   ],
   "sections": [
     {
@@ -228,7 +246,7 @@
     },
     {
       "question": "What data does Proud Tek provide after production to integrate with our WMS or EPCIS?",
-      "answer": "Each production batch ships with a TID-to-EPC mapping file in CSV or JSON format, listing for every encoded tag: the TID (unique chip hardware identifier assigned by the chip manufacturer, 96-bit hex), the encoded EPC hex value, the decoded human-readable GTIN, decoded serial number, filter value, partition value, encoded User memory content (if any), and encoding-verification status. The file is structured for direct import into WMS systems, EPCIS repositories (as OBJECT-event captures), serialization management platforms (Tracelink, rfXcel, SAP ATTP) and ERP systems. For customers with specific import requirements (custom column names, EPCIS XML event format, trading-partner specific CSV layouts), we match the delivery format to the target system during the order setup phase."
+      "answer": "A per-tag TID-to-EPC mapping file in CSV or JSON, ready for WMS, EPCIS or ERP import. Each production batch ships with a TID-to-EPC mapping file in CSV or JSON format, listing for every encoded tag: the TID (unique chip hardware identifier assigned by the chip manufacturer, 96-bit hex), the encoded EPC hex value, the decoded human-readable GTIN, decoded serial number, filter value, partition value, encoded User memory content (if any), and encoding-verification status. The file is structured for direct import into WMS systems, EPCIS repositories (as OBJECT-event captures), serialization management platforms (Tracelink, rfXcel, SAP ATTP) and ERP systems. For customers with specific import requirements (custom column names, EPCIS XML event format, trading-partner specific CSV layouts), we match the delivery format to the target system during the order setup phase."
     }
   ],
   "sources": [

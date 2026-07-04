@@ -3,7 +3,7 @@
   "group": "guides",
   "title": "NTAG424 DNA SUN + CMAC Authentication",
   "kicker": "NTAG424 DNA Authentication Guide",
-  "summary": "NTAG424 DNA (NT4H2421Gx / NT4H2421Tx) is NXP's flagship authentication NFC chip, combining ISO/IEC 14443-4 compliance, AES-128 cryptography and the Secure Unique NFC (SUN) message feature that generates a different, cryptographically signed URL on every single tap. Combined with CMAC (Cipher-based Message Authentication Code) verification, NTAG424 DNA is the technology that powers anti-counterfeit tags for luxury goods, EU Digital Product Passport implementations, tamper-evident seals and cryptographic brand-authentication campaigns. This encyclopedia documents the chip's architecture, memory layout, SUN/CMAC message format, key management, backend verification flow, and the specific commercial deployments where it is the correct engineering choice.",
+  "summary": "NTAG424 DNA is NXP's AES-128 authentication NFC chip: 416 bytes of user memory, ISO/IEC 14443-4, and a SUN message that signs a fresh URL every tap. Each URL embeds the 7-byte UID, a 24-bit monotonic read counter and a truncated AES-CMAC, so a photographed or cloned URL fails server-side verification. It powers anti-counterfeit tags for luxury goods, EU Digital Product Passport programmes, tamper-evident seals (TT variant) and brand authentication.",
   "heroPoints": [
     "Secure Unique NFC (SUN). Every tap generates a different URL containing the tag's UID, a monotonically incrementing read counter and a CMAC signature over both, making replay attacks mathematically infeasible even if a counterfeiter photographs or clones the printed QR/URL.",
     "{chip:nxp-ntag-424-dna:crypto.algorithm} cryptography — the chip ships with three independent 128-bit AES keys (Application Master, Data Encryption, MAC) used to derive session keys per read, enabling authenticated encryption and integrity verification without exposing the master key to the NFC interface.",
@@ -26,10 +26,28 @@
     "EU Digital Product Passport NFC"
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2026-06-11T11:00:00Z",
+  "modifiedAt": "2026-07-02",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
+  "brief": [
+    {
+      "label": "How SUN works",
+      "text": "Each tap increments a 24-bit counter, derives a session key from the SDMMACKey per NIST SP 800-38B, and mirrors UID, counter and an 8-byte truncated CMAC into the URL. Replays fail because the counter only moves forward."
+    },
+    {
+      "label": "Keys and memory",
+      "text": "416 bytes of user memory in three ISO 7816-4 files; three AES-128 application keys (AppKey0 master, AppKey1 SDMMACKey, AppKey2 SDMEncKey) plus a PICC-level key. Production deployments diversify per-tag keys from an HSM-held master key."
+    },
+    {
+      "label": "Phones need no app",
+      "text": "iOS 11+ opens the SUN URL via background NDEF reading; Android 4.4+ does the same through the native NFC handler. All cryptographic verification happens server-side, with 200-600 ms round trips."
+    },
+    {
+      "label": "Where it earns its cost",
+      "text": "Chips run US$0.18-0.28 at 100 K volume versus ~US$0.04-0.08 for NTAG213, so specify DNA where anti-counterfeit value per unit exceeds ~$5 retail: luxury goods, battery passports (TT tamper flag), pharma, refill programmes."
+    }
+  ],
   "sections": [
     {
       "title": "Chip family and part numbers",

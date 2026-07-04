@@ -3,9 +3,9 @@
   "group": "guides",
   "title": "UHF RFID Reader API Guide — LLRP and Vendor SDKs",
   "kicker": "UHF RFID Reader API",
-  "summary": "A system integrator's guide to UHF RFID reader APIs, protocols and SDK ecosystems. This page covers the LLRP protocol stack (EPCglobal / ISO 24791-5), vendor SDKs (Impinj Octane/ETK, Zebra Reader SDK and DataCapture DNA, ThingMagic Mercury API, Alien Gateway, Chainway / Zebex / Chafon serial protocols), event-driven versus polling integration patterns, MQTT/Kafka streaming, WebSocket bridges, filtered reads, GPIO orchestration for material-handling automation, security and network hardening, and tag-encoding compatibility. Written for enterprise developers, automation engineers and integration consultants deploying fixed and handheld UHF RFID readers at scale.",
+  "summary": "UHF RFID reader APIs stack in three tiers: standard LLRP (ISO 24791-5, TCP port 5084), vendor SDKs, and REST/MQTT on smart readers. Vendor SDKs — Impinj Octane/ETK, Zebra Reader SDK, ThingMagic Mercury API, Alien Gateway — wrap LLRP with higher-level abstractions. Modern Gen2 readers inventory 500-1500 unique tags per second, so the integration pattern — polling, event-driven callbacks, filtered reads, MQTT/Kafka streaming — decides latency and throughput.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-02",
   "reviewedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
@@ -33,6 +33,24 @@
   "imageSourceRoutes": [
     "/products/rfid-labels/uhf-rfid-inlay/",
     "/products/rfid-labels/impinj-m700-uhf-inlay/"
+  ],
+  "brief": [
+    {
+      "label": "Three integration tiers",
+      "text": "LLRP (EPCglobal / ISO 24791-5, binary over TCP port 5084) for vendor-neutral portability; vendor SDKs (Impinj Octane/ETK, Zebra Reader SDK, ThingMagic Mercury API) for richer abstractions; REST/MQTT on modern smart readers for cloud-native builds."
+    },
+    {
+      "label": "Pick the pattern first",
+      "text": "Polling suits cycle counts; event-driven callbacks are required for dock-door portals, which can emit 500-2000 tag events in 5-10 seconds; reader-side EPC-mask filters and MQTT/Kafka fan-out keep pipelines tractable at scale."
+    },
+    {
+      "label": "Throughput reality",
+      "text": "Modern Gen2 readers inventory 500-1500 unique tags per second; the downstream application, not the air interface, is usually the bottleneck, so size queues and backpressure for 10-100x burst rates."
+    },
+    {
+      "label": "Harden before go-live",
+      "text": "Dedicated VLANs, LLRP-over-TLS (port 5085 where supported), MQTT-over-TLS with client certificates, changed default credentials, staged firmware rollouts; R700 ETSI customers need firmware 9.0.1+ for EU RED compliance (effective 2025-08-01)."
+    }
   ],
   "sections": [
     {
@@ -223,7 +241,7 @@
     },
     {
       "question": "What SDK do I use for Impinj smart readers (R700)?",
-      "answer": "Impinj smart readers run a Linux-based platform with three integration paths: Impinj Octane SDK (traditional, backward-compatible with Speedway/R-series programmes), Impinj ETK (Embedded Development Kit, for on-reader applications that consume tag data locally and publish processed events upstream), and the native REST + MQTT API (for cloud-native architectures where the reader is treated as a REST/MQTT endpoint). For new projects, the REST+MQTT approach is increasingly preferred because it decouples application logic from the reader firmware version and fits naturally into IoT and cloud architectures. ETK is useful for edge-processing patterns; Octane remains relevant for programmes migrating from older Speedway deployments. The Impinj R720 has reached end-of-life per Impinj's published customer notification — new and replacement deployments should standardise on the R700 series, which the upgraded R700 hardware enhanced with a dual-core 1 GHz 64-bit ARM A53 processor and 64-bit Linux 6.6 OS to support richer edge applications."
+      "answer": "Three paths: Impinj Octane SDK, Impinj ETK, or the native REST + MQTT API — REST+MQTT for new projects. Impinj smart readers run a Linux-based platform: Octane is the traditional SDK, backward-compatible with Speedway/R-series programmes; ETK (Embedded Development Kit) serves on-reader applications that consume tag data locally and publish processed events upstream; the native REST + MQTT API fits cloud-native architectures where the reader is treated as a REST/MQTT endpoint. The REST+MQTT approach is increasingly preferred because it decouples application logic from the reader firmware version and fits naturally into IoT and cloud architectures. ETK is useful for edge-processing patterns; Octane remains relevant for programmes migrating from older Speedway deployments. The Impinj R720 has reached end-of-life per Impinj's published customer notification — new and replacement deployments should standardise on the R700 series, which the upgraded R700 hardware enhanced with a dual-core 1 GHz 64-bit ARM A53 processor and 64-bit Linux 6.6 OS to support richer edge applications."
     },
     {
       "question": "How does MQTT-based RFID integration differ from LLRP-based integration?",

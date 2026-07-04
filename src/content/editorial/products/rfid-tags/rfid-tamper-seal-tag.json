@@ -3,7 +3,7 @@
   "group": "products",
   "title": "RFID Tamper-Evident Seal Tags — Cargo Audit Trail",
   "kicker": "Supply Chain Security",
-  "summary": "RFID tamper-evident seal tags combine physical tamper detection with RFID digital identification for securing shipping containers, cargo doors, pharmaceutical pallets and high-value asset enclosures. Break the seal and the tamper event is permanently recorded. Both physically visible and digitally logged.",
+  "summary": "RFID tamper-evident seal tags combine physical tamper evidence with an irreversible OTP tamper flag, read at 2-5 m by UHF portals. Break the seal and the tamper event is permanently recorded. ISO 17712 High Security (H) bolt and Security (S) cable seals secure shipping containers, cargo doors, pharmaceutical pallets and high-value asset enclosures. Both physically visible and digitally logged.",
   "keywords": [
     "RFID tamper-evident seal tag",
     "ISO 17712 high-security RFID seal",
@@ -100,7 +100,7 @@
       },
       "bullets": [
         "Port security teams manually inspecting container seals at gate-in and gate-out are limited to visual inspection of the seal number. A process that takes 60–90 seconds per container and cannot scale to verify 500–2,000 container movements per day without creating dangerous gate queues.",
-        "Pharmaceutical GDP (Good Distribution Practice) auditors require documented chain of custody showing the exact time and location of any seal break on drug shipment pallets. Traditional physical seals provide no electronic tamper record, forcing manual log sheets that can be falsified.",
+        "Pharmaceutical GDP (Good Distribution Practice) auditors working to 2013/C 343/01 §9.2 require documented chain of custody showing the exact time and location of any seal break on drug shipment pallets. Traditional physical seals provide no electronic tamper record, forcing manual log sheets that can be falsified.",
         "Logistics security managers using standard ISO 17712 mechanical seals have no way to remotely verify seal status between checkpoint inspections. A container can be compromised hours before the next manual inspection with no alert generated.",
         "Cash-in-transit operators and ATM service companies need seals that generate an immutable digital tamper record that cannot be reset or cleared even if the physical breach is repaired. Standard electronic seals with resettable status flags can be manipulated by a knowledgeable insider.",
         "Import compliance teams filing C-TPAT documentation need a verifiable electronic audit trail linking each seal's physical break status to a timestamped RFID read log. Manual seal number transcription creates audit gaps that CBP officers flag during security reviews."
@@ -130,8 +130,8 @@
         "Dual tamper evidence: physical breakage visible to any inspector AND an irreversible tamper flag stored in one-time-programmable (OTP) chip memory that cannot be cleared or reset even after physical repair of the antenna loop. Eliminates insider manipulation of electronic status.",
         "UHF RFID (860–960 MHz) enables automated seal verification at gate checkpoints from 2–5 meters — portal readers identify and log seal/tamper status for every container as it passes through without vehicle stopping or manual inspection.",
         "ISO 17712 High Security (H) bolt seals and Security (S) cable seals for C-TPAT compliance documentation. Accepted by US CBP for container integrity certification with RFID audit trail as supplementary electronic documentation.",
-        "Sequential laser-engraved serial numbers on every seal, with EPC memory carrying seal serial number, shipment ID, origin/destination, and seal date. A complete digital seal record that matches the physical number for chain-of-custody documentation.",
-        "Adhesive label seals with breakable antenna circuits for pharmaceutical pallet and evidence bag applications. Same irreversible OTP tamper flag technology in a low-profile format suitable for GDP and chain-of-custody compliance."
+        "Sequential laser-engraved serial numbers on every seal, with 96-bit EPC memory carrying seal serial number, shipment ID, origin/destination, and seal date. A complete digital seal record that matches the physical number for chain-of-custody documentation.",
+        "Adhesive label seals with breakable antenna circuits for pharmaceutical pallet and evidence bag applications. Same irreversible OTP tamper flag technology in a low-profile format (0.5-2 m read range) suitable for GDP and chain-of-custody compliance."
       ]
     },
     {
@@ -144,7 +144,7 @@
         "source": "U.S. CBP C-TPAT Minimum Security Criteria + ISO/PAS 17712:2013 + GS1 EPCIS 2.0 (ISO/IEC 19987:2015)"
       },
       "bullets": [
-        "Container-terminal operators pair RFID tamper seals with UHF portal readers at gate-in/out lanes so seal-number capture, sealed/tampered status and driver/truck identity land in the TOS in a single pass — no paper transcription, no pull-aside inspection for the routine case.",
+        "Container-terminal operators pair RFID tamper seals with UHF portal readers reading at 2-5 m across gate-in/out lanes so seal-number capture, sealed/tampered status and driver/truck identity land in the TOS in a single pass — no paper transcription, no pull-aside inspection for the routine case.",
         "Pharmaceutical 3PLs bond the OTP tamper bit to each SGTIN-96 pallet EPC and push EPCIS ObjectEvents (bizStep='inspecting', sealStatus='sealed'|'tampered') into their GDP evidence platform, so DSCSA §582 T3 records and GDP 9.2 audits derive from the event stream rather than a manual log binder.",
         "Cash-in-transit and ATM-servicing providers specify OTP tamper-flag seals (rather than resettable electronic seals) because the bit transition 0→1 is hardware-enforced and survives any attempt to physically re-splice the antenna loop — the digital record remains even when the physical seal is repaired.",
         "Import-compliance teams running C-TPAT or EU AEO programmes attach the EPCIS seal manifest to each ISF / ENS filing so CBP or customs officers can correlate seal serial, tamper state and checkpoint timestamps without opening the container for routine inspection."
@@ -153,8 +153,8 @@
     {
       "title": "How RFID tamper seals work",
       "paragraphs": [
-        "An RFID tamper seal contains a UHF RFID chip connected to an antenna that incorporates a tamper-detection loop. The loop runs through the physical seal mechanism (cable, bolt or adhesive label). When the seal is intact, the loop completes the antenna circuit and the tag responds normally with a 'sealed' status.",
-        "When the seal is broken (cable cut, bolt snapped, label peeled), the tamper loop is permanently interrupted. The RFID chip detects the open circuit and sets an irreversible tamper flag in its memory. Every subsequent RFID read reports 'tampered' status. Even if someone attempts to physically repair the break, the digital flag cannot be cleared."
+        "An RFID tamper seal contains a UHF (860-960 MHz) RFID chip connected to an antenna that incorporates a tamper-detection loop. The loop runs through the physical seal mechanism (cable, bolt or adhesive label). When the seal is intact, the loop completes the antenna circuit and the tag responds normally with a 'sealed' status.",
+        "When the seal is broken (cable cut, bolt snapped, label peeled), the tamper loop is permanently interrupted. The RFID chip detects the open circuit and sets an irreversible tamper flag in its memory — the dedicated bit flips from 0 to 1. Every subsequent RFID read reports 'tampered' status. Even if someone attempts to physically repair the break, the digital flag cannot be cleared."
       ]
     },
     {
@@ -197,9 +197,9 @@
     {
       "title": "Applications",
       "bullets": [
-        "Shipping containers: high-security RFID bolt seals for intermodal container integrity verification.",
-        "Pharmaceutical logistics: tamper-evident seals on drug shipment pallets for GDP compliance.",
-        "Evidence and chain-of-custody. Sealed evidence bags and storage lockers with RFID audit trail.",
+        "Shipping containers: ISO 17712 high-security RFID bolt seals for intermodal container integrity verification.",
+        "Pharmaceutical logistics: tamper-evident seals on drug shipment pallets for GDP (2013/C 343/01 §9.2) compliance.",
+        "Evidence and chain-of-custody. Sealed evidence bags and storage lockers with RFID audit trail per CJIS Security Policy §5.12.",
         "Food safety: tamper seals on refrigerated trailer doors with optional temperature monitoring.",
         "Military logistics: sealed ammunition, equipment and supply containers with RFID tracking.",
         "Utility meters: tamper-evident seals on electricity, gas and water meters to detect unauthorized access.",
@@ -209,7 +209,7 @@
     {
       "title": "Data and integration",
       "bullets": [
-        "EPC memory: encode seal serial number, shipment ID, origin, destination and seal date.",
+        "EPC memory: encode seal serial number, shipment ID, origin, destination and seal date on the 96-bit EPC.",
         "Tamper flag: dedicated bit in user memory that flips from 0 (sealed) to 1 (tampered) irreversibly.",
         "Timestamp support: some seal tags include a real-time clock to record the exact tamper time.",
         "Cloud integration: RFID checkpoint readers automatically upload seal status to your supply chain platform.",
@@ -312,7 +312,7 @@
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2025-12-31",
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-02",
   "sources": [
     {
       "label": "ISO/PAS 17712:2013 — Mechanical seals for freight containers",
