@@ -330,6 +330,25 @@
     background: rgba(176, 141, 87, 0.10) !important;
   }
 
+  /* Current-page item inside the mega dropdown. Kadence's *inline* header CSS
+     paints `.header-navigation .header-menu-container ul ul li.menu-item.current-menu-item > a`
+     with `background: var(--global-palette4)` (#4f4f4f cold gray). Our codex
+     layer already recolors the text to muted gold (#6d5a3a) for the light
+     header, but never neutralized that gray fill — so the active item rendered
+     at #6d5a3a-on-#4f4f4f ≈ 1.24:1, effectively unreadable. This is the same
+     class of bleed the task #164 hover fix patched, but for the current/active
+     state. Force an on-brand gold-tint highlight with !important on BOTH
+     background and color to beat the higher-specificity (0,4,4) Kadence rule
+     (which is not itself !important). Semibold weight is the non-color
+     "you are here" cue (WCAG 1.4.1). Result: #6d5a3a on ~#f7f1e9 ≈ 5.8:1 (AA),
+     and it visually harmonizes with the gold-tint hover state above. */
+  .codex-mega-list > li.current-menu-item > a,
+  .codex-mega-list > li > a[aria-current="page"] {
+    color: var(--codex-gold-muted, #6d5a3a) !important;
+    background: rgba(176, 141, 87, 0.14) !important;
+    font-weight: var(--codex-weight-semibold, 600);
+  }
+
   /* Simple dropdown (Resources) link styling */
   .codex-mega-item--simple .codex-mega-dropdown .codex-mega-list > li > a {
     padding: var(--codex-space-2-plus) var(--codex-space-4-plus);
