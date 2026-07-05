@@ -322,8 +322,6 @@ export const ABOUT_MENU: MenuDropdown = {
         { href: "/about/factory/", label: "Factory & Production" },
         { href: "/about/certifications/", label: "Certifications & Compliance" },
         { href: "/about/leadership/", label: "Leadership & Team" },
-        // 2026-06-11: /about/case-studies/ 301s to the standalone hub now.
-        { href: "/case-studies/", label: "Case Studies" },
       ],
     },
     {
