@@ -4852,6 +4852,70 @@ form[data-codex-rfq] .kb-forms-submit {
   cursor: pointer;
 }
 
+/* ── Inline "Quick Quote" form — reconcile to the dark shell + polish.
+   .codex-inline-rfq ships a dark gradient background, but the shared
+   light-form rules above (which also serve the light Kadence forms) left the
+   labels at --codex-text (#291c0e — invisible on dark, 1:1) and hints at
+   --codex-text-subtle (#5c5c5c — 2.48:1). These overrides are scoped to
+   .codex-inline-rfq ONLY, so light Kadence/contact forms are untouched, and
+   restore the cohesive, WCAG-AA dark theme the shell was designed for
+   (translucent inputs + light text, per the original .codex-inline-rfq
+   block) plus a gold hairline frame, elevation, and a lifting CTA. ── */
+.codex-inline-rfq {
+  border: 1px solid var(--codex-border-gold);
+  box-shadow: var(--codex-elevation-hover);
+}
+.codex-inline-rfq-field {
+  margin-bottom: var(--codex-space-5);
+}
+.codex-inline-rfq-label {
+  color: var(--codex-text-inverse);              /* white on #291c0e ≈ 15:1 */
+  letter-spacing: 0.01em;
+}
+.codex-inline-rfq-hint {
+  color: rgba(244, 239, 231, 0.72);              /* warm cream ≈ 7:1 on dark */
+}
+.codex-inline-rfq-error {
+  color: #ff9f92;                                /* light salmon: AA on dark (was #8b2d2d, invisible) */
+}
+/* Input/submit selectors are scoped `.codex-inline-rfq .codex-inline-rfq-form`
+   (specificity 0,2,1) to decisively beat the shared light-form rule
+   `form[data-codex-rfq] input` (0,1,2) above — the inline form also carries
+   `data-codex-rfq`, so a plain `.codex-inline-rfq input` (0,1,1) would lose. */
+.codex-inline-rfq .codex-inline-rfq-form input,
+.codex-inline-rfq .codex-inline-rfq-form textarea {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--codex-radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--codex-text-inverse);
+}
+.codex-inline-rfq .codex-inline-rfq-form input::placeholder,
+.codex-inline-rfq .codex-inline-rfq-form textarea::placeholder {
+  color: rgba(244, 239, 231, 0.5);
+}
+.codex-inline-rfq .codex-inline-rfq-form input:hover,
+.codex-inline-rfq .codex-inline-rfq-form textarea:hover {
+  border-color: rgba(255, 255, 255, 0.34);
+}
+.codex-inline-rfq .codex-inline-rfq-form input:focus-visible,
+.codex-inline-rfq .codex-inline-rfq-form textarea:focus-visible {
+  border-color: var(--codex-gold);
+  box-shadow: var(--codex-ring-focus-glow);
+}
+.codex-inline-rfq .codex-inline-rfq-submit {
+  background: var(--codex-gradient-gold, linear-gradient(135deg, #d4a755, #c39a5f));
+  color: var(--codex-dark);
+  border: none;
+  border-radius: var(--codex-radius-sm);
+  box-shadow: var(--codex-elevation-rest);
+  transition: transform var(--codex-motion-fast), box-shadow var(--codex-motion-fast);
+}
+.codex-inline-rfq .codex-inline-rfq-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--codex-elevation-hover);
+  opacity: 1;
+}
+
 /* ─────────────────────────────────────────────────────────────
    Extended editorial section blocks (added 2026-05-11)
    For statBar / comparePanel / featureGrid / dataHighlight /
