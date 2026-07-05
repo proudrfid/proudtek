@@ -838,7 +838,7 @@ function renderFooterBrandRow(): string {
         `<a class="codex-footer-brand__logo" href="/" aria-label="Proud Tek home">` +
           `<img src="/site-assets/wp-content/uploads/2024/04/proudtek-logo.png" alt="Proud Tek" width="220" height="60" loading="lazy" decoding="async">` +
         `</a>` +
-        `<p class="codex-footer-brand__tagline">Custom RFID &amp; NFC manufacturer — cards, tags, labels, wristbands, keyfobs and readers shipped worldwide from China since 2010.</p>` +
+        `<p class="codex-footer-brand__tagline">Custom RFID &amp; NFC manufacturer — cards, tags, labels, wristbands, keyfobs and readers shipped worldwide from China since 2008.</p>` +
         `<address class="codex-footer-brand__address" aria-label="Office address and hours">` +
           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.line1)}, ${escapeHtml(addr.line2)}</span>` +
           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.region)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.country)}</span>` +

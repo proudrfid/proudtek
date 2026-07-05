@@ -3074,11 +3074,41 @@ body.codex-catalog-rail-locked { overflow: hidden; }
 
 .codex-editorial-link-card strong {
   display: block;
+  /* DS-15 precedent: brand gold #c39a5f on white is only 2.59:1 (fails AA).
+     Pin the readable muted-gold token (#6d5a3a, 6.96:1) so the link label
+     beats the gold inherited from the <a>. */
+  color: var(--codex-gold-muted);
 }
 
 .codex-editorial-link-card span {
   display: block;
   font-size: var(--codex-text-sm-plus);
+  /* Same AA fix for the description line (was inheriting #c39a5f / 2.59:1). */
+  color: var(--codex-gold-muted);
+}
+
+/* Resource-card links that carry a description are CARDS, not pills.
+   `.codex-editorial-link-card` is folded into the shared pill-button base
+   (inline-flex, center/center, border-radius: pill). That's correct for a
+   single-label link, but a link with a <strong>label</strong> + <span>desc</span>
+   becomes a near-square box whose 999px pill radius renders as a CIRCLE with
+   the label crushed into a one-word-wide column. Detect the description via
+   :has(span) and switch those to a left-aligned, full-width stacked card.
+   Label-only pills (no <span>) are untouched. */
+.codex-editorial-link-card:has(span) {
+  flex: 1 1 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  gap: var(--codex-space-1);
+  padding: var(--codex-space-4);
+  border-radius: var(--codex-radius-card);
+}
+
+.codex-editorial-link-card:has(span) strong,
+.codex-editorial-link-card:has(span) span {
+  width: 100%;
 }
 
 .codex-editorial-brief-grid {
