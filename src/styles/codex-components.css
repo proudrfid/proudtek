@@ -2544,6 +2544,18 @@ body.codex-catalog-rail-locked { overflow: hidden; }
     .codex-editorial-hero-copy > :not(.codex-editorial-figure) {
     grid-column: 2;
   }
+  /* Opt-out: a page can set `heroLayout: "stacked"` (editorial JSON) to keep the
+     single-column hero even when it's group=products. The /industries/ hub is
+     grouped under products (so it's data-page-type="product") but is a pillar
+     hub, not a SKU page — it should stack its full-width banner under the title
+     like the other hubs, not inherit the product image-left/copy-right split.
+     Higher specificity than the split rule above + later source order, so it
+     wins; keyed on data-hero-layout so real product SKU pages keep their split.
+     User-requested 2026-07-06. */
+  .codex-editorial-hero[data-page-type="product"][data-hero-layout="stacked"]
+    .codex-editorial-hero-copy:has(> .codex-editorial-figure) {
+    display: block;
+  }
 }
 
 .codex-editorial-hero h1 {

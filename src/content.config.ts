@@ -183,6 +183,11 @@ const editorialSchema = z.object({
    *  array can be left out entirely. Defaults to []. */
   imageSourceRoutes: z.array(z.string()).optional().default([]),
   heroImage: z.string().optional(),
+  /** Hero layout override. "stacked" forces the single-column hero (image
+   *  stacked full-width under the title) even on group=products pages that
+   *  otherwise inherit the product image-left / copy-right split. Used by the
+   *  /industries/ hub — grouped under products, but a pillar hub, not a SKU. */
+  heroLayout: z.enum(["stacked"]).optional(),
   /** Optional attribution metadata for hero images sourced under Creative
    *  Commons or similar licenses. EditorialHero.astro renders a small
    *  caption beneath the figure when this is present. */
