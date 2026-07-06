@@ -88,6 +88,9 @@ export interface EditorialDefinition {
   imageAlt: string;
   imageSourceRoutes: string[];
   heroImage?: string;
+  /** Hero layout override — "stacked" forces the single-column hero even on
+   *  group=products pages that otherwise get the product two-column split. */
+  heroLayout?: "stacked";
   /**
    * Optional attribution metadata for the hero image. Required when the
    * image is sourced under a Creative Commons or similar license that
