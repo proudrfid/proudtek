@@ -128,7 +128,6 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/blog/hotel-key-card-encoding-explained/":          "/guides/hotel-key-card-encoding/",
   "/blog/hotel-key-card-design-printing/":             "/guides/hotel-key-card-artwork-and-printing-checklist/",
   "/blog/walmart-rfid-mandate-2026-supplier-compliance/": "/guides/walmart-rfid-tagging-mandate/",
-  "/solutions/rfid-laundry-tracking/":                 "/solutions/rfid-laundry-management/",
   "/blog/rfid-laundry-system-payback-period/":         "/blog/rfid-laundry-system-roi/",
   "/blog/rfid-wristbands-music-festival-2026/":        "/blog/rfid-wristbands-festivals-events/",
   "/about/case-studies/":                              "/case-studies/",
