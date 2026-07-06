@@ -5010,6 +5010,24 @@ form[data-codex-rfq] .kb-forms-submit {
   gap: var(--codex-space-3);
   margin: var(--codex-space-4) 0;
 }
+/* Balance a SIX-card feature grid into a clean 3×2 (desktop) / 2×3 (tablet) /
+   1-col (mobile). On the wide, full-width pillar-hub sections the auto-fit rule
+   above lays six cards out as an ugly 5+1 orphan row. Scoped via :has() to grids
+   with exactly six cards, so 3- and 4-card grids elsewhere keep their auto-fit
+   flow untouched. Added 2026-07-06 (industries hub six-families section). */
+.codex-editorial-feature-grid:has(> .codex-editorial-feature:nth-child(6):last-child) {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (max-width: 600px) {
+  .codex-editorial-feature-grid:has(> .codex-editorial-feature:nth-child(6):last-child) {
+    grid-template-columns: 1fr;
+  }
+}
+@media (min-width: 1025px) {
+  .codex-editorial-feature-grid:has(> .codex-editorial-feature:nth-child(6):last-child) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 .codex-editorial-feature {
   padding: var(--codex-space-4);
   border-radius: var(--codex-radius-card);
