@@ -9,14 +9,8 @@
     "EAS-RFID integration moves theft detection from binary alarm to data-rich event capture — store managers see what was taken, when, and which checkout lane the perpetrator passed.",
     "Department stores running both report 30-50% shrinkage reduction and 3-5% revenue lift from preventing out-of-stocks on high-velocity SKUs."
   ],
-  "heroImage": "/landing-images/retail-apparel.jpg",
-  "imageCredit": {
-    "author": "melanie_hughes",
-    "sourceUrl": "https://www.flickr.com/photos/22658750@N02/4253803022",
-    "license": "CC BY 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/"
-  },
-  "imageAlt": "Close-up of an RFID inlay — antenna coil and chip — the tag behind department-store smart shelves and EAS loss prevention.",
+  "heroImage": "/diagrams/blog/department-store-rfid-smart-shelf-eas-hero.svg",
+  "imageAlt": "Diagram: department-store RFID as one tag doing two jobs. A smart shelf with a UHF reader beneath it reads an EPC Gen2 inlay on every item for a real-time per-SKU count; events flow to the cloud inventory platform and staff app in 30–90 seconds; an EAS gate at the exit reads each chip UID, so unsold items raise a data-rich alert and sold items pass silently — above headline stats of 30–50% shrinkage reduction, 3–5% revenue lift and a 12–24 month payback.",
   "imageSourceRoutes": [
     "/solutions/rfid-inventory-tracking/",
     "/solutions/rfid-asset-tracking-labels/"
@@ -31,7 +25,12 @@
         "Event types captured: item placed, item removed, item moved between shelves, prolonged dwell on shelf without sale (potential merchandising issue).",
         "Data flow: shelf reader → store gateway → cloud inventory platform → store-staff mobile app + ERP/POS integration. Latency 30-90 seconds from shelf event to dashboard.",
         "Power and connectivity: PoE-powered readers run off store ethernet; battery-powered shelves exist for legacy stores without low-voltage cabling but require quarterly battery service."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/deptstore-shelf-anatomy.svg",
+        "alt": "Diagram: a smart-shelf cross-section. A low-power UHF reader mounted under the shelf and powered over store ethernet scans upward through the shelf material to read an EPC Gen2 inlay on every item; quiet zones use a single antenna and busy zones a multi-antenna mesh. Every scan captures item placed, removed, moved between shelves, or dwelling without a sale (a merchandising flag); events flow from shelf reader to store gateway to cloud platform to the staff app and ERP/POS in 30–90 seconds."
+      },
+      "layout": "split"
     },
     {
       "title": "How does RFID enhance EAS gate detection?",
@@ -42,40 +41,60 @@
         "Data outputs: real-time alert to store manager with item description, image and last-known location. Backend records the theft event for daily/weekly shrinkage reporting.",
         "Reduced false alarm: pass-through alarm only fires when an unsold item is detected (chip not flagged 'sold' in POS). Sold items pass silently — much higher signal-to-noise ratio.",
         "Investigation support: timestamped video footage from store cameras can be queried by EAS event time, accelerating investigation of organized retail crime."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/deptstore-eas-beep-vs-data.svg",
+        "alt": "Diagram comparing legacy EAS with an RFID-EAS hybrid. Legacy EAS-only triggers a generic beep but cannot say what was taken, who walked out, or which checkout lane was used, so false positives cause alarm fatigue. The RFID-EAS hybrid reads the chip UID and captures the item and SKU, serial number, time and direction of pass, last-known shelf, and POS status; an unsold item raises an alert with description, image and last location while a sold item passes silently — a much higher signal-to-noise ratio."
+      },
+      "layout": "split-reverse"
     },
     {
       "title": "What ROI do department stores see from smart-shelf + EAS?",
-      "intro": "Department stores running unified RFID smart-shelf + EAS report measurable wins on three financial dimensions. The benchmarks below come from public 2024-2026 retail-industry reporting.",
+      "intro": "Ask a CFO to fund an RFID rollout and you will, sooner or later, be asked to translate 'inventory visibility' into actual money. Fair question. The tidy answer is that unified smart-shelf + EAS reports measurable wins on three financial dimensions a finance team already watches — shrink, stock, and staff time — and the numbers are not shy. The benchmarks below come from public 2024-2026 retail-industry reporting.",
       "bullets": [
         "Shrinkage reduction: 30-50% drop in identified shrinkage value within 12 months. Driven by pre-theft detection (item leaves shelf without POS event) and post-theft attribution (caught at gate).",
         "Out-of-stock reduction: 30-60% drop in OOS incidents on high-velocity SKUs. Smart shelf alerts staff when a peg or shelf zone falls below threshold, prompting replenishment before the customer abandonment.",
         "Labor reallocation: 15-30% reduction in cycle-counting labor (now automated) frees staff for customer service. Most stores reinvest the savings in service vs. cutting headcount.",
         "Revenue lift: 3-5% topline revenue lift from reduced OOS + increased customer-service availability, validated in matched-pair store comparisons.",
         "Payback period: 12-24 months typical for tier-1 department-store deployments. Anchor stores (>$100M annual revenue) often see <12 month payback driven by shrinkage savings alone."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/deptstore-roi-dimensions.svg",
+        "alt": "Diagram of ROI from smart-shelf plus EAS, drawn from public 2024–2026 benchmarks: a 30–50% shrinkage reduction within 12 months, a 30–60% out-of-stock drop on high-velocity SKUs, 15–30% less cycle-count labor reallocated to service, and a 3–5% topline revenue lift validated in matched-pair comparisons — with payback of 12–24 months typically and under 12 months for anchor stores above $100M revenue on shrink savings alone."
+      },
+      "layout": "split"
     },
     {
       "title": "Which EAS systems integrate cleanly with UHF RFID — vendor matrix and retrofit math",
-      "intro": "Most department stores run EAS gates from one of four incumbents. Each handles RFID retrofit differently and the choice influences total deployment cost, gate footprint and ongoing licensing. The decision usually starts with the brand of EAS already installed, since rip-and-replace destroys most of the ROI.",
+      "intro": "Nobody schedules a fun afternoon auditing the security pedestals bolted to their front doors, but that unglamorous hardware quietly decides whether the RFID upgrade is a tidy bolt-on or a demolition project. Most department stores run EAS gates from one of four incumbents. Each handles RFID retrofit differently and the choice influences total deployment cost, gate footprint and ongoing licensing. The decision usually starts with the brand of EAS already installed, since rip-and-replace destroys most of the ROI.",
       "bullets": [
         "Sensormatic Solutions (Johnson Controls) — historic AM (acousto-magnetic) leader, dominant at Macy's, Kohl's, JCPenney, Walmart and Target. Their Synergy RFID overlay adds UHF reader modules onto existing AM pedestals; combined Sensormatic Sensor Hub captures EAS alarm + RFID EPC + camera trigger in a single event. Add-on retrofit runs roughly $1.5K-4K per gate vs $8K-15K for full Synergy replacement.",
         "Checkpoint Systems (CCL Industries) — RF (radio frequency, 8.2 MHz) tradition with strong apparel-mandate footprint. Their EVOLVE iRange + HALO RFID combine RF EAS with UHF RFID at gate; Source Tagging Service applies RFID + RF labels at the factory and ships shelf-ready. Strong fit for Inditex, H&M and other source-tagging supply chains.",
         "Nedap Retail — challenger with the !D Top, !D Cloud and iSense product family that integrates RFID-only EAS (no separate AM/RF tag — the UHF chip itself is the security event source). Burberry, Decathlon and Zara have published Nedap reference deployments; pricing skews higher per gate but eliminates the dual-tag cost ($0.04-0.08 per item saved).",
         "Tyco Retail Solutions / Hytek — second-tier alternatives often used in regional department-store chains. Most run hybrid RF + UHF stacks; integration depth with Manhattan Associates, SAP IS-Retail or Oracle Retail XStore varies and is the binding factor for full SKU-level shrink reporting.",
         "Self-checkout integration — at NCR, Diebold-Nixdorf, Toshiba Global Commerce and Zebra SCO lanes, RFID-EAS integration matters most. Without RFID, scan-avoidance shrinkage runs 1.5-3% of self-checkout volume per Loss Prevention Research Council 2024 data. With RFID-EAS hybrid, the same lanes cut scan-avoidance shrink to 0.3-0.6% by detecting unscanned EPC at lane exit."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/deptstore-eas-vendor-matrix.svg",
+        "alt": "Diagram of EAS retrofit paths for four incumbents. Sensormatic, the AM leader: its Synergy overlay adds UHF onto AM pedestals for about $1.5K–4K per gate as an add-on versus $8K–15K for full replacement. Checkpoint, RF at 8.2 MHz: EVOLVE iRange plus HALO RFID with a factory Source Tagging Service. Nedap Retail, RFID-only: the !D Top, !D Cloud and iSense family needs no dual tag, saving $0.04–0.08 per item. Tyco/Hytek: hybrid RF plus UHF second-tier systems. At self-checkout, scan-avoidance shrink falls from 1.5–3% without RFID to 0.3–0.6% with an RFID-EAS hybrid."
+      },
+      "layout": "split-reverse"
     },
     {
       "title": "Real-world department store deployments — Macy's, Decathlon, Target, Bloomingdale's, Lululemon",
-      "intro": "Tier-1 department-store and specialty-retail RFID deployments are well-documented in earnings calls, NRF Big Show keynotes and trade press. The numbers below come from public sources and let you sanity-check internal business cases.",
+      "intro": "When your own pilot's results look too flattering to put in front of the board, it helps that the giants have already published theirs. Tier-1 department-store and specialty-retail RFID deployments are well-documented in earnings calls, NRF Big Show keynotes and trade press. The numbers below come from public sources and let you sanity-check internal business cases.",
       "bullets": [
         "Macy's — full 100% item-level UHF tagging across all stores by 2024 via the Macy's Vendor Compliance program. Public statements credit RFID with single-digit-percentage inventory-accuracy improvement (driving omnichannel BOPIS and ship-from-store fill rate from ~85% to >95%) and 5-15% shrink reduction at piloted EAS-integrated stores. Avery Dennison and SML supply most of the source-tagged inlays.",
         "Decathlon — first European retailer to mandate 100% item-level RFID across all 1,700+ stores worldwide. Public statements (Decathlon Sustainability Report, RAIN Alliance case studies) cite 9-12% revenue lift attributed to RFID-driven inventory accuracy, and 30%+ shrinkage reduction since rollout. Decathlon uses Nedap !D Cloud for EAS-RFID hybrid gates.",
         "Target — RFID rollout (2018-2024) tied to T2/T3 supplier-mandate scope expansion. Internal Target Connect documentation now requires UHF inlays on apparel, home goods, electronics accessories and shoes. Smart-shelf pilots running in select Target stores for high-shrink, high-velocity categories (cosmetics, baby formula).",
         "Bloomingdale's (Macy's Inc) — early Sensormatic Synergy RFID-EAS combo stores (Manhattan flagship, Century City) report shrink-event-attribution improving from <20% (EAS-only) to >70% (RFID-EAS hybrid). Investigations leverage Genetec/Avigilon video time-stamped to RFID gate events.",
         "Lululemon — store-level RFID shows 98%+ inventory accuracy (vs ~75% pre-RFID per ARC Advisory benchmarks for athleisure). Cycle counts cut from 4-6 hours weekly to 30-45 minutes, redirecting roughly 200 hours/store/year to selling-floor coverage. Suppliers source-tag at point of manufacture using SML or Avery inlays."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/deptstore-deployments-lineup.svg",
+        "alt": "Diagram of public tier-1 deployments. Macy's: omnichannel fill rate from about 85% to over 95%, 100% item-level by 2024, and 5–15% shrink reduction at EAS pilots. Decathlon: a 9–12% revenue lift across 1,700+ stores and over 30% shrink reduction, using Nedap !D Cloud. Target: a 2018–2024 rollout with smart-shelf pilots in cosmetics and baby formula. Bloomingdale's: shrink-event attribution from under 20% to over 70% moving from EAS-only to RFID-EAS. Lululemon: 98%+ inventory accuracy versus about 75% before, with weekly cycle counts cut from 4–6 hours to 30–45 minutes, redirecting roughly 200 hours per store per year to the selling floor."
+      },
+      "layout": "split"
     }
   ],
   "resourceCards": [
@@ -160,6 +179,6 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-07",
   "reviewedAt": "2026-05-10"
 }
