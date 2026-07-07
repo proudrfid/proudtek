@@ -24,15 +24,17 @@
   --codex-line-height-tight: 1.2;
   --codex-content-measure: 70ch;
   /* Centred reading column for balanced (non-split) editorial sections.
-     Deliberately rem, NOT ch: a ch measure is font-relative, so the larger
-     heading font would cap at a wider column than the body and their left
-     edges would not align. A fixed rem keeps headings and body the exact same
-     width. ~45rem ≈ the 70ch body measure. Pairs with the rule below. */
-  --codex-reading-column: 45rem;
-  /* Wider centred band for full-bleed data elements (comparison tables,
-     feature grids, figures) inside those sections — keeps a 4-column table
-     roomy while staying symmetric on ultra-wide rail pages. */
-  --codex-reading-column-wide: 70rem;
+     Deliberately rem-capped, NOT ch: a ch cap is font-relative, so the larger
+     heading font would cap wider than the body and their left edges would not
+     align. FLUID: min(cap, 92%) so the column grows with the content area
+     instead of floating as a fixed-width strip in a wide space (a fixed width
+     left big symmetric gutters on wide/rail screens). Fills 92% of the
+     available width up to a 72rem readability cap, then centres. */
+  --codex-reading-column: min(72rem, 92%);
+  /* Wider band for full-bleed data elements (tables, feature grids, figures) —
+     also fluid: fills the content area up to 88rem so a 4-column table has room
+     while still capping on ultra-wide screens. */
+  --codex-reading-column-wide: min(88rem, 100%);
 }
 
 body {
