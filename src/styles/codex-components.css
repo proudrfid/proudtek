@@ -3101,6 +3101,17 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   .codex-editorial-section:not([data-section-layout]) :is(li, dd) {
     max-width: none;
   }
+  /* Timeline body copy is a nested <p> inside <li>, so the sibling
+     `:is(li, dd) { max-width: none }` release above never reaches it — each
+     item's text kept the base 70ch reading cap and pinned left, leaving a
+     lopsided blank right half in the centred wide band (reported on the
+     /industries/hospitality/ rollout timeline, 2026-07-07). Release it so the
+     item copy fills the centred column like the rest of the section. The
+     `__label` is a block <span>, which the 70ch `:where(p, li, dd)` rule never
+     matched, so it needs no release. */
+  .codex-editorial-section:not([data-section-layout]) .codex-editorial-timeline__text {
+    max-width: none;
+  }
 }
 
 /* Multi-column list layout — the schema's `layout: "columns"`. Flows a long
