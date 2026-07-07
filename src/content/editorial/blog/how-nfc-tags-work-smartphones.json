@@ -3,25 +3,21 @@
   "group": "blog",
   "title": "How NFC Tags Work with Smartphones",
   "kicker": "NFC Technology",
-  "summary": "A technical explainer for product managers and procurement teams on how NFC tags actually communicate with smartphones. It covers the 13.56 MHz RF protocol stack, NDEF message format, OS-level handling, and the compatibility gaps between iOS and Android that decide whether a tap works or quietly does nothing.",
+  "summary": "The honest explainer for product managers and procurement teams on how NFC tags actually talk to smartphones — no hand-waving. It walks the 13.56 MHz RF protocol stack, the NDEF message format, OS-level handling, and the iOS-versus-Android compatibility gaps that decide whether a tap works or quietly does nothing.",
   "heroPoints": [
     "NFC tags harvest power from the smartphone's electromagnetic field, requiring no battery and enabling a 10+ year operational lifespan.",
     "The NDEF data format is an open standard that both iOS and Android parse natively, ensuring cross-platform compatibility without app installation.",
-    "Understanding the NFC communication sequence helps procurement teams write better specifications and avoid chip-selection mistakes."
+    "Understanding the NFC communication sequence helps procurement teams write sharper specifications and sidestep the chip-selection mistakes that only surface after the tags are already in the field."
   ],
-  "heroImage": "/landing-images/nfc-social-media-tag.jpg",
-  "imageAlt": "Smartphone reading an NFC tag with RF field visualization",
-  "imageSourceRoutes": [
-    "/product/nfc-stickers/",
-    "/product/acr122u/"
-  ],
+  "heroImage": "/diagrams/blog/nfc-smartphones-banner.svg",
+  "imageAlt": "Diagram of a smartphone's 13.56 MHz field powering a passive NFC tag, which answers by load modulation",
   "sections": [
     {
       "title": "How does NFC communication physically work?",
       "intro": "Hold a phone close to a sticker and a web page opens — no battery in the sticker, no app to install, no pairing dialog to dismiss. To anyone who hasn't seen inside the protocol it looks like a minor magic trick, and the honest engineering explanation is almost stranger than the trick: the tag has no power source of its own. The phone lends it one for the length of the tap. Near Field Communication operates at 13.56 MHz using magnetic induction between two loop antennas. One in the smartphone and one in the NFC tag. The smartphone acts as the active device (reader), generating an alternating magnetic field that induces a current in the tag's antenna coil.",
       "image": {
-        "src": "/blog-images/smartphone-nfc.jpg",
-        "alt": "Smartphone reading an NFC tag via electromagnetic induction"
+        "src": "/diagrams/blog/nfc-induction-handshake.svg",
+        "alt": "Three-step NFC handshake: the phone's field powers the tag's chip, which answers by load modulation"
       },
       "paragraphs": [
         "This induced current powers the tag's integrated circuit, which then modulates the RF field to transmit its stored data back to the phone. The process is called load modulation: the tag switches a resistive load on and off across its antenna, creating small amplitude changes in the reader's field that the phone's NFC controller decodes as binary data."
@@ -40,7 +36,11 @@
     },
     {
       "title": "How does the NFC protocol stack work from RF to application?",
-      "intro": "The communication between a smartphone and an NFC tag follows a layered protocol stack. Understanding each layer helps explain why certain tags work with certain phones and what can go wrong during a tap.",
+      "intro": "A tap that 'just works' is really five separate handshakes stacked on top of each other, each politely waiting for the one beneath it to finish before it takes its turn. You never notice them — until one fails, and a tag that lights up instantly on a colleague's Android plays dead on your iPhone. Here is the whole ladder, and the specific failure that hides on each rung.",
+      "image": {
+        "src": "/diagrams/blog/nfc-protocol-stack.svg",
+        "alt": "The five-layer NFC protocol stack from physical RF up to the OS handler, with each layer's failure mode"
+      },
       "table": {
         "columns": [
           "Layer",
@@ -84,7 +84,11 @@
     },
     {
       "title": "How does NDEF message format work?",
-      "intro": "NDEF is the standard data format stored on NFC tags. It defines how records (URLs, text strings, vCards, application launch commands) are structured so that any NFC-enabled device can parse them consistently.",
+      "intro": "NDEF is the tag's grammar: the agreed-upon way to arrange bytes so that a phone the tag has never met can still read the message and know exactly what to do with it. Formally, it is the standard data format stored on NFC tags. It defines how records (URLs, text strings, vCards, application launch commands) are structured so that any NFC-enabled device can parse them consistently. Get the grammar right and every device understands you; get it wrong and the tag technically 'has data' — it just reads as gibberish.",
+      "image": {
+        "src": "/diagrams/blog/ndef-record-anatomy.svg",
+        "alt": "Anatomy of an NDEF message: records split into a header and payload, plus the four common record types"
+      },
       "paragraphs": [
         "An [NDEF](/guides/nfc-ndef-format-explained/) message consists of one or more NDEF records, each containing a header (record type, payload length, ID) and a payload. The most common record types in B2B applications are URI (web link), Text (plain text with language code), vCard (contact information in MIME format) and Android Application Record (AAR) which forces a specific app to handle the tag."
       ],
@@ -97,7 +101,11 @@
     },
     {
       "title": "What's the difference between iOS and android NFC behavior?",
-      "intro": "iOS and Android handle NFC tag reads differently, and these differences affect how you design the user experience for a tap interaction.",
+      "intro": "Here is the demo that has quietly humbled a hundred product launches: the tap works flawlessly on the presenter's Android, then does precisely nothing on the VP's iPhone. Same tag, same URL — two operating systems with very different manners. Design for both from the first spec and you simply never have that meeting.",
+      "image": {
+        "src": "/diagrams/blog/ios-vs-android-nfc.svg",
+        "alt": "iOS versus Android NFC behavior compared side by side, with the read rules each platform enforces"
+      },
       "bullets": [
         "iOS (iPhone XS and later) reads NFC tags in the background without user action. A notification banner appears when a tag is detected, and tapping the banner opens the URL or action.",
         "Android dispatches NFC tag reads through an intent system. If no app claims the intent, the default browser opens URL records. Apps can register intent filters to handle specific tag types.",
@@ -109,6 +117,10 @@
     {
       "title": "How do you troubleshoot common NFC read failures?",
       "intro": "When a smartphone fails to read an NFC tag, the issue is almost always physical positioning, environmental interference or a software configuration problem. Not a defective tag — though a defective tag is, reliably, the first thing everyone suspects.",
+      "image": {
+        "src": "/diagrams/blog/nfc-read-failure-map.svg",
+        "alt": "NFC read-failure map pairing each symptom with its likely cause and the fix"
+      },
       "bullets": [
         "No read response: Ensure NFC is enabled in phone settings. On Android, check that the NFC toggle in quick settings is on. On iPhone, NFC is always on for background reading.",
         "Intermittent reads: The tag antenna is not aligned with the phone's NFC coil. NFC coil position varies by phone model. On iPhones it is at the top; on many Android devices it is center-back.",
@@ -227,5 +239,5 @@
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09",
-  "modifiedAt": "2026-07-02"
+  "modifiedAt": "2026-07-07"
 }
