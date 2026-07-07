@@ -3,18 +3,15 @@
   "group": "blog",
   "title": "Brand Protection RFID — Spotting Counterfeits",
   "kicker": "Brand Protection",
-  "summary": "Counterfeits enter supply chains through customs, gray-market diverters and unauthorized resellers. RFID/NFC anti-counterfeit programs detect fakes at scale by combining cryptographic chip authentication with backend audit trails.",
+  "summary": "A counterfeiter can copy the stitching, the box, the hologram and the printed serial number. The one thing they can't copy is the secret sealed inside the chip. Fakes still slip into supply chains through customs, gray-market diverters and unauthorized resellers — so RFID/NFC anti-counterfeit programs catch them at scale by pairing cryptographic chip authentication with a backend audit trail that flags a clone on its very first tap.",
   "heroPoints": [
-    "Counterfeit goods cost global brands $500B+ annually; cryptographic RFID/NFC authentication is the proven systemic detection mechanism at every supply-chain checkpoint.",
-    "Customs, retailers, online marketplaces and authentication services all benefit from a shared authentication backend that brands publish via NFC tap-to-verify.",
+    "Counterfeit goods cost global brands $500B+ a year, and shoppers usually can't tell the difference by looking — cryptographic RFID/NFC authentication is the proven systemic detection mechanism at every supply-chain checkpoint.",
+    "Customs, retailers, online marketplaces and authentication services all lean on the same shared authentication backend, which brands publish via NFC tap-to-verify.",
     "Brand-protection programs combine secure NFC chips (NTAG 424 DNA, DESFire EV3) with web-API verification accessible to enforcement partners worldwide."
   ],
-  "heroImage": "/landing-images/brand-protection.png",
-  "imageAlt": "Inspector using smartphone NFC scan on luxury product to verify authenticity — brand protection at supply chain checkpoint.",
-  "imageSourceRoutes": [
-    "/solutions/nfc-brand-authentication/",
-    "/industries/brand-protection/"
-  ],
+  "heroImage": "/diagrams/blog/brand-protection-spot-counterfeits-hero.svg",
+  "modifiedAt": "2026-07-07",
+  "imageAlt": "Diagram: a genuine product carries a secure NFC chip that computes a fresh cryptographic signature on every tap; a phone tap on the authentic item returns AUTHENTIC, while a visually identical counterfeit with a cloned UID returns REJECTED because it cannot reproduce the chip's per-item secret — the core of spotting counterfeits at supply-chain checkpoints.",
   "sections": [
     {
       "title": "How does RFID detect counterfeits in supply chains?",
@@ -25,51 +22,76 @@
         "API verifies: signature matches the chip's key set, counter is monotonically increasing (not replayed), and the item's authenticity record is in good standing.",
         "Counterfeits fail because cloned UIDs cannot reproduce the cryptographic signature without the private key — which never leaves the chip and is fab-secret.",
         "Output: verified-or-not flag + audit trail (when, where, by whom). Brands aggregate verification logs to identify counterfeit hotspots and supply-chain leakage."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/counterfeit-crypto-gap.svg",
+        "alt": "Diagram: two visually identical products are tapped with a phone. The genuine item's chip signs a fresh cryptographic signature with its fab-set private key and the backend API returns AUTHENTIC; the counterfeit only carries a cloned static UID, cannot reproduce the signature, and the API returns REJECTED — the private key never leaves the chip."
+      },
+      "layout": "split"
     },
     {
       "title": "What anti-counterfeit RFID technologies exist?",
-      "intro": "Multiple chip families and authentication protocols compete for the brand-protection use case. The right pick depends on unit value, supply-chain complexity and existing investment.",
+      "intro": "Every vendor at the trade show will call their chip 'secure.' Some mean it in the cryptographic sense; others mean it has a 32-bit password a laptop can guess over a coffee break. Multiple chip families and authentication protocols compete for the brand-protection use case, and the right pick depends on unit value, supply-chain complexity and existing investment.",
       "bullets": [
         "[NTAG 424 DNA](/guides/ntag424-dna-sun-cmac-authentication/) (NXP): smartphone-tappable, AES-128 SUN/CMAC authentication, $0.30-1.00 per chip. Industry standard for consumer-product authentication.",
         "MIFARE DESFire EV3 (NXP): higher security (multi-application memory, AES-128 mutual auth), $1.00-3.00 per chip. Used for higher-value items where chip-cost is negligible.",
         "EM Microelectronic em|echo: ultra-low-cost UHF anti-counterfeit, $0.10-0.25 per tag. Chip-DNA fingerprint for cryptographic identification at item level.",
         "ICODE DNA (NXP HF, ISO 15693): for higher-volume FMCG anti-counterfeit. ISO 15693 read range slightly longer than NFC; smartphone support is more limited.",
         "Avoid: plain NTAG213/215/216 with only password protection, generic 'tap-to-verify' chips without rotating signatures, or static-UID chips that can be cloned with any NFC writer."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/anti-counterfeit-chip-landscape.svg",
+        "alt": "Diagram: anti-counterfeit chip landscape. Use cryptographic options — NTAG 424 DNA (AES-128 SUN/CMAC, $0.30–1.00), MIFARE DESFire EV3 (AES-128 mutual auth, $1.00–3.00), EM Microelectronic em|echo UHF chip-DNA ($0.10–0.25) and ICODE DNA (NXP HF, ISO 15693). Avoid static or weak options — plain NTAG 213/215/216 with only a 32-bit password, and generic tap-to-verify chips with clonable static UIDs."
+      },
+      "layout": "split-reverse"
     },
     {
       "title": "How do you build a counterfeit detection workflow?",
-      "intro": "A scalable counterfeit-detection program covers four checkpoints: factory output, distribution, retail and consumer. Each stage uses the same chip but different operator workflows.",
+      "intro": "You do not catch counterfeits by squinting harder at the packaging — the good fakes already passed that test at the factory that printed them. You catch them by checking the same hidden secret at the four points a fake has to survive: factory output, distribution, retail and consumer. Same chip at every gate; a different person doing the tapping.",
       "bullets": [
         "Factory output: every shipped unit logged in the brand's authenticity backend with chip UID, batch, ship-to. This is the source of truth — items not in this list are by definition counterfeit.",
         "Distribution and customs: customs officers tap suspicious shipments with smartphone or USB NFC reader. API returns instant verification + alerts brand legal team if items are flagged.",
         "Retail and resale: physical store staff tap items at receiving and intake; resale platforms tap pre-listing. Failed verifications trigger return to supplier and investigation.",
         "Consumer: brands publish a tap-to-verify experience for end-consumers. Consumer taps build CRM data and surface counterfeits at point of attempted use.",
         "Backend analytics: dashboard showing per-region verification volume, pass/fail rate, suspected counterfeit clusters. Alerts when fail rate spikes in a specific channel or geography."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/counterfeit-detection-workflow.svg",
+        "alt": "Diagram: a four-checkpoint counterfeit-detection workflow using one chip. Factory output logs every unit as the source of truth; distribution and customs tap suspicious shipments; retail and resale tap at intake and pre-listing; consumers tap-to-verify. All four feed a backend analytics dashboard that tracks pass/fail rate by region and alerts when a channel's fail rate spikes."
+      },
+      "layout": "split"
     },
     {
       "title": "How big is the counterfeit problem and which categories drive RFID/NFC adoption?",
-      "intro": "Counterfeiting is the largest illicit trade category globally. The OECD's 2022 Trade in Counterfeit Goods study put the trade at roughly $464 billion in 2019 (the most recent measured year), with broader market estimates extending toward $4 trillion when domestic counterfeit production and digital piracy are included. Category-level seizure data — and the resulting RFID/NFC investment intensity — varies dramatically.",
+      "intro": "Counterfeiting is not a rounding error in world trade — it is the single largest illicit-trade category on the planet. The OECD's 2022 Trade in Counterfeit Goods study put the trade at roughly $464 billion in 2019 (the most recent measured year), with broader market estimates extending toward $4 trillion when domestic counterfeit production and digital piracy are included. Where the RFID/NFC budget actually goes, though, varies dramatically — and it follows the seizure data.",
       "bullets": [
         "Apparel and footwear lead seizure volume — US Customs & Border Protection FY2023 IPR seizure reports rank wearing apparel and footwear as the highest-volume seized counterfeit category. Brands like Nike, Adidas and LVMH have invested heaviest in [NTAG 424 DNA](/products/rfid-labels/ntag424-dna-tamper-evident-tag/) SUN authentication and source-tagged UHF inlays at the manufacturing line.",
         "Watches and jewellery carry the highest unit-value counterfeit risk — Vacheron Constantin and Hublot embed NFC chips in case backs, and the LVMH-Prada-Cartier Aura Blockchain Consortium uses NTAG 424 DNA + Ethereum-based provenance with smartphone tap-to-verify. Counterfeit watches represent roughly 10% of CBP IPR seizure value despite low unit volume.",
         "Beauty and personal care drive the highest consumer-engagement use cases — Estée Lauder, L'Oréal and Dior pair NTAG 424 DNA with mobile loyalty apps. Counterfeits in this category often contain hazardous ingredients (mercury, formaldehyde, undeclared steroids), so failed-verification alerts feed directly into brand-protection and product-safety teams.",
         "Wine, spirits and pharmaceuticals are now regulated authentication categories — Hennessy, Moët-Hennessy and Pernod Ricard tag bottle closures with NXP NTAG 424 or 213 TT (Tag Tamper) chips that detect cap removal. EU FMD pharmaceutical serialisation since 2019 and the US DSCSA Phase 3 (effective Nov 2024) push prescription packaging toward unique GS1 SGTIN identifiers verified via 2D + RFID/NFC.",
         "Electronics, automotive parts and toys are the fastest-growing regulated categories — chip-counterfeit detection programs from Cisco, Intel and Honeywell, plus EU CE mark anti-counterfeit, are pulling NFC/UHF authentication into B2B-only supply chains where the consumer never sees the tag. Toy safety alerts via ICTI CARE and ASTM F963 align with NFC-tagged provenance for Disney, Hasbro and Mattel."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/counterfeit-category-landscape.svg",
+        "alt": "Diagram: counterfeit categories that drive RFID/NFC adoption. Apparel and footwear lead CBP FY2023 seizure volume; watches and jewellery are highest unit-value at roughly 10% of CBP IPR seizure value; beauty and personal care drive consumer engagement (and safety alerts); wine, spirits and pharma are regulated categories under EU FMD and US DSCSA Phase 3; electronics, automotive parts and toys are the fastest-growing B2B-only category. Each pairs with a secure chip such as NTAG 424 DNA or 213 TT."
+      },
+      "layout": "split-reverse"
     },
     {
       "title": "How do gray-market diversion and parallel-import detection work with RFID?",
-      "intro": "Outright counterfeits are only half the brand-protection problem, and arguably the easier half — a fake at least has the decency to be fake. The other half is gray-market diversion — authentic product sold outside its authorised channel or geography (cross-border arbitrage, distributor over-allocation resold to unauthorised retailers, employee theft re-entering the supply chain). RFID/NFC programmes detect diversion using the same chip as counterfeit detection, but with different backend logic.",
+      "intro": "Outright counterfeits are only half the brand-protection problem, and arguably the easier half — a fake at least has the decency to be fake. The other half is gray-market diversion: authentic product sold outside its authorised channel or geography (cross-border arbitrage, distributor over-allocation resold to unauthorised retailers, employee theft re-entering the supply chain). RFID/NFC programmes catch diversion with the same chip as counterfeit detection, but with different backend logic.",
       "bullets": [
         "Channel binding at encoding time — each chip is encoded with a 'authorised channel' attribute (region, distributor, account). When the consumer or retailer taps, the backend compares actual location/IP against authorised channel and flags mismatches without revealing this to the unauthorised reseller.",
         "Tap-counter geo-anomaly — NTAG 424 DNA's monotonic tap counter combined with smartphone IP geolocation surfaces cases where a chip first scans in Hong Kong then six weeks later in Brazil despite the Brazilian distributor never receiving that batch. Aggregated across 100K+ scans, diversion routes become statistically obvious.",
         "Authorised resale platform integration — StockX, GOAT, eBay Authenticity Guarantee, The RealReal and Vestiaire Collective offer NFC-based pre-listing verification for sneakers and handbags. A failed verification at intake either confirms a fake or surfaces a stolen authentic unit; either outcome routes to brand legal.",
         "Distributor performance scoring — backend analytics rank distributors by counterfeit-encounter rate, gray-market detection rate and chargeback frequency. Brand protection moves from per-incident response to data-driven supplier qualification — Decathlon, Inditex (Zara) and H&M run quarterly distributor scorecards on item-level RFID data.",
         "Customs partnership programmes — WCO IPM (Interface Public-Members), CBP e-Recordation and EU EUIPO Anti-Counterfeiting Network give customs officers a single login that surfaces brand-specific NFC verification endpoints. Brands publish their verification API to these portals at no cost and gain a global enforcement multiplier."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/gray-market-geo-anomaly.svg",
+        "alt": "Diagram: gray-market diversion detection. A single NTAG 424 DNA chip is encoded with an authorised channel; its monotonic tap counter shows a first scan in Hong Kong then, six weeks later, a scan in Brazil — a region whose distributor never received that batch. Aggregated across 100K+ scans the diversion route becomes statistically obvious, without tipping off the unauthorised reseller."
+      },
+      "layout": "split"
     }
   ],
   "resourceCards": [
@@ -115,7 +137,7 @@
   "faq": [
     {
       "question": "Can counterfeiters reverse-engineer the chip's key?",
-      "answer": "Not without semiconductor-level attack equipment costing $1M+. NXP's secure chips (424 DNA, DESFire) use hardware key storage with anti-tamper protection rated EAL5+. Practical counterfeit operations cannot economically extract keys."
+      "answer": "Not without semiconductor-level attack equipment costing $1M+ — the kind of lab that does not coexist happily with a counterfeiting margin. NXP's secure chips (424 DNA, DESFire) use hardware key storage with anti-tamper protection rated EAL5+. Practical counterfeit operations cannot economically extract keys."
     },
     {
       "question": "What if customs officers do not have NFC-capable phones?",
@@ -123,7 +145,7 @@
     },
     {
       "question": "Does anti-counterfeit RFID slow down packaging lines?",
-      "answer": "Inline tag application adds 0.5-2 seconds per unit at 60-300 units/minute lines. Modern applicators integrate into existing labelers without throughput loss. Pre-encoded tags (received already programmed) avoid encoding-line bottleneck."
+      "answer": "Less than you would fear. Inline tag application adds 0.5-2 seconds per unit at 60-300 units/minute lines. Modern applicators integrate into existing labelers without throughput loss. Pre-encoded tags (received already programmed) avoid the encoding-line bottleneck."
     },
     {
       "question": "How many counterfeits do brands typically detect via NFC?",
@@ -154,6 +176,5 @@
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
-  "reviewedAt": "2026-05-10",
-  "modifiedAt": "2026-06-11T12:00:00Z"
+  "reviewedAt": "2026-05-10"
 }
