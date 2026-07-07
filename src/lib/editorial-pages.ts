@@ -334,6 +334,34 @@ function rewriteEditorialLinks(links: EditorialLink[]): EditorialLink[] {
     });
 }
 
+/**
+ * Hub & landing heroes stack the illustration UNDER the title instead of
+ * inheriting the product hero's image-left / copy-right split. That split is
+ * intended for individual product SKU pages only (user-requested 2026-06-11);
+ * the pillar-style hub and landing pages read better as a single column with
+ * the banner directly under the H1 — matching the /industries/ hub, which was
+ * switched to `heroLayout: "stacked"` on 2026-07-06.
+ *
+ * Keyed on group + route prefix so every current AND future page in these
+ * sections inherits the stacked layout automatically (no per-file JSON edits).
+ * Scoped to `group === "products"` because that's the only page type the split
+ * CSS targets (`[data-page-type="product"]`); other groups never split, so
+ * defaulting them would be a no-op. An explicit `heroLayout` in the editorial
+ * JSON always wins. Scope confirmed with the site owner 2026-07-07: industries
+ * + markets + landing pages stack; /products/ SKU and category pages keep the
+ * split.
+ */
+const STACKED_HERO_ROUTE_PREFIXES = ["/industries/", "/markets/", "/lp/"] as const;
+
+function defaultHeroLayout(
+  definition: EditorialDefinition,
+): EditorialDefinition["heroLayout"] {
+  if (definition.group !== "products") return undefined;
+  return STACKED_HERO_ROUTE_PREFIXES.some((prefix) => definition.route.startsWith(prefix))
+    ? "stacked"
+    : undefined;
+}
+
 export function normalizeEditorialDefinition(definition: EditorialDefinition): EditorialDefinition {
   // Resolve {chip:slug:field} placeholders against src/data/chip-specs.json BEFORE
   // any other normalization. This guarantees every downstream component sees
@@ -346,6 +374,9 @@ export function normalizeEditorialDefinition(definition: EditorialDefinition): E
 
   return {
     ...resolved,
+    // Hub/landing pages (industries, markets, lp) stack their hero; product
+    // SKU/category pages keep the image-left split. Explicit JSON wins.
+    heroLayout: resolved.heroLayout ?? defaultHeroLayout(resolved),
     brief: resolved.brief?.map((field) =>
       field.links && field.links.length > 0
         ? {
