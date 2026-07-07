@@ -17,6 +17,7 @@ export type PageLoader = (route: string) => Promise<SnapshotPage>;
  * missing because they were added as native hubs later.
  */
 const NATIVE_HUB_ROUTES: ReadonlyArray<string> = [
+  "/case-studies/",
   "/compare/",
   "/guides/",
   "/rfq/",
