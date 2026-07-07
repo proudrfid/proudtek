@@ -335,29 +335,32 @@ function rewriteEditorialLinks(links: EditorialLink[]): EditorialLink[] {
 }
 
 /**
- * Hub & landing heroes stack the illustration UNDER the title instead of
+ * Industry pillar/hub heroes stack the illustration UNDER the title instead of
  * inheriting the product hero's image-left / copy-right split. That split is
  * intended for individual product SKU pages only (user-requested 2026-06-11);
- * the pillar-style hub and landing pages read better as a single column with
- * the banner directly under the H1 — matching the /industries/ hub, which was
+ * the pillar-style /industries/ pages read better as a single column with the
+ * banner directly under the H1 — matching the /industries/ hub, which was
  * switched to `heroLayout: "stacked"` on 2026-07-06.
  *
- * Keyed on group + route prefix so every current AND future page in these
- * sections inherits the stacked layout automatically (no per-file JSON edits).
- * Scoped to `group === "products"` because that's the only page type the split
- * CSS targets (`[data-page-type="product"]`); other groups never split, so
- * defaulting them would be a no-op. An explicit `heroLayout` in the editorial
- * JSON always wins. Scope confirmed with the site owner 2026-07-07: industries
- * + markets + landing pages stack; /products/ SKU and category pages keep the
- * split.
+ * Scoped to `group === "products"` under /industries/ — the only product-type
+ * pages that carry the split-triggering `data-page-type="product"` hero. Keyed
+ * on the route prefix so every current AND future industry page inherits the
+ * stacked layout automatically; an explicit `heroLayout` in the editorial JSON
+ * always wins.
+ *
+ * Why only /industries/ (and not /markets/ or /lp/): live market and landing
+ * pages are their own page types (`markets` / `lp`), so the split CSS never
+ * applied to them and they need no opt-out. The legacy product-typed market /
+ * landing pages that once did split now live under `_unused/`, which
+ * loadEditorialDefinitions() filters out before normalization — so they never
+ * reach here. Verified against production 2026-07-07.
  */
-const STACKED_HERO_ROUTE_PREFIXES = ["/industries/", "/markets/", "/lp/"] as const;
+const STACKED_HERO_ROUTE_PREFIX = "/industries/";
 
 function defaultHeroLayout(
   definition: EditorialDefinition,
 ): EditorialDefinition["heroLayout"] {
-  if (definition.group !== "products") return undefined;
-  return STACKED_HERO_ROUTE_PREFIXES.some((prefix) => definition.route.startsWith(prefix))
+  return definition.group === "products" && definition.route.startsWith(STACKED_HERO_ROUTE_PREFIX)
     ? "stacked"
     : undefined;
 }
