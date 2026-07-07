@@ -3091,6 +3091,16 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   ) {
     max-width: var(--codex-reading-column-wide);
   }
+  /* List items and definition text must fill the fluid column too. The base
+     rule caps <li>/<dd> at the 70ch content-measure; without this override the
+     `> *` rule widens the paragraphs but the bullets keep the old narrow cap,
+     so a section reads ragged — full-width paragraphs stacked against
+     left-pinned, blank-right bullet lists. The <ul>/<ol>/<dl> container is
+     already fluid-capped and centred by `> *`; releasing the inner cap lets the
+     items span it so prose and lists line up. Added 2026-07-06. */
+  .codex-editorial-section:not([data-section-layout]) :is(li, dd) {
+    max-width: none;
+  }
 }
 
 /* Multi-column list layout — the schema's `layout: "columns"`. Flows a long
