@@ -59,7 +59,7 @@ The `-plus` half-step tiers (DS-8) were introduced to absorb pre-existing off-gr
 
 **Font weights:** 400 / 500 / 600 / 700 / 800.
 
-**Content measure:** `--codex-content-measure: 70ch` on `:where(.entry-content, .codex-editorial-section, .codex-editorial-card, .codex-blog-index, .codex-rfq-hero) :where(p, li, dd)`. Mid-window of the 45-75ch optimal-measure range.
+**Content measure:** `--codex-content-measure: 70ch` on `:where(.entry-content, .codex-editorial-section, .codex-editorial-card, .codex-blog-index, .codex-rfq-hero) :where(p, li, dd)`. Mid-window of the 45-75ch optimal-measure range. Default editorial sections also **center** their content (≥1025px) so prose isn't pinned left: the column is `--codex-reading-column` (45rem — rem, not ch, so the larger heading font shares the body's edge) and wide data elements use `--codex-reading-column-wide` (70rem). See Layout → Editorial reading column.
 
 ## Color
 
@@ -193,6 +193,7 @@ Not implemented as a full theme. Strategy: `color-scheme: light dark` is declare
 - **Kadence row layout:** `.kt-row-column-wrap` uses CSS Grid (`grid-template-columns: minmax(0, 1fr)` mobile; `repeat(N, 1fr)` desktop). Per-row inline `<style>` blocks emit desktop/tablet breakpoints with `(min-width: 1025px)`. Codex tokens **do not** override these — earlier polyfill attempts with `display: flex` broke every multi-column row.
 - **Codex row spacing:** `.kb-row-layout-wrap { margin-bottom: 20px }` — only spacing tweak applied site-wide.
 - **Max content width:** Kadence-controlled (typically 1290px center column).
+- **Editorial reading column (2026-07-06):** default (non-split) `.codex-editorial-section` blocks center their content in the `--codex-reading-column` (45rem) band from ≥1025px, so prose no longer pins to the left and leaves a lopsided blank right half on wide/rail pages. The band is **rem, not ch**, on purpose: a ch measure is font-relative, so the larger heading font would cap at a wider column than the body and their left edges would not align. Wide data elements (comparison tables, feature grids, compare panels, timelines, stat bars, figures) center in a wider `--codex-reading-column-wide` (70rem) band. Centering uses physical `margin-left/right: auto` longhands (not `margin-inline`) so they reliably beat the `margin: 0 0 …` shorthand on section headings across engines. Block flow is preserved, so paragraph margins keep collapsing and vertical rhythm is unchanged. `split` / `columns` layouts opt out via their `[data-section-layout]` attribute.
 - **Border radius scale:**
 
 | Token | Value | Use |
@@ -331,3 +332,4 @@ These appeared during the design audit (May 2026) and were removed. Don't reintr
 | 2026-05-08 | `codex.css` split into 4 sub-files by responsibility | Original 6581-line file became unreadable |
 | 2026-05-20 | DESIGN.md created via `/design-consultation` (codify path) | Document the system that already exists; provide future agents a reference |
 | 2026-06-29 (DS-17) | 12 color tokens reclaimed from raw hex (white `surface`/`text-inverse`, RFQ cool-palette `steel-*` + `surface-cool`/`border-cool`, `color-ink-strong`, `teal-dark`/`forest-dark`) | 100 raw literals → `var(--codex-*)`, zero-regression (token == value, verified); ~30 near-neighbour/singleton/brand values left raw on purpose |
+| 2026-07-06 | Balanced reading column: default editorial sections center a rem-based reading column (`--codex-reading-column` 45rem); wide data elements use a 70rem band (`--codex-reading-column-wide`). rem (not ch) keeps heading + body edges aligned | Prose-only sections pinned text to the left of a full-width container, leaving a lopsided blank right half — 2,247 of 3,442 sections across 512 pages. Split-layout figure pairing also added to image-bearing sections (DESFire post) |

@@ -23,6 +23,16 @@
   --codex-line-height-base: 1.6;
   --codex-line-height-tight: 1.2;
   --codex-content-measure: 70ch;
+  /* Centred reading column for balanced (non-split) editorial sections.
+     Deliberately rem, NOT ch: a ch measure is font-relative, so the larger
+     heading font would cap at a wider column than the body and their left
+     edges would not align. A fixed rem keeps headings and body the exact same
+     width. ~45rem ≈ the 70ch body measure. Pairs with the rule below. */
+  --codex-reading-column: 45rem;
+  /* Wider centred band for full-bleed data elements (comparison tables,
+     feature grids, figures) inside those sections — keeps a 4-column table
+     roomy while staying symmetric on ultra-wide rail pages. */
+  --codex-reading-column-wide: 70rem;
 }
 
 body {
@@ -3042,6 +3052,57 @@ body.codex-catalog-rail-locked { overflow: hidden; }
   }
   .codex-editorial-section[data-section-layout="split-reverse"] > :not(h2):not(.codex-editorial-figure) {
     grid-column: 2;
+  }
+}
+
+/* Balanced reading column — root-cause layout fix (2026-07-06) ──────────────
+   Default (non-split) editorial sections previously pinned every <p>/<li> to
+   the 70ch content-measure on the LEFT of a full-width section, leaving a
+   lopsided blank right half — worst on with-rail pillar pages, whose content
+   area drops its max-width to fill the space beside the rail (see
+   .codex-editorial-pillar--with-rail). Centre each section's content so the
+   outer whitespace is symmetric and intentional — the same principle already
+   applied to the Quick Answer box (.codex-conversion-shell caps its column at
+   one content-measure and centres it). Reading elements cap at the 70ch
+   measure; wide data elements (comparison tables, feature grids, compare
+   panels, timelines, stat bars, figures) keep a wider centred band so they
+   still breathe. Split / columns layouts opt out via their
+   [data-section-layout] attribute and keep their own grid. Block flow is
+   preserved (no display change) so paragraph margins keep collapsing and the
+   vertical rhythm is intact. Scoped ≥1025px, where there is excess width to
+   redistribute; below that the column already fills the narrow viewport. */
+@media (min-width: 1025px) {
+  .codex-editorial-section:not([data-section-layout]) > * {
+    max-width: var(--codex-reading-column);
+    /* Physical longhands (not margin-inline) so they reliably override the
+       `margin: 0 0 …` shorthand on section headings across every engine. */
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .codex-editorial-section:not([data-section-layout]) > :is(
+    .codex-editorial-table-wrap,
+    .codex-editorial-feature-grid,
+    .codex-editorial-compare-panel,
+    .codex-editorial-timeline,
+    .codex-editorial-stat-bar,
+    .codex-editorial-figure
+  ) {
+    max-width: var(--codex-reading-column-wide);
+  }
+}
+
+/* Multi-column list layout — the schema's `layout: "columns"`. Flows a long
+   single bullet list (e.g. the /industries/ 20-vertical index) into two columns
+   on wide screens, so it fills the full-width pillar-hub instead of leaving a
+   blank right half. Items never split across the column break. Collapses to one
+   column below 1025px. Added 2026-07-06. */
+@media (min-width: 1025px) {
+  .codex-editorial-section[data-section-layout="columns"] .codex-editorial-list {
+    columns: 2;
+    column-gap: var(--codex-space-8);
+  }
+  .codex-editorial-section[data-section-layout="columns"] .codex-editorial-list > li {
+    break-inside: avoid;
   }
 }
 
