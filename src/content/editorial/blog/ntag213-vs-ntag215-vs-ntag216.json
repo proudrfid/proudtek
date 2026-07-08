@@ -3,25 +3,34 @@
   "group": "blog",
   "title": "NTAG213 vs NTAG215 vs NTAG216 Comparison",
   "kicker": "RFID Technology",
-  "summary": "NTAG213, NTAG215 and NTAG216 differ in one spec that matters: user memory — 144, 504 or 888 bytes. Tap speed, phone support and security are identical. This buyer's guide covers what actually fits in each chip, volume pricing, the shared security toolkit and when to step up to NTAG 424 DNA instead.",
+  "summary": "A detailed technical comparison of the three most popular NXP NTAG chips for NFC applications. Covering memory, security features, read range, pricing and ideal use cases to help procurement teams select the right chip.",
   "heroPoints": [
-    "NTAG213, NTAG215 and NTAG216 share the same die, the same RF interface and the same security toolkit — the entire buying decision is 144 vs 504 vs 888 bytes of user memory.",
+    "NTAG213, 215 and 216 share the same RF interface but differ in memory, making chip selection primarily a payload-size decision.",
     "Choosing the smallest chip that fits your data payload reduces unit cost by 15-30 percent at volume without sacrificing performance.",
-    "All three chips carry 32-bit password protection and NXP's ECDSA originality signature; none can generate per-tap dynamic URLs — that job belongs to NTAG 424 DNA."
+    "All three chips support password-protected memory access, but only NTAG213 and NTAG216 include an originality signature for anti-counterfeiting."
   ],
-  "heroImage": "/diagrams/blog/ntag213-vs-ntag215-vs-ntag216-hero.svg",
-  "imageAlt": "Three NTAG chips compared side by side as product panels: NTAG213 with 144 bytes of user memory carrying a single small payload box, NTAG215 with 504 bytes carrying a medium stack, and NTAG216 with 888 bytes carrying a tall stack — with a shared footer noting the radio, security and phone compatibility are identical and memory is the only real difference.",
+  "heroImage": "/landing-images/ntag213-vs-ntag215-vs-ntag216-hero.jpg",
+  "imageCredit": {
+    "author": "Giacomo Alessandroni",
+    "sourceUrl": "https://commons.wikimedia.org/w/index.php?curid=125061283",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/"
+  },
+  "imageAlt": "Blue RFID-RC522 reader module board with printed antenna coil and pin header",
+  "imageSourceRoutes": [
+    "/product/nfc-stickers/",
+    "/product/nfc-cards/"
+  ],
   "sections": [
     {
       "title": "What do NTAG213, NTAG215 and NTAG216 share?",
-      "intro": "Almost everything: the same die architecture, the same 13.56 MHz air interface, ISO 14443-3A and NFC Forum Type 2 Tag compliance, and support from every NFC-enabled smartphone without custom drivers or apps. These three chips are identical triplets raised in the same house — same face, same locks, same handshake with your phone. They disagree about exactly one thing: how much they can carry. Ask a procurement team which is 'the best one' and the question quietly reframes itself, because there is no best — only the smallest one that holds your data.",
+      "intro": "Ask a procurement team which of these chips is 'the best one' and you can watch the question quietly reframe itself: there is no best, only the smallest one that holds your data. They are less a ladder to climb than the same engine offered with different-sized fuel tanks — what a buyer actually pays for is memory, and almost nothing else. NXP's NTAG21x series is the industry standard for consumer-facing NFC applications. All three variants operate at 13.56 MHz, comply with ISO 14443-3A and NFC Forum Type 2 Tag specifications, and are supported by every NFC-enabled smartphone without custom drivers or apps.",
       "image": {
-        "src": "/diagrams/blog/ntag-user-memory-scale.svg",
-        "alt": "Bar chart drawn to scale comparing user memory: NTAG213 holds 144 bytes, about one short URL; NTAG215 holds 504 bytes, several records or a full vCard and the amiibo chip; NTAG216 holds 888 bytes for configuration files and long text, filling the full bar width."
+        "src": "/blog-images/nfc-chip.jpg",
+        "alt": "NXP NTAG NFC chip close-up on an antenna inlay"
       },
       "paragraphs": [
-        "Because the family shares one die design, RF performance, power harvesting and the communication protocol are identical across the three. A reader or phone that works with NTAG213 will also work with NTAG215 and NTAG216 without any firmware changes. For a register-level reference, see the [NTAG21x family memory map and command set](/guides/ntag21x-family-memory-map-commands/).",
-        "That leaves memory as the whole movie: 144, 504 or 888 bytes of user space. Same physical footprint, same price ballpark, identical taps — you are, quite literally, shopping for how many bytes fit in the trunk."
+        "The chips share the same die architecture. The primary difference is EEPROM memory size. This means RF performance, power harvesting and communication protocol are identical across the family. A reader or phone that works with NTAG213 will also work with NTAG215 and NTAG216 without any firmware changes. For a register-level reference, see the [NTAG21x family memory map and command set](/guides/ntag21x-family-memory-map-commands/)."
       ],
       "bullets": [
         "All NTAG21x chips use a 7-byte UID that is factory-programmed and unique, enabling per-tag identification.",
@@ -32,7 +41,7 @@
     },
     {
       "title": "How do NTAG213, NTAG215 and NTAG216 differ in specs?",
-      "intro": "The table below compares every specification that differs between the three chips — squint at it and play spot-the-difference. There is exactly one row where they truly part ways (memory), one row where they politely disagree (price), and a group hug everywhere else. All other parameters (frequency, protocol, modulation, UID length) are identical.",
+      "intro": "The following table compares every specification that differs between the three chips. All other parameters (frequency, protocol, modulation, UID length) are identical.",
       "table": {
         "columns": [
           "Specification",
@@ -74,7 +83,7 @@
           [
             "Originality signature",
             "Yes (ECC-based)",
-            "Yes (ECC-based)",
+            "No",
             "Yes (ECC-based)"
           ],
           [
@@ -96,48 +105,18 @@
             "Stickers, cards, wristbands"
           ]
         ]
-      },
-      "paragraphs": [
-        "Two rows carry the entire decision — user memory and unit cost. Bookmark that fact; it will save you roughly three meetings."
-      ]
-    },
-    {
-      "title": "What actually fits in 144, 504 and 888 bytes?",
-      "intro": "A shortened URL wrapped in an NDEF record is about 40 bytes — meaning the smallest chip in the family holds it three times over. People wildly overestimate their payloads: a full HTTPS URL with tracking parameters is 80-120 bytes, a multi-record message with two URIs and a text record lands near 180 bytes, and a fuller vCard sits in the middle range where NTAG215 lives. You have to try quite hard to overflow an NTAG213.",
-      "image": {
-        "src": "/diagrams/blog/ntag-ndef-payload-fit.svg",
-        "alt": "Packing-test chart matching common NFC payloads to the minimum chip: a short URL at about 40 bytes and a serialized URL at about 80 bytes fit NTAG213, a two-URI-plus-text message near 180 bytes fits NTAG213 with no headroom, a full vCard needs NTAG215, amiibo-style game data uses all 504 bytes of NTAG215, and configuration files up to 888 bytes need NTAG216 — with a note that per-tap dynamic SUN URLs are not a memory question and require NTAG 424 DNA."
-      },
-      "bullets": [
-        "Tap-to-URL stickers, review cards, Wi-Fi provisioning and simple tickets all fit NTAG213 with room to spare — which is why it wins most projects by default.",
-        "Beware the payload that just fits: a multi-record message near 180 bytes squeezes into NTAG213 with zero headroom. If the record set might grow at reissue time, specify NTAG215 and buy yourself a future.",
-        "When the tag itself is the storage — device configs, long multi-language text, offline data — that is NTAG216 territory, and the only scenario where 888 bytes stops being decorative.",
-        "No NTAG21x chip fits a per-tap dynamic security URL at any size. That is a cryptography feature (SUN), not a memory feature — see the security section below."
-      ]
-    },
-    {
-      "title": "Do NTAG213, NTAG215 and NTAG216 differ in tap speed or phone compatibility?",
-      "intro": "No — and this earns a section only because the question consumes so many meetings. All three are NFC Forum Type 2 Tag compliant, speak ISO 14443-3A, and read identically on every NFC-enabled smartphone; URI, text, Smart Poster and Android Application Record NDEF types behave the same on each. Speed is a tie too: all three support the FAST_READ command, and at 106 kbit/s even a full NTAG216 memory dump transfers in under 100 milliseconds — the part a human actually feels is the phone launching the browser, which no chip choice can accelerate.",
-      "bullets": [
-        "The 'but is it iPhone-compatible?' question has the same answer for all three chips: yes. Spend that worry budget on your URL instead.",
-        "Write time is the one place size shows. Encoding a near-full NTAG216 at issuance takes several times longer than writing a 40-byte URL to an NTAG213 — tap-to-read users never notice, but high-volume on-site encoding stations should budget for it.",
-        "FAST_READ matters at the production line: it pulls the whole NDEF message in one command instead of page-by-page, which is how encoders and QC stations clock through full reels quickly."
-      ]
+      }
     },
     {
       "title": "Which NTAG chip should you choose?",
-      "intro": "Match the chip to the payload, and be honest about the payload — it is smaller than you think. Overspending on memory you will not use inflates project costs without benefit — the NFC equivalent of buying a chest freezer to keep a single popsicle cold.",
-      "image": {
-        "src": "/diagrams/blog/ntag-chip-decision-path.svg",
-        "alt": "Decision flowchart with four questions: just one short URL now and forever leads to NTAG213, the 95 percent answer; a few records, a full vCard or amiibo-style data leads to NTAG215 with 504 bytes of room; hundreds of bytes of configs or long text leads to NTAG216 with 888 bytes; and needing a fresh cryptographic URL on every tap leads out of the family entirely to NTAG 424 DNA."
-      },
+      "intro": "Selecting the right chip comes down to matching your data payload size and security requirements to the chip's capabilities. Overspending on memory you will not use inflates project costs without benefit — the NFC equivalent of buying a chest freezer to keep a single popsicle cold.",
       "bullets": [
         "NTAG213 — Best for single-URL applications: marketing tap links, Google review cards, Wi-Fi provisioning tags, simple vCard records. Covers 80+ percent of NFC marketing use cases.",
         "NTAG215 — Best for applications requiring 150-500 bytes of data: multi-record NDEF messages, longer vCards with photos, game figure authentication (e.g., the [amiibo standard from Nintendo](https://en.wikipedia.org/wiki/Amiibo)). Also suitable when you want a cost buffer for future payload expansion.",
-        "NTAG216 — Best for complex payloads: full vCard with multiple phone numbers and addresses, multi-language NDEF records, combined URL + text + AAR records. Also preferred when large payloads and originality-signature verification are needed on the same tag."
+        "NTAG216 — Best for complex payloads: full vCard with multiple phone numbers and addresses, multi-language NDEF records, combined URL + text + AAR records. Also preferred when originality signature verification is needed alongside large payloads."
       ],
       "paragraphs": [
-        "For most B2B marketing and access-control applications, NTAG213 provides sufficient memory. A standard HTTPS URL with UTM tracking parameters consumes 80-120 bytes, well within the 144-byte capacity. Only specify NTAG215 or NTAG216 if your payload genuinely requires the additional space — the bigger chips are not 'safer', just roomier and pricier."
+        "For most B2B marketing and access-control applications, NTAG213 provides sufficient memory. A standard HTTPS URL with UTM tracking parameters consumes 80-120 bytes, well within the 144-byte capacity. Only specify NTAG215 or NTAG216 if your payload genuinely requires the additional space or if your application needs the specific features unique to those chips."
       ],
       "callout": {
         "label": "Cost tip",
@@ -147,30 +126,17 @@
     },
     {
       "title": "How secure are NTAG21x chips against cloning?",
-      "intro": "All three chips ship the exact same security toolkit — not 'similar', the same: 32-bit password protection, an ECC-based originality signature and an optional read counter. Security is therefore never the tiebreaker inside the NTAG21x family. The real security decision is whether the family's ceiling is high enough for your threat model, because that ceiling is also identical on all three.",
-      "image": {
-        "src": "/diagrams/blog/ntag-shared-security-toolkit.svg",
-        "alt": "Security toolkit diagram: a shield marked identical on all three chips sits beside feature cards for the 32-bit password with 16-bit PACK, the ECDSA originality signature readable via READ_SIG, and the NFC read counter for analytics — plus a warning card stating the shared ceiling: no AES, no CMAC and no per-tap SUN URLs, which is NTAG 424 DNA territory."
-      },
+      "intro": "All NTAG21x chips offer password-protected memory access, but the originality signature feature is only available on NTAG213 and NTAG216. This distinction matters for product authentication and anti-counterfeiting applications.",
       "bullets": [
         "The 32-bit password and 16-bit PACK (password acknowledgment) mechanism protects memory pages from unauthorized writes. This prevents tag content from being overwritten after deployment.",
-        "The originality signature — present on NTAG213, NTAG215 and NTAG216 alike — is a factory-programmed elliptic curve cryptography (ECC) signature that proves the tag is a genuine NXP product. A reader requests it with the READ_SIG command; the public key for verification is published in the [official NXP NTAG213/215/216 datasheet](https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf).",
-        "The NFC read counter increments on each read command and can be mirrored into the NDEF URL — useful for tap analytics and crude clone-detection heuristics, but it is a number, not a cryptographic proof.",
-        "The shared ceiling: no NTAG21x chip has AES, CMAC or per-tap dynamic URLs. For high-security anti-counterfeiting, consider [NTAG424 DNA SUN/CMAC authentication](/guides/ntag424-dna-sun-cmac-authentication/) instead, which provides AES-128 mutual authentication and tamper-evident features beyond what any NTAG21x chip offers — see also our [DESFire EV1 vs EV2 vs EV3 comparison](/blog/desfire-ev1-vs-ev2-vs-ev3/) for higher-end secure chips."
-      ],
-      "callout": {
-        "label": "Before you promise 'tamper-proof'",
-        "text": "A static URL plus a read counter plus a silicon-authenticity signature adds up to marketing-grade 'tap to verify' — genuinely useful, and easily oversold. If your threat model includes motivated counterfeiters, verify server-side and specify NTAG 424 DNA with SUN.",
-        "href": "/guides/ntag424-dna-sun-cmac-authentication/"
-      }
+        "The originality signature is a factory-programmed elliptic curve cryptography (ECC) signature that proves the tag is a genuine NXP product. The public key for verification is published in the [official NXP NTAG213/215/216 datasheet](https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf).",
+        "NTAG215 lacks the originality signature, making it unsuitable for applications where chip authenticity must be cryptographically verified.",
+        "For high-security anti-counterfeiting, consider [NTAG424 DNA SUN/CMAC authentication](/guides/ntag424-dna-sun-cmac-authentication/) instead, which provides AES-128 mutual authentication and tamper-evident features beyond what any NTAG21x chip offers — see also our [DESFire EV1 vs EV2 vs EV3 comparison](/blog/desfire-ev1-vs-ev2-vs-ev3/) for higher-end secure chips."
+      ]
     },
     {
       "title": "Where do NTAG21x chips fit (and not fit) in the broader NFC chip landscape?",
-      "intro": "Sometimes the right answer is not 213, 215 or 216 — it is 'you are shopping in the wrong aisle entirely.' NTAG21x is the volume default for consumer-facing NFC, but procurement teams should know exactly when to step up to a higher-spec part. The distinctions below come up in nearly every B2B chip-selection meeting.",
-      "image": {
-        "src": "/diagrams/blog/ntag-alternatives-landscape.svg",
-        "alt": "Grid of six cards mapping jobs NTAG21x cannot do to the right chip family: per-tap anti-counterfeit URLs go to NTAG 424 DNA, multi-application credentials and stored value go to MIFARE DESFire EV2 or EV3, longer HF read range for libraries goes to ICODE SLI or SLIX, warehouse-distance reads go to UHF EPC Gen2 or dual-frequency inlays, a cheaper-than-NTAG213 aisle does not exist, and everything else — tap links, cards, tickets — stays happily on NTAG21x."
-      },
+      "intro": "NTAG21x is the volume default for consumer-facing NFC, but procurement teams should know exactly when to step up to a higher-spec part. The distinctions below come up in nearly every B2B chip-selection meeting.",
       "bullets": [
         "Higher security tier — NTAG 424 DNA: AES-128 SUN/CMAC rolling code, tamper-evident TT variant, ~416 bytes user memory. Pick this when anti-counterfeit, EU DPP authenticity, or repeated tap analytics matter. Costs ~$0.15-0.40 vs NTAG21x's $0.04-0.15. NTAG 424 DNA is the answer for luxury, premium spirits, pharma — NTAG21x is the answer for marketing taps and Wi-Fi handover.",
         "Higher memory + multi-app tier — MIFARE DESFire EV2/EV3: 2-8 KB user memory, AES-128 / 3DES mutual auth, multiple app keys. Pick this for transit, employee badges with multiple credentials on one chip, building access plus payment. Far more expensive ($0.40-1.50) — over-spec for marketing.",
@@ -181,23 +147,13 @@
     },
     {
       "title": "How do NTAG213/215/216 perform in real-world physical conditions?",
-      "intro": "Datasheets show ideal-condition specs; the deployment-condition factors below decide whether a 10K-unit batch actually reads reliably in the field. None of them care which of the three chips you picked — antenna, mounting surface and environment dominate — and this is where most procurement disappointment originates, so it is worth two minutes before the purchase order goes out.",
+      "intro": "Datasheets show ideal-condition specs. The deployment-condition factors below are what actually determines whether a 10K-unit batch reads reliably in the field — and where most procurement disappointment originates.",
       "bullets": [
         "Antenna size dominates range, not chip variant. A 25 mm circular antenna gets ~2-3 cm with iPhone; a 50 mm antenna gets ~4-7 cm. Switching from NTAG213 to NTAG216 will not improve range — same RF interface, same power harvesting.",
         "On-metal performance: NTAG21x inlays placed directly on metal surfaces (laptops, kitchen appliances, refrigerators, foil packaging) lose 80-100% of read range. Spec ferrite-backed (anti-metal) NTAG21x inlays or place a 1-2 mm spacer.",
         "Liquid attenuation: tags placed on plastic bottles read at reduced range vs cardboard packaging because water in the bottle absorbs the 13.56 MHz field. For wine/spirits, mount tags under capsule or behind back label, not directly over liquid.",
         "Industrial laundry and washing: standard NTAG21x inlays do not survive 60 °C+ industrial wash cycles or dry-cleaning solvents. For sewn-in textile NFC, spec laundry-rated PPS (polyphenylene sulfide) shell variants — typically NTAG213 or NTAG424 DNA in a sealed PPS housing.",
         "Temperature range: NTAG21x operating temperature is typically -25 to +85 °C, storage to +125 °C. Outside this (battery cells, automotive under-hood) you need ceramic-substrate or AEC-Q200 automotive parts — NTAG21x is not the right family. Standard inlays survive 10+ years at typical indoor / cellar conditions."
-      ]
-    },
-    {
-      "title": "How to buy NTAG21x chips without getting burned",
-      "intro": "You have picked a chip; now do not fumble the order. Four field-tested habits separate a smooth launch from an expensive Tuesday, and none of them appear on a datasheet.",
-      "bullets": [
-        "Sample the chip you want and the next size up. At prototype volumes the cost gap between NTAG213 and NTAG215 is pocket change — validate the real payload on the cheaper chip and keep the roomier one in your back pocket. Deciding on actual hardware beats arguing in a spreadsheet.",
-        "Test on real phones, not just the good one: your oldest supported iPhone, an Android flagship and one budget Android. The chips behave identically everywhere, but phone reader-module behaviour during writes varies more between handsets than between chips — find out at the prototype stage, not at launch.",
-        "For large runs, source from NXP-authorized distributors and verify the originality signature on a random sample of every shipment. Bargain-bin 'NTAG21x-compatible' stock has a habit of being re-marked or counterfeit silicon — cheap chips, expensive recall.",
-        "Make sure your encoding pipeline never writes over the first memory pages: the lock bits, Capability Container and configuration pages live there, and a careless issuance tool bricks tags permanently. Verify the tool's memory-map handling before the 10K reel arrives, not after."
       ]
     }
   ],
@@ -244,15 +200,15 @@
   "faq": [
     {
       "question": "Can I use NTAG215 as a drop-in replacement for NTAG213?",
-      "answer": "Yes. Both chips use the same NFC Forum Type 2 Tag protocol, the same 32-bit password protection and the same originality signature, and are read identically by smartphones. The only functional difference is memory size — 504 bytes of user space instead of 144 — so anything encoded for NTAG213 fits NTAG215 with room to spare. The practical question is simply whether you want to pay for the extra headroom."
+      "answer": "Yes for basic URL and vCard applications. Both chips use the same NFC Forum Type 2 Tag protocol and are read identically by smartphones. The only functional difference is memory size. However, NTAG215 lacks the originality signature, so it is not a direct replacement for authentication applications that verify chip genuineness."
     },
     {
       "question": "Why is NTAG215 popular for amiibo and gaming figures?",
-      "answer": "Nintendo's amiibo standard specifies NTAG215 because the data payload (532 bytes total memory) fits the game-data structure exactly. NTAG213 is too small, and NTAG216 is unnecessarily large and more expensive. Third-party amiibo clones also use NTAG215 for this reason — and if you are building your own toys-to-life collectible, the same 'the chip is the save file' logic applies."
+      "answer": "Nintendo's amiibo standard specifies NTAG215 because the data payload (532 bytes total memory) fits the game-data structure exactly. NTAG213 is too small, and NTAG216 is unnecessarily large and more expensive. Third-party amiibo clones also use NTAG215 for this reason."
     },
     {
       "question": "What is the maximum read range for NTAG21x chips?",
-      "answer": "Read range depends on the antenna size and the reader's RF field strength, not the chip itself. Typical credit-card-size antennas achieve 2-5 cm with smartphone NFC. Larger antennas (50 mm diameter circular) can extend range to 7-10 cm with powered desktop readers like the ACR122U. Switching between NTAG213, 215 and 216 changes nothing about range — same radio, same power harvesting."
+      "answer": "Read range depends on the antenna size and the reader's RF field strength, not the chip itself. Typical credit-card-size antennas achieve 2-5 cm with smartphone NFC. Larger antennas (50 mm diameter circular) can extend range to 7-10 cm with powered desktop readers like the ACR122U."
     },
     {
       "question": "Can I password-protect an NTAG213 tag to prevent overwriting?",
@@ -260,23 +216,11 @@
     },
     {
       "question": "Should I use NTAG21x or NTAG 424 DNA for my use case?",
-      "answer": "Pick NTAG21x for open-payload consumer engagement — URL taps, Wi-Fi handover, vCards, marketing campaigns, smart posters — where its low cost ($0.04-0.15 per inlay) and universal smartphone support are unbeatable. Pick NTAG 424 DNA (~$0.15-0.40) when the product's value justifies real anti-counterfeit hardware: rolling-code SUN authentication that defeats UID cloning, EU DPP authenticity requirements, or per-tap analytics with replay protection. The 32-bit password on NTAG21x is brute-forceable and is not an anti-counterfeit feature — for any authentication job the right answer is NTAG 424 DNA, not a password-protected NTAG213."
+      "answer": "Decision rule of thumb: pick NTAG21x for any open-payload consumer engagement (URL taps, Wi-Fi handover, vCard, marketing campaigns, smart posters) — its low cost ($0.04-0.15 per inlay) and universal smartphone support are unbeatable. Pick NTAG 424 DNA when (1) the value of the underlying product justifies anti-counterfeit chip cost (~$0.15-0.40), (2) you need rolling-code authentication that defeats UID cloning, (3) you must satisfy EU DPP authenticity requirements (luxury, premium spirits, electronics, batteries), or (4) you want per-tap analytics with replay protection. Plain NTAG21x's 32-bit password is brute-forceable in seconds; for any anti-counterfeit application the right answer is NTAG 424 DNA, not a password-protected NTAG213."
     },
     {
       "question": "How does the NTAG21x originality signature actually prevent cloning?",
-      "answer": "It proves silicon provenance. The originality signature is a 32-byte ECC signature (curve secp128r1) that NXP burns into NTAG213, NTAG215 and NTAG216 at manufacture; a reader requests it with READ_SIG and verifies it against NXP's public key, published in the NXP NTAG213/215/216 datasheet. That stops counterfeiters selling fake-die 'NTAG-compatible' silicon, but it does not stop UID-level cloning, because the signature signs the static UID rather than a per-tap challenge. For full anti-clone protection you need NTAG 424 DNA's rolling SUN/CMAC, which signs every tap with a fresh challenge a clone cannot reproduce."
-    },
-    {
-      "question": "Is NTAG216 the 'safe' choice if budget allows?",
-      "answer": "No — it is the quietly-overpaying choice. At 10K volumes NTAG216 runs roughly double NTAG213's unit cost ($0.08 – $0.15 vs $0.04 – $0.08) and delivers nothing a user can feel unless the payload genuinely needs hundreds of bytes. For tap-to-URL cards, review cards and simple tickets, NTAG213 is the engineered-correct answer, not the budget compromise."
-    },
-    {
-      "question": "Which NTAG chip does Apple Wallet support?",
-      "answer": "All of them, indirectly — Apple Wallet passes are not stored on the tag. The tag encodes a pass-delivery URL in a standard NDEF record, the iPhone reads it like any other link, and Safari adds the pass. So the only sizing question is the length of your delivery URL, and that almost always fits NTAG213 comfortably."
-    },
-    {
-      "question": "Can I upgrade a deployed NTAG213 fleet to NTAG215 later?",
-      "answer": "Not in the field — memory size is fixed in silicon at manufacture, so 'upgrading' means reissuing tags. If a deployed fleet outgrows NTAG213 you have three options: shorten the payload with a URL shortener, move the data server-side and keep the tag as a pointer, or reissue on NTAG215 at the next natural refresh. The first two are usually cheaper than a reprint — which is an argument for sizing headroom honestly on day one."
+      "answer": "The originality signature is a 32-byte ECC (NIST P-128 / secp128r1) signature that NXP burns into the chip at manufacture. The signing key is held by NXP; the public key for verification is published in the NXP NTAG213/215/216 datasheet. A reader can request the signature and verify it against the public key plus the chip UID — proving the chip was made in an NXP fab. This stops counterfeiters from selling chips with the NXP name on a fake die, but it does not stop UID-level cloning attacks (because the signature signs the UID, not a per-tap challenge). For full anti-clone protection you need NTAG 424 DNA's rolling SUN/CMAC, which signs each tap with a fresh challenge that a cloned chip cannot reproduce. Note also that NTAG215 lacks the originality signature feature — only NTAG213 and NTAG216 carry it."
     }
   ],
   "primaryAction": {
@@ -293,16 +237,8 @@
       "label": "Browse NFC cards"
     }
   ],
-  "keywords": [
-    "NTAG213 vs NTAG215 vs NTAG216",
-    "NTAG213 memory capacity",
-    "NTAG215 amiibo chip",
-    "NTAG216 user memory",
-    "NFC Forum Type 2 chips",
-    "NTAG21x comparison"
-  ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09",
-  "modifiedAt": "2026-07-08"
+  "modifiedAt": "2026-06-10T01:00:41Z"
 }
