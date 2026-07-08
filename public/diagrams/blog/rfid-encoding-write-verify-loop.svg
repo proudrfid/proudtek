@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+<title id="t">The write-then-verify loop — match ships the tag, mismatch goes to the reject bin</title>
+<desc id="d">Flow diagram. Step 1, write the intended payload. Step 2, read back what actually landed. Step 3, compare byte-for-byte. A green match path leads to a ship-it box — then lock per policy. A red mismatch path leads to the reject bin for inspection. A dashed gold retry loop returns from the compare step to the write step, capped at three attempts before the tag is binned. Banner: skipped verification is how read-rate promises quietly die — it is the single most common reason field read rates come in under spec, and the cheapest to fix.</desc>
+<defs><radialGradient id="bg" cx="50%" cy="16%" r="94%"><stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/></radialGradient></defs>
+<rect width="1200" height="675" fill="url(#bg)"/>
+<rect x="16" y="16" width="1168" height="643" rx="20" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+<text x="600" y="54" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="0.5" fill="#6d5a3a">ENCODING QA — NEVER TRUST A WRITE YOU DIDN'T READ BACK</text>
+<text x="600" y="96" text-anchor="middle" font-family="Lora, Georgia, serif" font-size="30" font-weight="700" fill="#291c0e">Write it, read it back, then believe it</text>
+
+<!-- write -->
+<rect x="84" y="210" width="190" height="90" rx="14" fill="#3d6b6b"/>
+<text x="179" y="248" text-anchor="middle" font-size="18" font-weight="800" fill="#ffffff">1 · Write</text>
+<text x="179" y="272" text-anchor="middle" font-size="12.5" fill="#cfe0e0">the intended payload</text>
+<line x1="282" y1="255" x2="322" y2="255" stroke="#c39a5f" stroke-width="3"/>
+<path d="M 330 255 l -12 -6 v 12 z" fill="#c39a5f"/>
+
+<!-- read back -->
+<rect x="338" y="210" width="190" height="90" rx="14" fill="#2c5454"/>
+<text x="433" y="248" text-anchor="middle" font-size="18" font-weight="800" fill="#ffffff">2 · Read back</text>
+<text x="433" y="272" text-anchor="middle" font-size="12.5" fill="#cfe0e0">what actually landed</text>
+<line x1="536" y1="255" x2="574" y2="255" stroke="#c39a5f" stroke-width="3"/>
+<path d="M 582 255 l -12 -6 v 12 z" fill="#c39a5f"/>
+
+<!-- compare -->
+<polygon points="700,190 810,255 700,320 590,255" fill="#291c0e"/>
+<text x="700" y="250" text-anchor="middle" font-size="15" font-weight="800" fill="#ffffff">3 · Compare</text>
+<text x="700" y="272" text-anchor="middle" font-size="12" fill="#d8d0c0">byte-for-byte</text>
+
+<!-- match path -->
+<line x1="764" y1="217" x2="862" y2="182" stroke="#1f6f3a" stroke-width="3"/>
+<circle cx="866" cy="181" r="4" fill="#1f6f3a"/>
+<text x="784" y="176" font-size="13" font-weight="700" fill="#1f6f3a">match ✓</text>
+<rect x="878" y="140" width="240" height="84" rx="12" fill="#eaf5ec" stroke="#2d6a4f" stroke-width="2"/>
+<text x="998" y="176" text-anchor="middle" font-size="16" font-weight="800" fill="#1f6f3a">Ship it</text>
+<text x="998" y="200" text-anchor="middle" font-size="12.5" fill="#2d6a4f">then lock per policy</text>
+
+<!-- mismatch path -->
+<line x1="764" y1="293" x2="862" y2="330" stroke="#8b2d2d" stroke-width="3"/>
+<circle cx="866" cy="331" r="4" fill="#8b2d2d"/>
+<text x="778" y="338" font-size="13" font-weight="700" fill="#8b2d2d">mismatch ✗</text>
+<rect x="878" y="340" width="240" height="84" rx="12" fill="#f7e9e9" stroke="#8b2d2d" stroke-width="2"/>
+<text x="998" y="376" text-anchor="middle" font-size="16" font-weight="800" fill="#8b2d2d">Reject bin</text>
+<text x="998" y="400" text-anchor="middle" font-size="12.5" fill="#8b2d2d">divert for inspection</text>
+
+<!-- retry loop -->
+<path d="M 690 326 C 560 432, 300 432, 190 310" fill="none" stroke="#c39a5f" stroke-width="3" stroke-dasharray="8 7"/>
+<path d="M 186 306 l 1 15 l 12 -9 z" fill="#c39a5f"/>
+<rect x="330" y="398" width="340" height="36" rx="12" fill="#f9f1e2" stroke="#e4c98f"/>
+<text x="500" y="421" text-anchor="middle" font-size="13.5" font-weight="700" fill="#6d5a3a">retry — three strikes, then the bin</text>
+
+<!-- banner -->
+<rect x="200" y="486" width="800" height="110" rx="14" fill="#f9f1e2" stroke="#e4c98f" stroke-width="1.5"/>
+<text x="600" y="530" text-anchor="middle" font-family="Lora, Georgia, serif" font-size="21" font-weight="700" fill="#291c0e">Skipped verification is how read-rate promises quietly die.</text>
+<text x="600" y="562" text-anchor="middle" font-size="13.5" fill="#4f4f4f">The most common reason field read rates come in under spec — and the cheapest one to fix.</text>
+
+<text x="600" y="632" text-anchor="middle" font-size="13.5" fill="#5c5c5c">Works for HF and UHF alike: compare against the manifest, not against optimism.</text>
+</svg>
