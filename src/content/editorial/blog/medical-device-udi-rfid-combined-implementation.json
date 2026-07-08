@@ -3,22 +3,25 @@
   "group": "blog",
   "title": "Medical Device UDI + RFID — A Combined Guide",
   "kicker": "Healthcare Compliance",
-  "summary": "FDA UDI (Unique Device Identifier) requires every medical device to carry a unique identifier with version data. RFID is increasingly the data carrier of choice — but UDI compliance requires specific encoding, marking and database submission.",
+  "summary": "FDA UDI (21 CFR 830) requires every Class I, II and III medical device to carry a Unique Device Identifier in human-readable and AIDC form. RFID is an accepted AIDC carrier — but compliance still hinges on specific encoding, dual marking and the mandatory GUDID database submission.",
   "heroPoints": [
     "FDA UDI rule (21 CFR 830) requires every Class I, II and III medical device to carry a Unique Device Identifier (UDI) — a Device Identifier (DI) plus optional Production Identifier (PI) — in human-readable plus AIDC formats.",
     "RFID/NFC is increasingly accepted as the AIDC data carrier alongside 2D DataMatrix and barcode, particularly for surgical instruments, implants and capital equipment.",
-    "Compliant programs combine the UDI on the device itself plus submission to the FDA GUDID database — RFID alone does not satisfy UDI; the database submission is mandatory."
+    "RFID alone does not satisfy UDI: compliant programs combine the identifier on the device itself with the mandatory submission to the FDA GUDID database."
   ],
-  "heroImage": "/blog-images/medical-device-udi-rfid-combined-implementation.jpg",
-  "imageAlt": "Medical device with a regulatory label — the FDA-required UDI marking RFID tagging extends.",
-  "imageSourceRoutes": [
-    "/industries/healthcare/",
-    "/solutions/rfid-tool-tracking/"
-  ],
+  "heroImage": "/diagrams/blog/medical-device-udi-rfid-combined-implementation-hero.svg",
+  "imageAlt": "A medical device carrying its UDI as a printed human-readable label plus an RFID tag, transmitting the Device Identifier and Production Identifier to the FDA GUDID database — marking the device and registering the record are separate, equally mandatory obligations.",
   "sections": [
     {
       "title": "What is FDA UDI and what does it require?",
-      "intro": "The first thing teams learn about UDI is that marking the device is only half the job. You can engrave a flawless identifier onto every instrument and still be out of compliance, because the same number also has to live in a federal database — and the database, not the device, is what an inspector pulls up first. UDI is two ledgers that must agree: the one in your hand and the one in Washington. The FDA Unique Device Identification (UDI) rule established a global system for identifying medical devices in commerce. Every device sold in the US carries a UDI; every UDI is registered in the FDA Global UDI Database (GUDID).",
+      "intro": "The first thing teams learn about UDI is that marking the device is only half the job. You can engrave a flawless identifier onto every instrument and still be out of compliance, because the same number also has to live in a federal database — and the database, not the device, is what an inspector pulls up first.",
+      "image": {
+        "src": "/diagrams/blog/udi-rfid-two-ledgers.svg",
+        "alt": "Two-panel diagram of the UDI obligation: on the device, a static Device Identifier and a variable Production Identifier appear as printed text plus an AIDC carrier; in the FDA GUDID database, the matching record lists the same identifier with intended use, MRI safety and roughly 57 attributes — and the two must match."
+      },
+      "paragraphs": [
+        "UDI is two ledgers that must agree: the one in your hand and the one in Washington. The FDA Unique Device Identification (UDI) rule established a global system for identifying medical devices in commerce. Every device sold in the US carries a UDI; every UDI is registered in the FDA Global UDI Database (GUDID)."
+      ],
       "bullets": [
         "Device Identifier (DI): static portion that identifies the device model, manufacturer and version. Same DI for every unit of that model.",
         "Production Identifier (PI): variable portion containing lot, serial number, manufacturing date and expiry. Changes per unit or per batch.",
@@ -29,7 +32,11 @@
     },
     {
       "title": "How does RFID work as a UDI data carrier?",
-      "intro": "RFID is one of several FDA-accepted AIDC formats for UDI. Its advantages over barcode are read speed, no line-of-sight requirement and reusability across the device lifecycle. Implementation has specific requirements.",
+      "intro": "RFID is one of several FDA-accepted AIDC formats for UDI. Its advantages over barcode are read speed, no line-of-sight requirement and reusability across the device lifecycle. A barcode must be presented to a scanner; an RFID tag can be read through packaging or a surgical drape without repositioning the device. Implementation has specific requirements.",
+      "image": {
+        "src": "/diagrams/blog/udi-rfid-data-carrier-read.svg",
+        "alt": "An RFID inlay encoded with the GS1 element string transmits the Device Identifier and Production Identifier to a handheld reader in one read with no line of sight — HF for surgical instruments and implants, UHF for capital equipment — alongside the requirement that a printed human-readable UDI accompany the tag and stay readable for the device's full useful life."
+      },
       "bullets": [
         "Encoding format: UDI string encoded into the RFID memory using GS1 element string format. Tag carries both DI and PI in a single read.",
         "Chip selection: passive HF or UHF — neither is mandatory. HF for surgical instruments and implants needing close-range identification; UHF for capital equipment and bulk inventory.",
@@ -41,17 +48,29 @@
     {
       "title": "How do you build a UDI + RFID program?",
       "intro": "A combined UDI + RFID program touches design, manufacturing, packaging, regulatory affairs and post-market surveillance. The five-step playbook below comes from successful medical-device manufacturer programs.",
+      "image": {
+        "src": "/diagrams/blog/udi-rfid-program-five-steps.svg",
+        "alt": "Five-step UDI plus RFID program flow — design, manufacturing line, GUDID submission, distribution and traceability, post-market surveillance — with the GUDID submission step flagged as mandatory before commercial distribution."
+      },
       "bullets": [
         "Design phase: choose UDI issuing agency (GS1 most common), reserve DI numbering range, design UDI placement on every device variant.",
         "Manufacturing line: integrate UDI marker (printer + RFID encoder) into the production line. Each device gets DI + PI marked plus RFID-encoded.",
         "GUDID submission: regulatory affairs team submits each UDI's metadata to GUDID via HL7 message or FDA portal. Submission deadline: prior to commercial distribution.",
         "Distribution and traceability: hospital and distributor systems read UDI + RFID for inventory, recall and adverse-event tracking. RFID accelerates the read; UDI provides the standardized identifier.",
         "Post-market surveillance: when adverse events occur, UDI lets FDA and manufacturer trace every unit affected. RFID helps locate units in hospital inventory; UDI tells you which units to look for."
-      ]
+      ],
+      "callout": {
+        "label": "Sequence requirement",
+        "text": "GUDID submission must be complete before commercial distribution. A correct label does not cure a missing database record — the submission comes first, shipping second."
+      }
     },
     {
       "title": "Where does the FDA UDI compliance timeline actually sit in 2026?",
       "intro": "The UDI Final Rule was published September 24, 2013 (21 CFR 801 Subpart B and 21 CFR 830) and phased in by device risk class. Greenlight Guru's UDI guide and FDA's own UDI Basics page are the two most cited references for the schedule. By 2026 the rule applies to every regulated risk class — but several edge cases still trip programs up.",
+      "image": {
+        "src": "/diagrams/blog/udi-rfid-compliance-timeline.svg",
+        "alt": "FDA UDI compliance timeline by risk class: Class III since September 24, 2014, Class II since September 24, 2016, Class I and unclassified since September 24, 2022 with GUDID submission by December 8, 2022, and a 2026 marker noting every class is now in scope — audit attention has moved to GUDID data quality, direct part marking under 21 CFR 801.45 and kit exemptions under 21 CFR 801.30."
+      },
       "bullets": [
         "Class III (life-supporting / life-sustaining): UDI compliance since September 24, 2014. By 2026 these devices have been UDI-labelled for over a decade; the 2026 issue is data hygiene in GUDID, not whether the label is present.",
         "Class II (most general medical devices): UDI compliance since September 24, 2016. By 2026 a 'missing UDI' on a Class II device is treated as a labelling violation and a Form FDA-483 inspection observation.",
@@ -63,13 +82,21 @@
     {
       "title": "How does FDA UDI compare with EU MDR UDI?",
       "intro": "EU Medical Devices Regulation 2017/745 (MDR) and In Vitro Diagnostics Regulation 2017/746 (IVDR) introduced the EU's UDI system in parallel with FDA's. Greenlight Guru's UDI overview emphasises that the two are conceptually aligned but procedurally divergent, with EUDAMED rather than GUDID, and an additional Basic UDI-DI grouping that has no FDA equivalent. Multinational programs need to track five differences explicitly.",
+      "image": {
+        "src": "/diagrams/blog/udi-rfid-gudid-vs-eudamed.svg",
+        "alt": "Side-by-side comparison of FDA GUDID — roughly 57 attributes, GS1, HIBCC and ICCBBA issuing agencies, public AccessGUDID look-up, no SRN — and EU EUDAMED — roughly 111 attributes, an additional Basic UDI-DI grouping, SRN registration required before submission, EMDN nomenclature — with a note that the two submissions are independent and one does not feed the other."
+      },
       "bullets": [
         "Basic UDI-DI vs UDI-DI: EU MDR introduced a Basic UDI-DI to group related device variants under one product family identifier. The Basic UDI-DI never appears on the device label or in AIDC — it is a regulatory grouping in EUDAMED. Manufacturers must assign a Basic UDI-DI per product group and map child UDI-DIs into it.",
         "Issuing entities: FDA approves GS1, HIBCC and ICCBBA. The European Commission also accredits IFA (Informationsstelle für Arzneispezialitäten) for certain IVDs in addition to those three. Most multinational manufacturers stay on GS1 across regions to keep one identifier set.",
         "Database: FDA GUDID (with public-facing AccessGUDID) versus the EU EUDAMED. Roughly 57 attributes in GUDID; ~111 attributes in EUDAMED. Submissions are independent — submitting to one does not feed the other.",
         "Single Registration Number (SRN): EU MDR requires economic operators (manufacturer, authorised representative, importer) to register and obtain an SRN before submitting UDI data to EUDAMED. FDA has no SRN equivalent — labeler identity is captured directly within GUDID submissions.",
         "Nomenclature: EU MDR uses the European Medical Device Nomenclature (EMDN) for product classification within EUDAMED. FDA uses its own product-code system (the FDA Device Classification database). Multinational regulatory teams typically maintain a crosswalk between EMDN, FDA product codes and the legacy Global Medical Device Nomenclature (GMDN) used by some other regions."
-      ]
+      ],
+      "callout": {
+        "label": "Editorial note",
+        "text": "This guide summarizes public FDA and EU regulatory requirements for general information. It is not legal or regulatory advice — confirm current obligations with the FDA UDI program and your notified body before acting."
+      }
     }
   ],
   "resourceCards": [
@@ -148,8 +175,17 @@
       "label": "Tool tracking"
     }
   ],
+  "keywords": [
+    "FDA UDI rule 21 CFR 830",
+    "UDI Device Identifier Production Identifier",
+    "RFID UDI data carrier",
+    "GUDID submission requirements",
+    "UDI direct part marking 21 CFR 801.45",
+    "EU MDR Basic UDI-DI",
+    "FDA GUDID vs EUDAMED"
+  ],
   "authorSlug": "editorial-board",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-08",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09"
 }
