@@ -140,6 +140,8 @@ Key routing rules:
 - Code review/diff check → invoke /review
 - Visual polish → invoke /design-review
 - Blog rewrite for enjoyability/humor (Tier A/B voice) → invoke /blog-voice
+- Blog full makeover: voice + SVG illustrations + SEO/GEO in one pass → invoke /blog-transform
+- Same makeover but running inside a Cowork/Fable sandbox session → invoke /blog-fable
 - Solutions/Guides page rewrite for enjoyability/humor → invoke /page-voice
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
 - Save progress → invoke /context-save
