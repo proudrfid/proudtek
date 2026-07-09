@@ -3,25 +3,21 @@
   "group": "blog",
   "title": "RFID Asset Tracking for Warehouses",
   "kicker": "Industrial RFID",
-  "summary": "A technical guide to RFID asset tracking in warehouse environments for operations and procurement teams, covering UHF vs HF frequency selection, LED-enabled tags for visual location, portal reader deployment and integration with warehouse management systems.",
+  "summary": "RFID warehouse asset tracking lifts inventory accuracy to 95-99% and reads 200-500 tags per second at UHF dock-door portals, replacing line-of-sight barcode scans. This guide covers UHF vs HF frequency selection, LED pick-to-light tags, portal deployment, RTLS and warehouse management system (WMS) integration.",
   "heroPoints": [
     "UHF RFID enables bulk reading of hundreds of tagged assets per second at portal readers and dock doors, eliminating manual barcode scanning.",
     "LED-enabled RFID tags provide visual pick-to-light location of individual items in dense storage, reducing search time by 70-90 percent.",
     "Portal readers at dock doors and zone transitions create automatic chain-of-custody records without operator intervention."
   ],
-  "heroImage": "/landing-images/rfid-asset-label.jpg",
-  "imageAlt": "RFID portal reader at warehouse dock door scanning tagged assets",
-  "imageSourceRoutes": [
-    "/product/rfid-tag-with-led-light/",
-    "/product/rfid-windshield-tag/"
-  ],
+  "heroImage": "/diagrams/blog/rfid-asset-tracking-warehouses-hero.svg",
+  "imageAlt": "Warehouse RFID system overview: a UHF dock portal reads a full pallet at 200-500 tags per second, zone readers log every crossing hands-free for chain of custody, LED tags light the exact pick location, and a ceiling RTLS reader pinpoints high-value assets to within 2 ft / 0.6 m — all feeding one WMS.",
   "sections": [
     {
       "title": "Why warehouses need RFID asset tracking",
       "intro": "Every warehouse has a ghost asset: the pallet the system swears is in Zone C and that is provably not in Zone C. It is somewhere in the building, and finding it has just become someone's entire afternoon. That is the quiet tax of line-of-sight tracking — the cost is rarely the scanning, it is the searching. Warehouses manage high volumes of assets (pallets, containers, tools, returnable transport items (RTIs) and high-value equipment) that move between zones, facilities and customers. Barcode-based tracking requires line-of-sight scanning of each item individually, creating bottlenecks at receiving, putaway, picking and shipping.",
       "image": {
-        "src": "/blog-images/warehouse.jpg",
-        "alt": "Warehouse interior with RFID-tagged inventory on shelving racks"
+        "src": "/diagrams/blog/rfid-vs-barcode-dock-capture.svg",
+        "alt": "Side-by-side comparison at one dock door: barcode scanning is line-of-sight and takes 15-30 seconds per carton by hand, while a UHF RFID portal reads a whole pallet hands-free in 2-3 seconds at 200-500 tags per second."
       },
       "paragraphs": [
         "RFID eliminates the line-of-sight requirement. A UHF portal reader at a dock door reads all tagged items on a pallet or in a truck simultaneously as they pass through, capturing 200-500 tag reads per second. This transforms receiving and shipping from a per-item scanning process into an automatic bulk-capture process, reducing dock-door dwell time and labor cost."
@@ -84,12 +80,16 @@
         ]
       },
       "paragraphs": [
-        "For most warehouse asset tracking applications (pallet tracking, RTI management, dock-door portals and forklift-mounted reading) UHF is the clear choice. HF is used when the application requires short-range precision, such as tool check-out at a crib window or item-level identification at a packing station."
+        "For most warehouse asset tracking applications (pallet tracking, RTI management, dock-door portals and forklift-mounted reading) UHF is the clear choice. HF is used when the application requires short-range precision, such as tool check-out at a crib window or item-level identification at a packing station. For the full physics-and-cost breakdown behind the frequency decision, see [UHF vs HF RFID](/blog/uhf-vs-hf-rfid-frequency-choice/)."
       ]
     },
     {
       "title": "How do you handle LED-enabled tags for visual item location?",
       "intro": "Finding a specific item in a warehouse with thousands of storage locations is a major time cost — you know it is in the building, which is precisely the problem. LED-enabled RFID tags add a visual indicator that lights up when the tag is queried, guiding the picker to the item, not down the wrong aisle first.",
+      "image": {
+        "src": "/diagrams/blog/rfid-led-pick-to-light.svg",
+        "alt": "Three-step LED pick-to-light flow: the WMS sends the tag ID to the reader, the target tag's on-board LED lights on the exact shelf, and the operator walks straight to the item — annotated with 70-90 percent less search time, 2-4 year battery life and 10,000-50,000 LED activations per tag."
+      },
       "bullets": [
         "The LED tag contains a small battery and an LED that activates when the tag receives a specific command from the reader. The operator searches for the tag ID and the LED flashes on the target item or shelf location.",
         "Search time reduction: operators report 70-90 percent reduction in time spent locating specific items in dense racking compared to label-reading visual search.",
@@ -101,6 +101,10 @@
     {
       "title": "How does portal reader deployment at dock doors and zone transitions work?",
       "intro": "Portal readers are fixed UHF reader systems installed at physical transition points (dock doors, zone boundaries, conveyor entries) to automatically capture all tagged items passing through.",
+      "image": {
+        "src": "/diagrams/blog/rfid-dock-portal-read-zone.svg",
+        "alt": "Anatomy of a dock-door portal: two to four antennas mounted inside the door frame create a read zone that captures a tagged pallet as it rolls through, alongside the four design facts — antenna count, mixed-load capture, EPC Gen2 Q-algorithm anti-collision, and conveyor reads up to 3 m/s."
+      },
       "bullets": [
         "A dock-door portal typically uses 2-4 antennas mounted on the door frame to create a read zone that captures tags on pallets, carts and individual cartons.",
         "Zone-transition portals installed at aisle entries or between warehouse sections provide real-time location updates as assets move through the facility.",
@@ -112,6 +116,10 @@
     {
       "title": "How do WMS integration and data architecture work?",
       "intro": "RFID readers generate high-volume tag-read data that must be filtered, deduplicated and mapped to business events before it is useful in a warehouse management system.",
+      "image": {
+        "src": "/diagrams/blog/rfid-wms-data-flow.svg",
+        "alt": "RFID data pipeline in four stages: raw EPC reads flow into middleware such as Impinj ItemSense or Zebra RFID Connect, which filters and deduplicates them into business events (received, moved to zone B, shipped) pushed to the WMS via API, MQTT/Kafka or EPCIS in near real-time."
+      },
       "bullets": [
         "RFID middleware (e.g., Impinj ItemSense, Zebra RFID Connect) processes raw tag reads into business events: 'asset received,' 'asset moved to zone B,' 'asset shipped.'",
         "EPC (Electronic Product Code) on each tag provides a globally unique identifier that maps to the asset record in the WMS database.",
@@ -123,6 +131,10 @@
     {
       "title": "What does a defensible warehouse RFID accuracy benchmark actually look like?",
       "intro": "Vendor brochures throw around '99% accuracy' loosely. When you commit your warehouse to a number in front of finance or a brand-customer SLA, you need an audit trail back to a published benchmark. The references below are the standard sources we cite for warehouse asset-tracking accuracy claims.",
+      "image": {
+        "src": "/diagrams/blog/warehouse-rfid-accuracy-benchmarks.svg",
+        "alt": "Four published warehouse RFID accuracy benchmarks with sources: Auburn RFID Lab Project Zipper (69% of orders inaccurate under legacy UPC versus under 0.01% with EPC/RFID), GS1 US (63% manual count to about 95% with item-level RFID), engineered UHF systems at 99.7-99.95%, and an SLS D-Series dock-door portal at 99.99%."
+      },
       "bullets": [
         "Auburn RFID Lab — Project Zipper (8 brands + 5 retailers, 10 months): legacy UPC receiving audits recorded inaccuracy in 69% of orders; EPC/RFID audits recorded inaccuracy in less than 0.01%. This is the cleanest published apples-to-apples dataset and the source most commonly cited in retail-mandate compliance discussions.",
         "GS1 US baseline (cited in the Walmart RFID supplier program): item-level RFID lifts retail inventory accuracy from a 63% manual-count baseline to ~95% — the same step-change that justifies the supplier mandates from Walmart, Target, Macy's, Nordstrom and Kohl's.",
@@ -134,6 +146,10 @@
     {
       "title": "How do real-time location systems (RTLS) extend basic asset tracking?",
       "intro": "Basic RFID asset tracking answers 'where was the asset last seen?' at the granularity of a portal or zone. Real-time location systems (RTLS) layered on top of RFID infrastructure answer 'where is the asset right now?' to the meter level. Choosing between portal-only and full RTLS is a cost-vs-precision decision that most warehouses make in two phases.",
+      "image": {
+        "src": "/diagrams/blog/rtls-vs-portal-coverage.svg",
+        "alt": "Portal-only versus full RTLS coverage: portal-only sees position only at portal crossings at 1/3 to 1/5 of the capex, while full RTLS with ceiling readers (Zebra ATR7000, Impinj xArray) locates assets continuously to within 2 ft / 0.6 m — with a two-year phasing plan underneath."
+      },
       "bullets": [
         "Zebra ATR7000 ceiling-mounted RTLS reader: electronically steered, processes hundreds of narrow flashlight-style beams simultaneously, delivers asset location accuracy within 2 ft / 0.6 m or less. Best fit for high-value mobile assets in well-defined zones (forklift positioning, RTI tracking, finished-goods staging).",
         "Impinj xArray Gateway: ceiling-mounted reader covering a 40-foot diameter at a 15-foot mounting height, distinguishing 52 distinct antenna beams for location assignment within the read zone. Linear-polarized antennas read tags in any orientation — useful for mixed-product zones where tag orientation cannot be controlled.",
@@ -243,8 +259,30 @@
       "label": "Read about LED tags for location"
     }
   ],
+  "keywords": [
+    "RFID asset tracking warehouse",
+    "UHF RFID portal reader",
+    "LED RFID pick-to-light tags",
+    "warehouse inventory accuracy RFID",
+    "RTLS warehouse asset tracking",
+    "WMS RFID integration"
+  ],
+  "sources": [
+    {
+      "label": "GS1 EPC UHF Gen2 Air Interface Protocol (Gen2v2)",
+      "url": "https://www.gs1.org/standards/epc-rfid/uhf-air-interface-protocol",
+      "publisher": "GS1",
+      "accessedAt": "2026-07-09"
+    },
+    {
+      "label": "Auburn University RFID Lab — supply-chain accuracy research (Project Zipper)",
+      "url": "https://rfid.auburn.edu/",
+      "publisher": "Auburn University RFID Lab",
+      "accessedAt": "2026-07-09"
+    }
+  ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09",
-  "modifiedAt": "2026-06-11T10:00:00Z"
+  "modifiedAt": "2026-07-09T10:00:00Z"
 }
