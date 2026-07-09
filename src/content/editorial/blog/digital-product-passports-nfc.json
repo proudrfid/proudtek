@@ -3,32 +3,28 @@
   "group": "blog",
   "title": "Digital Product Passports and NFC Tags",
   "kicker": "Industry Trends",
-  "summary": "The EU has decided that products should carry a digital passport — and NFC tags are how a shopper actually reads one. This is the specification-level guide to how NFC tags enable EU-mandated Digital Product Passports (DPP) for textiles, batteries, electronics and construction materials, covering the regulatory requirements, data architecture, tag selection and implementation timelines that B2B manufacturers and brand owners have to get right.",
+  "summary": "EU Digital Product Passports start becoming mandatory in 2027, and an NFC tag is how a shopper actually taps a product to read one — its origin, materials, repair guide and recycling route. This is the specification-level guide to how NFC tags carry EU-mandated Digital Product Passports (DPP) for textiles, batteries, electronics and construction materials: the regulatory requirements, data architecture, tag selection and implementation timelines B2B manufacturers and brand owners have to get right.",
   "heroPoints": [
     "The EU's Ecodesign for Sustainable Products Regulation (ESPR) mandates Digital Product Passports for multiple product categories starting in 2027, creating a massive B2B market for NFC-enabled product tagging.",
     "NFC tags provide the consumer-accessible interface for DPP data. A smartphone tap retrieves product origin, material composition, repair guides and recycling instructions.",
     "DPP implementation requires coordination between NFC hardware, cloud-hosted data repositories, GS1 identification standards and product-lifecycle management systems."
   ],
-  "heroImage": "/landing-images/nfc-digital-product-passport-tag.jpg",
-  "imageAlt": "NFC tag on a product label linking to a digital product passport on a smartphone",
-  "imageSourceRoutes": [
-    "/product/nfc-stickers/",
-    "/product/nfc-cards/"
-  ],
+  "heroImage": "/diagrams/blog/digital-product-passports-nfc-hero.svg",
+  "imageAlt": "Diagram: a shopper taps a product's NFC tag, the tag hands off a GS1 Digital Link URL, and the phone opens the product's Digital Product Passport showing five lifecycle data blocks — origin and manufacture, material composition, repair and care, recycling and end-of-life, and compliance and certificates.",
   "sections": [
     {
       "title": "What is a Digital Product Passport?",
-      "intro": "Somewhere in Brussels, a regulation decided that every battery, garment, and laptop sold in the EU should be able to explain itself — where it came from, what it is made of, and how to recycle it — to anyone holding a smartphone. Manufacturers received this as a compliance deadline; their customers will experience it as a tap. The tag that makes the tap work is the inexpensive part of the project; the structured data behind it is the part that keeps program managers up at night. A Digital Product Passport (DPP) is a structured digital record that accompanies a physical product throughout its lifecycle, providing standardized information on material composition, manufacturing origin, environmental footprint, repairability and end-of-life recycling pathways.",
+      "intro": "Somewhere in Brussels, a regulation decided that every battery, garment, and laptop sold in the EU should be able to explain itself — where it came from, what it is made of, and how to recycle it — to anyone holding a smartphone. Manufacturers received this as a compliance deadline; their customers will experience it as a tap. A Digital Product Passport (DPP) is a structured digital record that accompanies a physical product throughout its lifecycle, providing standardized information on material composition, manufacturing origin, environmental footprint, repairability and end-of-life recycling pathways. The tag that makes the tap work is the cheap part of the project; the structured data behind it — mapped below — is the part that keeps program managers up at night.",
       "image": {
-        "src": "/blog-images/digital-passport.jpg",
-        "alt": "NFC tag enabling digital product passport scan on luxury goods"
+        "src": "/diagrams/blog/dpp-nfc-concept.svg",
+        "alt": "Diagram: a physical product carries only a small identifier on an NFC tag, QR code or RFID label, while the actual passport record lives in the cloud; an arrow labelled 'unique identifier' connects the two, and a bottom row shows the four first-wave regulated categories — batteries, textiles, electronics and construction products — each with its own delegated act."
       },
       "paragraphs": [
         "The EU's ESPR framework mandates DPPs as a tool to advance circular-economy objectives. Each product category will have delegated acts specifying which data elements must be included in the passport. The data is hosted on a cloud platform and linked to the physical product via a unique identifier carried on an NFC tag, QR code or RFID label."
       ],
       "bullets": [
-        "Batteries: DPP requirements apply from February 2027, covering battery chemistry, capacity, carbon footprint, recycled content and collection instructions.",
-        "Textiles: DPP requirements expected from 2027–2028, covering fiber composition, country of manufacturing, care instructions and recyclability.",
+        "Batteries: DPP requirements apply from February 2027, covering battery chemistry, capacity, carbon footprint, recycled content and collection instructions — the category with the earliest, most detailed rules, unpacked in the [EU battery passport implementation guide](/blog/eu-battery-passport-rfid-nfc-implementation/).",
+        "Textiles: DPP requirements expected from 2027–2028, covering fiber composition, country of manufacturing, care instructions and recyclability — the [apparel DPP deep dive](/blog/eu-espr-digital-product-passport-apparel/) covers the fashion-specific data model.",
         "Electronics: DPP timelines vary by delegated act, targeting energy efficiency, repairability scores, hazardous substance declarations and spare-part availability.",
         "Construction products: DPP requirements align with the revised Construction Products Regulation, covering environmental declarations and performance characteristics."
       ],
@@ -40,7 +36,7 @@
     },
     {
       "title": "Why NFC is the preferred DPP carrier",
-      "intro": "While QR codes can also link to DPP data, NFC tags offer several advantages for B2B product manufacturers concerned with authenticity, durability and consumer experience.",
+      "intro": "For a DPP carrier, NFC's edge over a plain QR code comes down to three things a procurement team actually cares about: authenticity, durability and a consumer experience that survives contact with a real customer. A QR code can carry the same link — the table below is where the two quietly part ways.",
       "table": {
         "columns": [
           "Criterion",
@@ -89,8 +85,13 @@
       }
     },
     {
-      "title": "Where are NFC tag selection for DPP used?",
-      "intro": "The NFC tag embedded in a DPP-compliant product must survive the product's expected lifetime, resist tampering and provide cryptographic authentication to prevent counterfeit passports.",
+      "title": "Which NFC tag do you select for a DPP?",
+      "intro": "The tag in a DPP-compliant product has three jobs: survive the product's expected lifetime, resist tampering and provide cryptographic authentication so nobody can mint a counterfeit passport. Which chip you pick is mostly a question of how much of that third job you actually need — the decision map below sorts it out.",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/blog/dpp-nfc-tag-selection.svg",
+        "alt": "Diagram: a two-branch chip decision for DPP tags — a simple URL carrier in a low-risk category can use NTAG 213/215/216, while an anti-counterfeit or regulated passport needs NTAG 424 DNA with per-tap SUN authentication — paired with a form-factor panel showing textiles need sewn-in or laundry tags that survive 60 °C-plus washing, and electronics and batteries use under-label or in-packaging placement."
+      },
       "bullets": [
         "[NTAG 424 DNA](/guides/ntag424-dna-sun-cmac-authentication/) (NXP) is purpose-built for DPP and authentication applications. It generates a unique, one-time authentication code (SUN message) on every tap, verifiable by the cloud backend.",
         "NTAG 213/215/216 are suitable for basic DPP implementations where the tag serves as a simple URL carrier without on-tag cryptographic authentication.",
@@ -100,7 +101,12 @@
     },
     {
       "title": "How do data architecture and standards work?",
-      "intro": "It is tempting to picture the entire passport living on the chip. It does not. A DPP is not a monolithic data file on the tag. It is a distributed data architecture with the NFC tag providing a resolvable link to a cloud-hosted data record.",
+      "intro": "It is tempting to picture the entire passport living on the chip. It does not. A DPP is not a monolithic data file on the tag; it is a distributed data architecture, with the NFC tag providing a resolvable link to a cloud-hosted data record. The diagram below traces the whole path from tap to data.",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/blog/dpp-gs1-digital-link-resolution.svg",
+        "alt": "Diagram: a four-step resolution flow from tap to data — the NFC tag stores an NDEF URI record, which holds a GS1 Digital Link URL (id.gs1.org with GTIN and serial), which resolves through the GS1 Resolver, which returns the cloud DPP record served as a JSON-LD document conforming to schema.org Product and DigitalDocument types."
+      },
       "paragraphs": [
         "The GS1 Digital Link standard provides the URI structure for DPP identifiers: a product GTIN (Global Trade Item Number) combined with a serial number, encoded as a URL that resolves to the product's DPP data endpoint. The NFC tag stores this GS1 Digital Link URL as an [NDEF](/guides/nfc-ndef-format-explained/) URI record. When tapped, the smartphone browser resolves the URL to the manufacturer's DPP data repository or a neutral registry."
       ],
@@ -113,7 +119,12 @@
     },
     {
       "title": "What's the implementation roadmap for B2B manufacturers?",
-      "intro": "Manufacturers should begin DPP preparation now, even before delegated acts are finalized. The alternative — waiting for the rules to be perfectly clear, then sourcing tags, standing up a data backend, and re-tooling a production line in the weeks before a mandate — is how a planned budget line becomes an emergency one. Starting early costs less and panics no one.",
+      "intro": "Manufacturers should begin DPP preparation now, even before delegated acts are finalized. The alternative — waiting for the rules to be perfectly clear, then sourcing tags, standing up a data backend, and re-tooling a production line in the weeks before a mandate — is how a planned budget line becomes an emergency one. Starting early costs less and panics no one; the four phases below keep it a budget line rather than a fire drill.",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/blog/dpp-implementation-phases.svg",
+        "alt": "Diagram: a four-phase implementation roadmap — Phase 1 now, audit product-data availability and find the gaps; Phase 2, six to twelve months before the mandate, select NFC hardware, establish GS1 Digital Link identifiers and build the cloud repository; Phase 3, three to six months before, integrate tag encoding into production and pilot one product category; Phase 4, go-live, scale to all mandated categories and train supply-chain partners."
+      },
       "bullets": [
         "Phase 1 (now): Audit product-data availability. Identify gaps in material composition, supplier origin, carbon-footprint and recyclability data.",
         "Phase 2 (6–12 months before mandate): Select NFC tag hardware, establish GS1 Digital Link identifiers and build or procure the cloud DPP data repository.",
@@ -123,7 +134,12 @@
     },
     {
       "title": "What does the ESPR delegated-act timeline actually look like?",
-      "intro": "ESPR Regulation (EU) 2024/1781 entered into force in July 2024 as a framework — not a single compliance date. Each product category receives its own delegated act and 18+ month transition period. The Commission published the ESPR Working Plan 2025-2030 on 16 April 2025, which set the order in which categories will receive delegated acts.",
+      "intro": "ESPR Regulation (EU) 2024/1781 entered into force in July 2024 as a framework — not a single compliance date. Each product category receives its own delegated act and 18+ month transition period. The Commission published the ESPR Working Plan 2025-2030 on 16 April 2025, which set the order in which categories will receive delegated acts. Read the timeline below as a queue, not a calendar: the dates slip, but the order rarely does.",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/blog/espr-delegated-act-timeline.svg",
+        "alt": "Diagram: a vertical timeline of EU Digital Product Passport milestones — March 2026 CEN/CENELEC harmonised standards under mandate M/616, 19 July 2026 the EU DPP digital registry stands up, 2026 iron and steel as the first ESPR product act, 18 February 2027 battery passports go live, textiles in 2027 with compliance around late 2028 to 2029, furniture in 2028, and electronics in 2028 to 2029."
+      },
       "bullets": [
         "By 19 July 2026 the Commission must stand up the EU DPP digital registry that stores the unique identifiers — that infrastructure deadline is on track even when product-specific deadlines slip. Brand-side DPP backends should be designed to interoperate with this registry from day one.",
         "Battery passports go live first: from 18 February 2027, EV batteries, industrial batteries above 2 kWh, and LMT (light means of transport, e.g., e-bike) batteries on the EU market must carry a DPP retrievable via QR — under Regulation (EU) 2023/1542. The Commission's battery due-diligence guidelines are expected by 26 July 2026.",
@@ -134,7 +150,7 @@
     },
     {
       "title": "Which NFC chip and encoding choices stay future-proof through the ESPR rollout?",
-      "intro": "Because compliance dates land in 2027-2030 but tags ordered today must survive 5-10+ year product lifecycles, the chip + encoding decisions made in 2026 carry direct cost and re-tag risk if you under-spec.",
+      "intro": "Here is the timing trap: compliance dates land in 2027-2030, but a tag ordered today has to survive a 5-10+ year product lifecycle — so the chip and encoding decisions made in 2026 are the ones that either age gracefully or force an expensive re-tag. This is the section worth over-thinking now, because you cannot patch a chip in the field.",
       "bullets": [
         "Default to [NTAG 424 DNA](/products/rfid-labels/ntag424-dna-tamper-evident-tag/) (or DESFire EV3 for higher security) for any product likely to fall under ESPR or sectoral DPP. Plain NTAG213/215/216 work for low-risk categories, but their lack of cryptographic SUN/CMAC authentication exposes brands to counterfeit-DPP attacks once enforcement scales.",
         "Specify GS1 Digital Link 1.4.x grammar at encoding time: `https://id.gs1.org/01/{GTIN}/21/{serial}` (or your brand-controlled resolver). One URL covers product info, anti-counterfeit landing page and DPP — and aligns with GS1 EU DPP guidance.",
@@ -160,6 +176,14 @@
         {
           "href": "/products/rfid-labels/ntag424-dna-tamper-evident-tag/",
           "label": "NTAG 424 DNA tamper-evident tags"
+        },
+        {
+          "href": "/solutions/digital-product-passport/",
+          "label": "Digital Product Passport solution"
+        },
+        {
+          "href": "/guides/eu-digital-product-passport-2027/",
+          "label": "EU DPP 2027 guide"
         }
       ]
     },
@@ -224,8 +248,34 @@
       "label": "Browse NFC cards"
     }
   ],
+  "keywords": [
+    "digital product passport NFC",
+    "EU DPP NFC tag",
+    "ESPR digital product passport",
+    "NTAG 424 DNA DPP",
+    "GS1 Digital Link DPP",
+    "battery passport NFC"
+  ],
+  "sources": [
+    {
+      "label": "Regulation (EU) 2024/1781 — Ecodesign for Sustainable Products Regulation (ESPR)",
+      "url": "https://eur-lex.europa.eu/eli/reg/2024/1781/oj/eng",
+      "publisher": "EUR-Lex, Publications Office of the European Union",
+      "publishedAt": "2024-06-13",
+      "accessedAt": "2026-07-09",
+      "note": "Framework regulation establishing the Digital Product Passport; entered into force 18 July 2024."
+    },
+    {
+      "label": "Regulation (EU) 2023/1542 — EU Batteries Regulation",
+      "url": "https://eur-lex.europa.eu/eli/reg/2023/1542/oj/eng",
+      "publisher": "EUR-Lex, Publications Office of the European Union",
+      "publishedAt": "2023-07-12",
+      "accessedAt": "2026-07-09",
+      "note": "Battery passport provisions apply from 18 February 2027 for EV, industrial (>2 kWh) and LMT batteries."
+    }
+  ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09",
-  "modifiedAt": "2026-06-11T12:00:00Z"
+  "modifiedAt": "2026-07-09T12:00:00Z"
 }
