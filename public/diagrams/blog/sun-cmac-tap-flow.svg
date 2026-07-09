@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="t d" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+<title id="t">How SUN authentication works: tap, compute CMAC, dynamic URL, server check, verdict</title>
+<desc id="d">A five-step flow left to right. Step one, a phone taps the tag. Step two, the chip computes a CMAC from its internal AES-128 key, a monotonic tap counter, and the tag UID. Step three, the code is appended to a dynamic URL as a query parameter. Step four, the brand server recomputes the CMAC with its copy of the key and the expected counter, then compares. Step five, a match returns genuine and the counter increments, so the same URL is never generated twice and a replayed URL fails.</desc>
+<defs><radialGradient id="bg" cx="50%" cy="16%" r="94%"><stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/></radialGradient></defs>
+<rect width="1200" height="675" fill="url(#bg)"/>
+<rect x="16" y="16" width="1168" height="643" rx="20" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+<text x="600" y="56" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="0.5" fill="#6d5a3a">SUN / CMAC AUTHENTICATION</text>
+<text x="600" y="98" text-anchor="middle" font-family="Lora, Georgia, serif" font-size="29" font-weight="700" fill="#291c0e">One fresh signature per tap — a replay never checks out</text>
+
+<!-- step labels -->
+<g font-size="13" font-weight="800" letter-spacing="1" fill="#b79a52" text-anchor="middle">
+<text x="158" y="176">1 · TAP</text>
+<text x="379" y="176">2 · CHIP SIGNS</text>
+<text x="600" y="176">3 · DYNAMIC URL</text>
+<text x="821" y="176">4 · SERVER CHECKS</text>
+<text x="1042" y="176">5 · VERDICT</text>
+</g>
+
+<!-- step 1: phone tap -->
+<rect x="94" y="210" width="128" height="200" rx="16" fill="#ffffff" stroke="#3d6b6b" stroke-width="2"/>
+<rect x="132" y="238" width="52" height="120" rx="10" fill="#291c0e"/>
+<rect x="140" y="248" width="36" height="86" rx="5" fill="#e3f0e6"/>
+<path d="M198 270 a40 40 0 0 1 0 84" fill="none" stroke="#c39a5f" stroke-width="4" stroke-linecap="round"/>
+<text x="158" y="388" text-anchor="middle" font-size="13" fill="#4f4f4f">phone on tag</text>
+
+<!-- step 2: chip computes CMAC -->
+<rect x="291" y="210" width="176" height="200" rx="16" fill="#eef5f5" stroke="#cfe0e0" stroke-width="2"/>
+<rect x="339" y="230" width="80" height="52" rx="6" fill="#c39a5f"/>
+<text x="379" y="262" text-anchor="middle" font-size="13" font-weight="700" fill="#ffffff">AES-128</text>
+<text x="379" y="312" text-anchor="middle" font-size="14" font-weight="800" fill="#291c0e">CMAC computed from</text>
+<text x="379" y="336" text-anchor="middle" font-size="13" fill="#33595a">secret key + tap counter</text>
+<text x="379" y="356" text-anchor="middle" font-size="13" fill="#33595a">+ tag UID</text>
+<text x="379" y="388" text-anchor="middle" font-size="12.5" font-style="italic" fill="#6d5a3a">key never leaves the chip</text>
+
+<!-- step 3: dynamic URL -->
+<rect x="512" y="210" width="176" height="200" rx="16" fill="#291c0e"/>
+<text x="600" y="262" text-anchor="middle" font-family="'SFMono-Regular', ui-monospace, Menlo, monospace" font-size="13" fill="#e4ce9e">brand.com/v</text>
+<text x="600" y="286" text-anchor="middle" font-family="'SFMono-Regular', ui-monospace, Menlo, monospace" font-size="13" fill="#e4ce9e">?id=04A7…</text>
+<text x="600" y="310" text-anchor="middle" font-family="'SFMono-Regular', ui-monospace, Menlo, monospace" font-size="13" fill="#e4ce9e">&amp;c=A7F3C…</text>
+<text x="600" y="352" text-anchor="middle" font-size="12.5" letter-spacing="0.5" fill="#c9a96a">FRESH CMAC + COUNTER</text>
+<text x="600" y="386" text-anchor="middle" font-size="12.5" fill="#b7ac9a">opens in any browser</text>
+
+<!-- step 4: server recompute -->
+<rect x="733" y="210" width="176" height="200" rx="16" fill="#eef5f5" stroke="#cfe0e0" stroke-width="2"/>
+<rect x="789" y="234" width="64" height="64" rx="10" fill="#ffffff" stroke="#3d6b6b" stroke-width="2"/>
+<path d="M805 258 h32 M805 270 h32 M805 282 h32" stroke="#3d6b6b" stroke-width="2.5"/>
+<text x="821" y="330" text-anchor="middle" font-size="14" font-weight="800" fill="#291c0e">recompute &amp; compare</text>
+<text x="821" y="356" text-anchor="middle" font-size="13" fill="#33595a">its own key + the</text>
+<text x="821" y="376" text-anchor="middle" font-size="13" fill="#33595a">expected counter</text>
+
+<!-- step 5: verdict -->
+<rect x="954" y="210" width="176" height="200" rx="16" fill="#e3f0e6" stroke="#1f6f3a" stroke-width="2"/>
+<circle cx="1042" cy="272" r="34" fill="#ffffff" stroke="#1f6f3a" stroke-width="3"/>
+<path d="M1024 272 l12 13 22 -28" fill="none" stroke="#1f6f3a" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1042" y="336" text-anchor="middle" font-size="17" font-weight="800" fill="#1f6f3a">GENUINE</text>
+<text x="1042" y="364" text-anchor="middle" font-size="13" fill="#33595a">counter + 1 — the next</text>
+<text x="1042" y="384" text-anchor="middle" font-size="13" fill="#33595a">URL differs again</text>
+
+<!-- arrows between -->
+<g stroke="#9a8a66" stroke-width="2.5" fill="#9a8a66">
+<line x1="224" y1="310" x2="287" y2="310"/><polygon points="283,304 295,310 283,316"/>
+<line x1="469" y1="310" x2="508" y2="310"/><polygon points="504,304 516,310 504,316"/>
+<line x1="690" y1="310" x2="729" y2="310"/><polygon points="725,304 737,310 725,316"/>
+<line x1="911" y1="310" x2="950" y2="310"/><polygon points="946,304 958,310 946,316"/>
+</g>
+
+<rect x="150" y="452" width="900" height="150" rx="14" fill="#f7edd6" stroke="#e4c98f" stroke-width="1.6"/>
+<text x="600" y="492" text-anchor="middle" font-size="16" font-weight="800" fill="#291c0e">Why a captured URL can't be reused</text>
+<text x="600" y="524" text-anchor="middle" font-size="14.5" fill="#4f4535">The counter increments every tap and can't be rolled back, so the CMAC changes each time.</text>
+<text x="600" y="550" text-anchor="middle" font-size="14.5" fill="#4f4535">Replay a valid URL and the counter is already spent — verification fails.</text>
+<text x="600" y="582" text-anchor="middle" font-size="13.5" font-style="italic" fill="#6d5a3a">A cloned UID never had the key, so it could not have produced a valid CMAC in the first place.</text>
+</svg>
