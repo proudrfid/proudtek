@@ -3,25 +3,21 @@
   "group": "blog",
   "title": "RFID Elevator and Floor Access Control",
   "kicker": "Access Control",
-  "summary": "How RFID cards and fobs control elevator floor access in hotels, corporate offices and multi-tenant buildings. Covering system architecture, credential integration, floor-restriction logic and installation considerations for B2B access-control integrators and property managers.",
+  "summary": "RFID elevator access control restricts each card or fob to authorized floors, and paired with destination dispatch it trims average wait time 25-40%. The stranger who clears the lobby still can't reach the executive suite, the data center or a residential floor that isn't theirs. This guide covers the three system architectures, credential-to-floor mapping, the major elevator-OEM integrations and code-compliant installation for hotels, corporate offices and multi-tenant buildings.",
   "heroPoints": [
     "RFID elevator access control restricts floor selection to authorized cardholders — so the stranger who breezes past the lobby desk still can't reach executive floors, data centers, residential levels or other restricted areas.",
     "Integration between elevator RFID readers and the building's access-control system (ACS) enables unified credential management. One card for doors, elevators and parking.",
     "Key fobs and cards with MIFARE Classic or DESFire chips provide the optimal balance of security, cost and compatibility with major elevator-control systems."
   ],
-  "heroImage": "/blog-images/rfid-elevator-floor-access.jpg",
-  "imageAlt": "Elevator interior with floor-button panel — the destination-control surface RFID floor access pairs with.",
-  "imageSourceRoutes": [
-    "/product/mifare-classic-card/",
-    "/product/rfid-key-fob/"
-  ],
+  "heroImage": "/diagrams/blog/rfid-elevator-floor-access-hero.svg",
+  "imageAlt": "Diagram of RFID elevator floor access: a card taps the in-car reader, the access-control system checks the credential's floor list, and only authorized floor buttons illuminate while restricted floors stay locked.",
   "sections": [
     {
       "title": "Why RFID elevator access matters",
       "intro": "Picture the lobby of a shiny new office tower: a wall of glass speed-gates, a guard checking every badge, the whole security-theater budget on proud display. Then a visitor strolls through all of it, steps into the elevator, presses the button for the executive floor — and it works, because nobody thought to restrict it. In multi-tenant office buildings, hotels with restricted floors and residential high-rises, the elevator is the security layer everyone locks down last. Without floor restrictions, anyone who reaches the cab can reach any floor by pressing a button, and all that lobby hardware might as well be furniture.",
       "image": {
-        "src": "/blog-images/elevator-building.jpg",
-        "alt": "RFID card reader panel inside an elevator for floor access control"
+        "src": "/diagrams/blog/elevator-floor-restriction-comparison.svg",
+        "alt": "A side-by-side comparison: an unrestricted elevator where any rider can press any floor, versus an RFID-restricted elevator where the reader enables only the floors authorized for the presented credential."
       },
       "paragraphs": [
         "RFID elevator [access control](/solutions/rfid-access-control/) solves this by requiring card or fob authentication before the elevator accepts a floor-button press. Only floors authorized for the presented credential are enabled. This is implemented either by intercepting the elevator button-panel wiring (relay-based) or through native integration with the elevator manufacturer's destination-dispatch controller."
@@ -40,7 +36,12 @@
     },
     {
       "title": "What system architecture options exist?",
-      "intro": "RFID elevator access control is implemented through three primary architectural approaches, each with different cost, complexity and integration characteristics.",
+      "intro": "Three architectural approaches dominate RFID elevator access control, differing mainly in where the reader taps into the system — the button-panel wiring, the elevator controller, or a smart panel that replaces both. The diagram below shows how each one wires in; the table prices and compares them.",
+      "image": {
+        "src": "/diagrams/blog/elevator-access-architectures.svg",
+        "alt": "Three RFID elevator access architectures shown side by side: a relay-based retrofit that intercepts the button-panel wiring, a controller integration that talks to the elevator controller over serial or IP, and a cloud-managed smart panel that replaces the button panel entirely."
+      },
+      "layout": "split",
       "table": {
         "columns": [
           "Architecture",
@@ -76,7 +77,11 @@
     },
     {
       "title": "How do credential and floor-mapping configuration work?",
-      "intro": "The access-control system maps each credential (card or fob) to a set of authorized floors. This mapping can be static (fixed per credential) or dynamic (time-based, role-based or event-driven).",
+      "intro": "The access-control system maps each credential (card or fob) to a set of authorized floors. This mapping can be static (fixed per credential) or dynamic (time-based, role-based or event-driven). Because the same credential usually also opens the [door locks](/blog/nfc-door-locks-rfid-cards/) on each authorized floor — the way a hotel's [key-card system](/blog/how-hotel-rfid-key-cards-work/) writes a guest's floor at check-in — the whole map lives in one place, and the diagram below traces how a card resolves to floors.",
+      "image": {
+        "src": "/diagrams/blog/elevator-credential-floor-mapping.svg",
+        "alt": "A credential-to-floor mapping chart showing how one card or fob resolves to a set of authorized floors through five rule types: static assignment, role-based groups, time-based windows, hotel PMS floor encoding, and expiring visitor passes."
+      },
       "bullets": [
         "Static floor assignment: Each card is assigned a fixed set of floors at enrollment time. Simple to configure, used for residential buildings and basic office setups.",
         "Role-based assignment: Floor access is defined per access-level group (e.g., 'Engineering' = floors 3–5, 'Executive' = floors 8–10, 'All-access' = all floors). Cards inherit floor permissions from their assigned group.",
@@ -97,7 +102,11 @@
     },
     {
       "title": "What installation and wiring considerations apply?",
-      "intro": "RFID elevator access installation requires coordination between the access-control integrator, the elevator maintenance company and the building's electrical contractor.",
+      "intro": "RFID elevator access installation requires coordination between the access-control integrator, the elevator maintenance company and the building's electrical contractor. It also carries one non-negotiable, shown in the diagram: the fire-service override, which must drop every floor restriction the instant the alarm sounds.",
+      "image": {
+        "src": "/diagrams/blog/elevator-fire-service-override.svg",
+        "alt": "An elevator installation diagram showing in-car and hall-call reader placement and the fire-service override path: when the fire alarm activates it bypasses the RFID floor restrictions so every floor becomes accessible for evacuation and firefighter recall."
+      },
       "bullets": [
         "Elevator code compliance: All elevator modifications must comply with local elevator codes (ASME A17.1, EN 81, etc.) and be inspected by the authority having jurisdiction.",
         "Fire-service override: RFID access restrictions must be automatically bypassed during fire-alarm activation to ensure all floors are accessible for evacuation and firefighter access.",
@@ -109,6 +118,11 @@
     {
       "title": "Destination dispatch integration with the major elevator OEMs",
       "intro": "The biggest performance and capacity gain in elevator access is no longer about how fast the door opens — it is about destination dispatch (DD), where the system assigns each rider to a specific car based on their declared or credential-encoded floor before they step in. Pairing RFID or mobile credentials with DD typically cuts average wait time by 25-40% and shortens travel time by grouping riders going to the same floor. The summary below covers the common OEM control systems integrators encounter.",
+      "image": {
+        "src": "/diagrams/blog/elevator-destination-dispatch-flow.svg",
+        "alt": "A flow comparison of conventional elevator access versus destination dispatch: conventionally a rider boards any car and presses a floor button inside, while destination dispatch has the rider present a credential at a hall-call panel and be assigned a specific car before boarding."
+      },
+      "layout": "split-reverse",
       "bullets": [
         "Otis CompassPlus and Compass 360 (current-gen DD). Otis exposes a published API for credential-driven destination calls. Cards from HID Signo, ELATEC TWN4, Wavelynx Ethos, and similar multi-format readers send the credential ID via RS-485 or IP to the Otis e-Service interface, which routes the rider to a specific car. Best fit for new construction in towers above 12-15 floors where peak-hour throughput dominates the spec.",
         "KONE Polaris and KONE Access. KONE's Polaris destination control integrates with KONE Access for credential-based hall calls. Mobile credentials work over Bluetooth Low Energy through KONE Residential Flow and KONE Workplace apps. Polaris supports automatic elevator assignment from the credential without the user pressing any button — useful for accessibility (mobility-aid riders) and luxury residential lobbies.",
@@ -203,8 +217,32 @@
       "label": "Browse RFID key fobs"
     }
   ],
+  "keywords": [
+    "RFID elevator access control",
+    "elevator floor access restriction",
+    "destination dispatch access control",
+    "MIFARE DESFire elevator credential",
+    "multi-format elevator reader",
+    "relay-based elevator retrofit",
+    "hotel elevator floor access",
+    "ASME A17.1 elevator access compliance"
+  ],
+  "sources": [
+    {
+      "label": "ELATEC — Elevator Access Control System (RFID, BLE and NFC reader integration for floor-level access)",
+      "url": "https://www.elatec-rfid.com/int/applications/elevator",
+      "publisher": "ELATEC GmbH",
+      "accessedAt": "2026-07-09"
+    },
+    {
+      "label": "HID Global — Elevator Access Control (one credential, multi-level floor authorization)",
+      "url": "https://www.hidglobal.com/solutions/elevator-access-control",
+      "publisher": "HID Global",
+      "accessedAt": "2026-07-09"
+    }
+  ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
-  "modifiedAt": "2026-05-30"
+  "modifiedAt": "2026-07-09"
 }
