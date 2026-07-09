@@ -3,31 +3,21 @@
   "group": "blog",
   "title": "How NFC Door Locks Work with RFID Cards",
   "kicker": "Access Control",
-  "summary": "A technical guide to NFC-based door-lock systems — and how to tell a genuinely secure lock from one running on hope. Covers lock architectures, card-authentication protocols, credential encoding, lock-management software and security best practices for B2B access-control buyers deploying smart locks in hotels, offices and multi-tenant buildings.",
+  "summary": "An NFC door lock reads an RFID card's encrypted data — not just its UID — and runs an AES-128 challenge–response in 100–300 ms to grant or deny at the door. This guide covers offline vs online lock architectures, credential encoding, mobile keys (Apple Home Key, Google Wallet, Aliro) and the security best practices that separate a genuinely secure lock from one running on hope — for B2B access-control buyers deploying smart locks in hotels, offices and multi-tenant buildings.",
   "heroPoints": [
     "NFC door locks authenticate RFID cards using cryptographic challenge-response protocols, preventing the replay and cloning attacks that compromise legacy magnetic-stripe and 125 kHz proximity systems.",
     "Offline NFC locks store authorization data on the card itself, eliminating the need for real-time network connectivity at every door. Critical for hotels and remote facilities.",
     "Online NFC locks communicate with a central access-control server in real time, enabling instant credential revocation, audit logging and integration with building management systems."
   ],
-  "heroImage": "/landing-images/nfc-door-locks-rfid-cards-hero.jpg",
-  "imageCredit": {
-    "author": "Jakub Zerdzicki",
-    "sourceUrl": "https://www.pexels.com/photo/modern-security-system-in-industrial-hallway-33335255/",
-    "license": "Pexels License",
-    "licenseUrl": "https://www.pexels.com/license/"
-  },
-  "imageAlt": "Wall-mounted RFID/NFC access-control card reader beside a building door.",
-  "imageSourceRoutes": [
-    "/product/hotel-key-cards/",
-    "/product/mifare-desfire-cards/"
-  ],
+  "heroImage": "/diagrams/blog/nfc-door-locks-rfid-cards-hero.svg",
+  "imageAlt": "Diagram contrasting a secure NFC lock that runs an AES-128 challenge–response with an insecure UID-only lock that only checks a cloneable serial number.",
   "sections": [
     {
       "title": "How NFC door locks authenticate an RFID card",
       "intro": "Every hotel guest has run the same ritual: tap the card, wait for the little green light, push the door open. The whole thing feels like nothing happened. But in that one tap, the lock and the card either ran a real cryptographic conversation or they didn't — and that difference decides whether an off-the-shelf cloning gadget is enough to open the door. When a guest or employee presents an RFID card to an NFC door lock, a multi-step authentication and authorization process occurs within milliseconds. Understanding this process helps B2B buyers evaluate lock-system security claims.",
       "image": {
-        "src": "/blog-images/nfc-door-lock.jpg",
-        "alt": "NFC-enabled door lock reading an RFID access card"
+        "src": "/diagrams/blog/nfc-lock-mutual-auth-handshake.svg",
+        "alt": "Five-step flow showing an NFC lock and card authenticating: power and read UID at 13.56 MHz, random challenge, AES-128 response with the key kept on the card, mutual verification, then a local grant or deny in 100–300 ms."
       },
       "paragraphs": [
         "The lock's NFC reader powers the card via the 13.56 MHz field and reads the card's UID (unique identifier). For basic systems, the UID alone may be checked against a whitelist. For secure systems using MIFARE DESFire or similar smart cards, the lock initiates a mutual-authentication handshake: both the lock and the card prove knowledge of a shared secret key using AES-128, without the key ever being transmitted over the air."
@@ -46,7 +36,11 @@
     },
     {
       "title": "What's the difference between offline and online lock architectures?",
-      "intro": "NFC door locks are deployed in two primary architectures (offline (card-centric) and online (server-centric)) each with different infrastructure requirements, security properties and operational characteristics.",
+      "intro": "NFC door locks come in two architectures, and the choice drives everything downstream — battery life, how fast you can revoke a lost card, and whether every door needs a network drop. Offline (card-centric) stores the authorization on the card itself; online (server-centric) keeps it on a central server and pushes updates to each lock. Here's how the two topologies compare:",
+      "image": {
+        "src": "/diagrams/blog/nfc-lock-offline-vs-online.svg",
+        "alt": "Side-by-side comparison: an offline card-centric lock stands alone with authorization on the card and a 2–4 year battery, versus an online server-centric lock wired to a server that pushes updates, with a 6–18 month battery and immediate revocation."
+      },
       "table": {
         "columns": [
           "Feature",
@@ -95,6 +89,11 @@
     {
       "title": "How do you handle card credential encoding and management?",
       "intro": "The data written to the RFID card determines which doors the cardholder can open and for how long. Credential encoding is performed at front desks, security offices or kiosks using USB NFC readers and lock-vendor software.",
+      "image": {
+        "src": "/diagrams/blog/nfc-credential-encoding-map.svg",
+        "alt": "A card memory map listing the fields encoding writes onto a key card — room or door group, arrival date, departure date, access-level flags, and a sequence counter — plus the rule that a re-encoded card raises the counter so the lock rejects the older, lower-numbered card."
+      },
+      "layout": "split",
       "bullets": [
         "[Hotel key cards](/solutions/hotel-key-cards/) encode room number, arrival date, departure date, common-area access flags (pool, gym, parking) and a card-sequence counter for re-encoding detection.",
         "Corporate access cards encode a cardholder ID that maps to access-level groups in the lock-management database.",
@@ -106,6 +105,11 @@
     {
       "title": "What are the security best practices for NFC lock deployments?",
       "intro": "Deploying NFC locks securely requires attention to key management, card lifecycle, firmware maintenance and physical security of the lock hardware. The cryptography is usually the easy part; it's the master key on a sticky note in the back office that quietly undoes most deployments.",
+      "image": {
+        "src": "/diagrams/blog/nfc-lock-diversified-key-hierarchy.svg",
+        "alt": "Diversified-key hierarchy: one master key feeds AES CMAC key derivation to produce a unique key per lock, so a single compromised lock stays contained; a do-and-avoid strip contrasts MIFARE DESFire EV2/EV3 with the broken MIFARE Classic Crypto-1 cipher."
+      },
+      "layout": "split-reverse",
       "bullets": [
         "Use [MIFARE DESFire EV2](/guides/mifare-desfire-ev3-commands-reference/) or EV3 for all new lock deployments. Avoid MIFARE Classic (Crypto-1 is compromised) and UID-only authentication.",
         "Implement diversified keys using AES CMAC key derivation. Never use the same static key across multiple locks.",
@@ -128,6 +132,10 @@
     {
       "title": "How are mobile credentials (Apple Wallet, Google Wallet, Aliro) reshaping NFC door locks?",
       "intro": "The 2024-2026 wave of mobile credential standards has changed the lock-procurement decision. A lock spec'd today must support both physical RFID cards and at least one mobile credential framework — otherwise it's obsolete by year 2 of the deployment.",
+      "image": {
+        "src": "/diagrams/blog/nfc-lock-mobile-credential-timeline.svg",
+        "alt": "Timeline of the 2024–2026 mobile-credential wave: Apple Home Key and Wallet, iOS 18.1 opening NFC and Secure Element to third-party issuers, Google Wallet keys, and Aliro 1.0 from the Connectivity Standards Alliance released 26 February 2026."
+      },
       "bullets": [
         "Apple Home Key and Wallet keys: Apple's Wallet now stores digital keys for homes, hotel rooms, offices, schools, cars and scooters. iPhone or Apple Watch unlocks via NFC tap with the device within ~1 inch of the lock. Express Mode keeps the credential active even with a fully black screen — critical for hospitality user experience.",
         "Apple's iOS 18.1 NFC and Secure Element opening: Apple introduced expanded NFC and Secure Element access in iOS 18.1 for in-app contactless beyond Apple Pay — including badges, keys and tickets. This is the technical change that finally lets non-Apple-partner credential providers issue Wallet-grade keys on iPhone, opening up far broader smart-lock interoperability.",
@@ -208,5 +216,31 @@
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09",
-  "modifiedAt": "2026-06-06T13:24:50Z"
+  "modifiedAt": "2026-07-09T00:00:00Z",
+  "keywords": [
+    "NFC door locks",
+    "RFID access control cards",
+    "MIFARE DESFire EV3 door lock",
+    "offline vs online lock architecture",
+    "Apple Home Key hotel lock",
+    "Aliro mobile credential standard",
+    "OSDP access control",
+    "AES-128 mutual authentication"
+  ],
+  "sources": [
+    {
+      "label": "Aliro — Mobile Access Credential Standard",
+      "url": "https://csa-iot.org/all-solutions/aliro/",
+      "publisher": "Connectivity Standards Alliance",
+      "accessedAt": "2026-07-09",
+      "note": "Cross-vendor standard for mobile access credentials between readers and user devices."
+    },
+    {
+      "label": "MIFARE DESFire — product family",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-desfire:MC_53450",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-09",
+      "note": "Manufacturer reference for the DESFire family's AES-based secure messaging and mutual authentication."
+    }
+  ]
 }
