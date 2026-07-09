@@ -3,25 +3,21 @@
   "group": "blog",
   "title": "MIFARE Classic vs DESFire — Which Hotel Chip?",
   "kicker": "Hotel Technology",
-  "summary": "A side-by-side comparison of MIFARE Classic and DESFire chip families for hotel key card deployments. It is the unglamorous decision that quietly dictates years of card-stock economics: at MOQ 10,000, Classic 1K typically costs $0.08-$0.12 per unit and DESFire EV3 $0.25-$0.45. Covering security architecture, memory layout, cost structure and lock-system compatibility to help procurement teams make the right chip decision.",
+  "summary": "MIFARE Classic 1K typically costs $0.08-$0.12 per unit and DESFire EV3 $0.25-$0.45 at MOQ 10,000 — the unglamorous hotel key card chip decision that quietly dictates years of card-stock economics. This side-by-side comparison of the MIFARE Classic and DESFire chip families covers security architecture, memory layout, cost structure and lock-system compatibility to help procurement teams make the right chip decision.",
   "heroPoints": [
     "Classic 1K remains viable for properties with legacy lock bases but carries known Crypto-1 vulnerabilities.",
     "DESFire EV3 provides AES-128 encryption with secure messaging, meeting the strictest brand security mandates.",
     "Migration from Classic to DESFire can be staged sector-by-sector using MIFARE Plus EV2 as a bridge chip."
   ],
-  "heroImage": "/landing-images/mifare-classic-plus-desfire-hotel-chip-compare.jpg",
-  "imageAlt": "MIFARE Classic and DESFire hotel key cards side by side",
-  "imageSourceRoutes": [
-    "/product/mifare-classic-card/",
-    "/product/mifare-desfire-cards/"
-  ],
+  "heroImage": "/diagrams/blog/mifare-classic-vs-desfire-hotel-chips-hero.svg",
+  "imageAlt": "The hotel key card chip spectrum: MIFARE Classic 1K, MIFARE Plus EV2 as the migration bridge, and DESFire EV3, arranged along rising security and per-card cost.",
   "sections": [
     {
       "title": "Why chip selection matters for hotel operations",
       "intro": "Somewhere right now a hotel has a drawer full of key cards it can no longer use — ordered in good faith, just before the lock vendor's next-generation platform arrived. The chip is the cheapest part of the card and the easiest thing to get expensively wrong. The chip inside a hotel key card determines encryption strength, lock compatibility, multi-application potential and per-unit cost. Choosing the wrong chip leads to failed pilot tests, security audit findings or expensive card stock that cannot be re-used after a lock upgrade.",
       "image": {
-        "src": "/blog-images/hotel-chip-compare.jpg",
-        "alt": "MIFARE Classic and DESFire hotel key card chip comparison"
+        "src": "/diagrams/blog/hotel-chip-selection-stakes.svg",
+        "alt": "Why the hotel key card chip choice matters: a mixed-vintage lock estate with guest floors on Saflok Classic 1K and renovated suites on ASSA ABLOY Visionline DESFire EV3, and the three ways the wrong chip fails — a failed pilot test, a security audit finding, and dead card stock after a lock upgrade."
       },
       "paragraphs": [
         "Hotel groups with mixed-vintage lock estates face the hardest decision. A 300-room property may have Saflok RT locks on guest floors using Classic 1K, while newly renovated suites run ASSA ABLOY Visionline expecting DESFire EV3. Procurement must balance today's operational need against a two-to-five-year lock refresh roadmap."
@@ -41,9 +37,14 @@
     {
       "title": "How do security architecture options compare?",
       "intro": "Security is the primary driver behind the industry shift from Classic to DESFire. Understanding the cryptographic differences helps procurement teams articulate risk to ownership and brand standards committees.",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/blog/crypto1-vs-aes128-security.svg",
+        "alt": "MIFARE Classic Crypto-1 versus DESFire AES-128: Classic's 48-bit proprietary stream cipher with no mutual authentication, reverse-engineered in 2008 and clonable in under 30 seconds, set against DESFire's 128-bit AES with mutual authentication, random-number challenge-response, and per-card key diversification."
+      },
       "paragraphs": [
         "[MIFARE Classic](/guides/mifare-classic-1k-4k-chip-encyclopedia/) uses Crypto-1, a proprietary 48-bit stream cipher that was reverse-engineered in 2008. Publicly available tools can clone a Classic card in under 30 seconds using a $40 reader. While real-world hotel card cloning attacks remain uncommon, brand security audits increasingly flag Crypto-1 as a non-compliant encryption method.",
-        "DESFire EV3 implements AES-128 with secure messaging (EV3 secure channel). Key diversification means each card holds a unique derived key, so compromising one card does not expose the system. Random-number challenge-response authentication prevents replay attacks."
+        "[DESFire EV3](/guides/mifare-desfire-ev3-commands-reference/) implements AES-128 with secure messaging (EV3 secure channel). Key diversification means each card holds a unique derived key, so compromising one card does not expose the system. Random-number challenge-response authentication prevents replay attacks."
       ],
       "bullets": [
         "Classic Crypto-1: 48-bit key, no mutual authentication, vulnerable to known attacks.",
@@ -54,6 +55,10 @@
     {
       "title": "How do memory layout and multi-application potential work?",
       "intro": "Hotels increasingly want a single card to handle room access, elevator authorization, spa entry and cashless vending — the recurring dream of one credential that does everything. Memory layout determines whether one card can host multiple applications without data collision.",
+      "image": {
+        "src": "/diagrams/blog/mifare-memory-model-comparison.svg",
+        "alt": "How MIFARE Classic and DESFire organize memory: Classic 1K as 16 fixed sectors of 64 bytes each with sector-key access, versus DESFire EV3's flexible file system of cryptographically isolated application directories (AIDs) with per-file read, write and read-write permissions."
+      },
       "bullets": [
         "Classic 1K provides 16 sectors of 64 bytes each. Most lock systems use 1-2 sectors, leaving room for a second application if the sector keys are managed carefully.",
         "DESFire EV3 uses a flexible file-system with application directories (AIDs). Each application is cryptographically isolated, allowing independent management by different system vendors on the same card.",
@@ -63,7 +68,7 @@
     },
     {
       "title": "How do cost and procurement options compare?",
-      "intro": "Unit cost matters at hotel scale. A 500-room property issuing 1.5 cards per guest stay at 75 percent occupancy consumes roughly 200,000 cards per year. Even a $0.10 per-card difference translates to $20,000 annually.",
+      "intro": "Unit cost matters at hotel scale. A 500-room property issuing 1.5 cards per guest stay at 75 percent occupancy consumes roughly 200,000 cards per year. Even a $0.10 per-card difference translates to $20,000 annually. Our [hotel key-card cost comparison](/blog/rfid-hotel-keycard-cost-comparison/) breaks down the full per-card math.",
       "table": {
         "columns": [
           "Attribute",
@@ -113,7 +118,12 @@
     },
     {
       "title": "How do you choose the right chip for your property?",
-      "intro": "The decision framework is straightforward once you map chip capabilities against your lock estate, security requirements and budget horizon.",
+      "intro": "The decision framework is straightforward once you map chip capabilities against your lock estate, security requirements and budget horizon — one of the few procurement calls where the right answer falls out of three inputs instead of a spreadsheet war.",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/blog/hotel-chip-decision-flow.svg",
+        "alt": "A decision flow for choosing a hotel key card chip: legacy Classic-only locks with no upgrade planned within three years point to Classic 1K; a lock migration underway or planned within two years points to MIFARE Plus EV2; new locks or a brand-mandated security standard point to DESFire EV3 — with a standing rule to test a 50-card sample across lock models before any production order."
+      },
       "bullets": [
         "If all locks are legacy Classic-only and no upgrade is planned within three years, continue ordering Classic 1K to minimize cost.",
         "If a lock migration is underway or planned within two years, order {chip:nxp-mifare-plus-ev2:short_name} now — it runs in Classic mode today and switches to AES as locks are updated.",
@@ -125,6 +135,10 @@
     {
       "title": "Under-discussed DESFire EV3 features hotels rarely exploit",
       "intro": "Most hotel comparisons stop at 'AES-128 vs Crypto-1', missing several DESFire EV3 features that have direct guest-experience and operations value. These are the differentiators worth specifying in your RFP.",
+      "image": {
+        "src": "/diagrams/blog/desfire-ev3-hotel-features.svg",
+        "alt": "Six DESFire EV3 features hotels rarely exploit, arranged around the chip: the SUN secure unique NFC message for per-tap audit trails, a transaction timer against relay attacks, a proximity check against long-range relays, 30-40% longer read range than EV1, EAL5+ Common Criteria certification, and hardened resistance to differential power analysis."
+      },
       "bullets": [
         "SUN (Secure Unique NFC) message: each tap generates a one-time authentication string the back-end can verify without storing the card key. Originally designed for product-authentication (NTAG 424 DNA), SUN gives hotels a way to log every door-open event with provable card-side cryptographic origin — useful for forensic disputes, suite-level VIP audit and casino floor security.",
         "Transaction Timer (EV3 only): cuts off any transaction the chip detects has been delayed beyond a configurable timeout, defeating the relay/man-in-the-middle attack class that publicly demonstrated breaking earlier DESFire generations.",
@@ -137,6 +151,10 @@
     {
       "title": "What patterns are emerging from real-world hotel deployments?",
       "intro": "Across global hotel chip-stock orders we have visibility on, four deployment patterns now account for 90%+ of new procurement decisions. Mapping your property to one of these archetypes is faster than reinventing the framework from scratch.",
+      "image": {
+        "src": "/diagrams/blog/hotel-chip-deployment-archetypes.svg",
+        "alt": "Five hotel deployment archetypes mapped to a chip choice: limited-service and economy to Classic 1K, mid-scale full-service in a renovation cycle to MIFARE Plus EV2, luxury and casino and conference to DESFire EV3, mobile-key-forward chains to DESFire EV3, and Saflok-only estates to Ultralight C."
+      },
       "bullets": [
         "Limited-service / economy (e.g., select-service brands with one-room-type, no spa/POS): Classic 1K remains the volume choice. Chip cost dominates, threat model is single-application access. Watch for Fudan FM11RF08/FM11RF08S 'compatible' chips entering the supply chain at low-cost suppliers — these carry the documented backdoor and fail brand security audits.",
         "Mid-scale full-service in renovation cycle: {chip:nxp-mifare-plus-ev2:short_name} is the right hedge. Properties replacing locks 20-40% per year over a 3-year cycle benefit from stocking one card SKU that runs in Classic mode on legacy locks and AES mode on upgraded locks. Cost premium of $0.04-0.06/card buys SKU simplification across the migration window.",
@@ -210,7 +228,7 @@
     },
     {
       "question": "What is the practical difference between DESFire EV2 and EV3 for hotels?",
-      "answer": "All three (EV1, EV2, EV3) implement AES-128 and the file-system memory model. EV3 adds: Common Criteria EAL5+ certification (banking-card tier), transaction MAC for tamper detection, transaction timer for man-in-the-middle defense, proximity check for relay-attack defense, improved NFC Forum Type 4 implementation for Apple/Google Wallet provisioning, and slightly improved transaction speed (~10-15%) over EV2. For most hotel applications, EV2 is functionally sufficient — but properties planning Apple/Google Wallet keys, casino integration, or operating in jurisdictions with strict cardholder authentication rules should specify EV3 to avoid a re-spec later. Cost premium of EV3 over EV2 is typically $0.05-0.08/card at MOQ 10K."
+      "answer": "All three (EV1, EV2, EV3) implement AES-128 and the file-system memory model. EV3 adds: Common Criteria EAL5+ certification (banking-card tier), transaction MAC for tamper detection, transaction timer for man-in-the-middle defense, proximity check for relay-attack defense, improved NFC Forum Type 4 implementation for Apple/Google Wallet provisioning, and slightly improved transaction speed (~10-15%) over EV2. For most hotel applications, EV2 is functionally sufficient — but properties planning Apple/Google Wallet keys, casino integration, or operating in jurisdictions with strict cardholder authentication rules should specify EV3 to avoid a re-spec later. Cost premium of EV3 over EV2 is typically $0.05-0.08/card at MOQ 10K. See our [DESFire EV1 vs EV2 vs EV3 comparison](/blog/desfire-ev1-vs-ev2-vs-ev3/) for the full generational breakdown."
     },
     {
       "question": "What is SUN (Secure Unique NFC) and why does it matter for hotels?",
@@ -242,5 +260,39 @@
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
-  "modifiedAt": "2026-07-02"
+  "modifiedAt": "2026-07-09",
+  "keywords": [
+    "MIFARE Classic vs DESFire",
+    "hotel key card chip",
+    "DESFire EV3 hotel lock",
+    "MIFARE Plus EV2 migration",
+    "Crypto-1 vs AES-128",
+    "Fudan FM11RF08S backdoor"
+  ],
+  "sources": [
+    {
+      "label": "NXP MF3D(H)x3 — MIFARE DESFire EV3 product short data sheet (Rev. 3.1)",
+      "url": "https://www.nxp.com/docs/en/data-sheet/MF3D_H_X3_SDS.pdf",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2024-01-11",
+      "accessedAt": "2026-07-09",
+      "note": "Confirms EAL5+ Common Criteria certification at the same tier as banking cards and electronic passports, plus the multi-application file system."
+    },
+    {
+      "label": "MIFARE Classic: exposing the static encrypted nonce variant... and a few hardware backdoors",
+      "url": "https://blog.quarkslab.com/mifare-classic-static-encrypted-nonce-and-backdoors.html",
+      "publisher": "Quarkslab",
+      "publishedAt": "2024-08-20",
+      "accessedAt": "2026-07-09",
+      "note": "Documents the Fudan FM11RF08S hardware backdoor that compromises all user-defined sector keys, even when fully diversified."
+    },
+    {
+      "label": "Club Quarters rolls out NFC room keys that guests can store in their Apple or Google wallet",
+      "url": "https://www.nfcw.com/2025/01/24/389787/club-quarters-rolls-out-nfc-room-keys-that-guests-can-store-in-their-apple-or-google-wallet/",
+      "publisher": "NFCW",
+      "publishedAt": "2025-01-24",
+      "accessedAt": "2026-07-09",
+      "note": "First hotel brand to roll out Apple Wallet and Google Wallet keys across its entire portfolio (January 2025)."
+    }
+  ]
 }
