@@ -3,34 +3,25 @@
   "group": "blog",
   "title": "NFC Tags for Product Authentication",
   "kicker": "NFC Marketing",
-  "summary": "Counterfeiters can copy a hologram; they cannot copy a secret key. Global trade in counterfeit goods exceeds $500 billion annually (OECD/EUIPO). How brands use NFC tags embedded in products and packaging to enable tap-to-verify authentication, combat counterfeiting and build consumer trust through cryptographic proof of genuineness.",
+  "summary": "NFC product authentication lets any shopper confirm a product is genuine with one phone tap — no app — using a cryptographic chip whose rolling code the $500 billion-a-year counterfeit trade cannot clone. Counterfeiters copy a hologram; they cannot copy a secret key. How tap-to-verify works, which chips resist cloning, and how to run a vendor RFP.",
   "heroPoints": [
     "NFC-based authentication gives consumers a one-tap verification experience that requires no app download or technical knowledge.",
     "Cryptographic chips like NTAG424 DNA generate unique, rolling authentication codes that cannot be cloned even with physical access to the tag.",
     "Authentication tap data doubles as a supply chain visibility tool, tracking product movement from factory to end consumer."
   ],
-  "heroImage": "/landing-images/nfc-product-authentication-hero.jpg",
-  "imageCredit": {
-    "author": "melanie_hughes",
-    "sourceUrl": "https://www.flickr.com/photos/22658750@N02/4253803022",
-    "license": "CC BY 2.0",
-    "licenseUrl": "https://creativecommons.org/licenses/by/2.0/"
-  },
-  "imageAlt": "Smartphone tapping a product package — the consumer NFC authentication touchpoint.",
-  "imageSourceRoutes": [
-    "/product/nfc-stickers/",
-    "/product/mifare-stickers/"
-  ],
+  "heroImage": "/diagrams/blog/nfc-product-authentication-hero.svg",
+  "imageAlt": "Diagram: a genuine product carrying an NTAG424 DNA secure NFC chip returns AUTHENTIC when tapped because it signs a fresh SUN/CMAC rolling code, while a cloned tag replaying a captured code is REJECTED — framed against the counterfeit trade that tap-to-verify targets.",
   "sections": [
     {
       "title": "What counterfeiting problem does NFC authentication solve?",
       "intro": "Every anti-counterfeiting feature a brand ships starts life as 'uncopyable' and ends as a tutorial. The hologram gets reproduced; the serial number gets photographed and reprinted onto the counterfeits; the clever ink turns up on someone else's packaging. NFC authentication changes the contest entirely: instead of competing on how hard a mark is to copy, it competes on what a copy cannot do — prove it knows a secret. Global trade in counterfeit goods is estimated at over $500 billion annually according to OECD and EUIPO reports. Traditional anti-counterfeiting measures (holograms, serial numbers, special inks) are increasingly defeated by sophisticated counterfeiters who replicate visual security features with high fidelity.",
       "image": {
-        "src": "/landing-images/ntag424-dna-tamper-evident-tag.jpg",
-        "alt": "NFC authentication tags (NTAG424 DNA) for tap-to-verify product protection"
+        "src": "/diagrams/blog/visual-vs-cryptographic-authentication.svg",
+        "alt": "Diagram contrasting two authentication models: visual security features — holograms, static serial numbers, security inks — are copyable and get reproduced within months, while a cryptographic challenge-response proves the product knows a secret AES-128 key that a copy cannot possess."
       },
+      "layout": "split",
       "paragraphs": [
-        "NFC authentication shifts the verification mechanism from visual inspection (which can be faked) to cryptographic challenge-response (which cannot be faked without the secret key stored in the chip's secure memory). When a consumer taps an NFC-authenticated product, the chip generates a unique, one-time authentication code that is verified against the brand's cloud server. A cloned tag cannot produce valid codes because it does not possess the secret key."
+        "NFC authentication shifts the verification mechanism from visual inspection (which can be faked) to cryptographic challenge-response (which cannot be faked without the secret key stored in the chip's secure memory). When a consumer taps an NFC-authenticated product, the chip generates a unique, one-time authentication code that is verified against the brand's cloud server. A [cloned tag](/blog/nfc-card-clone-security-prevention/) cannot produce valid codes because it does not possess the secret key."
       ],
       "bullets": [
         "Visual security features (holograms, color-shifting inks) can be replicated by counterfeiters within months of introduction.",
@@ -96,7 +87,11 @@
     },
     {
       "title": "How SUN (Secure Unique NFC) authentication works",
-      "intro": "[NTAG424 DNA](/products/rfid-labels/ntag424-dna-tamper-evident-tag/) uses NXP's SUN protocol, which is the current industry standard for NFC product authentication. Understanding the protocol helps procurement teams evaluate vendor implementations and avoid insecure shortcuts.",
+      "intro": "[NTAG424 DNA](/products/rfid-labels/ntag424-dna-tamper-evident-tag/) uses NXP's SUN protocol, which is the current industry standard for NFC product authentication. Understanding the protocol helps procurement teams evaluate vendor implementations and avoid insecure shortcuts — the flow below traces exactly what happens between a tap and a verdict.",
+      "image": {
+        "src": "/diagrams/blog/sun-cmac-tap-flow.svg",
+        "alt": "Diagram of the SUN authentication flow: a phone tap makes the chip compute a CMAC from its internal AES-128 key, a monotonic tap counter and the tag UID; the code rides the URL as a dynamic query parameter; the brand server recomputes the CMAC and compares; a match returns genuine and the counter increments so the same URL never repeats and replays fail."
+      },
       "paragraphs": [
         "When a phone taps an [NTAG424 DNA](/guides/ntag424-dna-sun-cmac-authentication/) tag, the chip calculates a CMAC (Cipher-based Message Authentication Code) using its internal AES-128 key, the current tap counter and the tag's UID. This CMAC is appended to the URL as a dynamic query parameter. The brand's cloud server reconstructs the CMAC using its copy of the key and the expected counter value. If the CMACs match, the product is genuine. Each tap increments the counter, so the same URL is never generated twice. Replaying a captured URL will fail verification."
       ],
@@ -109,14 +104,19 @@
     },
     {
       "title": "How does it integrate with product packaging and labeling?",
-      "intro": "The physical integration of NFC authentication tags into products and packaging must balance security, aesthetics and manufacturing feasibility.",
+      "intro": "Where you hide the chip decides whether a counterfeiter can simply move it to a fake, so placement is a security decision before it is an aesthetic one — a balance of security, readability and manufacturing feasibility. The formats below are roughly ordered by how hard they make tag transfer, a lesson learned the expensive way in early [luxury-bag programs](/blog/anti-counterfeit-nfc-luxury-bags/).",
       "bullets": [
         "Tamper-evident placement: Position the NFC tag so that opening the package destroys the tag's antenna or triggers the TagTamper loop. This prevents tag transfer from a genuine package to a counterfeit.",
         "Invisible embedding: NFC tags can be laminated between packaging layers, making them invisible to consumers while remaining readable through cardboard, paper or thin plastic.",
         "Woven labels: For apparel and accessories, NFC chips can be embedded in woven care labels or hang tags that are sewn into the garment.",
-        "Bottle caps and closures: For spirits and beverages, NFC tags with tamper loops integrate into the closure so that breaking the seal is cryptographically recorded.",
+        "Bottle caps and closures: For spirits and beverages, NFC tags with tamper loops integrate into the closure so that breaking the seal is cryptographically recorded — the mechanism behind [NFC for wine and spirits under EU EPR](/blog/nfc-wine-spirits-eu-epr-compliance/).",
         "Direct-to-product: For high-value goods, NFC tags can be encapsulated in epoxy and attached directly to the product surface."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/nfc-tag-placement-formats.svg",
+        "alt": "Diagram of five NFC authentication tag placement formats — tamper-evident placement that destroys the antenna when the package is opened, invisible lamination between packaging layers, woven care labels and hang tags for apparel, tamper-loop bottle caps for spirits, and epoxy-encapsulated tags bonded directly to high-value goods."
+      },
+      "layout": "split-reverse"
     },
     {
       "title": "Which NFC authentication vendors and platforms should procurement evaluate?",
@@ -127,7 +127,11 @@
         "SaaS authentication platforms: Authena, Arianee (founding member of Aura), EON, Scantrust and Kezzler each provide turn-key key-management, verification API and consumer landing pages. Authena and Arianee are most-cited in luxury; Kezzler and Scantrust in FMCG and pharma; EON in textiles + DPP. Most charge per active item per year ($0.05-$0.30) on top of one-time setup.",
         "Aura Blockchain Consortium: shared-ledger trust anchor co-founded by LVMH, Prada, Richemont, OTB, joined by Mercedes-Benz; 40M+ encrypted products as of 2024. Available under licence to non-member brands. Evaluate when resale-platform interoperability with member brands is core to ROI.",
         "Open / DIY stack: NXP TapLinx SDK + open-source Android/iOS libraries + your own backend. Lowest per-unit cost, highest engineering and HSM operational burden. Recommended only for brands with mature security teams and >1M unit/year volume; otherwise SaaS amortises better."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/nfc-authentication-vendor-landscape.svg",
+        "alt": "Diagram mapping the NFC authentication supply chain into five layers a procurement team evaluates — chip suppliers such as NXP, Infineon and STMicroelectronics; inlay and converter vendors such as Avery Dennison Smartrac, Identiv, SATO and Beontag; SaaS authentication platforms such as Authena, Arianee, EON, Scantrust and Kezzler; the Aura Blockchain Consortium shared trust anchor; and an open DIY stack built on the NXP TapLinx SDK."
+      }
     },
     {
       "title": "How does cryptographic NFC authentication compare to QR, holograms and RFID for clone resistance?",
@@ -138,7 +142,11 @@
         "Serialised QR + backend lookup: better than static QR (the backend can flag duplicate-serial scans), but the serial is still copy-and-paste-able. Counterfeiters who control the bottle can scan once, copy the URL onto cloned units, and most consumers never look at the 'second tap' warning. Used in some EU EPR pilots as a cost compromise.",
         "UHF RFID with EPC Gen2v2 crypto suite: technically capable of mutual authentication, but consumer ecosystems do not have UHF readers. Strong for B2B supply-chain authentication; weak for consumer tap-to-verify.",
         "NFC SUN (NTAG 424 DNA): cryptographic rolling code on every tap, AES-128 key never leaves the chip, replay protection via monotonic counter. The chip-individual key model + smartphone tap is the only combination that scales consumer-side anti-counterfeit. Adding the TT (TagTamper) variant detects substrate removal — closing the 'transplant the genuine chip onto a counterfeit shell' attack."
-      ]
+      ],
+      "image": {
+        "src": "/diagrams/blog/clone-resistance-comparison.svg",
+        "alt": "Diagram ranking five anti-counterfeit methods by clone resistance and backend visibility: holograms and static QR codes are trivially copyable with no cryptographic trust anchor, serialized QR adds duplicate-scan detection but the serial is still copyable, UHF RFID crypto is strong for B2B supply chains but consumers lack readers, and NFC SUN is the only method combining a per-tap rolling code with a consumer smartphone tap."
+      }
     }
   ],
   "resourceCards": [
@@ -229,8 +237,43 @@
       "label": "View MIFARE stickers"
     }
   ],
+  "keywords": [
+    "NFC product authentication",
+    "NTAG424 DNA SUN authentication",
+    "tap-to-verify anti-counterfeiting",
+    "cryptographic NFC tag cloning resistance",
+    "AES-128 CMAC product verification",
+    "anti-counterfeit NFC packaging",
+    "NFC authentication vendor RFP"
+  ],
+  "sources": [
+    {
+      "label": "OECD/EUIPO — Trends in Trade in Counterfeit and Pirated Goods",
+      "url": "https://www.oecd.org/en/publications/trends-in-trade-in-counterfeit-and-pirated-goods_g2g9f533-en.html",
+      "publisher": "OECD/EUIPO",
+      "publishedAt": "2019",
+      "accessedAt": "2026-07-09",
+      "note": "2016 trade in counterfeit and pirated goods estimated up to USD 509 billion, or 3.3% of world trade."
+    },
+    {
+      "label": "NXP NT4H2421Gx — NTAG 424 DNA secure NFC IC data sheet",
+      "url": "https://www.nxp.com/docs/en/data-sheet/NT4H2421Gx.pdf",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2019",
+      "accessedAt": "2026-07-09",
+      "note": "AES-128 cryptography with a SUN/CMAC message generated on each tap."
+    },
+    {
+      "label": "NXP AN12196 — NTAG 424 DNA and NTAG 424 DNA TagTamper features and hints",
+      "url": "https://www.nxp.com/docs/en/application-note/AN12196.pdf",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2025",
+      "accessedAt": "2026-07-09",
+      "note": "SUN/CMAC implementation, tamper status file, and key-management guidance."
+    }
+  ],
   "authorSlug": "editorial-board",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-09",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09"
 }
