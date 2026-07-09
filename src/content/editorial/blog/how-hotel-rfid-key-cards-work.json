@@ -3,25 +3,21 @@
   "group": "blog",
   "title": "How Hotel RFID Key Cards Work",
   "kicker": "Hotel Technology",
-  "summary": "A technical breakdown of RFID hotel key card technology for procurement teams evaluating chip families, lock compatibility and card lifecycle planning. Over 70 % of new hotel lock installations worldwide now use RFID contactless technology, and before committing to a supplier, there is one unglamorous detail that decides every pilot: whether the chip you picked actually opens the door.",
+  "summary": "Over 70 % of new hotel lock installations worldwide now use RFID contactless technology, and the chip family you pick decides whether the card actually opens the door. This is the procurement-focused breakdown of how RFID hotel key cards work — across chip families, lock compatibility and card lifecycle planning.",
   "heroPoints": [
     "RFID key cards eliminate the demagnetization failures that plague legacy magstripe stock.",
     "Chip family choice drives lock compatibility, security posture and long-term migration cost.",
     "Understanding the encoding workflow before sampling prevents wasted pilot rounds."
   ],
-  "heroImage": "/landing-images/how-hotel-rfid-key-cards-work-hero.jpg",
-  "imageAlt": "RFID hotel key card with contactless lock",
-  "imageSourceRoutes": [
-    "/product/hotel-key-cards/",
-    "/product/mifare-classic-card/"
-  ],
+  "heroImage": "/diagrams/blog/how-hotel-rfid-key-cards-work-hero.svg",
+  "imageAlt": "Anatomy of a contactless hotel key-card exchange: the card's embedded antenna coil and chip module trade data with the lock's reader coil across a 13.56 MHz field at 1–4 cm, with no battery in the card.",
   "sections": [
     {
       "title": "How RFID key cards differ from magstripe",
       "intro": "Ask anyone who has worked a busy hotel front desk about magstripe key cards and you will get the same weary story: the guest who returns within the hour because the card 'stopped working,' the spare that fails by dinner, the quiet ritual of re-encoding a fresh card and sending the guest back upstairs to try again. A strip of iron oxide holds the room's secret, and almost anything magnetic in a pocket can scramble it. RFID key cards exist in no small part to end that conversation. Magnetic-stripe hotel key cards store room access data on a thin iron-oxide strip that must physically swipe through a reader head. RFID cards replace this with a wireless exchange between an embedded antenna-and-chip module and a contactless reader coil inside the lock.",
       "image": {
-        "src": "/blog-images/magstripe-vs-rfid.jpg",
-        "alt": "Side-by-side comparison of magnetic stripe and RFID hotel key cards"
+        "src": "/diagrams/blog/rfid-vs-magstripe-keycard.svg",
+        "alt": "Side-by-side comparison of magnetic-stripe and RFID hotel key cards: the magstripe swipes, demagnetises near magnets and lasts weeks; the RFID card taps at 1–4 cm, resists magnetic interference and lasts years."
       },
       "paragraphs": [
         "The practical difference for hotel operations is durability and reliability. Magstripe cards demagnetize when stored near phones, wallets with magnetic clasps or other cards. Front-desk staff at high-volume properties often re-encode two or three replacement cards per guest stay. RFID cards are immune to magnetic interference because data is stored in non-volatile silicon memory, not on a magnetic coating."
@@ -95,10 +91,10 @@
     },
     {
       "title": "How do encoding process and front-desk workflows work?",
-      "intro": "Hotel key card encoding is the step where a blank or recycled RFID card is written with room-number, check-in/out time and access-zone data by the Property Management System (PMS) through a desktop encoder.",
+      "intro": "Hotel key card encoding is the step where a blank or recycled RFID card is written with room-number, check-in/out time and access-zone data by the Property Management System (PMS) through a desktop encoder. The flow below traces one card from check-in to a written, encrypted credential.",
       "image": {
-        "src": "/blog-images/encoding.jpg",
-        "alt": "Hotel front desk encoding an RFID key card with a desktop reader"
+        "src": "/diagrams/blog/hotel-keycard-encoding-flow.svg",
+        "alt": "Four-step front-desk encoding flow: guest check-in, a PMS encode command over USB, serial or TCP/IP, the encoder writing an encrypted payload to a sector or application, and the card ready in under 500 ms, after which the lock reads and authenticates it."
       },
       "paragraphs": [
         "The encoder sits at the front desk and connects to the PMS via USB, serial or TCP/IP. When a guest checks in, the PMS sends an encoding command that writes an encrypted data payload to a specific sector or application on the card. The lock later reads and authenticates this payload to grant or deny access."
@@ -140,6 +136,10 @@
     {
       "title": "What happens at the moment the lock reads the card",
       "intro": "Most hotel RFID coverage glosses over the actual radio handshake. Knowing what happens in the 200-500 ms between tap and unlock helps engineering and IT teams diagnose intermittent failures and select the right diagnostic tools. This is the textbook ISO/IEC 14443 Type A sequence used by every MIFARE-based hotel lock.",
+      "image": {
+        "src": "/diagrams/blog/rfid-lock-handshake-timeline.svg",
+        "alt": "Timeline of the five ISO 14443 Type A handshake phases from tap to bolt: field activation at 0–50 ms, anti-collision at 50–150 ms, select and ATS at 150–200 ms, mutual authentication at 200–400 ms, and read and validate at 400–450 ms when the lock fires the bolt."
+      },
       "bullets": [
         "Field activation (0-50 ms): the lock's antenna emits a 13.56 MHz unmodulated carrier. When a card enters the field (typically within 1-4 cm), the chip rectifies the carrier into 3.3V DC and powers up. No card battery required — the chip is energy-harvesting.",
         "Anti-collision (50-150 ms): the lock issues a REQA (request type A) command. All cards in the field reply simultaneously. The lock walks the UID bit-tree to isolate one card at a time — this is why two cards in the same wallet sometimes both fail. ISO 14443-3 anti-collision typically resolves 1-2 cards reliably; 3+ cards may exceed the lock's resolution window.",
@@ -152,6 +152,10 @@
     {
       "title": "How do RFID cards coexist with mobile key (BLE and NFC wallet)?",
       "intro": "Industry digital-key adoption sits at roughly 14% across major chains after a decade of investment by Hilton, Marriott and IHG. Physical RFID cards remain the default for the other 86% of stays, and every chain offering mobile key still issues physical cards as backup. Procurement teams need to plan for both rails — not pick a winner.",
+      "image": {
+        "src": "/diagrams/blog/hotel-lock-credential-rails.svg",
+        "alt": "Three credential rails converging on one dual-credential lock: a physical RFID card carrying about 86% of stays, a BLE app key from the Hilton, Marriott and IHG apps, and an NFC wallet key in Apple Wallet or Google Wallet, all accepted by ASSA ABLOY, SALTO and dormakaba locks running one firmware."
+      },
       "bullets": [
         "BLE app keys (Hilton Honors, Marriott Bonvoy, IHG One Rewards): the lock listens for a credentialed phone within ~3-10 m range over Bluetooth Low Energy. Activation requires the brand's app installed and the reservation linked. Hilton alone has cumulatively recorded 135M+ door openings via BLE — at scale, but still single-digit percent of total daily openings system-wide.",
         "NFC wallet keys (Apple Wallet, Google Wallet): a tap-to-unlock model that does not require the brand's standalone app. Club Quarters became the first chain to deploy Apple Wallet + Google Wallet keys at all locations in January 2025. Adoption is climbing fastest in this format because it removes the app-install friction.",
@@ -278,5 +282,29 @@
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
-  "modifiedAt": "2026-07-02"
+  "modifiedAt": "2026-07-09",
+  "keywords": [
+    "RFID hotel key cards",
+    "MIFARE Classic 1K hotel locks",
+    "MIFARE DESFire EV3 key card",
+    "hotel key card chip compatibility",
+    "ISO 14443 hotel lock",
+    "hotel key card encoding workflow",
+    "mobile key vs RFID card"
+  ],
+  "sources": [
+    {
+      "label": "ISO/IEC 14443 — Identification cards, contactless proximity cards (13.56 MHz air interface & anti-collision)",
+      "url": "https://www.iso.org/standard/73596.html",
+      "publisher": "ISO",
+      "publishedAt": "2018",
+      "accessedAt": "2026-07-09"
+    },
+    {
+      "label": "NXP MIFARE DESFire EV3 — contactless IC security overview (AES-128, Common Criteria EAL5+)",
+      "url": "https://www.nxp.com/products/MF3DHx3",
+      "publisher": "NXP",
+      "accessedAt": "2026-07-09"
+    }
+  ]
 }
