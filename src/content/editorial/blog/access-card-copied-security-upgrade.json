@@ -3,22 +3,22 @@
   "group": "blog",
   "title": "Access Card Copied? How to Upgrade Security",
   "kicker": "Access Control",
-  "summary": "Discovering that an access card has been copied is a serious security breach: it exposes your building, tenants, and assets to unauthorized entry. And because a clone — made in seconds with a device costing less than $50 — reads exactly like the original, it hides in plain sight in your access logs. Here is how to respond, and how to upgrade so it cannot happen twice.",
+  "summary": "An access card can be cloned in seconds with a device costing less than $50, and the copy reads exactly like the original, hiding in your access logs. Here is how to respond in the first hours, and how to upgrade to AES-128 encrypted cards so it cannot happen twice.",
   "heroPoints": [
     "125 kHz proximity cards and MIFARE Classic cards can be cloned in seconds using devices costing less than $50, making them a significant liability for building security.",
     "Immediate response after a suspected cloning breach: audit access logs, revoke compromised credentials, and implement temporary access controls while planning a technology upgrade.",
     "Long-term fix: migrate to AES-128 encrypted cards (MIFARE DESFire EV3 or HID SEOS) that use cryptographic mutual authentication, making card cloning computationally infeasible."
   ],
-  "imageAlt": "Black RFID card reader pad with a card-tap icon mounted beside a white self-service terminal",
-  "heroImage": "/landing-images/access-card-copied-security-upgrade-hero.jpg",
-  "imageSourceRoutes": [
-    "/products/rfid-cards/mifare-desfire-ev3-card/",
-    "/products/rfid-cards/em4100-rfid-card/"
-  ],
+  "imageAlt": "Two outcomes for a copied badge: a legacy 125 kHz or MIFARE Classic card is duplicated by a sub-$50 device into a perfect clone that reads as accepted, while a MIFARE DESFire EV3 card using AES-128 mutual authentication rejects the clone. A stat band notes a sub-$50 cloner, Crypto-1 broken in 2008, AES-128 mutual authentication, and a 90-day cutover.",
+  "heroImage": "/diagrams/blog/access-card-copied-security-upgrade-hero.svg",
   "sections": [
     {
       "title": "How to respond to a suspected card cloning incident",
       "intro": "The first sign is rarely dramatic. It is usually a single line in an access log that has no business being there — the same badge opening the lobby and a restricted floor moments apart, or a credential belonging to someone who left the company months ago. A card has been copied, and the duplicate works exactly as well as the original. The unsettling part is not that it happened; it is how little it took, because cloning a legacy credential is less a heist than a photocopy. What matters now is doing things in order: contain the exposure first, reconstruct what happened second, and only then fix the technology that made copying so trivial — and the first hours decide how much of that you get to control.",
+      "image": {
+        "src": "/diagrams/blog/access-cloning-incident-response.svg",
+        "alt": "Incident-response order after a suspected cloning: first contain (revoke and reissue the credential, add guards and real-time alerts), then reconstruct (audit access logs, assess the scope of exposure), and only then fix the technology by planning an encrypted-card upgrade."
+      },
       "bullets": [
         "Audit access logs immediately. Review all entry records for the affected access points looking for anomalies: entries at unusual hours, entries by credentials that should not have been present, duplicate simultaneous reads of the same card at different locations, or entries by former employees whose cards should be deactivated.",
         "Revoke and reissue affected credentials. Deactivate the suspected cloned card number in your access control software and issue a new credential on a fresh card. If you cannot determine which specific cards were cloned, consider a mass reissuance for high-security zones.",
@@ -28,6 +28,10 @@
     },
     {
       "title": "Why your cards were vulnerable to cloning",
+      "image": {
+        "src": "/diagrams/blog/legacy-card-cloning-anatomy.svg",
+        "alt": "Why legacy cards clone so easily: a 125 kHz proximity card broadcasts its ID in plaintext and a MIFARE Classic card's Crypto-1 cipher was publicly broken in 2008, so a sub-$50 device captures the credential and writes it to a blank card, producing a perfect clone."
+      },
       "bullets": [
         "125 kHz proximity cards ([EM4100](/guides/em4100-em4305-t5577-lf-chip-encyclopedia/), HID Prox) broadcast their ID number in plaintext with zero encryption. Any device that can receive the 125 kHz signal can capture the full credential, and any compatible blank card can be programmed with that same ID.",
         "[MIFARE Classic 1K](/guides/mifare-classic-1k-4k-chip-encyclopedia/)/4K uses Crypto-1 encryption that was publicly broken in 2008. Free software tools can extract sector keys and dump entire card contents, creating perfect clones.",
@@ -47,6 +51,10 @@
     {
       "title": "Which clone-resistant credential family fits which building",
       "intro": "Not every facility has the same threat model, budget, or installed reader base. Choosing the right successor to your cloned cards is less about picking the most expensive credential and more about matching encryption strength, vendor lock-in tolerance, and migration cost to the building you actually operate. Use the families below as a 2026 short-list when scoping a real upgrade with your integrator.",
+      "image": {
+        "src": "/diagrams/blog/clone-resistant-credential-families.svg",
+        "alt": "Clone-resistant credential families compared: MIFARE DESFire EV3 (AES-128, three-pass mutual authentication, Common Criteria EAL5+), HID Seos (AES-128 plus ECC key exchange, portable across card, mobile and fob), MIFARE Plus (AES-128, upgradable from Classic compatibility), and mobile or FIDO2 credentials (phone Secure Element plus biometric, an additive layer)."
+      },
       "bullets": [
         "MIFARE DESFire EV3 (NXP) — the broadest-compatibility 13.56 MHz upgrade. AES-128 encryption, mutual three-pass authentication, optional Transaction MAC, and Common Criteria EAL5+ certification on the 4K SKU. EV3 is functionally backward compatible with EV2/EV1 readers per NXP application note AN12752, so most multi-vendor sites can swap cards before swapping readers. The DESFire EV3C variant maps a Classic 1K layout into a DESFire file, which lets a building keep partial Classic compatibility during a long phased rollout.",
         "HID Seos — the strongest mainstream commercial credential. Uses open-standard AES-128 plus Diffie-Hellman ECC key exchange and HID's Secure Identity Object (SIO) data wrapper, so the credential is portable across cards, fobs, smartphones (HID Mobile Access), and wearables. Best fit when you already run HID multiCLASS SE / Signo readers and want one credential type for badges, mobile, and IT logon. iCLASS SE is the older sibling — still secure, but uses HID's proprietary key system rather than open AES, which limits future portability.",
@@ -58,6 +66,10 @@
     {
       "title": "Building a 90-day post-breach remediation plan",
       "intro": "After a confirmed or strongly suspected cloning incident, the worst outcome is a slow, partial response that leaves the original vulnerability live for months. The 90-day plan below borrows from common physical-security incident-response playbooks and is tuned for buildings still running 125 kHz Prox or MIFARE Classic. Adjust durations to your scale, but keep the sequencing — readers and credentials must be swapped together inside each protected zone, not piecemeal across the whole building.",
+      "image": {
+        "src": "/diagrams/blog/post-breach-90-day-timeline.svg",
+        "alt": "A 90-day post-breach remediation timeline: days 0 to 7 contain and document, days 7 to 30 design the target architecture, days 30 to 60 pilot one zone in dual-credential mode, days 60 to 90 roll out to production and sunset legacy cards, and ongoing monitoring with annual clone-attempt penetration tests."
+      },
       "bullets": [
         "Days 0-7 — contain and document. Lock down high-value zones to a smaller approved-card list, escalate camera retention to 90+ days for the affected doors, and capture every cloned-card hit in the access log to a tamper-evident export. This evidence becomes the basis for any later insurance claim or law-enforcement report and is far harder to assemble retroactively.",
         "Days 7-30 — design the target architecture. Run a reader inventory (model, firmware, supported card families, OSDP vs Wiegand), pick the credential family from the previous section, and request a written migration quote from your integrator broken into hardware, encoding, and labor lines. Decide now whether the Wiegand backhaul will be replaced with OSDP v2 Secure Channel, because Wiegand is itself sniffable and will undermine even an AES card.",
@@ -142,5 +154,27 @@
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
-  "modifiedAt": "2026-07-02"
+  "modifiedAt": "2026-07-07",
+  "keywords": [
+    "access card cloning",
+    "clone-resistant access cards",
+    "MIFARE DESFire EV3",
+    "HID Seos credential",
+    "OSDP secure channel",
+    "access control security upgrade"
+  ],
+  "sources": [
+    {
+      "label": "SIA — Open Supervised Device Protocol (OSDP / IEC 60839-11-5)",
+      "url": "https://www.securityindustry.org/industry-standards/open-supervised-device-protocol/",
+      "publisher": "Security Industry Association",
+      "publishedAt": "2024-10-31"
+    },
+    {
+      "label": "NXP — MIFARE DESFire product family (EV3: AES, Common Criteria EAL5+)",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-desfire:MC_53450",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2023-04-28"
+    }
+  ]
 }
