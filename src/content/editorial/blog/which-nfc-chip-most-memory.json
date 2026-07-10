@@ -3,18 +3,14 @@
   "group": "blog",
   "title": "Which NFC Chip Has the Most Memory?",
   "kicker": "NFC Chip Memory Comparison",
-  "summary": "NFC chip memory ranges from 48 bytes on basic chips to 8 kilobytes or more on high-capacity models. Choosing the right memory size depends on what data you need to store: a short URL needs only 48-144 bytes.",
+  "summary": "MIFARE DESFire EV3 holds the most NFC memory at up to 8 KB; among sticker-friendly chips NTAG I2C Plus leads at 1,912 bytes and NTAG216 at 888 bytes — but most projects need far less, since a short URL fits in 48-144 bytes. This guide compares user memory across 11 NFC chips and shows how to size for URLs, vCards, DPP and offline data.",
   "heroPoints": [
     "NTAG I2C Plus offers up to 1,912 bytes — the largest user memory in the popular NTAG family, designed for IoT applications requiring substantial on-tag data storage alongside NFC communication.",
     "ICODE DNA offers 256 bytes (2,048 bits in 64 blocks × 4 bytes per {chip:nxp-icode-dna:name} datasheet) — a cryptographically-authenticated NFC chip with AES-128 + 32-byte originality signature, suited for brand-protection and digital product passport applications on ISO/IEC 15693 / NFC Forum Type 5 infrastructure.",
     "For most applications, 144-888 bytes is sufficient. NTAG213 (144 bytes), NTAG215 (504 bytes), and NTAG216 (888 bytes) cover the vast majority of URL, vCard, and multi-record NFC use cases."
   ],
-  "imageAlt": "NFC chip memory comparison chart showing storage capacity by chip model",
-  "heroImage": "/landing-images/ntag216-nfc-sticker.jpg",
-  "imageSourceRoutes": [
-    "/product/nfc-stickers/",
-    "/products/rfid-cards/"
-  ],
+  "imageAlt": "NFC chip user-memory comparison on a log scale: MIFARE DESFire EV3 up to 8 KB, NTAG I2C Plus 1,912 bytes, NTAG216 888 bytes, NTAG215 504 bytes, NTAG 424 DNA 416 bytes, NTAG213 144 bytes, MIFARE Ultralight 48 bytes.",
+  "heroImage": "/diagrams/blog/nfc-chip-memory-ladder-hero.svg",
   "sections": [
     {
       "title": "How do NFC chip memory compare?",
@@ -86,6 +82,8 @@
     },
     {
       "title": "How much NFC memory do you actually need?",
+      "intro": "Far less than the spec sheet tempts you to buy. Map the payload to its real byte count and the smallest chip that fits usually wins on cost and reliability — a single URL lives happily in 48-144 bytes. The sizing ladder below runs from a short URL to a multi-record tag; [programming the tag](/blog/how-to-program-nfc-tags/) is where the byte math gets real.",
+      "image": { "src": "/diagrams/blog/nfc-memory-payload-sizing.svg", "alt": "A payload-to-chip sizing ladder: short URL 48-64 B (NTAG210/Ultralight), standard URL 100-144 B (NTAG213), long URL 250-504 B (NTAG215), vCard 300-800 B (NTAG215/216), multiple NDEF records 500-2,000 B (NTAG216+)." },
       "bullets": [
         "Short URL (under 40 characters) — 48-64 bytes. A URL like 'https://proudtek.com' fits on even the smallest NFC chips. Use NTAG210 or [MIFARE Ultralight](/guides/mifare-ultralight-c-chip-encyclopedia/) for minimum cost.",
         "Standard URL (40-100 characters) — 100-144 bytes. Most website URLs, social media profile links, and Google Review URLs fit within NTAG213's 144 bytes.",
@@ -96,7 +94,8 @@
     },
     {
       "title": "What NFC memory sizing mistakes do procurement teams make?",
-      "intro": "Choosing NFC chip memory is straightforward when the use case is clear, but these five common mistakes cause expensive over-spec or last-minute scope changes mid-deployment.",
+      "intro": "Choosing NFC chip memory is straightforward when the use case is clear, but these five common mistakes cause expensive over-spec or last-minute scope changes mid-deployment. Each one below pairs with the discipline that prevents it.",
+      "image": { "src": "/diagrams/blog/nfc-memory-sizing-mistakes.svg", "alt": "A two-column map of five NFC memory-sizing mistakes and their fixes: over-buying NTAG216, forgetting NDEF overhead, confusing total vs user memory, ignoring the originality signature, and underestimating payload growth." },
       "bullets": [
         "Buying NTAG216 \"just in case\": NTAG216 (888 bytes) costs 2-3x more than NTAG213 (144 bytes). Most marketing URL applications fit comfortably in NTAG213. Only spec NTAG215/216 if your payload genuinely exceeds 130 chars.",
         "Forgetting NDEF overhead: each NDEF record carries 4-12 bytes of header. A single 100-char URL uses ~110 bytes; two 50-char URLs use ~120 bytes. Run a real encoding test before assuming the math.",
@@ -107,7 +106,8 @@
     },
     {
       "title": "When does on-tag memory matter vs cloud-resolved URLs?",
-      "intro": "The default architecture for modern NFC programs is 'small URL on tag, rich data in cloud'. But there are real use cases where on-tag memory matters — and procurement teams who don't know the line over-spec or under-spec.",
+      "intro": "The default architecture for modern NFC programs is 'small URL on tag, rich data in cloud'. But there are real use cases where on-tag memory matters — and procurement teams who don't know the line over-spec or under-spec. The map below sorts the default from the four exceptions; for the passport case specifically, see [NFC digital product passports](/blog/digital-product-passports-nfc/).",
+      "image": { "src": "/diagrams/blog/on-tag-vs-cloud-nfc-memory.svg", "alt": "A decision diagram: the default small-URL-plus-cloud pattern (NTAG213, ~95% of programs) versus four cases needing on-tag memory — offline operation, privacy/ephemeral payloads, sensor/counter buffers, and DPP/authentication (NTAG 424 DNA)." },
       "bullets": [
         "Cloud-resolved URL pattern: the tag stores a 50-150 byte URL like `https://id.gs1.org/01/{GTIN}/21/{serial}` or a brand-controlled resolver. All product info, DPP data, authentication payload and analytics live behind the URL. NTAG213 is sufficient. This is the right architecture for ~95% of consumer-facing NFC programs.",
         "Offline data needs on-tag memory: applications that must operate without network connectivity (industrial maintenance in basements, remote logistics, military / aviation maintenance records) need on-tag data. NTAG215, NTAG216 or NTAG I2C Plus carry vCard, configuration, equipment metadata that survives without backend access.",
@@ -119,6 +119,7 @@
     {
       "title": "How does memory size trade off against price, security and form factor?",
       "intro": "Memory is one of four variables procurement teams balance — and the one that tends to get the most attention for the least reason. The trade-offs below are the ones that show up in real vendor RFP responses.",
+      "image": { "src": "/diagrams/blog/nfc-memory-tradeoffs.svg", "alt": "A five-chip matrix trading user memory against price at 10K, security and tag type: NTAG213/215/216 (32-bit password, Type 2), NTAG 424 DNA (AES-128 SUN, Type 4), MIFARE DESFire EV3 (AES, card)." },
       "bullets": [
         "Memory vs price: at 10K MOQ, NTAG213 ($0.04-0.08) → NTAG215 ($0.06-0.12) → NTAG216 ($0.08-0.15) → NTAG 424 DNA ($0.15-0.40) → DESFire EV3 ($0.40-1.50). Each step up roughly 1.5-3x. Don't pay for memory you won't use.",
         "Memory vs security: NTAG213/215/216 have only 32-bit password protection (brute-forceable in seconds). NTAG 424 DNA has AES-128 SUN/CMAC with 416 bytes user memory. ICODE DNA has 256 bytes (2,048 bits per NXP datasheet) + AES-128 — at higher cost and narrower smartphone support (ISO 15693, not ISO 14443).",
@@ -201,5 +202,31 @@
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-09",
-  "modifiedAt": "2026-06-11T12:00:00Z"
+  "modifiedAt": "2026-07-09T00:00:00Z",
+  "keywords": [
+    "NFC chip memory comparison",
+    "NTAG213 NTAG215 NTAG216 user memory",
+    "which NFC chip has the most memory",
+    "NFC memory sizing",
+    "NTAG 424 DNA memory",
+    "MIFARE DESFire EV3 8KB",
+    "on-tag vs cloud-resolved NFC URL",
+    "NFC NDEF payload bytes"
+  ],
+  "sources": [
+    {
+      "label": "NXP NTAG 213/215/216 datasheet",
+      "url": "https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf",
+      "publisher": "NXP",
+      "note": "User memory 144/504/888 bytes (180/540/924 bytes total EEPROM); NFC Forum Type 2, 32-bit password.",
+      "accessedAt": "2026-07-09"
+    },
+    {
+      "label": "NXP ICODE DNA (SL2S6002) datasheet",
+      "url": "https://www.nxp.com/docs/en/data-sheet/SL2S6002_SDS.pdf",
+      "publisher": "NXP",
+      "note": "2,048-bit (256-byte) user memory, AES-128, 32-byte originality signature; ISO/IEC 15693.",
+      "accessedAt": "2026-07-09"
+    }
+  ]
 }
