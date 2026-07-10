@@ -3,26 +3,21 @@
   "group": "blog",
   "title": "What Is MIFARE? A Complete Guide",
   "kicker": "RFID Technology",
-  "summary": "A comprehensive technical reference for procurement and IT teams on NXP's MIFARE chip family — Classic, Plus, DESFire, Ultralight — and why the brand name alone never tells you which chip you are buying. Covering each line's applications in access control, transit, payment and identification.",
+  "summary": "MIFARE is NXP's family of 13.56 MHz ISO 14443 contactless smart-card chips — Ultralight, Classic, Plus and DESFire, over 12 billion shipped — and the brand name alone never tells you which one is in the card. This guide maps each line's memory, security and cost so procurement and IT teams stop ordering 'MIFARE' and start ordering the right chip for access control, transit and payment.",
   "heroPoints": [
     "MIFARE is the world's most widely deployed contactless smart card technology, with over 12 billion chips sold across transit, access and payment applications.",
     "The MIFARE family spans five product lines with different memory, security and cost profiles. Selecting the wrong line leads to compatibility failures.",
     "Understanding MIFARE's security evolution from Crypto-1 to AES-128 is critical for procurement teams evaluating legacy system migration paths."
   ],
-  "heroImage": "/landing-images/mifare-classic-1k-card.jpg",
-  "imageAlt": "MIFARE chip family lineup showing Classic, Plus and DESFire cards",
-  "imageSourceRoutes": [
-    "/product/mifare-classic-card/",
-    "/product/mifare-4k-card/",
-    "/product/mifare-plus-card/"
-  ],
+  "heroImage": "/diagrams/blog/what-is-mifare-complete-guide-hero.svg",
+  "imageAlt": "A single contactless card under a magnifier resolves into the five MIFARE lines — Ultralight, Classic, Plus, DESFire and DESFire Light — each labeled with its memory, security scheme and typical use, showing that the brand name alone never identifies the chip.",
   "sections": [
     {
       "title": "What MIFARE is and why it matters",
-      "intro": "Few words in access control cause more procurement confusion than 'MIFARE.' A buyer asks a vendor for 'MIFARE cards,' gets a quote, places the order, and discovers at install that the cards the integrator specified and the cards that arrived share a brand name and not much else. MIFARE is not a single product; it is a family of chips spanning several generations of memory and security, and the distance between two of them can be the distance between a working door and a help-desk queue. MIFARE is a series of contactless smart card integrated circuits manufactured by NXP Semiconductors. The name covers a family of chip products that operate at 13.56 MHz (HF) and conform to ISO 14443 Type A, the most widely adopted contactless communication standard.",
+      "intro": "Few words in access control cause more procurement confusion than 'MIFARE.' A buyer asks a vendor for 'MIFARE cards,' gets a quote, places the order, and discovers at install that the cards the integrator specified and the cards that arrived share a brand name and not much else. MIFARE is not a single product; it is a family of chips spanning several generations of memory and security, and the distance between two of them can be the distance between a working door and a help-desk queue. MIFARE is a series of contactless smart card integrated circuits manufactured by NXP Semiconductors. The name covers a family of chip products that operate at 13.56 MHz (HF) and conform to ISO 14443 Type A, the most widely adopted contactless communication standard. The stack below shows what the whole family shares — one radio layer — and where it quietly splits: at the application layer, where a Classic card and a DESFire card stop understanding each other.",
       "image": {
-        "src": "/blog-images/mifare-guide.jpg",
-        "alt": "NXP MIFARE chip family lineup from Classic to DESFire EV3"
+        "src": "/diagrams/blog/mifare-interoperability-layers.svg",
+        "alt": "A two-layer stack showing that all five MIFARE lines share one RF layer — 13.56 MHz and ISO 14443-3A anti-collision — but diverge at the application layer, where MIFARE Classic's sector-and-block structure and DESFire's file system are mutually unreadable without reader firmware changes."
       },
       "paragraphs": [
         "MIFARE matters for procurement teams because it is the default chip family for the majority of the world's contactless infrastructure. Transit systems (London Oyster, Hong Kong Octopus, Moscow Troika), hotel lock systems (ASSA ABLOY, Saflok, SALTO), corporate access control platforms and government identity programs all run on MIFARE chips. Choosing a MIFARE variant is not a technology decision in isolation. It is a compatibility decision that must align with the reader infrastructure already deployed."
@@ -97,7 +92,11 @@
     },
     {
       "title": "What is MIFARE Classic, the legacy workhorse?",
-      "intro": "MIFARE Classic is the most widely installed contactless chip in history. Despite known security vulnerabilities in its Crypto-1 encryption, it remains in active use because billions of dollars of reader infrastructure depend on it.",
+      "intro": "MIFARE Classic is the most widely installed contactless chip in history. Despite known security vulnerabilities in its Crypto-1 encryption, it remains in active use because billions of dollars of reader infrastructure depend on it. If your question is specifically about hotel locks, the Classic-versus-DESFire trade-off is laid out in [MIFARE Classic vs DESFire for hotel chips](/blog/mifare-classic-vs-desfire-hotel-chips/); the sector-and-block map below is the memory structure every Classic integration inherits.",
+      "image": {
+        "src": "/diagrams/blog/mifare-classic-sector-map.svg",
+        "alt": "A memory map of MIFARE Classic 1K showing sixteen sectors of four sixteen-byte blocks each, every sector guarded by a Key A and a Key B, with a note that the 4K variant extends the layout to forty sectors while reusing the same Crypto-1 access control."
+      },
       "paragraphs": [
         "Classic uses a sector-and-block memory structure. The 1K variant has 16 sectors of 4 blocks (16 bytes each). Each sector is protected by two keys (Key A and Key B) that control read and write access. The 4K variant extends this to 40 sectors, with the first 32 being standard size and the last 8 being double-size."
       ],
@@ -111,7 +110,11 @@
     },
     {
       "title": "What is MIFARE DESFire, the modern standard?",
-      "intro": "MIFARE DESFire is NXP's flagship contactless chip, designed for multi-application environments where strong security, flexible data structures and interoperability with banking and government standards are required.",
+      "intro": "MIFARE DESFire is NXP's flagship contactless chip, designed for multi-application environments where strong security, flexible data structures and interoperability with banking and government standards are required. The generation-to-generation security changes are compared in [DESFire EV1 vs EV2 vs EV3](/blog/desfire-ev1-vs-ev2-vs-ev3/), and the low-level commands in the [DESFire EV3 command reference](/guides/mifare-desfire-ev3-commands-reference/); the file-system diagram below shows why DESFire retired Classic's fixed sectors.",
+      "image": {
+        "src": "/diagrams/blog/mifare-desfire-file-system.svg",
+        "alt": "A diagram of the MIFARE DESFire file-system architecture showing a card master level holding up to 28 independent application directories, each with its own AES-128 keys, access rights and files, all protected by mutual authentication and secure messaging, contrasted against Classic's single flat sector array."
+      },
       "bullets": [
         "DESFire uses a file-system architecture with application directories, replacing Classic's rigid sector structure. Up to 28 independent applications can coexist on a single chip.",
         "AES-128 encryption with secure messaging protects all data in transit and at rest. Mutual authentication ensures both the card and reader prove their identity before exchanging data.",
@@ -123,7 +126,11 @@
     },
     {
       "title": "How do you plan migration paths and compatibility?",
-      "intro": "Most procurement teams encounter MIFARE when maintaining or upgrading an existing contactless system. Understanding migration paths prevents costly compatibility failures. The chips themselves are cheap; discovering at go-live that they don't match the installed readers is not.",
+      "intro": "Most procurement teams encounter MIFARE when maintaining or upgrading an existing contactless system. Understanding migration paths prevents costly compatibility failures. The chips themselves are cheap; discovering at go-live that they don't match the installed readers is not. The four routes below map each starting chip to its destination and the reader work each one quietly demands.",
+      "image": {
+        "src": "/diagrams/blog/mifare-migration-paths.svg",
+        "alt": "A migration map with four routes: Classic to Plus staying on the same sectors then switching from Security Level 1 to Security Level 3 AES once readers are updated; Classic to DESFire as a full memory-architecture change needing new cards and firmware; Ultralight to DESFire Light for reusable transit credentials; and a dual-chip bridge card carrying both a Classic and a DESFire chip during a phased reader upgrade."
+      },
       "bullets": [
         "Classic to Plus: MIFARE Plus can operate in Classic-compatible mode (Security Level 1) using the same sector structure and Crypto-1 keys. Once all readers are updated, cards can be switched to AES mode (Security Level 3) without replacing the cards.",
         "Classic to DESFire: This is a full migration. DESFire uses a different memory architecture. Cards and reader firmware must both be updated. A transition period where readers accept both Classic and DESFire is typically required.",
@@ -134,7 +141,11 @@
     },
     {
       "title": "MIFARE security history — the breaks, the patches and the chips you must avoid",
-      "intro": "Every MIFARE family member sits on a security trajectory shaped by published attacks, NXP responses and downstream user migrations. Buyers writing access-control or payment specs in 2026 need to read the credential not as a feature list but as a position on this timeline — what has been broken, what was patched, and what has held up to public cryptanalysis.",
+      "intro": "Every MIFARE family member sits on a security trajectory shaped by published attacks, NXP responses and downstream user migrations. Buyers writing access-control or payment specs in 2026 need to read the credential not as a feature list but as a position on this timeline — what has been broken, what was patched, and what has held up to public cryptanalysis. The timeline below plots each line from the 2008 Crypto-1 break to the 2024 Fudan backdoor disclosure, marking what you can still trust.",
+      "image": {
+        "src": "/diagrams/blog/mifare-security-timeline.svg",
+        "alt": "A security timeline of the MIFARE family: MIFARE Classic Crypto-1 reverse-engineered in 2008 and treated as broken; MIFARE Plus adding AES-128 at Security Level 3; DESFire EV1 from 2008 with 3DES and AES at EAL4+; DESFire EV2 from 2017 adding CMAC sessions at EAL5+; DESFire EV3 from 2020 adding SUN and SDM at EAL5+; and the 2024 disclosure of a hardware backdoor in Fudan FM11RF08 Classic clones, with broken states marked in red and current-generation chips marked secure."
+      },
       "bullets": [
         "MIFARE Classic 1K/4K (broken since 2008) — Karsten Nohl and Henryk Plötz reverse-engineered the proprietary Crypto-1 stream cipher in 2007-2008. Nested attacks (Garcia et al. 2008-2009), darkside attack (Courtois 2009) and hardnested (mfoc, mfcuk tools) extract sector keys in seconds. December 2024 saw the Quarkslab disclosure of an undocumented backdoor key in Fudan FM11RF08 MIFARE Classic clones — affecting hotel, transit and access cards in dozens of countries. Treat MIFARE Classic as a unique-ID-only token, never as a security credential.",
         "MIFARE Plus EV1/EV2 (transitional, AES-128 in SL3) — Plus offers four security levels (SL0-SL3) for backward-compatible migration. SL1 emulates Classic (still vulnerable). SL3 uses AES-128 mutual authentication and is considered secure today. Common Criteria EAL4+ certified at SL3. Used where you need a phased migration off Classic without replacing the entire reader fleet on day one.",
@@ -145,7 +156,11 @@
     },
     {
       "title": "MIFARE buying playbook — chip selection, encoding, key diversification and supply chain",
-      "intro": "MIFARE chips arrive blank. Turning them into a working credential requires three coordinated activities — chip selection matched to the application, key generation and diversification, and personalisation logistics. Get any of these wrong and you either pay for unused capability or lock yourself into a security architecture you cannot change.",
+      "intro": "MIFARE chips arrive blank. Turning them into a working credential requires three coordinated activities — chip selection matched to the application, key generation and diversification, and personalisation logistics. Get any of these wrong and you either pay for unused capability or lock yourself into a security architecture you cannot change. The diagram below traces the step buyers most often skip: deriving a unique key per card so one cloned credential never unlocks the whole fleet.",
+      "image": {
+        "src": "/diagrams/blog/mifare-key-diversification.svg",
+        "alt": "A key-diversification flow in which a single AES-128 master key held inside an HSM is combined with each card's unique UID through the NXP AN10922 and AN12752 key-derivation function to produce a different per-card key, so compromising one card exposes only that credential and never the master key or the rest of the fleet."
+      },
       "bullets": [
         "Choose the chip variant that matches the AID + file + key budget — MIFARE Classic 1K (1024 bytes, 16 sectors): legacy migrations only. Classic 4K (4096 bytes, 40 sectors): legacy bulk transit. DESFire EV3 2K (2 KB, 28 apps): single-use access or single transit. DESFire EV3 4K (4 KB, 28 apps + EAL5+ certified): multi-app campus + payment + transit. DESFire EV3 8K (8 KB): heavy multi-app eID overlay. NTAG 213 (144 B), NTAG 215 (504 B), NTAG 216 (888 B): consumer NFC bookmark/URL/wifi tags. NTAG 424 DNA (416 B + SUN): consumer authentication, brand protection.",
         "Diversify keys per card, never use the master key in the field — Generate per-card AES-128 keys via cryptographic key derivation (KDF) using the card's UID and a master key held in an HSM. NXP application notes AN10922 and AN12752 specify the standard KDF. Compromise of one card never compromises the system — only that single credential.",
@@ -273,8 +288,34 @@
       "label": "View MIFARE DESFire cards"
     }
   ],
+  "keywords": [
+    "MIFARE chip family",
+    "MIFARE Classic vs DESFire",
+    "MIFARE DESFire EV3",
+    "ISO 14443 Type A contactless smart card",
+    "MIFARE Crypto-1 vs AES-128 security",
+    "MIFARE migration Classic to DESFire",
+    "NXP contactless smart card procurement"
+  ],
+  "sources": [
+    {
+      "label": "NXP — MIFARE (HF) product family and deployment figures",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf:MC_53422",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-09",
+      "note": "Vendor overview: 12 billion ICs shipped, 750+ cities powered; MIFARE Classic ISO/IEC 14443 Type-A at 1 kB/4 kB; DESFire, Plus and Ultralight lines."
+    },
+    {
+      "label": "Quarkslab — MIFARE Classic: exposing the static encrypted nonce variant and a few hardware backdoors",
+      "url": "https://blog.quarkslab.com/mifare-classic-static-encrypted-nonce-and-backdoors.html",
+      "publisher": "Quarkslab",
+      "publishedAt": "2024-08-20",
+      "accessedAt": "2026-07-09",
+      "note": "Philippe Teuwen; hardware backdoor key common to Fudan FM11RF08/FM11RF08S MIFARE Classic clones. Full paper: IACR ePrint 2024/1275."
+    }
+  ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-10",
-  "modifiedAt": "2026-06-11T12:00:00Z"
+  "modifiedAt": "2026-07-09T12:00:00Z"
 }
