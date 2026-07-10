@@ -138,8 +138,8 @@
     "Multi-form-factor support. Standard ISO cards, key fobs, wristbands, and stickers that all work with your existing reader infrastructure.",
     "Compatible with the major access-control ecosystems in the installed base. Credentials regularly programmed for HID iCLASS / SEOS, Gallagher, Salto, Keri, Honeywell, Bosch and ASSA ABLOY reader families — send us a sample credential or the reader model and we confirm the chip and encoding format before production."
   ],
-  "imageAlt": "Assorted RFID keyfobs in red, blue, green, black and white with metal key rings on a gray surface",
-  "heroImage": "/landing-images/rfid-access-control-hero-v2.jpg",
+  "imageAlt": "Banner diagram of an RFID access control system: card, key fob and wristband credentials presented to a reader, connected over OSDP Secure Channel to the controller panel and PACS head-end software.",
+  "heroImage": "/diagrams/solutions/rfid-access-control-banner.svg",
   "imageSourceRoutes": [
     "/products/rfid-cards/mifare-classic-1k-card/",
     "/products/rfid-cards/mifare-plus-se-card/",
@@ -147,7 +147,7 @@
     "/products/rfid-keyfobs/rfid-abs-keyfob/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-10",
   "sections": [
     {
       "title": "RFID credentials for access control systems",
@@ -197,6 +197,7 @@
     },
     {
       "title": "Access control applications by sector",
+      "intro": "The credential family barely changes between verticals — what changes is which failure gets expensive. An office badge that misreads costs a few seconds of lobby grumbling; a medication-room door that fails open costs an audit finding. The notes below map each tier to the sector where it earns its keep — key-ring form factors get fuller treatment under [RFID key fobs for access control](/solutions/rfid-keyfobs-access-control/), and elevator wiring specifics in [RFID elevator floor access](/blog/rfid-elevator-floor-access/).",
       "bullets": [
         "Corporate offices: employee badges with MIFARE DESFire for door access, elevator control, time and attendance, secure printing and cashless vending.",
         "Residential buildings: apartment access cards or key fobs for main entrance, parking garage, gym, pool and common area doors.",
@@ -250,6 +251,11 @@
     },
     {
       "title": "Credential silicon deep-dive — four security tiers explained",
+      "intro": "Four tiers, one question: how expensive is the attack you are defending against? The ladder below runs from silicon a hobbyist tool clones during a coffee break up to AES-128 mutual authentication with no public break — and the bullets put part numbers to every rung.",
+      "image": {
+        "src": "/diagrams/solutions/access-credential-security-tiers.svg",
+        "alt": "Ladder diagram of four access-credential security tiers, from 125 kHz LF silicon with no cryptography at the bottom, through MIFARE Classic with broken Crypto-1 and AES transitional MIFARE Plus, up to DESFire EV3 and Seos class AES-128 credentials at the top."
+      },
       "bullets": [
         "Tier-1 (125 kHz LF) — {chip:em-microelectronic-em4100:short_name} / EM4102 / HID Prox 26-bit H10301 / HID ProxII / Indala / Casi-Rusco / AWID / Keri PSK / KeriPRX: simple LF inductive coupling at 125 kHz, ISO 11784/11785 lineage, 64-bit manufacturer ID + 26-bit Wiegand facility code. No cryptography. Cloneable in <60 seconds with $30 Proxmark3 RDV4 / Proxmark Easy / Flipper Zero / Iceman fork. Retained only for legacy maintenance — every NIST SP 800-116 Rev 1 audit flags LF as a deficiency for sensitive areas.",
         "Tier-2 (13.56 MHz HF Classic) — NXP {chip:nxp-mifare-classic-1k:short_name} / 4K (S50 / S70 silicon): ISO/IEC 14443-A air interface, 1KB or 4KB EEPROM partitioned into sectors with Crypto-1 stream-cipher 48-bit keys. Crypto-1 academically broken in 2008 (Garcia, de Koning Gans, Verdult — Radboud University Nijmegen) — sector keys recoverable in <1 minute via nested + darkside + hardnested attacks (mfoc, mfcuk, hardnested). Still widely installed but recommended for replacement during next refresh cycle.",
@@ -263,6 +269,11 @@
     },
     {
       "title": "PACS head-end integration — Genetec / Lenel / Honeywell / C·CURE / AMAG / Bosch / Gallagher",
+      "intro": "A credential is only as trustworthy as the head-end that enrols it. The stack below traces the full path — credential to reader to panel to PACS software — and the platform notes that follow say which vendors dominate each estate, so you can buy cards that match the software you already run instead of discovering the encoding format after despatch.",
+      "image": {
+        "src": "/diagrams/solutions/pacs-integration-stack.svg",
+        "alt": "Layer diagram of a physical access control system: credential, reader, reader-to-panel wiring, controller panel and PACS head-end software, with major vendor examples noted at each layer."
+      },
       "bullets": [
         "Genetec Synergis (Security Center) — Quebec-based unified platform combining Synergis access + Omnicast video + AutoVu ALPR + Mission Control + KiwiVision analytics. Native support for HID multiCLASS SE / Signo / iCLASS Seos, Mercury LP-1502 / LP-2500 / LP-4502 panels, ISONAS Pure IP. OSDP v2.2 + Wiegand + AES Mobile Credentials (HID Origo). Federation across multi-site for global enterprise. Genetec Cloud Link bridge for partial-cloud hybrid.",
         "Lenel S2 NetBox / OnGuard — now owned by Carrier (HID Global was separate before being merged into Carrier Global in 2024); long-time Fortune-500 enterprise + federal + healthcare default. OnGuard runs on Windows Server, supports Mercury LP / Lenel LNL-X / LNL-3300 panels, deeply integrated with video (Milestone XProtect, Genetec Omnicast). NetBox is the SMB-mid-market product. Lenel Mobile Credential via BlueDiamond app + LNL-Wave readers.",
@@ -277,6 +288,11 @@
     },
     {
       "title": "OSDP v2.2 migration from Wiegand — why and how",
+      "intro": "Wiegand is a 1974 protocol still guarding 2026 doors, and it shows: unencrypted, one-way, and tappable with a device that costs less than the door it defeats. The comparison below makes the case for OSDP v2.2; the bullets underneath are the migration playbook, cabling and pitfalls included.",
+      "image": {
+        "src": "/diagrams/solutions/osdp-vs-wiegand-migration.svg",
+        "alt": "Side-by-side comparison of legacy Wiegand and OSDP v2.2 reader-to-panel connections, contrasting unencrypted one-way Wiegand wiring with encrypted bidirectional OSDP Secure Channel over RS-485."
+      },
       "bullets": [
         "Wiegand legacy — 1974 vintage protocol, two-wire (D0 + D1) open-collector 5–12 V, unidirectional reader → panel. Standard formats: H10301 26-bit, H10302 37-bit, HID Corporate 1000 35-bit. No encryption, no tamper detection, no firmware update path. ESPKey wire-tap device (~$200) captures every credential read at the panel-side wiring.",
         "OSDP v2.2 — SIA OSDP-2020, IEC 60839-11-5:2020 international mirror, RS-485 multi-drop (up to 32 readers per home-run), bidirectional messaging, AES-128 Secure Channel between reader + panel, large card formats up to 2048 bits (vs Wiegand's 64-bit practical limit). Supports tamper events, firmware OTA, biometric template push, LED + buzzer + ICMP-style ping.",
@@ -289,6 +305,11 @@
     },
     {
       "title": "Mobile credentials — HID Origo / Apple Wallet / Aliro 1.0 unified standard",
+      "intro": "Phone-as-badge is real and growing — and still a complement to plastic, not a replacement. The map below shows today's vendor-cloud silos and where the Aliro standard is positioned to dissolve them; plan the next reader refresh with that horizon in mind.",
+      "image": {
+        "src": "/diagrams/solutions/mobile-credential-landscape-aliro.svg",
+        "alt": "Map of the mobile credential landscape showing separate vendor clouds for HID, Salto, Allegion and LEGIC converging toward the Aliro unified standard, with plastic credentials continuing alongside."
+      },
       "bullets": [
         "HID Mobile Access (HID Origo cloud platform) — issued via HID Origo to iOS + Android via HID Mobile App; consumed by HID Signo + iCLASS SE multiCLASS + OMNIKEY 5427CK readers with BLE + NFC. SEOS-over-BLE proprietary protocol — strongest installed-base in enterprise mobile credential as of 2026.",
         "Salto JustIN Mobile — Spanish hotel + access vendor; BLE proprietary protocol with Salto SVN / KS data-on-card / data-on-network architecture. Common in hospitality + multi-family residential.",
@@ -302,6 +323,11 @@
     },
     {
       "title": "Anti-cloning threat model + operational defences",
+      "intro": "Every attack on this list has a commercial tool behind it, which is exactly why the defence column matters more than the scare column. The map below pairs each threat with its counter; and if a credential in your estate has already been copied, [what to do after an access card is cloned](/blog/access-card-copied-security-upgrade/) walks through the recovery sequence.",
+      "image": {
+        "src": "/diagrams/solutions/access-threat-defence-map.svg",
+        "alt": "Matrix pairing access-credential threats such as LF cloning, Crypto-1 key recovery, Wiegand wire taps, relay attacks and lost cards with their operational defences."
+      },
       "bullets": [
         "Threat — LF 125 kHz cloning: Proxmark3 RDV4 / Iceman + Flipper Zero / ChameleonMini reads {chip:em-microelectronic-em4100:short_name} / HID Prox / Indala / Casi-Rusco / AWID / Keri raw card data in <60 seconds; writes to {chip:atmel-t5577:name} or replays via Flipper. Defence: migrate to HF DESFire EV3 / Seos; deploy LF + HF dual-tech readers during migration; monitor PACS for unusual access patterns (same credential at two distant doors within window).",
         "Threat — MIFARE Classic Crypto-1 break (2008+): mfoc nested attack recovers sector keys in 1–5 min with known key on one sector; mfcuk darkside attack works without any known key. Cloning to MIFARE Classic blank cards or magic UID cards is trivial. Defence: migrate to DESFire EV3 / Seos / Plus SL3; if Classic must remain, use UID-only mode (treat Classic as a Tier-1 surrogate, not as cryptographic credential).",
@@ -316,6 +342,7 @@
     },
     {
       "title": "Compliance + standards — UL 294 / NIST SP 800-116 / FIPS 201 / NDAA 889",
+      "intro": "Standards are how a PACS purchase survives its audit. The list is long because the estates are varied — federal buyers start at FICAM and FIPS 201-3, commercial buyers at UL 294, and everyone meets the ADA at the door.",
       "bullets": [
         "UL 294 (8th edition, 2023) — Standard for Access Control System Units; North American baseline for access control hardware. Three performance levels (Level I–IV) covering attack resistance, line-security, endurance. Most enterprise PACS panels + readers ship at Level IV. Required for AHJ approval in most US jurisdictions; AHJ may also require UL 1076 (proprietary alarm units) or UL 681 (installation).",
         "UL 1610 / UL 2050 — for federal SCIF / closed-area applications where access control is integrated with intrusion alarm; UL 2050 explicitly covers National Industrial Security Systems (DoD-spec).",
@@ -332,6 +359,11 @@
     },
     {
       "title": "Programme economics + TCO + procurement leverage",
+      "intro": "The credential is usually the cheapest line on the invoice. The cost anatomy below shows where a typical enterprise refresh budget actually lands, and the bullets give the unit-price ranges — and the consolidation levers — to negotiate against.",
+      "image": {
+        "src": "/diagrams/solutions/pacs-200-door-cost-anatomy.svg",
+        "alt": "Stacked cost anatomy of a typical 200-door enterprise access control refresh, breaking the year-one budget into credentials, readers, panels, installation labour, software licensing and integration services."
+      },
       "bullets": [
         "Credential unit cost at scale (10K+ qty): {chip:em-microelectronic-em4100:short_name} LF card $0.40–$0.80; {chip:nxp-mifare-classic-1k:short_name} $0.80–$1.20; MIFARE Plus SE $1.50–$2.50; DESFire EV3 $2.80–$5.50; Seos $3.50–$8.00; printable employee badge (any chip) +$0.20–$0.50 for card body. Key-fob form factor +20–50% on chip cost.",
         "Reader unit cost: legacy 125 kHz $80–$180; HF 13.56 MHz Wiegand-output $180–$350; OSDP-Verified multi-tech $250–$600; biometric (HID Signo Bio, Suprema FaceStation 2, ZKTeco SpeedFace) $600–$2,500.",
