@@ -5,7 +5,7 @@
   "kicker": "Hospitality Guide",
   "summary": "Hotel key card encoding is a systems decision: chip family, lock firmware, encoder fleet and PMS integration must align before a 200-card pilot. This guide walks the lock-estate audit, chip selection from MIFARE Classic 1K to DESFire EV3 with AES-128, pre-encoding scope and pilot exit criteria. A complete brief gets supplier samples and pricing back in 10–14 days; a chain-greenfield rollout reaches its first issued card in 8–12 weeks.",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-10",
   "reviewedAt": "2026-05-10",
   "authorSlug": "peter-zhang",
   "reviewedBySlug": "peter-zhang",
@@ -22,12 +22,8 @@
     "The installed lock and encoder estate determines what pre-encoding is realistic before a single sample is produced.",
     "A good pilot validates guest recovery, front-desk handling and PMS re-issue flow. Not just whether the door opens."
   ],
-  "imageAlt": "Hotel front-desk staff encoding RFID key card — MIFARE/DESFire encoder workflow",
-  "heroImage": "/blog-images/hotel-key-card-encoding-explained.jpg",
-  "imageSourceRoutes": [
-    "/product/hotel-key-cards/",
-    "/product/printed-rfid-cards/"
-  ],
+  "imageAlt": "Hotel key card encoding stack: PMS, encoder, card chip and lock firmware joined by one key ceremony — the connected system a card must clear before launch day.",
+  "heroImage": "/diagrams/blog/hotel-key-card-encoding-hero.svg",
   "brief": [
     {
       "label": "Chip family default",
@@ -49,7 +45,7 @@
   "sections": [
     {
       "title": "Why hotel card encoding is a systems decision, not a print decision",
-      "intro": "Most hotel card projects slow down for the same reason: procurement treats encoding as a production detail to be figured out after the card finish is approved, while the engineering team treats encoding as the lock vendor's problem, and neither side takes ownership of the chip-family, PMS-integration and key-handling decisions that determine whether cards open doors on launch day. Both views are incomplete and incompatible. A hotel key card is a systems artefact first (chip + encoder + lock firmware + PMS integration + key ceremony) and a printed artefact second (substrate + artwork + finish). Projects that treat encoding as the first decision and finish as the last decision ship on schedule; projects that invert that order routinely slip 6–12 weeks on first-order rework.",
+      "intro": "Launch day. The cards came out beautifully — the foil, the tasteful matte, the embossed logo the brand team fought hardest for. The first guest taps the door, and the door — which has never once cared about artwork — stays locked. Most hotel card projects slow down for the same reason: procurement treats encoding as a production detail to be figured out after the card finish is approved, while the engineering team treats encoding as the lock vendor's problem, and neither side takes ownership of the chip-family, PMS-integration and key-handling decisions that determine whether cards open doors on launch day. Both views are incomplete and incompatible. A hotel key card is a systems artefact first (chip + encoder + lock firmware + PMS integration + key ceremony) and a printed artefact second (substrate + artwork + finish). Projects that treat encoding as the first decision and finish as the last decision ship on schedule; projects that invert that order routinely slip 6–12 weeks on first-order rework.",
       "bullets": [
         "A hotel key card is only as useful as the encoder, lock firmware and PMS integration behind it. Get any one of those three wrong (wrong chip family for the lock firmware, wrong encoder firmware for the chip, wrong PMS config for the serial format) and the prettiest card fails at the first door, usually at peak check-in when the failure is most visible.",
         "Encoding spans three layers: the chip family on the card (MIFARE Classic 1K, Plus SL3, DESFire EV3, Ultralight C, NTAG424 DNA), the sector/file layout the lock vendor expects (VingCard's Orion file structure, Saflok's block layout, Salto's SALTO Space format), and the issue sequence the PMS drives at check-in (stay-window write, room-number write, master-card exception handling). Every layer has to be aligned before artwork matters, and any one layer misalignment blocks the whole workflow.",
@@ -60,7 +56,11 @@
     },
     {
       "title": "Audit the lock and encoder estate before talking about cards",
-      "intro": "The first working session on any hotel card project should be a lock estate audit, not a card review. Because the estate determines the chip family, which determines the encoder fleet compatibility, which determines the PMS integration path, which determines the encoding brief the supplier can actually fulfil. If you cannot describe the lock firmware, encoder model and PMS bridge in two sentences, no supplier can give a realistic encoding proposal, and the project will waste 3–4 weeks on back-and-forth discovery that should have happened in the property's own facilities-management and IT teams.",
+      "intro": "The first working session on any hotel card project should be a lock estate audit, not a card review. Because the estate determines the chip family, which determines the encoder fleet compatibility, which determines the PMS integration path, which determines the encoding brief the supplier can actually fulfil. If you cannot describe the lock firmware, encoder model and PMS bridge in two sentences, no supplier can give a realistic encoding proposal, and the project will waste 3–4 weeks on back-and-forth discovery that should have happened in the property's own facilities-management and IT teams. The map below walks the audit in constraint order: locks first, then encoders, then the PMS bridge, then the exceptions nobody wrote down.",
+      "image": {
+        "src": "/diagrams/blog/hotel-lock-estate-audit-map.svg",
+        "alt": "Lock estate audit map: four audit lanes — lock inventory, encoder fleet, PMS bridge and exception inventory — each constraining the next, ending in the chip-family decision."
+      },
       "bullets": [
         "Lock inventory: brand, model and firmware of every lock type in the property. Including back-of-house doors, lifts, garage barriers, pool gates, spa entrances, staff changing rooms and minibar/safe cabinets. A 200-room hotel typically has three to five distinct lock firmware versions once you include non-guest doors, and the oldest firmware (often on a back-of-house door installed 10+ years ago) usually constrains the chip-family choice for the whole property.",
         "Encoder inventory: model, firmware, connection type (RS-232 serial, USB, PoE, Wi-Fi, cloud-bridged) and software version at each front desk, plus any mobile encoders used by housekeeping, engineering and management. Aged encoders (Saflok System 6000 pre-2017, VingCard Signature pre-2018) often cap write speed at 1–2 seconds per card and limit the chip families they can program. DESFire EV3 writes may require an encoder firmware upgrade that the property has not done.",
@@ -73,7 +73,11 @@
     },
     {
       "title": "Chip family selection: what the lock firmware actually reads",
-      "intro": "The chip family is not a branding choice. It is constrained by lock firmware on one side and by the encryption posture the chain has committed to on the other, and the intersection of those two constraints usually leaves one clear default and one viable alternative. Using the wrong chip family for the lock firmware either fails outright (card does not open the door) or works insecurely (lock reads the card but the cryptographic handshake falls back to a weaker mode the auditor rejects). The list below is the menu the property chooses from, with the constraints that push each choice toward specific property profiles.",
+      "intro": "The chip family is not a branding choice. It is constrained by lock firmware on one side and by the encryption posture the chain has committed to on the other, and the intersection of those two constraints usually leaves one clear default and one viable alternative. Using the wrong chip family for the lock firmware either fails outright (card does not open the door) or works insecurely (lock reads the card but the cryptographic handshake falls back to a weaker mode the auditor rejects). The list below is the menu the property chooses from, with the constraints that push each choice toward specific property profiles. The ladder ranks that menu from default to last-resort; for a deeper cut, the [MIFARE Classic vs Plus vs DESFire comparison](/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/) takes the main contenders apart.",
+      "image": {
+        "src": "/diagrams/blog/hotel-chip-family-selection-ladder.svg",
+        "alt": "Chip family selection ladder for hotel locks, from MIFARE DESFire EV3 as the 2026 default down to MIFARE Classic 1K legacy support and 125 kHz LF systems where lock replacement is the real project."
+      },
       "bullets": [
         "MIFARE Classic 1K: still widespread in legacy locks (Saflok MT, VingCard Classic, older Onity systems). Adequate when the lock vendor implements diversified keys properly with per-property master keys, genuinely risky when the property relies on vendor default keys (the MIFARE Classic Crypto1 cipher has been broken publicly since 2008, and exploits are trivial). Best for short-runway retrofits where the upgrade budget cannot stretch to new locks; plan a migration to DESFire within 2–3 years.",
         "MIFARE Plus SL3 / MIFARE DESFire EV3: the current best practice for new builds and for any property refreshing locks in the 2023–2026 window. AES-128 cryptographic strength, audit-grade key diversification (per-card derived keys from a master key tree), support for multi-application credentials (room access + lift + pool + spa + minibar charging on one card), and compatibility with all major lock vendor mobile-key SDKs. DESFire EV3 2K is the default size; EV3 4K and 8K for properties with many applications on the same credential.",
@@ -85,7 +89,11 @@
     },
     {
       "title": "Pre-encoding vs site encoding: when to bake the data in",
-      "intro": "The cards can arrive blank (site-encoded at check-in by the front desk encoder), partially encoded (UID fixed, sector data written at the desk), or fully pre-encoded (printed numbering, sector layout, security keys, optionally room ranges. Ready to drop into the front-desk drawer and issue without encoder time). Each option has real trade-offs across logistics, key handling, throughput and supplier dependency, and the right choice depends on the property's encoder capacity, security posture and volume profile. The wrong choice is expensive in a direction that is hard to see until peak check-in hits.",
+      "intro": "The cards can arrive blank (site-encoded at check-in by the front desk encoder), partially encoded (UID fixed, sector data written at the desk), or fully pre-encoded (printed numbering, sector layout, security keys, optionally room ranges. Ready to drop into the front-desk drawer and issue without encoder time). Each option has real trade-offs across logistics, key handling, throughput and supplier dependency, and the right choice depends on the property's encoder capacity, security posture and volume profile. The wrong choice is expensive in a direction that is hard to see until peak check-in hits. Each model moves the same work — writing the guest data — to a different desk; the spectrum below prices the move and names who ends up holding the keys.",
+      "image": {
+        "src": "/diagrams/blog/hotel-pre-encoding-spectrum.svg",
+        "alt": "Pre-encoding spectrum comparing blank, partial and fully pre-encoded hotel cards by cost per card, key custody and front-desk throughput."
+      },
       "bullets": [
         "Blank cards work when the property has plenty of encoder capacity and the front desk writes every card at check-in. Pros: simplest logistics, no key exchange at supply time, no supplier dependency on key material. Cons: slow peak-check-in throughput (2–4 seconds per card encode + handoff, which adds up at a 25-arrival hour), higher encoder wear (a mid-tier encoder runs 50,000–100,000 writes before service), no pre-printed unique numbering, and the property carries all the responsibility for encoding errors.",
         "Partial pre-encoding (UID-locked, printed unique serial, keys loaded at site) is the most common middle ground and the default for mid-sized chain properties. The supplier handles printing and serial assignment; the property applies its own diversified keys via the lock vendor's encoder tool before first issue. Pros: balances supplier convenience with property security control. Cons: requires a one-time site-key-loading pass for the batch, which is typically 3–4 hours of staff time per 10,000 cards.",
@@ -98,7 +106,11 @@
     },
     {
       "title": "Pilot structure: what a useful first 200 cards actually tests",
-      "intro": "A weak pilot orders 50 cards, tries one door, and declares success. A useful pilot stress-tests the parts of the workflow that actually break in the first year of operation. Issue speed at peak check-in, replacement and invalidation latency, master-card exception handling, durability under real guest wear, and guest-recovery workflows that rarely get rehearsed before real guests need them. The pilot is the cheapest place in the project to find these failures, because every problem discovered at pilot costs 10–20× less to fix than the same problem discovered after the full production order ships.",
+      "intro": "A weak pilot orders 50 cards, tries one door, and declares success. A useful pilot stress-tests the parts of the workflow that actually break in the first year of operation. Issue speed at peak check-in, replacement and invalidation latency, master-card exception handling, durability under real guest wear, and guest-recovery workflows that rarely get rehearsed before real guests need them. The pilot is the cheapest place in the project to find these failures, because every problem discovered at pilot costs 10–20× less to fix than the same problem discovered after the full production order ships. The scorecard below is the exit list a pilot has to clear before the full order is authorised — and before [material selection](/guides/hotel-key-card-material-selection/) enters the conversation.",
+      "image": {
+        "src": "/diagrams/blog/hotel-encoding-pilot-exit-criteria.svg",
+        "alt": "Pilot exit-criteria scorecard: open rate, issue speed, invalidation latency, encoder write-failure rate and guest-facing incidents measured across a two-week, 200-card hotel pilot."
+      },
       "bullets": [
         "Opening behaviour across every lock firmware variant in the property, not just a reference room. Test back-of-house doors (cleaners closet, linen room, staff-only corridors), lift overrides (floor restrictions), spa and pool doors (often different firmware generation), minibar and safe cabinets, garage barriers. A 200-card pilot should touch at least 50 distinct lock instances to catch firmware-specific compatibility issues.",
         "Issue speed at peak check-in: measure time-per-key with the real PMS integration (Opera, Mews, Shiji) at a simulated peak-check-in load of 20–30 arrivals per hour, not a lab bench one-at-a-time test. A 20-second issue time becomes a visible lobby queue at 3 pm on a Friday, and the pilot is the only place to catch it before the queue is real.",
@@ -187,7 +199,11 @@
     },
     {
       "title": "Step-by-step encoding workflow: lock audit to first issued card",
-      "intro": "The encoding rollout below is the linear sequence the encoding lead should walk a new property through, with each step gated on a written deliverable rather than an elapsed-time estimate. Properties that follow the sequence reach a first issued card in 8–12 weeks (chain greenfield), 12–20 weeks (boutique retrofit), or 20–32 weeks (multi-property refresh requiring lock firmware updates). Skipping or compressing steps almost always pushes the failure into pilot or worse, into the first peak-check-in week.",
+      "intro": "The encoding rollout below is the linear sequence the encoding lead should walk a new property through, with each step gated on a written deliverable rather than an elapsed-time estimate. Properties that follow the sequence reach a first issued card in 8–12 weeks (chain greenfield), 12–20 weeks (boutique retrofit), or 20–32 weeks (multi-property refresh requiring lock firmware updates). Skipping or compressing steps almost always pushes the failure into pilot or worse, into the first peak-check-in week. The timeline below compresses the sequence into the phases that gate the schedule; the [sample planning guide](/guides/hotel-key-card-sample-planning/) covers the control-first discipline the middle of that timeline depends on.",
+      "image": {
+        "src": "/diagrams/blog/hotel-encoding-rollout-timeline.svg",
+        "alt": "Hotel encoding rollout timeline from lock audit to post-launch audit, showing the 8–12 week chain greenfield, 12–20 week boutique retrofit and 20–32 week multi-property refresh tracks."
+      },
       "bullets": [
         "Step 1 — lock estate audit (week 1–2): document every lock brand, model and firmware version across guest rooms and back-of-house. Include lifts, garage, pool, spa, minibar, safes. Produce one spreadsheet that the supplier and the lock vendor can both reference.",
         "Step 2 — encoder fleet audit (week 2): document encoder model, firmware, connection type and software version at every front desk plus mobile encoders. Flag any encoder that caps write speed or chip-family support, because a single laggard encoder can constrain the chip choice for the entire estate.",
