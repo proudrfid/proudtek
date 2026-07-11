@@ -1,0 +1,47 @@
+{
+ "skill_name": "page-geo",
+ "evals": [
+  {
+   "id": 0,
+   "eval_name": "markets-usa-rebuild",
+   "prompt": "markets/usa 这页(src/content/editorial/markets/usa.json)太空了——3 个光秃秃的 bullet section、0 sources、没有 keywords/brief。请按 GEO/SEO 原则把它完善成面向美国买家的采购落地页,重点:美国的频段/合规(FCC、NDAA 等)、物流与 Incoterms、信任证明。先出 preview,不要动 git。",
+   "expected_output": "usa_new.json passing strict schema + factscan discipline (new facts sourced), ≥5 sections with ≥1 table, FAQ ≥4, sources ≥2 primary (FCC/ETSI class), keywords+brief added, chip placeholders intact, preview HTML, NOTES.md justifying NEW tokens and flagging [OWNER-CONFIRM] company facts",
+   "files": [],
+   "assertions": [
+    "JSON parses and round-trips the repo serialization format byte-identically",
+    "passes strict zod mirror of content.config.ts",
+    "zero diff-added lines contain {chip: (drift-lint-safe construction)",
+    "factscan: no fact tokens dropped",
+    "factscan: every NEW fact token is justified in NOTES.md",
+    "completeness rubric >= 8/10",
+    "FAQ >= 4",
+    "sources >= 2 and all https",
+    ">= 3 internal links to site routes",
+    "preview HTML exists, non-trivial, chip placeholders resolved",
+    "summary is answer-first (contains a number in first 160 chars)"
+   ]
+  },
+  {
+   "id": 1,
+   "eval_name": "product-laundry-augment",
+   "prompt": "帮我优化 products/rfid-tags/rfid-textile-laundry-tag.json 的 GEO/SEO。页面有基础(7 sections、9 sources)但一张配图都没有、FAQ 偏薄、规格散在 prose 里。把它补到完善线以上:规格表、FAQ 扩充、需要的话补 1 张图。preview 模式,别动 git。",
+   "expected_output": "rfid-textile-laundry-tag_new.json preserving existing statBar/comparePanel/dataHighlight/timeline and all {chip:} lines byte-identical, adding spec table (columns/rows shape), FAQ ≥6, optional SVG following house conventions, factscan DROPPED=0, strict zod, preview HTML, NOTES.md",
+   "files": [],
+   "assertions": [
+    "JSON parses and round-trips the repo serialization format byte-identically",
+    "passes strict zod mirror of content.config.ts",
+    "zero diff-added lines contain {chip: (drift-lint-safe construction)",
+    "factscan: no fact tokens dropped",
+    "factscan: every NEW fact token is justified in NOTES.md",
+    "completeness rubric >= 8/10",
+    "FAQ >= 6",
+    "sources >= 9 and all https",
+    ">= 3 internal links to site routes",
+    "preview HTML exists, non-trivial, chip placeholders resolved",
+    "summary is answer-first (contains a number in first 160 chars)",
+    "preserves existing statBar/comparePanel/dataHighlight/timeline components",
+    "original sources all retained"
+   ]
+  }
+ ]
+}

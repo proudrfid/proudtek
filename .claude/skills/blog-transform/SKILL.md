@@ -150,13 +150,25 @@ Then re-score against `.claude/skills/blog-voice/references/rubric.md`.
 | Gate | Bar |
 |---|---|
 | enjoyable (rubric, absolute) | ≥ 8/10 |
-| humor | Tier A: 5–6/10 · Tier B: ≤ 2/10 |
+| humor | Tier A: 6–7/10 · Tier B: ≤ 2/10 (unchanged — non-negotiable) |
+| layout | no bullet-wall survives: any run of 5+ parallel-fact bullets, or bullets >250 chars, becomes a table / comparePanel / statBar / checklist / timeline; wit lives in intros, verdicts and labels — never inside tables, FAQ answers or the summary |
 | facts diff | = 0 |
 | `summary` | answers the title query in sentence 1, with a hard number, survives the 155-char meta cut |
 | `faq[]` | 3–6 answer-first entries (auto-feeds FAQPage JSON-LD) |
-| images | hero + every earning section; `check-svg.mjs` green; every PNG eyeballed |
+| images | hero + every earning section — floor on a standard 6–8-section post: hero + 5 section diagrams (a section whose payload is already a table may skip its image); `check-svg.mjs` green; every PNG eyeballed |
 | lint ×2 · `check` · `vitest` | all green |
 | dates | `modifiedAt` = today · `reviewedAt` untouched |
+
+**Owner dial update (2026-07-11).** The humor ceiling moved up one notch
+(Tier A 6–7), the image floor is now explicit, and the layout gate is new —
+the owner wants posts that are visibly illustrated, structurally scannable,
+and genuinely fun to read. The same doctrine, with placement heuristics and
+the fact-correction protocol, lives in
+`.claude/skills/page-geo/references/voice-and-visuals.md`; when a pass
+surfaces a factual error, follow that protocol (verify against a primary
+source, correct, log a `## Corrections` entry in the PR notes) instead of
+silently preserving it. Tier B stays sober: one notch of charm, zero jokes
+near harm outcomes.
 
 ## Step 5 — Deliver by mode
 
