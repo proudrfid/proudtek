@@ -77,10 +77,12 @@ re-verified against vendor datasheets). Protocol:
    correct directly; add the source to sources[]; record in NOTES.md under
    a `## Corrections` heading: `wrong → right, per <source URL>`.
 3. **Company facts** (wash cycles, MOQ, lead times, capacity): the owner is
-   the source of truth. If the site contradicts itself, align to the value
-   the site uses most consistently, correct the outlier, and flag
-   `[OWNER-CONFIRM]` so the owner ratifies it. If there's no majority
-   value, don't guess — flag without changing.
+   the source of truth. Check `references/canonical-facts.md` first — if
+   the fact is ruled there, correct to it directly (cite the file). If it
+   isn't ruled and the site contradicts itself, don't trust majority vote
+   (it has voted wrong before — the textile wash-cycle incident,
+   2026-07-11): flag `[OWNER-CONFIRM]` with the candidate values and let
+   the owner rule; add the ruling to canonical-facts.md afterwards.
 4. **Corrections inside frozen `{chip:}` lines** collide with the drift
    lint (any changed line containing a placeholder fails CI). Don't bury
    the fix: make it, run selfcheck, and document the expected drift-lint

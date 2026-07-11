@@ -71,7 +71,10 @@ fact-correction protocol) plus the one playbook that matches. Read
 
 4. **Source every fact.**
    - **Company facts** (MOQ, capacity, lead time, certifications, sample
-     policy): never invent. Grep existing pages for the canonical value
+     policy): never invent. Check `references/canonical-facts.md` FIRST —
+     it is the owner-ratified table and outranks anything a page says
+     (majority vote across pages has produced wrong "corrections" before).
+     If it's silent, grep existing pages for the canonical value
      (`git grep -h "MOQ" origin/main -- src/content/editorial | sort -u`)
      and reuse it verbatim. If no canonical value exists, write
      `[OWNER-CONFIRM: …]` and list it in your handoff notes.
