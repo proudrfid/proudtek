@@ -465,6 +465,13 @@ function escapeHtml(value: string): string {
  *   </li>
  */
 function buildDesktopDropdownHtml(dd: MenuDropdown, slug: string): string {
+  // No groups → a plain top-level link (no caret, no sub-menu). Used by the
+  // standalone Blog item. Keeps the `codex-mega-item` class so injection
+  // idempotency + active-state marking treat it like our other top-level items.
+  if (dd.groups.length === 0) {
+    return `<li class="menu-item codex-mega-item codex-mega-item--${slug} codex-mega-item--plain"><a href="${escapeHtml(dd.href)}">${escapeHtml(dd.label)}</a></li>`;
+  }
+
   const groupsHtml = dd.groups
     .map((g) => renderMegaGroupHtml(g))
     .join("");
@@ -514,6 +521,12 @@ function renderMegaGroupHtml(g: MenuGroup): string {
  * convention so the existing mobile drawer toggle continues to expand it.
  */
 function buildMobileDropdownHtml(dd: MenuDropdown, slug: string): string {
+  // No groups → a plain link in the drawer (no toggle, no accordion), mirroring
+  // the desktop standalone Blog item.
+  if (dd.groups.length === 0) {
+    return `<li class="menu-item codex-mega-item codex-mega-item--${slug} codex-mega-item--plain"><a href="${escapeHtml(dd.href)}">${escapeHtml(dd.label)}</a></li>`;
+  }
+
   const useAccordion = dd.groups.length > 1 && dd.groups.some((g) => Boolean(g.heading));
   const items: string[] = [];
 
@@ -718,8 +731,11 @@ function markActiveNav($body: ReturnType<typeof load>, currentRoute: string): vo
     [/^\/product\//, "/products/all/"],
     [/^\/industries\//, "/industries/"],
     [/^\/solutions\//, "/solutions/"],
+    // Blog is now its own top-level item (2026-07-10), so /blog/* highlights
+    // Blog rather than Resources. Must precede the Resources rule below.
+    [/^\/blog\//, "/blog/"],
     [
-      /^\/(blog|guides|compare|compatibility|case-studies|faq|resources)\//,
+      /^\/(guides|compare|compatibility|case-studies|faq|resources)\//,
       "/resources/",
     ],
     [/^\/contact\//, "/contact/"],

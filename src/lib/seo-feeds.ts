@@ -190,7 +190,7 @@ ${entry("/image-sitemap.xml")}
 }
 
 export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Promise<string> {
-  const mainRoutes = ["/", "/products/all/", "/about/", "/contact/", "/faq/", "/blog/", "/solutions/", "/compare/", "/compatibility/", "/guides/", "/glossary/", "/case-studies/", "/sample-pack/", "/rfq/", "/resources/downloads/", "/tools/rfid-tag-cost-estimator/"];
+  const mainRoutes = ["/", "/products/all/", "/about/", "/contact/", "/faq/", "/blog/", "/solutions/", "/compare/", "/compatibility/", "/guides/", "/glossary/", "/case-studies/", "/sample-pack/", "/rfq/", "/tools/rfid-tag-cost-estimator/"];
   const collectionRoutes = [
     "/products/rfid-tags/",
     "/products/rfid-labels/",

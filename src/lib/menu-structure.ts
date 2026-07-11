@@ -265,7 +265,8 @@ export const RESOURCES_MENU: MenuDropdown = {
     {
       heading: "Decide",
       links: [
-        { href: "/blog/", label: "Blog — Industry Articles" },
+        // Blog moved to its own top-level nav item (see BLOG_MENU below),
+        // 2026-07-10, per store-owner request — no longer duplicated here.
         { href: "/guides/", label: "Buying Guides" },
         { href: "/compare/", label: "Product Comparisons" },
         { href: "/compatibility/", label: "Hotel Lock Compatibility" },
@@ -274,15 +275,9 @@ export const RESOURCES_MENU: MenuDropdown = {
         { href: "/faq/", label: "FAQ" },
       ],
     },
-    {
-      heading: "Downloads",
-      links: [
-        { href: "/resources/downloads/", label: "Resource Center — All Downloads" },
-        { href: "/downloads/gs1-sgtin-96-encoding-template.xlsx", label: "GS1 SGTIN-96 Template (XLSX)" },
-        { href: "/downloads/hotel-key-card-artwork-template.pdf", label: "Hotel Key Card Artwork Template" },
-        { href: "/downloads/dscsa-item-level-rfid-brief.pdf", label: "DSCSA Compliance Brief" },
-      ],
-    },
+    // "Downloads" category removed 2026-07-10 (store-owner request): the
+    // /resources/downloads/ hub page and its GS1 / hotel-artwork / DSCSA
+    // template files were deleted and 301-redirected to /resources/.
     {
       heading: "Get started",
       links: [
@@ -343,6 +338,27 @@ export const ABOUT_MENU: MenuDropdown = {
 };
 
 // ---------------------------------------------------------------------------
+// BLOG — standalone top-level link (no dropdown)
+// ---------------------------------------------------------------------------
+
+/**
+ * Top-level "Blog" item for the primary nav bar (added 2026-07-10 when the
+ * store owner asked to promote the blog out of the Resources dropdown and
+ * give it its own slot after About).
+ *
+ * It has **no groups**, so it renders as a plain link (no caret, no
+ * sub-menu) in both the desktop bar and the mobile drawer — see the
+ * `groups.length === 0` branch in `buildDesktopDropdownHtml` /
+ * `buildMobileDropdownHtml` (render-snapshot.ts). The `/blog/` route is
+ * highlighted on this item (not Resources) via markActiveNav's TOP_LEVEL_RULES.
+ */
+export const BLOG_MENU: MenuDropdown = {
+  label: "Blog",
+  href: "/blog/",
+  groups: [],
+};
+
+// ---------------------------------------------------------------------------
 // FOOTER EXPANSION — sections appended after the existing product list
 // ---------------------------------------------------------------------------
 
@@ -393,7 +409,6 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/compare/", label: "Comparisons" },
       { href: "/compatibility/", label: "Hotel Lock Compatibility" },
       { href: "/case-studies/", label: "Case Studies" },
-      { href: "/resources/downloads/", label: "Resource Center" },
       { href: "/sample-pack/", label: "Free Sample Pack" },
       { href: "/tools/rfid-tag-cost-estimator/", label: "Cost Estimator Tool" },
       { href: "/rfq/", label: "Request a Quote" },
@@ -443,4 +458,5 @@ export const PRIMARY_MENU_DROPDOWNS: MenuDropdown[] = [
   SOLUTIONS_MENU,
   RESOURCES_MENU,
   ABOUT_MENU,
+  BLOG_MENU,
 ];
