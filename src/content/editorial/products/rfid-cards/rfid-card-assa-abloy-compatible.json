@@ -112,7 +112,7 @@
     "license": "CC BY 2.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/"
   },
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-11T10:00:00Z",
   "imageSourceRoutes": [
     "/solutions/hotel-key-cards/",
     "/lp/custom-rfid-card-printing/"
@@ -144,7 +144,12 @@
         "Assa Abloy Hospitality readers speak the open ISO/IEC 14443-A standard at 13.56 MHz. Any correctly specified MIFARE chip + ISO/IEC 7810 card body + correctly encoded site payload will function at the lock; OEM branding on the card is a supply-chain decision, not a technical requirement.",
         "Hotels are not obligated to source key cards exclusively from the lock manufacturer. Magnuson-Moss Warranty Act §2302(c) blocks the tying of consumer warranties to named-brand consumables absent an FTC waiver — the same legal principle that makes third-party printer cartridges legitimate applies here.",
         "The card is the volume consumable; the lock, the reader firmware and the PMS integration are the installed base that takes years to certify. Switching card supplier changes none of the installed base."
-      ]
+      ],
+      "intro": "A lock platform is a ten-year marriage negotiated with lawyers present; key cards are the groceries. Buying the groceries from whoever officiated the wedding is a choice, not a requirement — the stack below shows why. Before any card shopping, audit what is actually on the doors: the [hotel key card encoding guide](/guides/hotel-key-card-encoding/) walks that lock-estate audit step by step.",
+      "image": {
+        "src": "/diagrams/products/rfid-card-assa-abloy-compatible-supply-stack.svg",
+        "alt": "Four-layer hotel access stack. Top to bottom: property management system (Oracle Opera, Mews, Cloudbeds), Assa Abloy / Vostio access software with the front-desk encoder holding site keys, VingCard lock hardware reading ISO/IEC 14443-A at 13.56 MHz, and the RFID key card layer with MIFARE Classic 1K/4K or DESFire EV2/EV3 chips. The top three layers carry unchanged markers; only the bottom card layer is highlighted as the one a supplier switch touches."
+      }
     },
     {
       "title": "VingCard family vs Vostio — the chip and protocol matrix",
@@ -165,7 +170,113 @@
           "Card-agnostic to Oracle Opera / Mews / Cloudbeds PMS integrations",
           "Recommended for luxury, resort, casino, regulated-gaming tiers"
         ]
+      },
+      "intro": "Hotel lock estates age the way hotels do — wing by wing. Most portfolios run both columns below at the same time, which is why the chip question is really “which generations do we have,” plural. For the full three-way chip decision, see [MIFARE Classic vs Plus vs DESFire for hotel locks](/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/)."
+    },
+    {
+      "title": "Build sheet — the specification your integrator will ask for",
+      "intro": "Every RFQ converges on this table eventually, usually three emails in. Here it is on the first pass. Properties mid-way through a lock upgrade can pair the same card body with a magnetic stripe — the [RFID + magnetic-stripe combo card](/products/rfid-cards/rfid-card-magnetic-stripe-combo/) exists precisely for that transitional decade.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Specification",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip options",
+            "MIFARE Classic 1K / 4K (MF1ICS50 / MF1ICS70); MIFARE DESFire EV2 / EV3 (AES-128)",
+            "Matched to the lock generation — see the matrix below"
+          ],
+          [
+            "Air interface",
+            "ISO/IEC 14443 Type A at 13.56 MHz",
+            "The same open standard OEM cards conform to"
+          ],
+          [
+            "Card body",
+            "ISO/IEC 7810 ID-1, 85.60 × 53.98 × 0.76 mm",
+            "Durability per ISO/IEC 10373-1 (bend, torsion, UV, chemical)"
+          ],
+          [
+            "Materials",
+            "PVC (3-5 years hospitality service); PET/ABS composite (5-7 years); recycled PET and PLA options",
+            "FSC-certified paperboard holders and welcome kits available"
+          ],
+          [
+            "Encoding state",
+            "Blank, or factory UID allocation for serialised stock",
+            "Room-level encoding stays at your front desk; site keys never leave operator IT"
+          ],
+          [
+            "Print",
+            "Full-colour offset (ISO 12647-2) or UV digital 600-1200 dpi; Pantone spot, spot UV, hot foil, embossed numbering",
+            "Variable data (room, guest, Wi-Fi) is printed at the front desk via dye-sublimation retransfer"
+          ],
+          [
+            "Legacy options",
+            "HiCo magnetic-stripe combo (2750 Oe or 4000 Oe, ISO/IEC 7811-2/-6); dual-frequency LF 125 kHz + HF 13.56 MHz",
+            "For slot-type locks and staff parking barriers running in parallel"
+          ],
+          [
+            "MOQ and pricing",
+            "MOQ 1,000+; Classic 1K USD 0.18-0.30 and DESFire EV3 USD 0.50-0.80 per card at 5,000-50,000 units",
+            "Full-colour finish stack adds USD 0.03-0.08 per card; factory UID allocation is no-charge at ≥5,000 units"
+          ],
+          [
+            "Lead time",
+            "Blank stock 2-3 business days; custom-printed 5-7 business days at 1,000-10,000 units",
+            "Scales to 1,000,000+ cards with scheduled call-off"
+          ]
+        ]
       }
+    },
+    {
+      "title": "Which chip for which lock generation",
+      "intro": "One sober paragraph before the grid: Proud Tek is an independent factory. Assa Abloy, VingCard and Vostio are trademarks of their respective owners, named here to identify which lock platforms these non-OEM aftermarket cards are manufactured to work with — nothing on this page implies endorsement by the lock vendor. Per-model depth (door thickness, lock-case variants, back-end lifecycle) lives in the [Vingcard compatibility guide](/compatibility/vingcard-hotel-key-cards/); whatever any matrix says, the deciding gate is sample stock validated on your own encoder.",
+      "table": {
+        "columns": [
+          "Lock platform (as installed)",
+          "Chip the locks expect",
+          "Security layer",
+          "Supply note"
+        ],
+        "rows": [
+          [
+            "VingCard Classic / Essence / Allure (2000-2015 installed base)",
+            "MIFARE Classic 1K or 4K (MF1ICS50 / MF1ICS70)",
+            "Crypto-1 cipher, mitigated by site-local sector keys and short key validity",
+            "Classic stock, blank or UID-allocated; works with existing front-desk encoders, no firmware change"
+          ],
+          [
+            "VingCard Signature RFID / early Vostio",
+            "MIFARE Classic accepted; locks also wired for MIFARE DESFire EV1/EV2",
+            "Option to move to AES-128 without a lock swap",
+            "Migration-ready: issue DESFire as card stock cycles through the fleet"
+          ],
+          [
+            "Current Vostio cloud installations",
+            "MIFARE DESFire EV3",
+            "AES-128 with per-card key diversification (NXP AN10922)",
+            "Default for new issuance; Classic kept only on legacy auxiliary doors during transition"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Qualifying a second card source without betting the lobby",
+      "intro": "No procurement chief ever regretted validating sample stock before signing a bulk order — and none enjoyed explaining a lobby of guests holding cards the encoder refused. The path below is deliberately boring; boring is what good credential procurement looks like. Sizing the sample round itself has its own playbook in the [hotel key card sample planning guide](/guides/hotel-key-card-sample-planning/).",
+      "image": {
+        "src": "/diagrams/products/rfid-card-assa-abloy-compatible-validation-path.svg",
+        "alt": "Five-step qualification flow for a second hotel key card source: 1 audit the lock generation and encoder software version, 2 match the chip (MIFARE Classic 1K/4K or DESFire EV2/EV3 keying), 3 validate sample stock on the property's own encoder — marked as the deciding gate, 4 encode and issue a small pilot batch at the front desk, 5 scale to bulk with scheduled call-off (blank stock 2-3 business days, custom-printed 5-7)."
+      },
+      "checklist": [
+        "Pull the lock generation and encoder software version — the Assa Abloy encoding software shows whether the site is keyed for MIFARE Classic 1K/4K or DESFire EV2/EV3.",
+        "Send the lock model and software version with the RFQ, so chip selection is confirmed against the estate rather than against a guess.",
+        "Validate sample stock on your own front-desk encoder before any bulk production is scheduled.",
+        "Encode and issue a small pilot batch first, keeping existing OEM stock on the shelf until the pilot clears.",
+        "Move to bulk with scheduled call-off once the pilot clears — blank stock replenishes from factory inventory in 2-3 business days."
+      ]
     },
     {
       "title": "The factory-direct cost differential, decomposed",
@@ -180,7 +291,8 @@
         "MIFARE DESFire EV3 factory-direct at 5,000-50,000 units: USD 0.50-0.80 per card, printed one colour both sides.",
         "Full-colour offset CMYK + Pantone spot + UV finish adds USD 0.03-0.08 per card depending on run length and finish stack.",
         "Encoded-at-factory UID allocation (where the property wants serialised stock) is no-charge at ≥5,000 units."
-      ]
+      ],
+      "intro": "The 30-50% delta is not a discount; it is the absence of a brand surcharge on commodity silicon. The decomposition below shows where it comes from, and the [hotel keycard cost comparison](/blog/rfid-hotel-keycard-cost-comparison/) maps the wider market so you can see which band any OEM quote lands in."
     },
     {
       "title": "From VingCard 1979 to Vostio cloud — what the card has to survive",
@@ -215,7 +327,8 @@
             "text": "Reference operating practice across hotel-chain-flagship, boutique-resort, extended-stay, student-housing, and cruise-cabin programmes converge on a dual-sourced supply model: one OEM relationship for new-platform certification, one factory-direct supplier for steady-state replacement volume, with DESFire EV3 as the default chip for new issuance and Classic 1K kept only on the legacy installed base."
           }
         ]
-      }
+      },
+      "intro": "Forty-seven years separate the first electronic hotel lock from cloud key management, and the consumable at the bottom of the stack has outlived every software generation above it. The history is short, and it explains how the card became the commodity layer."
     }
   ],
   "resourceCards": [
@@ -248,8 +361,12 @@
           "label": "RFID + magnetic-stripe combo cards (legacy bridging)"
         },
         {
-          "href": "/solutions/hotel-key-cards/",
-          "label": "Hotel key-card programme guide"
+          "href": "/compatibility/vingcard-hotel-key-cards/",
+          "label": "Vingcard compatibility guide — lock generations in detail"
+        },
+        {
+          "href": "/guides/hotel-key-card-encoding/",
+          "label": "Hotel key card encoding guide"
         }
       ]
     }
@@ -274,6 +391,14 @@
     {
       "question": "Should we move from MIFARE Classic to DESFire across our portfolio?",
       "answer": "The Crypto-1 cipher in MIFARE Classic has known academic attacks (Nohl/Plötz 2008 et seq.); in hospitality the residual risk is mitigated by site-local sector keys, short key validity tied to check-out, and lock-side audit. For luxury / resort / casino / regulated-gaming properties where that residual risk is not acceptable, DESFire EV3 with per-card key diversification per NXP AN10922 is the standard recommendation. Mid-scale properties typically stay on Classic and run DESFire only on back-of-house and executive floors."
+    },
+    {
+      "question": "What is the MOQ and lead time for Assa Abloy-compatible key cards?",
+      "answer": "Blank MIFARE Classic 1K and DESFire EV3 stock ships from factory inventory in 2-3 business days. Custom-printed production runs 5-7 business days at 1,000-10,000 units and scales to 1,000,000+ cards on scheduled call-off; MOQ starts at 1,000 cards. Factory UID allocation for serialised stock is no-charge at ≥5,000 units."
+    },
+    {
+      "question": "Can RFID and magnetic-stripe key cards run in parallel during a lock upgrade?",
+      "answer": "Yes. Combination cards carry the RFID chip plus a HiCo magnetic stripe (2750 Oe or 4000 Oe per ISO/IEC 7811-2/-6) on one ISO/IEC 7810 card body, so properties can keep legacy slot-type locks in service while RFID floors go live. Dual-frequency variants (LF 125 kHz + HF 13.56 MHz) cover the separate case where one credential must also open a staff parking barrier reading EM or HID proximity."
     }
   ],
   "sources": [
