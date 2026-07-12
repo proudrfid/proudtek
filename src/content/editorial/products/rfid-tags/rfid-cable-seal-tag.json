@@ -2,7 +2,7 @@
   "route": "/products/rfid-tags/rfid-cable-seal-tag/",
   "group": "products",
   "title": "RFID Cable Seal Tag — Tamper-Evident Bonded Cargo",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-11",
   "kicker": "Tamper-Evident RFID Seal",
   "summary": "An RFID cable seal tag combines an ISO 17712 tamper-evident steel cable seal with an embedded UHF chip read at 2–4 m by portal readers. Once locked, the 1.8 mm galvanized or 316 stainless cable cannot be reopened without visible destruction. The factory-programmed TID defeats clone-and-swap fraud; ISO 18185 e-Seal data feeds C-TPAT, WCO SAFE, EU AEO and CBSA PIP programmes. Portal readers capture trucks passing at 15–20 km/h without stopping.",
   "keywords": [
@@ -11,7 +11,8 @@
     "ISO 18185 e-Seal",
     "C-TPAT RFID seal",
     "WCO SAFE Framework e-seal",
-    "CBP e-Seal"
+    "CBP e-Seal",
+    "RFID utility meter seal"
   ],
   "brief": [
     {
@@ -44,7 +45,7 @@
         "96-bit EPC + 32-bit user memory.",
         "ISO 18185-compliant e-Seal data frame option.",
         "Unique factory-programmed TID — unclonable.",
-        "User-memory payload: container number, shipper, route, seal-time."
+        "Data binding: seal EPC / TID paired to container number, shipper, route and seal-time in the TMS record at the sealing point."
       ]
     },
     {
@@ -138,13 +139,41 @@
   "sections": [
     {
       "title": "Why mechanical-only seals and manual logging fail C-TPAT / WCO SAFE / AEO programmes",
-      "bullets": [
-        "Traditional bolt seals and padlock seals provide physical tamper evidence but carry no digital identity. Seal numbers must be manually recorded at each custody transfer point — data-entry errors affect 3–8 % of shipments and break chain-of-custody documentation needed for C-TPAT and AEO trusted-trader programmes.",
-        "Barcode-printed cable seals require line-of-sight scanning at close range, slowing truck-gate processing to 45–90 s per vehicle as drivers exit the cab to present the seal. At a container yard or port terminal handling 1,000+ trucks/day, barcode-only seals force labor or wait-time proportional to fleet size.",
-        "Manual seal verification at container yards handles 200–400 containers per shift. Scaling to 1,000+ containers per day requires proportional headcount growth and erodes logistics margins — or alternatively creates verification gaps that break C-TPAT Tier II / III minimum criteria.",
-        "Seal-cloning and substitution fraud: criminals remove a genuine seal, access the cargo, and apply a counterfeit seal with a matching printed serial number. Without a cryptographic digital identity (unclonable TID), the substitution is undetectable until the shipment reaches its destination.",
-        "Customs and border agencies increasingly require electronic seal data (e-Seal) for expedited clearance — CBP e-Seal pilots, EU Single Window, ABF ATT, CBSA PIP and the WCO SAFE Framework all reference ISO 18185 e-Seal data structures. Paper-based seal logs do not qualify for expedited clearance status."
-      ],
+      "intro": "A cable seal has one job description: refuse to open quietly. The paper log tracking it has the opposite talent — it transposes digits, skips lines and forgives everyone. Automated seal identity closes that gap; and where the door geometry wants a rigid bolt instead of a cable, the [RFID bolt seal](/products/rfid-tags/rfid-bolt-seal/) runs the same evidence chain in ISO 17712 High Security form.",
+      "table": {
+        "columns": [
+          "Failure mode",
+          "What it costs",
+          "Programme consequence"
+        ],
+        "rows": [
+          [
+            "Manual seal-number logging",
+            "Data-entry errors affect 3–8 % of shipments at custody transfer points",
+            "Broken chain-of-custody documentation for C-TPAT and AEO trusted-trader programmes"
+          ],
+          [
+            "Barcode-only cable seals at the gate",
+            "Line-of-sight scans slow truck-gate processing to 45–90 s per vehicle while drivers exit the cab",
+            "At a yard handling 1,000+ trucks/day, labor or wait time grows in proportion to fleet size"
+          ],
+          [
+            "Manual yard verification",
+            "One shift verifies 200–400 containers; scaling to 1,000+ containers per day means proportional headcount",
+            "Verification gaps break C-TPAT Tier II / III minimum criteria"
+          ],
+          [
+            "Seal cloning and substitution",
+            "A genuine seal is removed, cargo is accessed, and a counterfeit with a matching printed serial goes back on",
+            "Without an unclonable cryptographic TID, the swap surfaces only at destination — after the loss"
+          ],
+          [
+            "Paper seal logs",
+            "Evidence assembled by hand for every audit and clearance request",
+            "CBP e-Seal pilots, EU Single Window, ABF ATT, CBSA PIP and the WCO SAFE Framework all reference ISO 18185 e-Seal data — paper logs do not qualify for expedited clearance"
+          ]
+        ]
+      },
       "statBar": {
         "items": [
           {
@@ -190,21 +219,166 @@
           "Factory TID verify blocks clone-and-swap and counterfeit seals.",
           "ISO 18185 e-Seal data frame feeds customs-single-window API."
         ]
+      },
+      "intro": "The hardware is Victorian-honest — steel cable, one-way ratchet, an audible click — and the identity layer is modern paranoia: a die-level serial no forger can rewrite. Procurement gets to like both for different reasons."
+    },
+    {
+      "title": "Inside the lock body: what closes once, and what breaks on the way back in",
+      "intro": "Tamper evidence is a mechanical argument: every path into the cargo must leave a mark that cannot be un-made. The cable seal wins that argument three ways — cut cable, wrecked body, silent chip. For cartons and cabinets where a cable cannot pass, the adhesive [tamper-evident label](/products/rfid-labels/rfid-tamper-evident-label/) makes the same point in sticker form.",
+      "image": {
+        "src": "/diagrams/products/rfid-cable-seal-lock-anatomy.svg",
+        "alt": "Cross-section of an RFID cable seal lock body showing the one-way ratchet, embedded UHF inlay, laser-engraved serial panel and cut-cable tamper evidence"
+      },
+      "bullets": [
+        "Lock-in: the 1.8 mm cable threads through the hasp and into the self-locking aluminum-alloy body; the one-way ratchet engages with an audible click. Pulling tightens the loop — it never pays out.",
+        "Open = destroy: there is no key and no release. Opening means cutting the cable, and cut galvanized or 316 stainless strands fray visibly — the ISO 17712 Indicative evidence an inspector reads at a glance.",
+        "Chip inside the wall: the UHF inlay is embedded in the seal body rather than stuck on it. There is no label to peel off and move, and force that reaches the chip announces itself on the housing first.",
+        "Three-factor identity: laser-engraved serial for eyes, QR code for smartphones, factory-programmed TID for readers. Forging one factor still fails the other two at verification.",
+        "The TID anchor: a 96-bit Tag Identifier with a 48-bit unique serial is factory-encoded and locked in silicon on both chip options. It cannot be rewritten — which is why a substituted seal fails TID verify in sub-100 ms."
+      ],
+      "callout": {
+        "label": "Single-use by design",
+        "text": "ISO 18185-1 defines electronic container seals as read-only and non-reusable — one journey, one seal. Budget spares into every order; a cut seal is evidence, not inventory."
+      }
+    },
+    {
+      "title": "RFID cable seal specifications",
+      "intro": "The numbers a tender template asks for, in the order it asks. Chip-level silicon detail lives in the [UCODE 9 encyclopedia](/guides/ucode-9-uhf-chip-encyclopedia/) and the [full UHF chip comparison](/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/); everything a seal spec sheet needs is below.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Cable",
+            "1.8 mm galvanized or 316 stainless steel",
+            "316 stainless for saltwater-exposed port and reefer routes"
+          ],
+          [
+            "Cable lengths",
+            "250 mm / 300 mm / 500 mm",
+            "Shortest loop the hasp geometry allows; longer lengths for valve handwheels and meter enclosures"
+          ],
+          [
+            "Lock body",
+            "Self-locking aluminum alloy, one-way ratchet",
+            "Irreversible without cutting; visible destruction per ISO 17712 Indicative criteria"
+          ],
+          [
+            "Marking",
+            "Laser-engraved serial number (9- or 10-digit)",
+            "Optional QR code for visual / smartphone verification; serial ranges reserved per customer"
+          ],
+          [
+            "RFID chip options",
+            "Impinj Monza R6-P or NXP UCODE 9",
+            "Factory-programmed TID on both; see memory rows below"
+          ],
+          [
+            "Air interface",
+            "EPC Gen2v2 / ISO/IEC 18000-63, 860–960 MHz",
+            "RAIN UHF; regional sub-bands covered within 860–960 MHz"
+          ],
+          [
+            "EPC memory",
+            "96-bit (UCODE 9) / up to 128-bit (Monza R6-P)",
+            "Encoded to a GS1 scheme or a customer numbering plan"
+          ],
+          [
+            "User memory",
+            "None (UCODE 9) / 32-bit (Monza R6-P)",
+            "Consignment detail lives in the TMS record keyed to the TID, not on the chip"
+          ],
+          [
+            "TID",
+            "96-bit, factory-locked, 48-bit unique serial",
+            "The anti-clone anchor — burned at chip manufacture, never rewritable"
+          ],
+          [
+            "Read range",
+            "2–4 m portal / 1–2 m handheld",
+            "Truck-through-portal capture at 15–20 km/h"
+          ],
+          [
+            "Operating temperature",
+            "−40 °C to +80 °C",
+            "Reefer carriage at −30 °C tolerated"
+          ],
+          [
+            "Ingress rating",
+            "IP67",
+            "Rain, dust, saltwater spray; UV-stable polymer housing over the inlay"
+          ],
+          [
+            "Mechanical seal class",
+            "ISO 17712 Indicative",
+            "ISO 17712 High Security (H) available as the thicker-shackle bolt-seal variant"
+          ],
+          [
+            "e-Seal data",
+            "ISO 18185 data-frame option",
+            "Feeds customs single-window integrations (CBP ACE, CBSA EDI, EU, ABF ICS)"
+          ],
+          [
+            "MOQ / Lead time",
+            "1,000 pieces / 15-20 business days",
+            "Volume price breaks at quote; samples available on request"
+          ]
+        ]
       }
     },
     {
       "title": "Applications across ocean, road, rail, bonded-warehouse and utility-meter use cases",
-      "bullets": [
-        "Ocean container shipping: seal ISO 668 containers at the shipper's CFS and verify integrity at every transshipment port, rail terminal and final destination gate — feeding C-TPAT / AEO / PIP advance-electronic-cargo data.",
-        "Truck and trailer security: secure trailer rear-door hasps at the loading dock and verify at weigh stations, border crossings and delivery sites via RFID portal reads.",
-        "Rail intermodal: seal COFC / TOFC container doors and rail-car cross-slide doors for through-chain reads at rail terminals (Class I / short-line).",
-        "Bonded-warehouse / in-transit: seal bonded cargo moving between Foreign-Trade Zones / bonded facilities — providing the electronic seal data required for expedited customs clearance under WCO SAFE.",
-        "Utility meter tamper detection: seal electric, gas and water meter enclosures to detect unauthorized access, meter tampering and revenue-protection cases.",
-        "High-value cargo: pharmaceuticals, electronics, tobacco and spirits shipments requiring documented chain-of-custody for insurance, regulatory (FDA DSCSA, TTB) and anti-theft programmes."
-      ]
+      "intro": "Anything that closes and must provably stay closed is a candidate: container doors, trailer hasps, meter rings, valve handwheels. The one disqualifier is assets designed to come back — returnable totes and racks want a [returnable container tag](/products/rfid-tags/rfid-returnable-container-tag/), not a single-use seal.",
+      "table": {
+        "columns": [
+          "Use case",
+          "What gets sealed",
+          "Where the seal is read"
+        ],
+        "rows": [
+          [
+            "Ocean container shipping",
+            "ISO 668 containers sealed at the shipper's CFS",
+            "Every transshipment port, rail terminal and destination gate — feeding C-TPAT / AEO / PIP advance-electronic-cargo data"
+          ],
+          [
+            "Truck and trailer security",
+            "Trailer rear-door hasps sealed at the loading dock",
+            "Weigh stations, border crossings and delivery sites via RFID portal reads"
+          ],
+          [
+            "Rail intermodal",
+            "COFC / TOFC container doors and rail-car cross-slide doors",
+            "Rail terminals (Class I / short-line) for through-chain reads"
+          ],
+          [
+            "Bonded warehouse / in-transit",
+            "Bonded cargo moving between Foreign-Trade Zones and bonded facilities",
+            "Electronic seal data required for expedited customs clearance under WCO SAFE"
+          ],
+          [
+            "Utility meter tamper detection",
+            "Electric, gas and water meter enclosures",
+            "Handheld verification on meter-reading rounds; unauthorized access and revenue-protection cases surface as cut seals or TID mismatches"
+          ],
+          [
+            "High-value and regulated cargo",
+            "Pharmaceuticals, electronics, tobacco and spirits shipments",
+            "Documented chain-of-custody for insurance, regulatory (FDA DSCSA, TTB) and anti-theft programmes"
+          ]
+        ]
+      }
     },
     {
       "title": "Integration with TMS, customs single-window and AEO / C-TPAT programmes",
+      "intro": "One seal, four read events, zero re-keying: the identity captured at the dock is the identity the destination verifies. Encoding follows your numbering plan — the [GS1 EPC encoding guide](/guides/gs1-epc-encoding-guide/) covers the scheme choices — and every read lands in the same audit trail.",
+      "image": {
+        "src": "/diagrams/products/rfid-cable-seal-custody-lifecycle.svg",
+        "alt": "Lifecycle of an RFID cable seal from application and TID pairing through in-motion portal reads to cut-and-retire at destination"
+      },
       "bullets": [
         "Sealing point: at shipper dock, operator applies the seal, reads the TID / EPC and pairs it with the WCO SAFE UCR in the TMS — creating the master chain-of-custody record.",
         "Portal gate reader: yard-gate, port-terminal and border-checkpoint portal readers capture EPC and TID. Cross-check against expected value; any mismatch flags seal substitution.",
@@ -228,7 +402,7 @@
           },
           {
             "label": "Weeks 14–24 — customs single-window + C-TPAT / AEO certification",
-            "text": "Programme experience across C-TPAT / AEO / PIP e-seal contributes the audit, refresh and onboarding patterns that inform this solution's operating playbook. wire ISO 18185 e-Seal frame into customs single-window and file trusted-trader tier upgrade with CBP, CBSA, EU customs or ABF based on validated chain-of-custody evidence."
+            "text": "Wire the ISO 18185 e-Seal frame into the customs single window and file the trusted-trader tier upgrade with CBP, CBSA, EU customs or ABF, based on the validated chain-of-custody evidence from the pilot lanes."
           }
         ]
       }
@@ -284,23 +458,39 @@
     {
       "question": "Does the seal support ISO 18185 e-Seal data for CBP / CBSA / AEO expedited clearance?",
       "answer": "Yes. The ISO 18185 e-Seal data-frame option is programmable into the user memory and exposed through the RFID read event. Customs broker integrations can feed the e-Seal frame directly into the CBP ACE / CBSA EDI / EU Customs single-window / ABF ICS portals — qualifying the shipment for C-TPAT / AEO / PIP / ATT expedited processing lanes."
+    },
+    {
+      "question": "Can an RFID cable seal be reused after opening?",
+      "answer": "No. The one-way ratchet has no release, and opening requires cutting the 1.8 mm steel cable, which destroys the seal. ISO 18185-1 defines electronic container seals as read-only and non-reusable. Order enough seals to cover every sealing event plus spares — the cut seal itself becomes part of the custody evidence."
+    },
+    {
+      "question": "What is the MOQ and lead time for RFID cable seal tags?",
+      "answer": "MOQ is 1,000 pieces with a standard lead time of 15-20 business days, in line with our other ISO 17712 seal products. Laser-engraved serial ranges, QR codes and EPC pre-encoding are specified at order time, and samples are available on request through the quote form."
+    },
+    {
+      "question": "How do RFID cable seals work for utility meter tamper detection?",
+      "answer": "The cable threads through the meter enclosure's sealing point and locks permanently; any unauthorized opening leaves a visibly cut cable. Field crews verify seals with a handheld reader at 1–2 m, checking physical condition and TID match in one pass, so a swapped or missing seal is flagged during a normal meter-reading round and documented for revenue-protection cases."
+    },
+    {
+      "question": "How is the EPC on each cable seal encoded?",
+      "answer": "Each seal carries a factory-programmed TID that cannot be altered. The writable EPC bank is encoded to a GS1 scheme or your own numbering plan — either at our factory before shipment or at your sealing point during application. Encoding customizes the EPC only; the TID stays fixed, which is what the anti-substitution check relies on."
     }
   ],
   "sources": [
     {
       "label": "ISO 17712:2013 Freight containers — Mechanical seals",
-      "url": "https://www.iso.org/standard/55244.html",
+      "url": "https://www.iso.org/standard/62464.html",
       "publisher": "ISO",
-      "publishedAt": "2013-09-01",
-      "accessedAt": "2026-04-24",
+      "publishedAt": "2013-05",
+      "accessedAt": "2026-07-11",
       "note": "Indicative / Security / High Security classification of mechanical seals — baseline compliance requirement for C-TPAT Tier II / III."
     },
     {
       "label": "ISO 18185-1:2007 Freight containers — Electronic seals — Part 1: Communication protocol",
-      "url": "https://www.iso.org/standard/39495.html",
+      "url": "https://www.iso.org/standard/41125.html",
       "publisher": "ISO",
-      "publishedAt": "2007-05-01",
-      "accessedAt": "2026-04-24",
+      "publishedAt": "2007-05",
+      "accessedAt": "2026-07-11",
       "note": "Electronic seal air-interface and data-frame specification — integration target for customs single-window feeds."
     },
     {
@@ -342,6 +532,20 @@
       "publishedAt": "2023-06-01",
       "accessedAt": "2026-04-24",
       "note": "Australian trusted-trader scheme aligned to WCO SAFE that reads ISO 18185 e-Seal data through ICS."
+    },
+    {
+      "label": "Impinj Monza R6 Series RAIN RFID Endpoint ICs (Monza R6-P)",
+      "url": "https://www.impinj.com/products/endpoint-ics/impinj-monza-r6-series",
+      "publisher": "Impinj",
+      "accessedAt": "2026-07-11",
+      "note": "Monza R6-P memory options — 96 / 128-bit EPC, 32 / 64-bit user memory, serialized TID. Page also carries the Monza R6 series end-of-life notice."
+    },
+    {
+      "label": "NXP UCODE 9 product page (SL3S1206)",
+      "url": "https://www.nxp.com/products/SL3S1206FUD2",
+      "publisher": "NXP",
+      "accessedAt": "2026-07-11",
+      "note": "UCODE 9 memory — 96-bit EPC, 96-bit factory-locked TID with 48-bit unique serial, no user memory; EPC Gen2 v2 / ISO/IEC 18000-63."
     }
   ],
   "primaryAction": {
