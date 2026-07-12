@@ -9,7 +9,8 @@ description: >
   gates. Use this whenever the user asks to 完善/optimize/improve/rebuild a
   products, compare, markets, lp, or case-studies page, mentions GEO or SEO
   for a specific non-blog page, complains a page is "太空/太薄/不够完善", or
-  says "next page-geo target", or complains the pages are 枯燥/dry/boring,
+  says "next page-geo target" or "继续下一批 / 改造剩余弱页" (batch mode —
+  run scripts/next.py first), or complains the pages are 枯燥/dry/boring,
   wants 配图/illustrations/diagrams added, wants the language 幽默有趣/more
   readable, or asks for factual errors to be found and corrected during the
   pass. Not for blog posts (/blog-transform or /blog-voice) and not for
@@ -47,6 +48,41 @@ Read `references/geo-seo-checklist.md` (shared principles) and
 fact-correction protocol) plus the one playbook that matches. Read
 `references/gates.md` before shipping.
 
+## Batch mode — dispatcher first
+
+For any "下一批 / 继续 / next batch / 改造剩余弱页" request, the first step
+is **always** the dispatcher (run `git fetch origin main` first):
+
+```bash
+python3 .claude/skills/page-geo/scripts/next.py                 # products, top 10
+python3 .claude/skills/page-geo/scripts/next.py --group compare --top 6
+python3 .claude/skills/page-geo/scripts/next.py --all-groups --json
+```
+
+It rescores every page on live origin/main (so merged work drops off by
+itself — no stale punch list), excludes pages claimed by in-flight
+`page-geo/*`, `fix/*` and `page-polish/*` branches (merge-base diffs, so
+stale old-base branches can't mass-claim), and skips snapshot-fixture
+pages unless `--include-fixtures`. Each target comes with a **gap
+profile** — that profile IS the work order:
+
+| Gap | What the pass must add |
+| --- | --- |
+| 图N (visuals below 3) | SVG diagrams to the floor (hero + 2; content-shape heuristics in voice-and-visuals.md) |
+| FAQn (below 4) | extend FAQ to ≥6 answer-first buyer questions per the group playbook |
+| 来源n (below 2) | primary sources for every external fact; company facts via canonical-facts.md |
+| NK字符 (below 8K) | thin sections — add the spec/decision tables the playbook prescribes, or rebuild |
+| 无brief / keywords不足 | add the machine-brief block and 4-7 keywords per geo-seo-checklist.md |
+
+Batch conventions: 6 pages per batch, parallel subagents, one branch
+`page-geo/<group>-batch-N` (single page → `page-geo/<slug>`), preview-only
+first, then the consolidated branch after independent re-verification.
+A human-readable snapshot of the backlog lives at repo root
+(`PRODUCTS_PAGE_BACKLOG_*.md`) — it is for the owner's eyes; agents pick
+targets from the dispatcher, never from the snapshot. If the dispatcher
+prints `NO_TARGETS_REMAIN` or `FEW_TARGETS_REMAIN`, report to the user
+instead of forcing targets.
+
 ## Workflow
 
 1. **Read the page from origin/main, not the working tree.** The main
@@ -71,7 +107,10 @@ fact-correction protocol) plus the one playbook that matches. Read
 
 4. **Source every fact.**
    - **Company facts** (MOQ, capacity, lead time, certifications, sample
-     policy): never invent. Grep existing pages for the canonical value
+     policy): never invent. Check `references/canonical-facts.md` FIRST —
+     it is the owner-ratified table and outranks anything a page says
+     (majority vote across pages has produced wrong "corrections" before).
+     If it's silent, grep existing pages for the canonical value
      (`git grep -h "MOQ" origin/main -- src/content/editorial | sort -u`)
      and reuse it verbatim. If no canonical value exists, write
      `[OWNER-CONFIRM: …]` and list it in your handoff notes.
