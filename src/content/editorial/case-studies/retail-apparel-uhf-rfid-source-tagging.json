@@ -23,7 +23,7 @@
     "/industries/retail-apparel/"
   ],
   "publishedAt": "2026-05-13",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-12",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-13",
@@ -107,6 +107,111 @@
       "paragraphs": [
         "Each store performs a full-floor RFID scan once every 7 days using a Zebra MC9300 handheld. A 100,000-unit store completes the scan in 35–45 minutes, vs the 8 hours a visual cycle count used to take. The inventory delta from the scan is reconciled into the WMS overnight and feeds the size-level replenishment recommendation. The 26% out-of-stock reduction is the operations team's primary KPI for the programme — replenishment recommendations only work if the underlying inventory data is trustworthy."
       ]
+    },
+    {
+      "title": "How the programme was built — inlay, source tagging, rollout",
+      "intro": "The architecture comes down to three decisions and one discipline: an inlay that reads through denim, lingerie and zipper metal without a per-SKU antenna; an EPC written at the supplier's factory so the tag arrives as part of the hang-tag artwork; and a goods-receipt audit that turns “is the chip actually there” into the supplier's problem to prove. The [GS1 EPC encoding guide](/guides/gs1-epc-encoding-guide/) covers the identifier; the [supply-chain solution](/solutions/rfid-supply-chain-management/) covers the factory-to-DC leg.",
+      "bullets": [
+        "Chip and tag — a Monza R6-P UHF RAIN inlay (96-bit EPC + 32-bit TID, Autotune-enabled) laminated into an 80 × 50 mm paper hang-tag with CMYK two-sided print, a thermal-transfer EPC barcode and the size/colour SKU.",
+        "Source tagging — the EPC is written at the apparel supplier's factory in Vietnam / Bangladesh / Indonesia, so goods arrive pre-encoded: $0.00 incremental DC labour and a 0-day DC dwell, versus $0.04 / unit and a 4-day dwell when the pilot tagged at the DC.",
+        "Encoding standard — GS1 SGTIN-96 built from the retailer's GS1 company prefix, item reference and serial, with a per-supplier serial-number block so suppliers never coordinate to stay unique.",
+        "Receipt audit — the DC reads a 5% carton sample through a portal reader and reconciles it to the supplier's per-carton EPC manifest; a mismatch triggers a chargeback to the supplier.",
+        "Reader estate — the existing Zebra FX9600 portals and MC9300 handhelds, already tuned for Monza from the pilot, carried the rollout to all 340 stores without a chip-family re-tune.",
+        "Scale — 11 M units / year across women's, men's and children's apparel."
+      ]
+    },
+    {
+      "title": "The item-level lifecycle — factory encode to store floor",
+      "intro": "One tag, five checkpoints. The SGTIN-96 written at the factory is the same identifier the store-floor scan, the endless-aisle order and the returns desk all read — no re-encode, no re-key, no second barcode to reconcile. The [inventory-tracking solution](/solutions/rfid-inventory-tracking/) documents the store-floor half of this flow.",
+      "image": {
+        "src": "/diagrams/products/retail-apparel-uhf-rfid-source-tagging-architecture.svg",
+        "alt": "Item-level lifecycle across five checkpoints: the supplier writes the GS1 SGTIN-96 at the factory and uploads a per-carton EPC manifest to the WMS; the DC reads a 5% carton sample through a portal reader and reconciles to the manifest; cartons arrive pre-encoded at $0.00 incremental DC labour; a store re-scans its floor every 7 days with an MC9300 handheld in 35–45 minutes rather than 8 hours; and at POS the SGTIN flips from sold to returned while HF EAS gates at 8.2 MHz coexist. A mismatch at DC verify triggers an automatic supplier chargeback, across 11 M units per year and 340 stores."
+      },
+      "bullets": [
+        "Factory encode — the supplier writes the GS1 SGTIN-96 at the print-and-attach step and uploads a per-carton EPC manifest to the retailer's WMS before the carton ships.",
+        "DC verify — the distribution centre reads a 5% carton sample through a portal reader and reconciles it to the manifest; the tag is already on the goods, so DC dwell stays at zero.",
+        "Store receiving — cartons arrive pre-encoded, with no DC tagging step and no $0.04 / unit tagging labour to absorb.",
+        "Floor cycle-count — every store re-scans its full floor every 7 days with an MC9300 handheld: 35–45 minutes for a 100,000-unit store, against the 8 hours a visual count used to take.",
+        "POS and EAS — a returned item's SGTIN flips from ‘sold’ to ‘returned’ at the desk, and the store's HF EAS gates at 8.2 MHz coexist with the UHF RAIN inlays without cross-triggering."
+      ]
+    },
+    {
+      "title": "Year-one results — measured against the pre-RFID baseline",
+      "intro": "The programme had one job: make the inventory number trustworthy. Everything downstream — replenishment, endless-aisle fulfilment, shrink control — is what a number you can trust unlocks, and year one put a figure against each. The wider pattern lives in the [retail and apparel industry guide](/industries/retail-apparel/).",
+      "image": {
+        "src": "/diagrams/products/retail-apparel-uhf-rfid-source-tagging-results.svg",
+        "alt": "Year-one results versus the pre-RFID baseline: store inventory accuracy rose from 67% under visual cycle counts to 98% under weekly handheld scans; size-level out-of-stock at full-price SKUs fell 26%; shrink from theft and admin error fell 22% year on year; markdowns from mis-priced inventory fell 18%; and online orders fulfilled from store stock rose 14%, across 11 M units per year and 340 stores."
+      },
+      "bullets": [
+        "Store inventory accuracy: 67% under pre-RFID visual cycle counts, 98% under weekly handheld scans.",
+        "Size-level out-of-stock at full-price SKUs: -26% — the operations team's primary KPI for the programme.",
+        "Shrink from theft and admin error: -22% year on year at the chain level.",
+        "Markdowns from mis-priced inventory: -18%.",
+        "Endless-aisle fulfilment of online orders from store stock: +14% units."
+      ]
+    },
+    {
+      "title": "The deployment at a glance — inlay, tag and measured results",
+      "intro": "One table for the reviewer who wants the specification and the numbers in the same glance. Every figure is the customer's own reported value — nothing here is modelled or rounded up for the slide.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "Monza R6-P — UHF RAIN, ISO/IEC 18000-63 + EPC Gen2v2",
+            "96-bit EPC + 32-bit TID, Autotune-enabled"
+          ],
+          [
+            "Tag format",
+            "Paper hang-tag, 80 × 50 mm",
+            "CMYK two-sided print + thermal-transfer EPC barcode + size/colour SKU"
+          ],
+          [
+            "Encoding",
+            "GS1 SGTIN-96, written at the supplier factory",
+            "Per-supplier serial block; per-carton EPC manifest to the WMS"
+          ],
+          [
+            "Tagging cost & dwell",
+            "$0.00 incremental DC labour, 0-day DC dwell",
+            "vs $0.04 / unit and a 4-day dwell tagging at the DC"
+          ],
+          [
+            "Inventory accuracy",
+            "67% → 98%",
+            "Weekly MC9300 handheld scan, every store"
+          ],
+          [
+            "Out-of-stock & shrink",
+            "Size-level OOS -26%, shrink -22% YoY",
+            "Markdowns -18%, store fulfilment +14%"
+          ],
+          [
+            "Scan time",
+            "35–45 minutes per 100,000-unit store",
+            "vs 8 hours for a visual cycle count"
+          ],
+          [
+            "Scale",
+            "11 M units / year, 340 stores",
+            "Women's, men's and children's apparel"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "What transfers — where item-level source tagging pays off",
+      "intro": "The deciding factors here — a size-and-colour SKU count that defeats visual counting, full-price stockouts that cost real margin, and a supply chain long enough to tag upstream — recur across soft-goods retail. The pattern ports cleanly; compare the chip families first on the [UCODE vs Monza vs Higgs page](/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/), then map the workflow with the [inventory-tracking solution](/solutions/rfid-inventory-tracking/).",
+      "bullets": [
+        "Footwear and accessories — the same size/colour SKU explosion that makes visual counts hopeless and item-level RFID decisive.",
+        "Department and specialty apparel — high full-price out-of-stock sensitivity, where a trustworthy size-level count is the replenishment engine's fuel.",
+        "Any retailer with an upstream supplier network — source tagging moves the encode to the factory and the audit to goods-receipt, exactly as it did here.",
+        "Omnichannel programmes leaning on ship-from-store — endless-aisle fulfilment only works when store stock is accurate enough to promise online."
+      ]
     }
   ],
   "resourceCards": [
@@ -185,6 +290,36 @@
     {
       "href": "/contact/",
       "label": "Talk to a Proud Tek retail specialist"
+    }
+  ],
+  "sources": [
+    {
+      "label": "Impinj Monza R6 / R6-P UHF RAIN tag chip — product page",
+      "url": "https://www.impinj.com/products/tag-chips/impinj-monza-r6",
+      "publisher": "Impinj",
+      "accessedAt": "2026-07-12",
+      "note": "Vendor reference for the Monza R6-P inlay, its 96-bit EPC and 32-bit TID, and the Autotune feature the deployment relies on across mixed apparel substrates."
+    },
+    {
+      "label": "GS1 EPC Tag Data Standard (TDS) — SGTIN encoding",
+      "url": "https://ref.gs1.org/standards/tds/",
+      "publisher": "GS1",
+      "accessedAt": "2026-07-12",
+      "note": "Defines the SGTIN scheme the suppliers encode at the factory — GS1 company prefix, item reference and serial — written here as a GS1 SGTIN-96 EPC."
+    },
+    {
+      "label": "GS1 EPC UHF Gen2 (Gen2v2) air-interface protocol",
+      "url": "https://www.gs1.org/standards/epc-rfid/uhf-air-interface-protocol",
+      "publisher": "GS1",
+      "accessedAt": "2026-07-12",
+      "note": "The EPC Gen2 air-interface protocol, developed for item-level retail rollouts, that the Monza R6-P inlays and the store reader fleet implement."
+    },
+    {
+      "label": "ISO/IEC 18000-63:2015 — UHF RFID air interface (Type C)",
+      "url": "https://www.iso.org/standard/63675.html",
+      "publisher": "ISO/IEC",
+      "accessedAt": "2026-07-12",
+      "note": "The UHF RAIN air-interface standard underlying the Monza R6-P inlays read at the DC portal and on the store handhelds."
     }
   ]
 }

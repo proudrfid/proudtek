@@ -23,7 +23,7 @@
     "/industries/libraries/"
   ],
   "publishedAt": "2026-05-13",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-12",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-13",
@@ -97,6 +97,128 @@
       "paragraphs": [
         "The customer's library director publicly credited the RFID migration with enabling the system's 'community-first' strategy — librarians moved from transaction-processing roles at the circulation desk to programming and community-services roles in the public-facing rooms. Patron-facing impact was measured separately and reported a 14% increase in patron NPS over the 24-month rollout window."
       ]
+    },
+    {
+      "title": "How the migration was engineered — chip, encoding, and a branch-by-branch cutover",
+      "intro": "Re-chipping 1.4 M catalogued items without shutting a single branch is less a technology project than a logistics one. The architecture came down to a few deliberate calls: an ISO 15693 chip for stack reads and built-in security, a paper label cheap enough to buy by the pallet, and a rolling cutover that let each branch switch protocols without ever going dark. The [ICODE SLIX chip encyclopedia](/guides/icode-slix-chip-encyclopedia/) covers the silicon; the [RFID library management solution](/solutions/rfid-library-management/) covers the workflow this case wired together.",
+      "bullets": [
+        "Chip choice: ICODE SLIX2 on ISO/IEC 15693 at 13.56 MHz, picked for anti-collision stack reads and the AFI security flag that folds EAS into the same tag — no separate security strip to buy, tune, or replace.",
+        "Encoding: each label carries the library's catalogue ID in the EPC field; a trained paraprofessional retags 180–220 items / hour at 12–18 seconds per item, including the barcode read, the write, and the WMS update.",
+        "Form factor: a 50 × 50 mm white paper square label — book-cover-inside on books, library-spine on DVDs and audiobooks, per ALA RFID guidance.",
+        "Cutover: a dual-tag transition window of 90 days per branch, during which the security gates read both the legacy 13.56 MHz chip and ICODE, so no branch ever stopped circulating.",
+        "Sequencing: an 80,000 items pilot at the central library, then 6 high-traffic branches, then a rolling conversion of the remaining 40 branches at roughly a 35,000-item branch every two weeks."
+      ]
+    },
+    {
+      "title": "The self-checkout path — one AFI bit does the security",
+      "intro": "Here is the whole patron journey in one diagram. A stack of books hits the kiosk, ISO 15693 anti-collision reads all 20–30 items in a single sweep, the AFI security flag flips to disarm the gate, and the catalogue logs the loan. Walk out; the gate stays quiet because the bit now says the books are yours. If you are still weighing the protocol, [compare 125 kHz vs 13.56 MHz RFID](/compare/125khz-vs-13.56mhz-rfid/) before committing.",
+      "image": {
+        "src": "/diagrams/products/library-icode-slix2-self-service-checkout-flow.svg",
+        "alt": "Self-service checkout and EAS-gate flow: a patron brings a stack of 20–30 items to the self-checkout kiosk, where ISO 15693 anti-collision reads the whole stack in one sweep at 30–80 cm and toggles the AFI security flag to disarm the gate while the loan is logged to the circulation system (WMS). At the EAS security gate the reader checks the AFI flag at 80–120 cm — a disarmed item passes silently, an item still armed trips the alarm. On return, check-in re-arms the AFI bit and the robotic sorter flags wrong-branch items before re-shelving."
+      },
+      "bullets": [
+        "At the kiosk: ISO 15693 anti-collision reads a stack of 20–30 items in one sweep at 30–80 cm, so the patron sets the whole pile down once instead of scanning book by book.",
+        "Security handoff: the AFI bit is toggled to disarm at check-out and toggled back at check-in — the EAS function lives in the chip, not in a separate strip glued to the page.",
+        "At the gate: the reader checks the AFI flag at 80–120 cm; a disarmed item passes silently, an item still armed trips the alarm.",
+        "On return: the loan is closed in the circulation system (WMS) and returns run past the robotic sorter, which flags wrong-branch items before they are re-shelved."
+      ]
+    },
+    {
+      "title": "The year-two scoreboard",
+      "intro": "Two years in, the figures the library director reports to the board are these. Self-service went from a fifth of circulations to more than three-quarters, and the security gate stopped crying wolf. Everything below is the customer's own measured result — nothing here is modelled.",
+      "image": {
+        "src": "/diagrams/products/library-icode-slix2-self-service-results.svg",
+        "alt": "Year-two results: self-service check-out share reached 78% of all circulations, up from 23% on the legacy chip. Alongside it, 12 FTE were redeployed from the circulation desk to programming, mis-shelved items per quarter fell -41%, the security-gate false-alarm rate fell -67%, and patron NPS rose 14% across the 24-month rollout."
+      },
+      "bullets": [
+        "Self-service check-out share reached 78% of all circulations, up from 23% on the legacy chip, which only supported assisted check-out.",
+        "12 FTE were redeployed from the circulation desk to community programming — the same staff, aimed at the public instead of the transaction.",
+        "Two gate-and-shelf metrics moved the most: mis-shelved items per quarter at -41%, and the security-gate false-alarm rate at -67%, after the AFI bit replaced the unreliable HF-EAS strips.",
+        "Patron NPS rose 14% across the 24-month rollout window, measured separately from the operational metrics."
+      ]
+    },
+    {
+      "title": "The deployment at a glance — spec, scale, and measured results",
+      "intro": "One table for the reviewer who wants the chip, the scale, and the outcomes side by side. Every figure here already appears in this case study; nothing is modelled or rounded up for effect.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "ICODE SLIX2 — ISO/IEC 15693, 13.56 MHz vicinity",
+            "2,528-bit user memory (2,560-bit total EEPROM)"
+          ],
+          [
+            "Security",
+            "AFI security flag — EAS-equivalent function",
+            "Toggled to disarm at check-out, re-armed at check-in"
+          ],
+          [
+            "Form factor",
+            "50 × 50 mm white paper square label",
+            "Book-cover-inside on books; library-spine on DVDs / audiobooks"
+          ],
+          [
+            "Read range",
+            "30–80 cm at the kiosk · 80–120 cm at the gate",
+            "ISO 15693 anti-collision; a stack of 20–30 items per sweep"
+          ],
+          [
+            "Scale",
+            "47 branches · 1.4 M catalogued items · 4.2 M annual circulations",
+            "Two counties; 78 full-time librarians plus paraprofessional staff"
+          ],
+          [
+            "Migration",
+            "24 months · 90 days dual-tag window per branch",
+            "Pilot 80,000 items → 6 high-traffic branches → remaining 40 branches"
+          ],
+          [
+            "Self-service share",
+            "78% of circulations (vs 23% on the legacy chip)",
+            "Measured at year 2"
+          ],
+          [
+            "Staffing shift",
+            "12 FTE redeployed to community programming",
+            "From the circulation desk"
+          ],
+          [
+            "Mis-shelved items",
+            "-41% per quarter",
+            "Sorter flags wrong-branch returns before re-shelving"
+          ],
+          [
+            "Gate false alarms",
+            "-67%",
+            "AFI bit replaces unreliable HF-EAS strips"
+          ],
+          [
+            "Label cost / MOQ",
+            "$0.12–0.18 / label at library MOQ (50k+)",
+            "Peel-and-stick, glassine release liner"
+          ],
+          [
+            "Label life",
+            "10-year minimum expectation",
+            "Replacement budget 0.5% / year; EEPROM rated >50-year at 70 °C"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "What transfers — where the ISO 15693 self-service pattern fits next",
+      "intro": "The deciding factors here — a large catalogue, stack reads at vicinity range, and EAS that rides inside the tag — are not unique to this system. Any circulation-heavy institution with a security gate and self-service ambitions inherits the same playbook. The [RFID library management solution](/solutions/rfid-library-management/) documents it end to end, and the [library industry guide](/industries/libraries/) maps the wider estate.",
+      "bullets": [
+        "Academic and university libraries — larger catalogues and heavier reserve-desk churn, on the same anti-collision stack read and AFI-gate pairing.",
+        "School and public-branch networks — where redeploying desk staff to programming is the entire point of going self-service.",
+        "Museum, archive, and special-collection lending — item-level ISO 15693 tagging where the data model, not the read range, is the hard part.",
+        "Media and equipment pools (tool libraries, AV lending) — mixed-media items on library-spine and book-cover-inside placements, checked out and returned through the same gate."
+      ]
     }
   ],
   "resourceCards": [
@@ -167,6 +289,36 @@
     {
       "href": "/contact/",
       "label": "Talk to a Proud Tek library specialist"
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP ICODE SLIX2 (SL2S2602) product page and short data sheet",
+      "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/icode/icode-slix2-label-ic:SL2S2602",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-12",
+      "note": "Chip-level reference for the ICODE SLIX2 2,528-bit user memory (2,560-bit total EEPROM), 13.56 MHz ISO 15693 operation, and the AFI security flag used for EAS."
+    },
+    {
+      "label": "ISO/IEC 15693-3:2019 — Vicinity cards, Part 3: Anticollision and transmission protocol",
+      "url": "https://www.iso.org/standard/73601.html",
+      "publisher": "International Organization for Standardization",
+      "accessedAt": "2026-07-12",
+      "note": "Defines the anti-collision stack read and the AFI (Application Family Identifier) flag the deployment uses for security-gate EAS."
+    },
+    {
+      "label": "ISO/IEC 15693-2:2019 — Vicinity cards, Part 2: Air interface and initialization",
+      "url": "https://www.iso.org/standard/73600.html",
+      "publisher": "International Organization for Standardization",
+      "accessedAt": "2026-07-12",
+      "note": "The 13.56 MHz vicinity air interface for the ISO 15693 label family selected for circulation."
+    },
+    {
+      "label": "ISO 28560-1:2023 — RFID in libraries, Part 1: Data elements and general guidelines for implementation",
+      "url": "https://www.iso.org/standard/85148.html",
+      "publisher": "International Organization for Standardization",
+      "accessedAt": "2026-07-12",
+      "note": "The library-RFID data model and implementation guidance for encoding the catalogue identifier onto the item tag."
     }
   ]
 }

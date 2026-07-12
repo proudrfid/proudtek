@@ -23,7 +23,7 @@
     "/solutions/rfid-event-wristbands/"
   ],
   "publishedAt": "2026-05-13",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-12",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-13",
@@ -107,6 +107,105 @@
       "paragraphs": [
         "The festival's operations team reported the cashless system covered 71% of all on-site spend by the end of day 4 (up from 52% on the festival's previous barcode + plastic-token system). Average top-up was €34, average per-attendee on-site spend was €87 (food, beverage and merch combined)."
       ]
+    },
+    {
+      "title": "How the credential was built — one band, two radios",
+      "intro": "Access and payment want opposite things from a chip, so this band simply carries two. A [UCODE 9](/products/rfid-wristbands/uhf-rfid-wristband/) UHF inlay does the hands-free gate read; an NTAG213 NFC chip on a separate tap patch settles the bar tab. The EPC is only ever an identifier — every balance and entitlement lives in the festival's back-office, which is what lets one disposable Tyvek band stand in for a ticket, a wallet and an ID.",
+      "bullets": [
+        "Gate credential: a UCODE 9 UHF chip, chosen for walk-through range and bulk-encoding speed rather than on-chip crypto — the clone defence here is a TID-vs-EPC lookup at the portal, not a challenge-response.",
+        "Cashless credential: an NTAG213 NFC chip read on a small tap surface at the point of sale, where one-at-a-time tapping is fine because a terminal handles well under 30 transactions per hour.",
+        "Encoding: bands ship chipped-but-blank and are paired to a ticket order at the fulfilment stage, so the EPC, the printed barcode and the buyer's order ID all point at the same record before a band is ever mailed.",
+        "Closure: a single-use snip-lock plastic closure that breaks on removal, so a credential cannot be quietly passed over a fence and re-tightened on another wrist."
+      ]
+    },
+    {
+      "title": "The tap-through architecture — gate read and cashless read",
+      "intro": "One picture beats four paragraphs of hand-waving about 'the RFID system'. Here is exactly which radio does what, from the portal at the gate to the terminal at the beer tent — the [event access-control workflow](/solutions/rfid-event-access-control/) covers the portal build in full.",
+      "image": {
+        "src": "/diagrams/case-studies/music-festival-uhf-wristband-architecture.svg",
+        "alt": "Deployment architecture: a single-use Tyvek festival wristband carries two radios — a UCODE 9 UHF chip and an NTAG213 NFC chip. At the gate, an Impinj R700 with four Times-7 A6034 antennas in a 1.8 m portal reads the UHF chip at 50–80 cm with the wrist at any angle, clearing 14 attendees per lane per minute against 9 on the old barcode lane. At the point of sale the NTAG213 chip is tapped, the balance is looked up over Wi-Fi in the back-office and the new balance is shown, at under 30 transactions per hour per terminal."
+      },
+      "bullets": [
+        "At the gate, an Impinj R700 driving four Times-7 A6034 antennas in a 1.8 m portal reads the UHF chip at 50–80 cm, so attendees walk through wrist-at-any-angle — 14 through a lane each minute against 9 on the old barcode workflow.",
+        "At the point of sale, the NTAG213 chip is tapped, the terminal looks up the balance over Wi-Fi, deducts the spend and shows the new balance — the chip never stores money, only the identifier that finds it.",
+        "Two reads, one wristband: the UHF read is tuned for throughput, the NFC read for a deliberate, confirmable transaction, which is why the payment lane can run slower without hurting anyone."
+      ]
+    },
+    {
+      "title": "The four-day scoreboard",
+      "intro": "The numbers the operations team went home with — throughput at the gate, money through the wristband, and how many cloned credentials the chip quietly turned away over the four-day window.",
+      "image": {
+        "src": "/diagrams/case-studies/music-festival-uhf-wristband-scoreboard.svg",
+        "alt": "Four-day results scoreboard: gate throughput of 14 attendees per lane per minute versus 9 on the barcode lane; cashless payment reaching 71% of on-site spend by day 4, up from 52%; $4.8M in cashless volume at a 0.04% transaction-fail rate; 47 cloned-credential entries caught at the gate; and under 0.3% of genuine entries needing a retry."
+      },
+      "bullets": [
+        "Gate throughput held at 14 attendees per lane per minute, up from 9 on the previous barcode-scan lanes — the difference between a moving queue and a stalled one at peak.",
+        "Cashless payment reached 71% of all on-site spend by day 4, up from 52% on the festival's previous barcode-and-token system, moving $4.8M in total volume at a 0.04% transaction-fail rate.",
+        "Integrity held too: 47 attempted entries on cloned barcode-only credentials were caught at the portal because the UHF chip forced a TID cross-check, and under 0.3% of genuine entries needed a second read."
+      ]
+    },
+    {
+      "title": "The deployment at a glance — chip, band and measured results",
+      "intro": "One table for the reviewer who wants the specification and the outcomes side by side. Every figure below is a value the festival shipped or measured — nothing here is modelled.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Gate chip",
+            "UCODE 9 — UHF RAIN, ISO/IEC 18000-63",
+            "96-bit EPC; hands-free walk-through read"
+          ],
+          [
+            "Cashless chip",
+            "NTAG213 — NFC, tap-to-pay lookup",
+            "Balance held in the back-office, not on the chip"
+          ],
+          [
+            "Band + closure",
+            "Single-use Tyvek hybrid, 25 mm, snip-lock",
+            "Breaks on removal; artwork changes yearly"
+          ],
+          [
+            "Gate throughput",
+            "14 / lane / minute",
+            "vs 9 on the prior barcode lane"
+          ],
+          [
+            "Read setup",
+            "Impinj R700 + 4 × Times-7 A6034, 1.8 m portal",
+            "Reads the UHF chip at 50–80 cm"
+          ],
+          [
+            "Cashless result",
+            "71% of on-site spend by day 4; $4.8M volume",
+            "Up from 52%; 0.04% transaction-fail rate"
+          ],
+          [
+            "Integrity",
+            "47 cloned-credential entries caught",
+            "TID cross-check at the portal; under 0.3% retry"
+          ],
+          [
+            "Unit economics",
+            "$0.18–0.24 / band (FOB Shenzhen, 200k MOQ)",
+            "200,000 shipped 28 days before gates"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "What transfers — where this UHF-plus-cashless pattern fits",
+      "intro": "The deciding factors here — a queue that cannot stall, a payment that must clear fast, and a credential you throw away at the end of the weekend — recur across live events. The same two-radio band moves cleanly onto any of them; the [event-wristband solution](/solutions/rfid-event-wristbands/) documents the workflow end to end.",
+      "bullets": [
+        "Multi-stage music and arts festivals — the exact profile here: high daily peaks, re-entry, age gates and cashless bars on one disposable band.",
+        "Marathons, cycling and mass-participation sport — walk-through timing and gated zones where a tap delay is unacceptable in the start pen.",
+        "Conferences and expos — badge-grade access plus cashless catering, where a reusable silicone band can pay off over a season; the [silicone vs fabric vs woven](/compare/silicone-vs-fabric-vs-woven-rfid-wristbands/) comparison shows when to switch material.",
+        "Resorts, theme parks and stadiums — longer-lived credentials where the [wristbands for hotels vs events vs resorts](/compare/rfid-wristbands-hotels-vs-events-vs-resorts/) trade-off decides the chip and closure."
+      ]
     }
   ],
   "resourceCards": [
@@ -185,6 +284,38 @@
     {
       "href": "/contact/",
       "label": "Talk to a Proud Tek events specialist"
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP UCODE 9 UHF RAIN RFID IC (SL3S1206) — product data sheet",
+      "url": "https://www.nxp.com/docs/en/data-sheet/SL3S1206.pdf",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2025-02-12",
+      "accessedAt": "2026-07-12",
+      "note": "Confirms the UCODE 9 96-bit EPC, EPC Gen2v2 and UHF RAIN air interface behind the wristband gate credential."
+    },
+    {
+      "label": "ISO/IEC 18000-63 — UHF RFID (RAIN) Type C air-interface standard",
+      "url": "https://www.iso.org/standard/63675.html",
+      "publisher": "ISO/IEC",
+      "publishedAt": "2015-10",
+      "accessedAt": "2026-07-12",
+      "note": "The UHF air-interface standard the UCODE 9 gate chip implements for walk-through portal reads."
+    },
+    {
+      "label": "GS1 EPC UHF Gen2 (Gen2v2) air-interface protocol",
+      "url": "https://www.gs1.org/standards/epc-rfid/uhf-air-interface-protocol",
+      "publisher": "GS1",
+      "accessedAt": "2026-07-12",
+      "note": "The EPC Gen2v2 protocol underlying the 96-bit EPC written to each wristband at the fulfilment stage."
+    },
+    {
+      "label": "NXP NTAG213 — NFC Forum Type 2 tag IC product data sheet",
+      "url": "https://www.nxp.com/docs/en/data-sheet/NTAG213_215_216.pdf",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-12",
+      "note": "The HF/NFC chip used for the cashless point-of-sale read on the same wristband."
     }
   ]
 }
