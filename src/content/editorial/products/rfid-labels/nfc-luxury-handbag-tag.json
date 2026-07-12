@@ -140,7 +140,7 @@
     "licenseUrl": "https://creativecommons.org/licenses/by/2.0/"
   },
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-11T11:00:00Z",
+  "modifiedAt": "2026-07-12",
   "sections": [
     {
       "title": "Why luxury fashion needs cryptographic authentication, not visual inspection",
@@ -238,6 +238,107 @@
             "label": "2026 Today",
             "text": "Reference operating practice across luxury-fashion-flagship, resale-provenance-second-hand, customs-anti-counterfeit, brand-authentication-app, and EU-DPP-textile-2027 programmes converge on {chip:nxp-ntag-424-dna:short_name} (or DNA TT for tamper-evident closures) silicon + woven-label / leather-patch / metal-hardware integration at factory assembly + GS1 Digital Link URI for DPP + AES-128 SUN per-tap authentication + Aura Blockchain Consortium provenance ledger as the operator-side template."
           }
+        ]
+      }
+    },
+    {
+      "title": "How a tap becomes proof — authentication and the chain of ownership",
+      "intro": "A super-fake can copy the stitching, the hardware, even the dust bag; what it cannot copy is a chip that signs a different URL every time you tap it. Each tap makes the NTAG 424 DNA chip mint a fresh AES-128 CMAC that the brand backend checks against a rising counter, so a captured link works exactly once and then indicts itself. The same tap does a second job the paperwork never could: it records who owns the bag and hands that record to the next buyer on resale. The chip-level mechanics live in the [NTAG 424 DNA SUN + CMAC encyclopedia](/guides/ntag424-dna-sun-cmac-authentication/); the programme view is in the [luxury brands industry guide](/industries/luxury-brands/).",
+      "image": {
+        "src": "/diagrams/products/nfc-luxury-handbag-tag-ownership-flow.svg",
+        "alt": "Four-step tap-to-verify flow for an NFC luxury handbag tag: a buyer taps the leather patch at 13.56 MHz, the NTAG 424 DNA chip mints a fresh per-tap CMAC URL with an AES-128 key sealed in the silicon, the brand backend verifies the signature and a rising counter, and the result shows genuine while recording the owner of record — on resale the record transfers to the next buyer, and a copied URL returns counterfeit on the next tap."
+      },
+      "bullets": [
+        "Secure Dynamic Messaging (SDM) makes the chip emit a new CMAC URL on every tap; the brand backend rejects any URL whose counter it has already seen, so replaying a captured link fails.",
+        "The AES-128 key is provisioned into the silicon at NXP's secure facility and never leaves it — cloning the leather, the hardware and the serial does not clone the key.",
+        "First owner registers at the first tap; on resale the owner-of-record transfers to the buyer through the brand platform or the Aura Blockchain Consortium ledger, which survives even if a brand backend goes offline.",
+        "Authenticated NFC-tagged listings command a 20-40% price premium on Vestiaire Collective and The RealReal, while verification drops from USD 20-50 for expert visual inspection to under USD 3 per tap."
+      ]
+    },
+    {
+      "title": "Sewn in, riveted down, destroyed on removal — the leather-patch build",
+      "intro": "The tag has to survive a decade of daily carry, the occasional downpour and a professional dry-clean, then refuse to be transplanted onto a fake. A durable NFC inlay does that by living inside a leather patch that is stitched or riveted into the lining seam, where pulling it out breaks the antenna trace and scars the leather — an authenticator's dream and a counterfeiter's headache. Closure-tamper variants use the [NTAG 424 DNA TamperTag](/products/rfid-labels/ntag424-dna-tamper-evident-tag/) sibling; the same anti-transplant logic underpins the [sneaker authentication tag](/products/rfid-labels/nfc-sneaker-authentication-tag/).",
+      "image": {
+        "src": "/diagrams/products/nfc-luxury-handbag-tag-construction.svg",
+        "alt": "Construction of an NFC luxury handbag tag: a leather NFC patch stitched and riveted into a handbag lining seam, where extraction breaks the antenna; a layer stack of a leather patch face, an antenna coil with the NTAG 424 DNA die running at 13.56 MHz with AES-128 SUN, a PET substrate with polyurethane encapsulant, and a stitch or rivet anchor that breaks on removal; and four factory-integrated form factors — woven fabric label 40 × 20 mm, thin PET inlay 25 × 15 mm, embedded leather logo patch, and NFC inside a metal hardware plate."
+      },
+      "bullets": [
+        "The inlay stacks a PET antenna substrate, a polyurethane encapsulant and a PPS or cotton outer layer, then hides inside a leather patch or under the interior logo — invisible to the consumer until the tap.",
+        "Sewn-in and heat-sealed constructions are designed to self-destruct on extraction: the chip or antenna trace breaks, and heat-sealed leather visibly tears, so a transplanted tag betrays itself.",
+        "Woven-label variants are ISO 6330 60 °C wash and ISO 3175 perchloroethylene dry-clean qualified and survive Martindale 20,000+ rubs; leather-patch and metal-hardware builds outlast the bag itself.",
+        "Four factory-integrated form factors cover the range: woven fabric label (40 × 20 mm), thin PET inlay (25 × 15 mm), embedded leather logo patch, and NFC inside a metal hardware plate."
+      ]
+    },
+    {
+      "title": "Luxury handbag authentication tag — the spec sheet",
+      "intro": "One place to scope the programme: the chip and its cryptography, the four factory-integrated form factors, durability qualification, the EU compliance carrier, and the commercial terms a brand-protection buyer needs before sampling. The regulatory backdrop is in the [Digital Product Passport solution](/solutions/digital-product-passport/).",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "NTAG 424 DNA — AES-128 SUN / SDM",
+            "NTAG 424 DNA TT (TagTamper) for tamper-evident closures"
+          ],
+          [
+            "Air interface",
+            "13.56 MHz — NFC Forum Type 4, ISO/IEC 14443-4",
+            "Smartphone-readable on iPhone and modern Android, no app"
+          ],
+          [
+            "Cryptography",
+            "AES-128 mutual auth + per-tap SUN CMAC",
+            "Monotonic counter makes replay mathematically impossible"
+          ],
+          [
+            "Endurance",
+            "200,000 write cycles · 50-year retention at 55 °C",
+            "Authentication is read-only, so the write budget is untouched"
+          ],
+          [
+            "Form factors",
+            "Woven label 40 × 20 mm · PET inlay 25 × 15 mm · leather patch · metal plate",
+            "All integrated at factory assembly"
+          ],
+          [
+            "Durability",
+            "ISO 6330 60 °C wash · ISO 3175 dry-clean · Martindale 20,000+ rubs",
+            "Woven-label variant; leather and metal builds outlast the bag"
+          ],
+          [
+            "Data carrier",
+            "GS1 Digital Link URI in the NDEF payload",
+            "Same payload carries the SUN URL, the DPP URL and the Aura reference"
+          ],
+          [
+            "EU compliance",
+            "Regulation (EU) 2024/1781 ESPR Digital Product Passport",
+            "Textile / fashion accessories, 2027-2028 effective date"
+          ],
+          [
+            "Anti-transplant",
+            "UID bound to product serial; destroyed on removal",
+            "Sewn or riveted extraction breaks the antenna trace"
+          ],
+          [
+            "Resale economics",
+            "20-40% authenticated price premium",
+            "Under USD 3 per tap vs USD 20-50 expert visual; Vestiaire Collective, The RealReal"
+          ],
+          [
+            "MOQ / lead time",
+            "2,000 pieces · 15-20 business days",
+            "USD 0.40-1.20 per tag by form factor and chip variant"
+          ],
+          [
+            "Key provisioning",
+            "AES-128 key set at NXP's secure facility",
+            "Brand backend via REST API; Aura onboarding via consortium operator"
+          ]
         ]
       }
     }
@@ -342,6 +443,10 @@
     {
       "question": "What MOQ and lead time should I plan for?",
       "answer": "MOQ 2,000 pieces; lead time 15-20 business days. Per-tag cost USD 0.40-1.20 depending on form factor (woven label / PET inlay / leather patch / metal-hardware) and chip variant (DNA vs DNA TT). AES-128 key provisioning happens at NXP's secure facility — coordinated through Proud Tek as part of the first production batch. Brand-side backend integration via standard REST API; Aura Blockchain Consortium onboarding coordinated through consortium operator."
+    },
+    {
+      "question": "Which form factor should I choose — woven label, leather patch, or metal hardware?",
+      "answer": "It depends on how hidden and how durable the placement needs to be. A woven fabric label (40 × 20 mm) sews into the lining seam and is ISO 6330 60 °C wash and ISO 3175 dry-clean qualified — the default for most bags. A thin PET inlay (25 × 15 mm) hides under a leather logo patch or interior pocket for the lowest profile. An embedded leather patch or an NFC-inside-metal hardware plate is fully hidden and outlasts the bag, which suits collector-grade pieces. All four are integrated at factory assembly and use the same NTAG 424 DNA chip, so the authentication, EU Digital Product Passport and resale-transfer behaviour is identical regardless of form factor."
     }
   ],
   "sources": [

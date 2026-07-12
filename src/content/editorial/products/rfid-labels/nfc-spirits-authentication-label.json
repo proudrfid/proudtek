@@ -134,7 +134,7 @@
     "/products/rfid-labels/ntag424-dna-tamper-evident-tag/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-12",
   "sections": [
     {
       "title": "Why spirits need cryptographic per-bottle authentication",
@@ -145,7 +145,48 @@
       ]
     },
     {
-      "title": "Bridge-antenna NFC vs static QR vs duty stamp — anti-refill architecture"
+      "title": "Bridge-antenna NFC vs static QR vs duty stamp — anti-refill architecture",
+      "intro": "Every anti-counterfeit layer on a spirits bottle answers a different question, and most go quiet on the one that matters: was this bottle opened and refilled? A hologram, a duty stamp and a printed QR all ride happily on a genuine empty bottle sourced from a hotel bar. Here is what each layer actually proves the moment a buyer taps, and why only the bridge antenna registers the seal break. The general-purpose sibling is the [NTAG 424 DNA TamperTag](/products/rfid-labels/ntag424-dna-tamper-evident-tag/).",
+      "table": {
+        "columns": [
+          "Security layer",
+          "Catches a refilled genuine bottle?",
+          "Consumer self-verify (no app)",
+          "What a tap proves"
+        ],
+        "rows": [
+          [
+            "Hologram / foil capsule",
+            "No — it travels with the reused bottle",
+            "No — looks identical to the eye",
+            "Nothing verifiable"
+          ],
+          [
+            "Government duty / tax stamp",
+            "No — it certifies duty paid, not the liquid",
+            "No — and stamps are themselves forged",
+            "Excise paid, not authenticity"
+          ],
+          [
+            "Static QR / printed serial",
+            "No — the code is copied onto the refill",
+            "Scans, but carries no secret",
+            "Engagement, not proof"
+          ],
+          [
+            "Static NFC on the bottle body",
+            "No — genuine chip that never saw the seal break",
+            "A tap, but no tamper state",
+            "Chip authenticity only"
+          ],
+          [
+            "Bridge-antenna NTAG 424 DNA TT",
+            "Yes — opening snaps the trace; the tap returns opened",
+            "Yes — signed SUN URL + sealed / opened state",
+            "Cryptographic proof + tamper state"
+          ]
+        ]
+      }
     },
     {
       "title": "What bridge-antenna anti-refill actually defeats",
@@ -195,6 +236,107 @@
             "label": "2026 Today",
             "text": "Field-reference patterns drawn from premium-whisky-distillery, cognac-grand-marque, agave-tequila-DO, fine-wine-bordeaux-burgundy, and craft-spirits-distillery programmes converge on NTAG 424 DNA TT bridge-antenna seal + per-bottle serialisation + AES-128 SUN per-tap authentication + GI-protected provenance verification (Scotch Whisky Regulations 2009 / Cognac AOC + BNIC / Tequila NOM + CRT / Champagne AOC + CIVC) + co-existence with regulator tax stamps as the operator-side template."
           }
+        ]
+      }
+    },
+    {
+      "title": "How a tap becomes proof — SUN authentication plus the seal break",
+      "intro": "The label stores no password a counterfeiter could read off the cap. Each tap makes the NTAG 424 DNA chip sign a fresh URL with an AES-128 key that never leaves the silicon — and the same tap reports whether the bridge antenna across the closure is still intact. A copied link works exactly once; a refilled bottle reports 'opened' forever. The chip-level mechanics are in the [NTAG 424 DNA SUN + CMAC encyclopedia](/guides/ntag424-dna-sun-cmac-authentication/).",
+      "image": {
+        "src": "/diagrams/products/nfc-spirits-authentication-label-verify-flow.svg",
+        "alt": "Four-step tap-to-verify flow: a phone taps the bottle cap seal at 13.56 MHz, the NTAG 424 DNA chip emits a fresh per-tap CMAC URL with its AES-128 key, the brand server checks the signature and the bridge-antenna state, and the result shows genuine and sealed — while an opened bottle returns a tamper state or no answer on the next tap."
+      },
+      "bullets": [
+        "Secure Dynamic Messaging (SDM) makes the chip emit a new CMAC URL on every tap; the brand server's monotonic counter rejects any replayed URL.",
+        "The AES-128 key is provisioned into the silicon at NXP's secure facility and never leaves it — cloning the label or the closure does not clone the key.",
+        "The NTAG 424 DNA TT variant folds the bridge-antenna state into the signed message, so one tap returns both authenticity and sealed / opened status.",
+        "The consumer needs no app — the phone opens the returned URL and the branded page shows genuine and sealed, GI provenance, or an opened / counterfeit warning."
+      ]
+    },
+    {
+      "title": "The bottle-neck closure — a cap-bridge antenna that dies when the cap turns",
+      "intro": "A spirits closure is the one place a counterfeiter cannot avoid touching, so that is where the antenna lives. The NFC coil is routed as a bridge spanning the cap and the neck; twisting the cap to pour snaps the trace at the closure line, and the break is permanent. The result is a seal that fails loudly the first time the bottle is opened — and coexists with the regulator's tax stamp rather than fighting it for real estate. It shares its silicon with the [NFC wine bottle tag](/products/rfid-labels/nfc-wine-bottle-tag/).",
+      "image": {
+        "src": "/diagrams/products/nfc-spirits-authentication-label-construction.svg",
+        "alt": "Bottle-neck closure construction: a sealed neck with the NFC antenna as an intact bridge trace spanning cap and neck versus an opened neck with the trace severed and marked VOID, plus the layer stack — premium foil capsule, bridge antenna coil with the NTAG 424 DNA die, the break-line across the cap-neck gap, and tamper adhesive that leaves VOID on removal."
+      },
+      "bullets": [
+        "The antenna is a physical bridge across the cap-to-neck gap; opening the bottle (screw cap, foil cutter, cork pull) severs the trace at the break-line.",
+        "Once severed, the chip either cannot answer at all or returns a cryptographically signed 'opened' state on the TT variant — the first pour is detectable forever.",
+        "Premium foil, soft-touch laminate and hot-foil stamping sit above the inlay, so the security layer stays invisible under the brand's existing capsule design.",
+        "The bridge sits on the cap-neck closure, leaving the neck and main label clear for the government duty stamp (HMRC DS5, EU 92/83/EEC, Russian EGAIS) it complements."
+      ]
+    },
+    {
+      "title": "Spirits authentication label — the spec sheet",
+      "intro": "One place to price the programme: chip variant, closure format, substrate, air interface and the commercial terms a brand-protection buyer needs before sampling. Every value here is drawn from the specifications above; the full range sits on the [RFID labels hub](/products/rfid-labels/).",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "NTAG 424 DNA (NT4H2421Gx) — AES-128 SUN / SDM",
+            "NTAG 424 DNA TT (NT4H2421Tx) adds the signed tamper loop"
+          ],
+          [
+            "Tamper mechanism",
+            "Bridge antenna across the cap-neck closure",
+            "Opening severs the trace; the chip returns opened or stops responding"
+          ],
+          [
+            "Air interface",
+            "13.56 MHz — ISO/IEC 14443-4, NFC Forum Type 4",
+            "Smartphone-readable on iPhone (iOS 14+) and modern Android, no app"
+          ],
+          [
+            "Authentication",
+            "Per-bottle AES-128 SUN, per-tap CMAC URL",
+            "Monotonic counter rejects replayed URLs; per-chip key un-extractable"
+          ],
+          [
+            "Provenance",
+            "Cask, bottling date, master-blender signoff, GI certification",
+            "Scotch Whisky Regulations 2009, Cognac AOC, Tequila NOM-CRT, Champagne CIVC"
+          ],
+          [
+            "Endurance",
+            "200,000 erase/write cycles, 50-year data retention",
+            "Outlasts decades-aged whisky and vintage cognac in cellar conditions"
+          ],
+          [
+            "Closure formats",
+            "Screw-cap, cork-and-capsule, swing-top, T-cork",
+            "Bridge geometry adapted to the cap shape"
+          ],
+          [
+            "Substrate / finish",
+            "Metallic foil, soft-touch laminate, embossed, hot-foil",
+            "Applies on standard bottling-line equipment, no process change"
+          ],
+          [
+            "Duty-stamp coexistence",
+            "Sits on the cap-neck bridge, above the tax stamp",
+            "HMRC DS5, EU 92/83/EEC, Russian EGAIS, US TTB strip-stamp"
+          ],
+          [
+            "MOQ / lead time",
+            "5,000 pieces, 15-20 business days",
+            "AES-128 key provisioning at NXP secure facility"
+          ],
+          [
+            "Unit cost",
+            "USD 0.40-1.20",
+            "By form factor and chip variant (DNA vs DNA TT)"
+          ],
+          [
+            "Compliance",
+            "ISO/IEC 14443-4, NFC Forum Type 4, EU Regulation 2019/787 GI",
+            "Coexists with HMRC DS5 / EU 92/83/EEC / EGAIS / TTB regimes"
+          ]
         ]
       }
     }
@@ -283,6 +425,10 @@
     {
       "question": "Does the bridge-antenna NFC label survive standard bottling-line application?",
       "answer": "Yes — bridge-antenna geometry is adapted to standard cap shapes (screw-cap, cork-and-capsule, swing-top, T-cork) and applies on standard bottling-line equipment. No process change for the spirits producer. Premium-substrate label design (metallic foil, soft-touch laminate, embossed textures, hot-foil stamping) matches the aesthetic of high-end spirits packaging. Tag chip rated for cellar conditions across decades-aged whisky / vintage cognac (200,000 write cycles + 50-year retention per NXP datasheet)."
+    },
+    {
+      "question": "What is the MOQ, lead time and sample process for NFC spirits authentication labels?",
+      "answer": "MOQ is 5,000 pieces, lead time 15-20 business days, and per-tag cost USD 0.40-1.20 depending on form factor and chip variant (DNA vs DNA TT). AES-128 key provisioning happens at NXP's secure facility, coordinated as part of the first production batch, so plan a sampling round before the production run. Blank and pre-encoded bridge-antenna samples are available for closure-fit testing on your specific cap and neck geometry — screw-cap, cork-and-capsule, swing-top or T-cork — before you commit to tooling."
     }
   ],
   "sources": [
