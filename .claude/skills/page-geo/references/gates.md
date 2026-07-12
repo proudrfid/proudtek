@@ -1,5 +1,29 @@
 # Verification gates and git discipline
 
+## Three rules earned in the 2026-07-11 products batch
+
+- **New content uses plain short-form chip names, never new `{chip:}`
+  placeholders.** The drift lint fails ANY added line containing a
+  placeholder unless its resolved text byte-matches a removed line —
+  placeholders are strictly for 1:1 migration of existing prose. Plain
+  names in new tables/bullets are correct and are validated by
+  lint-chip-claims instead. (Two batch-1 agents each rediscovered this
+  independently; now it's written down.)
+- **`chipFamilies` / `envFamilies` / `relatedIndustries` values must come
+  from the FACET_RULES vocabulary** (see src/content.config.ts ~line 238
+  and src/lib/catalog-pages.ts). Dead facet values render nothing and
+  break catalog filtering silently — batch-1 found 5 sibling keyfob pages
+  sharing one. Validate against the vocabulary when touching these fields.
+- **Snapshot fixtures**: 6 pages are byte-locked by
+  editorial-pages-integration.snapshot.test.ts (list in scripts/next.py
+  SNAPSHOT_FIXTURES; notably products/rfid-keyfobs/rfid-wooden-keyfob and
+  guides/icode-slix-chip-encyclopedia). Changing one — even only bumping
+  modifiedAt — requires regenerating the .snap in a **clean origin/main
+  temp worktree** (`git worktree add --detach /tmp/x origin/main`, symlink
+  node_modules, apply your files, `TMPDIR=/tmp npx vitest run -u`) and
+  shipping the updated .snap with the branch. Never run `-u` in the main
+  worktree: it is parked on someone else's branch whose lib code differs.
+
 Run everything from the repo root. The main worktree is frequently parked on
 someone else's branch with WIP — treat it as read-only; every check below
 works without touching it.

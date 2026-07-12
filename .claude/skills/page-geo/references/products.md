@@ -41,4 +41,23 @@ section either qualifies the product or advances the sample request.
 Zero section images (hero photo only), FAQ 3-5 but generic, no spec table
 (specs buried in prose bullets), summary descriptive rather than
 answer-first. Fixing exactly these four moves a page from "中等" to the
-completeness line — do them before considering anything fancier.
+completeness line — do them before considering anything fancier. The
+dispatcher (`scripts/next.py`) prints each target's exact gap profile —
+treat it as the work order and spend the pass on those gaps, not on
+rewriting what already works.
+
+Recurring gap→fix patterns from batch 1 (each page got 2 SVGs + spec
+table + FAQ to 7-8 + 4-7 internal links, 5-7/10 → 10/10):
+
+- 图1 (hero photo only) → construction cross-section and process-flow
+  diagrams are the two universally applicable SVG subjects for a physical
+  product; material-specific physics (on-metal shielding, doming, wood
+  grain lamination) beats generic beauty shots.
+- FAQ3 → the reliable buyer six: MOQ, lead time, sampling, artwork/
+  personalization, encoding, compliance-or-durability. Answers built only
+  from on-page or canonical facts.
+- 来源0-1 → chip datasheets for every chip family named; standards bodies
+  for every certification claimed; app notes (ST/TI class) for physics
+  claims. Verify each URL loads before citing.
+- 5-7K字符 → one 12-16-row spec table + one comparison or checklist
+  section usually crosses 8K without padding prose.
