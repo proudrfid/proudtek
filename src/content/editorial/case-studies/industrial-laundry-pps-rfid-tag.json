@@ -23,7 +23,7 @@
     "/solutions/rfid-laundry-tags/"
   ],
   "publishedAt": "2026-05-13",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-12",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-13",
@@ -104,6 +104,105 @@
       "paragraphs": [
         "The customer runs Impinj R700 fixed readers under each portal, with four Times-7 A6034 circular-polarised antennas configured in a square geometry around the conveyor. Tags are read on multiple antennas during the 2-second portal pass, so a momentary null on one antenna is recovered by another. The 99.7% portal read rate is measured at the customer's largest site (workwear pool, 480,000 garments / year throughput)."
       ]
+    },
+    {
+      "title": "How the deployment was built — encoding, installation, rollout",
+      "intro": "The architecture was a small number of deliberate choices: a UHF chip for hands-free throughput, a PPS housing for the wash chemistry and heat, and a heat-seal install that fits the customer's existing garment-labelling line.",
+      "bullets": [
+        "Encoding: each UCODE 8 carries a 128-bit EPC mapped to the garment's rental record, with the 64-bit TID as an immutable anti-duplication anchor.",
+        "Installation: the tag is heat-sealed to the inner garment label at 2.4 seconds per garment on the customer's continuous heat-sealing press.",
+        "Rollout: phased across the three sites and the workwear, kitchen-wear and healthcare-uniform pools, replacing the textile-laminated tag pool by pool.",
+        "Reader estate: Impinj R700 fixed readers on the sort-line portals read the tag hands-free rather than hand-scanned, which is what UHF buys over the previous HF approach."
+      ]
+    },
+    {
+      "title": "The sort-line portal — how the 99.7% read rate is built",
+      "intro": "The read rate is a geometry story, not a chip story. The customer runs an Impinj R700 under each portal with four Times-7 A6034 circular-polarised antennas in a square around the conveyor, so every garment is read from several angles on the way through.",
+      "image": {
+        "src": "/diagrams/products/industrial-laundry-pps-rfid-tag-portal.svg",
+        "alt": "Sort-line portal: an Impinj R700 reader driving four Times-7 A6034 antennas in a square at 1.5 m height around a conveyor moving 12 garments per second, read on multiple antennas during a 2-second pass for a 99.7% read rate at 480,000 garments per year."
+      },
+      "bullets": [
+        "An Impinj R700 fixed reader drives four Times-7 A6034 circular-polarised antennas in a square around the conveyor at 1.5 m height.",
+        "Garments move at 12 per second and are read on multiple antennas during the 2-second pass, so a null on one antenna is recovered by another.",
+        "The 99.7% portal read rate is measured at the largest site — the workwear pool at 480,000 garments per year."
+      ]
+    },
+    {
+      "title": "250 versus 120 cycles — the durability delta",
+      "intro": "The whole case rests on one measured gap: the PPS housing carries the chip through the chemical wash, tunnel-finisher heat and extractor G-force that broke the legacy textile-laminated tag.",
+      "image": {
+        "src": "/diagrams/products/industrial-laundry-pps-rfid-tag-survival.svg",
+        "alt": "Survival by wash cycle: the legacy textile-laminated tag failed at 91% by cycle 120, while the PPS UCODE 8 tag held 99.4% at 250 cycles and 97.1% at 350, with a 2.1-year payback noted on the tag-cost increase."
+      },
+      "bullets": [
+        "The PPS-housed UCODE 8 tag held 99.4% survival at 250 cycles and 97.1% at 350, where the legacy textile-laminated tag had already failed at 91% by cycle 120.",
+        "Roughly 4× the survival rate at about 4× the unit cost — a 2.1-year payback on the tag-cost increase alone, before sort-line labour savings.",
+        "End-of-life is tag delamination from the garment label, not chip failure; chips often survive into the 400+ cycle range and are sometimes re-attached."
+      ]
+    },
+    {
+      "title": "The deployment at a glance — chip, housing and measured results",
+      "intro": "One table for the reviewer who wants the specification and the numbers together. Every figure is the customer's own measured or shipped value — nothing here is modelled.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "UCODE 8 — UHF RAIN, ISO/IEC 18000-63 + EPC Gen2v2",
+            "128-bit EPC + 64-bit TID"
+          ],
+          [
+            "Housing",
+            "PPS injection-moulded, heat-sealed",
+            "26 × 11 × 2.6 mm"
+          ],
+          [
+            "Operating temperature",
+            "-25 °C to +200 °C continuous, +220 °C peak",
+            "Survives tunnel finishers"
+          ],
+          [
+            "Survival",
+            "99.4% at 250 cycles · 97.1% at 350",
+            "vs textile-laminated 91% at 120"
+          ],
+          [
+            "Sort-line read rate",
+            "99.7% at 12 garments/sec",
+            "Impinj R700 + 4 Times-7 A6034 antennas"
+          ],
+          [
+            "Labour & write-offs",
+            "Manual sortation -54% · lost-garment write-offs -38% YoY",
+            "After RFID-driven sortation"
+          ],
+          [
+            "Unit cost / MOQ",
+            "$0.42–0.55 / tag (FOB Shenzhen, 1 M MOQ)",
+            "About 4× the legacy tag; 2.1-year payback"
+          ],
+          [
+            "Scale",
+            "1.8 M garments · 3 sites · 14,000 B2B accounts",
+            "Workwear / kitchen / healthcare pools"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "What transfers — where this PPS + UHF pattern fits",
+      "intro": "The deciding factors here — chemical wash, high-temperature finishing and a hands-free sort line — recur across textile-service verticals. The same pattern moves cleanly onto any of them; the [laundry-tag solution](/solutions/rfid-laundry-tags/) documents the workflow end to end.",
+      "bullets": [
+        "Healthcare linen and scrubs — the same chemical-wash, high-temperature and ozone-disinfection profile the PPS housing was chosen to survive.",
+        "Hospitality linen (hotel sheets, food-and-beverage napery) — high wash frequency where lost-item write-offs dominate the cost case.",
+        "Workwear and cleanroom garment rental — tunnel-finisher heat and extractor forces are exactly the failure modes textile lamination could not take.",
+        "Any UHF sort line where hands-free portal throughput beats HF tap-scanning — the [full laundry-tracking workflow](/solutions/rfid-laundry-tracking/) shows the reader and portal build."
+      ]
     }
   ],
   "resourceCards": [
@@ -178,6 +277,36 @@
     {
       "href": "/contact/",
       "label": "Talk to a Proud Tek laundry specialist"
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP UCODE 8 UHF RAIN RFID IC — product page and datasheet",
+      "url": "https://www.nxp.com/products/rfid-nfc/rain-rfid/ucode:UCODE",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-12",
+      "note": "Chip-level reference for the UCODE 8 128-bit EPC + 64-bit TID and its operating specification."
+    },
+    {
+      "label": "ISO/IEC 18000-63:2015 — UHF RFID Type C air interface",
+      "url": "https://www.iso.org/standard/63675.html",
+      "publisher": "International Organization for Standardization",
+      "accessedAt": "2026-07-12",
+      "note": "UHF RAIN air-interface standard for the 860-960 MHz portal reads described."
+    },
+    {
+      "label": "GS1 EPC UHF Gen2 (EPC Gen2v2) air-interface protocol",
+      "url": "https://www.gs1.org/standards/epc-rfid/uhf-air-interface-protocol",
+      "publisher": "GS1",
+      "accessedAt": "2026-07-12",
+      "note": "EPC Gen2v2 protocol the UCODE 8 tag and Impinj R700 reader implement."
+    },
+    {
+      "label": "21 CFR 177.2415 — Poly(phenylene sulfide) resins (indirect food additives)",
+      "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-B/part-177/subpart-C/section-177.2415",
+      "publisher": "U.S. eCFR",
+      "accessedAt": "2026-07-12",
+      "note": "FDA indirect-food-contact clearance cited for the kitchen-uniform pool's PPS housing."
     }
   ]
 }

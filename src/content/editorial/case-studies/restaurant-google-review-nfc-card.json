@@ -23,7 +23,7 @@
     "/solutions/google-review-nfc-card/"
   ],
   "publishedAt": "2026-05-13",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-12",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-13",
@@ -105,6 +105,118 @@
       "paragraphs": [
         "The customer's CX team modelled the Google review programme on a 'review velocity' KPI — reviews per store per month, normalised by transaction volume. The 3.07× lift held steady through month 6 and showed no sign of habituation decay in the year-1 data. The customer expanded the programme to include hand-held cards for shift leaders and is piloting NTAG424 DNA cards as a future authenticated-loyalty card."
       ]
+    },
+    {
+      "title": "How the card program was built — chip, encoding, artwork, rollout",
+      "intro": "A review card only works if the guest never has to think about it, so the build came down to four deliberate choices: a universally-readable chip, a per-store URL burned in at the factory, brand-matched artwork, and a two-placement drop that put a card exactly where the guest's hands already were. The same specification is documented on the [Google Review NFC card solution](/solutions/google-review-nfc-card/) page.",
+      "bullets": [
+        "Chip: NXP NTAG215 — an NFC Forum Type 2 tag with 504 bytes of user memory, room for the Google Review URL plus a fallback redirect, readable by every iPhone since iOS 13 and every NFC-enabled Android since Android 4.4.",
+        "Encoding: each card was written with its store's own Google Review URL (https://g.page/r/<store-id>/review) on Proud Tek's Mühlbauer line at 8,000 cards / hour, then 100% read-verified against the store-ID database — 0 mis-encoded cards in the deployment lot.",
+        "Form factor: an 85 × 55 mm PVC card, tabletop matte finish with a spot UV brand mark and a QR code fallback printed on the reverse for the few phones without a tap path.",
+        "Placement: one card per booth plus one hand-held card at the takeout counter — the counter card sees 12–18 taps a day because the cashier says the words out loud, against 5–7 taps a day on a passive tabletop card.",
+        "Rollout: production to store shelf in 28 days (18 days production, 6 days FedEx ground, 4 days store-team activation), shipped as one branded card set per store across all 412 stores."
+      ]
+    },
+    {
+      "title": "The tap-to-review path — one gesture from booth to posted review",
+      "intro": "This is the whole product in one gesture. The guest taps the card, the phone opens the store's Google Review URL, and the rating posts — no camera, no app, no typing a search into Maps. Removing those steps is exactly what moved tabletop conversion from 0.7% on a QR code to 2.1% on a tap.",
+      "image": {
+        "src": "/diagrams/products/restaurant-google-review-nfc-card-tap-flow.svg",
+        "alt": "Three-step tap-to-review flow: a guest taps their phone to the NTAG215 NFC Forum Type 2 card, the phone opens the store's per-store Google Review URL, and the rating posts to the store's profile, with a QR code fallback on the card reverse; tabletop conversion rose from 0.7% on a QR code to 2.1% on an NFC tap."
+      },
+      "bullets": [
+        "Tap: the guest holds their phone to the NTAG215 card at the booth or takeout counter — NFC Forum Type 2 tags are read natively, with no app to open first.",
+        "Open: the phone reads the encoded per-store URL (https://g.page/r/<store-id>/review) and opens it directly in the browser.",
+        "Post: the guest lands on the store's own Google review screen and leaves a rating — the single step the card exists to make frictionless.",
+        "Fallback: phones without a tap path (older iPhone 7–X, non-NFC Android) use the QR code on the card's reverse, so no guest reaches a dead end."
+      ]
+    },
+    {
+      "title": "What 90 days changed — reviews, rating, and sentiment",
+      "intro": "Every figure here is the customer's own measured result over the first 90 days against the pre-deployment control — reported, not modelled. The headline is review velocity: monthly reviews per store went from 14 to 43.",
+      "image": {
+        "src": "/diagrams/products/restaurant-google-review-nfc-card-results.svg",
+        "alt": "Results after the first 90 days versus the pre-deployment control: Google reviews per store per month rose from 14 to 43, a 3.07× lift; the chain-wide rating moved from 4.2 to 4.4 stars; 91% of reviews were 4 or 5 stars versus 84% in the control; and NFC tap-to-review conversion was 2.1% versus 0.7% for QR, across 412 stores."
+      },
+      "bullets": [
+        "Review volume: 14 reviews / store / month in the control period rose to 43 in the first 90 days — a 3.07× lift that held through month 6 with no habituation decay in the year-1 data.",
+        "Rating: the chain-wide Google rating moved from 4.2 to 4.4 stars (+0.2 ⭐) as review volume climbed.",
+        "Sentiment: 91% of deployment-period reviews were 4 or 5 stars, up from 84% in the control period — the prompt lifted review quality, not just count.",
+        "Reach: the program ran across all 412 stores, and the customer has since expanded it to hand-held cards for shift leaders."
+      ]
+    },
+    {
+      "title": "The deployment at a glance — chip, card, and measured results",
+      "intro": "One table for the reviewer who wants the specification and the outcomes side by side. Every figure is either the shipped specification or the customer's own reported result — nothing here is modelled.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "NXP NTAG215 — NFC Forum Type 2, 504 bytes user memory",
+            "Encoded with the per-store Google Review URL"
+          ],
+          [
+            "Card",
+            "85 × 55 mm PVC, tabletop matte + spot UV brand mark",
+            "QR code fallback printed on the reverse"
+          ],
+          [
+            "Placement",
+            "One per booth + one hand-held at takeout",
+            "Tabletop 5–7 taps/day · counter 12–18 taps/day"
+          ],
+          [
+            "Encoding & QA",
+            "Mühlbauer line, 8,000 cards / hour",
+            "100% read-verified · 0 mis-encoded in the lot"
+          ],
+          [
+            "Lead time",
+            "28 days production-to-store",
+            "18 days production · 6 days FedEx · 4 days activation"
+          ],
+          [
+            "Reviews / store / month",
+            "14 → 43 (3.07× lift)",
+            "First 90 days vs pre-deployment control"
+          ],
+          [
+            "Chain-wide rating",
+            "4.2 → 4.4 stars (+0.2 ⭐)",
+            "Held steady through month 6"
+          ],
+          [
+            "Review sentiment",
+            "91% 4- or 5-star vs 84% control",
+            "Quality rose alongside volume"
+          ],
+          [
+            "Tap → review conversion",
+            "2.1% NFC vs 0.7% QR",
+            "Tap events vs tabletop QR impressions"
+          ],
+          [
+            "Scale",
+            "412 stores across 12 states",
+            "~2.4 M monthly transactions"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "What transfers — where a tap-to-review card fits next",
+      "intro": "The mechanics that made this work — a universally-readable NFC tag, a per-location review URL, and a card placed where the customer's hands already are — aren't specific to fast-casual restaurants. The same pattern moves onto any high-footfall, review-sensitive business; the [Google Review cards for restaurants](/solutions/google-review-cards-for-restaurants/) page documents the workflow, and the [Google Review NFC card setup guide](/guides/google-review-nfc-card-setup/) covers the per-store URL encoding end to end.",
+      "bullets": [
+        "Multi-location hospitality — cafés, bars, and quick-service groups where each site has its own Google Business Profile and its own review URL to encode.",
+        "Personal-service chains — salons, clinics, gyms, and auto service, where a front-desk hand-off is the natural moment to invite a tap.",
+        "Any counter with a verbal prompt — the takeout-counter pattern, where a staff member invites the tap, was the highest-converting placement and transfers to any service desk.",
+        "Choosing the chip is the one real decision — the [NTAG213 vs NTAG215 vs NTAG216](/compare/ntag213-vs-ntag215-vs-ntag216/) comparison covers when the extra memory of NTAG215 earns its keep over NTAG213."
+      ]
     }
   ],
   "resourceCards": [
@@ -183,6 +295,36 @@
     {
       "href": "/contact/",
       "label": "Talk to a Proud Tek hospitality specialist"
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP NTAG213/215/216 — NFC Forum Type 2 Tag compliant IC",
+      "url": "https://www.nxp.com/products/NTAG213_215_216",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-12",
+      "note": "Chip reference for the NTAG215 selection: NFC Forum Type 2, 504 bytes user memory, 10-year data retention and 100,000-cycle write endurance."
+    },
+    {
+      "label": "NFC Forum — Type 2 Tag Technical Specification",
+      "url": "https://nfc-forum.org/build/specifications",
+      "publisher": "NFC Forum",
+      "accessedAt": "2026-07-12",
+      "note": "Defines how an NFC-enabled phone in reader/writer mode reads the NDEF URL record on a Type 2 tag and opens it — the tap-to-open mechanic behind the card."
+    },
+    {
+      "label": "Google Business Profile — Create a Google link or QR code to request reviews",
+      "url": "https://support.google.com/business/answer/16816815",
+      "publisher": "Google",
+      "accessedAt": "2026-07-12",
+      "note": "Source for the per-store review link and QR fallback the card encodes; also notes that incentivised reviews are prohibited, so the card is a prompt only."
+    },
+    {
+      "label": "Google Business Profile — Tips to get more reviews",
+      "url": "https://support.google.com/business/answer/3474122",
+      "publisher": "Google",
+      "accessedAt": "2026-07-12",
+      "note": "Best-practice guidance on reminding customers to leave a review via a Google link or QR code — the compliant prompt this program automates at the table."
     }
   ]
 }

@@ -23,7 +23,7 @@
     "/solutions/hotel-key-cards/"
   ],
   "publishedAt": "2026-05-13",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-12",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-13",
@@ -104,6 +104,108 @@
       },
       "paragraphs": [
         "The customer's CX team tracks a single composite KPI for front-desk friction (the 'arrival friction index') and reported a 17% improvement in the score across the estate within six months of the rollout. The procurement team separately tracked card lifecycle cost (purchase + encoding labor + replacement + lock-platform support tickets) and reported a 23% net annual saving once the encoding workflow stabilised."
+      ]
+    },
+    {
+      "title": "How the rollout was built — encode, migrate, replenish",
+      "intro": "The rollout had three moving parts, and the chip was the least of them. The card is a [MIFARE Classic 1K](/products/rfid-cards/mifare-classic-1k-card/) with the magnetic stripe deliberately left off; the work lived in the encoding desk, the property-by-property cutover, and a three-SKU supply line that kept 28 front desks stocked without air-freighting everything. The [hotel key card solution](/solutions/hotel-key-cards/) documents the same workflow for a single property.",
+      "bullets": [
+        "Encoding: the card ships blank and the property's own lock-platform encoder writes sectors 1–15 at the front desk in 1.8 seconds, down from the 12.0-second magnetic swipe-and-program it replaced. Sector 0 stays fixed and the 7-byte UID anchors the credential.",
+        "Lock estate: one chip, three platforms — Saflok at 60% of properties, Onity at 25%, Salto at 15% — all reading MIFARE Classic 1K natively, so no door hardware changed.",
+        "Migration: property by property, in each brand tier's off-season, with a 30-day window where the front desk encoded both magnetic and RFID credentials and the locks accepted either. Calendar time 18 months; the manufacturing portion was an 8-month rolling production cycle.",
+        "Supply line: a master ocean SKU (chipped, unprinted) landed at $0.21 per card on a 30-day cycle, a branded air SKU (per-property artwork) landed at $0.34 per card on a 10-day cycle, and a factory pre-encoded SKU covered new-property launches.",
+        "Quality gate: 100% inline read-rate test on a Mühlbauer ICT2 plus a 1% destructive sample for the chip-to-antenna bond, before anything leaves Shenzhen."
+      ]
+    },
+    {
+      "title": "From front-desk encode to a logged door open",
+      "intro": "A hotel credential only has to do two things well: get written in under two seconds at check-in, and open exactly one guest's door for exactly one stay. Here is the whole path, from the encoder at the desk to the audit line the lock writes when the card taps. Door hardware never changed — the [Saflok compatibility profile](/compatibility/saflok-hotel-key-cards/) shows why the 60 / 25 / 15 lock split all reads the same card.",
+      "image": {
+        "src": "/diagrams/case-studies/hospitality-hotel-key-card-rollout-access-flow.svg",
+        "alt": "Hotel key-card access flow: a front-desk encoder writes sectors 1–15 of a MIFARE Classic 1K card in 1.8 seconds, the guest taps the card on the door lock at 13.56 MHz over ISO 14443 Type A, and the Saflok, Onity or Salto lock grants access and writes an audit event — replacing a magnetic stripe that was failing on 4.1% of guest interactions by 2024."
+      },
+      "bullets": [
+        "Check-in: the front-desk encoder writes the stay's credential into sectors 1–15 of a MIFARE Classic 1K card in 1.8 seconds; sector 0 and the 7-byte UID stay fixed.",
+        "Tap: the guest presents the card at 13.56 MHz over the ISO 14443 Type A air interface — no swipe, no direction, nothing to demagnetise in a pocket next to a phone.",
+        "Decision and log: the lock checks the credential against the stay and writes an access event — the same audit line whether the door is Saflok, Onity or Salto.",
+        "For contrast, the magnetic stripe it replaced was failing on 4.1% of guest interactions by 2024, which is where the whole migration started."
+      ]
+    },
+    {
+      "title": "The numbers that closed the business case",
+      "intro": "Procurement did not approve a chip; it approved four numbers and a payback. Encoding got faster, complaints and lost-card spend fell, and the total lifecycle cost dropped even though each card costs a few cents more. The [MIFARE Classic vs Plus vs DESFire](/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/) comparison covers why the group bought the cheaper chip on purpose.",
+      "image": {
+        "src": "/diagrams/case-studies/hospitality-hotel-key-card-rollout-results.svg",
+        "alt": "Rollout outcomes after 12 months: front-desk encoding time per card down 85% (12.0 seconds to 1.8 seconds), 'card does not work' complaints down 68%, lost-card replacement spend down 41%, and net card-lifecycle cost down 23%, on 2.4 M cards shipped across 28 properties, with card unit cost rising 9% from $0.31 to $0.34 per card."
+      },
+      "bullets": [
+        "Front-desk encoding time per card fell 85%, from 12.0 seconds on the magnetic swipe-and-program to 1.8 seconds on the RFID tap-encode.",
+        "'Card does not work' complaints at the lock dropped 68%, and lost-card replacement spend fell 41% — chip cards survive the bending, water and phone-pocket exposure that killed mag stripes.",
+        "Card unit cost rose 9%, from $0.31 to $0.34 and was offset roughly 6× by the lifecycle saving; net card-lifecycle cost fell 23% once the workflow stabilised.",
+        "The CX team's arrival-friction index improved 17% across the estate within six months, on 2.4 M cards shipped across 28 properties in year one."
+      ]
+    },
+    {
+      "title": "The deployment at a glance — card, encoding, logistics, results",
+      "intro": "One table for the reviewer who wants the specification and the outcomes side by side. Every figure here is the customer's own shipped or measured value; nothing is modelled.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "MIFARE Classic 1K — ISO 14443 Type A, 13.56 MHz",
+            "1KB EEPROM; sector 0 fixed, sectors 1–15 encoded at the desk"
+          ],
+          [
+            "Card body",
+            "0.84 mm PVC, CMYK one side, spot-UV brand mark",
+            "Magnetic stripe omitted — saved $0.07 per card"
+          ],
+          [
+            "Lock estate",
+            "Saflok 60% · Onity 25% · Salto 15%",
+            "All read MIFARE Classic 1K natively; no door hardware changed"
+          ],
+          [
+            "Encoding",
+            "1.8 s per card at the front desk",
+            "Down from 12.0 s on the magnetic swipe-and-program (85% faster)"
+          ],
+          [
+            "Logistics",
+            "Ocean master $0.21 · air branded $0.34 per card",
+            "30-day ocean vs 10-day air; factory pre-encode for launches"
+          ],
+          [
+            "Migration",
+            "18 months, property by property",
+            "30-day dual-credential overlap; 8-month rolling production"
+          ],
+          [
+            "Measured results",
+            "Complaints -68% · lost-card spend -41% · lifecycle cost -23%",
+            "Arrival-friction index +17% within six months"
+          ],
+          [
+            "Scale",
+            "2.4 M cards year 1 · 28 properties · 12,000 rooms",
+            "1.8 M cards year 2 at steady-state replenishment"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "What transfers — where this MIFARE Classic key-card pattern fits",
+      "intro": "The deciding factors here — a mixed estate of installed locks, a front desk that re-encodes credentials all day, and cards that live in pockets next to phones — are not unique to one hotel group. The same MIFARE Classic 1K playbook moves onto any of the properties below; the [hotel key card solution](/solutions/hotel-key-cards/) documents it end to end and the [case-study library](/case-studies/) shows adjacent deployments.",
+      "bullets": [
+        "Multi-brand hotel and resort groups on mixed Saflok / Onity / Salto estates, where one card SKU has to read every installed lock without a firmware project.",
+        "Serviced apartments and extended-stay brands, where high credential turnover makes the 1.8-second encode and the lower lost-card spend the whole business case.",
+        "Casinos, conference hotels and campus housing that already run 13.56 MHz door hardware and want the audit trail without swapping locks.",
+        "Any operator plotting a later move to DESFire EV3 for AES-128 credentials — the same card artwork and production line carry the chip swap when the lock firmware is ready."
       ]
     }
   ],
@@ -187,6 +289,32 @@
     {
       "href": "/contact/",
       "label": "Talk to a Proud Tek hospitality specialist"
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP MIFARE Classic EV1 1K — product page and datasheet",
+      "url": "https://www.nxp.com/products/rfid-nfc/mifare-hf/mifare-classic/mifare-classic-ev1-1k-4k:MF1S50YYX_V1",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2018",
+      "accessedAt": "2026-07-12",
+      "note": "Confirms the card's air interface — ISO 14443 Type A at 13.56 MHz, 1KB EEPROM across 16 sectors, one unique serial per card — positioned by NXP for access control."
+    },
+    {
+      "label": "ISO 14443-3 — proximity card initialization and anticollision (Type A)",
+      "url": "https://www.iso.org/standard/73598.html",
+      "publisher": "ISO/IEC",
+      "publishedAt": "2018",
+      "accessedAt": "2026-07-12",
+      "note": "Defines the Type A polling and anticollision the MIFARE Classic 1K card and the hotel locks use to select a single card in the field."
+    },
+    {
+      "label": "NXP DESFire EV3 — AES contactless smart-card IC (the FY28 migration target)",
+      "url": "https://www.nxp.com/products/MF3DHx3",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2020",
+      "accessedAt": "2026-07-12",
+      "note": "The AES-128 chip the group plans to migrate to once its Saflok, Onity and Salto locks ship the firmware update; same card artwork and production line."
     }
   ]
 }

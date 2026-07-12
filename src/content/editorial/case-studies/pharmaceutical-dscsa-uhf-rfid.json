@@ -23,7 +23,7 @@
     "/industries/pharmaceutical/"
   ],
   "publishedAt": "2026-05-13",
-  "modifiedAt": "2026-06-10T18:00:00Z",
+  "modifiedAt": "2026-07-12",
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-05-13",
@@ -107,6 +107,111 @@
       "paragraphs": [
         "The customer's compliance team reported zero DSCSA findings in their first annual FDA audit post-enforcement, citing the RFID-driven verification rate as the primary mitigation against the most common DSCSA failure mode (slow verification on suspect product). The procurement team reported the RFID programme is now considered table-stakes; the question internally has shifted from 'should we use RFID' to 'how do we standardise the chip family across all distributor partners'."
       ]
+    },
+    {
+      "title": "How the programme was built — chip, encoding and QA",
+      "intro": "The programme was a small set of deliberate choices: a UHF chip for read-through-carton throughput, an SGTIN-96 encoding to satisfy DSCSA, and a QA regime tight enough for a regulated packaging line.",
+      "bullets": [
+        "Chip and encoding: UCODE 9 carrying a GS1 SGTIN-96 on the 96-bit EPC, encoded at the customer's packaging line, with lot and expiry thermal-transfer-printed beside the barcode.",
+        "QA: 100% chip-presence test inline at Proud Tek (Mühlbauer ICT2), a 0.5% destructive lot sample for the chip-antenna bond, and 100% EPC encoding verification at the customer's line.",
+        "Line scale: four packaging-line shifts across two facilities, each line consuming 6,000–8,000 labels / hour.",
+        "Logistics: 28 days ocean freight Shenzhen-to-Long-Beach plus 5 days inland, with 60 days of label safety stock at every line."
+      ]
+    },
+    {
+      "title": "How DSCSA verification runs at the receipt portal",
+      "intro": "DSCSA requires a distributor to verify the SGTIN of suspect product against the manufacturer's authoritative source. This is how that runs at the receipt portal at the customer's volume.",
+      "image": {
+        "src": "/diagrams/products/pharmaceutical-dscsa-uhf-rfid-verify-flow.svg",
+        "alt": "Four-step DSCSA verification flow: the receipt portal reads each item's SGTIN at over 2,000 items per minute, the WMS submits the EPC to the manufacturer's GS1 EPCIS endpoint, the manufacturer responds within 90 seconds, and a verified item is released while a suspect item is quarantined into a 24-hour investigation — a 99.96% first-query verification rate."
+      },
+      "bullets": [
+        "The receipt portal reads each item's SGTIN at 2,000+ items / minute — UHF RAIN reads through the sealed carton, which barcode cannot.",
+        "The WMS submits each EPC to the manufacturer's GS1 EPCIS lightweight verification endpoint over HTTPS.",
+        "The manufacturer responds within the 90-second SLA with VERIFIED, NOT_VERIFIED or SUSPECT; a suspect item is quarantined into a 24-hour investigation.",
+        "99.96% of items return VERIFIED on first query; the remaining 0.04% surface manufacturer-side data errors resolved within the SLA window."
+      ]
+    },
+    {
+      "title": "First-year results against the DSCSA requirements",
+      "intro": "The results are stated against their requirements, so the margin is visible. Every figure is the customer's own measured value from the first full year under enforcement.",
+      "image": {
+        "src": "/diagrams/products/pharmaceutical-dscsa-uhf-rfid-results.svg",
+        "alt": "Four measured results against requirement or baseline: a 99.96% verification rate against the 99% FDA threshold, 22-hour suspect investigation against a 24-hour requirement, a 4-hour lot recall span down from 5 days, and 18 minutes per pallet for returns down from 4 hours — at 380 million units per year with zero DSCSA audit findings."
+      },
+      "bullets": [
+        "Verification rate 99.96% against the FDA's 99% threshold; suspect-product investigation 22 hrs against the 24-hour requirement.",
+        "Item-level lot recall span 4 hrs from FDA recall notice to a full chain-of-custody report, down from 5 days.",
+        "Saleable returns processing 18 min / pallet, down from 4 hours pre-RFID.",
+        "Zero DSCSA findings in the first annual FDA audit post-enforcement, at 380 M item-level units tagged per year."
+      ]
+    },
+    {
+      "title": "The deployment at a glance — chip, form factor and results",
+      "intro": "The specification and the measured results in one place; nothing here is modelled.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "UCODE 9 — UHF RAIN, ISO/IEC 18000-63, EPC Gen2v2",
+            "96-bit EPC + 64-bit TID"
+          ],
+          [
+            "Form factor",
+            "50 × 30 mm thermal-transfer paper label",
+            "GS1 SGTIN-96 + lot + expiry overprint"
+          ],
+          [
+            "Verification rate",
+            "99.96%",
+            "FDA DSCSA threshold: 99%"
+          ],
+          [
+            "Suspect investigation",
+            "22 hrs",
+            "DSCSA requirement: 24-hour"
+          ],
+          [
+            "Lot recall span",
+            "4 hrs",
+            "Down from 5 days"
+          ],
+          [
+            "Saleable returns",
+            "18 min / pallet",
+            "Down from 4 hours pre-RFID"
+          ],
+          [
+            "Receipt throughput",
+            "2,000+ items / minute",
+            "vs 25–45 items / minute on a hand-held barcode"
+          ],
+          [
+            "Label cost / MOQ",
+            "$0.04–0.09 / label (FOB Shenzhen, 100 M MOQ)",
+            "28 days ocean + 5 days inland"
+          ],
+          [
+            "Scale",
+            "380 M item-level units / year",
+            "~14,000 prescriber accounts, 2 facilities"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "What transfers — where this pattern fits",
+      "intro": "The deciding factors here — sealed-carton verification and receipt-portal throughput — recur across regulated distribution. The [pharmaceutical industry guide](/industries/pharmaceutical/) and the [FDA RFID tracking guide](/guides/fda-rfid-pharmaceutical-tracking/) cover the compliance frame.",
+      "bullets": [
+        "Wholesale drug distribution — the same receipt-portal throughput and saleable-returns problem at any DSCSA-regulated distributor.",
+        "Hospital and health-system pharmacy — item-level verification at receiving docks where sealed cartons cannot be opened to scan each unit.",
+        "Any regulated supply chain where sealed-carton verification throughput beats line-of-sight barcode scanning."
+      ]
     }
   ],
   "resourceCards": [
@@ -177,6 +282,36 @@
     {
       "href": "/contact/",
       "label": "Talk to a Proud Tek pharma specialist"
+    }
+  ],
+  "sources": [
+    {
+      "label": "NXP UCODE 9 (SL3S1206) UHF RAIN RFID IC — data sheet",
+      "url": "https://www.nxp.com/docs/en/data-sheet/SL3S1206.pdf",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-12",
+      "note": "Chip-level reference for the UCODE 9 96-bit EPC, 64-bit TID and EPC Gen2v2 air interface."
+    },
+    {
+      "label": "ISO/IEC 18000-63:2015 — UHF RFID Type C air interface",
+      "url": "https://www.iso.org/standard/63675.html",
+      "publisher": "International Organization for Standardization",
+      "accessedAt": "2026-07-12",
+      "note": "UHF RAIN air-interface standard for the through-carton portal reads described."
+    },
+    {
+      "label": "FDA — Drug Supply Chain Security Act (DSCSA)",
+      "url": "https://www.fda.gov/drugs/drug-supply-chain-security-act-dscsa/drug-supply-chain-security-act-law-and-policies",
+      "publisher": "U.S. Food and Drug Administration",
+      "accessedAt": "2026-07-12",
+      "note": "DSCSA framework — unique product identifier (SGTIN), verification and interoperable traceability."
+    },
+    {
+      "label": "GS1 EPCIS and Core Business Vocabulary — supply-chain event standard",
+      "url": "https://www.gs1.org/standards/epcis",
+      "publisher": "GS1",
+      "accessedAt": "2026-07-12",
+      "note": "Event-data standard behind the EPCIS lightweight verification queried at receipt."
     }
   ]
 }
