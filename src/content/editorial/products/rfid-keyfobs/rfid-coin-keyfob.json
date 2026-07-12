@@ -205,6 +205,137 @@
           }
         ]
       }
+    },
+    {
+      "title": "RFID coin keyfob — the full specification envelope",
+      "intro": "Operators comparing quotes want the spec sheet, not adjectives. Here is the coin in one table — dimensions, chip menu, cryptography, sealing and the commercial terms — so procurement can drop it straight into a bill of materials. It sits in the wider [RFID keyfob range](/products/rfid-keyfobs/); if you want the same silicon without the key-ring lug, the [coin tag](/products/rfid-keyfobs/rfid-coin-tag/) is the adhesive-disc sibling.",
+      "table": {
+        "columns": [
+          "Parameter",
+          "Specification",
+          "Standard / note"
+        ],
+        "rows": [
+          [
+            "Coin diameter",
+            "Ø 25 mm or Ø 30 mm disc",
+            "Pocket-friendly, keyring-compatible"
+          ],
+          [
+            "Thickness",
+            "3-4 mm",
+            "Slots into legacy coin-acceptor adapters"
+          ],
+          [
+            "Keyring lug",
+            "2.5 mm hole (optional)",
+            "Plain edge for pocket-carry or coin-slot retrofit"
+          ],
+          [
+            "Operating frequency",
+            "13.56 MHz HF",
+            "Near-field tap, not long-range"
+          ],
+          [
+            "Air interface",
+            "ISO/IEC 14443-3 / -4 Type A",
+            "T=CL framing with Transaction MAC on EV2 / EV3"
+          ],
+          [
+            "NFC profile",
+            "NFC Forum Type 4 Tag (NDEF)",
+            "Tap-to-URL path on NTAG213 / NTAG216"
+          ],
+          [
+            "Chip menu",
+            "NTAG213 / NTAG216, MIFARE Classic 1K (legacy), MIFARE DESFire EV2 / EV3",
+            "DESFire EV3 is the greenfield default"
+          ],
+          [
+            "Cryptography",
+            "AES-128 mutual authentication on DESFire EV2 / EV3",
+            "NIST FIPS 197 cipher"
+          ],
+          [
+            "Anti-replay",
+            "Transaction MAC + commit counter",
+            "NXP AN12343, per value-file update"
+          ],
+          [
+            "Stored-value model",
+            "Server-side balance, on-chip DESFire value file, or hybrid",
+            "Backend for connected readers; on-chip for offline"
+          ],
+          [
+            "Housing",
+            "ABS injection-moulded or two-part epoxy dome",
+            "Seamless — no seam, no adhesive layer"
+          ],
+          [
+            "Sealing",
+            "IP67 (IEC 60529)",
+            "Pocket moisture, laundry spray, car-wash overspray"
+          ],
+          [
+            "Operating temperature",
+            "-20 to +80 °C",
+            "Commercial-washer-adjacent duty"
+          ],
+          [
+            "Tap endurance",
+            "10,000+ tap cycles",
+            "Coin outlives the keyring it rides on"
+          ],
+          [
+            "Cashless controllers",
+            "Nayax, USA Technologies, Setomatic, CSC ServiceWorks, Dexter",
+            "Retrofit modules installed alongside the coin slot"
+          ],
+          [
+            "Compliance",
+            "RoHS 3 (EU 2015/863), REACH",
+            "Declared per shipment of ABS / epoxy housings"
+          ],
+          [
+            "MOQ",
+            "500 pcs stock / 1,000 pcs custom-printed",
+            "Per-order UID ↔ starting-balance CSV"
+          ],
+          [
+            "Lead time",
+            "10-15 business days stock / 15-20 pre-encoded + printed",
+            "Signed key-ceremony evidence included"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Anatomy of a stored-value coin",
+      "intro": "A coin keyfob is a disc with a secret: a copper coil and a secure die potted under a moulded skin. The buyer-facing decisions are the skin — ABS for colour and price, or a two-part [epoxy](/products/rfid-keyfobs/rfid-epoxy-keyfob/) dome for a seamless, outdoor-adjacent seal — and the security tier of the die underneath. It is the same construction logic as the [ABS keyfob](/products/rfid-keyfobs/rfid-abs-keyfob/), rounded into a pocket coin.",
+      "image": {
+        "src": "/diagrams/products/rfid-coin-keyfob-construction.svg",
+        "alt": "Cutaway of an RFID coin keyfob showing the moulded ABS or epoxy disc, a copper coil tuned to 13.56 MHz, the MIFARE DESFire stored-value die under AES-128, an IP67 seal, and the optional 2.5 mm keyring lug on a 25 mm / 30 mm round body."
+      },
+      "bullets": [
+        "Moulded disc: ABS injection-moulded or a two-part epoxy dome over the inlay — no seam and no adhesive layer for water to creep into.",
+        "HF coil antenna: a copper coil tuned to 13.56 MHz harvests the reader's energy — there is no battery inside the coin.",
+        "Secure die: MIFARE DESFire EV2 / EV3 carrying the AES-128 stored-value file, or a plain NTAG213 / NTAG216 for tap-to-URL tokens.",
+        "Seal and lug: IP67 potting to IEC 60529 rated for laundry and car-wash overspray, finished with an optional 2.5 mm keyring hole."
+      ]
+    },
+    {
+      "title": "Three chips, three security tiers — which belongs in a coin",
+      "intro": "The coin's body is the easy part; the chip inside is the decision that survives an audit. Three tiers cover every coin programme: a plain tap-token, a legacy chip you should not build new value on, and the AES-128 stored-value default. If the coin holds money, the [MIFARE DESFire keyfob](/products/rfid-keyfobs/mifare-desfire-keyfob/) chemistry is the one that closes the counterfeit-coin path.",
+      "image": {
+        "src": "/diagrams/products/rfid-coin-keyfob-chip-decision.svg",
+        "alt": "Decision diagram for stored-value coin chips: NTAG213 / NTAG216 for tap-to-URL tokens with no encryption, MIFARE Classic 1K flagged as CRYPTO-1-broken and unsuitable for new stored value, and MIFARE DESFire EV2 / EV3 with AES-128 as the greenfield default."
+      },
+      "bullets": [
+        "Tap token — NTAG213 / NTAG216: opens a URL or carries a basic ID with no encryption. Fine for a loyalty tap, wrong for stored value.",
+        "Legacy — MIFARE Classic 1K: the CRYPTO-1 cipher was publicly broken in 2008 (Garcia et al.) and clones in seconds. Keep it only for drop-in compatibility with an existing Classic estate.",
+        "Greenfield — MIFARE DESFire EV2 / EV3: AES-128 mutual authentication plus a Transaction MAC per NXP AN12343 puts a counterfeit balance computationally out of reach.",
+        "The upgrade math: the DESFire EV3 upcharge is about $0.25 per coin — recovered the first time a counterfeit coin is refused at the reader."
+      ]
     }
   ],
   "resourceCards": [
@@ -247,6 +378,14 @@
     {
       "question": "How do I handle offline vending machines with intermittent connectivity?",
       "answer": "Use DESFire EV2/EV3 value files for on-chip balance storage with AES-128 protection. The controller debits the value file during a transaction without needing to reach the backend. When connectivity is restored, the controller uploads the transaction log and reconciles against the backend record. Nayax VPOS Touch, USA Technologies ePort G10-S and Setomatic SpyderWash 3 all support this hybrid online/offline model. Do not attempt offline storage on MIFARE Classic — a cloned coin with a forged balance will not be detected until the reconciliation window, by which point the counterfeit coin may have been used at dozens of machines."
+    },
+    {
+      "question": "What is the MOQ and lead time, and can you pre-encode and brand the coins?",
+      "answer": "Stock coins are MOQ 500 pcs; custom-printed coins are MOQ 1,000 pcs. Lead time is 10-15 business days from stock, or 15-20 business days when the order is pre-encoded and printed. We print your logo, denomination value, serial number and colour on one or both faces, and multi-value denominations can be colour-coded ($5 blue / $10 green / $20 gold) for visual stock control. Factory pre-encoding covers the AES-128 keys, the initial value-file load and a signed UID list, delivered with a per-order UID ↔ starting-balance CSV and key-ceremony evidence."
+    },
+    {
+      "question": "Will the coins survive a laundry room or car wash, and are they REACH / RoHS compliant?",
+      "answer": "Yes. The housing is IP67 sealed to IEC 60529 — moulded ABS or a two-part epoxy dome with no seam or adhesive layer — so pocket moisture, laundry-room spray and car-wash overspray are within spec. The operating range is -20 to +80 °C (commercial-washer-adjacent) and the coin is rated for 10,000+ tap cycles, which outlasts the keyring it rides on. Housings ship with a RoHS 3 (EU 2015/863) and REACH declaration per shipment; an SVHC disclosure is available on request."
     }
   ],
   "primaryAction": {
@@ -277,7 +416,7 @@
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-12",
   "reviewedAt": "2025-12-14",
   "sources": [
     {
@@ -364,6 +503,14 @@
       "publishedAt": "2006-12-18",
       "accessedAt": "2026-04-24",
       "note": "Chemical substance registration and SVHC disclosure framework applicable to the coin housing."
+    },
+    {
+      "label": "NXP NTAG213 / NTAG216 — NFC Forum Type 2 Tag datasheet",
+      "url": "https://www.nxp.com/products/rfid-nfc/nfc-hf/ntag-for-tags-and-labels/ntag-213-215-216-nfc-forum-type-2-tag-compliant-ic-with-144-504-888-bytes-user-memory:NTAG213_215_216",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2019-11-01",
+      "accessedAt": "2026-04-24",
+      "note": "Vendor datasheet for the NTAG213 / NTAG216 tap-to-URL token option offered on the coin — no cryptographic authentication at the air interface."
     }
   ]
 }
