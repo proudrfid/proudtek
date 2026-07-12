@@ -112,7 +112,7 @@
     "/products/rfid-labels/impinj-m700-uhf-inlay/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-12",
   "sections": [
     {
       "title": "Why {chip:impinj-m750:short_name} — user memory at M700-family economics",
@@ -172,6 +172,176 @@
             "label": "2026 Today",
             "text": "{chip:impinj-m730:short_name} remains the volume retail-floor cost optimum; {chip:impinj-m750:short_name} holds the supply-chain / RTI / small-payload niche where 32-bit user memory is actually used; {chip:impinj-m770:short_name} covers mixed-surface programmes with AutoTune. M800 ({chip:impinj-m830:short_name} / {chip:impinj-m850:short_name}) runs as the next-gen migration path for any of the three when sensitivity / power gains are operationally significant."
           }
+        ]
+      }
+    },
+    {
+      "title": "Inside the inlay — copper, silicon, and the part you actually pay for",
+      "intro": "A UHF inlay is deliberately unglamorous hardware: an etched aluminium dipole, a grain-of-sand die flip-chipped onto a strap, and a substrate to keep the two flat. Every cent of the price premium hides in that speck of silicon, which is why choosing a chip is a memory-and-sensitivity argument rather than an antenna one — the same [logistics dock portal](/industries/logistics/) reads a bare-EPC tag and a user-memory tag identically. When the decision is genuinely cross-vendor, the [full UHF chip comparison](/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/) is where you settle it.",
+      "image": {
+        "src": "/diagrams/products/impinj-m750-uhf-inlay-anatomy.svg",
+        "alt": "Flat anatomy of a UHF RAIN inlay: an etched aluminium or copper dipole antenna tuned for the 902-928 MHz (FCC) and 865-868 MHz (ETSI) bands on a PET or paper substrate, with a flip-chip strap carrying the Impinj M700-family die at the centre, shown above the three delivery forms — dry inlay, wet inlay and converted label."
+      },
+      "bullets": [
+        "Dry inlay — bare antenna and chip on the carrier web, no adhesive; the form label converters laminate into their own face-stock construction.",
+        "Wet inlay — pressure-sensitive adhesive on a release liner, ready to apply straight to the item or hangtag.",
+        "Converted label — printed face stock laminated over the inlay and delivered as a finished, branded label.",
+        "Stock antenna designs span compact retail hangtags to long-range logistics labels; the M700-family die stays constant while the antenna sets the read range."
+      ]
+    },
+    {
+      "title": "The M700 family ladder — where M750 sits between M730 and M770",
+      "intro": "The M700 family is really one antenna design wearing three feature sets. [M730](/products/rfid-labels/impinj-m730-uhf-inlay/) is the bare-EPC volume workhorse; M750 bolts on a 32-bit user bank plus access and kill passwords; M770 stretches the user memory further and adds AutoTune for mixed surfaces. The read-sensitivity floor barely moves across all three — around −22.1 dBm — so you are buying memory and features, not a longer radio. When those features aren't enough, the [M800 next-gen upgrade path](/products/rfid-labels/impinj-m800-uhf-inlay/) is pin-compatible on the same antennas.",
+      "image": {
+        "src": "/diagrams/products/impinj-m750-uhf-inlay-family-ladder.svg",
+        "alt": "Positioning ladder of the Impinj M700 family: M730 with 0-bit user memory as the cost-optimised retail chip; M750 (this page) adding a 32-bit user bank plus access and kill passwords and short-range mode; M770 adding extended user memory and AutoTune; and the M800 series as the next-generation successor. All four share the EPC Gen2v2 air interface and antenna designs and a near-identical −22.1 dBm read-sensitivity floor, so the tiers differ by memory and features rather than read range."
+      },
+      "table": {
+        "columns": [
+          "Bank",
+          "Contents",
+          "Size",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Bank 0 — Reserved",
+            "Access + kill passwords",
+            "32-bit + 32-bit",
+            "Gates write access; not cryptographic"
+          ],
+          [
+            "Bank 1 — EPC",
+            "SGTIN-96 / 198, SSCC, GIAI",
+            "128-bit default",
+            "Reconfigurable to 96-bit EPC + user memory"
+          ],
+          [
+            "Bank 2 — TID",
+            "Factory-serialised unique ID",
+            "96-bit",
+            "Inventory dedup; anti-clone audit trail"
+          ],
+          [
+            "Bank 3 — User",
+            "Small on-tag payloads",
+            "32-bit (up to 64-bit)",
+            "Lot codes, GS1 AI fragments, RTI cycle counters"
+          ]
+        ]
+      },
+      "bullets": [
+        "M730 → M750 is a chip-on-foil swap, not an antenna re-tune: same converter tooling, same encoders, same reader fleet.",
+        "The 32-bit user bank is deliberately small — enough for a lot code, a GS1 Application Identifier fragment, a returnable-transit-item cycle counter, or a short offline-traceability token.",
+        "Programmes that need to carry a whole trip log or DPP record on the tag outgrow the M700 user bank and step up to a 688-bit user-memory UHF chip instead.",
+        "Short-range mode lets a reader attenuate the tag at point of sale — a physical-layer privacy primitive, not cryptographic authentication."
+      ]
+    },
+    {
+      "title": "M750 at a glance — the full spec sheet",
+      "intro": "Everything a converter or procurement team needs to quote an M750 inlay, in one block: silicon lineage, the four memory banks, sensitivity, applied read range, regulatory bands, and commercial terms. Read-range figures are free-air bench numbers on a paper hangtag with an Impinj R700 at +30 dBm EIRP; applied ranges depend on the substrate. Ready to price a run? [Request samples and a quote](/contact/rfid-labels-tags/) — and specify M730 versus M750 up front so the converter pulls the right chip-on-foil.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip silicon",
+            "M750 (Impinj M700 family)",
+            "Rebrand of Monza R6-P; datasheet, features and TID prefix unchanged"
+          ],
+          [
+            "Air interface",
+            "ISO/IEC 18000-63 / EPC UHF Gen2v2",
+            "Backward-compatible with the installed reader base"
+          ],
+          [
+            "EPC memory",
+            "128-bit default",
+            "Reconfigurable to 96-bit EPC + 32-bit user, or 96-bit EPC + 64-bit user"
+          ],
+          [
+            "TID memory",
+            "96-bit, factory-serialised",
+            "Immutable; inventory dedup and anti-clone audit trail"
+          ],
+          [
+            "User memory",
+            "32-bit (up to 64-bit accessible)",
+            "Lot codes, GS1 AI fragments, RTI cycle counters, short audit tokens"
+          ],
+          [
+            "Password memory",
+            "32-bit access + 32-bit kill",
+            "Gates writes after a programme is sealed; not cryptographic"
+          ],
+          [
+            "Read sensitivity",
+            "−22.1 dBm typical",
+            "Impinj datasheet; within ~0.4 dB of M730's −22.6 dBm — choose by memory, not range"
+          ],
+          [
+            "Write sensitivity",
+            "−17.3 dBm typical",
+            "Impinj datasheet"
+          ],
+          [
+            "Read range — free-air",
+            "7-9 m on a paper hangtag",
+            "Impinj R700 at +30 dBm EIRP"
+          ],
+          [
+            "Read range — applied",
+            "5-7 m apparel · 2-3 m on-metal · 1.5-2 m on-liquid",
+            "With an appropriate foam spacer / antenna"
+          ],
+          [
+            "Regulatory bands",
+            "902-928 MHz (FCC) · 865-868 MHz (ETSI)",
+            "Reader-side operation; FCC Part 15.247 / ETSI EN 302 208"
+          ],
+          [
+            "Privacy",
+            "Short-range mode + Gen2v2 Kill",
+            "Physical-layer attenuation and destructive kill; neither is cryptographic"
+          ],
+          [
+            "Data integrity",
+            "MarginRead · memory self-check · TID parity",
+            "Flags edge-of-reliability reads before they ship"
+          ],
+          [
+            "Encoding",
+            "GS1 TDS 2.x — SGTIN-96 / 198, SSCC, GIAI, GRAI, GLN",
+            "Retail item-level and non-retail keys"
+          ],
+          [
+            "Compliance",
+            "RAIN RFID Alliance certified · Walmart source-tag compatible",
+            "Satisfies the SGTIN-96 source-tag requirement"
+          ],
+          [
+            "Delivery forms",
+            "Dry inlay · wet inlay · converted label",
+            "Chip-on-foil constant across forms"
+          ],
+          [
+            "MOQ — stock antenna",
+            "10,000 pieces",
+            "3-5 week lead time; same converter tooling as M730"
+          ],
+          [
+            "MOQ — custom antenna",
+            "50,000-100,000 pieces",
+            "6-10 week tooling + 2-4 week production"
+          ],
+          [
+            "Samples",
+            "100-500 pieces",
+            "Specify M730 vs M750 at the quote stage"
+          ]
         ]
       }
     }

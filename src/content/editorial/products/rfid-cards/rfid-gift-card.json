@@ -23,7 +23,7 @@
     "NFC tap-to-redeem gift card",
     "reloadable NFC gift card"
   ],
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-12",
   "brief": [
     {
       "label": "Card body and form factor",
@@ -224,6 +224,125 @@
           }
         ]
       }
+    },
+    {
+      "title": "Anatomy of an NFC gift card — layers, coil, and the finish that does the selling",
+      "intro": "A gift card has one job the recipient notices — feeling like a gift — and one the POS notices: answering in under a second. Both are settled in the lamination stack. Under the foil and the spot-UV sit a copper antenna coil and a 13.56 MHz chip that never carries the balance, only the identity that unlocks it. Spec the finishes on the [custom card printing](/products/rfid-cards/nfc-card-custom-printing/) page and the secure chip tier on the [MIFARE DESFire EV3 card](/products/rfid-cards/mifare-desfire-ev3-card/) page.",
+      "image": {
+        "src": "/diagrams/products/rfid-gift-card-construction.svg",
+        "alt": "Two-panel diagram of an NFC gift card. Left, the lamination stack exploded: a printed front overlay carrying artwork and hot-foil; a PVC or PET core embedding the copper antenna coil and the NFC chip module; and a back overlay carrying the scratch-off PIN panel and signature strip. A bracket marks 0.76 mm assembled thickness on an 85.60 × 53.98 × 0.76 mm ISO/IEC 7810 ID-1 body, with a note to keep foil, spot-UV and embossing off the scratch panel. Right, the tap-to-redeem path: the card coil couples inductively with a POS reader at 13.56 MHz, contactless and powered by the reader field; the chip carries only a unique UID that the POS or gift-card processor looks up to find the balance and post the deduction, in under 1 second with a < 500 ms round-trip."
+      },
+      "bullets": [
+        "Print stack: the front overlay carries the artwork, hot-foil, spot-UV and embossing; the back overlay carries the scratch-off PIN panel and signature strip.",
+        "Core: a PVC or PET core embeds the copper antenna coil and the NFC chip module — the coil harvests the reader's field, so there is no battery to fail.",
+        "Chip: NTAG213 (144 B) for a balance URL, NTAG216 (888 B) for a promo payload, MIFARE Classic 1K for legacy sector reads, or MIFARE DESFire EV3 with AES-128 for high-value programmes.",
+        "Geometry: 85.60 × 53.98 × 0.76 mm — the ISO/IEC 7810 ID-1 body every retail rack, wallet and gift envelope is already built around.",
+        "Keep-out: foil, spot-UV and embossing stay clear of the scratch panel so the activation PIN reveals cleanly at the till."
+      ]
+    },
+    {
+      "title": "The full specification — body, chip, finishing and commercial terms",
+      "intro": "Procurement reads tables, not adjectives. Here is the whole card in one: the ID-1 body, the four chip tiers and what each remembers, the finishing menu, and the numbers a buyer needs before requesting a sample. The rest of the [RFID card range](/products/rfid-cards/) is one click up if a gift card is not quite the shape you need.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Card body",
+            "ISO/IEC 7810 ID-1 — 85.60 × 53.98 × 0.76 mm",
+            "Standard retail geometry; fits every rack, wallet and gift envelope in the store"
+          ],
+          [
+            "RF interface",
+            "13.56 MHz, ISO/IEC 14443",
+            "Contactless tap-to-redeem; the card is powered by the reader field"
+          ],
+          [
+            "Chip — entry",
+            "NTAG213 (144 B user memory)",
+            "URL-to-balance lookup for low-stakes retail and café programmes"
+          ],
+          [
+            "Chip — mid-market",
+            "NTAG216 (888 B user memory)",
+            "Room for a promo payload alongside the balance URL"
+          ],
+          [
+            "Chip — legacy POS",
+            "MIFARE Classic 1K",
+            "Sector-based balance storage for stacks that read sectors directly"
+          ],
+          [
+            "Chip — high-value",
+            "MIFARE DESFire EV3",
+            "AES-128 and per-card key diversification (NXP AN10922) for premium programmes"
+          ],
+          [
+            "Balance model",
+            "Server-side (POS / gift-card processor)",
+            "The chip carries a unique UID; the balance lives on the server, not the card"
+          ],
+          [
+            "Printing",
+            "Full-colour offset (MOQ 500) or UV digital (MOQ 100)",
+            "CMYK plus spot colour; soft-touch or gloss lamination"
+          ],
+          [
+            "Premium finishing",
+            "Hot-foil, spot-UV, embossing, die-cut shapes",
+            "Adds 3-5 business days; die-cut needs bespoke tooling and skips ID-1 racks"
+          ],
+          [
+            "Variable data",
+            "Sequential numbers, QR codes, 4-digit or 6-digit scratch-off PIN, NDEF URL",
+            "Per-card personalisation for tracking and online balance management"
+          ],
+          [
+            "Activation",
+            "Ships deactivated, zero balance",
+            "The POS loads the initial balance at sale — pre-loaded stock can't be stolen off the rack"
+          ],
+          [
+            "Digital overlay",
+            "NDEF URI record",
+            "Opens a balance page on iOS 12+ and NFC Android with no app install"
+          ],
+          [
+            "Packaging",
+            "Carriers, envelopes, magnetic-closure boxes, blister packs",
+            "Sequenced on the packing line so the unit walks out as a giftable SKU"
+          ],
+          [
+            "Unit price band",
+            "USD 0.30–2.50 per card",
+            "By chip and finish; foil, emboss and die-cut sit at the top of the band"
+          ],
+          [
+            "MOQ & lead time",
+            "MOQ 500 custom-printed; 12-15 business days",
+            "Free samples after artwork lock; +3-5 days for foil / emboss / die-cut"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "From print run to tap-to-redeem — the gift-card lifecycle",
+      "intro": "A gift card earns its keep in four moves: it is printed and encoded, it sits on the rack with no money on it, it is activated at the till, and then it is tapped — ideally more than once. The chip never changes across any of it; the processor just toggles a flag. Turn the one-time gift into a repeat visit with a [reloadable loyalty card](/products/rfid-cards/rfid-loyalty-card/) or a [membership card](/products/rfid-cards/rfid-membership-card/) built on the same silicon.",
+      "image": {
+        "src": "/diagrams/products/rfid-gift-card-lifecycle.svg",
+        "alt": "A four-step left-to-right flow. One, print and encode: offset or UV digital print, UID plus an NDEF balance URL, scratch-PIN and packaging. Two, on the rack: ships deactivated with zero balance, worthless until sold. Three, activate at POS: scan the barcode, reveal the PIN, the processor loads the balance and the card flips live. Four, tap to redeem: tap in under 1 second, UID drives a balance lookup with a < 500 ms round-trip. A dashed reload loop returns to the POS for a repeat visit, and a bottom band notes that 6–12 % of loaded value is never redeemed and books as revenue under ASC 606 / IFRS 15."
+      },
+      "checklist": [
+        "Print & encode: artwork → offset or UV digital → lamination → punch → chip encoding (UID registration + NDEF balance URL) → scratch-PIN → packaging.",
+        "Ship deactivated: cards leave the factory with zero balance, so inventory taken off the display rack is worthless until it is activated.",
+        "Activate at POS: the cashier scans the barcode and reveals the PIN; the processor loads the initial balance and flips the card live in under a second.",
+        "Tap to redeem: the recipient taps at the lane; UID → processor balance lookup → deduction, with a < 500 ms round-trip target.",
+        "Reload or check balance: top up at the POS, on an e-commerce reload page, or in a wallet pass; a tap opens the balance page on any NFC phone.",
+        "Breakage settles: 6–12 % of loaded value is never redeemed and books as revenue under ASC 606 / IFRS 15 — the structural margin behind the whole programme."
+      ]
     }
   ],
   "sources": [
@@ -336,6 +455,22 @@
     {
       "question": "What is the MOQ and lead time for custom gift cards?",
       "answer": "Custom-printed NFC gift cards: MOQ 500, lead time 12-15 business days from artwork approval. Premium features (foil stamping, embossing, die-cut shapes) add 3-5 business days. Gift card packaging (holders, envelopes, boxes): MOQ 500, produced concurrently with the cards. Contact us with your design concept for a quotation."
+    },
+    {
+      "question": "Can we see samples before committing to a full gift-card run?",
+      "answer": "Yes. Proud Tek provides free samples once your artwork is locked, so you can check the print, foil, scratch-off PIN panel and chip encoding on a physical card before the main run. Send your design concept and target chip (NTAG213, NTAG216, MIFARE Classic 1K or MIFARE DESFire EV3) for a quotation; custom-printed cards are MOQ 500 with a 12-15 business day lead time from artwork approval."
+    },
+    {
+      "question": "What printing, finishing and personalisation options are available on RFID gift cards?",
+      "answer": "Full-colour offset printing (MOQ 500) or UV digital (MOQ 100), with hot-foil stamping in gold, silver, copper or holographic, spot-UV varnish, soft-touch lamination, embossed logos and card numbers, and die-cut non-ID-1 shapes for seasonal ranges. Per-card variable data includes sequential card numbers, unique QR codes, 4-digit or 6-digit scratch-off PIN panels, and a pre-programmed NDEF balance URL. Premium finishes add 3-5 business days, and die-cut shapes require bespoke tooling."
+    },
+    {
+      "question": "How are RFID gift cards encoded, activated and protected against theft?",
+      "answer": "Each card ships deactivated with a zero balance and a unique chip UID registered at encoding, and an NDEF URI record is written so a tap opens your balance page on iOS 12+ or NFC Android with no app install. At the point of sale the cashier scans the barcode, reveals the scratch-off PIN, and the processor loads the initial balance — so cards taken off the display rack before activation are worthless. For high-value programmes, MIFARE DESFire EV3 adds AES-128 and per-card key diversification (NXP AN10922) so a skimmer cannot replay the card against the POS."
+    },
+    {
+      "question": "What gift-card regulations apply, and does RFID change compliance?",
+      "answer": "The regulatory stack is independent of the read interface — RFID does not change it. In the United States, the CARD Act of 2009 prohibits expiry inside 5 years and restricts dormancy fees, with state escheatment rules layering unclaimed-property reporting on top. In the EU, most retailer-issued closed-loop gift cards operate under the PSD2 (Directive (EU) 2015/2366) limited-network exemption, and the Consumer Rights Directive 2011/83/EU requires clear disclosure of expiry and fees. Because a closed-loop RFID gift card carries a UID rather than payment-card data, it typically stays outside PCI DSS scope; confirm the boundary with your processor at tender stage."
     }
   ],
   "primaryAction": {

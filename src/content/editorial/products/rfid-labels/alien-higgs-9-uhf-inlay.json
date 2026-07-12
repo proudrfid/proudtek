@@ -131,7 +131,7 @@
     "/products/rfid-labels/impinj-m800-uhf-inlay/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-12",
   "sections": [
     {
       "title": "Why {chip:alien-higgs-9:short_name} — when on-tag data storage matters",
@@ -232,6 +232,68 @@
           }
         ]
       }
+    },
+    {
+      "title": "Inside the inlay — dipole, strap, and where the 688 bits live",
+      "intro": "A UHF RAIN inlay is unglamorous hardware: a copper dipole, a grain-of-sand die flip-chipped to a strap, and a substrate to hold them flat. Everything you pay a premium for hides in that speck of silicon — which is why the [full UHF chip comparison](/compare/ucode8-vs-ucode9-vs-monza-r6-vs-higgs9/) is really a memory-and-sensitivity argument, not an antenna one.",
+      "image": {
+        "src": "/diagrams/products/alien-higgs-9-uhf-inlay-anatomy.svg",
+        "alt": "Flat anatomy of a UHF RAIN inlay: a copper or aluminium dipole antenna tuned 860-960 MHz on a PET or paper substrate, a flip-chip strap carrying the Higgs-9 die at the centre, and the three delivery forms — dry inlay, wet inlay, converted label."
+      },
+      "bullets": [
+        "Dry inlay — bare antenna and chip on the carrier, no adhesive; the form label converters laminate into their own construction.",
+        "Wet inlay — pressure-sensitive adhesive on a release liner, ready to apply directly to the item.",
+        "Converted label — printed face stock over the inlay, delivered as a finished branded label.",
+        "12+ standard antenna designs from 20 × 20 mm compact to 100 × 20 mm long-range; the Higgs-9 die is constant, the antenna sets the read range."
+      ]
+    },
+    {
+      "title": "The four memory banks — EPC, TID, and that headline User bank",
+      "intro": "EPC Gen2v2 gives every RAIN tag the same four memory banks. On a cost-optimised chip the User bank is a rounding error; on Higgs-9 it is the reason the SKU exists — 688 bits, the largest in the volume RAIN tier, enough to carry a whole [returnable-transit-item](/industries/logistics/) trip record on the tag itself.",
+      "image": {
+        "src": "/diagrams/products/alien-higgs-9-uhf-inlay-memory-map.svg",
+        "alt": "The four EPC Gen2v2 memory banks of the Higgs-9 drawn to scale: Reserved 64-bit passwords, EPC 128-bit, TID 96-bit, and the dominant User bank at 688-bit, annotated that a 36-byte RTI trip record fits the User bank but not an M700 32-bit User bank."
+      },
+      "table": {
+        "columns": [
+          "Bank",
+          "Contents",
+          "Size",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Bank 0 — Reserved",
+            "Access + kill passwords",
+            "32-bit + 32-bit",
+            "Locks write access; not cryptographic"
+          ],
+          [
+            "Bank 1 — EPC",
+            "SGTIN-96 / 198, SSCC, GIAI",
+            "128-bit",
+            "GS1 TDS 2.0 encoding"
+          ],
+          [
+            "Bank 2 — TID",
+            "Factory-serialised unique ID",
+            "96-bit",
+            "Immutable; anti-clone audit trail"
+          ],
+          [
+            "Bank 3 — User",
+            "On-tag application data",
+            "688-bit (≥64 byte)",
+            "Largest in volume RAIN tier; RTI trip data, GS1 AI"
+          ]
+        ]
+      },
+      "bullets": [
+        "RTI trip data — origin, destination, consignee, weight, trip number, timestamp — is 32-48 bytes and lives entirely on the tag.",
+        "Field-service logs (service date, serial, calibration, technician) run 30-40 bytes; pharma lot / expiry / sterilisation fields 20-30 bytes.",
+        "GS1 Application Identifiers — AI (01) GTIN, AI (10) lot, AI (17) expiry, AI (21) serial — write straight to User memory for multi-party exchange.",
+        "None of these fit an M700 32-bit User bank — offline on-tag data is where Higgs-9 stops being interchangeable."
+      ]
     }
   ],
   "resourceCards": [

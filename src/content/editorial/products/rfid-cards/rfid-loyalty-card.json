@@ -23,7 +23,7 @@
     "contactless loyalty programme card",
     "NTAG213 loyalty card"
   ],
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-12",
   "brief": [
     {
       "label": "Card body and form factor",
@@ -224,6 +224,112 @@
           }
         ]
       }
+    },
+    {
+      "title": "Anatomy of the card — coil, chip, and a wallet-worthy shell",
+      "intro": "Electrically a loyalty card is almost nothing: a printed PVC sandwich, a copper antenna coil, and one NFC chip. The engineering that actually reaches the customer is the finishing — the spot UV, foil and soft-touch that decide whether the card earns a wallet slot or a spot in the bin. Push the artwork through [custom card printing](/products/rfid-cards/nfc-card-custom-printing/) once the chip is locked.",
+      "image": {
+        "src": "/diagrams/products/rfid-loyalty-card-construction.svg",
+        "alt": "Cutaway of an RFID loyalty card. Left, the lamination stack: printed front overlay with artwork and spot UV, a PVC core carrying the antenna coil and NFC chip module, and a printed back overlay with the fallback barcode and card number; 85.60 × 53.98 × 0.76 mm, ISO/IEC 7810 ID-1. Right, the embedded inlay: a copper antenna coil tuned to 13.56 MHz around the chip, which reads its UID over ISO/IEC 14443-A as an NFC Forum Type 2 tag; chip options NTAG213 (144 B), NTAG216 (888 B) and MIFARE Classic 1K (16 sectors)."
+      },
+      "bullets": [
+        "Lamination stack: a printed front overlay (artwork, spot UV, metallic foil), a PVC core carrying the antenna coil and NFC chip module, and a printed back overlay for the fallback barcode and sequential card number.",
+        "One inlay, many chips: the same coil-and-chip construction takes NTAG213, NTAG216, MIFARE Classic 1K or MIFARE DESFire EV3 without changing the card body.",
+        "Finishing is the retention play: spot UV, metallic foil (gold, silver, holographic), soft-touch matte lamination, embossed numbering, die-cut shapes and transparent or frosted PVC earn wallet-slot residency over a paper punch card.",
+        "The barcode rides the print, not the chip: a 1D Code 128 or 2D QR carrying the same member-ID keeps the card working on lanes still waiting on NFC hardware."
+      ]
+    },
+    {
+      "title": "From tap to points — the POS flow in four moves",
+      "intro": "A loyalty tap is over before the customer has pocketed their payment card. The reader lifts the UID, the loyalty engine does the thinking, and the points post inside the same receipt — no app to open, no barcode to align. Weighing it against the sticker-and-scanner status quo? The [RFID vs barcode comparison](/compare/rfid-vs-barcode/) settles that half of the decision.",
+      "image": {
+        "src": "/diagrams/products/rfid-loyalty-card-tap-to-earn-flow.svg",
+        "alt": "Four-step tap-to-earn POS flow for an RFID loyalty card. Step 1, the customer taps the card on the POS NFC reader. Step 2, the reader captures the chip UID in < 100 ms at 13.56 MHz. Step 3, the loyalty engine (Yotpo, Smile.io or custom) maps the UID to the member record. Step 4, points, tier and promotions post and the receipt prints inside the normal transaction envelope. A phone-tap branch shows the same card opening a loyalty dashboard via an NDEF URL on an iPhone (iOS 12+) or Android phone, with no app install."
+      },
+      "bullets": [
+        "Tap: the customer taps the loyalty card on the NFC reader at the POS — no app to download, no card to hand over.",
+        "Read: the reader captures the chip UID in < 100 ms and passes it to the loyalty engine — Yotpo, Annex Cloud, Smile.io, Voucherify, Loyalty Lion or a custom back-end.",
+        "Resolve: the engine maps UID → member record and applies points, tier, basket promo and birthday reward before the receipt prints.",
+        "Self-service: programmed with an NDEF URL, the same card opens the member dashboard on a phone-tap (iOS 12+ or Android) with no app install — hybrid physical and digital by default."
+      ]
+    },
+    {
+      "title": "The full specification — chip, memory, finish, commercial terms",
+      "intro": "Procurement reads tables, not adjectives, so here is the whole card in one place: the RFID interface and chip memory up top, materials and finishing in the middle, MOQ, lead time and price at the bottom. Buying the reward variant instead? The [RFID gift card](/products/rfid-cards/rfid-gift-card/) shares this body and chip set, and the full [RFID card range](/products/rfid-cards/) lists the rest.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Card body",
+            "ISO/IEC 7810 ID-1 — 85.60 × 53.98 × 0.76 mm PVC",
+            "Standard CR80 wallet geometry; fits every existing loyalty-card rack, slot and wallet divider"
+          ],
+          [
+            "Alternative formats",
+            "Die-cut keytag 30 × 55 mm · shortened half-card",
+            "Keyring attachment or wallet-depth constraints"
+          ],
+          [
+            "RFID interface",
+            "13.56 MHz · ISO/IEC 14443-A · NFC Forum Type 2 tag",
+            "Contactless tap-to-earn; UID read at the POS reader"
+          ],
+          [
+            "Chip options",
+            "NTAG213 · NTAG216 · MIFARE Classic 1K · MIFARE DESFire EV3",
+            "NTAG213 is the loyalty default; DESFire EV3 (AES-128) for stored-value tiers"
+          ],
+          [
+            "On-card memory",
+            "NTAG213 144 B user · NTAG216 888 B NDEF · MIFARE Classic 1K 16 sectors",
+            "URL / UID lookup, on-card NDEF payload, or one sector per merchant"
+          ],
+          [
+            "Data model",
+            "UID resolved by the loyalty engine; optional NDEF URL for phone-tap",
+            "Card is a UID carrier; the member record lives in the back-end"
+          ],
+          [
+            "Barcode fallback",
+            "1D Code 128 or 2D QR, ISO/IEC 15416 grade A/B",
+            "Same member-ID both ways; reads on lanes still waiting on NFC"
+          ],
+          [
+            "Materials & finish",
+            "PVC core; transparent or frosted PVC; spot UV, metallic foil, soft-touch, embossing",
+            "Finishing stack earns wallet-slot residency over a paper punch card"
+          ],
+          [
+            "Encoding",
+            "Factory pre-encode (UID registration + optional NDEF URL) or desktop encode",
+            "Per-card manifest for import into the loyalty engine"
+          ],
+          [
+            "Read latency",
+            "UID read < 100 ms at the POS reader",
+            "Inside the normal transaction envelope; no line delay"
+          ],
+          [
+            "MOQ",
+            "500 offset-printed · 100 UV digital short run",
+            "Variable data (sequential numbers, per-card QR) on both"
+          ],
+          [
+            "Lead time",
+            "10-12 business days after artwork approval; 7-day rush",
+            "Free samples after artwork lock"
+          ],
+          [
+            "Unit price",
+            "USD 0.25–1.50; premium finishes add 10–30 %",
+            "Volume breaks at 1,000 / 2,500 / 5,000 / 10,000+"
+          ]
+        ]
+      }
     }
   ],
   "sources": [
@@ -335,6 +441,22 @@
     {
       "question": "What is the MOQ and cost for custom loyalty cards?",
       "answer": "MOQ is 500 for custom-printed NFC loyalty cards with NTAG213 chip. Pricing decreases significantly at 1,000, 2,500, 5,000 and 10,000+ quantities. Premium finishes (metallic foil, spot UV, embossing) add a small per-card premium. Contact us with your quantity, chip choice and finishing requirements for a detailed quotation."
+    },
+    {
+      "question": "What is the production lead time, and can we get samples first?",
+      "answer": "Standard production runs 10-12 business days after artwork approval, with a 7-day rush available for promotional or seasonal launches. Free samples ship once artwork is locked, so you can approve card stock, print quality and chip encoding before committing the full run. Share your quantity, chip choice and finishing stack and we return a firm schedule."
+    },
+    {
+      "question": "Which chip should we choose — NTAG213, NTAG216, MIFARE Classic 1K or MIFARE DESFire EV3?",
+      "answer": "NTAG213 (144 B) is the loyalty default: enough memory for a member-ID or a URL that opens the loyalty dashboard on phone-tap, at the lowest credible NFC cost. NTAG216 (888 B) suits programmes that want a welcome promo plus member-ID written into the NDEF payload on first tap. MIFARE Classic 1K gives 16 sectors for multi-merchant mall or plaza programmes that separate one merchant per sector. MIFARE DESFire EV3 adds AES-128 per-card key diversification where a stored-value or prepaid balance is stacked onto the loyalty card."
+    },
+    {
+      "question": "Can you print our brand artwork and add per-card variable data?",
+      "answer": "Yes. Cards print full-colour by offset (MOQ 500) or UV digital (MOQ 100), with a premium finishing stack — spot UV, metallic foil, soft-touch lamination, embossed card numbers, die-cut shapes, and transparent or frosted PVC — that earns the card wallet-slot residency instead of the bin. Variable data is standard: sequential card numbers, a unique QR code per card, and a pre-programmed NDEF URL that opens each customer's loyalty dashboard when tapped on a phone."
+    },
+    {
+      "question": "Can you pre-encode cards for our loyalty platform, and where does customer data live?",
+      "answer": "Yes. Proud Tek factory pre-encodes the chip UID and an optional NDEF URL, and ships a per-card manifest for import into your loyalty engine — Yotpo, Annex Cloud, Smile.io, Voucherify, Loyalty Lion, or a custom back-end. The card itself is only a UID carrier: the member record, points and tier live in the back-end, which keeps personal data off the card and lets GDPR access, erasure and portability requests be served from one system. If the card later carries a stored-value or payment-linked balance, PCI-DSS v4.0 scope applies to the back-end and POS path, not to the card."
     }
   ],
   "primaryAction": {
@@ -353,11 +475,13 @@
   ],
   "relatedIndustries": [
     "hospitality",
-    "education"
+    "education",
+    "retail-apparel"
   ],
   "chipFamilies": [
     "ntag21x",
-    "mifare-classic"
+    "mifare-classic",
+    "mifare-desfire"
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
