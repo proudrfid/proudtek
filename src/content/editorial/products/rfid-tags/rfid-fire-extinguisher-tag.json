@@ -2,7 +2,7 @@
   "route": "/products/rfid-tags/rfid-fire-extinguisher-tag/",
   "group": "products",
   "title": "RFID Fire Extinguisher Tag — Inspection & AHJ Audit",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-12",
   "kicker": "Life-Safety Inspection RFID",
   "summary": "At BOM level, RFID fire-extinguisher tags carry a cryptographically verifiable, per-device identifier that maps each portable extinguisher to its NFPA 10 monthly visual, annual maintenance, 6-year internal examination and 12-year hydrostatic test schedule. The programme replaces paper hang tags with an NFC-tap inspection record — timestamped, GPS-stamped and signed by the inspector. So Authorities Having Jurisdiction (AHJ) and Joint Commission surveyors receive a complete, searchable audit trail that meets NFPA 10 Chapter 7 recordkeeping, OSHA 29 CFR 1910.157(e), ISO 11602-2 and Joint Commission EC.02.03.05 documentation demands.",
   "keywords": [
@@ -149,6 +149,112 @@
           }
         ]
       }
+    },
+    {
+      "title": "Built for the mount surface — how the fire-extinguisher tag is constructed",
+      "intro": "A paper hang tag survives about one pressure-wash and one summer in a parking garage before it turns to illegible pulp — which is the whole reason an extinguisher programme goes digital in the first place. The tag earns its keep in the layers between the printed face and the cylinder, and in an overlaminate rated for the years the unit will hang there untouched. The on-metal cousin that mounts the same way to a process line is the [valve tag](/products/rfid-tags/rfid-valve-tag/).",
+      "image": {
+        "src": "/diagrams/products/rfid-fire-extinguisher-tag-construction.svg",
+        "alt": "Construction stack of a fire-extinguisher RFID tag: the steel extinguisher cylinder or hanger bracket, a mount layer of 3M 468MP adhesive or a grommet wire loop, a polyester substrate in 80 × 35 mm hang-tag or 70 × 25 mm cylinder-wrap size, an NFC HF inlay carrying NTAG213 / NTAG215 / NTAG216 / NTAG424 DNA at 13.56 MHz, a printed ISO/IEC 18004:2015 QR fallback, and a protective overlaminate rated IP67 / IP68, with qualification chips for -20 °C to +70 °C, UV ISO 4892-2 + ASTM G154 1,000 h and UL 94 V-0."
+      },
+      "bullets": [
+        "Overlaminate and housing sealed to IP67 / IP68 (IEC 60529), UV-qualified to ISO 4892-2 and ASTM G154 for 1,000 h, and flame-resistant to UL 94 V-0 where the tag shares the fire-protection volume.",
+        "NFC HF inlay at 13.56 MHz carrying NTAG213 (144 B), NTAG215 (504 B), NTAG216 (888 B) or NTAG424 DNA, each mapped to a per-unit GS1 GIAI-96 identifier.",
+        "Five mount SKUs — 80 × 35 mm hang tag on the hanger-bracket wire loop, 70 × 25 mm cylinder wrap on 3M 468MP high-bond adhesive, 25 mm valve-neck collar, 30 mm inside-cabinet disc and 50 × 50 mm hose-reel square.",
+        "A printed ISO/IEC 18004:2015 QR fallback on the same substrate keeps the record reachable for gloved hands and non-NFC handsets."
+      ]
+    },
+    {
+      "title": "From the monthly tap to the AHJ audit export",
+      "intro": "An Authority Having Jurisdiction does not want to hear that the inspection happened; they want the record that proves it — timestamped, located, and impossible to back-date from the truck on a rainy Friday. The tag turns the NFPA 10 cadence into a tap the inspector makes at the extinguisher, and the tap into a record a survey can pull in seconds. The same round-execution logic drives the [guard-tour tags](/products/rfid-tags/rfid-guard-tour-tag/); the whole line lives on the [RFID tags hub](/products/rfid-tags/).",
+      "image": {
+        "src": "/diagrams/products/rfid-fire-extinguisher-tag-inspection-flow.svg",
+        "alt": "Four-step inspection-to-audit flow for a fire-extinguisher RFID tag: the platform auto-schedules the NFPA 10 §7.2 monthly visual and §7.3 annual maintenance per unit; the inspector taps within 0-5 cm at 13.56 MHz with a GPS stamp and timestamped photo; a signed EPCIS 2.0 record is written with an optional NTAG424 DNA SUN CMAC AES-128 signature; and an AHJ or Joint Commission PDF or CSV export is produced on demand, with a missed monthly visual escalating the unit to overdue."
+      },
+      "bullets": [
+        "Schedule: the platform auto-generates the NFPA 10 §7.2 monthly visual and §7.3 annual maintenance per unit, escalating an overdue extinguisher to the facility Authority Having Jurisdiction (AHJ).",
+        "Tap: the inspector brings the handset within 0-5 cm at 13.56 MHz, capturing a GPS stamp and a timestamped photo that satisfy the NFPA 10 §7.2.2 physical-presence requirement.",
+        "Log: each inspection is written as a signed, timestamped EPCIS 2.0 event, with an optional NTAG424 DNA SUN CMAC AES-128 per-tap signature where inspector authentication is required.",
+        "Audit: a per-unit and per-building PDF or CSV export indexed to NFPA 10 Chapter 7 and Joint Commission EC.02.03.05 EP 1-16 is produced on demand — the exact record surveyors request."
+      ]
+    },
+    {
+      "title": "Fire-extinguisher tag — the spec sheet",
+      "intro": "Chip, frequency, sealing, mount and commercial terms in one place — the sheet a facilities buyer forwards to the AHJ and the fire-protection contractor in the same email. For the head-protection sibling that runs on the same inspection platform, see the [helmet tags](/products/rfid-tags/rfid-helmet-tag/).",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip options",
+            "NTAG213 · NTAG215 · NTAG216 · NTAG424 DNA",
+            "NTAG424 DNA adds SUN CMAC AES-128 per-tap signatures for Joint Commission / federal sites"
+          ],
+          [
+            "User memory",
+            "144 B · 504 B · 888 B",
+            "NTAG213 / NTAG215 / NTAG216 respectively"
+          ],
+          [
+            "Frequency / air interface",
+            "13.56 MHz HF",
+            "ISO/IEC 14443-3 Type A · NFC Forum Type 2 (NTAG21x) / Type 4 (NTAG424 DNA)"
+          ],
+          [
+            "Asset identifier",
+            "GS1 GIAI-96",
+            "Per GS1 Tag Data Standard 2.0 §7.1; inspections logged as EPCIS 2.0 ObjectEvents"
+          ],
+          [
+            "Read range",
+            "0-5 cm proximity",
+            "Enforces the NFPA 10 §7.2.2 physical-inspection requirement"
+          ],
+          [
+            "Sealing",
+            "IP67 / IP68 to IEC 60529",
+            "Flame resistance to UL 94 V-0"
+          ],
+          [
+            "Operating temperature",
+            "-20 °C to +70 °C",
+            "Per NFPA 10 §5.5 extinguisher operating range"
+          ],
+          [
+            "UV / weathering",
+            "ISO 4892-2 + ASTM G154 for 1,000 h",
+            "Outdoor parking-garage, loading-dock and yard mounting"
+          ],
+          [
+            "Form-factor SKUs",
+            "80 × 35 mm hang tag · 70 × 25 mm cylinder wrap · 25 mm collar · 30 mm disc · 50 × 50 mm square",
+            "Hanger wire loop · 3M 468MP adhesive · valve neck · cabinet · hose reel"
+          ],
+          [
+            "QR fallback",
+            "ISO/IEC 18004:2015",
+            "Printed on the same substrate for gloved hands and non-NFC handsets"
+          ],
+          [
+            "Cadence engine",
+            "NFPA 10 §7.2 / §7.3 / §7.3.3 / §8",
+            "Monthly · annual · 6-year internal · 12-year hydrostatic"
+          ],
+          [
+            "Compliance",
+            "NFPA 10:2022 · OSHA 29 CFR 1910.157 · ISO 11602-2:2020 · UL 299 · EC.02.03.05",
+            "AHJ / Joint Commission PDF or CSV audit export"
+          ],
+          [
+            "MOQ / lead time",
+            "250 units per SKU · 3-4 weeks",
+            "500 units · 4-6 weeks for NTAG424 DNA keyed variants"
+          ]
+        ]
+      }
     }
   ],
   "resourceCards": [
@@ -191,6 +297,22 @@
     {
       "question": "What chip should we pick?",
       "answer": "NTAG213 (144 B) for monthly-visual-only rollouts where cadence lives entirely in the cloud. NTAG215 (504 B) for the typical NFPA 10 §7.2 / §7.3 / §7.3.3 multi-cadence programme carrying class + listing + service-provider ID + last-service dates on the tag. NTAG216 (888 B) for large service providers wanting full inspection history on the tag for offline audit. NTAG424 DNA with SUN CMAC AES-128 per-tap signatures for Joint Commission accredited hospitals, CMS participating facilities, federal buildings and critical-infrastructure sites that cannot tolerate pencil-whipping exposure."
+    },
+    {
+      "question": "How is the tag mounted to the extinguisher?",
+      "answer": "Five mount SKUs cover the common surfaces. The hang-tag replacement is an 80 × 35 mm polyester hang tag with a reinforced grommet, fitted on the extinguisher hanger-bracket wire loop; the cylinder-wrap is a 70 × 25 mm flexible label applied circumferentially with 3M 468MP high-bond adhesive to the ASTM D1002 steel-to-polymer bond spec; a 25 mm valve-neck collar fits between the gauge and the discharge lever; a 30 mm inside-cabinet disc covers recessed or concealed NFPA 10 §6 cabinets; and a 50 × 50 mm hose-reel / fire-blanket square covers Class F / K kitchen-hood and hose-reel extensions."
+    },
+    {
+      "question": "Will the tag survive outdoor and wash-down mounting?",
+      "answer": "Yes. The tag is sealed to IP67 / IP68 (IEC 60529) with a -20 °C to +70 °C operating range per NFPA 10 §5.5, and is UV-qualified to ISO 4892-2 Method A 1,000 h plus ASTM G154 Cycle 1 1,000 h — rated for outdoor mounting in parking garages, loading docks and industrial yards. The housing resists the NFPA 10 §7.3 dry-chemical refill agents (monoammonium phosphate, sodium bicarbonate, potassium bicarbonate, aqueous film-forming foam) and is flame-resistant to UL 94 V-0 where the tag shares the fire-protection volume."
+    },
+    {
+      "question": "How does the AHJ audit export work?",
+      "answer": "The platform produces a per-unit and per-building PDF or CSV export covering every inspection, photo, signature and GPS stamp, indexed to NFPA 10 Chapter 7 and Joint Commission EC.02.03.05 EP 1-16 citations — the exact record AHJs and surveyors request. Because 13.56 MHz read range is 0-5 cm, each tap proves the inspector was within physical proximity of the extinguisher, and the optional NTAG424 DNA SUN CMAC AES-128 per-tap signature closes inspector-identity forgery under EC.02.03.05 EP 12."
+    },
+    {
+      "question": "What is the MOQ and lead time?",
+      "answer": "MOQ is 250 units per SKU for the standard hang-tag and cylinder-wrap NTAG21x variants, and 500 units for NTAG424 DNA cryptographic variants with a dedicated key-derivation root. Lead time is 3-4 weeks for NTAG21x and 4-6 weeks for NTAG424 DNA with keyed-pair encoding."
     }
   ],
   "primaryAction": {

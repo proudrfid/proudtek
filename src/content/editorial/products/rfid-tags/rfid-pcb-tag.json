@@ -2,7 +2,7 @@
   "route": "/products/rfid-tags/rfid-pcb-tag/",
   "group": "products",
   "title": "RFID PCB Tag — Thin On-Metal UHF for IT Assets",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-12",
   "kicker": "PCB-Substrate On-Metal RFID",
   "summary": "RFID PCB tags build a UHF EPC Gen2v2 antenna on an FR-4 or Rogers 4350B substrate, 1.0-2.0 mm thick, with 1-3 m on-metal read range. The rigid dielectric holds unit-to-unit variance ≤ ±0.5 dB on painted or powder-coated metal. An {chip:impinj-monza-r6-p:name} / M750 / M800 or {chip:nxp-ucode-9:name} chip is reflowed in-line per IPC-A-610 / IPC J-STD-001. It suits data-centre DCIM and IT-asset audits — a 42U rack sweep takes 30-60 seconds at 99 %+ capture.",
   "keywords": [
@@ -211,6 +211,107 @@
           }
         ]
       }
+    },
+    {
+      "title": "Thin, rigid, and loud on metal — how the PCB tag is built",
+      "intro": "A bare UHF inlay stuck to a server chassis reads like a whisper in a wind tunnel: the sheet metal detunes the antenna and swallows the return. The PCB tag earns its keep in the millimetre between antenna and steel — a controlled FR-4 or Rogers RO4350B dielectric with its own ground plane, so the read survives the one surface a data centre is entirely built from. The through-chassis cousin, for assets that want a screw instead of adhesive, is the [PCB screw-mount tag](/products/rfid-tags/rfid-pcb-screw-mount-tag/).",
+      "image": {
+        "src": "/diagrams/products/rfid-pcb-tag-construction.svg",
+        "alt": "Construction stack of a thin RFID PCB tag reading on a metal chassis: the metal chassis at the base, a 3M VHB 4910F / 5952 adhesive or M2 / M3 screw mount, an FR-4 or Rogers RO4350B dielectric with a ground plane at 1.0-2.0 mm, an etched copper UHF antenna with ENIG or HASL finish at 860-960 MHz, a reflowed Monza R6-P / M730 / M750 / M800 / UCODE 9 chip, and a solder-masked IP65 face built to IPC-A-610 Class 2 / 3 — with qualification chips for 1-3 m on-metal read range, plus or minus 0.5 dB unit variance, -40 °C to +85 °C service and IPC-A-610 workmanship."
+      },
+      "bullets": [
+        "Controlled-thickness FR-4 (εr ≈ 4.3 @ 915 MHz) or low-loss Rogers RO4350B (εr ≈ 3.66 @ 915 MHz) laminate, 1.0-2.0 mm — the rigid dielectric is what pins antenna impedance to ≤ ±0.5 dB unit-to-unit.",
+        "A ground-plane copper pour beneath the etched antenna isolates it from the chassis and restores the 1-3 m on-metal read a foam-backed label loses on the same surface.",
+        "The chip — Monza R6-P, M730, M750, M800 or UCODE 9 — is reflowed in-line per IPC-A-610 Class 2 / Class 3 and IPC J-STD-001, the same process stack as the board it is tagging.",
+        "ENIG or HASL finish on the copper antenna; a solder-masked IP65 face shrugs off cold-aisle airflow; 3M VHB 4910F / 5952 adhesive or an M2 / M3 screw fixes the tag flat to the chassis."
+      ]
+    },
+    {
+      "title": "One EPC, four stops — the PCB tag across an asset's life",
+      "intro": "An asset tag only pays for itself if it is still legible four years and three racks later, when the auditor arrives and the printed label has not. The PCB tag rides the whole ISO/IEC 19770-1 lifecycle on a single permalocked EPC — commissioned to a CMDB record, deployed in a rack, swept in seconds, retired with a clean chain of custody. The label-thin sibling for lighter estates is the [anti-metal UHF IT-asset tag](/products/rfid-tags/anti-metal-uhf-it-asset-tag/); the full range sits in the [RFID tag catalogue](/products/rfid-tags/).",
+      "image": {
+        "src": "/diagrams/products/rfid-pcb-tag-lifecycle.svg",
+        "alt": "Four-step IT-asset lifecycle for an RFID PCB tag: commission by encoding and permalocking the EPC and mapping it to the CMDB CI with factory TID read-only per ISO 18000-63; deploy the tag flat on the server or switch chassis with rack moves auto-logged to DCIM; audit with a handheld UHF sweep reading a full 42U rack in 30-60 seconds at 99 %+ capture that publishes an EPCIS 2.0 event; and decommission by logging a retirement event that closes the chain of custody read by ISO/IEC 19770-1, NIST SP 800-53 CM-8, CIS Control 1 and PCI DSS v4.0 Req. 9 from one audit feed."
+      },
+      "bullets": [
+        "Commission — the EPC is encoded and permalocked, the factory TID left read-only per ISO 18000-63, and mapped 1:1 to the CMDB CI so the tag becomes the asset's authoritative physical identifier.",
+        "Deploy — the tag goes flat on the server / switch / PDU chassis; every rack-to-rack move writes a DCIM event, with no manual re-labelling.",
+        "Audit — a handheld UHF sweep reads a full 42U rack in 30-60 seconds at 99 %+ capture, and each scan publishes an EPCIS 2.0 event to CMDB / DCIM.",
+        "Decommission — retirement is one more EPCIS 2.0 event, closing the chain of custody that NIST SP 800-53 CM-8, CIS Control 1 and PCI DSS v4.0 Req. 9 all read from a single audit feed."
+      ]
+    },
+    {
+      "title": "RFID PCB tag — the spec sheet",
+      "intro": "Chip, substrate, ratings and commercial terms in one liftable block — the numbers a DCIM architect pastes straight into a hardware standard. For a smaller-footprint asset the [RFID coin tag](/products/rfid-tags/rfid-coin-tag/) shares the on-metal playbook.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip options",
+            "Monza R6-P · M730 · M750 · M800 · UCODE 9",
+            "UHF Gen2v2; permalocked EPC maps 1:1 to the CMDB CI"
+          ],
+          [
+            "Frequency / air interface",
+            "860-960 MHz UHF Gen2v2",
+            "ISO 18000-63 / GS1 EPC Gen2v2; dual-resonant FCC + ETSI on one SKU"
+          ],
+          [
+            "Substrate",
+            "FR-4 (εr ≈ 4.3 @ 915 MHz) · Rogers RO4350B (εr ≈ 3.66 @ 915 MHz)",
+            "IPC-4101/21 or IPC-4103 controlled dielectric tolerance"
+          ],
+          [
+            "Size / profile",
+            "30-80 mm × 10-30 mm × 1.0-2.0 mm; 1.5-6 g",
+            "ENIG or HASL finish on the etched copper antenna"
+          ],
+          [
+            "On-metal read range",
+            "1-3 m on painted / anodised / powder-coated metal",
+            "+30 dBm handheld at 6 dBic; 3-5 m on FR-4 free space"
+          ],
+          [
+            "Unit-to-unit variance",
+            "≤ ±0.5 dB across a 10,000-unit order",
+            "Below the 3-6 dB drift of foam-backed anti-metal labels"
+          ],
+          [
+            "Assembly conformance",
+            "IPC-A-610 Class 2 / Class 3 · IPC J-STD-001 · JEDEC MSL 3",
+            "Same reflow stack as the tagged board; IEC 61760-1 process"
+          ],
+          [
+            "Attachment",
+            "3M VHB 4910F / 5952 adhesive · epoxy pot · M2 / M3 screw",
+            "Room-temperature bond to painted / anodised / powder-coated metal"
+          ],
+          [
+            "Operating envelope",
+            "-40 °C to +85 °C · IP65 solder-masked face",
+            "Vibration per IEC 60068-2-6 (5-500 Hz); MTBF > 15 years"
+          ],
+          [
+            "Materials compliance",
+            "RoHS 3 (Directive 2015/863) · REACH SVHC cleared · lead-free",
+            "Halogen-free FR-4 and nickel-free ENIG variants available"
+          ],
+          [
+            "IT-asset governance",
+            "ISO/IEC 19770-1 · NIST SP 800-53 CM-8 · CIS Control 1 · PCI DSS v4.0 Req. 9",
+            "One EPCIS 2.0 audit feed also serves SOX ITGC / HIPAA 164.310(d) / FedRAMP Moderate"
+          ],
+          [
+            "MOQ / lead time",
+            "Quoted on request",
+            "Reflow line shared with the tagged hardware; chip and substrate drive the build"
+          ]
+        ]
+      }
     }
   ],
   "resourceCards": [
@@ -257,6 +358,22 @@
     {
       "question": "What regulatory and audit frameworks does the RFID event feed address?",
       "answer": "The EPCIS 2.0 event stream feeds CMDB / ITAM systems that satisfy ISO/IEC 19770-1 IT asset management, NIST SP 800-53 CM-8 hardware inventory, CIS Controls v8 Control 1, PCI DSS v4.0 Req. 9 physical asset inventory, SOX IT general controls, HIPAA §164.310(d), FedRAMP Moderate, CMMC L2 and NERC CIP-010 baseline-configuration requirements. One RFID audit feed becomes the authoritative evidence source across all of them."
+    },
+    {
+      "question": "How is the RFID PCB tag mounted to a server or switch chassis?",
+      "answer": "The RFID PCB tag mounts flat with a 3M VHB 4910F / 5952 pressure-sensitive adhesive that bonds at room temperature to painted, anodised or powder-coated metal; an epoxy pot or an M2 / M3 self-tapping screw variant is available where the attachment has to be chassis-permanent. Because the board is a rigid 1.0-2.0 mm laminate it cannot fold or crease into the adhesive line during install, which removes the inlay-damage failure mode common to foam-backed labels."
+    },
+    {
+      "question": "What read range does the PCB tag hold on a metal chassis?",
+      "answer": "The RFID PCB tag reads 1-3 m on painted, anodised or powder-coated metal with a +30 dBm handheld at a 6 dBic antenna, and 3-5 m in FR-4 free space. The controlled PCB dielectric keeps unit-to-unit read-range variance at ≤ ±0.5 dB across a 10,000-unit order — tighter than the 3-6 dB drift typical of foam-backed anti-metal labels — which is the tolerance a DCIM rack-audit sweep needs to trust the handshake at 99 %+ capture."
+    },
+    {
+      "question": "Can the PCB tag survive reflow assembly and data-centre operating temperatures?",
+      "answer": "Yes. The RFID PCB tag is built on the same IPC-A-610 Class 2 / Class 3 reflow line as the boards it tracks, with IPC J-STD-001 soldering and JEDEC MSL 3 moisture-sensitivity handling, so it can be assembled in-line rather than applied afterwards. In service it is rated -40 °C to +85 °C with an IP65 solder-masked face and vibration resilience per IEC 60068-2-6 (5-500 Hz), giving an MTBF above 15 years under normal data-centre conditions."
+    },
+    {
+      "question": "What is the minimum order quantity and lead time for RFID PCB tags?",
+      "answer": "MOQ and lead time are quoted per configuration: the chip choice (Monza R6-P, M730, M750, M800 or UCODE 9), the substrate (FR-4 or Rogers RO4350B) and the IPC-A-610 workmanship class drive the reflow build, and encode-and-permalock services — EPC mapped to the CMDB CI, factory TID left read-only — are configured per order."
     }
   ],
   "sources": [
@@ -339,6 +456,20 @@
       "publishedAt": "2022-07-11",
       "accessedAt": "2026-04-24",
       "note": "Event stream that CMDB / DCIM / ITAM systems subscribe to for IT-asset commissioning, movement and retirement events."
+    },
+    {
+      "label": "Impinj Monza R6-P RAIN RFID Tag Chip",
+      "url": "https://www.impinj.com/products/tag-chips/impinj-monza-r6-p",
+      "publisher": "Impinj",
+      "accessedAt": "2026-07-12",
+      "note": "UHF Gen2v2 tag-chip option reflowed onto the PCB-tag substrate — Monza R6-P air-interface and memory reference."
+    },
+    {
+      "label": "NXP UCODE 9 UHF RAIN RFID IC",
+      "url": "https://www.nxp.com/products/rfid-nfc/rain-rfid/ucode/ucode-9-the-high-performance-industry-benchmark:UCODE-9",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-12",
+      "note": "UHF Gen2v2 tag-chip option for the PCB-tag inlay — UCODE 9 sensitivity and memory reference."
     }
   ],
   "primaryAction": {
@@ -360,25 +491,17 @@
     }
   ],
   "relatedIndustries": [
-    "data-center",
-    "manufacturing",
+    "data-center-it-asset-tracking",
+    "industrial",
     "healthcare",
-    "finance",
-    "government"
+    "government-defense-supply-chain"
   ],
   "chipFamilies": [
-    "impinj-monza-r6-p",
-    "impinj-m730",
-    "impinj-m750",
-    "impinj-m800",
-    "nxp-ucode-9"
+    "impinj-m7",
+    "ucode"
   ],
   "envFamilies": [
-    "on-metal",
-    "fr4-substrate",
-    "rogers-ro4350b",
-    "ipc-class-2",
-    "ipc-class-3"
+    "anti-metal"
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "proudtek-engineering",
