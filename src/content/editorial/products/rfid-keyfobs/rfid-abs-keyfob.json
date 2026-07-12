@@ -2,7 +2,7 @@
   "route": "/products/rfid-keyfobs/rfid-abs-keyfob/",
   "group": "products",
   "title": "ABS RFID Keyfob — IP68 Ultrasonic-Welded Credential",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-12",
   "kicker": "ABS-Housing Keyfob",
   "summary": "ABS RFID keyfobs house a 125 kHz LF or 13.56 MHz HF chip in two injection-moulded shells, ultrasonically welded to an IP68 ingress rating. The chip library spans EM4200 / EM4305 / {chip:atmel-t5577:name}, MIFARE Classic 1K, DESFire EV3, NTAG 424 DNA and I-CODE SLIX2. The halogen-free housing has a UL 94 V-0 option and RoHS 3 + REACH clearance for building-access, campus, fleet, hospitality and student-ID programmes.",
   "keywords": [
@@ -211,6 +211,35 @@
           }
         ]
       }
+    },
+    {
+      "title": "Same shell, two radios — the chip decision at a glance",
+      "intro": "The ABS shell does not care what it carries; your readers do. The whole decision collapses to a single question — which reader estate is this credential walking up to — and the map below answers it without a spec sheet. Low frequency is the drop-in for legacy panels; high frequency is where authentication actually lives. If a site runs both, read the [125 kHz vs 13.56 MHz](/compare/125khz-vs-13.56mhz-rfid/) split before you commit, and note that a single-chip [EM4305 keyfob](/products/rfid-keyfobs/em4305-keyfob/) or a [MIFARE DESFire keyfob](/products/rfid-keyfobs/mifare-desfire-keyfob/) already covers the two ends of this range.",
+      "image": {
+        "src": "/diagrams/products/rfid-abs-keyfob-chip-decision.svg",
+        "alt": "Decision diagram: one ABS keyfob shell splits into two chip options by reader estate. Left, LF 125 kHz — EM4200, EM4305 or T5577 for legacy HID Prox, Indala and AWID panels with Wiegand 26 / 34 / 37 output and no cryptography. Right, HF 13.56 MHz — MIFARE Classic 1K, MIFARE Plus SE, MIFARE DESFire EV3 with AES-128, NTAG 213-216, NTAG 424 DNA and I-CODE SLIX2 over OSDP v2.2 Secure Channel. A bottom bar shows a dual-frequency LF plus HF fob bridging both estates."
+      },
+      "bullets": [
+        "LF 125 kHz — EM4200 / EM4305 / T5577 drop into legacy HID Prox, Indala and AWID panels; the ID carries no cryptography, so it is right for legacy and low-risk doors, not high-security ones.",
+        "HF 13.56 MHz — MIFARE DESFire EV3 and MIFARE Plus SE bring AES-128 mutual authentication; NTAG 424 DNA adds a SUN message for tap-to-verify; MIFARE Classic 1K stays only where CRYPTO-1's weakness is understood.",
+        "Output format follows the estate — Wiegand 26 / 34 / 37 for legacy panels, OSDP v2.2 Secure Channel for AES-128 head-ends.",
+        "Dual-frequency LF plus HF lives in the same welded shell, so one credential can bridge legacy and modern readers through a multi-year migration."
+      ]
+    },
+    {
+      "title": "Inside the weld — how an ABS fob is actually built",
+      "intro": "Pull an ABS fob apart — carefully, because the ultrasonic weld has no intention of giving it back — and there is almost nothing to it: two injection-moulded shells, an inlay of copper coil plus chip, and a stainless split ring absorbing all the key-ring abuse. That simplicity is the whole point; the housing is cheap, colourful and repeatable, and every rugged upgrade is a shell swap rather than a redesign. When the environment turns mean, the [epoxy keyfob](/products/rfid-keyfobs/rfid-epoxy-keyfob/) and the [metal keyfob](/products/rfid-keyfobs/rfid-metal-keyfob/) reuse the same inlay, and the [silicone keyfob](/products/rfid-keyfobs/rfid-silicone-keyfob/) takes the wash-down and food-contact duty.",
+      "image": {
+        "src": "/diagrams/products/rfid-abs-keyfob-construction.svg",
+        "alt": "Cutaway of a welded ABS keyfob labelling five parts with leader lines: a two-piece ABS top and bottom shell in 94HB or UL 94 V-0 grade, an ultrasonic weld seam at 20-35 kHz sealing the cavity to IP68 per IEC 60529, an LF or HF inlay of copper coil plus chip, and a 304 / 316 stainless split ring. A footnote lists the -25 to +85 °C range, 1.5 m drop test and 30-50 mm footprint."
+      },
+      "bullets": [
+        "Two-piece ABS shell — injection-moulded to ±0.1 mm on the 30-50 mm teardrop, rectangle or oval footprint, in a 10 Pantone-shade standard library.",
+        "Ultrasonic weld at 20-35 kHz fuses the shells in under half a second and seals the cavity to IP68 per IEC 60529 — no epoxy pot, no cure oven.",
+        "LF / HF inlay — a copper coil tuned to 125 kHz or 13.56 MHz plus the chip; swapping the chip never touches the housing tooling.",
+        "304 / 316 stainless split ring — the part that fails first on a busy key-ring, and the cheapest place to over-specify.",
+        "Rated -25 °C to +85 °C with a 1.5 m drop test (IEC 60068-2-32 Ea) and a 5-10 year field life under daily carry."
+      ]
     }
   ],
   "resourceCards": [
@@ -269,6 +298,22 @@
     {
       "question": "How does fob retirement work for a terminated employee?",
       "answer": "The actual security control is PACS revocation at the head-end — revocation should complete within 10 seconds of the HRIS termination event, regardless of whether the physical fob is recovered. On physical return, the ABS shell is cut or pulverised to render the chip inoperative per NIST SP 800-88 media-sanitisation guidance; the shell enters the WEEE recycling stream and the disposal is logged against the HRIS record. This closes the ISO/IEC 27001 A.11.1 physical-security control cleanly."
+    },
+    {
+      "question": "Can ABS keyfobs be produced in our brand colour with a logo and serial number?",
+      "answer": "Yes. The standard ABS library is 10 Pantone-matched shades, decorated by pad-printing, thermal-transfer or UV inkjet with a logo and a sequential serial number; laser-engraving under the surface is available on special-order SKUs. A fully bespoke Pantone colour match is available at a 20,000+ piece MOQ, while the 10-shade standard library carries no colour surcharge."
+    },
+    {
+      "question": "Do ABS keyfobs ship pre-encoded, or are they programmed on site?",
+      "answer": "Either. The LF inlay (EM4200 / EM4305 / T5577) can be pre-encoded to a HID-compatible facility code and card-number range for legacy Prox estates; HF inlays are keyed to your scheme — MIFARE DESFire EV3 with AES-128 mutual authentication, or NTAG 424 DNA with a SUN URL. Output matches the panel: Wiegand 26 / 34 / 37 for legacy readers, OSDP v2.2 Secure Channel for AES-128 head-ends. On-site encoding runs off a standard 125 kHz or 13.56 MHz bench writer tied into the HRIS / ITAM workflow."
+    },
+    {
+      "question": "How durable is the welded ABS shell in daily carry and outdoor use?",
+      "answer": "The ultrasonically welded ABS shell is rated IP68 per IEC 60529, survives a 1.5 m drop test (IEC 60068-2-32 Ea) without weld break, and holds a 5-10 year field life under daily carry across a -25 °C to +85 °C service range. It tolerates common facility cleaners — IPA, quaternary ammonia and dilute bleach — but is not rated for continuous hydrocarbon or acid exposure; specify the epoxy variant for those environments."
+    },
+    {
+      "question": "What are the MOQ, sample options and lead time for ABS keyfobs?",
+      "answer": "A fully bespoke Pantone colour match carries a 20,000+ piece MOQ; the 10-shade standard library carries no colour surcharge. Standard MOQ, production lead time and paid-sample availability are set per programme and are not published on this page. Request them with your target chip, housing shape and annual volume for a firm quote."
     }
   ],
   "sources": [
@@ -351,6 +396,14 @@
       "publishedAt": "2014-12-18",
       "accessedAt": "2026-04-24",
       "note": "Retirement / destroy guidance applied to the cut-or-pulverise end-of-life step for RFID keyfobs."
+    },
+    {
+      "label": "Atmel / Microchip T5577 125 kHz Read/Write Passive RFID Chip — product page",
+      "url": "https://www.microchip.com/en-us/product/atmel-t5577",
+      "publisher": "Microchip Technology (formerly Atmel)",
+      "publishedAt": "2010-06-01",
+      "accessedAt": "2026-07-12",
+      "note": "Vendor product page for the programmable 125 kHz T5577 LF chip named in the LF chip option and emulation notes."
     }
   ],
   "primaryAction": {
@@ -372,29 +425,22 @@
     }
   ],
   "relatedIndustries": [
-    "corporate",
     "education",
     "hospitality",
-    "government",
+    "government-defense-supply-chain",
     "logistics"
   ],
   "chipFamilies": [
-    "em4200",
-    "em4305",
-    "t5577",
+    "em-tk5",
     "mifare-classic",
-    "mifare-plus-se",
-    "mifare-desfire-ev3",
-    "ntag-213-215-216",
-    "ntag424-dna",
-    "icode-slix2"
+    "mifare-plus",
+    "mifare-desfire",
+    "ntag21x",
+    "ntag424",
+    "icode"
   ],
   "envFamilies": [
-    "ip68",
-    "ul-94-v0",
-    "halogen-free",
-    "recycled-content",
-    "osdp-v22"
+    "outdoor"
   ],
   "authorSlug": "editorial-board",
   "reviewedBySlug": "proudtek-engineering",
