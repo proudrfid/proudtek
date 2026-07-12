@@ -144,7 +144,7 @@
   ],
   "heroImage": "/landing-images/nfc-digital-product-passport-tag.jpg",
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-12",
   "sections": [
     {
       "title": "Why DPP — phased rollout, hard deadlines, and procurement lead time",
@@ -244,6 +244,107 @@
           }
         ]
       }
+    },
+    {
+      "title": "One tap, five answers — how the passport opens",
+      "intro": "A Digital Product Passport is only as trustworthy as the carrier it rides on, and a printed QR carries nothing it can prove. The NTAG 424 DNA chip signs a fresh URL on every tap with an AES-128 key that never leaves the silicon, so the phone resolving the GS1 Digital Link identifier is reading a passport that authenticated itself first. The full authentication mechanics live in the [NTAG 424 DNA SUN + CMAC encyclopedia](/guides/ntag424-dna-sun-cmac-authentication/); the general-purpose sibling label is the [NTAG 424 DNA TamperTag](/products/rfid-labels/ntag424-dna-tamper-evident-tag/).",
+      "image": {
+        "src": "/diagrams/products/nfc-digital-product-passport-tag-passport-flow.svg",
+        "alt": "Tap-to-passport flow: a phone taps the tag at 13.56 MHz, the NTAG 424 DNA chip signs a fresh per-tap CMAC URL with its AES-128 key, the registry verifies the signature and the GS1 Digital Link resolves, and the passport opens to five data fields — origin, materials, recyclability, carbon footprint, and repair or end-of-life."
+      },
+      "bullets": [
+        "Secure Dynamic Messaging (SDM) makes the chip emit a fresh CMAC URL on every tap; the registry's tap counter rises each time, so a replayed URL is caught rather than trusted.",
+        "The AES-128 key is provisioned into the silicon at NXP's secure facility and never leaves it — cloning the label artwork or copying its URL does not reproduce the key.",
+        "No app is required: the phone OS opens the returned URL and shows the consumer view, while recycler and regulator tiers authenticate to their own keys for the deeper record.",
+        "One tap resolves the whole passport data model — GTIN and serial per ISO/IEC 15459, material composition and REACH SVHC disclosure, recyclability and end-of-life pathway, PEF carbon footprint, and repairability under Directive 2024/1799."
+      ]
+    },
+    {
+      "title": "Built to outlast the product — inlay construction and mounting",
+      "intro": "The passport has to survive everything the product does: a decade on a battery terminal, 50+ ISO 6330 wash cycles on a garment, a warranty longer than the receipt. That rules out ink. The inlay seals the NTAG 424 DNA die and its antenna behind a printed face and a tamper-evident adhesive, then mounts the way the category demands — glued, sewn, laminated in, or shrink-wrapped onto a cell. For battery packs specifically see the [NFC battery passport tag](/products/rfid-labels/nfc-battery-passport-tag/); the full form-factor range sits on the [RFID label hub](/products/rfid-labels/).",
+      "image": {
+        "src": "/diagrams/products/nfc-digital-product-passport-tag-construction.svg",
+        "alt": "Durable DPP inlay layer stack — printed protective face, aluminium antenna with the NTAG 424 DNA die at 13.56 MHz and AES-128 SUN, PET or woven-textile substrate, and a tamper-evident adhesive that leaves VOID on removal — with four mountings: adhesive label or hang tag, sewn-in woven tag rated to ISO 6330 50+ wash cycles and ISO 3175, embedded heat- and chemical-resistant inlay, and a battery pole label for cells over 2 kWh."
+      },
+      "bullets": [
+        "The layer stack is consistent across form factors: a printed protective face, an aluminium antenna coil carrying the NTAG 424 DNA die, a PET or woven-textile substrate, and a tamper-evident adhesive that leaves a VOID pattern if the label is peeled.",
+        "Mounting is matched to the product: adhesive label or hang tag for packaging and retail, sewn-in woven tag for garments and footwear (ISO 6330 50+ wash cycles, ISO 3175 dry-clean), embedded heat- and chemical-resistant inlay for electronics and batteries, and a battery pole label or shrink-sleeve for EV and industrial cells.",
+        "The tamper-evident construction ties the passport to the physical item — a removed or transferred tag is visible, which matters where the DPP doubles as an anti-counterfeit and provenance record.",
+        "NFC earns its place over a printed QR on durability alone: 10+ year chip retention against 2-3 year QR fade, enough to outlast the 10-15 year service life of an EV battery or a multi-year electronics warranty."
+      ]
+    },
+    {
+      "title": "NFC Digital Product Passport tag — the spec sheet",
+      "intro": "One place to scope the programme: the chip, the data carrier, the form factors, and the commercial terms a manufacturer needs before committing a production line. The end-to-end compliance walk-through is the [Digital Product Passport solution guide](/solutions/digital-product-passport/); for the phased category deadlines see [EU compliance — ESPR, DPP, Battery Passport](/industries/eu-compliance/).",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Recommended chip",
+            "NTAG 424 DNA — AES-128 SUN / SDM",
+            "Role-based consumer / recycler / regulator access from one tag"
+          ],
+          [
+            "Basic-tier chips",
+            "NTAG213 (144 B) · NTAG216 (888 B)",
+            "Public-only URL where the delegated act permits it"
+          ],
+          [
+            "Data carrier",
+            "GS1 Digital Link 1.3 URI",
+            "Pre-encoded on every order — no production-line re-encoding step"
+          ],
+          [
+            "Unique identifier",
+            "GTIN + serial number per ISO/IEC 15459",
+            "One identifier bound to each physical item"
+          ],
+          [
+            "Protocol / frequency",
+            "ISO/IEC 14443-4 · NFC Forum Type 4 · 13.56 MHz",
+            "Universal smartphone tap, iOS 14+ and Android, no app"
+          ],
+          [
+            "Form factors",
+            "Adhesive label · sewn-in tag · embedded inlay · hang tag · battery pole label",
+            "Matched to the product category"
+          ],
+          [
+            "Textile durability",
+            "ISO 6330 50+ wash cycles · ISO 3175 dry-clean",
+            "For sewn-in garment and footwear tags"
+          ],
+          [
+            "MOQ / lead time",
+            "5,000 pieces · 12-18 business days",
+            "Stock antenna designs; AES-128 keys provisioned at NXP secure facility"
+          ],
+          [
+            "Per-tag cost",
+            "USD 0.40-1.20",
+            "By chip variant and form factor"
+          ],
+          [
+            "Programme lead time",
+            "9-18 months to first production batch",
+            "Procurement + data-registry integration + line validation"
+          ],
+          [
+            "Regulatory anchor",
+            "EU 2024/1781 ESPR · EU 2023/1542 Battery Passport",
+            "Battery Passport hard deadline 18 February 2027"
+          ],
+          [
+            "Data standards / compliance",
+            "GS1 Digital Link 1.3 · ISO/IEC 15459 · REACH SVHC · PEF · Directive 2024/1799",
+            "Repairability, material and carbon fields per delegated act"
+          ]
+        ]
+      }
     }
   ],
   "resourceCards": [
@@ -334,6 +435,10 @@
     {
       "question": "How does ERP integration work for the DPP data registry?",
       "answer": "Three patterns: (1) hosted DPP platform (Circularise, EON Group, Trustchain, Trustless Computing Association reference implementations) — fastest time-to-compliance, vendor-managed; (2) ERP-integrated DPP module — SAP Asset Performance Management, Oracle Cloud SCM, Microsoft Dynamics 365 SCM all have DPP add-ons or third-party modules; (3) PLM-integrated — Siemens Teamcenter / PTC Windchill / Dassault Enovia / Aras Innovator hold bill-of-materials + material-composition data, feed DPP registry via REST API. Proud Tek provides reference implementation guidance for SAP / Oracle / Microsoft Dynamics and the hosted-platform alternatives."
+    },
+    {
+      "question": "What is the MOQ, lead time and per-tag cost for DPP NFC tags?",
+      "answer": "MOQ is 5,000 pieces and lead time is 12-18 business days for stock antenna designs; per-tag cost runs USD 0.40-1.20 depending on chip variant and form factor. AES-128 key provisioning happens at NXP's secure facility, coordinated through the first production batch, so budget a sampling round before the production run. Across the full programme — procurement, data-registry integration and production-line validation — plan 9-18 months from decision to first production batch; battery-passport programmes facing the 18 February 2027 deadline should be committing by Q3 2025."
     }
   ],
   "sources": [
@@ -416,6 +521,13 @@
       "publishedAt": "2022-03-30",
       "accessedAt": "2026-04-25",
       "note": "Textile/footwear DPP timeline anchor — 2027-2028 effective date for textile category."
+    },
+    {
+      "label": "NXP AN12196 — NTAG 424 DNA SUN / Secure Dynamic Messaging application note",
+      "url": "https://www.nxp.com/docs/en/application-note/AN12196.pdf",
+      "publisher": "NXP Semiconductors",
+      "accessedAt": "2026-07-12",
+      "note": "SUN CMAC and SDM access-controlled file mechanics — the authentication flow behind role-based consumer / recycler / regulator DPP access."
     }
   ],
   "primaryAction": {

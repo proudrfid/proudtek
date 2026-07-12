@@ -132,7 +132,7 @@
     "/products/rfid-labels/nfc-food-traceability-label/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-12",
   "sections": [
     {
       "title": "Why olive oil needs cryptographic per-bottle authentication",
@@ -232,6 +232,107 @@
           }
         ]
       }
+    },
+    {
+      "title": "From tap to grove — the SUN authentication and provenance flow",
+      "intro": "A paper certificate travels with whatever bottle it is glued to; a cryptographic seal does not. Each tap makes the NTAG 424 DNA chip sign a fresh URL with an AES-128 key that never leaves the silicon, so a copied link works once and then indicts itself on the next tap — and the same tap surfaces the grove, the harvest date and the lab certificate the bottle is claiming. The chip-level mechanics live in the [NTAG 424 DNA SUN + CMAC encyclopedia](/guides/ntag424-dna-sun-cmac-authentication/).",
+      "image": {
+        "src": "/diagrams/products/nfc-olive-oil-authentication-label-verify-flow.svg",
+        "alt": "Four-step tap-to-verify flow for an olive-oil label: a phone taps the cap and neck at 13.56 MHz, the NTAG 424 DNA chip signs a fresh per-tap CMAC URL with its AES-128 key, the mill server checks the signature and seal state, and the result shows genuine with the seal intact — a refilled bottle reads opened on the next tap. A strip lists what the tap surfaces: grove GPS polygon, harvest date, cultivar mix, mill ID, the IOC certificate and the PDO or PGI entry in EU eAmbrosia."
+      },
+      "bullets": [
+        "Secure Dynamic Messaging (SDM) makes the chip emit a fresh CMAC URL on every tap — a captured URL is caught by the server's rising tap counter.",
+        "The AES-128 key is provisioned into the silicon at NXP's secure facility and never leaves it; cloning the bottle and its label does not clone the key.",
+        "The consumer needs no app — the phone OS opens the returned URL, and the branded page shows grove GPS polygon, harvest date, cultivar breakdown, mill ID and the IOC analytical certificate.",
+        "The PDO / PGI appellation cross-references directly to the bottle's entry in the EU eAmbrosia public registry, so the origin claim is checkable against the source, not just asserted on the label."
+      ]
+    },
+    {
+      "title": "Built for the bottle — the bridge-antenna neck seal",
+      "intro": "Refilling a genuine premium bottle with commodity oil is the oldest trick in the trade, and a hologram has never once stopped it. The bridge antenna does what a sticker cannot: it spans the cap and the neck, so the first turn of the cap severs the trace and every later tap reports OPENED. The general-purpose sibling is the [NTAG 424 DNA TamperTag](/products/rfid-labels/ntag424-dna-tamper-evident-tag/); the same cap-bridge trick guards a bottle in the [NFC spirits authentication label](/products/rfid-labels/nfc-spirits-authentication-label/).",
+      "image": {
+        "src": "/diagrams/products/nfc-olive-oil-authentication-label-construction.svg",
+        "alt": "Bridge-antenna olive-oil label construction: a label layer stack of a paper or PET face label, an aluminium bridge antenna carrying the NTAG 424 DNA die at 13.56 MHz with AES-128 SUN, a break line across the cap and neck seam, and a permanent or tamper-evident adhesive — shown spanning a bottle cap and neck, with three tap states: sealed reads genuine, opened reads opened, and a QR code printed alongside as a fallback."
+      },
+      "bullets": [
+        "The bridge antenna spans the cap and neck; opening the bottle physically breaks the trace, and the chip returns 'opened' on every subsequent tap — the refill vector is closed structurally, not by inspection.",
+        "The NTAG 424 DNA TagTamper (TT) variant signs the sealed or opened state cryptographically, so the tamper status itself cannot be spoofed onto a counterfeit.",
+        "The inlay hides under the paper face label or on the cap; a QR code printed alongside carries the same verification URL for the minority of phones without NFC.",
+        "200,000 erase/write cycles and 50-year data retention per the NXP datasheet outlast the shelf life of premium EVOO — the seal is still readable at the bottle's end of life."
+      ]
+    },
+    {
+      "title": "Olive-oil authentication label — the spec sheet",
+      "intro": "One place to price the programme before you sample: the chip, the tamper mechanism, the provenance and analytical data the tap surfaces, and the commercial terms a buyer needs. Browse the rest of the family from the [RFID & NFC label hub](/products/rfid-labels/).",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "NTAG 424 DNA — AES-128 SUN / SDM",
+            "NTAG 424 DNA TagTamper (TT) variant signs the sealed / opened state"
+          ],
+          [
+            "Tamper mechanism",
+            "Bridge antenna spans cap + neck",
+            "Opening breaks the trace; the chip returns 'opened' on the next tap"
+          ],
+          [
+            "Endurance",
+            "200,000 erase/write cycles · 50-year data retention",
+            "Exceeds the shelf life of premium EVOO, per NXP datasheet"
+          ],
+          [
+            "Frequency",
+            "13.56 MHz — NFC Forum Type 4",
+            "Smartphone-readable, no app; QR code printed alongside as fallback"
+          ],
+          [
+            "Provenance data",
+            "Grove GPS polygon · harvest date · cultivar · mill ID",
+            "Linked to the mill bottling MES per-bottle serial"
+          ],
+          [
+            "Analytical certificate",
+            "Free acidity ≤ 0.8% · peroxide value ≤ 20 meq O2/kg · K270 ≤ 0.22",
+            "IOC COI/T.20 methods; published to the consumer-tap page"
+          ],
+          [
+            "Cold-press claim",
+            "Extraction temperature ≤ 27 °C",
+            "Per EU 29/2012 Art. 5, recorded per bottle in the provenance database"
+          ],
+          [
+            "Designation",
+            "PDO / PGI cross-referenced to EU eAmbrosia",
+            "EU 1151/2012 quality-scheme framework; 140+ olive-oil designations"
+          ],
+          [
+            "Retention sample",
+            "Sealed reference sample, minimum 2 years",
+            "ISO 17025 accredited lab batch-release certificate"
+          ],
+          [
+            "Traceability",
+            "Lot-level record for FSMA 204 / EUDR cross-reference",
+            "Recall targeting by serial range via the verification database"
+          ],
+          [
+            "MOQ / lead time",
+            "5,000 pieces · 15-20 business days",
+            "AES-128 key provisioning at NXP secure facility"
+          ],
+          [
+            "Unit cost",
+            "USD 0.40-1.20",
+            "By form factor and chip variant (DNA vs DNA TT)"
+          ]
+        ]
+      }
     }
   ],
   "resourceCards": [
@@ -310,6 +411,10 @@
     {
       "question": "How does this support FSMA 204 and EUDR food-traceability compliance?",
       "answer": "FSMA 204 (U.S. FDA Food Traceability Rule effective 2026) and EUDR (EU Regulation 2023/1115 deforestation-free supply chain) both require lot-level supply-chain documentation for select food categories. NFC per-bottle provenance page surfaces grove GPS polygon + mill ID + bulk oil intake records + ISO 17025 lab certificate — all the lot-level traceability data regulators require. In a recall event, backend recall targeting through the NFC verification database identifies affected bottles by serial range and notifies consumers directly via the registered tap. Producer-side controls (bulk oil intake testing, tamper-evident bulk holding tanks with NFC-logged fill events, camera-supervised bottling) form the documented chain-of-custody programme that NFC consumer-facing authentication caps."
+    },
+    {
+      "question": "What is the MOQ, lead time and unit cost for olive-oil authentication labels?",
+      "answer": "MOQ is 5,000 pieces, lead time is 15-20 business days, and per-tag cost is USD 0.40-1.20 depending on form factor and chip variant (NTAG 424 DNA versus NTAG 424 DNA TagTamper). AES-128 key provisioning happens at NXP's secure facility, coordinated as part of the first production batch, so plan a sampling round before the production run. Blank and pre-encoded label samples are available for antenna-fit testing on your specific bottle, cap and neck geometry before you commit to tooling."
     }
   ],
   "sources": [

@@ -133,7 +133,7 @@
   ],
   "heroImage": "/landing-images/nfc-cosmetics-authentication-label.png",
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-11T11:00:00Z",
+  "modifiedAt": "2026-07-12",
   "sections": [
     {
       "title": "Why beauty brands need cryptographic authentication, not visual security",
@@ -164,7 +164,42 @@
       ]
     },
     {
-      "title": "NTAG 424 DNA cosmetics inlay vs hologram / static QR / serial"
+      "title": "NTAG 424 DNA cosmetics inlay vs hologram / static QR / serial",
+      "intro": "Every visual security feature shares one flaw: the consumer cannot tell a real one from a good fake, and neither can the fake's next buyer. Here is what each method actually proves at the moment a shopper taps.",
+      "table": {
+        "columns": [
+          "Security method",
+          "Clonable?",
+          "Consumer self-verify",
+          "What it proves at tap"
+        ],
+        "rows": [
+          [
+            "Hologram / foil seal",
+            "Replicated within weeks of launch",
+            "No — looks identical to the eye",
+            "Nothing verifiable"
+          ],
+          [
+            "Static QR code",
+            "A QR is copied pixel-for-pixel",
+            "Scans, but carries no secret",
+            "Engagement, not proof"
+          ],
+          [
+            "Serial-number sticker",
+            "Numbers are printed, then reprinted",
+            "Only against a database, if one exists",
+            "Weak — reuse goes unseen"
+          ],
+          [
+            "NTAG 424 DNA — AES-128 SUN",
+            "No — per-tap CMAC needs the in-silicon key",
+            "Yes — a fresh signed URL every tap",
+            "Cryptographic proof"
+          ]
+        ]
+      }
     },
     {
       "title": "What flexible PET + curved-surface compatibility actually buys",
@@ -207,6 +242,97 @@
             "label": "2026 Today",
             "text": "Field-reference patterns drawn from prestige-cosmetics-counter, e-commerce-cosmetics-verification, hair-care-professional-only, fragrance-anti-refill, and K-beauty-export programmes converge on NTAG 424 DNA silicon + ultra-compact flexible PET inlay (Ø 18 / 12 × 19 mm) + transparent overlay for visual integration + CPNP notification ID + MoCRA facility ID encoded in SDM payload + branded consumer-tap page with full INCI + adverse-event reporting + recall targeting as the operator-side template."
           }
+        ]
+      }
+    },
+    {
+      "title": "How a tap becomes proof — the SUN authentication flow",
+      "intro": "The label does not store a password a counterfeiter could read off it. Each tap makes the NTAG 424 DNA chip sign a fresh URL with an AES-128 key that never leaves the silicon — so a copied link works exactly once, then reports itself on the next tap. The chip-level mechanics are in the [NTAG 424 DNA SUN + CMAC encyclopedia](/guides/ntag424-dna-sun-cmac-authentication/).",
+      "image": {
+        "src": "/diagrams/products/nfc-cosmetics-authentication-label-verify-flow.svg",
+        "alt": "Four-step tap-to-verify flow: phone taps at 13.56 MHz, NTAG 424 DNA emits a fresh per-tap CMAC URL with its AES-128 key, the brand server verifies the signature, and the result shows genuine — a copied URL returns counterfeit on the next tap."
+      },
+      "bullets": [
+        "Secure Dynamic Messaging (SDM) makes the chip emit a new CMAC URL on every tap — replay of a captured URL is caught by the server's tap counter.",
+        "The AES-128 key is provisioned into the silicon at NXP's secure facility and never leaves it; cloning the packaging does not clone the key.",
+        "The consumer needs no app — the phone OS opens the returned URL and the branded page shows genuine, ingredient data, or a recall alert.",
+        "EU CPNP notification ID and US MoCRA facility ID ride in the same SDM payload, so one tap serves authentication and regulatory cross-reference."
+      ]
+    },
+    {
+      "title": "Built for curved packaging — flexible PET, near-invisible, tamper-evident",
+      "intro": "Premium packaging is mostly curves, and a rigid inlay detunes the moment it wraps a bottle. A flexible-PET inlay conforms to the glass, hides under a transparent overlay, and — where the box seal needs it — voids on removal. The general-purpose sibling is the [NTAG 424 DNA TamperTag](/products/rfid-labels/ntag424-dna-tamper-evident-tag/).",
+      "image": {
+        "src": "/diagrams/products/nfc-cosmetics-authentication-label-construction.svg",
+        "alt": "Flexible-PET cosmetics inlay layer stack — transparent PET overlay, aluminium antenna coil with NTAG 424 DNA die, flexible PET substrate, tamper-evident adhesive that leaves VOID on removal — shown conforming to a curved bottle, with standard sizes 22, 18 and 12 by 19 mm and their read distances."
+      },
+      "bullets": [
+        "Flexible PET conforms to cylindrical bottles, jars and tubes without detuning the antenna — the structural advantage over rigid inlays.",
+        "A transparent PET overlay and clear adhesive keep the label near-invisible; embed under an opaque label for a fully hidden placement.",
+        "Tamper-evident adhesive leaves a VOID pattern on the outer-box seal; a bridge-antenna closure variant breaks the trace when a refill bottle is opened.",
+        "Standard sizes: Ø 22 mm (25-35 mm read), Ø 18 mm (20-30 mm), 12 × 19 mm (15-25 mm); below Ø 12 mm, move the tag to the outer carton."
+      ]
+    },
+    {
+      "title": "Cosmetics authentication label — the spec sheet",
+      "intro": "One place to price the programme: chip, sizes, substrate, read range, and the commercial terms a buyer needs before sampling.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip",
+            "NTAG 424 DNA — AES-128 SUN / SDM",
+            "NTAG213 for marketing-only variants (no authentication claim)"
+          ],
+          [
+            "Inlay sizes",
+            "Ø 18 mm · 12 × 19 mm · Ø 22 mm",
+            "Custom footprints 4-8 weeks"
+          ],
+          [
+            "Substrate",
+            "Flexible PET",
+            "Conforms to curved bottle / jar / tube without detuning"
+          ],
+          [
+            "Adhesive",
+            "Permanent · tamper-evident (VOID)",
+            "Tamper-evident on outer-box flap seal"
+          ],
+          [
+            "Read distance",
+            "15-35 mm by inlay size",
+            "Ø 12 mm minimum reads 5-10 mm — else move to carton"
+          ],
+          [
+            "Frequency",
+            "13.56 MHz — NFC Forum Type 4",
+            "Smartphone-readable, no app"
+          ],
+          [
+            "MOQ / lead time",
+            "5,000 pieces · 12-18 business days",
+            "AES-128 key provisioning at NXP secure facility"
+          ],
+          [
+            "Unit cost",
+            "USD 0.30-0.90",
+            "By inlay size and chip variant"
+          ],
+          [
+            "Regulatory encoding",
+            "EU CPNP ID · US MoCRA facility ID in SDM",
+            "On-pack INCI / batch / PAO disclosures still required"
+          ],
+          [
+            "Compliance",
+            "EC 1223/2009 · MoCRA 2022 · ISO 22715",
+            "CPNP notification + Responsible Person framework"
+          ]
         ]
       }
     }
@@ -303,6 +429,10 @@
     {
       "question": "How does this work with US MoCRA 2022 cosmetics regulation?",
       "answer": "Modernization of Cosmetics Regulation Act of 2022 (MoCRA) — FDA-administered facility registration, product listing, safety substantiation, and adverse-event reporting (serious adverse events within 15 business days). NFC adds consumer-facing complaint / adverse-event reporting flow on the branded tap page; facility-registration ID encoded in SDM payload for FDA traceability cross-reference. EU CPNP and US MoCRA can both be encoded on the same chip — branded tap page surfaces region-appropriate regulatory information based on phone locale."
+    },
+    {
+      "question": "What is the MOQ, lead time and sample process for cosmetics authentication labels?",
+      "answer": "MOQ is 5,000 pieces, lead time 12-18 business days, and per-tag cost USD 0.30-0.90 depending on inlay size and chip variant. AES-128 key provisioning happens at NXP's secure facility, coordinated as part of the first production batch, so plan a sampling round before the production run. Blank and pre-encoded inlay samples are available for antenna-fit testing on your specific bottle, jar or compact before you commit to tooling."
     }
   ],
   "sources": [
