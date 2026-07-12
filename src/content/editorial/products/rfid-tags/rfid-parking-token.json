@@ -2,7 +2,7 @@
   "route": "/products/rfid-tags/rfid-parking-token/",
   "group": "products",
   "title": "RFID Parking Token — NFC / UHF Barrier Credential",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-12",
   "kicker": "Parking Access RFID",
   "summary": "RFID parking tokens are compact, coin-shaped NFC or UHF credentials for parking-facility access control, prepaid payment and vehicle identification — replacing paper tickets, magnetic-stripe cards and manual booth attendants with durable, rewritable electronic tokens. Aligned with ISO/IEC 14443-A/B, ISO/IEC 18092 NFC, NFC Forum Type 4 Tag Spec, EN 15291 / EN 12414 parking equipment, PCI DSS v4.0 for prepaid balances and GDPR / CCPA for parker data across SKIDATA, Designa, Amano McGann, TIBA, WPS, Scheidt & Bachmann, T2 Systems, ParkMobile and Flowbird estates.",
   "heroPoints": [
@@ -174,6 +174,99 @@
         "Municipal parking — city-wide parking token programs for residents and commuters, interoperable across multiple parking structures, surface lots and transit networks (Calypso in France / Belgium, ITSO in UK, OV-chipkaart in Netherlands, Suica in Japan, Octopus in Hong Kong).",
         "Event and venue parking — issue pre-sold tokens for event attendees via Flowbird / ParkMobile, enabling express-lane entry and eliminating cash collection at the barrier under EN 12414 cash-handling exemption."
       ]
+    },
+    {
+      "title": "Anatomy of the token — the coin, the coil, and the shell that outlives the barrier",
+      "intro": "A parking token is a coin you cannot spend: its whole job is to survive ten years of glovebox heat, keyring abuse and the occasional 1.5 m drop onto a garage deck, then open a barrier in about a second. The value sits in the layer between the antenna coil and the housing. The coin body is shared with the general-purpose [RFID coin tag](/products/rfid-tags/rfid-coin-tag/); the same credential in a wallet format is the [RFID parking card](/products/rfid-cards/rfid-parking-card/).",
+      "image": {
+        "src": "/diagrams/products/rfid-parking-token-construction.svg",
+        "alt": "Cutaway of a coin-shaped RFID parking token: a 304 / 316 stainless split ring, an ABS or polycarbonate housing UV-stable to ISO 4892-2, a 3-mil laser-engraved serial, a 13.56 MHz NFC coil antenna per ISO/IEC 14443-A, and a secure NTAG424 DNA / NTAG21x chip die, with a windshield UHF Monza R6-P / M775 variant reading 2-5 m at 860-960 MHz."
+      },
+      "bullets": [
+        "Housing: ABS (UL 94 V-0 flame-rated, drop-tested from 1.5 m onto concrete) or vandal-rated polycarbonate, UV-stable per ISO 4892-2 Cycle A for 1,000 h, with IP67 optional for exterior-kiosk returns.",
+        "NFC inlay: a 13.56 MHz antenna coil tuned per ISO/IEC 14443-3 / -4 carries an NTAG213 / NTAG215 / NTAG216 or NTAG424 DNA die — the silicon that answers every NFC-enabled barrier reader.",
+        "Memory: 144 B, 504 B or 888 B of user memory (NTAG213 / NTAG215 / NTAG216) or 416 B on NTAG424 DNA, holding parker ID, access zone, validity dates and prepaid balance for offline barrier operation.",
+        "Key-ring hole with a stainless split ring on the coin and fob SKUs; the windshield UHF variant swaps the ring for a PET adhesive label carrying a Monza R6-P or M775 inlay at 860-960 MHz for 2-5 m drive-through reads.",
+        "Laser serial: a 3-mil laser-engraved serial plus optional 4-colour logo gives the counter attendant a human-readable audit mark alongside the cryptographic UID."
+      ]
+    },
+    {
+      "title": "From bumper to boom gate — the one-second barrier cycle",
+      "intro": "Every parking token exists to answer one question at the barrier: is this car allowed in, right now, on this account? The token carries the credential, the parking-management system carries the verdict, and the boom gate just does what it is told. Here is the loop from the reader's point of view. To browse the adjacent form factors, see the full [RFID tag range](/products/rfid-tags/).",
+      "image": {
+        "src": "/diagrams/products/rfid-parking-token-access-flow.svg",
+        "alt": "Barrier-access flow: a driver taps the token 1-5 cm at the entry reader; the reader reads the 7-byte UID and an NTAG424 DNA SUN AES-128 CMAC; the parking-management system checks the access list online or offline; a valid credential opens the barrier in under 1 second and logs the pass, while a deactivated or expired token is refused and the attempt is logged."
+      },
+      "bullets": [
+        "Approach and tap: the driver holds the token within 1-5 cm of the entry reader; a 13.56 MHz ISO/IEC 14443 exchange reads the credential inside the 1-2 s barrier cycle — no ticket to pull, no card to swipe.",
+        "Read the credential: the reader lifts the factory 7-byte UID and, on secure SKUs, an NTAG424 DNA SUN message — an AES-128 CMAC-signed URL generated fresh on every tap that the server cryptographically verifies.",
+        "Check the access list: the parking-management system (SKIDATA ControlPanel, Designa Abacus, Amano McGann iParcNet, WPS ParkAdvance) validates the credential against the authorised database — online, or offline from the token's stored access zone and validity dates.",
+        "Grant or deny: a valid, active credential opens the barrier in under 1 second; a deactivated, expired or unrecognised token is refused and the attempt is logged for the operator.",
+        "Log and rotate: each pass writes a transaction record, and on NTAG424 DNA tokens the operator can rotate the per-site AES-128 key to invalidate any lost-token authenticator without reissuing the whole fleet."
+      ]
+    },
+    {
+      "title": "Parking token — the spec sheet",
+      "intro": "Chip, frequency, form factor, durability and commercial terms in one place — the table a procurement reviewer scrolls to first. For the hands-free long-range lane see the [UHF windshield label](/products/rfid-labels/uhf-rfid-windshield-label/); for the access-control fob body, the [ABS RFID keyfob](/products/rfid-keyfobs/rfid-abs-keyfob/).",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Chip options",
+            "NTAG213 / NTAG215 / NTAG216 · NTAG424 DNA · MIFARE Classic 1K / 4K · MIFARE DESFire EV3 · ICODE SLIX2 · Monza R6-P / M775 (UHF)",
+            "NTAG424 DNA SUN or DESFire EV3 for cryptographic anti-clone SKUs"
+          ],
+          [
+            "Frequency / air interface",
+            "13.56 MHz HF (NFC, ISO/IEC 14443-A/B + NFC Forum Type 2 / Type 4) · 860-960 MHz UHF (windshield, EPC Gen2 / ISO 18000-63)",
+            "ISO/IEC 15693 vicinity option for 10-30 cm drive-through lanes"
+          ],
+          [
+            "Read range",
+            "1-5 cm NFC tap · 2-5 m UHF windshield",
+            "Sub-second read inside the EN 15291 / EN 12414 throughput envelope"
+          ],
+          [
+            "Form factors (6 SKUs)",
+            "Coin Ø 30 × 3 mm · Coin XL Ø 40 × 4 mm · ISO card 85.6 × 54 × 0.76 mm · Windshield UHF 75 × 35 × 1 mm PET · Valet wristband TPU 200 × 20 × 1.5 mm · Key fob 40 × 30 × 6 mm",
+            "One credential scheme across every body"
+          ],
+          [
+            "Housing & durability",
+            "ABS (UL 94 V-0) or polycarbonate · IEC 60068-2-32 drop 1.5 m · -20 / +85 °C · ISO 4892-2 Cycle A 1,000 h UV · IP67 optional",
+            "10-year data retention, 100,000 write cycles per chip datasheet"
+          ],
+          [
+            "Memory",
+            "144 B / 504 B / 888 B user (NTAG213 / NTAG215 / NTAG216) · 416 B (NTAG424 DNA) · DESFire EV3 2 / 4 / 8 KB",
+            "Stores parker ID, access zone, validity dates and prepaid balance for offline operation"
+          ],
+          [
+            "Authentication",
+            "7-byte UID baseline · NTAG424 DNA SUN AES-128 CMAC · MIFARE DESFire EV3 AES-128 mutual authentication",
+            "Blocks the sidewalk key-copy attack on plain NTAG and MIFARE Classic tokens"
+          ],
+          [
+            "Reader / PMS compatibility",
+            "SKIDATA ControlPanel · Designa Abacus · Amano McGann iParcNet · TIBA Smart Park · WPS ParkAdvance · Scheidt & Bachmann Entervo · T2 Systems Luke · Flowbird",
+            "Factory block-write templates matched per platform"
+          ],
+          [
+            "Compliance",
+            "ISO/IEC 14443-3 / -4:2018 · NFC Forum Type 4 · EN 15291:2007 / EN 12414:2000 · PCI DSS v4.0 Req 3-4 · GDPR / CCPA · ISO 14906 (UHF EFC)",
+            "PCI DSS tokenised prepaid balance; GDPR / CCPA parker-data minimisation"
+          ],
+          [
+            "MOQ / lead time",
+            "500 pc (NTAG213 / NTAG215 coin) · 1,000 pc (NTAG424 DNA SUN or DESFire EV3 keyed lot) · 7-12 business days · 5-day expedite",
+            "Expedite on pre-approved SKIDATA / Designa / Amano / WPS block-write templates"
+          ]
+        ]
+      }
     }
   ],
   "sources": [
@@ -256,6 +349,22 @@
       "publishedAt": "2020-02-01",
       "accessedAt": "2026-04-24",
       "note": "European radiated-power compliance for HF / UHF parking readers."
+    },
+    {
+      "label": "NXP NTAG213 / NTAG215 / NTAG216 — NFC Forum Type 2 Tag compliant IC (product data sheet)",
+      "url": "https://www.nxp.com/products/NTAG213_215_216",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2015-06-03",
+      "accessedAt": "2026-07-12",
+      "note": "Data sheet for the NTAG213 / NTAG215 / NTAG216 coin-token chip family — confirms 13.56 MHz operation, 7-byte UID, 10-year retention and 100,000 write-cycle endurance."
+    },
+    {
+      "label": "NXP NTAG 424 DNA — Secure NFC T4T compliant IC (product data sheet)",
+      "url": "https://www.nxp.com/products/NTAG424DNA",
+      "publisher": "NXP Semiconductors",
+      "publishedAt": "2019-01-31",
+      "accessedAt": "2026-07-12",
+      "note": "Data sheet for the NTAG424 DNA anti-clone SKU — AES-128 SUN message authentication and 416 bytes of ISO/IEC 7816-4 file-system memory."
     }
   ],
   "resourceCards": [
@@ -290,6 +399,22 @@
     {
       "question": "What happens if a token is lost or stolen?",
       "answer": "The parking-management-system administrator (SKIDATA ControlPanel / Designa Abacus / Amano iParcNet / TIBA Smart Park / WPS ParkAdvance / Scheidt Entervo / T2 Luke) deactivates the lost token's UID in the authorised database. Any subsequent tap is rejected at the barrier. A replacement token with a new UID is issued and linked to the parker's account. Since the token itself stores no financial value by default (the balance is tokenised in the PCI DSS v4.0 server database), a lost token does not create a financial liability. For NTAG424 DNA tokens, the per-site AES-128 key can also be rotated to invalidate any lost-token cryptographic authenticator."
+    },
+    {
+      "question": "Should I choose an NFC or a UHF parking token for barrier access?",
+      "answer": "For staff, tenant and monthly barrier access where the driver taps at the reader, choose the 13.56 MHz NFC token (NTAG213 / NTAG215 / NTAG216 or NTAG424 DNA per ISO/IEC 14443) — it reads at 1-5 cm and clears the barrier in the 1-2 s cycle. Choose the 860-960 MHz UHF windshield variant (Monza R6-P or M775) only for hands-free long-range lanes, where a 2-5 m read lets a VIP or residential vehicle trigger the gate without lowering a window. Most estates deploy NFC as the default and reserve UHF for premium or auto-open lanes."
+    },
+    {
+      "question": "Will these tokens work with our existing SKIDATA / Designa / Amano barrier readers?",
+      "answer": "Yes. Parking tokens ship with factory block-write templates matched to SKIDATA ControlPanel, Designa Abacus, Amano McGann iParcNet, TIBA Smart Park, WPS ParkAdvance, Scheidt & Bachmann Entervo, T2 Systems Luke and Flowbird encoding schemes, so the credential is recognised by the barrier reader on day one. For legacy estates the MIFARE Classic 1K / 4K option matches installed SKIDATA / Designa / Amano readers; new deployments should specify NTAG424 DNA or MIFARE DESFire EV3 for cryptographic authentication. Confirm your controller model and firmware with us before the keyed lot so the block-write template is pre-approved."
+    },
+    {
+      "question": "Can a parking token be cloned, and how is it secured?",
+      "answer": "A plain 7-byte-UID token can be read and copied at the kerb, which is why higher-risk portfolios specify a cryptographic SKU. The NTAG424 DNA SUN message generates an AES-128 CMAC-signed URL on every tap that the parking-management server verifies, and MIFARE DESFire EV3 adds AES-128 mutual authentication — both block the sidewalk key-copy attack that plain NTAG and MIFARE Classic tokens suffer. Per-site AES-128 key diversification with an HSM-backed key ceremony contains a compromised token to one site, and the per-site key can be rotated to invalidate any lost authenticator."
+    },
+    {
+      "question": "What is the MOQ and lead time for parking tokens?",
+      "answer": "MOQ is 500 pc for standard NTAG213 / NTAG215 coin tokens and 1,000 pc for an NTAG424 DNA SUN or MIFARE DESFire EV3 AES-keyed lot with factory key diversification. Standard lead time is 7-12 business days, with a 5-day expedite available on pre-approved SKIDATA, Designa, Amano and WPS block-write templates. Samples of the coin, card, windshield, valet and key-fob SKUs are available for barrier-reader compatibility testing before a production order."
     }
   ],
   "primaryAction": {
