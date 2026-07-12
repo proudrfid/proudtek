@@ -7,7 +7,7 @@
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "publishedAt": "2026-04-19",
-  "modifiedAt": "2026-06-11T10:00:00Z",
+  "modifiedAt": "2026-07-12",
   "reviewedAt": "2025-11-02",
   "heroPoints": [
     "Range: NFC works at 0-5 cm (intentional tap); Bluetooth Classic reaches 1-10 m; BLE reaches 10-100 m depending on power class, antenna and environment.",
@@ -105,6 +105,32 @@
         "Common pitfall: deploying BLE beacons without channel planning in a dense Wi-Fi environment. Collisions degrade beacon detection reliability.",
         "Common pitfall: deploying NFC tags behind metal without metal-shielded NFC variants. The metal detunes the antenna and the tag fails to read.",
         "Common pitfall: assuming all BLE beacons are equally secure. Verify rolling identifier support, signed payloads and proper key management before deploying."
+      ]
+    },
+    {
+      "title": "NFC vs Bluetooth vs BLE — the comparison table",
+      "intro": "The two are not really alternatives: NFC owns the 0-5 cm intentional tap (payment, access, authentication), and Bluetooth owns metres of sustained streaming (Classic 1-10 m, BLE 10-100 m for audio, sensors and presence). The table is the physics behind that split; the [RFID vs NFC guide](/products/rfid-tags/) covers the wider radio family.",
+      "image": {
+        "src": "/diagrams/products/nfc-vs-bluetooth-matrix.svg",
+        "alt": "Comparison matrix of NFC, Bluetooth Classic and BLE across range, frequency, data rate, power, connection setup, security and tag or device cost."
+      },
+      "bullets": [
+        "Range and intent: NFC 0-5 cm forces a deliberate tap; Bluetooth Classic reaches 1-10 m and BLE 10-100 m for hands-off range.",
+        "Data and power: NFC 106-424 kbps from a passive tag; Bluetooth Classic 1-3 Mbps; BLE 125 kbps-2 Mbps on a coin cell lasting 1-5 years.",
+        "Cost: an NFC tag is $0.05-$1.20; a BLE beacon $5-$30; a Bluetooth Classic peripheral $15-$200+."
+      ]
+    },
+    {
+      "title": "The hybrid pattern — NFC handshake, Bluetooth data",
+      "intro": "Because they solve different problems, premium electronics use both — an NFC tap to carry the pairing handshake, then Bluetooth to sustain the data. Tap a speaker and it connects without the scan-select-PIN dance.",
+      "image": {
+        "src": "/diagrams/products/nfc-vs-bluetooth-hybrid.svg",
+        "alt": "Four-step hybrid flow: tap the NFC tag, the tag hands over the Bluetooth MAC and keys, the phone pairs silently, and Bluetooth sustains the audio or BLE sensor data — as used by tap-to-pair headphones and Wi-Fi Easy Connect provisioning."
+      },
+      "bullets": [
+        "Tap-to-pair: the NFC tag carries the Bluetooth MAC and keys, so the phone pairs silently — Sony, Bose and Sennheiser headphones ship this.",
+        "Onboarding: Wi-Fi Easy Connect and IoT setup tap to provision credentials instead of typing them.",
+        "Security split: NFC's first defence is the 0-5 cm range; Bluetooth travels across a room and relies on cryptographic implementation (AES-CCM, ECDH)."
       ]
     }
   ],
@@ -264,6 +290,31 @@
     {
       "href": "/products/rfid-cards/mifare-desfire-ev3-card/",
       "label": "MIFARE DESFire cards"
+    }
+  ],
+  "keywords": [
+    "nfc vs bluetooth",
+    "nfc vs ble range",
+    "nfc vs bluetooth security",
+    "nfc bluetooth pairing handshake",
+    "nfc vs ble power consumption",
+    "nfc vs bluetooth cost"
+  ],
+  "brief": [
+    {
+      "label": "Verdict by goal",
+      "items": [
+        "Deliberate tap — payment, access, authentication → NFC (0-5 cm, no pairing, passive tag $0.05-$1.20).",
+        "Sustained streaming — audio, sensors → Bluetooth Classic (1-3 Mbps) or BLE (10-100 m, coin cell 1-5 years).",
+        "Room or building presence and location → BLE beacons with gateway infrastructure."
+      ]
+    },
+    {
+      "label": "They pair up more than they compete",
+      "items": [
+        "The dominant pattern in premium electronics: NFC tap for the pairing handshake, Bluetooth for the sustained data channel.",
+        "NFC security is proximity first (0-5 cm) plus chip crypto; Bluetooth travels across a room and depends on cryptographic implementation."
+      ]
     }
   ]
 }
