@@ -441,6 +441,13 @@ const machineTextPath = buildMachineRoute(route, "txt");
             }
             // Funnel event fires on CONFIRMED delivery, not on attempt.
             pushRfqEvent("rfq_submit", { rfq_step: total });
+            // GA4-standard lead event. `rfq_submit` is a custom name GA4's
+            // lead-gen model doesn't recognize, so the Generate-leads report
+            // and its "Qualified leads / Converted" tiles read 0 without this.
+            // Same confirmed-delivery trigger; mark `generate_lead` as a key
+            // event in GA4 Admin. Fires alongside rfq_submit (no double-count:
+            // different event names).
+            pushRfqEvent("generate_lead", { lead_source: "rfq_wizard", currency: "USD", value: 0 });
           })
           .catch(() => {
             // Network / endpoint failure: keep the form (nothing the buyer

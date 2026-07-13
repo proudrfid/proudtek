@@ -748,6 +748,16 @@
             route: window.location.pathname,
             fields_completed: Object.keys(completedFields).length,
           });
+          // GA4-standard lead event — `form_submit` is a custom name GA4's
+          // lead-gen model doesn't recognize, so the Generate-leads report
+          // reads 0 qualified leads without this. Mark `generate_lead` as a
+          // key event in GA4 Admin. Fires alongside form_submit (distinct
+          // event names, so no double-count).
+          codexPushEvent('generate_lead', {
+            form_id: formId,
+            route: window.location.pathname,
+            lead_source: 'inline_rfq_form',
+          });
         });
       });
 
