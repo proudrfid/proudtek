@@ -23,7 +23,7 @@
     {
       "label": "Magnetic-stripe standards and coercivity choice",
       "items": [
-        "ISO/IEC 7811-2 (magnetic characteristics), 7811-6 (HiCo stripe, ~2750 Oe typical, up to 4000 Oe for high-durability), 7811-7 (LoCo stripe, ~300 Oe) and 7811-8 (financial-variant coercivity) are the canonical standards. HiCo is the default hospitality and enterprise choice; LoCo is reserved for disposable / single-visit cards.",
+        "ISO/IEC 7811-2 (LoCo stripe, ~300 Oe), 7811-6 (HiCo stripe, ~2750 Oe typical, up to 4000 Oe for high-durability), 7811-7 (high-coercivity high-density) and 7811-8 (the 650 Oe intermediate grade) are the canonical coercivity parts. HiCo is the default hospitality and enterprise choice; LoCo is reserved for disposable / single-visit cards.",
         "HiCo resists accidental demagnetisation from handset magnets, magnetic wallet closures, and other cards in a lanyard stack — the same failure mode that generates the bulk of front-desk re-encoding labor on LoCo fleets."
       ]
     },
@@ -114,7 +114,7 @@
     "license": "CC BY-SA 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/"
   },
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-11",
   "imageSourceRoutes": [
     "/lp/custom-rfid-card-printing/",
     "/solutions/hotel-key-cards/"
@@ -146,7 +146,100 @@
         "A combo card is the only credential that lets an operator run two reader generations on one estate without issuing duplicate cards or forcing a single-day cutover.",
         "The typical hospitality portfolio transition runs 18-36 months; campus card migrations run 24-48 months — both horizons where a dual-rail card is cheaper than the support cost of parallel issuance.",
         "Post-migration, combo stock is retired in favour of RFID-only; the per-card ~USD 0.05-0.10 stripe premium disappears at that point and the same chip SKU continues to ship."
+      ],
+      "intro": "Every reader-estate migration has an awkward middle act: the lobby doors went RFID in the renovation, the parking barrier and the vending bank still want a stripe swiped, and no guest wants to carry two cards about it. The combo card is the one credential both reader generations agree on. Still weighing the end state itself? The [RFID vs magnetic hotel key card comparison](/compare/rfid-vs-magnetic-hotel-key-cards/) closes that half of the decision."
+    },
+    {
+      "title": "Inside the card — two rails, zero crosstalk",
+      "intro": "One ISO/IEC 7810 body, two entirely different physics. The chip talks to readers by inductive coupling at 13.56 MHz; the stripe stores flux reversals that a swipe head reads by contact. They do not share a wire, a frequency, or an opinion — which is why one card serves both fleets without either rail noticing the other.",
+      "image": {
+        "src": "/diagrams/products/rfid-magstripe-combo-card-construction.svg",
+        "alt": "Two-panel diagram of an RFID magstripe combo card. Left: exploded lamination stack — printed front overlay, PVC core carrying the embedded antenna coil and chip module, back overlay with the HiCo 2750 Oe magnetic stripe and signature panel; 0.76-0.84 mm total thickness on an 85.60 × 53.98 mm ISO/IEC 7810 ID-1 body, with the stripe read surface flagged to stay unlaminated. Right: the two rails compared — the RFID rail couples inductively with readers at 13.56 MHz without contact, while the magnetic rail stores flux reversals read by a contact swipe head. Different physics, no cross-coupling in normal use."
+      },
+      "bullets": [
+        "Lamination stack: printed front overlay, PVC core carrying the embedded antenna coil and chip module, back overlay with the HiCo stripe panel and optional signature panel.",
+        "The stripe is a lamination feature, not an electronic one — it pairs with any chip in the matrix, from MIFARE Classic 1K to DESFire EV3 to HID iCLASS SE.",
+        "Finishes stay off the stripe: spot UV, hot-foil, and hologram overlays are combo-compatible provided the stripe area keeps its unlaminated read surface.",
+        "ISO/IEC 10373-1 / 10373-2 test methods cover flex, torsion, UV exposure, and stripe survivability — the combo body qualifies as one construction, not two."
       ]
+    },
+    {
+      "title": "The full specification — chip options, stripe grades, track formats",
+      "intro": "Procurement reads tables, not adjectives, so here is the whole card in one: RFID rail up top, magnetic rail in the middle, commercial terms at the bottom. For what actually gets written onto the chip and tracks at issuance, the [hotel key card encoding guide](/guides/hotel-key-card-encoding/) walks the full workflow.",
+      "table": {
+        "columns": [
+          "Attribute",
+          "Value",
+          "Notes"
+        ],
+        "rows": [
+          [
+            "Card body",
+            "ISO/IEC 7810 ID-1 — 85.60 × 53.98 mm",
+            "Standard CR80 geometry; fits every badge printer, holder, and wallet on the estate"
+          ],
+          [
+            "Thickness",
+            "0.76-0.84 mm",
+            "Varies with stripe lamination tier"
+          ],
+          [
+            "RFID rail",
+            "13.56 MHz, ISO/IEC 14443-A",
+            "Contactless side — electrically independent of the stripe"
+          ],
+          [
+            "Chip options",
+            "MIFARE Classic 1K / 4K · MIFARE DESFire EV3 · MIFARE Ultralight C · NTAG 213 / 216 · HID iCLASS SE / SEOS-compatible",
+            "Spec the chip for the post-migration estate; DESFire EV3 carries AES-128 for secure tiers"
+          ],
+          [
+            "Stripe grades",
+            "HiCo 2750 Oe (default) · HiCo 4000 Oe (high-use) · LoCo 300 Oe (disposable)",
+            "HiCo per ISO/IEC 7811-6; LoCo per ISO/IEC 7811-2"
+          ],
+          [
+            "Track 1",
+            "79 alphanumeric characters at 210 bpi",
+            "IATA format per ISO/IEC 7813"
+          ],
+          [
+            "Track 2",
+            "40 numeric characters at 75 bpi",
+            "ABA format — the track most legacy hospitality and campus head-ends read"
+          ],
+          [
+            "Track 3",
+            "107 numeric characters at 210 bpi, read-write",
+            "ISO/IEC 4909; where legacy campus stored-value and laundry-credit balances live"
+          ],
+          [
+            "Materials",
+            "PVC core + PET/ABS laminate; PC for high-temperature duty",
+            "PC covers vehicle dashboards and sunlit kiosks with 5-7 year service life"
+          ],
+          [
+            "Durability testing",
+            "ISO/IEC 10373-1 / 10373-2 methods",
+            "Flex, torsion, UV, and magnetic-stripe survivability"
+          ],
+          [
+            "Encoding",
+            "Factory pre-encode (UID + Track 1/2/3 + CSV manifest) or desktop dual-encode in one print pass",
+            "HID Fargo, Magicard, Evolis, Entrust, Zebra supported"
+          ],
+          [
+            "MOQ & stock",
+            "1,000 custom-printed; blank dual-rail stock ships in 2-3 business days",
+            "Pre-encoding no-charge at ≥5,000 units"
+          ],
+          [
+            "Lead time",
+            "5-7 business days at 1,000-10,000 units",
+            "Scales to 1,000,000+ cards with scheduled call-off"
+          ]
+        ]
+      }
     },
     {
       "title": "HiCo vs LoCo — coercivity, failure modes, and where each fits",
@@ -158,16 +251,17 @@
           "Demagnetises near handset magnets, magnetic wallet closures, other cards",
           "Front-desk re-encoding events drive support labour",
           "Fits single-visit / disposable use (day-pass, event badge, one-night hotel)",
-          "ISO/IEC 7811-7 coercivity class"
+          "ISO/IEC 7811-2 coercivity class"
         ],
         "after": [
           "~USD 0.05-0.10 per-card stripe cost",
           "Resists handset magnets, wallet clasps, lanyard-stack interaction",
           "5-year service life under hospitality wear patterns",
           "Standard for returning-guest, member, and employee programmes",
-          "ISO/IEC 7811-6 coercivity class, 4000 Oe variant for airline/high-use"
+          "ISO/IEC 7811-6 coercivity class; the 4000 Oe high-density tier is ISO/IEC 7811-7"
         ]
-      }
+      },
+      "intro": "Coercivity, measured in oersteds, is a stripe's stubbornness: how strong a magnetic field must be before the encoding surrenders. LoCo gives in to a handbag clasp; HiCo holds out for the encoder that wrote it. Pick by how long the card has to survive the real world, not by the per-card delta."
     },
     {
       "title": "The per-card economics of the bridge period",
@@ -182,6 +276,22 @@
         "Combo MIFARE DESFire EV3 + HiCo 2750 Oe at MOQ 5,000: typical per-card USD 0.55-0.90 printed both sides.",
         "Pre-encoding (UID + magstripe tracks + CSV manifest): no-charge at ≥5,000 units.",
         "Signature panel, hot-foil, spot UV, and embossed numbering add USD 0.03-0.15 per card depending on finish stack."
+      ],
+      "intro": "The stripe costs a nickel or a dime per card right up until it saves you from running two credential programmes in parallel — duplicate issuance, duplicate support, duplicate lost-card churn. This is the whole business case, in one number and four bullets."
+    },
+    {
+      "title": "The migration playbook — one estate, two reader fleets",
+      "intro": "No estate migrates over a weekend, and nobody budgets for a flag-day cutover that goes perfectly. Below is how hospitality and campus operators actually run it. If the RFID side must land on an existing lock platform, start from the [Assa Abloy-compatible card page](/products/rfid-cards/rfid-card-assa-abloy-compatible/); once the spec is frozen, put the artwork through [custom card printing](/products/rfid-cards/nfc-card-custom-printing/).",
+      "image": {
+        "src": "/diagrams/products/magstripe-to-rfid-migration-bridge.svg",
+        "alt": "Three-phase migration bridge diagram. Phase 1, legacy estate: doors, POS, and parking all read magnetic stripe. Phase 2, the 18-36 month bridge: one combo card serves a mixed fleet — some readers migrated to 13.56 MHz RFID, others still on stripe. Phase 3, end state: every reader on RFID, the stripe retired, and reissue switches to an RFID-only card on the same chip SKU."
+      },
+      "checklist": [
+        "Audit the reader estate first: list every door, elevator, POS, vending unit, and parking head-end by rail — magstripe, RFID, or both.",
+        "Spec the chip for the end state, not the legacy fleet — the RFID rail outlives the stripe by design.",
+        "Issue combo stock at natural reissue points: guest checkout cycles, card-office renewals, new-hire batches.",
+        "Migrate reader zones in renovation order; a combo credential keeps working on both sides of every phase boundary.",
+        "Write the sunset clause: when the last magstripe head-end retires, reorder the same chip SKU as RFID-only and pocket the stripe premium."
       ]
     },
     {
@@ -217,7 +327,8 @@
             "text": "From buyer conversations across hospitality-legacy-PMS, university-multi-system, healthcare-legacy-badge, transit-interim, and enterprise-migration programmes converge on combo-card issuance for the 18-36 month bridge, with an explicit sunset clause that retires the stripe once the last legacy reader is decommissioned."
           }
         ]
-      }
+      },
+      "intro": "The magstripe has been declared dead roughly once a decade since 1994 and has attended every one of its own funerals. The timeline explains both the longevity and the scheduled exit."
     }
   ],
   "resourceCards": [
@@ -246,12 +357,12 @@
           "label": "RFID student ID cards"
         },
         {
-          "href": "/blog/magnetic-stripe-vs-rfid-hotel-cards/",
-          "label": "Magnetic stripe vs RFID hotel cards"
+          "href": "/compare/rfid-vs-magnetic-hotel-key-cards/",
+          "label": "RFID vs magnetic hotel key cards — full comparison"
         },
         {
-          "href": "/solutions/hotel-key-cards/",
-          "label": "Hotel key-card programme guide"
+          "href": "/guides/hotel-key-card-encoding/",
+          "label": "Hotel key card encoding guide"
         }
       ]
     }
@@ -276,16 +387,24 @@
     {
       "question": "When should we stop ordering combo stock and move to RFID-only?",
       "answer": "When the last legacy magstripe reader in the estate is decommissioned. Typical hospitality portfolios reach that point 18-36 months into a renovation cycle; universities 24-48 months. At that point the combo spec is retired and the same chip SKU ships as RFID-only, saving the ~USD 0.05-0.10 per-card stripe premium."
+    },
+    {
+      "question": "Is a combo card with Track 2 data in PCI DSS scope?",
+      "answer": "Only if the track carries payment data. A combo card used purely as a room key or facility credential — no PAN, no cardholder data — falls outside PCI DSS scope. When Track 2 or Track 3 carries stored-value or cashless-payment data on a campus or loyalty programme, PCI DSS v4.0 applies to the issuance, encoding, and handling systems that touch that track; agree the scope boundary with your integrator at tender stage, not after deployment."
+    },
+    {
+      "question": "What artwork restrictions does the magnetic stripe add to card printing?",
+      "answer": "The stripe band must keep an unlaminated, unobstructed read surface: no embossing, spot UV, hot-foil, or hologram overlay across the stripe area, and bleeds run under it rather than around it. Everything else in the finish stack — full-colour offset, UV digital, dye-sublimation retransfer personalisation, signature panels, embossed numbering elsewhere on the card — coexists with the combo construction. Have artwork preflighted against the stripe keep-out zone before committing a print run."
     }
   ],
   "sources": [
     {
-      "label": "ISO/IEC 7811 series — Identification cards: recording technique (magnetic stripe)",
-      "url": "https://www.iso.org/standard/75497.html",
+      "label": "ISO/IEC 7811-2:2018 — Identification cards — Recording technique — Part 2: Magnetic stripe: Low coercivity",
+      "url": "https://www.iso.org/standard/73638.html",
       "publisher": "International Organization for Standardization",
-      "publishedAt": "2018-04-01",
-      "accessedAt": "2026-04-24",
-      "note": "Master standard family for magnetic-stripe cards; parts 2/6/7/8 define LoCo/HiCo/high-HiCo coercivity classes used on combo cards."
+      "publishedAt": "2018",
+      "accessedAt": "2026-07-11",
+      "note": "Low-coercivity (~300 Oe) stripe part — the disposable / single-visit tier on combo cards. Defines the recording technique and track densities used on all three tracks."
     },
     {
       "label": "ISO/IEC 7810 — Identification cards — Physical characteristics",
@@ -313,10 +432,10 @@
     },
     {
       "label": "ISO/IEC 10373-1 — Test methods for identification cards",
-      "url": "https://www.iso.org/standard/73601.html",
+      "url": "https://www.iso.org/standard/70482.html",
       "publisher": "International Organization for Standardization",
-      "publishedAt": "2020-09-01",
-      "accessedAt": "2026-04-24",
+      "publishedAt": "2020",
+      "accessedAt": "2026-07-11",
       "note": "Durability and magstripe-survivability test methodology used in hospitality / campus lifecycle QA."
     },
     {
@@ -358,6 +477,22 @@
       "publishedAt": "2023-01-01",
       "accessedAt": "2026-04-24",
       "note": "Historical reference anchoring the magstripe timeline back to 1969 and the lineage of the rail the combo card supports."
+    },
+    {
+      "label": "ISO/IEC 7811-6:2018 — Identification cards — Recording technique — Part 6: Magnetic stripe: High coercivity",
+      "url": "https://www.iso.org/standard/73639.html",
+      "publisher": "International Organization for Standardization",
+      "publishedAt": "2018",
+      "accessedAt": "2026-07-11",
+      "note": "High-coercivity part behind the 2750 Oe default stripe; ISO/IEC 7811-7 covers the high-coercivity high-density tier."
+    },
+    {
+      "label": "Magnetic Stripe Card Standards (PN 99800004) — track formats, densities and ISO 7811 part map",
+      "url": "https://www.magtek.com/content/documentationfiles/d99800004.pdf",
+      "publisher": "MagTek, Inc.",
+      "publishedAt": "2011",
+      "accessedAt": "2026-07-11",
+      "note": "Encoder-vendor reference: Track 1 — 210 bpi, 79 alphanumeric (IATA); Track 2 — 75 bpi, 40 numeric (ABA); Track 3 — 210 bpi, 107 numeric (ISO/IEC 4909); 0.110 in track width."
     }
   ],
   "primaryAction": {
@@ -370,8 +505,8 @@
       "label": "Explore hotel key card options"
     },
     {
-      "href": "/blog/magnetic-stripe-vs-rfid-hotel-cards/",
-      "label": "Read: magstripe vs RFID for hotels"
+      "href": "/compare/rfid-vs-magnetic-hotel-key-cards/",
+      "label": "Compare: RFID vs magnetic stripe hotel cards"
     }
   ],
   "relatedIndustries": [
