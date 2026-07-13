@@ -488,6 +488,15 @@ export const PAGE_IMAGE_OVERRIDES: Record<string, { url: string; alt: string }> 
 };
 
 export const PAGE_DESCRIPTION_OVERRIDES: Record<string, string> = {
+  "/solutions/rfid-event-wristbands/":
+    "Choose the right RFID event wristband — Tyvek, silicone, woven or NFC — matched to chip and cashless platform. Procurement pricing, materials and ROI.",
+  "/solutions/rfid-supply-chain-management/":
+    "Tag items, cases & pallets with UHF RAIN RFID — cut shipment errors 95%, receiving time 80%. GS1 EPCIS 2.0 events for DSCSA, FSMA 204 & EUDR.",
+  "/solutions/hotel-key-cards/":
+    "Hotel key cards matched to your lock platform — MIFARE Classic, Plus, DESFire or Ultralight. Encoder & PMS workflow, materials and 2026 security notes.",
+  "/solutions/nfc-business-card/":
+    "Custom NFC business cards: NTAG chip choice, PVC, wood, metal or bamboo, vCard & URL encoding, iPhone tap-to-share. You own the URL — no subscription.",
+
   "/":
     "Proud Tek is a custom RFID & NFC manufacturer in China since 2008. Two Shenzhen factories, 10 automated production lines, 305+ pieces of equipment, OEM/ODM cards, tags, labels, wristbands, keyfobs and readers shipped to 50+ countries.",
   "/product/125khz-rfid-sticker/":
