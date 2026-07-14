@@ -166,6 +166,15 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
      safely in window.dataLayer and flush when it loads, so no events
      are lost; only the network fetch is deferred. */
   (function () {
+    // Host-gate (2026-07-13): load gtag.js ONLY on the production domain, so
+    // Vercel preview deploys (*.vercel.app) and local dev never send page
+    // views to the live GA4 property. Consent defaults + config above still
+    // run, but gtag.js never fetches off-prod, so nothing is transmitted —
+    // this removes the vercel.com/referral traffic that dominated the
+    // Jun–Jul 2026 GA reports. Add hosts here if the site gains another
+    // production domain.
+    var h = location.hostname;
+    if (h !== 'proudtek.com' && h !== 'www.proudtek.com') return;
     var loaded = false;
     function loadGtag() {
       if (loaded) return;
