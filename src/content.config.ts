@@ -113,7 +113,7 @@ const sectionSchema = z.object({
     .optional(),
   testimonial: z.object({ text: z.string(), source: z.string() }).optional(),
   checklist: z.array(z.string()).optional(),
-  layout: z.enum(["default", "split", "split-reverse"]).optional(),
+  layout: z.enum(["default", "split", "split-reverse", "columns"]).optional(),
 });
 
 const briefFieldSchema = z.object({
