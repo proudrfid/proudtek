@@ -48,7 +48,7 @@ export interface EditorialSectionData {
   timeline?: { items: Array<{ label: string; text: string }> };
   testimonial?: { text: string; source: string };
   checklist?: string[];
-  layout?: "default" | "split" | "split-reverse";
+  layout?: "default" | "split" | "split-reverse" | "columns";
 }
 
 export interface EditorialBriefField {
