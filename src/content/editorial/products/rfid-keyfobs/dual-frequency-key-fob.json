@@ -39,81 +39,23 @@
         "MIFARE DESFire EV3 (AES-128, NIST FIPS 197) — recommended HF-side default",
         "NTAG213 / NTAG216 (NDEF tap-to-URL, phone-readable)"
       ]
-    },
-    {
-      "label": "Air-interface standards",
-      "items": [
-        "ISO/IEC 18000-2:2009 Type A — LF 125-134.2 kHz",
-        "ISO/IEC 14443-3:2018 + ISO/IEC 14443-4:2018 — HF 13.56 MHz Type A",
-        "ISO/IEC 15693:2018 — HF alternative for Vicinity-class readers (optional HF variant)"
-      ]
-    },
-    {
-      "label": "Reader-panel interface",
-      "items": [
-        "Wiegand 26 / 34 legacy 5-wire (incumbent fleet)",
-        "SIA OSDP v2.2 RS-485 Secure Channel Protocol (modernised reader-to-panel link)",
-        "OSDP retrofit proceeds independently of the credential — dual-frequency fob spans both eras"
-      ]
-    },
-    {
-      "label": "Cross-frequency isolation",
-      "items": [
-        "Large-diameter LF coil on one layer + small planar HF coil on another, orthogonal routing",
-        "< 1 dB cross-coupling sensitivity degradation, verified per unit on both-frequency test rig",
-        "LF reader energises only LF coil, HF reader energises only HF coil — no mutual interference"
-      ]
-    },
-    {
-      "label": "UID correlation evidence",
-      "items": [
-        "Every order ships with a signed CSV mapping LF UID ↔ HF UID per physical fob",
-        "Customer access-control system links both IDs to one employee / tenant record",
-        "No manual reconciliation required during issuance or re-enrollment"
-      ]
-    },
-    {
-      "label": "Housing",
-      "items": [
-        "40 × 32 × 6 mm ABS, ultrasonic-welded (no adhesive seam)",
-        "IP65 per IEC 60529 — dust-tight + low-pressure water jet",
-        "Black / blue / red / green standard or custom pantone; metal split ring or lobster clasp"
-      ]
-    },
-    {
-      "label": "Chip-pair presets",
-      "items": [
-        "EM4100 + MIFARE Classic 1K (budget LF→HF upgrade)",
-        "{chip:atmel-t5577:name} + MIFARE DESFire EV3 (flexible LF + AES-128 HF — recommended)",
-        "HID Prox + HID iCLASS (HID-ecosystem migration within a single brand)"
-      ]
-    },
-    {
-      "label": "Migration posture",
-      "items": [
-        "Single re-issuance event replaces two — staff receive dual-frequency fob once, keep it through rollout",
-        "LF half continues to serve legacy Wiegand panels until HF reader coverage reaches 100 %",
-        "HF half authenticates with AES-128 per NXP AN10922 diversification once the HF reader is live"
-      ]
-    },
-    {
-      "label": "Quality assurance",
-      "items": [
-        "Per-unit dual-frequency test — LF and HF read on different antennas before packaging",
-        "Coupling-degradation reject threshold: > 1 dB drop vs single-chip baseline",
-        "Signed production-lot evidence pack retained for access-control-audit closure"
-      ]
-    },
-    {
-      "label": "Logistics",
-      "items": [
-        "MOQ 500 pcs / 12-18 business days lead time",
-        "Pre-encoded on both chips with customer facility code + HF application keys",
-        "UID correlation CSV + per-lot QA certificate shipped with every order"
-      ]
     }
   ],
   "sections": [
+    {
+      "title": "One credential, two frequencies",
+      "layout": "split",
+      "intro": "One fob, two frequencies — and no re-badging the building. A 125 kHz LF transponder and a 13.56 MHz HF chip share a single 40 × 32 × 6 mm ABS housing, so one credential carries a site from its Wiegand past into its OSDP future and staff get issued once instead of twice.",
+      "bullets": [
+        "Two independent antenna systems, electromagnetically isolated to < 1 dB cross-coupling and verified per unit at production acceptance.",
+        "LF options span EM4100, T5577 and HID Prox emulation; HF spans MIFARE Classic, DESFire EV3 and NTAG.",
+        "A single issuance event spans the full 12-24 month LF-to-HF migration — no second re-badging and no mid-migration access interruption."
+      ],
+      "image": {
+        "src": "/diagrams/products/dual-frequency-key-fob-anatomy.svg",
+        "alt": "Cutaway of one ABS key-fob housing showing a large-diameter 125 kHz LF coil and a small planar 13.56 MHz HF coil on separate layers, orthogonally routed to under 1 dB cross-coupling."
+      }
+    },
     {
       "title": "Dual-frequency keyfob at a glance",
       "statBar": {
@@ -143,6 +85,35 @@
             "label": "Typical LF-to-HF migration window spanned"
           }
         ]
+      }
+    },
+    {
+      "title": "Why the two chips don't fight",
+      "layout": "split-reverse",
+      "intro": "Two orders of magnitude apart in frequency, the two chips never notice each other. A large-diameter LF coil sits on one layer and a small planar HF coil on another, routed orthogonally, so the two antennas are electromagnetically isolated with no mutual interference — the LF reader energises only the LF coil, the HF reader only the HF coil. Cross-coupling sensitivity degradation stays under < 1 dB, verified per unit on a both-frequency test rig.",
+      "bullets": [
+        "LF coil: large-diameter copper winding on the outermost layer for the ISO/IEC 18000-2 inductive envelope.",
+        "HF coil: small planar coil on the inner layer for the ISO/IEC 14443-3 / NFC Forum Type 2-4 envelope; orthogonal routing avoids mutual-inductance crosstalk.",
+        "When presented to a 125 kHz reader, only the LF chip energises and responds. When presented to a 13.56 MHz reader, only the HF chip energises and responds.",
+        "Production acceptance rejects any unit where cross-coupling affects sensitivity by more than 1 dB against a single-chip baseline — per-unit test, both frequencies."
+      ],
+      "image": {
+        "src": "/diagrams/products/dual-frequency-key-fob-isolation.svg",
+        "alt": "A 125 kHz LF reader energises only the LF coil and a 13.56 MHz HF reader only the HF coil in the same fob, with under 1 dB cross-coupling and no mutual interference."
+      }
+    },
+    {
+      "title": "Spans both reader eras",
+      "layout": "split",
+      "intro": "The credential outlives the wiring debate. A dual-frequency fob answers to whatever the panel behind the reader speaks — the incumbent Wiegand fleet today, the modernised OSDP link tomorrow — so the reader-to-panel retrofit can proceed on its own schedule, independent of the credential already in the user's pocket.",
+      "bullets": [
+        "Wiegand 26 / 34 legacy 5-wire (incumbent fleet)",
+        "SIA OSDP v2.2 RS-485 Secure Channel Protocol (modernised reader-to-panel link)",
+        "OSDP retrofit proceeds independently of the credential — dual-frequency fob spans both eras"
+      ],
+      "image": {
+        "src": "/diagrams/products/dual-frequency-key-fob-reader-eras.svg",
+        "alt": "One dual-frequency fob bridging a legacy Wiegand 26/34 five-wire panel on the left and a modern SIA OSDP v2.2 RS-485 Secure Channel panel on the right."
       }
     },
     {
@@ -207,14 +178,47 @@
       }
     },
     {
-      "title": "Technical design — two antennas, one housing",
-      "intro": "The dual-frequency fob contains two separate antenna coils wound on different layers within the ABS housing. The 125 kHz antenna is a large-diameter coil optimised for close-range inductive coupling; the 13.56 MHz antenna is a smaller planar coil tuned for NFC-range communication. The two antennas are electromagnetically isolated to prevent cross-frequency interference.",
-      "bullets": [
-        "LF coil: large-diameter copper winding on the outermost layer for the ISO/IEC 18000-2 inductive envelope.",
-        "HF coil: small planar coil on the inner layer for the ISO/IEC 14443-3 / NFC Forum Type 2-4 envelope; orthogonal routing avoids mutual-inductance crosstalk.",
-        "When presented to a 125 kHz reader, only the LF chip energises and responds. When presented to a 13.56 MHz reader, only the HF chip energises and responds.",
-        "Production acceptance rejects any unit where cross-coupling affects sensitivity by more than 1 dB against a single-chip baseline — per-unit test, both frequencies."
-      ]
+      "title": "The reference facts, at a glance",
+      "intro": "Everything a procurement or integration reviewer cross-checks against the datasheet — air-interface standards, housing, chip pairings, correlation evidence, migration posture, QA and logistics — kept in one scannable block.",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "📡",
+            "title": "Air-interface standards",
+            "text": "ISO/IEC 18000-2:2009 Type A — LF 125-134.2 kHz; ISO/IEC 14443-3:2018 + ISO/IEC 14443-4:2018 — HF 13.56 MHz Type A; ISO/IEC 15693:2018 — HF alternative for Vicinity-class readers (optional HF variant)."
+          },
+          {
+            "icon": "🧱",
+            "title": "Housing",
+            "text": "40 × 32 × 6 mm ABS, ultrasonic-welded (no adhesive seam); IP65 per IEC 60529 — dust-tight + low-pressure water jet; Black / blue / red / green standard or custom pantone; metal split ring or lobster clasp."
+          },
+          {
+            "icon": "🔗",
+            "title": "Chip-pair presets",
+            "text": "EM4100 + MIFARE Classic 1K (budget LF→HF upgrade); T5577 + MIFARE DESFire EV3 (flexible LF + AES-128 HF — recommended); HID Prox + HID iCLASS (HID-ecosystem migration within a single brand)."
+          },
+          {
+            "icon": "🪪",
+            "title": "UID correlation evidence",
+            "text": "Every order ships with a signed CSV mapping LF UID ↔ HF UID per physical fob; Customer access-control system links both IDs to one employee / tenant record; No manual reconciliation required during issuance or re-enrollment."
+          },
+          {
+            "icon": "🔁",
+            "title": "Migration posture",
+            "text": "Single re-issuance event replaces two — staff receive dual-frequency fob once, keep it through rollout; LF half continues to serve legacy Wiegand panels until HF reader coverage reaches 100 %; HF half authenticates with AES-128 per NXP AN10922 diversification once the HF reader is live."
+          },
+          {
+            "icon": "🔍",
+            "title": "Quality assurance",
+            "text": "Per-unit dual-frequency test — LF and HF read on different antennas before packaging; Coupling-degradation reject threshold: > 1 dB drop vs single-chip baseline; Signed production-lot evidence pack retained for access-control-audit closure."
+          },
+          {
+            "icon": "📦",
+            "title": "Logistics",
+            "text": "MOQ 500 pcs / 12-18 business days lead time; Pre-encoded on both chips with customer facility code + HF application keys; UID correlation CSV + per-lot QA certificate shipped with every order."
+          }
+        ]
+      }
     }
   ],
   "resourceCards": [
@@ -297,7 +301,7 @@
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2025-12-31",
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-13",
   "sources": [
     {
       "label": "ISO/IEC 18000-2:2009 — Parameters for air interface communications below 135 kHz",
