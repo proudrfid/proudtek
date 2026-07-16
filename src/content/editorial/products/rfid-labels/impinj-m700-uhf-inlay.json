@@ -29,89 +29,6 @@
         "GS1 EPC Tag Data Standard (TDS) encoding for SGTIN, SSCC, GIAI, GLN identifiers.",
         "RAIN RFID Alliance certified across reader and infrastructure ecosystem."
       ]
-    },
-    {
-      "label": "Read sensitivity and range performance",
-      "items": [
-        "−22.7 dBm ({chip:impinj-m730:short_name} / {chip:impinj-m770:short_name}) / −22.1 dBm ({chip:impinj-m750:short_name}) read sensitivity at the chip — 15-30% longer read range than M600-series predecessor in identical antenna designs.",
-        "Free-air bench: 10-15 m read range with 6 dBic CP antenna at 4 W EIRP.",
-        "Real-world envelopes: 5-10 m handheld in retail, 3-8 m fixed-portal in warehouse, 2-4 m on healthcare small-item / liquid-adjacent / on-metal applications."
-      ]
-    },
-    {
-      "label": "Real-world range derating rule of thumb",
-      "items": [
-        "Retail apparel floor: divide datasheet range by 2× for actual operational read.",
-        "Warehouse cases / pallet: divide by 3× — pallet contents, stretch-wrap, tag orientation all attenuate.",
-        "Healthcare / pharma: divide by 4× — small antenna footprints, aqueous drug attenuation, dense packaging.",
-        "On-metal / on-liquid: factor in 50-70% range reduction vs free-air; specify on-metal-tuned antenna or {chip:impinj-m770:short_name} AutoTune for consistency."
-      ]
-    },
-    {
-      "label": "Memory architecture",
-      "items": [
-        "{chip:impinj-m730:short_name}: 128-bit EPC (configurable to 96-bit for SGTIN) + 96-bit serialised TID; no user memory.",
-        "{chip:impinj-m750:short_name}: 96-bit EPC + 96-bit serialised TID + 32-bit user memory (for short lot / date codes).",
-        "{chip:impinj-m770:short_name}: 128-bit EPC + 96-bit serialised TID + 64-bit user memory + Protected Mode + AutoTune.",
-        "32-bit access password + 32-bit kill password on all variants per EPC Gen2v2."
-      ]
-    },
-    {
-      "label": "Form factors — dry, wet, converted label",
-      "items": [
-        "Dry inlay: bare antenna + chip on a carrier substrate, no adhesive. For label converters laminating into their own label construction.",
-        "Wet inlay: pressure-sensitive adhesive on release liner, ready to apply to any surface.",
-        "Converted label: printed face stock (paper, PET, polypropylene) + adhesive + inlay; finished branded label ready for end-use application."
-      ]
-    },
-    {
-      "label": "Antenna designs available",
-      "items": [
-        "15+ standard antenna designs: general-purpose far-field, compact (jewellery / pharma), on-metal, on-liquid, windshield, tire, woven care label, hang-tag.",
-        "Custom antenna engineering 4-8 weeks for specialised applications — provide target read range, tag dimensions, mounting surface, environmental conditions.",
-        "Smartrac, Avery Dennison, ARC Master List-certified antenna designs available across the M700 portfolio."
-      ]
-    },
-    {
-      "label": "Walmart RFID retail mandate alignment",
-      "items": [
-        "Walmart RFID source-tagging mandate (apparel since 2020, expanded to home / electronics / beauty 2022-2024) requires SGTIN encoding per GS1 TDS — {chip:impinj-m730:short_name} is the volume chip for source-tag compliance.",
-        "ARC Master List spec category compliance (apparel, footwear, hard goods) — Auburn University RFID Lab benchmarks are the procurement reference.",
-        "Adjacent retail mandates: Target, Macy's, Inditex, Nike, Lululemon, Kohl's all run on the same chip / antenna / encoding stack."
-      ]
-    },
-    {
-      "label": "Healthcare and pharmaceutical use",
-      "items": [
-        "DSCSA (U.S. Drug Supply Chain Security Act) + EU FMD (Falsified Medicines Directive) — RFID-on-pack pharmaceutical traceability with {chip:impinj-m730:short_name} / {chip:impinj-m750:short_name}.",
-        "Surgical instrument tracking, blood-bag identification, specimen-slide labelling — small-antenna inlays with high-sensitivity M700 chip recover range lost to miniaturisation.",
-        "Healthcare RTLS adjacency — UHF inlays + ceiling readers for instrument / asset / patient-flow tracking."
-      ]
-    },
-    {
-      "label": "Aerospace and supply-chain MRO",
-      "items": [
-        "ATA Spec 2000 Chapter 9-5 RFID for aviation parts traceability; Boeing / Airbus tier-1 supplier requirement on rotable parts.",
-        "Spec 2000 EPC encoding + serialised TID for unique-part identification across the part lifecycle.",
-        "{chip:impinj-m750:short_name} with user memory for on-tag part-history payload where backend connectivity is unreliable."
-      ]
-    },
-    {
-      "label": "M700 → M800 upgrade path",
-      "items": [
-        "Pin- and protocol-compatible: inlays qualified on M700 antenna designs swap to {chip:impinj-m830:short_name} (128-bit EPC, no user memory) or {chip:impinj-m850:short_name} (96-bit EPC + 32-bit user memory) without antenna re-tune or reader-fleet re-qualification.",
-        "M800 adds Gen2X protocol features (faster inventory, improved data integrity, optional Protected Mode for privacy / supply-chain serialisation control).",
-        "~1-2 dB sensitivity improvement (10-20% longer read range) and 30% lower power consumption at the chip level enable smaller / on-metal / on-liquid inlays that struggled on M700.",
-        "Plan M700 → M800 transition 4-8 weeks ahead for stock antenna designs (production line continues unchanged) — longer if new antenna tooling is required."
-      ]
-    },
-    {
-      "label": "Procurement and validation",
-      "items": [
-        "Prototype quantities: 100-1,000 units; production: 100M+ units / year.",
-        "On-site pilot validation recommended before committing to antenna choice — bench specs over-state real-world range; divide datasheet by 2-4× depending on application.",
-        "Lead time: 4-6 weeks for standard antenna designs; 8-12 weeks for custom antenna development + production qualification."
-      ]
     }
   ],
   "heroPoints": [
@@ -126,8 +43,36 @@
     "/products/rfid-labels/alien-higgs-9-uhf-inlay/"
   ],
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-13",
   "sections": [
+    {
+      "title": "What an M700 inlay actually is",
+      "layout": "split",
+      "intro": "Strip away the face stock, the print and the die-cut and what actually answers the reader is deceptively small: an Impinj M700-series chip flip-mounted onto a metal strap, bonded to an etched-aluminium dipole antenna on a PET web. That is the inlay — a sub-component, not a finished label — resonating across the global UHF RAIN band of 860-960 MHz that each region then carves into its own narrower window. On the generic inlay hub the silicon is treated as interchangeable; on this SKU it is the whole specification. The M700's −22.7 dBm read sensitivity is why the same antenna reads 15-30% further than it did on the M600-series predecessor — and the antenna geometry is the part you actually tune around it.",
+      "bullets": [
+        "15+ standard antenna designs: general-purpose far-field, compact (jewellery / pharma), on-metal, on-liquid, windshield, tire, woven care label, hang-tag.",
+        "Custom antenna engineering 4-8 weeks for specialised applications — provide target read range, tag dimensions, mounting surface, environmental conditions.",
+        "Smartrac, Avery Dennison, ARC Master List-certified antenna designs available across the M700 portfolio."
+      ],
+      "image": {
+        "src": "/diagrams/products/impinj-m700-uhf-inlay-anatomy.svg",
+        "alt": "Annotated anatomy of an Impinj M700-series UHF RFID inlay: the M700 chip on a metal strap at the centre of an etched-aluminium dipole antenna, carried on a PET web, reading at −22.7 dBm sensitivity and tuned across the 860-960 MHz UHF band."
+      }
+    },
+    {
+      "title": "Wet, dry, converted: one M700 inlay, three finish states",
+      "layout": "split-reverse",
+      "intro": "The same M700 chip and antenna leave the line in one of three finish states, and which one you order is dictated entirely by the process waiting downstream. A dry inlay is the bare core; a wet inlay adds the pressure-sensitive adhesive and release liner a label converter laminates from; a converted label is that inlay already built into printed face stock — at which point it has stopped being a component and become a finished branded label.",
+      "bullets": [
+        "Dry inlay: bare antenna + chip on a carrier substrate, no adhesive. For label converters laminating into their own label construction.",
+        "Wet inlay: pressure-sensitive adhesive on release liner, ready to apply to any surface.",
+        "Converted label: printed face stock (paper, PET, polypropylene) + adhesive + inlay; finished branded label ready for end-use application."
+      ],
+      "image": {
+        "src": "/diagrams/products/impinj-m700-uhf-inlay-forms.svg",
+        "alt": "Three finish states of one Impinj M700 inlay, left to right: a dry inlay with no adhesive or liner for converter lamination, a wet inlay adding a pressure-sensitive adhesive layer and a release liner, and a converted label with the inlay built into printed face stock as a finished branded label."
+      }
+    },
     {
       "title": "Why M700 chip selection drives UHF deployment performance",
       "statBar": {
@@ -238,6 +183,54 @@
         "{chip:impinj-m730:short_name} / {chip:impinj-m770:short_name} share −22.7 dBm sensitivity; {chip:impinj-m750:short_name} at −22.1 dBm (~0.6 dB difference) — antenna design and mounting surface dominate in-use range variation.",
         "Pin- and protocol-compatible upgrade to M800 ({chip:impinj-m830:short_name} / {chip:impinj-m850:short_name}) for Gen2X features, ~30% lower power consumption, and ~1-2 dB sensitivity improvement on the same antenna design."
       ]
+    },
+    {
+      "title": "The reference facts, at a glance",
+      "intro": "Everything a converter or programme reviewer cross-checks against the datasheet — sensitivity and range, the real-world derating rule, memory architecture, retail and Walmart mandate fit, the healthcare and aerospace programme notes, the M700 → M800 upgrade path and procurement — gathered into one scannable block.",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "📡",
+            "title": "Read sensitivity & range",
+            "text": "−22.7 dBm (M730 / M770) / −22.1 dBm (M750) read sensitivity at the chip — 15-30% longer read range than M600-series predecessor in identical antenna designs. Free-air bench: 10-15 m read range with 6 dBic CP antenna at 4 W EIRP. Real-world envelopes: 5-10 m handheld in retail, 3-8 m fixed-portal in warehouse, 2-4 m on healthcare small-item / liquid-adjacent / on-metal applications."
+          },
+          {
+            "icon": "📉",
+            "title": "Real-world range derating",
+            "text": "Retail apparel floor: divide datasheet range by 2× for actual operational read. Warehouse cases / pallet: divide by 3× — pallet contents, stretch-wrap, tag orientation all attenuate. Healthcare / pharma: divide by 4× — small antenna footprints, aqueous drug attenuation, dense packaging. On-metal / on-liquid: factor in 50-70% range reduction vs free-air; specify on-metal-tuned antenna or M770 AutoTune for consistency."
+          },
+          {
+            "icon": "💾",
+            "title": "Memory architecture",
+            "text": "M730: 128-bit EPC (configurable to 96-bit for SGTIN) + 96-bit serialised TID; no user memory. M750: 96-bit EPC + 96-bit serialised TID + 32-bit user memory (for short lot / date codes). M770: 128-bit EPC + 96-bit serialised TID + 64-bit user memory + Protected Mode + AutoTune. 32-bit access password + 32-bit kill password on all variants per EPC Gen2v2."
+          },
+          {
+            "icon": "🏬",
+            "title": "Walmart & retail mandate fit",
+            "text": "Walmart RFID source-tagging mandate (apparel since 2020, expanded to home / electronics / beauty 2022-2024) requires SGTIN encoding per GS1 TDS — M730 is the volume chip for source-tag compliance. ARC Master List spec category compliance (apparel, footwear, hard goods) — Auburn University RFID Lab benchmarks are the procurement reference. Adjacent retail mandates: Target, Macy's, Inditex, Nike, Lululemon, Kohl's all run on the same chip / antenna / encoding stack."
+          },
+          {
+            "icon": "🏥",
+            "title": "Healthcare & pharmaceutical use",
+            "text": "DSCSA (U.S. Drug Supply Chain Security Act) + EU FMD (Falsified Medicines Directive) — RFID-on-pack pharmaceutical traceability with M730 / M750. Surgical instrument tracking, blood-bag identification, specimen-slide labelling — small-antenna inlays with high-sensitivity M700 chip recover range lost to miniaturisation. Healthcare RTLS adjacency — UHF inlays + ceiling readers for instrument / asset / patient-flow tracking."
+          },
+          {
+            "icon": "✈️",
+            "title": "Aerospace & supply-chain MRO",
+            "text": "ATA Spec 2000 Chapter 9-5 RFID for aviation parts traceability; Boeing / Airbus tier-1 supplier requirement on rotable parts. Spec 2000 EPC encoding + serialised TID for unique-part identification across the part lifecycle. M750 with user memory for on-tag part-history payload where backend connectivity is unreliable."
+          },
+          {
+            "icon": "⬆️",
+            "title": "M700 → M800 upgrade path",
+            "text": "Pin- and protocol-compatible: inlays qualified on M700 antenna designs swap to M830 (128-bit EPC, no user memory) or M850 (96-bit EPC + 32-bit user memory) without antenna re-tune or reader-fleet re-qualification. M800 adds Gen2X protocol features (faster inventory, improved data integrity, optional Protected Mode for privacy / supply-chain serialisation control). ~1-2 dB sensitivity improvement (10-20% longer read range) and 30% lower power consumption at the chip level enable smaller / on-metal / on-liquid inlays that struggled on M700. Plan M700 → M800 transition 4-8 weeks ahead for stock antenna designs (production line continues unchanged) — longer if new antenna tooling is required."
+          },
+          {
+            "icon": "💰",
+            "title": "Procurement & validation",
+            "text": "Prototype quantities: 100-1,000 units; production: 100M+ units / year. On-site pilot validation recommended before committing to antenna choice — bench specs over-state real-world range; divide datasheet by 2-4× depending on application. Lead time: 4-6 weeks for standard antenna designs; 8-12 weeks for custom antenna development + production qualification."
+          }
+        ]
+      }
     }
   ],
   "resourceCards": [
