@@ -105,7 +105,7 @@ export const COMMERCIAL_TERMS = {
   items: [
     {
       label: "MOQ",
-      value: "Varies by SKU — stock items from 100 pcs; custom production typically 500-1,000 pcs",
+      value: "Varies by SKU — stock items from 100 pcs; custom production typically 200-1,000 pcs",
     },
     {
       label: "Lead time",
@@ -231,11 +231,13 @@ export const ORGANIZATION_OPERATIONS = {
    *  Reconciled 2026-06-11 with COMMERCIAL_TERMS + the lp sourcing pages
    *  (stock items from 100 pcs; custom production typically 500-1,000):
    *  wristbands corrected from the unsourced "200 pcs" to the lp-verified
-   *  silicone-500 / stock-Tyvek-100 figures. */
+   *  silicone-500 / stock-Tyvek-100 figures.
+   *  Owner ruling 2026-07-15: custom wristband MOQ unified at 200 pcs
+   *  across all materials (stock Tyvek 100 unchanged). */
   moq: {
     nfcCards: "100 pcs (stock); 1,000 custom-printed",
     rfidLabels: "500 pcs printed; inlays by the roll (1,000+)",
-    rfidWristbands: "500 pcs custom; stock Tyvek from 100 pcs",
+    rfidWristbands: "200 pcs custom; stock Tyvek from 100 pcs",
     rfidReaders: "10 pcs",
   },
   /** Lead time for stock vs custom orders — used in llms.txt Quick facts. */
