@@ -5189,7 +5189,14 @@ form[data-codex-rfq] .kb-forms-submit {
 
 .codex-editorial-data-highlight {
   display: grid;
-  grid-template-columns: minmax(120px, auto) 1fr;
+  /* Overflow guard (2026-07-17): value is a big-number slot ("30 m"), but
+     ~28 live pages carry long compound strings in it. `auto` sized the
+     column to the unwrapped string — it ate the row and crushed the
+     heading into a 1ch vertical strip. fit-content(40%) is identical for
+     proper short values (max-content < 40%) and caps + wraps long ones so
+     heading/text keep their column. Stopgap: the long values themselves
+     are being reshaped into tables/panels batch by batch. */
+  grid-template-columns: minmax(120px, fit-content(40%)) 1fr;
   gap: var(--codex-space-3) var(--codex-space-4);
   align-items: start;
   margin: var(--codex-space-5) 0;
@@ -5207,7 +5214,10 @@ form[data-codex-rfq] .kb-forms-submit {
   font-size: clamp(2rem, 1.5rem + 2vw, 3rem);
   font-weight: var(--codex-weight-semibold, 600);
   color: var(--codex-gold);
-  line-height: 1;
+  /* 1.1 (was 1): imperceptible for one-line stats, keeps wrapped
+     long-value lines from touching (overflow guard above). */
+  line-height: 1.1;
+  overflow-wrap: break-word;
 }
 .codex-editorial-data-highlight__heading {
   display: block;
