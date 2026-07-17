@@ -2568,6 +2568,35 @@ body.codex-catalog-rail-locked { overflow: hidden; }
     .codex-editorial-hero-copy:has(> .codex-editorial-figure) {
     display: block;
   }
+  /* Hero-points full-width strip (user-requested, 2026-07-17): with the
+     split hero, title + Quick Answer + hero points + CTA all stacked into
+     the right column — a tower of text beside an empty left gutter under
+     the image. Pull the points list out of the right column and lay it
+     across BOTH columns, below the image and the copy. Explicit row 13 is
+     the first track after the figure's `grid-row: span 12` (unused rows
+     collapse to zero height, so no gap appears); the CTA + trust bar keep
+     auto-flowing in column 2 and now sit directly under the Quick Answer.
+     The list itself becomes a two-up grid so long procurement bullets read
+     at a comfortable measure instead of one 70ch column pinned to the left
+     of an ~1100px row; li+li margins yield to grid gap so column tops
+     align. Excludes data-hero-layout="stacked" (hub opt-out above). */
+  .codex-editorial-hero[data-page-type="product"]:not([data-hero-layout="stacked"])
+    .codex-editorial-hero-copy:has(> .codex-editorial-figure) > .codex-editorial-points {
+    grid-column: 1 / -1;
+    grid-row: 13;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--codex-space-3) var(--codex-space-7);
+    margin-top: var(--codex-space-5);
+  }
+  .codex-editorial-hero[data-page-type="product"]:not([data-hero-layout="stacked"])
+    .codex-editorial-hero-copy:has(> .codex-editorial-figure) > .codex-editorial-points li {
+    max-width: none;
+  }
+  .codex-editorial-hero[data-page-type="product"]:not([data-hero-layout="stacked"])
+    .codex-editorial-hero-copy:has(> .codex-editorial-figure) > .codex-editorial-points li + li {
+    margin-top: 0;
+  }
 }
 
 .codex-editorial-hero h1 {
