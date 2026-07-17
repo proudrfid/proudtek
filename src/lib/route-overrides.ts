@@ -44,7 +44,7 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/product/mifare-desfire-cards/":          "/products/rfid-cards/mifare-desfire-ev3-card/",
   "/product/mifare-desfire-ev2-cards/":      "/products/rfid-cards/mifare-desfire-ev3-card/",
   "/product/desfire-tag/":                   "/products/rfid-cards/mifare-desfire-ev3-card/",
-  "/product/java-card/":                     "/products/rfid-cards/mifare-desfire-ev3-card/",
+  "/product/java-card/":                     "/products/rfid-cards/",
   "/product/dual-interface-card/":           "/products/rfid-cards/dual-frequency-rfid-card/",
   "/product/combi-card/":                    "/products/rfid-cards/dual-frequency-rfid-card/",
   "/product/metal-nfc-card/":                "/products/rfid-cards/rfid-metal-business-card/",

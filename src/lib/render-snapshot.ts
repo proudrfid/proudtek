@@ -869,9 +869,9 @@ function renderFooterBrandRow(): string {
 function renderFooterBottomStrip(): string {
   const year = new Date().getFullYear();
   const social = [
-    { href: "https://www.facebook.com/", label: "Facebook", svg: '<svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M31.997 16C31.997 7.164 24.834 0 16 0S0 7.164 0 16c0 7.985 5.85 14.604 13.5 15.804V20.625H9.438V16H13.5v-3.525c0-4.01 2.39-6.225 6.043-6.225 1.75 0 3.581.313 3.581.313v3.937h-2.017c-1.987 0-2.607 1.233-2.607 2.498V16h4.437l-.709 4.625H18.5v11.18C26.149 30.604 32 23.985 32 16z"/></svg>' },
-    { href: "https://twitter.com/", label: "Twitter", svg: '<svg viewBox="0 0 26 28" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M25.312 6.375a10.6 10.6 0 0 1-2.531 2.609c.016.219.016.438.016.656 0 6.672-5.078 14.359-14.359 14.359-2.86 0-5.516-.828-7.75-2.266.406.047.797.063 1.219.063 2.359 0 4.531-.797 6.266-2.156-2.219-.047-4.078-1.5-4.719-3.5.313.047.625.078.953.078.453 0 .906-.063 1.328-.172-2.312-.469-4.047-2.5-4.047-4.953v-.063c.672.375 1.453.609 2.281.641-1.359-.906-2.25-2.453-2.25-4.203 0-.938.25-1.797.688-2.547 2.484 3.062 6.219 5.063 10.406 5.281a5.69 5.69 0 0 1-.125-1.156c0-2.781 2.25-5.047 5.047-5.047 1.453 0 2.766.609 3.687 1.594 1.141-.219 2.234-.641 3.203-1.219-.375 1.172-1.172 2.156-2.219 2.781 1.016-.109 2-.391 2.906-.781z"/></svg>' },
-    { href: "https://www.linkedin.com/", label: "LinkedIn", svg: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05a3.75 3.75 0 0 1 3.38-1.85c3.61 0 4.27 2.38 4.27 5.47v6.27zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45C23.21 24 24 23.23 24 22.28V1.72C24 .77 23.21 0 22.23 0h-.01z"/></svg>' },
+    { href: "https://www.facebook.com/RFIDTRANSPONDER/", label: "Facebook", svg: '<svg viewBox="0 0 32 32" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M31.997 16C31.997 7.164 24.834 0 16 0S0 7.164 0 16c0 7.985 5.85 14.604 13.5 15.804V20.625H9.438V16H13.5v-3.525c0-4.01 2.39-6.225 6.043-6.225 1.75 0 3.581.313 3.581.313v3.937h-2.017c-1.987 0-2.607 1.233-2.607 2.498V16h4.437l-.709 4.625H18.5v11.18C26.149 30.604 32 23.985 32 16z"/></svg>' },
+    { href: "https://www.youtube.com/@protekrfid875", label: "YouTube", svg: '<svg viewBox="0 0 28 20" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M27.4 3.1c-.3-1.2-1.3-2.2-2.5-2.5C22.7 0 14 0 14 0S5.3 0 3.1.6C1.9.9.9 1.9.6 3.1 0 5.3 0 10 0 10s0 4.7.6 6.9c.3 1.2 1.3 2.2 2.5 2.5 2.2.6 10.9.6 10.9.6s8.7 0 10.9-.6c1.2-.3 2.2-1.3 2.5-2.5.6-2.2.6-6.9.6-6.9s0-4.7-.6-6.9zM11.2 14.3V5.7L18.5 10l-7.3 4.3z"/></svg>' },
+    { href: "https://www.linkedin.com/company/proud-tek-co-ltd/", label: "LinkedIn", svg: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.35V9h3.42v1.56h.05a3.75 3.75 0 0 1 3.38-1.85c3.61 0 4.27 2.38 4.27 5.47v6.27zM5.34 7.43a2.07 2.07 0 1 1 0-4.13 2.07 2.07 0 0 1 0 4.13zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55C0 23.23.79 24 1.77 24h20.45C23.21 24 24 23.23 24 22.28V1.72C24 .77 23.21 0 22.23 0h-.01z"/></svg>' },
   ];
   const socialHtml = social
     .map(
@@ -1207,8 +1207,8 @@ function replaceHomepageHero($body: ReturnType<typeof load>): void {
     <h1 class="codex-home-hero__h1">Custom RFID &amp; NFC Manufacturer in China</h1>
     <p class="codex-home-hero__subtitle">— Cards, Tags, Labels, Wristbands, Keyfobs &amp; Readers for OEM/ODM Buyers</p>
     <div class="codex-home-hero__cta">
-      <a class="codex-home-hero__btn codex-home-hero__btn--primary" href="/contact/">REQUEST QUOTE</a>
-      <a class="codex-home-hero__btn codex-home-hero__btn--ghost" href="/contact/#contact-rfq-form">REQUEST SAMPLES</a>
+      <a class="codex-home-hero__btn codex-home-hero__btn--primary" href="/rfq/">REQUEST QUOTE</a>
+      <a class="codex-home-hero__btn codex-home-hero__btn--ghost" href="/sample-pack/">REQUEST SAMPLES</a>
     </div>
   </div>
 </section>`.trim();
