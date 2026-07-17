@@ -143,6 +143,7 @@ Key routing rules:
 - Blog full makeover: voice + SVG illustrations + SEO/GEO in one pass → invoke /blog-transform
 - Same makeover but running inside a Cowork/Fable sandbox session → invoke /blog-fable
 - Solutions/Guides page rewrite for enjoyability/humor → invoke /page-voice
+- Product page full makeover: brand + 图文 + humor + de-densify + SEO/GEO (品牌范儿/图文结合/排版优美) → invoke /product-transform
 - Ship/deploy/PR → invoke /ship or /land-and-deploy
 - Save progress → invoke /context-save
 - Resume context → invoke /context-restore
