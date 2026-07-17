@@ -62,6 +62,11 @@ polishes substance, it does not create it.
   local `git branch --list '*<slug>*'`, and memory/PR notes. Redoing merged
   or in-flight work has real precedent. `STOP_*` sentinels halt bulk
   rollouts, not a user-named single page.
+- **This repo squash-merges.** Never judge merged/pending state by
+  `merge-base --is-ancestor`, branch ancestry, or an empty PR list — a
+  squashed branch is never an ancestor of main and its PR closes on merge.
+  Judge by **content**: `git cat-file -p origin/main:<path> | cmp - <file>`
+  (trap re-fired 2026-07-17 even with the lesson already written down).
 - **Tier the topic**:
   `node .claude/skills/blog-voice/scripts/classify-tier.mjs <path>` (accepts
   any JSON path). Tier A = full treatment (humor 6–7/10). **Tier B — medical
@@ -116,7 +121,15 @@ move the content out:
   and a `featureGrid` "reference facts" block (emoji icons) absorbing the
   remaining reference facets (standards, housing, QA, logistics) as tiles.
 - Keep existing statBar / comparePanel / timeline / dataHighlight sections —
-  they already beat prose.
+  they already beat prose. **But kept ≠ exempt**: audit every retained
+  structure against its component contract first (the doc comment at the top
+  of its `src/components/editorial/*.astro` file). Real failure mode:
+  `dataHighlight.value` is a big-number slot (`"30 m"`, `"99.4%"`) rendered
+  at ~48px in a `minmax(120px, auto)` grid column — a 58-char compound
+  standards string in it ate the full row width and crushed the heading into
+  a 1-character-wide vertical strip (live, user-reported). A kept structure
+  whose slot is misused gets reshaped by content shape (usually a table),
+  tokens preserved — that's a repair, not a rewrite.
 
 ### 3b · Layout gate everywhere else
 
@@ -250,7 +263,11 @@ python3 .claude/skills/page-geo/scripts/build_preview.py --repo . \
   --json /tmp/<slug>_new.json --out preview_<slug>.html --svg <svg-dir>
 ```
 
-Justify every NEW token in your notes. **Snapshot fixtures**: 6 pages are
+Justify every NEW token in your notes. Know the preview's limits:
+`build_preview.py` approximates components and did **not** reproduce the
+dataHighlight layout collapse the real site showed — for any kept structure
+carrying unusual content, check the component contract itself rather than
+trusting the preview render. **Snapshot fixtures**: 6 pages are
 byte-locked by `editorial-pages-integration.snapshot.test.ts` (list in
 `.claude/skills/page-geo/scripts/next.py` SNAPSHOT_FIXTURES — notably
 `rfid-wooden-keyfob`). Touching one requires regenerating the `.snap` in a
