@@ -42,101 +42,6 @@
       ]
     },
     {
-      "label": "Cryptographic security",
-      "items": [
-        "AES-128 mutual authentication per ISO/IEC 14443-4 + ISO/IEC 9798",
-        "SDM Secure Dynamic Messaging — single-use authentication code per tap",
-        "SUN URL: PICCData (encrypted UID + counter) + optional encrypted file mirror + CMAC signature",
-        "Per-tag diversified key via CMAC-AES (NXP AN10922) from buyer master secret"
-      ]
-    },
-    {
-      "label": "RF + protocol",
-      "items": [
-        "13.56 MHz HF carrier, ISO/IEC 14443-4 Type A transmission protocol",
-        "NFC Forum Type 4 Tag operation — native phone read, no app required",
-        "Read distance 20-40 mm with consumer phone antennas (chip class 6)",
-        "Apple Core NFC framework (iOS 14+) + Android NFC API ready"
-      ]
-    },
-    {
-      "label": "Tamper-evidence mechanism",
-      "items": [
-        "Bridge-antenna loop routes RF coil through breakable trace at sticker edge",
-        "Peeling severs trace — chip detects open circuit, sets CTTES register",
-        "CTTES is one-way write-only — cannot be reset or forged",
-        "Tamper status surfaced in SUN payload on every tap forever after"
-      ]
-    },
-    {
-      "label": "Form factors + sizes",
-      "items": [
-        "Ø22 mm (compact bottle-cap / cosmetics seal)",
-        "Ø25 mm (standard balanced size)",
-        "Ø30 mm (extended read range)",
-        "Ø38 mm (luxury packaging / wine capsule)",
-        "30×45 mm rectangular label format",
-        "Custom shapes from MOQ 5,000 (rectangle / oval / void-pattern die-cuts)"
-      ]
-    },
-    {
-      "label": "Substrate + adhesive",
-      "items": [
-        "PET face stock (75 µm transparent or matte white) — standard",
-        "Paper (FSC-certified, 80 gsm) — wine-label / pharmacy-box variant",
-        "Acrylic permanent adhesive (3M 467MP / 9472LE) — surface-energy ≥30 mN/m",
-        "Optional clear-on-clear (transparent face + transparent adhesive) for premium glass",
-        "Anti-metal variant: ferrite spacer for metal substrate compatibility"
-      ]
-    },
-    {
-      "label": "Personalisation + encoding",
-      "items": [
-        "AES-128 per-tag diversified key provisioning at our secure encoding line",
-        "SDM URL template encoded per buyer (verify.brand.com?picc=...&cmac=...)",
-        "Variable digital print on face — UID / serial / QR / brand artwork",
-        "Encrypted UID-to-key CSV delivered for backend integration"
-      ]
-    },
-    {
-      "label": "Application verticals",
-      "items": [
-        "Wine + spirits anti-counterfeit (under-cap or capsule placement)",
-        "Pharmaceutical anti-tamper (sits ON TOP of mandated GS1 DataMatrix)",
-        "Luxury cosmetics and fragrance refill prevention",
-        "Luxury fashion and leather-goods authentication (handbags / sneakers)",
-        "EU Digital Product Passport carrier (textile / electronics / battery)"
-      ]
-    },
-    {
-      "label": "Backend integration patterns",
-      "items": [
-        "SDM signature verification: open-source Python / Node / Go reference libraries",
-        "Counter-anomaly anti-cloning: detect non-monotonic / geographic-impossibility taps",
-        "Tamper-state surfacing: CTTES decoded into 'Authentic / Tampered / Cloned' result",
-        "REST API integration with brand DTC apps + e-commerce verification widgets"
-      ]
-    },
-    {
-      "label": "Standards + compliance",
-      "items": [
-        "ISO/IEC 14443-4 Type A transmission protocol",
-        "ISO/IEC 7816-4 file structure (NDEF over Type 4 Tag)",
-        "FIPS PUB 197 (AES) + NIST SP 800-38B (CMAC) cryptographic primitives",
-        "NFC Forum Type 4 Tag Operation Specification",
-        "EU ESPR 2024/1781 + EU FMD 2011/62/EU + US FDA DSCSA framework support"
-      ]
-    },
-    {
-      "label": "Procurement",
-      "items": [
-        "MOQ 1,000 pieces (provisioned), 50-100 non-provisioned engineering samples",
-        "Lead time 15-20 business days (chip lot dependent)",
-        "Encrypted key CSV delivered separately from physical inventory",
-        "RoHS / REACH compliant materials, FDA 21 CFR 175.105 indirect-food-contact PSA option"
-      ]
-    },
-    {
       "label": "Typical pricing",
       "text": "USD 0.30–1.20 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
     }
@@ -170,6 +75,32 @@
         "Backend authentication server required but not maintained. A luxury brand deploys NFC authentication requiring consumers to hit a backend API to verify the tag signature; 18 months after launch, the API service is discontinued and all existing tags in the market become unverifiable.",
         "Key management complexity prevents adoption. A beverage brand's security team understands that cryptographic NFC authentication requires key provisioning and management; without a clear path to AES key diversification, key rotation and secure key delivery to the encoding facility, the project stalls in procurement.",
         "Consumer friction from app requirement. A cosmetics brand's initial NFC authentication deployment requires consumers to download a dedicated brand app; app store reviews cite the download requirement as a barrier, and active user rates are under 3%."
+      ]
+    },
+    {
+      "title": "A seal that files its own incident report",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/products/ntag424-dna-tamper-evident-tag-loop.svg",
+        "alt": "Tamper-evident bridge antenna: intact closed loop versus peeled severed trace with the CTTES register latched — every later tap reports the broken seal"
+      },
+      "intro": "Bridge-antenna loop routes RF coil through breakable trace at sticker edge Peeling severs trace — chip detects open circuit, sets CTTES register CTTES is one-way write-only — cannot be reset or forged Tamper status surfaced in SUN payload on every tap forever after",
+      "bullets": [
+        "Ø22 mm (compact bottle-cap / cosmetics seal) Ø25 mm (standard balanced size) Ø30 mm (extended read range) Ø38 mm (luxury packaging / wine capsule) 30×45 mm rectangular label format Custom shapes from MOQ 5,000 (rectangle / oval / void-pattern die-cuts)",
+        "PET face stock (75 µm transparent or matte white) — standard Paper (FSC-certified, 80 gsm) — wine-label / pharmacy-box variant Acrylic permanent adhesive (3M 467MP / 9472LE) — surface-energy ≥30 mN/m Optional clear-on-clear (transparent face + transparent adhesive) for premium glass Anti-metal variant: ferrite spacer for metal substrate compatibility"
+      ]
+    },
+    {
+      "title": "Every tap mints a fresh, signed URL",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/products/ntag424-dna-tamper-evident-tag-sun.svg",
+        "alt": "SDM flow: phone tap, tag composes UID + counter + AES-128 CMAC URL, brand server recomputes and accepts or flags — mutual auth per ISO/IEC 14443-4 and 9798"
+      },
+      "intro": "AES-128 mutual authentication per ISO/IEC 14443-4 + ISO/IEC 9798 SDM Secure Dynamic Messaging — single-use authentication code per tap SUN URL: PICCData (encrypted UID + counter) + optional encrypted file mirror + CMAC signature Per-tag diversified key via CMAC-AES (NXP AN10922) from buyer master secret",
+      "bullets": [
+        "AES-128 per-tag diversified key provisioning at our secure encoding line SDM URL template encoded per buyer (verify.brand.com?picc=...&cmac=...) Variable digital print on face — UID / serial / QR / brand artwork Encrypted UID-to-key CSV delivered for backend integration",
+        "SDM signature verification: open-source Python / Node / Go reference libraries Counter-anomaly anti-cloning: detect non-monotonic / geographic-impossibility taps Tamper-state surfacing: CTTES decoded into 'Authentic / Tampered / Cloned' result REST API integration with brand DTC apps + e-commerce verification widgets"
       ]
     },
     {
@@ -323,6 +254,38 @@
           }
         ]
       }
+    },
+    {
+      "title": "The reference facts, at a glance",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "🔬",
+            "title": "Chip silicon",
+            "text": "NXP NTAG 424 DNA (NT4H2421Gx) — AES-128 mutual authentication + SDM NXP NTAG 424 DNA TagTamper (NT4H2421Tx) — adds tamper-loop CTTES register Production lots reference per NXP MOA-7 / SOT658-1 wafer-die packaging"
+          },
+          {
+            "icon": "📡",
+            "title": "RF + protocol",
+            "text": "13.56 MHz HF carrier, ISO/IEC 14443-4 Type A transmission protocol NFC Forum Type 4 Tag operation — native phone read, no app required Read distance 20-40 mm with consumer phone antennas (chip class 6) Apple Core NFC framework (iOS 14+) + Android NFC API ready"
+          },
+          {
+            "icon": "🏷️",
+            "title": "Application verticals",
+            "text": "Wine + spirits anti-counterfeit (under-cap or capsule placement) Pharmaceutical anti-tamper (sits ON TOP of mandated GS1 DataMatrix) Luxury cosmetics and fragrance refill prevention Luxury fashion and leather-goods authentication (handbags / sneakers) EU Digital Product Passport carrier (textile / electronics / battery)"
+          },
+          {
+            "icon": "📜",
+            "title": "Standards + compliance",
+            "text": "ISO/IEC 14443-4 Type A transmission protocol ISO/IEC 7816-4 file structure (NDEF over Type 4 Tag) FIPS PUB 197 (AES) + NIST SP 800-38B (CMAC) cryptographic primitives NFC Forum Type 4 Tag Operation Specification EU ESPR 2024/1781 + EU FMD 2011/62/EU + US FDA DSCSA framework support"
+          },
+          {
+            "icon": "📦",
+            "title": "Procurement",
+            "text": "MOQ 1,000 pieces (provisioned), 50-100 non-provisioned engineering samples Lead time 15-20 business days (chip lot dependent) Encrypted key CSV delivered separately from physical inventory RoHS / REACH compliant materials, FDA 21 CFR 175.105 indirect-food-contact PSA option"
+          }
+        ]
+      }
     }
   ],
   "resourceCards": [
@@ -442,7 +405,7 @@
   "authorSlug": "editorial-board",
   "reviewedBySlug": "peter-zhang",
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-18T00:00:00Z",
   "reviewedAt": "2026-01-14",
   "sources": [
     {
