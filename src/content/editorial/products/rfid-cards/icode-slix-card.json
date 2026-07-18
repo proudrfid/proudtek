@@ -46,88 +46,12 @@
       ]
     },
     {
-      "label": "Anti-collision behaviour",
-      "items": [
-        "Slotted ALOHA with 16 slots per round — typical inventory of 30 cards completes in ~300 ms on a 26 kbps data rate.",
-        "Bulk-read throughput is the canonical differentiator vs ISO/IEC 14443 NFC, which enforces single-card selection."
-      ]
-    },
-    {
-      "label": "Memory layout",
-      "items": [
-        "ICODE SLIX: 28 blocks × 32 bits = 896 bits user memory + 64-bit UID + AFI + DSFID + EAS bit + password-protected write block.",
-        "ICODE SLIX2: 79 blocks × 32 bits = 2,528 bits user memory + privacy mode that disables card response until password authentication.",
-        "SLIX2 adds originality signature and per-block password protection — useful for document tracking where chain-of-custody integrity matters."
-      ]
-    },
-    {
-      "label": "Library data model",
-      "items": [
-        "ISO 28560-2 defines the data element layout for RFID in libraries — primary item identifier, set information, type of usage, supplier identifier, ISIL code, etc. Maps onto SLIX memory blocks directly.",
-        "Danish Data Model (DDM) 2.0 is the ISO 28560-2 profile used across Scandinavia, the Netherlands and most BIC-2 UK libraries.",
-        "SIP2 (3M) and NCIP (NISO Z39.83) are the two ILS-to-self-service-kiosk protocols that read AFI/EAS state on check-in and check-out."
-      ]
-    },
-    {
-      "label": "EAS integration",
-      "items": [
-        "The ICODE SLIX EAS bit is cleared at self-service check-out and set at check-in — no separate EM / acousto-magnetic strip is required.",
-        "Bibliotheca, D-Tech, Nedap, P.V. Supa and 3M Tattle-Tape RFID gates all natively read the SLIX EAS bit per the Danish Data Model."
-      ]
-    },
-    {
-      "label": "Regional radio regulation",
-      "items": [
-        "EU: ETSI EN 300 330 SRD rules cover 13.56 MHz operation up to 42 dBμA/m at 10 m.",
-        "US: FCC Part 15 Subpart C §15.225 sets 13.56 MHz band limits — the same band SLIX reaches the 1 m range claim under.",
-        "Japan: ARIB STD-T82 (13.56 MHz) governs equivalent HF reader EIRP."
-      ]
-    },
-    {
-      "label": "Industrial inventory use-cases",
-      "items": [
-        "Gas-bottle fleets (AGA, Linde, Air Liquide regional programmes) use SLIX as the chip on card-shaped fleet tokens that attach to bottle collars for inventory sweeps.",
-        "Law-firm and records-management centres run shelf-sweep inventories at 30–50 cm with handheld ISO/IEC 15693 readers — impossible with ISO/IEC 14443 NFC.",
-        "Industrial laundry operators use SLIX hard-tags on uniform bundles; card-form SLIX shows up mostly in staff credentials and route-identification cards."
-      ]
-    },
-    {
-      "label": "Phone compatibility (NFC Forum Type 5)",
-      "items": [
-        "Android with NXP NFC controllers (PN544 onward) reads ISO/IEC 15693 natively — 1–3 cm range with the phone's small antenna.",
-        "iPhone 7 and later on iOS 14+ read ISO/IEC 15693 via Core NFC ISO15693ReaderSession — limited to 1–2 cm.",
-        "NFC Forum Type 5 Tag (2015) formalised URI / NDEF over ISO/IEC 15693, used by NXP ICODE NTP / DNA product-authentication SKUs rather than SLIX."
-      ]
-    },
-    {
-      "label": "Card form factor",
-      "items": [
-        "Standard ISO/IEC 7810 ID-1 (85.6 × 54 × 0.76–0.84 mm) PVC laminate body with a copper or aluminium circular coil antenna tuned for ISO/IEC 15693 resonance at 13.56 MHz.",
-        "Coil geometry differs from ISO/IEC 14443 inlays — SLIX antennas are typically larger-turn and narrower-trace to favour range over proximity coupling."
-      ]
-    },
-    {
-      "label": "Pre-encoding service",
-      "items": [
-        "AFI (Application Family Identifier — e.g. 0x07 for libraries per ISO 28560) can be pre-written in bulk at the factory.",
-        "DSFID + user-data blocks pre-encoded per the ILS vendor's mapping (Bibliotheca, Axiell, Ex Libris Alma, Koha, Evergreen) → plug-and-play library deployment."
-      ]
-    },
-    {
-      "label": "Security posture",
-      "items": [
-        "SLIX / SLIX2 crypto is password-based; there is no AES / 3DES mutual authentication — SLIX is the inventory-and-library chip, not the access-control chip.",
-        "For authenticated access or cashless payments, DESFire EV3 (ISO/IEC 14443-4) is the canonical NXP option — not SLIX.",
-        "SLIX2 privacy mode stops arbitrary readers from enumerating UIDs — a library privacy requirement under some EU DPA guidance."
-      ]
-    },
-    {
       "label": "Typical pricing",
       "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
     }
   ],
   "publishedAt": "2024-02-12",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-18T00:00:00Z",
   "authorSlug": "editorial-board",
   "author": "Proud Tek Editorial Board",
   "reviewedBySlug": "peter-zhang",
@@ -161,6 +85,32 @@
           }
         ]
       }
+    },
+    {
+      "title": "Reads the stack, not the card",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/products/icode-slix-card-inventory.svg",
+        "alt": "A reader inventories a stack of 30 ICODE SLIX cards in about 300 ms via ISO/IEC 15693 slotted ALOHA anti-collision with 16 slots per round at 26 kbps, next to the per-card memory facts"
+      },
+      "intro": "ISO/IEC 15693 parts 1–3 cover physical, anti-collision and transmission protocol for vicinity cards at 13.56 MHz. ISO/IEC 18000-3 Mode 1 is the ISO/IEC 18000-series mapping of the same interface for asset-ID applications. NFC Forum Type 5 Tag specification (2015) brings phone compatibility for ISO/IEC 15693 — Android with NXP controllers + iOS 14+ via Core NFC.",
+      "bullets": [
+        "Slotted ALOHA with 16 slots per round — typical inventory of 30 cards completes in ~300 ms on a 26 kbps data rate. Bulk-read throughput is the canonical differentiator vs ISO/IEC 14443 NFC, which enforces single-card selection.",
+        "ICODE SLIX: 28 blocks × 32 bits = 896 bits user memory + 64-bit UID + AFI + DSFID + EAS bit + password-protected write block. ICODE SLIX2: 79 blocks × 32 bits = 2,528 bits user memory + privacy mode that disables card response until password authentication. SLIX2 adds originality signature and per-block password protection — useful for document tracking where chain-of-custody integrity matters."
+      ]
+    },
+    {
+      "title": "One bit runs the exit gate",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/products/icode-slix-card-library-flow.svg",
+        "alt": "Library loop: self check-out clears the EAS bit, the exit gate alarms only when it is set, check-in arms it again — with the ISO 28560-2 data model and factory AFI pre-encoding beneath"
+      },
+      "intro": "ISO 28560-2 defines the data element layout for RFID in libraries — primary item identifier, set information, type of usage, supplier identifier, ISIL code, etc. Maps onto SLIX memory blocks directly. Danish Data Model (DDM) 2.0 is the ISO 28560-2 profile used across Scandinavia, the Netherlands and most BIC-2 UK libraries. SIP2 (3M) and NCIP (NISO Z39.83) are the two ILS-to-self-service-kiosk protocols that read AFI/EAS state on check-in and check-out.",
+      "bullets": [
+        "The ICODE SLIX EAS bit is cleared at self-service check-out and set at check-in — no separate EM / acousto-magnetic strip is required. Bibliotheca, D-Tech, Nedap, P.V. Supa and 3M Tattle-Tape RFID gates all natively read the SLIX EAS bit per the Danish Data Model.",
+        "AFI (Application Family Identifier — e.g. 0x07 for libraries per ISO 28560) can be pre-written in bulk at the factory. DSFID + user-data blocks pre-encoded per the ILS vendor's mapping (Bibliotheca, Axiell, Ex Libris Alma, Koha, Evergreen) → plug-and-play library deployment."
+      ]
     },
     {
       "title": "SLIX vs DESFire EV3 vs MIFARE Classic 1K — pick the HF chip for the job",
@@ -252,6 +202,38 @@
           {
             "label": "2026 — Today",
             "text": "ICODE SLIX / SLIX2 is the default chip for library RFID, document-tracking and industrial inventory programmes worldwide. Cross-buyer reference experience on library-self-service, file-folder-tracking, gas-bottle-fleet, industrial-laundry-staff and records-management SLIX-ISO-15693 programmes shows."
+          }
+        ]
+      }
+    },
+    {
+      "title": "The reference facts, at a glance",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "📻",
+            "title": "Regional radio regulation",
+            "text": "EU: ETSI EN 300 330 SRD rules cover 13.56 MHz operation up to 42 dBμA/m at 10 m. US: FCC Part 15 Subpart C §15.225 sets 13.56 MHz band limits — the same band SLIX reaches the 1 m range claim under. Japan: ARIB STD-T82 (13.56 MHz) governs equivalent HF reader EIRP."
+          },
+          {
+            "icon": "🏭",
+            "title": "Industrial inventory",
+            "text": "Gas-bottle fleets (AGA, Linde, Air Liquide regional programmes) use SLIX as the chip on card-shaped fleet tokens that attach to bottle collars for inventory sweeps. Law-firm and records-management centres run shelf-sweep inventories at 30–50 cm with handheld ISO/IEC 15693 readers — impossible with ISO/IEC 14443 NFC. Industrial laundry operators use SLIX hard-tags on uniform bundles; card-form SLIX shows up mostly in staff credentials and route-identification cards."
+          },
+          {
+            "icon": "📱",
+            "title": "Phone compatibility",
+            "text": "Android with NXP NFC controllers (PN544 onward) reads ISO/IEC 15693 natively — 1–3 cm range with the phone's small antenna. iPhone 7 and later on iOS 14+ read ISO/IEC 15693 via Core NFC ISO15693ReaderSession — limited to 1–2 cm. NFC Forum Type 5 Tag (2015) formalised URI / NDEF over ISO/IEC 15693, used by NXP ICODE NTP / DNA product-authentication SKUs rather than SLIX."
+          },
+          {
+            "icon": "💳",
+            "title": "Card form factor",
+            "text": "Standard ISO/IEC 7810 ID-1 (85.6 × 54 × 0.76–0.84 mm) PVC laminate body with a copper or aluminium circular coil antenna tuned for ISO/IEC 15693 resonance at 13.56 MHz. Coil geometry differs from ISO/IEC 14443 inlays — SLIX antennas are typically larger-turn and narrower-trace to favour range over proximity coupling."
+          },
+          {
+            "icon": "🔒",
+            "title": "Security posture",
+            "text": "SLIX / SLIX2 crypto is password-based; there is no AES / 3DES mutual authentication — SLIX is the inventory-and-library chip, not the access-control chip. For authenticated access or cashless payments, DESFire EV3 (ISO/IEC 14443-4) is the canonical NXP option — not SLIX. SLIX2 privacy mode stops arbitrary readers from enumerating UIDs — a library privacy requirement under some EU DPA guidance."
           }
         ]
       }
