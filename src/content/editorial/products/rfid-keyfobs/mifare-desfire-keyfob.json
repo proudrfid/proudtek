@@ -41,78 +41,6 @@
       ]
     },
     {
-      "label": "Command layer",
-      "items": [
-        "ISO/IEC 7816-4 APDU command framework",
-        "DESFire native command set (CreateApplication, SelectApplication, AuthenticateAES, ReadData, WriteData, CommitTransaction)",
-        "NXP AN12343 Transaction MAC + Secure Unique NFC (SUN) / Secure Dynamic Messaging (SDM) on EV3"
-      ]
-    },
-    {
-      "label": "Cryptography",
-      "items": [
-        "AES-128 block cipher per NIST FIPS 197",
-        "CMAC authentication per NIST SP 800-38B on every command (EV3)",
-        "3DES / 2K3DES supported only for legacy compatibility — disabled in greenfield Proud Tek builds"
-      ]
-    },
-    {
-      "label": "Key diversification",
-      "items": [
-        "NXP AN10922 AES-128 CMAC key-diversification procedure",
-        "Per-fob Application Keys derived from UID + customer AES-128 master secret",
-        "Master-key ceremony inside a FIPS 140-3 Level 3 HSM — master secret never exposed in the clear"
-      ]
-    },
-    {
-      "label": "Security certification",
-      "items": [
-        "Common Criteria EAL5+ hardware security evaluation on DESFire EV2/EV3 silicon",
-        "BSI TR-02102-1 cipher-suite-recommendations alignment (AES-128 + CMAC)",
-        "ISO/IEC 27001 Annex A.9 access-control control-family mapping for the issuance programme"
-      ]
-    },
-    {
-      "label": "Reader-platform compatibility",
-      "items": [
-        "HID iCLASS SE / multiCLASS SE / Signo — Corporate 1000 or UUID payload in the DESFire application",
-        "SALTO XS4 / KS / NEOXX — SALTO DESFire profile with per-customer AID",
-        "ASSA ABLOY Aperio / SMARTair, dormakaba evolo / community, Nedap AEOS, LenelS2 OnGuard — tested during acceptance"
-      ]
-    },
-    {
-      "label": "Housing",
-      "items": [
-        "ABS (standard, 10+ pantone colours, keyring-moulded)",
-        "Silicone (platinum-cured, IP68 wet-handling, Shore A 60)",
-        "Epoxy drop (seamless, outdoor / ATEX passive-equipment) — all with 304 / 316 stainless split ring"
-      ]
-    },
-    {
-      "label": "Personalisation payload options",
-      "items": [
-        "Access-only AES-128 application with per-site AID",
-        "Dual-application: access + transit (ITSO / Calypso-adjacent AID, separate key set)",
-        "PIV-aligned FASC-N / UUID payload per NIST FIPS 201-3 for federal-contractor issuance"
-      ]
-    },
-    {
-      "label": "Audit & key-ceremony evidence",
-      "items": [
-        "Signed per-lot key-derivation log tied to production order and UID range",
-        "Remote-attended key ceremony (encrypted screen-share) with customer security officer",
-        "ISO/IEC 27001 A.9 evidence pack (access-control policy, key-lifecycle log, role-separation sign-off)"
-      ]
-    },
-    {
-      "label": "Logistics",
-      "items": [
-        "MOQ 200 stock ABS / 300 pre-personalised + printed",
-        "Lead time 12-15 business days stock / 15-18 business days custom personalisation",
-        "Every order includes signed UID list + AES-128 application-key derivation evidence"
-      ]
-    },
-    {
       "label": "Typical pricing",
       "text": "USD 0.80–2.00 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
     }
@@ -148,6 +76,32 @@
           }
         ]
       }
+    },
+    {
+      "title": "The whole smartcard stack, hanging on a keyring",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/products/mifare-desfire-keyfob-stack.svg",
+        "alt": "DESFire fob protocol layers: 14443-3 radio, 14443-4 T=CL framing, 7816-4 APDU commands, AES-128 with CMAC, EAL5+ silicon — beside the fob-not-card case"
+      },
+      "intro": "ISO/IEC 14443-3 Type A anticollision at 13.56 MHz ISO/IEC 14443-4 T=CL block-framing with Transaction MAC / commit-counter (EV2/EV3) NFC Forum Type 4 Tag — NDEF access profile for SUN tap-to-URL",
+      "bullets": [
+        "ISO/IEC 7816-4 APDU command framework DESFire native command set (CreateApplication, SelectApplication, AuthenticateAES, ReadData, WriteData, CommitTransaction) NXP AN12343 Transaction MAC + Secure Unique NFC (SUN) / Secure Dynamic Messaging (SDM) on EV3",
+        "AES-128 block cipher per NIST FIPS 197 CMAC authentication per NIST SP 800-38B on every command (EV3) 3DES / 2K3DES supported only for legacy compatibility — disabled in greenfield Proud Tek builds",
+        "Common Criteria EAL5+ hardware security evaluation on DESFire EV2/EV3 silicon BSI TR-02102-1 cipher-suite-recommendations alignment (AES-128 + CMAC) ISO/IEC 27001 Annex A.9 access-control control-family mapping for the issuance programme"
+      ]
+    },
+    {
+      "title": "Every fob gets its own key — and a paper trail",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/products/mifare-desfire-keyfob-ceremony.svg",
+        "alt": "Key ceremony chain: HSM-held master key, AN10922 CMAC per-fob derivation, signed per-lot log tied to order and UID range, remote-attended ceremonies"
+      },
+      "intro": "NXP AN10922 AES-128 CMAC key-diversification procedure Per-fob Application Keys derived from UID + customer AES-128 master secret Master-key ceremony inside a FIPS 140-3 Level 3 HSM — master secret never exposed in the clear",
+      "bullets": [
+        "Signed per-lot key-derivation log tied to production order and UID range Remote-attended key ceremony (encrypted screen-share) with customer security officer ISO/IEC 27001 A.9 evidence pack (access-control policy, key-lifecycle log, role-separation sign-off)"
+      ]
     },
     {
       "title": "DESFire EV1, EV2 and EV3 at a glance",
@@ -219,6 +173,33 @@
         "Skipping the Transaction MAC (EV2/EV3) on cashless / fare applications. Without Transaction MAC a reader cannot distinguish a replayed transaction from a fresh one; always enable Transaction MAC + commit counter per NXP AN12343 when the fob carries a balance.",
         "Deploying DESFire EV1 for a new 2026 project. EV1 lacks Transaction MAC, SUN and SDM and sits on an older EAL4+ evaluation; EV3 is the forward-compatible default for any greenfield install and is already byte-compatible with EV1 reader code for the access-control subset."
       ]
+    },
+    {
+      "title": "The reference facts, at a glance",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "📋",
+            "title": "Reader-platform compatibility",
+            "text": "HID iCLASS SE / multiCLASS SE / Signo — Corporate 1000 or UUID payload in the DESFire application SALTO XS4 / KS / NEOXX — SALTO DESFire profile with per-customer AID ASSA ABLOY Aperio / SMARTair, dormakaba evolo / community, Nedap AEOS, LenelS2 OnGuard — tested during acceptance"
+          },
+          {
+            "icon": "📦",
+            "title": "Housing",
+            "text": "ABS (standard, 10+ pantone colours, keyring-moulded) Silicone (platinum-cured, IP68 wet-handling, Shore A 60) Epoxy drop (seamless, outdoor / ATEX passive-equipment) — all with 304 / 316 stainless split ring"
+          },
+          {
+            "icon": "📋",
+            "title": "Personalisation payload options",
+            "text": "Access-only AES-128 application with per-site AID Dual-application: access + transit (ITSO / Calypso-adjacent AID, separate key set) PIV-aligned FASC-N / UUID payload per NIST FIPS 201-3 for federal-contractor issuance"
+          },
+          {
+            "icon": "🚚",
+            "title": "Logistics",
+            "text": "MOQ 200 stock ABS / 300 pre-personalised + printed Lead time 12-15 business days stock / 15-18 business days custom personalisation Every order includes signed UID list + AES-128 application-key derivation evidence"
+          }
+        ]
+      }
     }
   ],
   "resourceCards": [
@@ -304,7 +285,7 @@
   "reviewedBySlug": "peter-zhang",
   "reviewedAt": "2026-01-10",
   "publishedAt": "2026-04-22",
-  "modifiedAt": "2026-01-07",
+  "modifiedAt": "2026-07-18T00:00:00Z",
   "sources": [
     {
       "label": "ISO/IEC 14443-3:2018 — Identification cards — Contactless integrated circuit cards — Proximity cards — Part 3: Initialization and anticollision",
