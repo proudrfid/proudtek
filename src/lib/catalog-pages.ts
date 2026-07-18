@@ -1133,6 +1133,18 @@ function renderCatalogMain({
         if (e.key === 'Escape' && rail && rail.classList.contains('is-open')) closeRail();
       });
 
+      // Rail yields to the footer (2026-07-17): the rail is position:fixed,
+      // so at page bottom it floated over the footer columns. While any part
+      // of the footer is >=24px into the viewport, body.codex-rail-yield
+      // fades the rail + toggle out (CSS); user-opened overlays are exempt
+      // via :not(.is-open) in the CSS selectors.
+      var yieldFooter = document.querySelector('footer#colophon, footer.site-footer');
+      if (rail && yieldFooter && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function(entries){
+          document.body.classList.toggle('codex-rail-yield', entries[0].isIntersecting);
+        }, { rootMargin: '0px 0px -24px 0px' }).observe(yieldFooter);
+      }
+
       // Smooth-scroll on link click, and auto-close the overlay on narrow viewports.
       links.forEach(function(l){
         l.addEventListener('click', function(e){
@@ -2005,6 +2017,18 @@ function buildIndustriesPage(
       document.addEventListener('keydown', function(e){
         if (e.key === 'Escape' && rail && rail.classList.contains('is-open')) closeRail();
       });
+
+      // Rail yields to the footer (2026-07-17): the rail is position:fixed,
+      // so at page bottom it floated over the footer columns. While any part
+      // of the footer is >=24px into the viewport, body.codex-rail-yield
+      // fades the rail + toggle out (CSS); user-opened overlays are exempt
+      // via :not(.is-open) in the CSS selectors.
+      var yieldFooter = document.querySelector('footer#colophon, footer.site-footer');
+      if (rail && yieldFooter && 'IntersectionObserver' in window) {
+        new IntersectionObserver(function(entries){
+          document.body.classList.toggle('codex-rail-yield', entries[0].isIntersecting);
+        }, { rootMargin: '0px 0px -24px 0px' }).observe(yieldFooter);
+      }
 
       // Smooth-scroll on link click; auto-close drawer on narrow viewports.
       links.forEach(function(l){

@@ -1845,6 +1845,25 @@ a[href="#main"]:focus {
 }
 .codex-catalog-rail__close:hover { color: var(--codex-text, #291c0e); }
 
+/* Rail yields to the footer (user-requested 2026-07-17): the rail is
+   position:fixed, so at page bottom it floated over the footer columns
+   (guides/solutions/compare details, hub indexes, /products/all). A small
+   IntersectionObserver (PageScript module; duplicated in the catalog
+   inline scripts) sets body.codex-rail-yield while footer#colophon is
+   >=24px into the viewport; the rail and its floating toggle fade out and
+   release pointer events, returning on scroll-up. User-opened overlay
+   drawers stay: .is-open / aria-expanded="true" are exempt. Opacity-only,
+   so prefers-reduced-motion needs no special case. */
+.codex-catalog-rail,
+.codex-catalog-rail-toggle {
+  transition: opacity var(--codex-motion-fast) ease;
+}
+body.codex-rail-yield .codex-catalog-rail:not(.is-open),
+body.codex-rail-yield .codex-catalog-rail-toggle:not([aria-expanded="true"]) {
+  opacity: 0;
+  pointer-events: none;
+}
+
 body.codex-catalog-rail-locked { overflow: hidden; }
 
 /* Narrow viewports: hide the fixed rail by default, show the toggle button.
