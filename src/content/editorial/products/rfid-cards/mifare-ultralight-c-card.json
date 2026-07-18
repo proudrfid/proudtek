@@ -28,81 +28,6 @@
       ]
     },
     {
-      "label": "Memory layout and capacity",
-      "items": [
-        "192 bytes organised as 48 pages × 4 bytes. Pages 0-1 hold the 7-byte UID; pages 2-3 internal configuration + OTP + lock bits; pages 4-39 user memory (144 bytes free); pages 40-43 3DES key slots; pages 44-47 counter + lock.",
-        "144 free bytes are enough for: one NDEF URI + 16-byte fare payload; or transit operator ID + product code + validity window + ride counter + transaction log; or a 64-byte loyalty payload + counter; or a signed access token."
-      ]
-    },
-    {
-      "label": "Security posture — 3DES mutual authentication",
-      "items": [
-        "Triple-DES (TDEA, NIST SP 800-67) mutual authentication with a 112-bit effective key — both card and reader must prove knowledge of the shared secret before the reader can access authenticated pages or increment the decrement counter.",
-        "With per-card key diversification (NXP AN11136) the master key never leaves the issuer; compromising one card reveals nothing about any other card in the batch, which is what makes Ultralight C acceptable at disposable-volume deployment."
-      ]
-    },
-    {
-      "label": "Why not Ultralight (no-C), Classic, or DESFire",
-      "items": [
-        "Ultralight / Ultralight EV1 use a 32-bit password — brute-forceable on commodity hardware; fine for a brochure URL, not for a fare or a pass.",
-        "MIFARE Classic 1K uses Crypto-1, publicly broken since Nohl/Plötz 2008; one European metro publicly estimated €2-5M / year in fare-evasion loss from Crypto-1 cloning on legacy stock.",
-        "DESFire EV3 (AES-128) is the right answer for multi-application credentials and stored value, but 2-3× the silicon cost — overkill for single-use disposable economics."
-      ]
-    },
-    {
-      "label": "Card body, durability and slot geometry",
-      "items": [
-        "ISO/IEC 7810 ID-1 (85.60 × 53.98 × 0.76 mm) standard; ISO/IEC 10373-1 durability methodology. Thin 0.3 mm PET option for turnstile slot-accept gates used in public transit.",
-        "Paper / Tyvek inlay option laminates the Ultralight C chip into a paper or non-woven ticket body for the lowest possible per-credential cost, common on festival wristbands and single-ride fare tickets."
-      ]
-    },
-    {
-      "label": "Factory pre-encoding and manifests",
-      "items": [
-        "3DES key diversification per card using the issuer's master key + UID (TDEA-CMAC per AN11136 or a custom algorithm the issuer specifies); UID-to-diversified-key mapping CSV ships before the batch leaves the factory.",
-        "NDEF payload (URL RTD, Smart Poster, vCard, custom) pre-written; lock-bits set after encoding, never before, so OTP pages are not accidentally locked against the application data."
-      ]
-    },
-    {
-      "label": "QC on every bulk run",
-      "items": [
-        "Genuine NXP MF0ICU2 chip-authenticity certificate ships with the batch; a spot-check 3DES authentication log confirms the feature is present and responding on every sampled card.",
-        "Dimensional tolerance to ISO/IEC 7810 is 100% inspected so magnetic-stripe encoders, lamination presses, and turnstile card dispensers do not jam on mixed-tolerance stock."
-      ]
-    },
-    {
-      "label": "Print, personalise, brand",
-      "items": [
-        "Full-colour CMYK offset (≥1,000 units, ISO 12647-2 process control) or UV digital (short runs, 600-1,200 dpi). Pantone spot colour, spot UV, hot foil, embossed numbering, signature panel, HiCo / LoCo magstripe overlay.",
-        "Variable data — sequential card numbers, QR / 1D barcodes for visual fallback, sponsor logos — inline with the factory print step."
-      ]
-    },
-    {
-      "label": "Programme fit and deployment patterns",
-      "items": [
-        "Transit: single-ride, day-pass, multi-ride disposable tickets for bus / metro / rail, with 3DES gate authentication + counter.",
-        "Events: festival wristbands, day-pass concert / exhibition / sports tickets — gate-tap throughput lifts from ~600-800 / hr (barcode) to ~1,200-1,800 / hr (RFID tap).",
-        "Ski resorts: day and multi-day passes with 3DES + diversified key; seasons after migration from magstripe typically see 40-60× fewer verified clone incidents.",
-        "Hospitality short-stay: 1-3 night room credentials where the card is not recovered — DESFire-grade security at sub-DESFire cost.",
-        "Loyalty one-time claims: scratch-style tap-to-redeem promotion cards where 3DES blocks replay of single-use tokens.",
-        "Libraries / self-service kiosks: patron ID with a short borrow record on user pages."
-      ]
-    },
-    {
-      "label": "Procurement realities",
-      "items": [
-        "MOQ 500 blank / 1,000 printed; lead time 10-15 business days for custom printed batches, 2-3 business days for blank stock.",
-        "Per-card cost at 50k-500k volume lands roughly 40-60% below a DESFire EV3 equivalent while delivering genuine 3DES (not password) security — which is what makes the chip the default for disposable economics."
-      ]
-    },
-    {
-      "label": "Compliance and end-of-life",
-      "items": [
-        "Applicable card-side standards: ISO/IEC 14443-3/-4, ISO/IEC 7810, ISO/IEC 10373-1; NFC Forum Type 2 Tag. Reader-side radio compliance (FCC 47 CFR Part 15, EN 300 330) sits with the gate / terminal supplier.",
-        "Paper / Tyvek inlay variants route to standard paper-recycling streams; PVC cards are collected at the gate or venue exit and routed to local PVC recycling where streams accept them; r-PET / PLA substrate options on request for ESG-reporting programmes."
-      ]
-    },
-    {
       "label": "Typical pricing",
       "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
     }
@@ -118,7 +43,7 @@
     "/products/rfid-cards/"
   ],
   "heroImage": "/landing-images/mifare-ultralight-c-card-hero.jpg",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-18T00:00:00Z",
   "sections": [
     {
       "title": "The disposable-ticketing sweet spot — 3DES at Ultralight economics",
@@ -149,6 +74,18 @@
       ]
     },
     {
+      "title": "The cheapest card that still asks for ID",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/products/mifare-ultralight-c-card-ticket-flow.svg",
+        "alt": "Fare-gate flow: Ultralight C and the reader complete 3DES mutual authentication with a 112-bit effective key before any protected operation, with the contrast against plain Ultralight passwords and broken CRYPTO-1"
+      },
+      "intro": "Triple-DES (TDEA, NIST SP 800-67) mutual authentication with a 112-bit effective key — both card and reader must prove knowledge of the shared secret before the reader can access authenticated pages or increment the decrement counter. With per-card key diversification (NXP AN11136) the master key never leaves the issuer; compromising one card reveals nothing about any other card in the batch, which is what makes Ultralight C acceptable at disposable-volume deployment.",
+      "bullets": [
+        "Ultralight / Ultralight EV1 use a 32-bit password — brute-forceable on commodity hardware; fine for a brochure URL, not for a fare or a pass. MIFARE Classic 1K uses Crypto-1, publicly broken since Nohl/Plötz 2008; one European metro publicly estimated €2-5M / year in fare-evasion loss from Crypto-1 cloning on legacy stock. DESFire EV3 (AES-128) is the right answer for multi-application credentials and stored value, but 2-3× the silicon cost — overkill for single-use disposable economics."
+      ]
+    },
+    {
       "title": "Ultralight C vs neighbouring MIFARE tiers",
       "comparePanel": {
         "beforeHeading": "Ultralight / Ultralight EV1 — entry cost, no real security",
@@ -176,7 +113,13 @@
         "Page 41 counter (optional): monotonic decrement, tear-off-style ride / punch tracking.",
         "Pages 40, 42, 43 (16 bytes 3DES key slots): write-only after personalisation.",
         "Pages 2-3 lock bits + OTP: lock user memory or individual pages permanently once personalised."
-      ]
+      ],
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/products/mifare-ultralight-c-card-page-memory.svg",
+        "alt": "Ultralight C page memory: 48 pages of 4 bytes totalling 192 bytes — UID in pages 0-1, config, OTP and lock bits in pages 2-3, 144 usable bytes behind 3DES"
+      },
+      "intro": "192 bytes organised as 48 pages × 4 bytes. Pages 0-1 hold the 7-byte UID; pages 2-3 internal configuration + OTP + lock bits; pages 4-39 user memory (144 bytes free); pages 40-43 3DES key slots; pages 44-47 counter + lock. 144 free bytes are enough for: one NDEF URI + 16-byte fare payload; or transit operator ID + product code + validity window + ride counter + transaction log; or a 64-byte loyalty payload + counter; or a signed access token."
     },
     {
       "title": "From Crypto-1 break 2008 to Ultralight C as default disposable silicon",
@@ -233,6 +176,43 @@
         "No UID manifest: comma-separated UID list (hex + decimal) emailed before shipment for database seeding.",
         "Dimensional drift: 100% ISO/IEC 7810 ID-1 tolerance inspection so magstripe encoders, lamination presses, and turnstile dispensers do not jam."
       ]
+    },
+    {
+      "title": "The reference facts, at a glance",
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "💳",
+            "title": "Card body + slot geometry",
+            "text": "ISO/IEC 7810 ID-1 (85.60 × 53.98 × 0.76 mm) standard; ISO/IEC 10373-1 durability methodology. Thin 0.3 mm PET option for turnstile slot-accept gates used in public transit. Paper / Tyvek inlay option laminates the Ultralight C chip into a paper or non-woven ticket body for the lowest possible per-credential cost, common on festival wristbands and single-ride fare tickets."
+          },
+          {
+            "icon": "🔑",
+            "title": "Factory pre-encoding + manifests",
+            "text": "3DES key diversification per card using the issuer's master key + UID (TDEA-CMAC per AN11136 or a custom algorithm the issuer specifies); UID-to-diversified-key mapping CSV ships before the batch leaves the factory. NDEF payload (URL RTD, Smart Poster, vCard, custom) pre-written; lock-bits set after encoding, never before, so OTP pages are not accidentally locked against the application data."
+          },
+          {
+            "icon": "✅",
+            "title": "QC on every bulk run",
+            "text": "Genuine NXP MF0ICU2 chip-authenticity certificate ships with the batch; a spot-check 3DES authentication log confirms the feature is present and responding on every sampled card. Dimensional tolerance to ISO/IEC 7810 is 100% inspected so magnetic-stripe encoders, lamination presses, and turnstile card dispensers do not jam on mixed-tolerance stock."
+          },
+          {
+            "icon": "🎨",
+            "title": "Print + personalisation",
+            "text": "Full-colour CMYK offset (≥1,000 units, ISO 12647-2 process control) or UV digital (short runs, 600-1,200 dpi). Pantone spot colour, spot UV, hot foil, embossed numbering, signature panel, HiCo / LoCo magstripe overlay. Variable data — sequential card numbers, QR / 1D barcodes for visual fallback, sponsor logos — inline with the factory print step."
+          },
+          {
+            "icon": "📦",
+            "title": "Procurement realities",
+            "text": "MOQ 500 blank / 1,000 printed; lead time 10-15 business days for custom printed batches, 2-3 business days for blank stock. Per-card cost at 50k-500k volume lands roughly 40-60% below a DESFire EV3 equivalent while delivering genuine 3DES (not password) security — which is what makes the chip the default for disposable economics."
+          },
+          {
+            "icon": "📋",
+            "title": "Compliance + end-of-life",
+            "text": "Applicable card-side standards: ISO/IEC 14443-3/-4, ISO/IEC 7810, ISO/IEC 10373-1; NFC Forum Type 2 Tag. Reader-side radio compliance (FCC 47 CFR Part 15, EN 300 330) sits with the gate / terminal supplier. Paper / Tyvek inlay variants route to standard paper-recycling streams; PVC cards are collected at the gate or venue exit and routed to local PVC recycling where streams accept them; r-PET / PLA substrate options on request for ESG-reporting programmes."
+          }
+        ]
+      }
     }
   ],
   "resourceCards": [

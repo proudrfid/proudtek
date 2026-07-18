@@ -42,92 +42,12 @@
       ]
     },
     {
-      "label": "AES-128 mutual auth + CMAC (NIST FIPS 197 + SP 800-38B)",
-      "items": [
-        "Security Level 3 runs AES-128 reader-card mutual authentication per NIST FIPS 197 with CMAC integrity per NIST SP 800-38B.",
-        "Cloning at SL3 requires extracting a diversified per-card key — no publicly known attack path.",
-        "Command stream is AES-encrypted end-to-end; UID-replay and session-fixation attacks fail at the CMAC step."
-      ]
-    },
-    {
-      "label": "Security Level ladder (SL0 → SL1 → SL3)",
-      "items": [
-        "SL0 factory personalisation → SL1 Classic-compatible CRYPTO-1 → SL3 AES-128 endpoint — one-way, no downgrade path.",
-        "Level switch is issued as a CommitReaderID / LevelSwitch command over the air (tap) or during natural re-issuance.",
-        "One-way ladder is intentional — prevents attacker from coercing the card back into CRYPTO-1 mode."
-      ]
-    },
-    {
-      "label": "Key diversification (NXP AN10922)",
-      "items": [
-        "Per-card AES-128 diversified keys derived from UID + sector identifier per NXP AN10922 reference scheme.",
-        "Master key stays in an HSM or SAM — never appears in reader-side firmware or issuance-station memory.",
-        "Compromising one card does not compromise the fleet — the single most cited procurement requirement on a migration RFP."
-      ]
-    },
-    {
-      "label": "Phased migration workflow",
-      "items": [
-        "Phase 0 baseline audit → Phase 1 issue Plus SE at SL1 → Phase 2 reader firmware upgrade → Phase 3 SL3 level-switch → Phase 4 retire Classic.",
-        "Every phase can begin without waiting for the previous phase to complete across the entire estate.",
-        "Defers 70–85% of reader capex across a 3–5-year budget window vs a single-cycle DESFire rip-and-replace."
-      ]
-    },
-    {
-      "label": "Reader-firmware compatibility",
-      "items": [
-        "HID iCLASS SE, HID Signo, multiCLASS SE, SALTO XS4, ASSA ABLOY Aperio, dormakaba exos and SafeRoute all support Plus SE SL3 on current firmware.",
-        "Legacy HID Prox (125 kHz) and pre-SE first-generation iCLASS do not support Plus SE — estates on those platforms are reader-replacement candidates.",
-        "Integrator pilots 50–100 cards across a representative reader sample before committing to the full roll-out."
-      ]
-    },
-    {
-      "label": "Enterprise access-control deployment",
-      "items": [
-        "Large-enterprise Classic 1K estates are the canonical Plus SE use case — the reader capex debt is exactly what Plus SE is designed to defer.",
-        "Multi-year campus, government and corporate badge programmes commonly run 10–100 k-card Plus SE issuance per phase.",
-        "Access + canteen + printing sector-keys unchanged from Classic — zero downstream integration work at Phase 1."
-      ]
-    },
-    {
-      "label": "Hospitality keycard deployment",
-      "items": [
-        "Compatible with Saflok, VingCard, SALTO and Onity hotel lock ecosystems that run Plus SE SL3 firmware.",
-        "Combi cards co-laminate Plus SE inlay with HiCo 2750 Oe / LoCo 300 Oe magstripe per ISO/IEC 7811-2 for legacy-door coexistence.",
-        "Classic-era Saflok / VingCard estates migrate building-by-building as lock firmware is updated."
-      ]
-    },
-    {
-      "label": "Healthcare + education campus",
-      "items": [
-        "Hospital staff-ID migration — replaces Classic 1K badge stock while maintaining access on legacy reader hardware during roll-out.",
-        "University campus card programmes — meal plan + library + printing sector-keys inherit from Classic on day one, upgrade to AES-128 when readers permit.",
-        "No access gaps for users during the multi-year transition — Classic and Plus SE SL1 coexist on every reader."
-      ]
-    },
-    {
-      "label": "Audit + compliance closure (CRYPTO-1 mitigation)",
-      "items": [
-        "CRYPTO-1 publicly broken by Garcia et al. (CRYPTO 2008) — cloneable today with $30 Flipper Zero in under 60 s.",
-        "Plus SE issuance at SL1 immediately closes the 'CRYPTO-1 credential in circulation' audit finding on the card side (SL3 closes it end-to-end).",
-        "Plus SE is Common Criteria EAL4+ certified per NXP's security target — acceptable for SOX, PCI DSS, HIPAA and SOC 2 compliance reviews."
-      ]
-    },
-    {
-      "label": "Regulatory + card-body posture",
-      "items": [
-        "RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process.",
-        "Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists + sector-key configuration templates ship with every production lot.",
-        "CR80 4-colour offset print + overlay lamination runs on the same Proud Tek line as Classic — no bureau re-tooling required."
-      ]
-    },
-    {
       "label": "Typical pricing",
       "text": "USD 0.80–2.00 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
     }
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2025-12-17",
+  "modifiedAt": "2026-07-18T00:00:00Z",
   "authorSlug": "peter-zhang",
   "author": "Proud Tek Editorial Board",
   "reviewedBySlug": "peter-zhang",
@@ -161,6 +81,32 @@
           }
         ]
       }
+    },
+    {
+      "title": "The one-way ladder out of CRYPTO-1",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/products/mifare-plus-se-card-sl-ladder.svg",
+        "alt": "Plus SE security-level ladder from SL0 factory personalisation through SL1 Classic-compatible operation to the SL3 AES-128 endpoint, with the phased rollout underneath"
+      },
+      "intro": "SL0 factory personalisation → SL1 Classic-compatible CRYPTO-1 → SL3 AES-128 endpoint — one-way, no downgrade path. Level switch is issued as a CommitReaderID / LevelSwitch command over the air (tap) or during natural re-issuance. One-way ladder is intentional — prevents attacker from coercing the card back into CRYPTO-1 mode.",
+      "bullets": [
+        "Security Level 3 runs AES-128 reader-card mutual authentication per NIST FIPS 197 with CMAC integrity per NIST SP 800-38B. Cloning at SL3 requires extracting a diversified per-card key — no publicly known attack path. Command stream is AES-encrypted end-to-end; UID-replay and session-fixation attacks fail at the CMAC step.",
+        "Phase 0 baseline audit → Phase 1 issue Plus SE at SL1 → Phase 2 reader firmware upgrade → Phase 3 SL3 level-switch → Phase 4 retire Classic. Every phase can begin without waiting for the previous phase to complete across the entire estate. Defers 70–85% of reader capex across a 3–5-year budget window vs a single-cycle DESFire rip-and-replace."
+      ]
+    },
+    {
+      "title": "To your readers, it looks exactly like Classic",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/products/mifare-plus-se-card-classic-compat.svg",
+        "alt": "Side-by-side memory maps: Classic 1K's 16-sector layout with MAD next to Plus SE presenting the identical layout at SL1 while AES-128 waits for SL3"
+      },
+      "intro": "ISO/IEC 14443-2/-3/-4 Type A at 13.56 MHz with T=CL block transfer — identical PHY to MIFARE Classic 1K so SL1 enrols on every Classic reader. ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) card body; ISO/IEC 10373 durability test envelope. 1 KB EEPROM organised as 16 sectors × 4 blocks — mirror of the Classic 1K memory map.",
+      "bullets": [
+        "Same 16-sector / 4-block layout, same Application Directory (MAD v1/v2) and same access-condition bits as Classic 1K. Access-control and card-issuance software schemas do not change — Plus SE drops in on the existing encoding template. Sector-key slots map 1:1 between Classic Key A / Key B and Plus SE SL1 CRYPTO-1 keys.",
+        "Per-card AES-128 diversified keys derived from UID + sector identifier per NXP AN10922 reference scheme. Master key stays in an HSM or SAM — never appears in reader-side firmware or issuance-station memory. Compromising one card does not compromise the fleet — the single most cited procurement requirement on a migration RFP."
+      ]
     },
     {
       "title": "Security Level 1 vs Security Level 3 — the phased model",
@@ -297,6 +243,36 @@
             "icon": "🏭",
             "title": "Same card-body economics",
             "text": "CR80 PVC, 4-colour offset print, overlay lamination — every Classic production line at Proud Tek runs Plus SE too."
+          },
+          {
+            "icon": "📡",
+            "title": "Reader-firmware coverage",
+            "text": "HID iCLASS SE, HID Signo, multiCLASS SE, SALTO XS4, ASSA ABLOY Aperio, dormakaba exos and SafeRoute all support Plus SE SL3 on current firmware. Legacy HID Prox (125 kHz) and pre-SE first-generation iCLASS do not support Plus SE — estates on those platforms are reader-replacement candidates. Integrator pilots 50–100 cards across a representative reader sample before committing to the full roll-out."
+          },
+          {
+            "icon": "🏢",
+            "title": "Enterprise access estates",
+            "text": "Large-enterprise Classic 1K estates are the canonical Plus SE use case — the reader capex debt is exactly what Plus SE is designed to defer. Multi-year campus, government and corporate badge programmes commonly run 10–100 k-card Plus SE issuance per phase. Access + canteen + printing sector-keys unchanged from Classic — zero downstream integration work at Phase 1."
+          },
+          {
+            "icon": "🏨",
+            "title": "Hospitality keycards",
+            "text": "Compatible with Saflok, VingCard, SALTO and Onity hotel lock ecosystems that run Plus SE SL3 firmware. Combi cards co-laminate Plus SE inlay with HiCo 2750 Oe / LoCo 300 Oe magstripe per ISO/IEC 7811-2 for legacy-door coexistence. Classic-era Saflok / VingCard estates migrate building-by-building as lock firmware is updated."
+          },
+          {
+            "icon": "🏥",
+            "title": "Healthcare + campus",
+            "text": "Hospital staff-ID migration — replaces Classic 1K badge stock while maintaining access on legacy reader hardware during roll-out. University campus card programmes — meal plan + library + printing sector-keys inherit from Classic on day one, upgrade to AES-128 when readers permit. No access gaps for users during the multi-year transition — Classic and Plus SE SL1 coexist on every reader."
+          },
+          {
+            "icon": "🔍",
+            "title": "Audit + compliance closure",
+            "text": "CRYPTO-1 publicly broken by Garcia et al. (CRYPTO 2008) — cloneable today with $30 Flipper Zero in under 60 s. Plus SE issuance at SL1 immediately closes the 'CRYPTO-1 credential in circulation' audit finding on the card side (SL3 closes it end-to-end). Plus SE is Common Criteria EAL4+ certified per NXP's security target — acceptable for SOX, PCI DSS, HIPAA and SOC 2 compliance reviews."
+          },
+          {
+            "icon": "📋",
+            "title": "Card body + bureau posture",
+            "text": "RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process. Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists + sector-key configuration templates ship with every production lot. CR80 4-colour offset print + overlay lamination runs on the same Proud Tek line as Classic — no bureau re-tooling required."
           }
         ]
       }

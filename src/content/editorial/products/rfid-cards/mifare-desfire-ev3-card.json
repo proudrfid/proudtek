@@ -42,92 +42,12 @@
       ]
     },
     {
-      "label": "File-system architecture (28 apps × 32 files)",
-      "items": [
-        "Up to 28 independent applications, each with up to 32 files (Standard Data, Backup Data, Value, Linear Record, Cyclic Record).",
-        "Per-file access conditions (Read / Write / ReadWrite / ChangeAccessRights) — canonical separation between transit, cashless, access, printing.",
-        "Memory options 2 KB / 4 KB / 8 KB EEPROM per AN12343 application note."
-      ]
-    },
-    {
-      "label": "Secure Dynamic Messaging (SDM + CMAC)",
-      "items": [
-        "Every tap generates a unique server-verifiable URL — identical SUN mechanism to NTAG 424 DNA.",
-        "CMAC integrity per NIST SP 800-38B; encryption of picc-data + read-counter prevents replay.",
-        "Tap-to-verify on any NFC-enabled iPhone (iPhone 7+) or Android device — no app install required."
-      ]
-    },
-    {
-      "label": "Transaction MAC + offline value-store",
-      "items": [
-        "Transaction MAC returns a cryptographic receipt on every stored-value mutation — offline readers reconcile without a server round-trip.",
-        "Prevents the offline revenue leakage pattern that broke Classic-era fare systems (OV-chipkaart 2008, Oyster 2009 academic retrospectives).",
-        "Supports back-office settlement reconciliation in transit agencies operating fare gates across multiple network generations."
-      ]
-    },
-    {
-      "label": "Key diversification (NXP AN10922)",
-      "items": [
-        "NXP AN10922 defines the canonical AES-128 diversification scheme used across DESFire issuance programmes — master key is never present on any issued card.",
-        "Per-card diversified keys derived from UID + application identifier; compromising one card does not compromise a fleet.",
-        "Issuance bureaux typically run the diversification under an HSM or SAM (secure application module) at pre-encoding."
-      ]
-    },
-    {
-      "label": "Common Criteria EAL5+ (AVA_VAN.5 / ALC_DVS.2)",
-      "items": [
-        "Common Criteria EAL5+ certificate with augmented AVA_VAN.5 (high attack-potential vulnerability analysis) and ALC_DVS.2 (developer security).",
-        "Above the EAL4+ bar typical for EMV contactless; within the range accepted for US/EU government employee credentials.",
-        "Certificate indexed on the Common Criteria Portal under NXP Semiconductors product listings."
-      ]
-    },
-    {
-      "label": "Transit fare collection deployment",
-      "items": [
-        "EN 1545 transit interoperability + Calypso CD97 regional variants + APTA TCRP Report 115 US-side guidance.",
-        "Fare-gate tap budget 150-180 ms at 300+ pax/min peak throughput; transaction MAC eliminates offline revenue leakage.",
-        "DESFire EV3 is the 2026 default for transit agencies upgrading from Classic / EM4100 legacy stored-value cards."
-      ]
-    },
-    {
-      "label": "Enterprise + campus access control",
-      "items": [
-        "Native reader-firmware support across HID iCLASS SE, ASSA ABLOY Aperio, SALTO XS4 and LEGIC ecosystems.",
-        "Replaces MIFARE Classic + 125 kHz HID Prox + EM4100 cleartext credentials with AES-128 in a single procurement cycle.",
-        "Multi-application layout consolidates access + canteen + printing + library + exam authentication on one credential."
-      ]
-    },
-    {
-      "label": "Government + defense ID adjacency",
-      "items": [
-        "EAL5+ satisfies Common Criteria procurement lines for agency employee credentials and controlled-facility access.",
-        "Complements FIPS 201-3 PIV programmes where DESFire EV3 carries the physical access credential alongside the PIV contact chip.",
-        "Used by defense supply-chain contractors for controlled-substance, toolroom and classified-area access credentials."
-      ]
-    },
-    {
-      "label": "Hospitality keycard compatibility",
-      "items": [
-        "Compatible with Saflok, VingCard, SALTO and Onity hotel lock ecosystems per their respective DESFire-capable firmware branches.",
-        "Combi cards co-laminate DESFire EV3 inlay with HiCo 2750 Oe or LoCo 300 Oe magnetic stripe per ISO/IEC 7811-2.",
-        "Hospitality is the most common phased-migration path: magstripe + DESFire combi card covers legacy and newer locks simultaneously."
-      ]
-    },
-    {
-      "label": "Regulatory + issuance-bureau posture",
-      "items": [
-        "ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) physical card dimensions; ISO/IEC 27001 controlled pre-encoding.",
-        "RoHS 3 + REACH Annex XVII compliant PVC substrates; chip-body lamination under ISO/IEC 10373 durability test regime.",
-        "Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists ship with every production lot."
-      ]
-    },
-    {
       "label": "Typical pricing",
       "text": "USD 0.80–2.00 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
     }
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2026-07-02",
+  "modifiedAt": "2026-07-18T00:00:00Z",
   "authorSlug": "peter-zhang",
   "author": "Proud Tek Editorial Board",
   "reviewedBySlug": "peter-zhang",
@@ -161,6 +81,33 @@
           }
         ]
       }
+    },
+    {
+      "title": "Same CR80 shell — a smartcard conversation inside",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/products/mifare-desfire-ev3-card-anatomy.svg",
+        "alt": "CR80 card cutaway beside the DESFire EV3 interface stack: ISO/IEC 14443-1/-2/-3/-4 Type A at 13.56 MHz, T=CL block transfer at 106-848 kbit/s, ISO/IEC 7816 APDU framing and AES-128 mutual authentication"
+      },
+      "intro": "ISO/IEC 14443-1/-2/-3/-4 Type A at 13.56 MHz with T=CL block transfer and 106-848 kbit/s bit-rate envelope. ISO/IEC 7816-4 APDU command set — DESFire file-system commands map natively onto standard smart-card command/response pairs. NFC Forum Type 4 Tag operation — DESFire EV3 exposes NDEF messaging on the same air interface without a separate tag IC.",
+      "bullets": [
+        "AES-128 reader-card mutual authentication per NIST FIPS 197 with session-fresh IVs; no clear-text UID exchange after authentication. Per-application keys — a loyalty or canteen vendor cannot read the access app key even when holding the card. Replacing MIFARE Classic CRYPTO-1 (publicly broken Garcia et al. 2008) with AES-128 is the core cryptographic upgrade driver.",
+        "Common Criteria EAL5+ certificate with augmented AVA_VAN.5 (high attack-potential vulnerability analysis) and ALC_DVS.2 (developer security). Above the EAL4+ bar typical for EMV contactless; within the range accepted for US/EU government employee credentials. Certificate indexed on the Common Criteria Portal under NXP Semiconductors product listings."
+      ]
+    },
+    {
+      "title": "Not sectors — a filing cabinet",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/products/mifare-desfire-ev3-card-filesystem.svg",
+        "alt": "DESFire EV3 file system: up to 28 applications of up to 32 files each across five file types, with SDM/SUN per-tap URLs and Transaction MAC receipts"
+      },
+      "intro": "Up to 28 independent applications, each with up to 32 files (Standard Data, Backup Data, Value, Linear Record, Cyclic Record). Per-file access conditions (Read / Write / ReadWrite / ChangeAccessRights) — canonical separation between transit, cashless, access, printing. Memory options 2 KB / 4 KB / 8 KB EEPROM per AN12343 application note.",
+      "bullets": [
+        "Every tap generates a unique server-verifiable URL — identical SUN mechanism to NTAG 424 DNA. CMAC integrity per NIST SP 800-38B; encryption of picc-data + read-counter prevents replay. Tap-to-verify on any NFC-enabled iPhone (iPhone 7+) or Android device — no app install required.",
+        "Transaction MAC returns a cryptographic receipt on every stored-value mutation — offline readers reconcile without a server round-trip. Prevents the offline revenue leakage pattern that broke Classic-era fare systems (OV-chipkaart 2008, Oyster 2009 academic retrospectives). Supports back-office settlement reconciliation in transit agencies operating fare gates across multiple network generations.",
+        "NXP AN10922 defines the canonical AES-128 diversification scheme used across DESFire issuance programmes — master key is never present on any issued card. Per-card diversified keys derived from UID + application identifier; compromising one card does not compromise a fleet. Issuance bureaux typically run the diversification under an HSM or SAM (secure application module) at pre-encoding."
+      ]
     },
     {
       "title": "DESFire EV3 vs EV2 vs Plus SE vs Classic — decision matrix",
@@ -304,6 +251,31 @@
             "icon": "🔁",
             "title": "EV2 backward compatibility",
             "text": "EV3 runs on EV2 reader firmware — no forced reader replacement, so migration cost is card-side only."
+          },
+          {
+            "icon": "🚇",
+            "title": "Transit fare collection",
+            "text": "EN 1545 transit interoperability + Calypso CD97 regional variants + APTA TCRP Report 115 US-side guidance. Fare-gate tap budget 150-180 ms at 300+ pax/min peak throughput; transaction MAC eliminates offline revenue leakage. DESFire EV3 is the 2026 default for transit agencies upgrading from Classic / EM4100 legacy stored-value cards."
+          },
+          {
+            "icon": "🏢",
+            "title": "Enterprise + campus access",
+            "text": "Native reader-firmware support across HID iCLASS SE, ASSA ABLOY Aperio, SALTO XS4 and LEGIC ecosystems. Replaces MIFARE Classic + 125 kHz HID Prox + EM4100 cleartext credentials with AES-128 in a single procurement cycle. Multi-application layout consolidates access + canteen + printing + library + exam authentication on one credential."
+          },
+          {
+            "icon": "🏛️",
+            "title": "Government + defense ID",
+            "text": "EAL5+ satisfies Common Criteria procurement lines for agency employee credentials and controlled-facility access. Complements FIPS 201-3 PIV programmes where DESFire EV3 carries the physical access credential alongside the PIV contact chip. Used by defense supply-chain contractors for controlled-substance, toolroom and classified-area access credentials."
+          },
+          {
+            "icon": "🏨",
+            "title": "Hospitality keycards",
+            "text": "Compatible with Saflok, VingCard, SALTO and Onity hotel lock ecosystems per their respective DESFire-capable firmware branches. Combi cards co-laminate DESFire EV3 inlay with HiCo 2750 Oe or LoCo 300 Oe magnetic stripe per ISO/IEC 7811-2. Hospitality is the most common phased-migration path: magstripe + DESFire combi card covers legacy and newer locks simultaneously."
+          },
+          {
+            "icon": "📋",
+            "title": "Card body + bureau posture",
+            "text": "ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) physical card dimensions; ISO/IEC 27001 controlled pre-encoding. RoHS 3 + REACH Annex XVII compliant PVC substrates; chip-body lamination under ISO/IEC 10373 durability test regime. Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists ship with every production lot."
           }
         ]
       }
