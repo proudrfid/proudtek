@@ -42,92 +42,12 @@
       ]
     },
     {
-      "label": "CRYPTO-1 cipher (historical posture)",
-      "items": [
-        "Proprietary 48-bit stream cipher designed by Philips in the mid-1990s; public reverse-engineering published at 24C3 (Nohl & Plötz, 2007).",
-        "Full cryptanalysis by Garcia et al. (ESORICS 2008) — dark-side + nested attacks recover sector keys in seconds on modest hardware.",
-        "CRYPTO-1 should not be trusted as a security boundary for any new deployment — specify Plus SE or DESFire EV3 where cloning is a realistic threat."
-      ]
-    },
-    {
-      "label": "Key A / Key B per-sector access conditions",
-      "items": [
-        "Each sector carries two independent 48-bit keys; access-condition bits determine which key authorises each block operation.",
-        "Sector model supports basic multi-application use (access + canteen + parking) under separate key ownership without migrating to DESFire.",
-        "Sector-key slots map 1:1 onto MIFARE Plus SE SL1 keys — the mechanical basis for the phased Plus SE upgrade path."
-      ]
-    },
-    {
-      "label": "MIFARE Application Directory (MAD)",
-      "items": [
-        "MAD v1 (sector 0) and MAD v2 (sector 16) provide a canonical directory of sector → application mapping for multi-application issuance.",
-        "Application identifiers register with the MIFARE Application Directory registry — enables cross-issuer sector-allocation consistency.",
-        "Access control + time-attendance + loyalty applications have canonical MAD AIDs documented in the NXP Classic 1K functional specification."
-      ]
-    },
-    {
-      "label": "Universal reader compatibility",
-      "items": [
-        "Every MIFARE-capable reader deployed in the last two decades reads Classic 1K natively — HID, SALTO, ASSA ABLOY, dormakaba, Suprema, ZKTeco, Rosslare.",
-        "Every major card-printer platform (Zebra ZXP Series 7/8, Evolis Primacy, Matica XID, Fargo HDP5000) supports inline Classic encoding.",
-        "iOS Core NFC exposes Classic UID only; Android MifareClassic API exposes sector data under known keys."
-      ]
-    },
-    {
-      "label": "Low-value / high-volume issuance economics",
-      "items": [
-        "Lowest per-card BOM cost in the MIFARE family at 10 k+ volume — the reason Classic is still specified where credentials are disposable.",
-        "CR80 4-colour offset print + overlay lamination + inline Classic encoding pipeline runs at 1,200–1,800 cards/hour on standard bureau equipment.",
-        "Volume discount tiers apply at 1 k / 5 k / 10 k / 50 k — the economic floor against which Plus SE and DESFire are compared on TCO."
-      ]
-    },
-    {
-      "label": "Gym, fitness + events deployment",
-      "items": [
-        "Gym membership + locker token issuance where the credential is re-issued on cancel and the threat of cloning is low-cost-per-event.",
-        "Multi-day event and conference badges with session-access sectors — disposable after the event, replacement cost covered in the entry fee.",
-        "Loyalty + gift card issuance where a low-value balance or sequential member ID lives on the card."
-      ]
-    },
-    {
-      "label": "Budget hospitality deployment",
-      "items": [
-        "Classic-compatible hotel key cards for properties running legacy MIFARE Classic generations of Saflok, VingCard, SALTO, Onity locks.",
-        "Combi cards co-laminate Classic inlay with ISO/IEC 7811-2 HiCo 2750 Oe / LoCo 300 Oe magstripe for properties with mixed door fleets.",
-        "Natural migration pivot to Plus SE or DESFire when the property refreshes locks — the card body stays the same, the chip specification changes."
-      ]
-    },
-    {
-      "label": "Time-attendance + loyalty",
-      "items": [
-        "Factory, warehouse and construction time-clock terminals reading Classic UID for payroll integration — often UID-only with server-side validation.",
-        "Library membership + school / college campus estates that already invested in Classic-only readers — Plus SE + DESFire are the phased upgrades.",
-        "Server-side credential-check pattern (UID + back-end validation) is safer than trusting data stored in Classic sectors under CRYPTO-1."
-      ]
-    },
-    {
-      "label": "Migration path (Plus SE / DESFire)",
-      "items": [
-        "MIFARE Plus SE drops in on Classic readers at Security Level 1, upgrades to AES-128 at Security Level 3 after reader firmware update.",
-        "MIFARE DESFire EV3 provides AES-128 file-system architecture + EAL5+ certification for new deployments with no Classic reader debt.",
-        "NTAG 424 DNA TT is the path where the credential also needs smartphone-readable tamper-evident brand authentication."
-      ]
-    },
-    {
-      "label": "Regulatory + card-body posture",
-      "items": [
-        "RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process.",
-        "Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists ship with every production lot.",
-        "Classic 1K is NOT suitable where PCI DSS, SOX, HIPAA, SOC 2 or government procurement references AES-128 / EAL4+ as the credential baseline."
-      ]
-    },
-    {
       "label": "Typical pricing",
       "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
     }
   ],
   "publishedAt": "2026-04-18",
-  "modifiedAt": "2026-06-10T17:00:00Z",
+  "modifiedAt": "2026-07-18T00:00:00Z",
   "authorSlug": "peter-zhang",
   "author": "Proud Tek Editorial Board",
   "reviewedBySlug": "peter-zhang",
@@ -161,6 +81,32 @@
           }
         ]
       }
+    },
+    {
+      "title": "Inside the card — CR80, three layers and a loop",
+      "layout": "split",
+      "image": {
+        "src": "/diagrams/products/mifare-classic-1k-card-anatomy.svg",
+        "alt": "Exploded CR80 card: printed PVC overlay, inlay with chip and planar 13.56 MHz antenna loop, PVC core — with the ISO/IEC 14443 Type A interface facts alongside"
+      },
+      "intro": "The CR80 body is the easy part; the work happens in the inlay. ISO/IEC 14443-1/-2/-3 Type A at 13.56 MHz — 106 kbit/s bit-rate with anticollision per Type A cascade level 1. ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) physical card body; ISO/IEC 10373-6 durability test regime. Launched by Philips Semiconductors (now NXP) in 1997 — oldest contactless smart card specification still in wide active issuance.",
+      "bullets": [
+        "Every MIFARE-capable reader deployed in the last two decades reads Classic 1K natively — HID, SALTO, ASSA ABLOY, dormakaba, Suprema, ZKTeco, Rosslare. Every major card-printer platform (Zebra ZXP Series 7/8, Evolis Primacy, Matica XID, Fargo HDP5000) supports inline Classic encoding. iOS Core NFC exposes Classic UID only; Android MifareClassic API exposes sector data under known keys.",
+        "Card-body posture: RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process. Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists ship with every production lot. Classic 1K is NOT suitable where PCI DSS, SOX, HIPAA, SOC 2 or government procurement references AES-128 / EAL4+ as the credential baseline."
+      ]
+    },
+    {
+      "title": "1 KB, sixteen sectors — the memory map",
+      "layout": "split-reverse",
+      "image": {
+        "src": "/diagrams/products/mifare-classic-1k-card-memory-map.svg",
+        "alt": "MIFARE Classic 1K memory grid: 16 sectors of 4 blocks, read-only manufacturer block holding the UID, sector trailers with 48-bit Key A and Key B, and the MAD directory"
+      },
+      "intro": "1 KB EEPROM organised as 16 sectors × 4 blocks × 16 bytes; block 0 of sector 0 is the read-only manufacturer block (UID + manufacturer data). Trailer block of each sector holds Key A, Key B and access-condition bits that govern read/write on the three data blocks. NXP MF1S503x product family — the MF1ICS50 die is the canonical Classic 1K reference implementation.",
+      "bullets": [
+        "Each sector carries two independent 48-bit keys; access-condition bits determine which key authorises each block operation. Sector model supports basic multi-application use (access + canteen + parking) under separate key ownership without migrating to DESFire. Sector-key slots map 1:1 onto MIFARE Plus SE SL1 keys — the mechanical basis for the phased Plus SE upgrade path.",
+        "MAD v1 (sector 0) and MAD v2 (sector 16) provide a canonical directory of sector → application mapping for multi-application issuance. Application identifiers register with the MIFARE Application Directory registry — enables cross-issuer sector-allocation consistency. Access control + time-attendance + loyalty applications have canonical MAD AIDs documented in the NXP Classic 1K functional specification."
+      ]
     },
     {
       "title": "Classic 1K vs Plus SE vs DESFire EV3 — when to pick which",
@@ -218,7 +164,7 @@
     },
     {
       "title": "The CRYPTO-1 break and what it means for your deployment",
-      "intro": "Classic's security status is not speculation — it is 18 years of published attacks. The timeline below is the context procurement and audit teams will expect to see acknowledged.",
+      "intro": "Classic's security status is not speculation — it is 18 years of published attacks. The timeline below is the context procurement and audit teams will expect to see acknowledged. Proprietary 48-bit stream cipher designed by Philips in the mid-1990s; public reverse-engineering published at 24C3 (Nohl & Plötz, 2007). Full cryptanalysis by Garcia et al. (ESORICS 2008) — dark-side + nested attacks recover sector keys in seconds on modest hardware. CRYPTO-1 should not be trusted as a security boundary for any new deployment — specify Plus SE or DESFire EV3 where cloning is a realistic threat.",
       "timeline": {
         "items": [
           {
@@ -298,6 +244,31 @@
             "icon": "🏫",
             "title": "Campus legacy",
             "text": "School and college estates already invested in Classic-only readers; Plus SE and DESFire are the phased migration."
+          },
+          {
+            "icon": "🏋️",
+            "title": "Gym, fitness + events",
+            "text": "Gym membership + locker token issuance where the credential is re-issued on cancel and the threat of cloning is low-cost-per-event. Multi-day event and conference badges with session-access sectors — disposable after the event, replacement cost covered in the entry fee. Loyalty + gift card issuance where a low-value balance or sequential member ID lives on the card."
+          },
+          {
+            "icon": "🏨",
+            "title": "Budget hospitality",
+            "text": "Classic-compatible hotel key cards for properties running legacy MIFARE Classic generations of Saflok, VingCard, SALTO, Onity locks. Combi cards co-laminate Classic inlay with ISO/IEC 7811-2 HiCo 2750 Oe / LoCo 300 Oe magstripe for properties with mixed door fleets. Natural migration pivot to Plus SE or DESFire when the property refreshes locks — the card body stays the same, the chip specification changes."
+          },
+          {
+            "icon": "⏱️",
+            "title": "Time-attendance + loyalty",
+            "text": "Factory, warehouse and construction time-clock terminals reading Classic UID for payroll integration — often UID-only with server-side validation. Library membership + school / college campus estates that already invested in Classic-only readers — Plus SE + DESFire are the phased upgrades. Server-side credential-check pattern (UID + back-end validation) is safer than trusting data stored in Classic sectors under CRYPTO-1."
+          },
+          {
+            "icon": "📦",
+            "title": "Low-value, high-volume issuance",
+            "text": "Lowest per-card BOM cost in the MIFARE family at 10 k+ volume — the reason Classic is still specified where credentials are disposable. CR80 4-colour offset print + overlay lamination + inline Classic encoding pipeline runs at 1,200–1,800 cards/hour on standard bureau equipment. Volume discount tiers apply at 1 k / 5 k / 10 k / 50 k — the economic floor against which Plus SE and DESFire are compared on TCO."
+          },
+          {
+            "icon": "📋",
+            "title": "Regulatory + bureau posture",
+            "text": "RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process. Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists ship with every production lot. Classic 1K is NOT suitable where PCI DSS, SOX, HIPAA, SOC 2 or government procurement references AES-128 / EAL4+ as the credential baseline."
           }
         ]
       }
@@ -324,7 +295,8 @@
         "[MIFARE Plus SE](/products/rfid-cards/mifare-plus-se-card/) — drop-in on existing Classic readers in Security Level 1, AES-128 in Security Level 3 once reader firmware is updated. Zero card-side disruption.",
         "[MIFARE DESFire EV3](/products/rfid-cards/mifare-desfire-ev3-card/) — full AES-128 file system, 28 firewalled applications, EAL5+ certification. Requires DESFire-capable readers.",
         "[NTAG 424 DNA TT](/products/rfid-cards/ntag424-dna-tt-card/) — when the credential also needs a smartphone-readable, tamper-evident brand-authentication layer (luxury goods, warranty).",
-        "Review [Plus EV2 vs DESFire EV3](/compare/mifare-plus-ev2-vs-desfire-ev3/) and [Classic vs Plus vs DESFire for hotel locks](/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/) before locking the migration roadmap."
+        "Review [Plus EV2 vs DESFire EV3](/compare/mifare-plus-ev2-vs-desfire-ev3/) and [Classic vs Plus vs DESFire for hotel locks](/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks/) before locking the migration roadmap.",
+        "MIFARE Plus SE drops in on Classic readers at Security Level 1, upgrades to AES-128 at Security Level 3 after reader firmware update. MIFARE DESFire EV3 provides AES-128 file-system architecture + EAL5+ certification for new deployments with no Classic reader debt. NTAG 424 DNA TT is the path where the credential also needs smartphone-readable tamper-evident brand authentication."
       ]
     }
   ],
