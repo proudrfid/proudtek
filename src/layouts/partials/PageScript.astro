@@ -925,6 +925,26 @@
         }
       } catch (e) { /* never block the page on the hero video */ }
 
+      /* Rail yields to the footer (user-requested 2026-07-17): the
+         floating catalog rail (.codex-catalog-rail — guides/solutions/
+         compare details via Hub/GroupedHubRail, hub indexes via seo/rail)
+         is position:fixed, so at page bottom it floated over the footer
+         columns. While any part of footer#colophon is >=24px into the
+         viewport, body carries .codex-rail-yield and the rail + its
+         floating toggle fade out (CSS); user-opened overlay drawers stay
+         via :not(.is-open) in the CSS selectors. /products/all ships the
+         same module inside its own inline script (catalog-pages.ts) since
+         the static catalog pipeline does not run PageScript. */
+      try {
+        var yieldRail = document.querySelector('.codex-catalog-rail');
+        var yieldFooter = document.querySelector('footer#colophon, footer.site-footer');
+        if (yieldRail && yieldFooter && 'IntersectionObserver' in window) {
+          new IntersectionObserver(function(entries) {
+            document.body.classList.toggle('codex-rail-yield', entries[0].isIntersecting);
+          }, { rootMargin: '0px 0px -24px 0px' }).observe(yieldFooter);
+        }
+      } catch (e) { /* non-critical enhancement */ }
+
       /* DS-13 #4b — dev-only sanity check for banner role attribute.
          Pattern docs require role="complementary" / "status" / "alert" per
          use case. Easy to forget — surface a console.warn during local dev
