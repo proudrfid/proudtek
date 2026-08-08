@@ -141,15 +141,16 @@ const AI_ALLOW_BOTS: ReadonlyArray<string> = [
 ];
 
 export function buildRobotsTxt(): string {
-  const disallowedPrefixes = ["ar", "da", "de", "es", "fa", "fr", "he", "it", "ja", "pt", "ru", "tr", "zh"]
-    .map((prefix) => `Disallow: /${prefix}/`)
-    .join("\n");
-
+  /* 2026-08-04: the 13 legacy WPML language prefixes (/ar/ … /zh/) are no
+   * longer Disallowed. They now 301 to canonical unprefixed paths at the
+   * edge (vercel.json), and Google can only process a redirect it is
+   * allowed to crawl — keeping the Disallow would freeze the stale
+   * language URLs in the index as zombies forever. Each hit resolves in
+   * one redirect hop, so there's no crawl-budget downside. */
   const aiSections = AI_ALLOW_BOTS.map((ua) => `User-agent: ${ua}\nAllow: /`).join("\n\n");
 
   return `User-agent: *
 Allow: /
-${disallowedPrefixes}
 # P0-S2: hide machine-readable mirrors from generic crawlers — they're
 # discoverable for AI bots via <link rel="alternate"> on each page head,
 # so emitting them in robots/sitemap for Googlebot wastes crawl budget.
