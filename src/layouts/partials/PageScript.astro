@@ -960,5 +960,77 @@
           });
         }
       } catch (e) { /* ignore */ }
+
+      /* P0 CRO (pinnacle 2026-08-12) — context-prefilled WhatsApp FAB.
+         The FAB ships a generic wa.me message server-side (whatsappUrl()
+         default). Rewrite the ?text= client-side so the sales team sees
+         WHICH page the buyer was on — same principle as the mailto
+         template in ContactChannels. The contact_click analytics above
+         is unchanged (channel detection still matches wa.me). */
+      try {
+        var waFab = document.querySelector('a.codex-wa-fab');
+        if (waFab) {
+          var waBase = new URL(waFab.getAttribute('href') || 'https://wa.me/8618665820632');
+          var pageTitle = (document.title || '').split('|')[0].trim();
+          waBase.searchParams.set('text',
+            'Hi Proud Tek, I\'m looking at "' + pageTitle + '" (' +
+            window.location.pathname + ') — can you help with my project?');
+          waFab.setAttribute('href', waBase.toString());
+        }
+      } catch (e) { /* non-critical enhancement */ }
+
+      /* P0 CRO (pinnacle 2026-08-12) — /contact/?intent= consumption.
+         StickyCta, the mega-menu and several editorial CTAs have linked
+         /contact/?intent=engineering|sample|quote since 2026-05; until now
+         nothing read the parameter (StickyCta's comment promised it would
+         be). Adapt headline, lede, notes placeholder and the Formspree
+         _subject so (a) the page acknowledges what the visitor asked for
+         and (b) the inbox can route replies by intent. */
+      try {
+        if (window.location.pathname === '/contact/') {
+          var intent = new URLSearchParams(window.location.search).get('intent');
+          var INTENTS = {
+            engineering: {
+              title: 'Talk to a Proud Tek RFID engineer',
+              lede: 'Read-range walls, chip choices, lock compatibility, hostile environments — describe the technical corner you are in and an engineer replies within one business day.',
+              placeholder: 'Engineering question — chip / frequency, reader or lock environment, materials, and what is going wrong or needs validating.',
+              subject: 'Engineering question'
+            },
+            sample: {
+              title: 'Request your free RFID sample pack',
+              lede: 'Tell us your application and target chip families — a free 8–12 SKU sample pack (LF / HF / UHF) ships in 5–10 days so you can hold the product before you commit.',
+              placeholder: 'Which products do you want to sample? Application, chip families (MIFARE / NTAG / UHF), and your shipping country.',
+              subject: 'Sample pack request'
+            },
+            quote: {
+              title: 'Get a custom RFID quote',
+              lede: 'Share quantity, chip and printing requirements and we reply within one business day with pricing, lead time and sample options.',
+              placeholder: 'Quantity, chip family, size / form factor, printing or encoding needs, and target delivery date.',
+              subject: 'Quote request'
+            }
+          };
+          var intentConf = intent && INTENTS[intent];
+          if (intentConf) {
+            var ctTitle = document.querySelector('.codex-contact__title');
+            if (ctTitle) ctTitle.textContent = intentConf.title;
+            var ctLede = document.querySelector('.codex-contact__lede');
+            if (ctLede) ctLede.textContent = intentConf.lede;
+            var ctNotes = document.querySelector('form [name="kb_field_4"]');
+            if (ctNotes && !ctNotes.value) ctNotes.setAttribute('placeholder', intentConf.placeholder);
+            var ctForm = ctNotes && ctNotes.form;
+            if (ctForm) {
+              var ctSubj = ctForm.querySelector('input[name="_subject"]');
+              if (!ctSubj) {
+                ctSubj = document.createElement('input');
+                ctSubj.type = 'hidden';
+                ctSubj.name = '_subject';
+                ctForm.appendChild(ctSubj);
+              }
+              ctSubj.value = intentConf.subject + ' — proudtek.com/contact/?intent=' + intent;
+            }
+            codexPushEvent('contact_intent', { intent: intent, route: '/contact/' });
+          }
+        }
+      } catch (e) { /* non-critical enhancement */ }
     })();
     </script>

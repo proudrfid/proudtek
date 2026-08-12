@@ -12,6 +12,7 @@
  * circular badge).
  */
 import type { EditorialDefinition } from "../../lib/editorial-types";
+import { whatsappUrl } from "../../lib/seo-content";
 
 interface Props {
   definition: EditorialDefinition;
@@ -34,7 +35,11 @@ const mailtoHref = mailtoFromPrimary ?? `mailto:info@proudtek.com?subject=${fall
 
 const phoneDisplay = "+86 186 6582 0632";
 const phoneHref = "tel:+8618665820632";
-const whatsappHref = "https://wa.me/8618665820632";
+// Context-prefilled WhatsApp message — mirrors the mailto template above so
+// the sales team sees which route the buyer came from (P0 conversion fix).
+const whatsappHref = whatsappUrl(
+  `Hi Proud Tek, I'm reaching out via the ${definition.kicker} contact route about: ${definition.title}. Can you help with my project?`,
+);
 
 const kickerLower = definition.kicker.toLowerCase();
 ---
