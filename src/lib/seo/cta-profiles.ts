@@ -40,7 +40,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/rfid-wristbands-for-hotels/.test(normalized) || /(hotel|room-key|key-card)/.test(normalized)) {
     return {
-      href: "/contact/hotel-rfid/",
+      href: "/rfq/?product=rfid-cards&route=hotel-rfid",
       label: "Get hotel lock compatibility check",
       description:
         "Use the hotel RFID route when the next step is lock compatibility, sample planning, encoding support or a production quote.",
@@ -54,7 +54,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(laundry|linen)/.test(normalized)) {
     return {
-      href: "/contact/laundry-rfid/",
+      href: "/rfq/?product=rfid-tags&route=laundry-rfid",
       label: "Request laundry tag samples",
       description:
         "Use the laundry RFID route when wash durability, attachment method and reader validation matter more than broad catalog browsing.",
@@ -68,7 +68,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(wristband|event|coconut-shell)/.test(normalized)) {
     return {
-      href: "/contact/event-rfid/",
+      href: "/rfq/?product=rfid-wristbands&route=event-rfid",
       label: "Request event RFID quote",
       description:
         "Use the event RFID route when the brief needs to cover gate flow, wristband format, numbering logic and launch timing together.",
@@ -82,7 +82,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(reader|scanner|acr122u)/.test(normalized)) {
     return {
-      href: "/contact/rfid-readers/",
+      href: "/rfq/?product=rfid-readers&route=reader-rfid",
       label: "Ask for reader recommendation",
       description:
         "Use the reader route when protocol support, SDK requirements and pilot hardware fit are the real buying decision.",
@@ -96,7 +96,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(windshield|vehicle|headlight|transponder|\bcar\b)/.test(normalized)) {
     return {
-      href: "/contact/vehicle-rfid/",
+      href: "/rfq/?product=rfid-labels&route=vehicle-rfid",
       label: "Request vehicle RFID guidance",
       description:
         "Tell us where the tag mounts (windshield inside, headlight, bumper), your required read range, and whether you need tamper-evident anti-transfer — we'll match the right UHF label.",
@@ -110,7 +110,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(key-fob|keyfob|fob)/.test(normalized)) {
     return {
-      href: "/contact/access-control-keyfobs/",
+      href: "/rfq/?product=rfid-keyfobs&route=access-control-keyfobs",
       label: "Request keyfob quote",
       description:
         "Use the keyfob route when reader compatibility, shell style and branding requirements need to be confirmed in the first reply.",
@@ -124,7 +124,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(google-review|review)/.test(normalized)) {
     return {
-      href: "/contact/nfc-branding-cards/",
+      href: "/rfq/?product=rfid-cards&freq=hf&route=nfc-branding-cards",
       label: "Request custom review card",
       description:
         "Use the NFC branding route when the real decision is about review flow, placement, phone compatibility and branded rollout.",
@@ -138,7 +138,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(business-card|metal-nfc-card|wooden-rfid-card|eco_rfid_card|nfc-ring|nfc-cards?)/.test(normalized)) {
     return {
-      href: "/contact/nfc-branding-cards/",
+      href: "/rfq/?product=rfid-cards&freq=hf&route=nfc-branding-cards",
       label: "Request custom NFC card",
       description:
         "Use the NFC branding route when the shortlist depends on material, phone compatibility, encoding workflow and premium finish decisions.",
@@ -152,7 +152,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
 
   if (/(label|sticker|tag)/.test(normalized)) {
     return {
-      href: "/contact/rfid-labels-tags/",
+      href: "/rfq/?product=rfid-labels&route=rfid-labels-tags",
       label: /nfc-stickers/.test(normalized) ? "Request NFC sticker quote" : "Request label and tag quote",
       description:
         "Use the labels and tags route when surface, adhesive, read environment and converting details control the buying decision.",
@@ -165,7 +165,7 @@ export function resolveProductCtaProfile(canonicalPath: string, contentTitle: st
   }
 
   return {
-    href: "/contact/custom-rfid-cards/",
+    href: "/rfq/?product=rfid-cards&route=custom-rfid-cards",
     label: "Get custom RFID card quote",
     description: `Use the card inquiry route when ${contentTitle} is already close to the right fit and the next step is pricing, samples or customization confirmation.`,
     briefItems: [
@@ -181,7 +181,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (normalized === "/products/all/") {
     return {
-      href: "/contact/",
+      href: "/rfq/",
       label: "Contact the right RFID specialist",
       description:
         "Not sure which product family fits your project? Tell us your application, reader environment, and timeline — we'll point you to the right collection and send matching samples.",
@@ -200,7 +200,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (/(reader|scanner|acr122u|rfid-readers)/.test(normalized)) {
     return {
-      href: "/contact/rfid-readers/",
+      href: "/rfq/?product=rfid-readers&route=reader-rfid",
       label: "Discuss reader requirements",
       description:
         "Tell us your chip type, host OS, and whether you need desktop USB or portable Bluetooth — we'll recommend the right reader and ship a test unit.",
@@ -219,7 +219,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (/(key-fob|keyfob|fob|rfid-keyfobs)/.test(normalized)) {
     return {
-      href: "/contact/access-control-keyfobs/",
+      href: "/rfq/?product=rfid-keyfobs&route=access-control-keyfobs",
       label: "Discuss keyfob requirements",
       description:
         "Share your access control reader brand and preferred fob shape — we'll confirm chip compatibility and send samples with your logo engraved.",
@@ -238,7 +238,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (/(wristband|rfid-wristbands)/.test(normalized)) {
     return {
-      href: "/contact/event-rfid/",
+      href: "/rfq/?product=rfid-wristbands&route=event-rfid",
       label: "Discuss wristband requirements",
       description:
         "Tell us your event type, expected attendance, and whether guests will be near water — we'll recommend band material, closure style, and chip, then send samples before your deadline.",
@@ -257,7 +257,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (/(label|sticker|rfid-labels)/.test(normalized)) {
     return {
-      href: "/contact/rfid-labels-tags/",
+      href: "/rfq/?product=rfid-labels&route=rfid-labels-tags",
       label: "Discuss label requirements",
       description:
         "Tell us what surface the label sticks to, whether it needs phone-tap NFC or long-range UHF, and your print artwork — we'll recommend the right inlay and adhesive.",
@@ -276,7 +276,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (/(laundry|linen)/.test(normalized)) {
     return {
-      href: "/contact/laundry-rfid/",
+      href: "/rfq/?product=rfid-tags&route=laundry-rfid",
       label: "Discuss laundry tag requirements",
       description:
         "Share your wash cycle temperature, textile type, and daily volume — we'll recommend PPS, silicone, or textile tags and ship test samples for your laundry line.",
@@ -295,7 +295,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (/(windshield|vehicle|headlight|transponder|\bcar\b)/.test(normalized)) {
     return {
-      href: "/contact/vehicle-rfid/",
+      href: "/rfq/?product=rfid-labels&route=vehicle-rfid",
       label: "Request vehicle RFID guidance",
       description:
         "Tell us where the tag mounts (windshield inside, headlight, bumper), your required read range, and whether you need tamper-evident anti-transfer — we'll match the right UHF label.",
@@ -314,7 +314,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
 
   if (/(tag|rfid-tags)/.test(normalized)) {
     return {
-      href: "/contact/rfid-labels-tags/",
+      href: "/rfq/?product=rfid-labels&route=rfid-labels-tags",
       label: "Discuss RFID tag requirements",
       description:
         "Share what you're tagging (garments, vehicles, assets), the operating environment, and your read distance — we'll recommend HF or UHF tags and send samples.",
@@ -332,7 +332,7 @@ export function resolveCollectionCtaProfile(canonicalPath: string): InquiryCtaPr
   }
 
   return {
-    href: "/contact/custom-rfid-cards/",
+    href: "/rfq/?product=rfid-cards&route=custom-rfid-cards",
     label: "Discuss RFID card requirements",
     description:
       "Tell us your lock brand, chip preference, and quantity — we'll recommend the right card format, confirm print and encoding options, and send samples.",

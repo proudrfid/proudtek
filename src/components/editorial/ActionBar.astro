@@ -11,6 +11,7 @@
  */
 import type { EditorialDefinition, EditorialLink, EditorialGroup } from "../../lib/editorial-types";
 import { buildIntentHref } from "../../lib/editorial-pages";
+import { resolveArticleInquiryAction } from "../../lib/seo/normalize-body";
 import { rewriteContactHref } from "../../lib/editorial-shadow-normalizers";
 
 interface Props {
@@ -48,14 +49,19 @@ const isContact = group === "contact";
 const heading = isContact ? "Send your project details" : "Ready to discuss your project?";
 const description = isContact
   ? "The main button opens a prefilled email for this route. Use it if the project already fits, or keep reviewing the linked product and reference pages first."
-  : "Use the contact route when you are ready for pricing, samples, or compatibility help, or continue into the linked product and comparison pages below.";
+  : "Use the structured RFQ when you are ready for pricing and production guidance, request samples when validation comes first, or continue into the linked product and comparison pages below.";
 
 const mailtoSubject = encodeURIComponent(`Inquiry: ${title}`);
 const mailtoBody = encodeURIComponent(
   `Hi Proud Tek,\n\nI'm interested in: ${title}\n\nProject details:\n- Application:\n- Chip / frequency requirement:\n- Quantity:\n- Target date:\n\nPlease advise on next steps.\n\nThanks`,
 );
 const mailtoHref = `mailto:info@proudtek.com?subject=${mailtoSubject}&body=${mailtoBody}`;
-const primaryHref = buildIntentHref(primaryAction.href, "quote", route);
+const resolvedQuoteHref = resolveArticleInquiryAction(route, title).href;
+const primaryHref = buildIntentHref(
+  primaryAction.href.startsWith("/contact/") ? resolvedQuoteHref : primaryAction.href,
+  "quote",
+  route,
+);
 ---
 <section class="codex-editorial-action-bar" id={id}>
   <div>

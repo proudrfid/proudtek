@@ -544,6 +544,56 @@
         }
       }
 
+      /* Inquiry attribution — carry acquisition context into every RFQ/contact
+         form and across the click from a content page to /rfq/. Session storage
+         keeps this scoped to the active buying journey; every access is guarded
+         because privacy modes can disable storage. */
+      var ATTR_PREFIX = 'codex.attribution.';
+      var ATTR_QUERY_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+      function attrGet(key) {
+        try { return window.sessionStorage.getItem(ATTR_PREFIX + key) || ''; } catch (e) { return ''; }
+      }
+      function attrSet(key, value) {
+        if (!value) return;
+        try { window.sessionStorage.setItem(ATTR_PREFIX + key, String(value)); } catch (e) {}
+      }
+      function readGaClientId() {
+        var match = document.cookie.match(/(?:^|;\s*)_ga=GA\d+\.\d+\.(\d+\.\d+)/);
+        return match ? match[1] : '';
+      }
+      function initializeAttribution() {
+        var params = new URLSearchParams(window.location.search);
+        ATTR_QUERY_KEYS.forEach(function(key) {
+          var value = params.get(key);
+          if (value) attrSet(key, value);
+        });
+        var clickId = params.get('gclid') || params.get('msclkid') || params.get('fbclid') || attrGet('click_id');
+        if (clickId) attrSet('click_id', clickId);
+        if (!attrGet('landing_page')) attrSet('landing_page', window.location.href);
+        if (!attrGet('referrer') && document.referrer) attrSet('referrer', document.referrer);
+        var sourceRoute = params.get('route');
+        if (sourceRoute) attrSet('source_route', sourceRoute);
+      }
+      function fillAttribution(form) {
+        if (!form || !form.querySelectorAll) return;
+        var values = {};
+        ATTR_QUERY_KEYS.forEach(function(key) { values[key] = attrGet(key); });
+        values.click_id = attrGet('click_id');
+        values.referrer = attrGet('referrer') || document.referrer || '';
+        values.landing_page = attrGet('landing_page') || window.location.href;
+        values.current_page = window.location.href;
+        values.source_route = attrGet('source_route') || '';
+        values.cta_tier = attrGet('cta_tier') || '';
+        values.cta_label = attrGet('cta_label') || '';
+        values.ga_client_id = readGaClientId();
+        form.querySelectorAll('[data-codex-attribution]').forEach(function(input) {
+          var key = input.getAttribute('data-codex-attribution');
+          if (key && Object.prototype.hasOwnProperty.call(values, key)) input.value = values[key] || '';
+        });
+      }
+      initializeAttribution();
+      document.querySelectorAll('form[data-codex-rfq], #rfq-wizard').forEach(fillAttribution);
+
       /* CTA-tier analytics — DS-10 #1 (2026-04-27).
          Three commitment levels share the page:
            hero    = "Request samples"      (low)
@@ -619,6 +669,9 @@
           var ctaTier = ctaTarget.getAttribute('data-cta-tier');
           var ctaLabel = (ctaTarget.textContent || '').replace(/\s+/g, ' ').trim();
           var ctaHref = ctaTarget.getAttribute('href') || '';
+          attrSet('cta_tier', ctaTier || '');
+          attrSet('cta_label', ctaLabel);
+          attrSet('source_route', route);
           codexPushEvent('cta_click', {
             cta_tier: ctaTier,
             cta_label: ctaLabel,
@@ -735,6 +788,7 @@
         });
 
         form.addEventListener('submit', function(e) {
+          fillAttribution(form);
           // CRO 2026-06-11: only count submits that pass validation. The
           // DS-11 #5c validation handler is registered earlier on this same
           // form (same file, codexForms loop above), so an invalid submit

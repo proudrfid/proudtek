@@ -38,9 +38,19 @@ interface Props {
    *  declared in StickyCta.astro. */
   stickyCtaHref?: string;
   stickyCtaLabel?: string;
+  /** Disable the global sticky banner on focused conversion routes such as
+   *  /rfq/, where a second CTA competes with the form being completed. */
+  showStickyCta?: boolean;
 }
 
-const { seo, machineJsonPath, machineTextPath, stickyCtaHref, stickyCtaLabel } = Astro.props;
+const {
+  seo,
+  machineJsonPath,
+  machineTextPath,
+  stickyCtaHref,
+  stickyCtaLabel,
+  showStickyCta = true,
+} = Astro.props;
 ---
 
 <!doctype html>
@@ -59,7 +69,7 @@ const { seo, machineJsonPath, machineTextPath, stickyCtaHref, stickyCtaLabel } =
     <a class="codex-skip-link" href="#main">Skip to main content</a>
     <slot />
     <WhatsAppFab />
-    <StickyCta href={stickyCtaHref} label={stickyCtaLabel} />
+    {showStickyCta && <StickyCta href={stickyCtaHref} label={stickyCtaLabel} />}
     <PageScript />
   </body>
 </html>

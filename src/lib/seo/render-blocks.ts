@@ -19,24 +19,25 @@ import {
   GROWTH_ACTIONS,
 } from "../seo-content";
 
+import { getTotalCompareCount } from "../../data/compare-categories";
 import { escapeXml } from "./utils";
 
 /* ── Trust bar ─────────────────────────────────────────────────── */
 
 export function renderTrustBar(): string {
-  return `<section class="codex-trust-bar" aria-label="Manufacturing credentials">
-    <div class="codex-trust-bar__item">
-      <strong>Since 2008</strong><span>RFID Manufacturing</span>
-    </div>
-    <div class="codex-trust-bar__item">
-      <strong>ISO 9001</strong><span>Certified Factory</span>
-    </div>
-    <div class="codex-trust-bar__item">
-      <strong>500+</strong><span>Enterprise Clients</span>
-    </div>
-    <div class="codex-trust-bar__item">
-      <strong>Shenzhen</strong><span>Factory Direct</span>
-    </div>
+  return `<section class="codex-trust-bar" aria-label="Verified manufacturing credentials">
+    <a class="codex-trust-bar__item" href="/about/">
+      <strong>Since 2008</strong><span>RFID manufacturing</span>
+    </a>
+    <a class="codex-trust-bar__item" href="/about/certifications/">
+      <strong>ISO 9001</strong><span>Verify certification</span>
+    </a>
+    <a class="codex-trust-bar__item" href="/sample-pack/">
+      <strong>Free samples</strong><span>Test before production</span>
+    </a>
+    <a class="codex-trust-bar__item" href="/rfq/">
+      <strong>1 business day</strong><span>Quote response target</span>
+    </a>
   </section>`;
 }
 
@@ -150,6 +151,7 @@ export function renderHomeQuoteBrief(): string {
  * are discoverable from the homepage, not just the Resources menu.
  */
 export function renderHomeResourceTrio(): string {
+  const compareCount = getTotalCompareCount();
   const cards = [
     {
       eyebrow: "Real deployments",
@@ -160,18 +162,26 @@ export function renderHomeResourceTrio(): string {
       accent: "#3d6b6b",
     },
     {
-      eyebrow: "Free, 5-field form",
-      title: "Sample Pack & RFQ Wizard",
+      eyebrow: "Test before production",
+      title: "Request a Free Sample Pack",
       description:
-        "Hold the chip first: a free 8–12-SKU sample pack (LF / HF / UHF) ships in 5–10 days. Or skip to a structured quote with the 5-step RFQ wizard — product family, frequency, quantity, printing, contact — under 2 minutes.",
+        "Hold the chip first: a free 8–12-SKU LF / HF / UHF sample pack ships in 5–10 days so your team can validate compatibility before production.",
       href: "/sample-pack/",
       accent: "#2d6a4f",
     },
     {
-      eyebrow: "Settle the chip question",
-      title: "Compare 31+ chip & material pairs",
+      eyebrow: "Structured procurement brief",
+      title: "Request a Production Quote",
       description:
-        "MIFARE Classic vs Plus vs DESFire EV3, NTAG213/215/216, UCODE 8/9 vs Monza R6 vs Higgs-9, EM4100 vs T5577, PPS vs silicone laundry tag, UHF vs HF — side-by-side specifications, cloning economics, deployment fit.",
+        "Use the five-step RFQ wizard to share product family, frequency, quantity, printing and contact details. A specialist replies within one business day.",
+      href: "/rfq/",
+      accent: "#4a5568",
+    },
+    {
+      eyebrow: "Settle the chip question",
+      title: `Compare ${compareCount} chip & material pairs`,
+      description:
+        "MIFARE Classic vs Plus vs DESFire EV3, NTAG213/215/216, UCODE 8/9 vs Monza R6 vs Higgs-9, EM4100 vs T5577, and material choices side by side.",
       href: "/compare/",
       accent: "#c39a5f",
     },
@@ -180,7 +190,7 @@ export function renderHomeResourceTrio(): string {
   return `<section class="codex-industry-selector codex-industry-selector--resources" aria-label="Resources for your project">
     <div class="codex-industry-selector__header">
       <h2>Skip the catalog — start with what your peers already chose</h2>
-      <p>Case studies, a free sample pack and 31+ comparison pages drive most decisions before a quote conversation begins.</p>
+      <p>Case evidence, sample validation, a structured RFQ and ${compareCount} comparisons help procurement teams move from research to a qualified quote.</p>
     </div>
     <div class="codex-industry-selector__grid">
       ${cards
