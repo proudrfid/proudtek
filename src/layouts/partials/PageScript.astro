@@ -544,6 +544,66 @@
         }
       }
 
+      /* Stable in-page quote navigation.
+         Editorial pages contain many lazy images above #quick-quote. Native
+         fragment navigation runs before those resources finish sizing, so the
+         form can be pushed several sections below the viewport after the
+         browser has already jumped. Re-align after layout settles, and handle
+         direct hash visits as well as CTA clicks. */
+      var quickQuoteTarget = document.getElementById('quick-quote');
+      if (quickQuoteTarget) {
+        var quickQuoteTimers = [];
+        function clearQuickQuoteTimers() {
+          quickQuoteTimers.forEach(function(timer) { window.clearTimeout(timer); });
+          quickQuoteTimers = [];
+        }
+        function alignQuickQuote(behavior) {
+          quickQuoteTarget.scrollIntoView({ behavior: behavior || 'auto', block: 'start' });
+        }
+        function stabilizeQuickQuote(behavior) {
+          clearQuickQuoteTimers();
+          alignQuickQuote(behavior);
+          [120, 450, 1000, 1800].forEach(function(delay) {
+            quickQuoteTimers.push(window.setTimeout(function() {
+              if (window.location.hash === '#quick-quote') alignQuickQuote('auto');
+            }, delay));
+          });
+        }
+        var quoteContainer = quickQuoteTarget.closest('.entry-content') || document;
+        quoteContainer.querySelectorAll('img').forEach(function(image) {
+          var targetFollowsImage = Boolean(
+            image.compareDocumentPosition(quickQuoteTarget) & Node.DOCUMENT_POSITION_FOLLOWING
+          );
+          if (targetFollowsImage && !image.complete) {
+            image.addEventListener('load', function() {
+              if (window.location.hash === '#quick-quote') alignQuickQuote('auto');
+            }, { once: true });
+          }
+        });
+        document.addEventListener('click', function(event) {
+          var link = event.target && event.target.closest
+            ? event.target.closest('a[href="#quick-quote"]')
+            : null;
+          if (!link) return;
+          event.preventDefault();
+          try { window.history.pushState(null, '', '#quick-quote'); }
+          catch (e) { window.location.hash = 'quick-quote'; }
+          stabilizeQuickQuote(prefersReducedMotion ? 'auto' : 'smooth');
+        });
+        window.addEventListener('hashchange', function() {
+          if (window.location.hash === '#quick-quote') stabilizeQuickQuote('auto');
+        });
+        window.addEventListener('load', function() {
+          if (window.location.hash === '#quick-quote') stabilizeQuickQuote('auto');
+        });
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(function() {
+            if (window.location.hash === '#quick-quote') stabilizeQuickQuote('auto');
+          });
+        }
+        if (window.location.hash === '#quick-quote') stabilizeQuickQuote('auto');
+      }
+
       /* Inquiry attribution — carry acquisition context into every RFQ/contact
          form and across the click from a content page to /rfq/. Session storage
          keeps this scoped to the active buying journey; every access is guarded
