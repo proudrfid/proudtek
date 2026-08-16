@@ -2,28 +2,9 @@ import type { SiteData, SnapshotPage } from "./site-data";
 import type { EditorialDefinition } from "./editorial-types";
 import { SITE_ORIGIN, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS } from "./seo-content";
 import { buildPageSeo, buildPageSummary, getIndexablePages, isIndexableRoute } from "./seo";
+import { getNativeSitemapSupplementRoutes } from "./route-registry";
 
 export type PageLoader = (route: string) => Promise<SnapshotPage>;
-
-/**
- * Native `.astro` hub indexes that aren't in `siteData.pages` (they're
- * built directly by Astro from files under `src/pages/{group}/index.astro`,
- * not from WP-snapshot data). Without this list they'd be missing from the
- * sitemap even though they're real, indexable pages in production.
- *
- * Audit on 2026-05-12 confirmed `/blog/`, `/research/`, `/compatibility/`,
- * `/industries/`, `/solutions/` already appear in sitemap (their hub
- * indexes ARE in siteData.pages) — only `/compare/` and `/guides/` are
- * missing because they were added as native hubs later.
- */
-const NATIVE_HUB_ROUTES: ReadonlyArray<string> = [
-  "/case-studies/",
-  "/compare/",
-  "/guides/",
-  "/rfq/",
-  "/glossary/",
-  "/tools/rfid-tag-cost-estimator/",
-];
 
 export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader): Promise<string> {
   const indexable = getIndexablePages(siteData);
@@ -47,7 +28,7 @@ export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader):
   // Append native hub indexes (not in siteData.pages — built from
   // src/pages/{group}/index.astro files directly).
   const siteLastmod = (siteData.generatedAt ?? new Date().toISOString()).slice(0, 10);
-  for (const route of NATIVE_HUB_ROUTES) {
+  for (const route of getNativeSitemapSupplementRoutes()) {
     urlEntries.push(
       [
         "  <url>",
