@@ -250,7 +250,7 @@ export function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context
   const resourceTrioHtml = context.kind === "home" && !isEditorialBody ? renderHomeResourceTrio() : "";
   const growthHtml =
     context.kind === "home" && !isEditorialBody
-      ? resourceTrioHtml + renderHomeGrowthHub() + trustBarHtml
+      ? trustBarHtml + resourceTrioHtml + renderHomeGrowthHub()
       : context.kind === "blog" && page.route !== "/blog/" && !isEditorialBody
         ? renderBlogGrowthHub()
         : "";
@@ -772,5 +772,24 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
       }
     }
   });
-}
 
+  // Carry acquisition context into Formspree so sales can attribute a lead to
+  // its first landing page, campaign and last CTA rather than only the form URL.
+  if (!form.find('[data-codex-attribution]').length) {
+    form.prepend([
+      '<input type="hidden" name="utm_source" data-codex-attribution="utm_source" />',
+      '<input type="hidden" name="utm_medium" data-codex-attribution="utm_medium" />',
+      '<input type="hidden" name="utm_campaign" data-codex-attribution="utm_campaign" />',
+      '<input type="hidden" name="utm_term" data-codex-attribution="utm_term" />',
+      '<input type="hidden" name="utm_content" data-codex-attribution="utm_content" />',
+      '<input type="hidden" name="click_id" data-codex-attribution="click_id" />',
+      '<input type="hidden" name="referrer" data-codex-attribution="referrer" />',
+      '<input type="hidden" name="landing_page" data-codex-attribution="landing_page" />',
+      '<input type="hidden" name="current_page" data-codex-attribution="current_page" />',
+      '<input type="hidden" name="source_route" data-codex-attribution="source_route" />',
+      '<input type="hidden" name="cta_tier" data-codex-attribution="cta_tier" />',
+      '<input type="hidden" name="cta_label" data-codex-attribution="cta_label" />',
+      '<input type="hidden" name="ga_client_id" data-codex-attribution="ga_client_id" />',
+    ].join(""));
+  }
+}

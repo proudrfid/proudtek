@@ -12,9 +12,9 @@
  *   - `group === "contact"` → suppress CTA + trust bar (contact pages have
  *     their own ContactChannels block)
  *   - `quickQuoteHref` prop set (audit C-11) → primary CTA deep-links to the
- *     in-page quick-quote form instead of navigating away to /contact/.
- *     Label and data-cta-tier are unchanged; when the prop is absent the
- *     routed `/contact/?intent=samples&route=...` href is preserved.
+ *     in-page quick-quote form instead of navigating away to /rfq/.
+ *     The visible label matches the destination: in-page quote anchors say
+ *     "Get a Quick Quote"; routed fallbacks say "Request a Quote".
  *   - `getPillarClusterId(route)` returns a cluster id → emit ghost CTA
  *     linking to `/products/all/#<cluster>` with `data-pillar-bridge`
  *   - illustration source starts with `/landing-images/` → emit `<picture>`
@@ -64,12 +64,12 @@ const { definition, illustration, byline = null, quickQuoteHref = null } = Astro
 
 const pageType = resolvePageType(definition.group);
 const isContact = definition.group === "contact";
-const samplesHref = `/contact/?intent=samples&route=${encodeURIComponent(definition.route)}`;
-// C-11: prefer the in-page quick-quote anchor when the composer says the
-// form is on this page. The cta_click handler in PageScript.astro reads the
-// href off the element at click time, so analytics attribution is unchanged
-// (cta_href simply becomes "#quick-quote").
-const primaryCtaHref = quickQuoteHref ?? samplesHref;
+const quoteHref = `/rfq/?route=${encodeURIComponent(definition.route)}`;
+// C-11 / CRO-1: prefer the in-page quick-quote anchor when the composer says
+// the form is on this page. The visible label must match the action: quick
+// quote for an anchor, request quote for the full RFQ wizard fallback.
+const primaryCtaHref = quickQuoteHref ?? quoteHref;
+const primaryCtaLabel = quickQuoteHref ? "Get a Quick Quote" : "Request a Quote";
 const pillarClusterId = getPillarClusterId(definition.route);
 const pillarLabel = pillarClusterId ? PILLAR_CLUSTER_LABELS[pillarClusterId] : null;
 
@@ -220,7 +220,7 @@ const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0
     {!isContact && (
       <>
         <div class="codex-hero-cta">
-          <a class="codex-hero-cta-btn" data-cta-tier="hero" href={primaryCtaHref}>Request samples</a>
+          <a class="codex-hero-cta-btn" data-cta-tier="hero" href={primaryCtaHref}>{primaryCtaLabel}</a>
           {pillarClusterId && pillarLabel && (
             <a
               class="codex-hero-cta-btn codex-hero-cta-btn--ghost"

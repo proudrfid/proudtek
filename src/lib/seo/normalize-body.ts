@@ -108,38 +108,38 @@ export function resolveArticleInquiryAction(route: string, contentTitle: string)
   const normalized = `${route} ${contentTitle}`.toLowerCase();
 
   if (/(hotel|room-key|saflok|onity|salto|vingcard)/.test(normalized)) {
-    return { href: "/contact/hotel-rfid/", label: "Hotel RFID inquiry page" };
+    return { href: `/rfq/?product=rfid-cards&route=${encodeURIComponent(route)}`, label: "Request a hotel RFID quote" };
   }
 
   if (/(laundry|linen)/.test(normalized)) {
-    return { href: "/contact/laundry-rfid/", label: "Laundry RFID inquiry page" };
+    return { href: `/rfq/?product=rfid-tags&route=${encodeURIComponent(route)}`, label: "Request a laundry RFID quote" };
   }
 
   if (/(wristband|event|festival)/.test(normalized)) {
-    return { href: "/contact/event-rfid/", label: "Event RFID inquiry page" };
+    return { href: `/rfq/?product=rfid-wristbands&route=${encodeURIComponent(route)}`, label: "Request an event RFID quote" };
   }
 
   if (/(reader|acr122u|scanner|writer)/.test(normalized)) {
-    return { href: "/contact/rfid-readers/", label: "RFID reader inquiry page" };
+    return { href: `/rfq/?product=rfid-readers&route=${encodeURIComponent(route)}`, label: "Request an RFID reader quote" };
   }
 
   if (/(vehicle|windshield|headlight|transponder|\bcar\b)/.test(normalized)) {
-    return { href: "/contact/vehicle-rfid/", label: "Vehicle RFID inquiry page" };
+    return { href: `/rfq/?product=rfid-labels&route=${encodeURIComponent(route)}`, label: "Request a vehicle RFID quote" };
   }
 
   if (/(keyfob|key-fob|fob)/.test(normalized)) {
-    return { href: "/contact/access-control-keyfobs/", label: "Keyfob inquiry page" };
+    return { href: `/rfq/?product=rfid-keyfobs&route=${encodeURIComponent(route)}`, label: "Request a keyfob quote" };
   }
 
   if (/(review|google review|business card|wooden card|metal nfc|ntag|nfc)/.test(normalized)) {
-    return { href: "/contact/nfc-branding-cards/", label: "NFC branding cards inquiry page" };
+    return { href: `/rfq/?product=rfid-cards&freq=hf&route=${encodeURIComponent(route)}`, label: "Request an NFC quote" };
   }
 
   if (/(label|sticker|tag|asset tracking)/.test(normalized)) {
-    return { href: "/contact/rfid-labels-tags/", label: "RFID labels inquiry page" };
+    return { href: `/rfq/?product=rfid-labels&route=${encodeURIComponent(route)}`, label: "Request an RFID label quote" };
   }
 
-  return { href: "/contact/custom-rfid-cards/", label: "Custom RFID cards inquiry page" };
+  return { href: `/rfq/?product=rfid-cards&route=${encodeURIComponent(route)}`, label: "Request a custom RFID card quote" };
 }
 
 

@@ -44,7 +44,7 @@ const machineJsonPath = buildMachineRoute(route, "json");
 const machineTextPath = buildMachineRoute(route, "txt");
 ---
 
-<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
+<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath} showStickyCta={false}>
   <Fragment set:html={seo.bodyHtml.split("<main")[0]} />
 
   <main id="main" class="codex-rfq-main">
@@ -59,7 +59,7 @@ const machineTextPath = buildMachineRoute(route, "txt");
     <section class="codex-rfq-hero">
       <p class="codex-rfq-hero__eyebrow">Quote in one form</p>
       <h1 class="codex-rfq-hero__title">Request a quote for custom RFID &amp; NFC manufacturing</h1>
-      <p class="codex-rfq-hero__lede">Five short steps. Five fields. Most buyers finish in under two minutes. A Proud Tek RFID specialist replies within one business day with a unit price, MOQ ladder, lead time and a matching sample-pack subset.</p>
+      <p class="codex-rfq-hero__lede">Five short steps, with contact details only at the end. The form is designed to take about two minutes. A Proud Tek RFID specialist replies within one business day with a unit price, MOQ ladder, lead time and a matching sample-pack subset.</p>
       <ul class="codex-rfq-hero__pill-row">
         <li>1. Product family</li>
         <li>2. Frequency band</li>
@@ -75,6 +75,19 @@ const machineTextPath = buildMachineRoute(route, "txt");
     <form id="rfq-wizard" class="codex-rfq" action="https://formspree.io/f/xlgorlog" method="POST">
       <input type="hidden" name="_subject" value="RFQ — proudtek.com" />
       <input type="hidden" id="rfq-payload" name="message" value="" />
+      <input type="hidden" name="utm_source" data-codex-attribution="utm_source" />
+      <input type="hidden" name="utm_medium" data-codex-attribution="utm_medium" />
+      <input type="hidden" name="utm_campaign" data-codex-attribution="utm_campaign" />
+      <input type="hidden" name="utm_term" data-codex-attribution="utm_term" />
+      <input type="hidden" name="utm_content" data-codex-attribution="utm_content" />
+      <input type="hidden" name="click_id" data-codex-attribution="click_id" />
+      <input type="hidden" name="referrer" data-codex-attribution="referrer" />
+      <input type="hidden" name="landing_page" data-codex-attribution="landing_page" />
+      <input type="hidden" name="current_page" data-codex-attribution="current_page" />
+      <input type="hidden" name="source_route" data-codex-attribution="source_route" />
+      <input type="hidden" name="cta_tier" data-codex-attribution="cta_tier" />
+      <input type="hidden" name="cta_label" data-codex-attribution="cta_label" />
+      <input type="hidden" name="ga_client_id" data-codex-attribution="ga_client_id" />
 
       <noscript>
         {/* No-JS fallback: reveal every step + the real submit button and
@@ -170,7 +183,8 @@ const machineTextPath = buildMachineRoute(route, "txt");
         </label>
         <label class="codex-rfq__text-field">
           <span>Business email <em>*</em></span>
-          <input type="email" name="email" autocomplete="email" required />
+          <input type="email" name="email" autocomplete="email" aria-describedby="rfq-email-error" required />
+          <span class="codex-rfq__field-error" id="rfq-email-error" role="alert" aria-live="polite"></span>
         </label>
         <label class="codex-rfq__text-field">
           <span>Country / region <em>*</em></span>
@@ -341,11 +355,24 @@ const machineTextPath = buildMachineRoute(route, "txt");
         }
         const requiredText = step.querySelectorAll("input[required], textarea[required]");
         for (const f of requiredText) {
-          if (!f.value.trim()) {
+          if (!f.checkValidity()) {
             f.classList.add("has-error");
+            f.setAttribute("aria-invalid", "true");
+            const errorId = f.getAttribute("aria-describedby");
+            const errorEl = errorId ? document.getElementById(errorId) : null;
+            if (errorEl) {
+              errorEl.textContent = f.validity.typeMismatch && f.type === "email"
+                ? "Please enter a valid business email address."
+                : "Please fill in this field.";
+            }
             f.focus();
             return false;
           }
+          f.classList.remove("has-error");
+          f.removeAttribute("aria-invalid");
+          const errorId = f.getAttribute("aria-describedby");
+          const errorEl = errorId ? document.getElementById(errorId) : null;
+          if (errorEl) errorEl.textContent = "";
         }
         step.classList.remove("has-error");
         return true;
@@ -464,7 +491,12 @@ const machineTextPath = buildMachineRoute(route, "txt");
       });
 
       wizard.addEventListener("input", (e) => {
-        if (e.target instanceof HTMLElement) e.target.classList.remove("has-error");
+        if (!(e.target instanceof HTMLElement)) return;
+        e.target.classList.remove("has-error");
+        e.target.removeAttribute("aria-invalid");
+        const errorId = e.target.getAttribute("aria-describedby");
+        const errorEl = errorId ? document.getElementById(errorId) : null;
+        if (errorEl) errorEl.textContent = "";
       });
 
       show(current);

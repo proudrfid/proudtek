@@ -32,17 +32,17 @@ export function normalizeGlobalInquiryEntry($body: CheerioAPI, page: SnapshotPag
 export function ensureMobileInquiryEntry($body: CheerioAPI, page: SnapshotPage): void {
   const mobileMenu = $body("#mobile-menu").first();
 
-  if (!mobileMenu.length || mobileMenu.find('a[href="/contact/"], a[href="https://proudtek.com/contact/"]').length) {
+  if (!mobileMenu.length || mobileMenu.find('a[href="/rfq/"], a[href="/contact/"], a[href="https://proudtek.com/rfq/"], a[href="https://proudtek.com/contact/"]').length) {
     return;
   }
 
   const currentClass =
-    page.route === "/contact/" || page.route.startsWith("/contact/")
+    page.route === "/rfq/" || page.route.startsWith("/rfq/")
       ? " current-menu-item current_page_item"
       : "";
 
   mobileMenu.append(
-    `<li class="menu-item menu-item-type-post_type menu-item-object-page codex-nav-rfq-item${currentClass}"><a href="/contact/" class="codex-nav-rfq-link" title="Request a quote from Proud Tek" aria-label="Request a quote from Proud Tek">Request Quote</a></li>`,
+    `<li class="menu-item menu-item-type-post_type menu-item-object-page codex-nav-rfq-item${currentClass}"><a href="/rfq/" class="codex-nav-rfq-link" title="Request a quote from Proud Tek" aria-label="Request a quote from Proud Tek">Request Quote</a></li>`,
   );
 }
 
@@ -64,7 +64,7 @@ export function rewriteGlobalInquiryLinks($body: CheerioAPI): void {
       link.text("Request Quote");
     }
 
-    link.attr("href", "/contact/");
+    link.attr("href", "/rfq/");
     link.attr("title", "Request a quote from Proud Tek");
     link.attr("aria-label", "Request a quote from Proud Tek");
     link.addClass("codex-nav-rfq-link");
@@ -107,7 +107,7 @@ export function rewriteFooterInquirySection($body: CheerioAPI): void {
     .find("section.widget")
     .filter((_, element) => /Quote & Contact|RFQ & Contact|Contact Us/i.test(cleanText($body(element).text())))
     .first();
-  const rfqHtml = `<section class="widget widget_block codex-footer-rfq-entry"><p><a class="codex-footer-rfq-link" href="/contact/">Request a quote</a></p></section>`;
+  const rfqHtml = `<section class="widget widget_block codex-footer-rfq-entry"><p><a class="codex-footer-rfq-link" href="/rfq/">Request a quote</a></p></section>`;
 
   if (headingWidget.length) {
     headingWidget.after(rfqHtml);
@@ -140,7 +140,7 @@ export function normalizeHomeHeroInquiryButtons($body: CheerioAPI): void {
           button.text("Request Quote");
         }
 
-        button.attr("href", "/contact/");
+        button.attr("href", "/rfq/");
         return;
       }
 
@@ -151,7 +151,7 @@ export function normalizeHomeHeroInquiryButtons($body: CheerioAPI): void {
           button.text("Request Samples");
         }
 
-        button.attr("href", "/contact/#contact-rfq-form");
+        button.attr("href", "/sample-pack/");
       }
     });
 }

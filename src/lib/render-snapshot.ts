@@ -860,7 +860,7 @@ function renderFooterBrandRow(): string {
           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.region)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.country)}</span>` +
           `<span class="codex-footer-brand__address-line codex-footer-brand__hours">${escapeHtml(SITE_CONTACT.hours)}</span>` +
         `</address>` +
-        `<a class="codex-footer-brand__cta" href="/contact/">Request a quote <span aria-hidden="true">→</span></a>` +
+        `<a class="codex-footer-brand__cta" href="/rfq/">Request a quote <span aria-hidden="true">→</span></a>` +
       `</div>` +
     `</div>`
   );
@@ -1207,8 +1207,8 @@ function replaceHomepageHero($body: ReturnType<typeof load>): void {
     <h1 class="codex-home-hero__h1">Custom RFID &amp; NFC Manufacturer in China</h1>
     <p class="codex-home-hero__subtitle">— Cards, Tags, Labels, Wristbands, Keyfobs &amp; Readers for OEM/ODM Buyers</p>
     <div class="codex-home-hero__cta">
-      <a class="codex-home-hero__btn codex-home-hero__btn--primary" href="/rfq/">REQUEST QUOTE</a>
-      <a class="codex-home-hero__btn codex-home-hero__btn--ghost" href="/sample-pack/">REQUEST SAMPLES</a>
+      <a class="codex-home-hero__btn codex-home-hero__btn--primary" data-cta-tier="hero" href="/rfq/">Request a Quote</a>
+      <a class="codex-home-hero__btn codex-home-hero__btn--ghost" data-cta-tier="hero-secondary" href="/sample-pack/">Request Samples</a>
     </div>
   </div>
 </section>`.trim();
