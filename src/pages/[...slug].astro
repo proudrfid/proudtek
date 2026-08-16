@@ -3,33 +3,16 @@ import SnapshotLayout from "../layouts/SnapshotLayout.astro";
 import EditorialPageLayout from "../layouts/EditorialPageLayout.astro";
 import { getPageByRoute, getSiteData, routeToParam, type SnapshotPage } from "../lib/site-data";
 import { LOW_VALUE_ROUTE_PREFIXES } from "../lib/route-overrides";
-import { COMPARE_CATEGORIES } from "../data/compare-categories";
+import { isNativeOwnedStaticPath } from "../lib/route-registry";
 
 export async function getStaticPaths() {
-  // Routes owned by native .astro hubs — exclude from the WP-snapshot static
-  // path generator so Astro doesn't error on duplicate static paths. Each
-  // entry here must have a corresponding file under src/pages/. Defined
-  // inside getStaticPaths so Astro reliably bundles it into the prerender
-  // chunk (module-level locals are sometimes dropped during chunk extraction).
-  const NATIVE_HUB_ROUTES = new Set<string>([
-    "/blog/",          // src/pages/blog/index.astro
-    "/guides/",        // src/pages/guides/index.astro
-    "/compare/",       // src/pages/compare/index.astro
-    "/compatibility/", // src/pages/compatibility/index.astro
-    "/solutions/",     // src/pages/solutions/index.astro (blog-style topic-rail hub)
-    "/case-studies/",  // src/pages/case-studies.astro (custom-designed hub)
-    // src/pages/compare/[category].astro generates /compare/{id}/ for each
-    // entry in COMPARE_CATEGORIES — fold those in here too:
-    ...COMPARE_CATEGORIES.map((c) => `/compare/${c.id}/`),
-  ]);
-
   const siteData = await getSiteData();
 
   return siteData.pages
     .filter(
       (page) =>
         page.route !== "/" &&
-        !NATIVE_HUB_ROUTES.has(page.route) &&
+        !isNativeOwnedStaticPath(page.route) &&
         !LOW_VALUE_ROUTE_PREFIXES.some((prefix) => page.route.startsWith(prefix)) &&
         !page.route.endsWith("/page/1/"),
     )
