@@ -120,7 +120,10 @@ async function parseHtmlOutputs(warnings) {
     const description = $('meta[name="description"]').attr("content") ?? null;
     const h1Count = $("main h1, body h1").length;
     const mainCount = $("main").length;
-    const mainTextHash = sha256(normalizeText($("main").first().text() || ""));
+    const mainText = normalizeText($("main").first().text() || "");
+    const mainTextHash = sha256(mainText);
+    const mainTextLength = mainText.length;
+    const mainTextPreview = mainText.slice(0, 240);
     const machineAlternates = $('link[rel="alternate"]').map((_, el) => ({
       type: $(el).attr("type") ?? "",
       href: $(el).attr("href") ?? "",
@@ -140,6 +143,8 @@ async function parseHtmlOutputs(warnings) {
       h1Count,
       mainCount,
       mainTextHash,
+      mainTextLength,
+      mainTextPreview,
       jsonLd: collectJsonLd($, route, warnings),
       machineAlternates,
     });
@@ -251,6 +256,8 @@ function summarizePages(pages) {
     h1Count: page.h1Count,
     mainCount: page.mainCount,
     mainTextHash: page.mainTextHash,
+    mainTextLength: page.mainTextLength,
+    mainTextPreview: page.mainTextPreview,
     jsonLd: page.jsonLd.map((node) => ({ type: node.type, id: node.id, hash: node.hash })),
     machineAlternates: page.machineAlternates,
   })).sort((a, b) => a.outputPath.localeCompare(b.outputPath));
@@ -278,7 +285,7 @@ function diffComparable(expected, actual) {
   for (const [key, expectedPage] of expectedPages.entries()) {
     const actualPage = actualPages.get(key);
     if (!actualPage) continue;
-    for (const field of ["route", "canonical", "robots", "title", "descriptionHash", "h1Count", "mainCount", "mainTextHash"]) {
+    for (const field of ["route", "canonical", "robots", "title", "descriptionHash", "h1Count", "mainCount", "mainTextHash", "mainTextLength", "mainTextPreview"]) {
       if (JSON.stringify(expectedPage[field]) !== JSON.stringify(actualPage[field])) {
         diffs.push({ code: "PAGE_FIELD_CHANGED", outputPath: key, field, expected: expectedPage[field], actual: actualPage[field] });
       }
