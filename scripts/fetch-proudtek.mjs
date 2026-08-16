@@ -1,10 +1,27 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { load } from "cheerio";
 import { XMLParser } from "fast-xml-parser";
 
 const SITE_ORIGIN = process.env.SITE_ORIGIN ?? "https://proudtek.com";
+
+// ── STOP sentinel (same drop-file convention as STOP_CHIP_MIGRATION) ──
+// This script was written for the one-time WordPress → Astro migration.
+// proudtek.com now serves THIS Astro build, so re-running the fetch would
+// re-crawl our own output and overwrite the WordPress-era snapshots in
+// src/data/pages/ that editorial pages still depend on for chrome/fallback
+// (index.json among them). Guard against a reflexive `npm run fetch`.
+const STOP_SENTINEL = path.join(process.cwd(), "STOP_FETCH");
+if (existsSync(STOP_SENTINEL) && process.env.FORCE_FETCH !== "1") {
+  console.error("✋ STOP_FETCH sentinel present — refusing to run.\n");
+  console.error(readFileSync(STOP_SENTINEL, "utf8"));
+  console.error(
+    "\nOverride with FORCE_FETCH=1 only if SITE_ORIGIN points at a source that is NOT this Astro build.",
+  );
+  process.exit(1);
+}
 const USER_AGENT = "Mozilla/5.0 (compatible; Codex Static Migration Bot/1.0)";
 const PROJECT_ROOT = process.cwd();
 const DATA_OUTPUT_PATH = path.join(PROJECT_ROOT, "src", "data", "site-data.json");
