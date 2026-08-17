@@ -7,7 +7,7 @@ import {
 } from "../route-registry";
 import { getCanonicalRedirect, getCanonicalRedirects } from "../redirect-registry";
 import { ROUTE_CANONICAL_OVERRIDES } from "../route-overrides";
-import { getRouteRollout, REBUILD_KILL_SWITCHES } from "../rollout";
+import { getRouteRollout, NATIVE_SHELL_CANARY_ROUTES, REBUILD_KILL_SWITCHES } from "../rollout";
 
 describe("route registry", () => {
   it("contains every dedicated native hub and compare category route once", () => {
@@ -58,6 +58,10 @@ describe("rollout defaults", () => {
       body: "editorial",
       data: "legacy",
     });
+    expect(NATIVE_SHELL_CANARY_ROUTES).toEqual([
+      "/glossary/",
+      "/tools/rfid-tag-cost-estimator/",
+    ]);
     expect(REBUILD_KILL_SWITCHES).toEqual({
       nativeShell: "PROUDTEK_NATIVE_SHELL",
       homeV2: "PROUDTEK_HOME_V2",

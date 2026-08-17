@@ -29,10 +29,17 @@ const HOME_V2_ENABLED = enabled(import.meta.env.PROUDTEK_HOME_V2);
 const CATALOG_V2_ENABLED = enabled(import.meta.env.PROUDTEK_CATALOG_V2);
 
 /**
- * Exact-route canary allowlist. It intentionally starts empty; PR-02 can add
- * preview-only component routes without changing any current production page.
+ * Exact-route canary allowlist. PR-03 starts with two low-risk native pages:
+ * a static glossary and an interactive planning tool. The global kill switch
+ * remains off by default, so adding a route here does not change production
+ * until PROUDTEK_NATIVE_SHELL=1 is set for a deployment.
  */
-const NATIVE_SHELL_ROUTES = new Set<string>([]);
+export const NATIVE_SHELL_CANARY_ROUTES = [
+  "/glossary/",
+  "/tools/rfid-tag-cost-estimator/",
+] as const;
+
+const NATIVE_SHELL_ROUTES = new Set<string>(NATIVE_SHELL_CANARY_ROUTES);
 
 export function getRouteRollout(route: string, hasEditorialDefinition = false): RouteRollout {
   const nativeShell = NATIVE_SHELL_ENABLED && NATIVE_SHELL_ROUTES.has(route);

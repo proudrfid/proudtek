@@ -1,0 +1,35 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import PageFrameLayout from "./PageFrameLayout.astro";
+import { shouldUseNativeShell } from "../lib/rollout";
+import type { PageSeoData } from "../lib/seo";
+
+interface Props {
+  seo: PageSeoData;
+  currentRoute: string;
+  machineJsonPath?: string;
+  machineTextPath?: string;
+  stickyCtaHref?: string;
+  stickyCtaLabel?: string;
+  showStickyCta?: boolean;
+}
+
+const props = Astro.props;
+const useNativeShell = shouldUseNativeShell(props.currentRoute);
+---
+{useNativeShell ? (
+  <PageFrameLayout {...props}>
+    <slot />
+  </PageFrameLayout>
+) : (
+  <BaseLayout
+    seo={props.seo}
+    machineJsonPath={props.machineJsonPath}
+    machineTextPath={props.machineTextPath}
+    stickyCtaHref={props.stickyCtaHref}
+    stickyCtaLabel={props.stickyCtaLabel}
+    showStickyCta={props.showStickyCta}
+  >
+    <slot />
+  </BaseLayout>
+)}

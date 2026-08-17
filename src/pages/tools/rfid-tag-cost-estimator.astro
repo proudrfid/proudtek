@@ -21,9 +21,10 @@
  * only the tab switcher and result panel are new, minimal, token-only
  * CSS additions.
  */
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShellSwitchLayout from "../../layouts/ShellSwitchLayout.astro";
 import { buildPageSeo, buildMachineRoute } from "../../lib/seo";
 import type { SnapshotPage } from "../../lib/site-data";
+import { shouldUseNativeShell } from "../../lib/rollout";
 
 const route = "/tools/rfid-tag-cost-estimator/";
 const pageStub: SnapshotPage = {
@@ -42,10 +43,11 @@ const pageStub: SnapshotPage = {
 const seo = buildPageSeo(pageStub);
 const machineJsonPath = buildMachineRoute(route, "json");
 const machineTextPath = buildMachineRoute(route, "txt");
+const useNativeShell = shouldUseNativeShell(route);
 ---
 
-<BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
-  <Fragment set:html={seo.bodyHtml.split("<main")[0]} />
+<ShellSwitchLayout seo={seo} currentRoute={route} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
+  {!useNativeShell && <Fragment set:html={seo.bodyHtml.split("<main")[0]} />}
 
   <main id="main" class="codex-rfq-main">
     <nav class="codex-rfq-breadcrumb" aria-label="Breadcrumb">
@@ -312,4 +314,4 @@ const machineTextPath = buildMachineRoute(route, "txt");
       });
     })();
   </script>
-</BaseLayout>
+</ShellSwitchLayout>
