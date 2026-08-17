@@ -1,0 +1,37 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import SiteShell from "../components/shell/SiteShell.astro";
+import type { PageSeoData } from "../lib/seo";
+
+interface Props {
+  seo: PageSeoData;
+  currentRoute: string;
+  machineJsonPath?: string;
+  machineTextPath?: string;
+  stickyCtaHref?: string;
+  stickyCtaLabel?: string;
+  showStickyCta?: boolean;
+}
+
+const {
+  seo,
+  currentRoute,
+  machineJsonPath,
+  machineTextPath,
+  stickyCtaHref,
+  stickyCtaLabel,
+  showStickyCta = true,
+} = Astro.props;
+---
+<BaseLayout
+  seo={seo}
+  machineJsonPath={machineJsonPath}
+  machineTextPath={machineTextPath}
+  stickyCtaHref={stickyCtaHref}
+  stickyCtaLabel={stickyCtaLabel}
+  showStickyCta={showStickyCta}
+>
+  <SiteShell currentRoute={currentRoute}>
+    <slot />
+  </SiteShell>
+</BaseLayout>

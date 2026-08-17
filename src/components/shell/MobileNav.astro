@@ -1,0 +1,66 @@
+---
+import type { MenuDropdown } from "../../lib/menu-structure";
+
+interface Props {
+  menus: MenuDropdown[];
+  currentRoute: string;
+}
+
+const { menus, currentRoute } = Astro.props;
+
+function normalizeRoute(value: string): string {
+  return (value || "/").split(/[?#]/, 1)[0].replace(/\/?$/, "/").toLowerCase();
+}
+
+function isActive(href: string): boolean {
+  return normalizeRoute(href) === normalizeRoute(currentRoute);
+}
+
+function groupId(menuLabel: string, index: number): string {
+  return `codex-mobile-${menuLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${index}`;
+}
+---
+<div id="mobile-drawer" class="codex-native-drawer" aria-hidden="true">
+  <div class="drawer-inner codex-native-drawer__panel" role="dialog" aria-modal="true" aria-label="Site navigation">
+    <div class="codex-native-drawer__head">
+      <p>Browse Proud Tek</p>
+      <button type="button" class="codex-native-drawer__close" data-native-drawer-close aria-label="Close menu">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
+    <nav id="mobile-site-navigation" aria-label="Mobile navigation">
+      <ul id="mobile-menu" class="codex-native-mobile-menu">
+        {menus.map((menu) => (
+          <li class:list={["menu-item", menu.groups.length > 0 && "menu-item-has-children"]}>
+            {menu.groups.length === 0 ? (
+              <a href={menu.href} aria-current={isActive(menu.href) ? "page" : undefined}>{menu.label}</a>
+            ) : (
+              <details>
+                <summary>
+                  <span>{menu.label}</span>
+                  <svg viewBox="0 0 12 8" aria-hidden="true"><path d="m1 1.5 5 5 5-5" /></svg>
+                </summary>
+                <a class="codex-native-mobile-menu__overview" href={menu.href}>View {menu.label} overview <span aria-hidden="true">→</span></a>
+                {menu.groups.map((group, index) => (
+                  <section class="codex-native-mobile-menu__group" aria-labelledby={groupId(menu.label, index)}>
+                    {group.heading && <h2 id={groupId(menu.label, index)}>{group.heading}</h2>}
+                    <ul>
+                      {group.links.map((link) => (
+                        <li><a href={link.href} aria-current={isActive(link.href) ? "page" : undefined}>{link.label}</a></li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </details>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="codex-native-drawer__actions">
+      <a class="codex-cta--primary" href="/rfq/">Request a quote</a>
+      <a class="codex-cta--secondary" href="/sample-pack/">Request samples</a>
+    </div>
+  </div>
+  <button class="codex-native-drawer__backdrop" type="button" data-native-drawer-close tabindex="-1" aria-label="Close menu"></button>
+</div>

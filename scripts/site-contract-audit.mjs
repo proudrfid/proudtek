@@ -120,7 +120,9 @@ async function parseHtmlOutputs(warnings) {
     const description = $('meta[name="description"]').attr("content") ?? null;
     const h1Count = $("main h1, body h1").length;
     const mainCount = $("main").length;
-    const mainText = normalizeText($("main").first().text() || "");
+    const main = $("main").first();
+    main.find('script, style, noscript, template, [hidden], [aria-hidden="true"]').remove();
+    const mainText = normalizeText(main.text() || "");
     const mainTextHash = sha256(mainText);
     const mainTextLength = mainText.length;
     const mainTextPreview = mainText.slice(0, 240);
