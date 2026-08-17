@@ -1,0 +1,80 @@
+---
+/**
+ * Native verification-first homepage body behind PROUDTEK_HOME_V2.
+ *
+ * The legacy snapshot still owns the document chrome and all SEO inputs. This
+ * layout replaces only the first <main>...</main> block, so the flag can be
+ * rolled back without changing route ownership, canonical metadata, JSON-LD,
+ * sitemap membership or the current header/footer implementation.
+ */
+import BaseLayout from "./BaseLayout.astro";
+import HomePage from "../components/home/HomePage.astro";
+import type { SnapshotPage } from "../lib/site-data";
+import { prepareSnapshot } from "../lib/render-snapshot";
+import { buildMachineRoute, buildPageSeo } from "../lib/seo";
+import { buildAuthorityLdForRoute } from "../lib/editorial-authority-ld";
+import homeV2Css from "../styles/codex-home-v2.css?inline";
+
+const { page } = Astro.props as { page: SnapshotPage };
+const snapshot = prepareSnapshot(page);
+const seo = buildPageSeo({
+  ...page,
+  htmlAttrs: snapshot.htmlAttrs,
+  bodyAttrs: snapshot.bodyAttrs,
+  headHtml: snapshot.headHtml,
+  bodyHtml: snapshot.bodyHtml,
+});
+
+// V2 correction: keep the existing VideoObject type/@id but remove the
+// unsupported implication that ISO 9001 audits the manufacturing factories.
+// The published certificate scope is sales service of smart cards and RFID
+// tags; factory figures remain clearly labeled as company-stated on the page.
+seo.jsonLd = seo.jsonLd.map((entry) => {
+  try {
+    const parsed: unknown = JSON.parse(entry);
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const node = parsed as Record<string, unknown>;
+      if (node["@type"] === "VideoObject") {
+        return JSON.stringify({
+          ...node,
+          description: "On-site footage from Proud Tek's Shenzhen facility showing RFID and NFC card, tag and label production lines. Factory and equipment figures are company-stated operational information; certification scope is published separately.",
+        });
+      }
+    }
+  } catch {
+    // Preserve malformed legacy JSON-LD verbatim; SeoHead owns diagnostics.
+  }
+  return entry;
+});
+
+const authorityLd = await buildAuthorityLdForRoute(page.route);
+if (authorityLd) seo.jsonLd = [...seo.jsonLd, authorityLd];
+
+const machineJsonPath = buildMachineRoute(page.route, "json");
+const machineTextPath = buildMachineRoute(page.route, "txt");
+
+const MAIN_RE = /^([\s\S]*?)<main\b[^>]*>[\s\S]*?<\/main>([\s\S]*)$/i;
+const match = seo.bodyHtml.match(MAIN_RE);
+const canSplit = Boolean(match);
+const preMain = canSplit ? match![1] : "";
+const postMain = canSplit ? match![2] : "";
+---
+
+<BaseLayout
+  seo={seo}
+  machineJsonPath={machineJsonPath}
+  machineTextPath={machineTextPath}
+  stickyCtaHref="/rfq/"
+  stickyCtaLabel="Start an RFQ"
+>
+  <Fragment slot="head"><style set:html={homeV2Css}></style></Fragment>
+  {canSplit ? (
+    <>
+      <Fragment set:html={preMain} />
+      <HomePage />
+      <Fragment set:html={postMain} />
+    </>
+  ) : (
+    <Fragment set:html={seo.bodyHtml} />
+  )}
+</BaseLayout>
