@@ -1,0 +1,63 @@
+---
+import { PRIMARY_MENU_DROPDOWNS } from "../../lib/menu-structure";
+import DesktopNav from "./DesktopNav.astro";
+import MobileNav from "./MobileNav.astro";
+
+interface Props {
+  currentRoute: string;
+}
+
+const { currentRoute } = Astro.props;
+---
+<header id="masthead" class="site-header codex-native-header" data-native-shell-header>
+  <div id="main-header" class="codex-native-header__bar">
+    <div class="site-container codex-native-header__inner">
+      <a class="site-branding codex-native-brand" href="/" aria-label="Proud Tek home">
+        <img
+          class="custom-logo"
+          src="/site-assets/wp-content/uploads/2024/04/proudtek-logo.png"
+          alt="Proud Tek"
+          width="220"
+          height="60"
+          decoding="async"
+        />
+      </a>
+      <DesktopNav menus={PRIMARY_MENU_DROPDOWNS} currentRoute={currentRoute} />
+      <div class="codex-native-header__actions">
+        <a class="codex-native-header__quote" href="/rfq/">Request quote</a>
+        <button
+          type="button"
+          class="drawer-toggle menu-toggle-open codex-native-header__menu"
+          aria-label="Open menu"
+          aria-controls="mobile-drawer"
+          aria-expanded="false"
+          data-native-drawer-open
+        >
+          <span class="menu-toggle-icon" aria-hidden="true"><span></span></span>
+          <span class="codex-sr-only">Open menu</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <MobileNav menus={PRIMARY_MENU_DROPDOWNS} currentRoute={currentRoute} />
+</header>
+
+<script>
+  const body = document.body;
+  const drawer = document.getElementById("mobile-drawer");
+  const openButton = document.querySelector("[data-native-drawer-open]");
+  const closeButtons = document.querySelectorAll("[data-native-drawer-close]");
+
+  function setDrawer(open: boolean) {
+    if (!drawer || !openButton) return;
+    body.classList.toggle("drawer-open", open);
+    drawer.setAttribute("aria-hidden", open ? "false" : "true");
+    openButton.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  openButton?.addEventListener("click", () => setDrawer(true));
+  closeButtons.forEach((button) => button.addEventListener("click", () => setDrawer(false)));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && body.classList.contains("drawer-open")) setDrawer(false);
+  });
+</script>

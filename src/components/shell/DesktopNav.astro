@@ -1,0 +1,68 @@
+---
+import type { MenuDropdown } from "../../lib/menu-structure";
+
+interface Props {
+  menus: MenuDropdown[];
+  currentRoute: string;
+}
+
+const { menus, currentRoute } = Astro.props;
+
+function normalizeRoute(value: string): string {
+  return (value || "/").split(/[?#]/, 1)[0].replace(/\/?$/, "/").toLowerCase();
+}
+
+function isTopLevelActive(href: string): boolean {
+  const route = normalizeRoute(currentRoute);
+  const target = normalizeRoute(href);
+  if (target === "/products/all/") return route.startsWith("/products/") || route.startsWith("/product/");
+  if (target === "/resources/") return /^\/(guides|compare|compatibility|case-studies|faq|resources|research)\//.test(route);
+  return target === "/" ? route === "/" : route.startsWith(target);
+}
+
+function isExactActive(href: string): boolean {
+  return normalizeRoute(href) === normalizeRoute(currentRoute);
+}
+---
+<nav id="site-navigation" class="codex-native-nav" aria-label="Primary navigation">
+  <ul id="primary-menu" class="codex-native-nav__list">
+    {menus.map((menu) => {
+      const active = isTopLevelActive(menu.href);
+      const hasDropdown = menu.groups.length > 0;
+      return (
+        <li class:list={["menu-item", "codex-native-nav__item", hasDropdown && "menu-item-has-children", hasDropdown && "codex-mega-item", active && "current-menu-item", active && "codex-active"]}>
+          <a class="codex-native-nav__link" href={menu.href} aria-current={active ? "page" : undefined}>
+            {menu.label}
+            {hasDropdown && <svg class="codex-native-nav__caret" viewBox="0 0 12 8" aria-hidden="true"><path d="m1 1.5 5 5 5-5" /></svg>}
+          </a>
+          {hasDropdown && (
+            <div class:list={["codex-native-nav__panel", menu.groups.length > 2 && "codex-native-nav__panel--wide"]}>
+              <div class="codex-native-nav__panel-head">
+                <p>{menu.label}</p>
+                <a href={menu.href}>Browse all <span aria-hidden="true">→</span></a>
+              </div>
+              <div class="codex-native-nav__groups">
+                {menu.groups.map((group) => (
+                  <section class="codex-native-nav__group">
+                    {group.heading && (
+                      group.headingHref
+                        ? <h2><a href={group.headingHref}>{group.heading}</a></h2>
+                        : <h2>{group.heading}</h2>
+                    )}
+                    <ul>
+                      {group.links.map((link) => (
+                        <li class:list={[isExactActive(link.href) && "current-menu-item"]}>
+                          <a href={link.href} aria-current={isExactActive(link.href) ? "page" : undefined}>{link.label}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            </div>
+          )}
+        </li>
+      );
+    })}
+  </ul>
+</nav>
