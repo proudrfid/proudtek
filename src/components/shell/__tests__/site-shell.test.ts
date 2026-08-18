@@ -76,13 +76,17 @@ describe("native SiteShell dark launch", () => {
   });
 
   it.each([
-    ["hidden", { hiddenTriggerAncestor: true }],
-    ["inert", { inertTriggerAncestor: true }],
-  ])("does not claim %s trigger restoration and blurs drawer focus", (_label, options) => {
-    const fixture = createDrawerFixture(options);
+    ["hidden", (fixture: ReturnType<typeof createDrawerFixture>) => { fixture.triggerAncestor.hidden = true; }],
+    ["inert", (fixture: ReturnType<typeof createDrawerFixture>) => { fixture.triggerAncestor.setAttribute("inert", ""); }],
+    ["CSS-hidden", (fixture: ReturnType<typeof createDrawerFixture>) => { fixture.triggerAncestor.rendered = false; }],
+  ])("does not claim %s trigger restoration after open and blurs drawer focus", (_label, hideTrigger) => {
+    const fixture = createDrawerFixture();
 
     fixture.openButton.click();
     fixture.flushAnimationFrames();
+    expect(fixture.document.activeElement).toBe(fixture.closeButton);
+
+    hideTrigger(fixture);
     fixture.document.dispatchEvent({ type: "keydown", key: "Escape" });
     fixture.flushAnimationFrames();
 

@@ -5,8 +5,6 @@ import ts from "typescript";
 interface FixtureOptions {
   disabledCloseButton?: boolean;
   hiddenFirstLink?: boolean;
-  hiddenTriggerAncestor?: boolean;
-  inertTriggerAncestor?: boolean;
 }
 
 class FakeElement {
@@ -15,6 +13,7 @@ class FakeElement {
   readonly listeners = new Map<string, Array<(event: Record<string, unknown>) => void>>();
   parentElement: FakeElement | null = null;
   isConnected = true;
+  rendered = true;
   hidden = false;
   open = true;
   tabIndex = 0;
@@ -58,7 +57,8 @@ class FakeElement {
   focus(): void {
     let ancestor: FakeElement | null = this;
     while (ancestor) {
-      if (ancestor.hidden
+      if (!ancestor.rendered
+        || ancestor.hidden
         || ancestor.hasAttribute("inert")
         || ancestor.getAttribute("aria-hidden") === "true"
         || (ancestor.tagName === "DETAILS" && !ancestor.open)) return;
@@ -187,8 +187,6 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
   header.append(openButton);
   document.body.append(header);
   document.body.append(drawer);
-  if (options.hiddenTriggerAncestor) header.hidden = true;
-  if (options.inertTriggerAncestor) header.setAttribute("inert", "");
   document.register("mobile-drawer", drawer);
   document.register("open", openButton);
   document.register("open", openButton);
@@ -210,6 +208,7 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
   return {
     document,
     drawer,
+    triggerAncestor: header,
     openButton,
     closeButton,
     fallbackLink,

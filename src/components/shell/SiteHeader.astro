@@ -75,8 +75,9 @@ const { currentRoute } = Astro.props;
     return true;
   }
 
-  function restoreFocus(element: HTMLElement | null): void {
+  function restoreFocus(element: HTMLElement | null): boolean {
     if (element && isFocusable(element)) element.focus({ preventScroll: true });
+    return document.activeElement === element;
   }
 
   function setDrawer(open: boolean) {
@@ -109,8 +110,8 @@ const { currentRoute } = Astro.props;
     openingTrigger = null;
     requestAnimationFrame(() => {
       if (change !== drawerChange) return;
-      restoreFocus(trigger);
-      if ((!trigger || !isFocusable(trigger)) && drawer.contains(document.activeElement)) {
+      const restored = restoreFocus(trigger);
+      if (!restored && drawer.contains(document.activeElement)) {
         (document.activeElement as HTMLElement).blur();
       }
     });
