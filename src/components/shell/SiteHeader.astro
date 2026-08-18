@@ -45,14 +45,54 @@ const { currentRoute } = Astro.props;
 <script>
   const body = document.body;
   const drawer = document.getElementById("mobile-drawer");
-  const openButton = document.querySelector("[data-native-drawer-open]");
+  const openButton = document.querySelector<HTMLElement>("[data-native-drawer-open]");
   const closeButtons = document.querySelectorAll("[data-native-drawer-close]");
+  let openingTrigger: HTMLElement | null = null;
+  let drawerChange = 0;
+
+  function isFocusable(element: HTMLElement): boolean {
+    return element.isConnected
+      && !element.hasAttribute("disabled")
+      && element.getAttribute("aria-disabled") !== "true"
+      && element.tabIndex >= 0;
+  }
 
   function setDrawer(open: boolean) {
     if (!drawer || !openButton) return;
+    const change = ++drawerChange;
+
+    if (open) openingTrigger = openButton;
     body.classList.toggle("drawer-open", open);
     drawer.setAttribute("aria-hidden", open ? "false" : "true");
     openButton.setAttribute("aria-expanded", open ? "true" : "false");
+
+    if (open) {
+      requestAnimationFrame(() => {
+        if (change !== drawerChange || !body.classList.contains("drawer-open")) return;
+        const closeButton = Array.from(
+          drawer.querySelectorAll<HTMLElement>("[data-native-drawer-close]"),
+        ).find(isFocusable);
+        const firstFocusable = Array.from(
+          drawer.querySelectorAll<HTMLElement>(
+            'a[href], button, [tabindex]:not([tabindex="-1"])',
+          ),
+        ).find(isFocusable);
+        (closeButton ?? firstFocusable)?.focus();
+      });
+      return;
+    }
+
+    const trigger = openingTrigger;
+    if (trigger && isFocusable(trigger)) trigger.focus();
+    openingTrigger = null;
+    requestAnimationFrame(() => {
+      if (change !== drawerChange) return;
+      if (trigger && isFocusable(trigger)) {
+        trigger.focus();
+      } else if (drawer.contains(document.activeElement)) {
+        (document.activeElement as HTMLElement).blur();
+      }
+    });
   }
 
   openButton?.addEventListener("click", () => setDrawer(true));

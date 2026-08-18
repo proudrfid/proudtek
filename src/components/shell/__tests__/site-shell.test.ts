@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import SiteHeader from "../SiteHeader.astro";
@@ -25,8 +26,27 @@ describe("native SiteShell dark launch", () => {
     expect(html).toContain('id="mobile-drawer"');
     expect(html).toContain('id="mobile-menu"');
     expect(html).toContain('aria-controls="mobile-drawer"');
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('id="mobile-drawer" class="codex-native-drawer" aria-hidden="true"');
+    expect(html).toContain('data-native-drawer-open');
+    expect(html).toContain('data-native-drawer-close');
     expect(html).toContain('href="/rfq/"');
     expect(html).toContain('href="/sample-pack/"');
+  });
+
+  it("declares the explicit drawer focus-management controller", () => {
+    const source = readFileSync(new URL("../SiteHeader.astro", import.meta.url), "utf8");
+
+    expect(source).toContain("let openingTrigger: HTMLElement | null = null");
+    expect(source).toContain("openingTrigger = openButton");
+    expect(source).toContain("requestAnimationFrame");
+    expect(source).toContain('[data-native-drawer-close]');
+    expect(source).toContain("function isFocusable(element: HTMLElement): boolean");
+    expect(source).toContain("element.isConnected");
+    expect(source).toContain("trigger.focus()");
+    expect(source).toContain("drawer.contains(document.activeElement)");
+    expect(source).toContain("find(isFocusable)");
+    expect(source).toContain("openingTrigger = null");
   });
 
   it("marks the relevant desktop route active without changing the menu data", async () => {
