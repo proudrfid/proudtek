@@ -53,19 +53,35 @@ No new environment variable is introduced. `PROUDTEK_NATIVE_SHELL` remains the s
 
 The route strings must retain their trailing slash because rollout matching is exact and the site uses trailing-slash URLs.
 
-### 3.2 Page entry points
+### 3.2 Page entry points and donor chrome
 
-The implementation should inspect the existing dedicated Astro entry points for the three hubs and make the smallest possible change needed to route their shell through `ShellSwitchLayout`. If a hub already uses `ShellSwitchLayout`, no page-level change is needed; only the rollout allowlist changes.
+The three dedicated hub entry points currently construct `PageSeoData` manually and merge attributes/head markup from an extracted WordPress donor snapshot. This slice must preserve that pipeline exactly; it must not migrate the hubs to `buildPageSeo`.
 
-Each hub entry point must continue to:
+Each hub must replace its outer `BaseLayout` with `ShellSwitchLayout`, pass its exact route as `currentRoute`, and conditionally omit **both** donor-chrome fragments when native shell is active:
 
-1. build SEO metadata through the existing `buildPageSeo` pipeline;
-2. emit the same machine JSON and text paths;
-3. render the existing hub body unchanged;
-4. pass its exact route to the shell switch;
-5. keep any snapshot compatibility fragment only for the snapshot branch, as the cost estimator currently does.
+```astro
+const useNativeShell = shouldUseNativeShell(ROUTE);
 
-Do not move body composition into `SiteShell`. `SiteShell` owns only site chrome; the hub page owns its `<main>`.
+<ShellSwitchLayout seo={seo} currentRoute={ROUTE}>
+  {!useNativeShell && <Fragment set:html={chrome.beforeMainHtml} />}
+  <main id="main">...</main>
+  {!useNativeShell && <Fragment set:html={chrome.afterMainHtml} />}
+</ShellSwitchLayout>
+```
+
+The branch contract is:
+
+- flag off: render both `chrome.beforeMainHtml` and `chrome.afterMainHtml`, preserving the current snapshot header/footer;
+- flag on: omit both donor fragments so `SiteShell` provides the only header and footer;
+- either branch: render the existing `<main>` and its internal order unchanged.
+
+Do not copy the cost estimator's one-fragment pattern: these hubs have both pre-main and post-main donor chrome. Rendering either donor fragment in the native branch would duplicate site navigation, footer, and compatibility IDs.
+
+The current `extractChromeFromSnapshot` calls, donor fallback order, and merging of `seo.htmlAttrs`, `seo.bodyAttrs`, and `seo.headHtml` remain unchanged. They are still required by the default branch and must not be refactored as part of this shell migration.
+
+The hub HTML currently has no machine-alternate links. Keep that head contract unchanged: do not add `machineJsonPath`, `machineTextPath`, or `<link rel="alternate">` to these page entry points. Independent machine JSON/TXT outputs and `site-index.json` membership must remain unchanged; “machine route preservation” in this spec refers to those independent generated outputs, not new alternates in the hub HTML.
+
+Do not move body composition into `SiteShell`. `SiteShell` owns only site chrome; each hub page owns its `<main>`.
 
 ### 3.3 Native shell behavior
 
@@ -77,6 +93,7 @@ The native shell must preserve:
 - the active desktop navigation state based on `currentRoute`;
 - the existing RFQ and sample-pack destinations;
 - keyboard-operable mobile drawer behavior, Escape close, and `aria-expanded`/`aria-hidden` state;
+- focus management that stores the opening trigger, moves focus into the drawer on open, and returns focus to that trigger on close;
 - 44px touch targets, focus rings, reduced-motion behavior, and token-only styling.
 
 No menu item is added, removed, renamed, or reordered in this slice. Menu data remains sourced from `src/lib/menu-structure`.
@@ -86,12 +103,12 @@ No menu item is added, removed, renamed, or reordered in this slice. Menu data r
 For each of the three hub routes:
 
 1. Astro resolves the dedicated hub page rather than the catch-all snapshot page because the route is already marked `ownsStaticPath` in `route-registry.ts`.
-2. The page builds its existing `PageSeoData` and machine route paths.
-3. The page passes its exact route to `ShellSwitchLayout`.
+2. The page constructs its existing manual `PageSeoData`, extracts the same donor snapshot, and performs the same HTML/body/head attribute merge.
+3. The page passes its exact route to `ShellSwitchLayout` and computes `useNativeShell` from the same rollout registry.
 4. `ShellSwitchLayout` calls `shouldUseNativeShell(route)`.
-5. When the build flag is disabled, the page follows its current `BaseLayout`/snapshot-compatible shell branch.
-6. When the flag is enabled and the route is in the exact allowlist, `PageFrameLayout` renders `BaseLayout` plus native `SiteShell` around the unchanged page body.
-7. The same body data, SEO metadata, canonical, schema, machine routes, and sitemap registry are emitted in either branch.
+5. When the build flag is disabled, the page renders both donor-chrome fragments around the unchanged `<main>`.
+6. When the flag is enabled and the route is in the exact allowlist, the page omits both donor fragments and `PageFrameLayout` renders `BaseLayout` plus the native `SiteShell` around the unchanged `<main>`.
+7. The same body data, manual SEO metadata, canonical, schema, independent machine outputs, and sitemap registry are emitted in either branch.
 
 The migration is intentionally build-time and deterministic. There is no cookie, user-agent, random split, runtime fetch, or client-side route decision.
 
@@ -108,7 +125,7 @@ The migration is intentionally build-time and deterministic. There is no cookie,
 
 - If a page cannot render its native shell branch, the deployment is rolled back by disabling `PROUDTEK_NATIVE_SHELL`; no content or route data needs to be reverted.
 - The page body must not depend on native-shell-only DOM. Existing compatibility IDs and classes remain in the native header/footer for scripts that query them.
-- Mobile drawer failures must fail closed: the default state is closed, and Escape restores the closed state.
+- Mobile drawer failures must fail closed: the initial state is closed; Escape, the close button, and the backdrop restore `aria-expanded="false"` and `aria-hidden="true"`; focus returns to the trigger that opened the drawer.
 
 ### Rollback procedure
 
@@ -124,10 +141,12 @@ Update the rollout tests to assert:
 
 - the canary list contains exactly the existing two routes plus `/guides/`, `/solutions/`, and `/blog/`;
 - default rollout remains `shell: "snapshot"` for the three hub routes;
+- `PROUDTEK_NATIVE_SHELL=1` enables only those five exact routes;
+- near-miss routes remain snapshot-shell routes, including `/guides/example/`, `/blog/example/`, `/solutions/example/`, and `/guides` without the trailing slash;
 - non-canary routes remain snapshot-shell routes;
 - the kill-switch name remains `PROUDTEK_NATIVE_SHELL`.
 
-Add or extend page-level tests for each hub to assert the page still renders its existing `<main>` content and passes the correct route into the shell switch. Reuse the existing `SiteShell` compatibility tests for header/footer landmarks and navigation hooks; add only route-specific assertions that are not already covered.
+Add or extend page-level tests for each hub to assert the page still renders its existing `<main>` content and passes the correct route into the shell switch. The tests must also cover the two-fragment branch contract: flag off keeps both donor fragments, while flag on omits both. Reuse the existing `SiteShell` compatibility tests for header/footer landmarks and navigation hooks; add only route-specific assertions that are not already covered.
 
 ### Contract and build checks
 
@@ -145,16 +164,34 @@ npm run audit:site-contract
 
 `package.json` currently exposes `check` (Astro check) and `audit:site-contract`; it does not expose separate `astro:check`, `audit:seo-contract`, or `audit:redirects` scripts. The site-contract audit and the CI workflow are the source of truth for the current canonical, robots, sitemap, redirect, machine-route, and JSON-LD checks. If CI invokes an additional repository-local audit during implementation, run that exact CI command as well rather than inventing a new npm script.
 
-Run a second flagged build with `PROUDTEK_NATIVE_SHELL=1` and repeat the relevant checks. The flagged build may differ in shell HTML for exactly `/guides/`, `/solutions/`, and `/blog/`, plus the two existing canaries. It must not change:
+Run a second flagged build with `PROUDTEK_NATIVE_SHELL=1` and repeat the relevant checks. The flagged build may differ in shell HTML for exactly these five output paths:
+
+- `glossary/index.html`
+- `tools/rfid-tag-cost-estimator/index.html`
+- `guides/index.html`
+- `solutions/index.html`
+- `blog/index.html`
+
+It must not change:
 
 - the 595 output-path set;
 - canonical URLs;
 - robots directives;
-- sitemap and image-sitemap membership;
+- sitemap membership;
 - redirect mappings;
-- machine JSON/TXT route membership;
+- independent machine JSON/TXT route membership and `site-index.json` membership;
 - JSON-LD type and entity-ID sets;
+- hub HTML machine-alternate links, which remain absent;
 - page body content outside the intended shell boundary.
+
+Because `audit:site-contract` intentionally compares normalized page/main contracts rather than full header/footer HTML, add explicit build-output assertions:
+
+1. In the default build, `[data-native-site-shell]` appears in zero HTML files.
+2. In the flagged build, that marker appears only in the five exact output paths above.
+3. Each of the three new hub outputs contains exactly one `#masthead`, `#site-navigation`, `#primary-menu`, `#mobile-drawer`, `#mobile-menu`, `main#main`, and `footer#colophon`.
+4. The default build's three hub outputs retain both donor-chrome boundaries and match the clean `origin/main` build for those selected HTML regions. Do not compare only the `<main>` hash.
+5. The flagged build's three hub outputs contain no donor masthead/footer in addition to the native shell.
+6. Normalize and compare `dist/image-sitemap.xml` between default and flagged builds; its membership/content must be identical. The current site-contract audit does not parse image-sitemap membership, so this comparison is required by the implementation verification and is not claimed as coverage by the audit.
 
 ### Accessibility and browser checks
 
@@ -163,7 +200,10 @@ For each new canary route, verify:
 - one visible H1 remains in the page body;
 - header, main, footer, and navigation landmarks are present;
 - desktop active navigation identifies the current hub;
-- mobile menu opens and closes with keyboard and restores state on Escape;
+- the mobile drawer starts closed;
+- hamburger activation opens it and updates `aria-expanded="true"`/`aria-hidden="false"`;
+- Escape, the close button, and the backdrop close it and restore `aria-expanded="false"`/`aria-hidden="true"`;
+- focus moves into the drawer on open and returns to the opening trigger on close;
 - focus-visible rings and touch targets meet the established token rules;
 - no horizontal overflow appears at mobile, tablet, and desktop breakpoints.
 
@@ -181,6 +221,8 @@ This slice does not:
 - fix the known duplicate sitemap warning; that remains a separate contract-allowlisted SEO cleanup;
 - add evidence cards, catalog-v2 data, compare-builder behavior, or RFQ schema changes.
 
+The only allowed shared-shell behavior change is the native drawer focus-management fix required to satisfy the rebuild blueprint accessibility gate: store the opening trigger, focus the drawer close control or first drawer focusable on open, and restore focus to the trigger on close. That change belongs in `src/components/shell/SiteHeader.astro` and its shell tests, not in hub content.
+
 ## 8. Acceptance criteria
 
 The slice is complete when:
@@ -189,8 +231,8 @@ The slice is complete when:
 2. The default build is unchanged for all routes.
 3. The flagged build preserves all URL, SEO, sitemap, redirect, machine-route, and JSON-LD contracts.
 4. Existing body content and hub behavior are unchanged.
-5. Header/footer compatibility hooks and mobile navigation behavior pass tests and browser checks.
-6. The implementation remains limited to the route allowlist, any already-required hub entry-point wiring, tests, and documentation.
+5. Header/footer compatibility hooks, drawer focus management, and mobile navigation behavior pass tests and browser checks.
+6. The implementation remains limited to the route allowlist, required hub entry-point wiring, the native drawer focus-management fix in `SiteHeader.astro`, tests, and documentation.
 
 ## 9. Follow-up decision
 
