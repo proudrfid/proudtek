@@ -66,6 +66,21 @@ describe("native SiteShell dark launch", () => {
     expect(fixture.document.activeElement).toBe(fixture.openButton);
   });
 
+  it("restores the trigger through the close-button click path after a competing focus", () => {
+    const fixture = createDrawerFixture();
+
+    fixture.openButton.click();
+    fixture.flushAnimationFrames();
+    expect(fixture.document.activeElement).toBe(fixture.closeButton);
+
+    fixture.closeButton.addEventListener("click", () => fixture.scheduleAnimationFrame(() => {
+      fixture.document.activeElement = fixture.closeButton;
+    }));
+    fixture.closeButton.click();
+    fixture.flushAnimationFrames();
+
+    expect(fixture.document.activeElement).toBe(fixture.openButton);
+  });
   it("falls back past hidden and disabled drawer controls", () => {
     const fixture = createDrawerFixture({ disabledCloseButton: true, hiddenFirstLink: true });
 

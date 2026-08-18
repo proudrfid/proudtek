@@ -216,5 +216,8 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
     flushAnimationFrames: () => {
       while (animationFrames.length) animationFrames.shift()?.();
     },
+    scheduleAnimationFrame: (callback: () => void) => {
+      animationFrames.push(callback);
+    },
   };
 }

@@ -114,6 +114,13 @@ const { currentRoute } = Astro.props;
       if (!restored && drawer.contains(document.activeElement)) {
         (document.activeElement as HTMLElement).blur();
       }
+      requestAnimationFrame(() => {
+        if (change !== drawerChange) return;
+        const retried = restoreFocus(trigger);
+        if (!retried && drawer.contains(document.activeElement)) {
+          (document.activeElement as HTMLElement).blur();
+        }
+      });
     });
   }
 
