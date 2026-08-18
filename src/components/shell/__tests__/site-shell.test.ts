@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { createDrawerFixture } from "./drawer-focus.fixture";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import SiteHeader from "../SiteHeader.astro";
 import SiteFooter from "../SiteFooter.astro";
@@ -34,19 +35,42 @@ describe("native SiteShell dark launch", () => {
     expect(html).toContain('href="/sample-pack/"');
   });
 
-  it("declares the explicit drawer focus-management controller", () => {
-    const source = readFileSync(new URL("../SiteHeader.astro", import.meta.url), "utf8");
+  it("keeps legacy drawer ownership out of native shell pages", () => {
+    const source = readFileSync(new URL("../../../layouts/partials/PageScript.astro", import.meta.url), "utf8");
 
-    expect(source).toContain("let openingTrigger: HTMLElement | null = null");
-    expect(source).toContain("openingTrigger = openButton");
-    expect(source).toContain("requestAnimationFrame");
-    expect(source).toContain('[data-native-drawer-close]');
-    expect(source).toContain("function isFocusable(element: HTMLElement): boolean");
-    expect(source).toContain("element.isConnected");
-    expect(source).toContain("trigger.focus()");
-    expect(source).toContain("drawer.contains(document.activeElement)");
-    expect(source).toContain("find(isFocusable)");
-    expect(source).toContain("openingTrigger = null");
+    expect(source).toContain("new MutationObserver");
+    expect(source).toContain("var __nativeSiteShell = document.querySelector('[data-native-site-shell]')");
+    expect(source).toContain("if (__nativeSiteShell || document.querySelector('[data-native-site-shell]')) return;");
+    expect(source).toContain("if (!__nativeSiteShell)");
+  });
+
+  it("executes drawer focus management for open, Escape and backdrop close", async () => {
+    const fixture = createDrawerFixture();
+
+    fixture.openButton.click();
+    fixture.flushAnimationFrames();
+    expect(fixture.document.activeElement).toBe(fixture.closeButton);
+
+    fixture.document.dispatchEvent({ type: "keydown", key: "Escape" });
+    fixture.flushAnimationFrames();
+    expect(fixture.openButton.getAttribute("aria-expanded")).toBe("false");
+    expect(fixture.drawer.getAttribute("aria-hidden")).toBe("true");
+    expect(fixture.document.activeElement).toBe(fixture.openButton);
+
+    fixture.openButton.click();
+    fixture.flushAnimationFrames();
+    fixture.backdrop.click();
+    fixture.flushAnimationFrames();
+    expect(fixture.document.activeElement).toBe(fixture.openButton);
+  });
+
+  it("falls back past hidden and disabled drawer controls", () => {
+    const fixture = createDrawerFixture({ disabledCloseButton: true, hiddenFirstLink: true });
+
+    fixture.openButton.click();
+    fixture.flushAnimationFrames();
+
+    expect(fixture.document.activeElement).toBe(fixture.fallbackLink);
   });
 
   it("marks the relevant desktop route active without changing the menu data", async () => {
