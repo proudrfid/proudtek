@@ -42,6 +42,12 @@ const { currentRoute } = Astro.props;
   <MobileNav menus={PRIMARY_MENU_DROPDOWNS} currentRoute={currentRoute} />
 </header>
 
+<style is:global>
+  #masthead[data-native-shell-header] #main-header {
+    display: block;
+  }
+</style>
+
 <script>
   const body = document.body;
   const drawer = document.getElementById("mobile-drawer");
@@ -49,6 +55,18 @@ const { currentRoute } = Astro.props;
   const closeButtons = document.querySelectorAll("[data-native-drawer-close]");
   let openingTrigger: HTMLElement | null = null;
   let drawerChange = 0;
+
+  function canRestoreFocus(element: HTMLElement | null): element is HTMLElement {
+    return !!element
+      && element.isConnected
+      && !element.hasAttribute("disabled")
+      && element.getAttribute("aria-disabled") !== "true"
+      && element.tabIndex >= 0;
+  }
+
+  function restoreFocus(element: HTMLElement | null): void {
+    if (canRestoreFocus(element)) element.focus({ preventScroll: true });
+  }
 
   function isFocusable(element: HTMLElement): boolean {
     if (!element.isConnected
@@ -95,13 +113,12 @@ const { currentRoute } = Astro.props;
     }
 
     const trigger = openingTrigger;
-    if (trigger && isFocusable(trigger)) trigger.focus();
+    restoreFocus(trigger);
     openingTrigger = null;
     requestAnimationFrame(() => {
       if (change !== drawerChange) return;
-      if (trigger && isFocusable(trigger)) {
-        trigger.focus();
-      } else if (drawer.contains(document.activeElement)) {
+      restoreFocus(trigger);
+      if (!canRestoreFocus(trigger) && drawer.contains(document.activeElement)) {
         (document.activeElement as HTMLElement).blur();
       }
     });

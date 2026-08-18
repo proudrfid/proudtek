@@ -5,6 +5,7 @@ import ts from "typescript";
 interface FixtureOptions {
   disabledCloseButton?: boolean;
   hiddenFirstLink?: boolean;
+  hiddenTriggerAncestor?: boolean;
 }
 
 class FakeElement {
@@ -161,6 +162,7 @@ function extractScript(): string {
 export function createDrawerFixture(options: FixtureOptions = {}) {
   const document = new FakeDocument();
   const openButton = new FakeElement("button", { "data-native-drawer-open": "", "aria-expanded": "false" });
+  const header = new FakeElement("header");
   const drawer = new FakeElement("div", { id: "mobile-drawer", "aria-hidden": "true" });
   const closeButton = new FakeElement("button", { "data-native-drawer-close": "", "aria-label": "Close menu" });
   const firstLink = new FakeElement("a", { href: "/hidden" });
@@ -173,8 +175,10 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
   drawer.append(firstLink);
   drawer.append(fallbackLink);
   drawer.append(backdrop);
-  document.body.append(openButton);
+  header.append(openButton);
+  document.body.append(header);
   document.body.append(drawer);
+  if (options.hiddenTriggerAncestor) header.hidden = true;
   document.register("mobile-drawer", drawer);
   document.register("open", openButton);
   document.register("open", openButton);

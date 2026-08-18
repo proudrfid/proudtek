@@ -31,6 +31,8 @@ describe("native SiteShell dark launch", () => {
     expect(html).toContain('id="mobile-drawer" class="codex-native-drawer" aria-hidden="true"');
     expect(html).toContain('data-native-drawer-open');
     expect(html).toContain('data-native-drawer-close');
+    const source = readFileSync(new URL("../SiteHeader.astro", import.meta.url), "utf8");
+    expect(source).toContain("#masthead[data-native-shell-header] #main-header");
     expect(html).toContain('href="/rfq/"');
     expect(html).toContain('href="/sample-pack/"');
   });
@@ -73,6 +75,16 @@ describe("native SiteShell dark launch", () => {
     expect(fixture.document.activeElement).toBe(fixture.fallbackLink);
   });
 
+  it("restores the opening trigger even when its ancestor is hidden after close", () => {
+    const fixture = createDrawerFixture({ hiddenTriggerAncestor: true });
+
+    fixture.openButton.click();
+    fixture.flushAnimationFrames();
+    fixture.document.dispatchEvent({ type: "keydown", key: "Escape" });
+    fixture.flushAnimationFrames();
+
+    expect(fixture.document.activeElement).toBe(fixture.openButton);
+  });
   it("marks the relevant desktop route active without changing the menu data", async () => {
     const container = await AstroContainer.create();
     const html = normalizeHtml(await container.renderToString(SiteHeader, {
