@@ -75,15 +75,19 @@ describe("native SiteShell dark launch", () => {
     expect(fixture.document.activeElement).toBe(fixture.fallbackLink);
   });
 
-  it("restores the opening trigger even when its ancestor is hidden after close", () => {
-    const fixture = createDrawerFixture({ hiddenTriggerAncestor: true });
+  it.each([
+    ["hidden", { hiddenTriggerAncestor: true }],
+    ["inert", { inertTriggerAncestor: true }],
+  ])("does not claim %s trigger restoration and blurs drawer focus", (_label, options) => {
+    const fixture = createDrawerFixture(options);
 
     fixture.openButton.click();
     fixture.flushAnimationFrames();
     fixture.document.dispatchEvent({ type: "keydown", key: "Escape" });
     fixture.flushAnimationFrames();
 
-    expect(fixture.document.activeElement).toBe(fixture.openButton);
+    expect(fixture.document.activeElement).toBe(fixture.document.body);
+    expect(fixture.document.activeElement).not.toBe(fixture.openButton);
   });
   it("marks the relevant desktop route active without changing the menu data", async () => {
     const container = await AstroContainer.create();

@@ -6,6 +6,7 @@ interface FixtureOptions {
   disabledCloseButton?: boolean;
   hiddenFirstLink?: boolean;
   hiddenTriggerAncestor?: boolean;
+  inertTriggerAncestor?: boolean;
 }
 
 class FakeElement {
@@ -55,6 +56,14 @@ class FakeElement {
   }
 
   focus(): void {
+    let ancestor: FakeElement | null = this;
+    while (ancestor) {
+      if (ancestor.hidden
+        || ancestor.hasAttribute("inert")
+        || ancestor.getAttribute("aria-hidden") === "true"
+        || (ancestor.tagName === "DETAILS" && !ancestor.open)) return;
+      ancestor = ancestor.parentElement;
+    }
     if (this.fixtureDocument) this.fixtureDocument.activeElement = this;
   }
 
@@ -179,6 +188,7 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
   document.body.append(header);
   document.body.append(drawer);
   if (options.hiddenTriggerAncestor) header.hidden = true;
+  if (options.inertTriggerAncestor) header.setAttribute("inert", "");
   document.register("mobile-drawer", drawer);
   document.register("open", openButton);
   document.register("open", openButton);

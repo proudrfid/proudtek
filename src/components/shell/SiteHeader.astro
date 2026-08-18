@@ -56,18 +56,6 @@ const { currentRoute } = Astro.props;
   let openingTrigger: HTMLElement | null = null;
   let drawerChange = 0;
 
-  function canRestoreFocus(element: HTMLElement | null): element is HTMLElement {
-    return !!element
-      && element.isConnected
-      && !element.hasAttribute("disabled")
-      && element.getAttribute("aria-disabled") !== "true"
-      && element.tabIndex >= 0;
-  }
-
-  function restoreFocus(element: HTMLElement | null): void {
-    if (canRestoreFocus(element)) element.focus({ preventScroll: true });
-  }
-
   function isFocusable(element: HTMLElement): boolean {
     if (!element.isConnected
       || element.hasAttribute("disabled")
@@ -85,6 +73,10 @@ const { currentRoute } = Astro.props;
       ancestor = ancestor.parentElement;
     }
     return true;
+  }
+
+  function restoreFocus(element: HTMLElement | null): void {
+    if (element && isFocusable(element)) element.focus({ preventScroll: true });
   }
 
   function setDrawer(open: boolean) {
@@ -118,7 +110,7 @@ const { currentRoute } = Astro.props;
     requestAnimationFrame(() => {
       if (change !== drawerChange) return;
       restoreFocus(trigger);
-      if (!canRestoreFocus(trigger) && drawer.contains(document.activeElement)) {
+      if ((!trigger || !isFocusable(trigger)) && drawer.contains(document.activeElement)) {
         (document.activeElement as HTMLElement).blur();
       }
     });
