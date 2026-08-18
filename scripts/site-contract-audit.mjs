@@ -12,11 +12,12 @@
  * which URLs changed intentionally and which would be accidental SEO drift.
  */
 import fs from "node:fs/promises";
+import { realpathSync } from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 import * as cheerio from "cheerio";
-import { XMLParser } from "fast-xml-parser";
+import { XMLParser, XMLValidator } from "fast-xml-parser";
 
 const __filename = fileURLToPath(import.meta.url);
 const ROOT = path.resolve(path.dirname(__filename), "..");
@@ -24,8 +25,32 @@ const DIST = path.join(ROOT, "dist");
 const BASELINE = path.join(ROOT, "src", "data", "site-contract.v1.json");
 const SITE_ORIGIN = "https://proudtek.com";
 
-const args = new Set(process.argv.slice(2));
-const writeBaseline = args.has("--write-baseline");
+function parseArgs(argv) {
+  const values = { writeBaseline: false, distPath: DIST };
+  let seenDist = false;
+  let index = 0;
+  while (index < argv.length) {
+    const option = argv[index];
+    if (option === "--write-baseline") {
+      if (values.writeBaseline) throw Object.assign(new Error("duplicate --write-baseline"), { exitCode: 1 });
+      values.writeBaseline = true;
+      index += 1;
+      continue;
+    }
+    if (option === "--dist") {
+      if (seenDist) throw Object.assign(new Error("duplicate --dist"), { exitCode: 1 });
+      seenDist = true;
+      const value = argv[index + 1];
+      if (!value || value.startsWith("--")) throw Object.assign(new Error("--dist requires a path"), { exitCode: 1 });
+      values.distPath = path.resolve(value);
+      index += 2;
+      continue;
+    }
+    if (option.startsWith("--")) throw Object.assign(new Error(`unknown option ${option}`), { exitCode: 1 });
+    throw Object.assign(new Error(`unexpected argument ${option}`), { exitCode: 1 });
+  }
+  return values;
+}
 
 function sha256(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
@@ -91,6 +116,8 @@ function collectJsonLd($, route, warnings) {
         }
         if (Array.isArray(node["@graph"])) {
           node["@graph"].forEach(pushNode);
+        } else if (node["@graph"] && typeof node["@graph"] === "object") {
+          pushNode(node["@graph"]);
         }
         if (node["@type"] || node["@id"]) nodes.push(node);
       };
@@ -100,21 +127,21 @@ function collectJsonLd($, route, warnings) {
         entries.push({ type, id: node["@id"] ?? null, hash: sha256(stableJson(node)) });
       }
     } catch (err) {
-      warnings.push({ code: "JSONLD_PARSE_ERROR", route, message: err.message });
+      throw new Error(`malformed JSON-LD at ${route}: ${err.message}`);
     }
   });
   return entries.sort((a, b) => `${a.type}:${a.id}`.localeCompare(`${b.type}:${b.id}`));
 }
 
-async function parseHtmlOutputs(warnings) {
-  const files = (await walk(DIST)).filter((file) => file.endsWith(".html"));
+async function parseHtmlOutputs(distPath, warnings) {
+  const files = (await walk(distPath)).filter((file) => file.endsWith(".html"));
   const pages = [];
   for (const file of files.sort()) {
-    const relativePath = path.relative(DIST, file).replace(/\\/g, "/");
+    const relativePath = path.relative(distPath, file).replace(/\\/g, "/");
     const route = outputPathToRoute(relativePath);
     const html = await fs.readFile(file, "utf8");
     const $ = cheerio.load(html);
-    const canonicalLinks = $('link[rel="canonical"]').map((_, el) => $(el).attr("href") ?? "").get().filter(Boolean);
+    const canonicalLinks = $('link[rel~="canonical"]').map((_, el) => $(el).attr("href") ?? "").get().filter(Boolean);
     const robots = $('meta[name="robots"]').attr("content") ?? null;
     const title = normalizeText($("title").first().text());
     const description = $('meta[name="description"]').attr("content") ?? null;
@@ -139,6 +166,7 @@ async function parseHtmlOutputs(warnings) {
       route,
       outputPath: relativePath,
       canonical: canonicalLinks[0] ?? null,
+      canonicalCount: canonicalLinks.length,
       robots,
       title,
       description,
@@ -159,14 +187,43 @@ function toArray(value) {
   return Array.isArray(value) ? value : [value];
 }
 
-async function parseSitemaps(warnings) {
-  const parser = new XMLParser({ ignoreAttributes: false });
-  const sitemapPath = path.join(DIST, "sitemap.xml");
-  const indexPath = path.join(DIST, "sitemap-index.xml");
+function parseExpectedXmlRoot(raw, fileName, expectedRoot, parser) {
+  const validation = XMLValidator.validate(raw);
+  if (validation !== true) {
+    const validationMessage = validation?.err?.msg ?? "";
+    if (/multiple possible root nodes/i.test(validationMessage)) throw new Error(`${fileName} must contain exactly one ${expectedRoot} root`);
+    throw new Error(`${fileName} is malformed${validationMessage ? `: ${validationMessage}` : ""}`);
+  }
+  const parsed = parser.parse(raw);
+  if (!parsed || typeof parsed !== "object" || !(expectedRoot in parsed)) throw new Error(`${fileName} must contain a ${expectedRoot} root`);
+  const roots = Object.keys(parsed).filter((key) => !key.startsWith("?"));
+  if (roots.length !== 1 || roots[0] !== expectedRoot || Array.isArray(parsed[expectedRoot])) {
+    throw new Error(`${fileName} must contain exactly one ${expectedRoot} root`);
+  }
+  const root = parsed[expectedRoot];
+  if (root === "") return {};
+  if (!root || typeof root !== "object" || Array.isArray(root)) throw new Error(`${fileName} must contain an object ${expectedRoot} root`);
+  return root;
+}
+
+function validateSitemapChildren(root, childKey, locKey, fileName) {
+  const children = toArray(root[childKey]);
+  for (const [index, child] of children.entries()) {
+    if (!child || typeof child !== "object" || Array.isArray(child) || typeof child[locKey] !== "string" || !child[locKey]) {
+      throw new Error(`${fileName} ${childKey}[${index}] must be an object with a non-empty loc`);
+    }
+  }
+  return children;
+}
+
+async function parseSitemaps(distPath, warnings) {
+  const parser = new XMLParser({ ignoreAttributes: false, parseTagValue: false, parseAttributeValue: false, trimValues: false });
+  const sitemapPath = path.join(distPath, "sitemap.xml");
+  const indexPath = path.join(distPath, "sitemap-index.xml");
   const result = { urls: [], duplicates: [], index: [] };
   if (await exists(sitemapPath)) {
-    const xml = parser.parse(await fs.readFile(sitemapPath, "utf8"));
-    result.urls = toArray(xml.urlset?.url).map((u) => u.loc).filter(Boolean).sort();
+    const root = parseExpectedXmlRoot(await fs.readFile(sitemapPath, "utf8"), "sitemap.xml", "urlset", parser);
+    result.urls = validateSitemapChildren(root, "url", "loc", "sitemap.xml").map((u) => u.loc).sort();
     const seen = new Set();
     const dupes = new Set();
     for (const url of result.urls) {
@@ -176,17 +233,17 @@ async function parseSitemaps(warnings) {
     result.duplicates = [...dupes].sort();
     if (result.duplicates.length) warnings.push({ code: "SITEMAP_DUPLICATE_URLS", count: result.duplicates.length, urls: result.duplicates });
   } else {
-    warnings.push({ code: "SITEMAP_MISSING", file: "dist/sitemap.xml" });
+    warnings.push({ code: "SITEMAP_MISSING", file: path.join(distPath, "sitemap.xml") });
   }
   if (await exists(indexPath)) {
-    const xml = parser.parse(await fs.readFile(indexPath, "utf8"));
-    result.index = toArray(xml.sitemapindex?.sitemap).map((s) => s.loc).filter(Boolean).sort();
+    const root = parseExpectedXmlRoot(await fs.readFile(indexPath, "utf8"), "sitemap-index.xml", "sitemapindex", parser);
+    result.index = validateSitemapChildren(root, "sitemap", "loc", "sitemap-index.xml").map((s) => s.loc).sort();
   }
   return result;
 }
 
-async function parseSiteIndex(warnings) {
-  const file = path.join(DIST, "site-index.json");
+async function parseSiteIndex(distPath, warnings) {
+  const file = path.join(distPath, "site-index.json");
   if (!(await exists(file))) {
     warnings.push({ code: "SITE_INDEX_MISSING" });
     return { pageCount: 0, pages: [], urls: [] };
@@ -205,13 +262,13 @@ async function parseSiteIndex(warnings) {
   };
 }
 
-async function parseMachineRoutes() {
-  const machineDir = path.join(DIST, "machine");
+async function parseMachineRoutes(distPath) {
+  const machineDir = path.join(distPath, "machine");
   if (!(await exists(machineDir))) return { json: [], txt: [] };
   const files = await walk(machineDir);
   return {
-    json: files.filter((file) => file.endsWith(".json")).map((file) => path.relative(DIST, file).replace(/\\/g, "/")).sort(),
-    txt: files.filter((file) => file.endsWith(".txt")).map((file) => path.relative(DIST, file).replace(/\\/g, "/")).sort(),
+    json: files.filter((file) => file.endsWith(".json")).map((file) => path.relative(distPath, file).replace(/\\/g, "/")).sort(),
+    txt: files.filter((file) => file.endsWith(".txt")).map((file) => path.relative(distPath, file).replace(/\\/g, "/")).sort(),
   };
 }
 
@@ -227,12 +284,15 @@ function parseNetlifyRedirects(raw) {
   });
 }
 
-async function parseRedirects() {
+async function parseRedirects(distPath) {
+  // Vercel has no generated static redirect artifact, so the repository config
+  // remains its contract source. Netlify's final generated output is audited.
   const vercelPath = path.join(ROOT, "vercel.json");
-  const netlifyPath = path.join(ROOT, "public", "_redirects");
+  const netlifyPath = path.join(distPath, "_redirects");
+  if (!(await exists(netlifyPath))) throw new Error(`missing generated Netlify redirects ${netlifyPath}`);
   return {
     vercel: await exists(vercelPath) ? parseVercelRedirects(await fs.readFile(vercelPath, "utf8")) : [],
-    netlify: await exists(netlifyPath) ? parseNetlifyRedirects(await fs.readFile(netlifyPath, "utf8")) : [],
+    netlify: parseNetlifyRedirects(await fs.readFile(netlifyPath, "utf8")),
   };
 }
 
@@ -252,6 +312,7 @@ function summarizePages(pages) {
     route: page.route,
     outputPath: page.outputPath,
     canonical: page.canonical,
+    canonicalCount: page.canonicalCount,
     robots: page.robots,
     title: page.title,
     descriptionHash: page.description ? sha256(page.description) : null,
@@ -287,9 +348,11 @@ function diffComparable(expected, actual) {
   for (const [key, expectedPage] of expectedPages.entries()) {
     const actualPage = actualPages.get(key);
     if (!actualPage) continue;
-    for (const field of ["route", "canonical", "robots", "title", "descriptionHash", "h1Count", "mainCount", "mainTextHash", "mainTextLength", "mainTextPreview"]) {
-      if (JSON.stringify(expectedPage[field]) !== JSON.stringify(actualPage[field])) {
-        diffs.push({ code: "PAGE_FIELD_CHANGED", outputPath: key, field, expected: expectedPage[field], actual: actualPage[field] });
+    for (const field of ["route", "canonical", "canonicalCount", "robots", "title", "descriptionHash", "h1Count", "mainCount", "mainTextHash", "mainTextLength", "mainTextPreview"]) {
+      const expectedValue = field === "canonicalCount" && expectedPage[field] === undefined ? (expectedPage.canonical ? 1 : 0) : expectedPage[field];
+      const actualValue = field === "canonicalCount" && actualPage[field] === undefined ? (actualPage.canonical ? 1 : 0) : actualPage[field];
+      if (JSON.stringify(expectedValue) !== JSON.stringify(actualValue)) {
+        diffs.push({ code: "PAGE_FIELD_CHANGED", outputPath: key, field, expected: expectedValue, actual: actualValue });
       }
     }
     if (JSON.stringify(expectedPage.jsonLd) !== JSON.stringify(actualPage.jsonLd)) diffs.push({ code: "JSONLD_CHANGED", outputPath: key });
@@ -301,17 +364,17 @@ function diffComparable(expected, actual) {
   return diffs;
 }
 
-async function buildContract() {
+async function buildContract(distPath = DIST) {
   const warnings = [];
-  if (!(await exists(DIST))) {
-    throw new Error("dist/ does not exist. Run npm run build first.");
+  if (!(await exists(distPath))) {
+    throw new Error(`${distPath} does not exist. Run npm run build first.`);
   }
-  const pagesRaw = await parseHtmlOutputs(warnings);
-  const sitemap = await parseSitemaps(warnings);
-  const siteIndex = await parseSiteIndex(warnings);
-  const machine = await parseMachineRoutes();
+  const pagesRaw = await parseHtmlOutputs(distPath, warnings);
+  const sitemap = await parseSitemaps(distPath, warnings);
+  const siteIndex = await parseSiteIndex(distPath, warnings);
+  const machine = await parseMachineRoutes(distPath);
   await validateMachineAlternates(pagesRaw, machine, warnings);
-  const redirects = await parseRedirects();
+  const redirects = await parseRedirects(distPath);
   const pages = summarizePages(pagesRaw);
   return {
     version: 1,
@@ -338,7 +401,8 @@ async function buildContract() {
 }
 
 async function main() {
-  const contract = await buildContract();
+  const { distPath, writeBaseline } = parseArgs(process.argv.slice(2));
+  const contract = await buildContract(distPath);
   if (writeBaseline) {
     await fs.writeFile(BASELINE, JSON.stringify(contract, null, 2) + "\n");
     console.log(`[site-contract] wrote ${path.relative(ROOT, BASELINE)}`);
@@ -360,7 +424,19 @@ async function main() {
   console.log(`[site-contract] PASS outputs=${contract.counts.htmlOutputs} warnings=${contract.counts.warnings}`);
 }
 
-main().catch((err) => {
-  console.error(`[site-contract] ${err.stack || err.message}`);
-  process.exit(2);
-});
+export {
+  buildContract,
+  contractComparable,
+  diffComparable,
+  normalizeText,
+  sha256,
+  stableJson,
+  sortObject,
+};
+
+if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(__filename)) {
+  main().catch((err) => {
+    console.error(`[site-contract] ${err.stack || err.message}`);
+    process.exit(err.exitCode ?? 2);
+  });
+}
