@@ -29,14 +29,17 @@ const HOME_V2_ENABLED = enabled(import.meta.env.PROUDTEK_HOME_V2);
 const CATALOG_V2_ENABLED = enabled(import.meta.env.PROUDTEK_CATALOG_V2);
 
 /**
- * Exact-route canary allowlist. PR-03 starts with two low-risk native pages:
- * a static glossary and an interactive planning tool. The global kill switch
- * remains off by default, so adding a route here does not change production
- * until PROUDTEK_NATIVE_SHELL=1 is set for a deployment.
+ * Exact-route canary allowlist. PR-03 starts with two low-risk native pages,
+ * then adds the guides, solutions and blog hubs. The global kill switch remains
+ * off by default, so adding a route here does not change production until
+ * PROUDTEK_NATIVE_SHELL=1 is set for a deployment.
  */
 export const NATIVE_SHELL_CANARY_ROUTES = [
   "/glossary/",
   "/tools/rfid-tag-cost-estimator/",
+  "/guides/",
+  "/solutions/",
+  "/blog/",
 ] as const;
 
 const NATIVE_SHELL_ROUTES = new Set<string>(NATIVE_SHELL_CANARY_ROUTES);
