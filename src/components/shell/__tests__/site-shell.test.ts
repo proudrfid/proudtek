@@ -31,8 +31,10 @@ describe("native SiteShell dark launch", () => {
     expect(html).toContain('id="mobile-drawer" class="codex-native-drawer" aria-hidden="true"');
     expect(html).toContain('data-native-drawer-open');
     expect(html).toContain('data-native-drawer-close');
-    const source = readFileSync(new URL("../SiteHeader.astro", import.meta.url), "utf8");
-    expect(source).toContain("#masthead[data-native-shell-header] #main-header");
+    const headerSource = readFileSync(new URL("../SiteHeader.astro", import.meta.url), "utf8");
+    const shellCss = readFileSync(new URL("../../../styles/codex-shell.css", import.meta.url), "utf8");
+    expect(headerSource).not.toContain("#masthead[data-native-shell-header] #main-header");
+    expect(shellCss).toContain("#masthead[data-native-shell-header] #main-header");
     expect(html).toContain('href="/rfq/"');
     expect(html).toContain('href="/sample-pack/"');
   });

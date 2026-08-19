@@ -56,18 +56,20 @@ class FakeElement {
     this.listeners.get(String(event.type))?.forEach((listener) => listener(event));
   }
 
+  private isRenderedForFocus(element: FakeElement | null = this): boolean {
+    if (!element) return true;
+    if (!element.rendered
+      || element.hidden
+      || element.hasAttribute("inert")
+      || element.getAttribute("aria-hidden") === "true"
+      || (element.tagName === "DETAILS"
+        && !element.open
+        && this.tagName !== "SUMMARY")) return false;
+    return this.isRenderedForFocus(element.parentElement);
+  }
+
   focus(): void {
-    let ancestor: FakeElement | null = this;
-    while (ancestor) {
-      if (!ancestor.rendered
-        || ancestor.hidden
-        || ancestor.hasAttribute("inert")
-        || ancestor.getAttribute("aria-hidden") === "true"
-        || (ancestor.tagName === "DETAILS"
-          && !ancestor.open
-          && this.tagName !== "SUMMARY")) return;
-      ancestor = ancestor.parentElement;
-    }
+    if (!this.isRenderedForFocus()) return;
     if (this.fixtureDocument) this.fixtureDocument.activeElement = this;
   }
 
