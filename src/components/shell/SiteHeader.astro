@@ -153,13 +153,28 @@ const { currentRoute } = Astro.props;
     });
   }
 
+  function getDesktopMediaQuery(): MediaQueryList | null {
+    if (typeof window.matchMedia !== "function") return null;
+    try {
+      return window.matchMedia("(min-width: 1280px)") || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function isDesktopViewport(): boolean {
+    return getDesktopMediaQuery()?.matches === true;
+  }
+
+  const desktopMediaQuery = getDesktopMediaQuery();
+
   openButton?.addEventListener("click", () => setDrawer(true));
   closeButtons.forEach((button) => button.addEventListener("click", () => setDrawer(false)));
-  window.matchMedia("(min-width: 1280px)").addEventListener?.("change", (event) => {
+  desktopMediaQuery?.addEventListener?.("change", (event) => {
     if (event.matches && body.classList.contains("drawer-open")) setDrawer(false, false);
   });
   window.addEventListener("resize", () => {
-    if (window.matchMedia("(min-width: 1280px)").matches && body.classList.contains("drawer-open")) {
+    if (isDesktopViewport() && body.classList.contains("drawer-open")) {
       setDrawer(false, false);
     }
   });

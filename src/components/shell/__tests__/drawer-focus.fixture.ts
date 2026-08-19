@@ -6,6 +6,7 @@ interface FixtureOptions {
   disabledCloseButton?: boolean;
   hiddenFirstLink?: boolean;
   hiddenCloseButton?: boolean;
+  matchMedia?: "missing" | "null" | "throw";
 }
 
 class FakeElement {
@@ -212,8 +213,18 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
 
   const animationFrames: Array<() => void> = [];
   const windowListeners = new Map<string, Array<() => void>>();
-  const window = {
-    matchMedia: () => ({ matches: false }),
+  const window: {
+    matchMedia?: () => { matches: boolean; addEventListener?: (type: string, listener: () => void) => void } | null;
+    addEventListener: (type: string, listener: () => void) => void;
+    dispatchEvent: (event: Record<string, unknown>) => void;
+  } = {
+    matchMedia: options.matchMedia === "missing"
+      ? undefined
+      : options.matchMedia === "null"
+        ? () => null
+        : options.matchMedia === "throw"
+          ? () => { throw new Error("matchMedia unavailable"); }
+          : () => ({ matches: false }),
     addEventListener: (type: string, listener: () => void) => {
       const listeners = windowListeners.get(type) ?? [];
       listeners.push(listener);

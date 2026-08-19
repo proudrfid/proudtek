@@ -104,6 +104,21 @@ describe("native SiteShell dark launch", () => {
     expect(fixture.openButton.getAttribute("aria-expanded")).toBe("false");
     expect(fixture.document.activeElement).toBe(fixture.document.body);
   });
+  it.each(["missing", "null", "throw"] as const)(
+    "keeps drawer handlers working when matchMedia is %s",
+    (matchMedia) => {
+      const fixture = createDrawerFixture({ matchMedia });
+
+      fixture.openButton.click();
+      fixture.flushAnimationFrames();
+      expect(fixture.openButton.getAttribute("aria-expanded")).toBe("true");
+
+      fixture.document.dispatchEvent({ type: "keydown", key: "Escape" });
+      fixture.flushAnimationFrames();
+      expect(fixture.openButton.getAttribute("aria-expanded")).toBe("false");
+      expect(fixture.drawer.getAttribute("aria-hidden")).toBe("true");
+    },
+  );
   it("falls back past hidden and disabled drawer controls", () => {
     const fixture = createDrawerFixture({ disabledCloseButton: true, hiddenFirstLink: true });
 
