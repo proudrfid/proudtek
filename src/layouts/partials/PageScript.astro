@@ -103,7 +103,9 @@
          focused trigger and restore focus to it on close so tab order
          doesn't reset to <body>. */
       var __drawerLastTrigger = null;
+      var __nativeSiteShell = document.querySelector('[data-native-site-shell]');
       var __drawerObserver = new MutationObserver(function(mutations) {
+        if (__nativeSiteShell || document.querySelector('[data-native-site-shell]')) return;
         for (var i = 0; i < mutations.length; i++) {
           if (mutations[i].attributeName !== 'class') continue;
           var isOpen = document.body.classList.contains('drawer-open');
@@ -123,7 +125,9 @@
           }
         }
       });
-      __drawerObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      if (!__nativeSiteShell) {
+        __drawerObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      }
 
       /* Mobile menu — second-level group accordion.
          Each `[data-codex-mobile-group-toggle]` button is paired with its

@@ -17,7 +17,7 @@
  * Individual blog posts (/blog/{slug}/) are unaffected — they still
  * render through [...slug].astro + the editorial pipeline.
  */
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShellSwitchLayout from "../../layouts/ShellSwitchLayout.astro";
 import CardThumb from "../../components/editorial/CardThumb.astro";
 import { getCollection } from "astro:content";
 import {
@@ -33,8 +33,10 @@ import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { truncateText } from "../../lib/seo/utils";
 import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
+import { shouldUseNativeShell } from "../../lib/rollout";
 
 const ROUTE = "/blog/";
+const useNativeShell = shouldUseNativeShell(ROUTE);
 const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
 
 // ── Pull every blog editorial entry ──
@@ -200,8 +202,8 @@ const filterScript = buildRailFilterScript({
  */
 ---
 
-<BaseLayout seo={seo}>
-  <Fragment set:html={chrome.beforeMainHtml} />
+<ShellSwitchLayout seo={seo} currentRoute={ROUTE}>
+  {!useNativeShell && <Fragment set:html={chrome.beforeMainHtml} />}
 
   <main id="main" class="site-main" role="main">
     <Fragment set:html={railHtml} />
@@ -244,5 +246,5 @@ const filterScript = buildRailFilterScript({
     </section>
   </main>
 
-  <Fragment set:html={chrome.afterMainHtml} />
-</BaseLayout>
+  {!useNativeShell && <Fragment set:html={chrome.afterMainHtml} />}
+</ShellSwitchLayout>

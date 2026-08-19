@@ -14,7 +14,7 @@
  * Architecture note: 2nd native .astro editorial page (after [cluster].astro).
  * See docs/architecture/editorial-rendering-debt.md for the path-3 plan.
  */
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShellSwitchLayout from "../../layouts/ShellSwitchLayout.astro";
 import { getCollection } from "astro:content";
 import { GUIDE_CLUSTERS, getTotalGuideCount } from "../../data/guide-clusters";
 import type { PageSeoData } from "../../lib/seo";
@@ -23,8 +23,10 @@ import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
+import { shouldUseNativeShell } from "../../lib/rollout";
 
 const ROUTE = "/guides/";
+const useNativeShell = shouldUseNativeShell(ROUTE);
 const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
 const TOTAL_GUIDES = getTotalGuideCount();
 
@@ -141,8 +143,8 @@ seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
 const railHtml = buildGuideClustersRailHtml(undefined);
 ---
 
-<BaseLayout seo={seo}>
-  <Fragment set:html={chrome.beforeMainHtml} />
+<ShellSwitchLayout seo={seo} currentRoute={ROUTE}>
+  {!useNativeShell && <Fragment set:html={chrome.beforeMainHtml} />}
 
   <main id="main" class="site-main" role="main">
     {/* Same rail markup as blog hub. */}
@@ -183,5 +185,5 @@ const railHtml = buildGuideClustersRailHtml(undefined);
     </section>
   </main>
 
-  <Fragment set:html={chrome.afterMainHtml} />
-</BaseLayout>
+  {!useNativeShell && <Fragment set:html={chrome.afterMainHtml} />}
+</ShellSwitchLayout>

@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getNativeRoutes,
   getNativeSitemapSupplementRoutes,
@@ -7,7 +7,6 @@ import {
 } from "../route-registry";
 import { getCanonicalRedirect, getCanonicalRedirects } from "../redirect-registry";
 import { ROUTE_CANONICAL_OVERRIDES } from "../route-overrides";
-import { getRouteRollout, NATIVE_SHELL_CANARY_ROUTES, REBUILD_KILL_SWITCHES } from "../rollout";
 
 describe("route registry", () => {
   it("contains every dedicated native hub and compare category route once", () => {
@@ -45,7 +44,19 @@ describe("redirect registry", () => {
 });
 
 describe("rollout defaults", () => {
-  it("keeps every rebuild surface disabled unless an exact route is enabled", () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.resetModules();
+  });
+
+  it("keeps every rebuild surface disabled unless an exact route is enabled", async () => {
+    vi.stubEnv("PROUDTEK_NATIVE_SHELL", "0");
+    vi.stubEnv("PROUDTEK_HOME_V2", "0");
+    vi.stubEnv("PROUDTEK_CATALOG_V2", "0");
+    vi.resetModules();
+    const { getRouteRollout, NATIVE_SHELL_CANARY_ROUTES, REBUILD_KILL_SWITCHES } =
+      await import("../rollout");
+
     expect(getRouteRollout("/", false)).toEqual({
       route: "/",
       shell: "snapshot",
@@ -61,11 +72,56 @@ describe("rollout defaults", () => {
     expect(NATIVE_SHELL_CANARY_ROUTES).toEqual([
       "/glossary/",
       "/tools/rfid-tag-cost-estimator/",
+      "/guides/",
+      "/solutions/",
+      "/blog/",
     ]);
+
+    for (const route of [
+      "/guides/",
+      "/solutions/",
+      "/blog/",
+      "/guides/example/",
+      "/blog/example/",
+      "/solutions/example/",
+      "/guides",
+      "/",
+    ]) {
+      expect(getRouteRollout(route, true).shell).toBe("snapshot");
+    }
+
     expect(REBUILD_KILL_SWITCHES).toEqual({
       nativeShell: "PROUDTEK_NATIVE_SHELL",
       homeV2: "PROUDTEK_HOME_V2",
       catalogV2: "PROUDTEK_CATALOG_V2",
     });
+  });
+
+  it("enables the exact five-route canary when the native shell flag is on", async () => {
+    vi.stubEnv("PROUDTEK_NATIVE_SHELL", "1");
+    vi.stubEnv("PROUDTEK_HOME_V2", "0");
+    vi.stubEnv("PROUDTEK_CATALOG_V2", "0");
+    vi.resetModules();
+    const { getRouteRollout: getFlaggedRouteRollout } = await import("../rollout");
+
+    for (const route of [
+      "/glossary/",
+      "/tools/rfid-tag-cost-estimator/",
+      "/guides/",
+      "/solutions/",
+      "/blog/",
+    ]) {
+      expect(getFlaggedRouteRollout(route, true).shell).toBe("native");
+    }
+
+    for (const route of [
+      "/guides/example/",
+      "/blog/example/",
+      "/solutions/example/",
+      "/guides",
+      "/",
+    ]) {
+      expect(getFlaggedRouteRollout(route, true).shell).toBe("snapshot");
+    }
   });
 });

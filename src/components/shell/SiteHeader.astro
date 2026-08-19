@@ -45,18 +45,133 @@ const { currentRoute } = Astro.props;
 <script>
   const body = document.body;
   const drawer = document.getElementById("mobile-drawer");
-  const openButton = document.querySelector("[data-native-drawer-open]");
+  const openButton = document.querySelector<HTMLElement>("[data-native-drawer-open]");
   const closeButtons = document.querySelectorAll("[data-native-drawer-close]");
+  let openingTrigger: HTMLElement | null = null;
+  let drawerChange = 0;
 
-  function setDrawer(open: boolean) {
+  function isFocusable(element: HTMLElement): boolean {
+    if (!element.isConnected
+      || element.hasAttribute("disabled")
+      || element.getAttribute("aria-disabled") === "true"
+      || element.tabIndex < 0) return false;
+
+    try {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      if (style.display === "none"
+        || style.visibility === "hidden"
+        || rect.width === 0
+        || rect.height === 0) return false;
+    } catch {
+      // Keep DOM focus behavior fail-safe when computed styles are unavailable.
+    }
+
+    let ancestor: HTMLElement | null = element;
+    while (ancestor) {
+      if (ancestor.hidden
+        || ancestor.hasAttribute("inert")
+        || ancestor.getAttribute("aria-hidden") === "true"
+        || (ancestor.tagName === "DETAILS"
+          && !(ancestor as HTMLDetailsElement).open
+          && element.tagName !== "SUMMARY")) {
+        return false;
+      }
+      ancestor = ancestor.parentElement;
+    }
+    return true;
+  }
+
+  function restoreFocus(element: HTMLElement | null): boolean {
+    if (element && isFocusable(element)) element.focus({ preventScroll: true });
+    return document.activeElement === element;
+  }
+
+  function focusFirstVisible(elements: HTMLElement[]): HTMLElement | null {
+    for (const element of elements) {
+      if (!isFocusable(element)) continue;
+      element.focus();
+      if (document.activeElement === element) return element;
+    }
+    return null;
+  }
+
+  function setDrawer(open: boolean, restoreTrigger = true) {
     if (!drawer || !openButton) return;
+    const change = ++drawerChange;
+
+    if (open) openingTrigger = openButton;
     body.classList.toggle("drawer-open", open);
     drawer.setAttribute("aria-hidden", open ? "false" : "true");
     openButton.setAttribute("aria-expanded", open ? "true" : "false");
+
+    if (open) {
+      requestAnimationFrame(() => {
+        if (change !== drawerChange || !body.classList.contains("drawer-open")) return;
+        const firstFocusable = Array.from(
+          drawer.querySelectorAll<HTMLElement>(
+            'a[href], button, summary, [tabindex]:not([tabindex="-1"])',
+          ),
+        );
+        const target = focusFirstVisible([
+          ...Array.from(drawer.querySelectorAll<HTMLElement>("[data-native-drawer-close]")),
+          ...firstFocusable,
+        ]);
+        requestAnimationFrame(() => {
+          if (change !== drawerChange || !body.classList.contains("drawer-open")) return;
+          if (!target || document.activeElement !== target) focusFirstVisible([
+            ...Array.from(drawer.querySelectorAll<HTMLElement>("[data-native-drawer-close]")),
+            ...firstFocusable,
+          ]);
+        });
+      });
+      return;
+    }
+
+    const trigger = restoreTrigger ? openingTrigger : null;
+    restoreFocus(trigger);
+    openingTrigger = null;
+    requestAnimationFrame(() => {
+      if (change !== drawerChange) return;
+      const restored = restoreFocus(trigger);
+      if (!restored && drawer.contains(document.activeElement)) {
+        (document.activeElement as HTMLElement).blur();
+      }
+      requestAnimationFrame(() => {
+        if (change !== drawerChange) return;
+        const retried = restoreFocus(trigger);
+        if (!retried && drawer.contains(document.activeElement)) {
+          (document.activeElement as HTMLElement).blur();
+        }
+      });
+    });
   }
+
+  function getDesktopMediaQuery(): MediaQueryList | null {
+    if (typeof window.matchMedia !== "function") return null;
+    try {
+      return window.matchMedia("(min-width: 1280px)") || null;
+    } catch {
+      return null;
+    }
+  }
+
+  function isDesktopViewport(): boolean {
+    return getDesktopMediaQuery()?.matches === true;
+  }
+
+  const desktopMediaQuery = getDesktopMediaQuery();
 
   openButton?.addEventListener("click", () => setDrawer(true));
   closeButtons.forEach((button) => button.addEventListener("click", () => setDrawer(false)));
+  desktopMediaQuery?.addEventListener?.("change", (event) => {
+    if (event.matches && body.classList.contains("drawer-open")) setDrawer(false, false);
+  });
+  window.addEventListener("resize", () => {
+    if (isDesktopViewport() && body.classList.contains("drawer-open")) {
+      setDrawer(false, false);
+    }
+  });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && body.classList.contains("drawer-open")) setDrawer(false);
   });
