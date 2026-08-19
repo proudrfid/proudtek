@@ -5,6 +5,7 @@ import ts from "typescript";
 interface FixtureOptions {
   disabledCloseButton?: boolean;
   hiddenFirstLink?: boolean;
+  hiddenCloseButton?: boolean;
 }
 
 class FakeElement {
@@ -61,7 +62,9 @@ class FakeElement {
         || ancestor.hidden
         || ancestor.hasAttribute("inert")
         || ancestor.getAttribute("aria-hidden") === "true"
-        || (ancestor.tagName === "DETAILS" && !ancestor.open)) return;
+        || (ancestor.tagName === "DETAILS"
+          && !ancestor.open
+          && this.tagName !== "SUMMARY")) return;
       ancestor = ancestor.parentElement;
     }
     if (this.fixtureDocument) this.fixtureDocument.activeElement = this;
@@ -69,6 +72,18 @@ class FakeElement {
 
   blur(): void {
     if (this.fixtureDocument?.activeElement === this) this.fixtureDocument.activeElement = this.fixtureDocument.body;
+  }
+
+  getBoundingClientRect(): { width: number; height: number } {
+    return this.rendered ? { width: 44, height: 44 } : { width: 0, height: 0 };
+  }
+
+  get clientWidth(): number {
+    return this.rendered ? 44 : 0;
+  }
+
+  get clientHeight(): number {
+    return this.rendered ? 44 : 0;
   }
 
   getAttribute(name: string): string | null {
@@ -155,8 +170,11 @@ class FakeDocument {
 
 function matchesSelector(element: FakeElement, selector: string): boolean {
   if (selector === "[data-native-drawer-close]") return element.hasAttribute("data-native-drawer-close");
-  if (selector === 'a[href], button, [tabindex]:not([tabindex="-1"])') {
-    return element.tagName === "A" || element.tagName === "BUTTON" || element.hasAttribute("tabindex");
+  if (selector === 'a[href], button, summary, [tabindex]:not([tabindex="-1"])') {
+    return element.tagName === "A"
+      || element.tagName === "BUTTON"
+      || element.tagName === "SUMMARY"
+      || element.hasAttribute("tabindex");
   }
   return false;
 }
@@ -179,6 +197,7 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
   const backdrop = new FakeElement("button", { "data-native-drawer-close": "", tabindex: "-1" });
 
   if (options.disabledCloseButton) closeButton.setAttribute("disabled", "");
+  if (options.hiddenCloseButton) closeButton.rendered = false;
   if (options.hiddenFirstLink) firstLink.hidden = true;
   drawer.append(closeButton);
   drawer.append(firstLink);
@@ -192,9 +211,25 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
   document.register("open", openButton);
 
   const animationFrames: Array<() => void> = [];
+  const windowListeners = new Map<string, Array<() => void>>();
+  const window = {
+    matchMedia: () => ({ matches: false }),
+    addEventListener: (type: string, listener: () => void) => {
+      const listeners = windowListeners.get(type) ?? [];
+      listeners.push(listener);
+      windowListeners.set(type, listeners);
+    },
+    dispatchEvent: (event: Record<string, unknown>) => {
+      windowListeners.get(String(event.type))?.forEach((listener) => listener());
+    },
+  };
   const context = {
     document,
-    window: {},
+    window,
+    getComputedStyle: (element: FakeElement) => ({
+      display: element.rendered ? "block" : "none",
+      visibility: element.rendered ? "visible" : "hidden",
+    }),
     requestAnimationFrame: (callback: () => void) => {
       animationFrames.push(callback);
       return animationFrames.length;
@@ -211,6 +246,7 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
     triggerAncestor: header,
     openButton,
     closeButton,
+    firstLink,
     fallbackLink,
     backdrop,
     flushAnimationFrames: () => {
@@ -218,6 +254,10 @@ export function createDrawerFixture(options: FixtureOptions = {}) {
     },
     scheduleAnimationFrame: (callback: () => void) => {
       animationFrames.push(callback);
+    },
+    setViewport: (width: number) => {
+      window.matchMedia = () => ({ matches: width >= 1280 });
+      window.dispatchEvent({ type: "resize" });
     },
   };
 }

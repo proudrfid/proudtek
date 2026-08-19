@@ -81,6 +81,29 @@ describe("native SiteShell dark launch", () => {
 
     expect(fixture.document.activeElement).toBe(fixture.openButton);
   });
+  it("skips a CSS-hidden close button and focuses the visible drawer fallback", () => {
+    const fixture = createDrawerFixture({ hiddenCloseButton: true });
+
+    fixture.openButton.click();
+    fixture.flushAnimationFrames();
+
+    expect(fixture.document.activeElement).toBe(fixture.firstLink);
+  });
+
+  it("closes the drawer when the viewport crosses to desktop", () => {
+    const fixture = createDrawerFixture();
+
+    fixture.openButton.click();
+    fixture.flushAnimationFrames();
+    expect(fixture.document.activeElement).toBe(fixture.closeButton);
+
+    fixture.setViewport(1280);
+    fixture.flushAnimationFrames();
+
+    expect(fixture.drawer.getAttribute("aria-hidden")).toBe("true");
+    expect(fixture.openButton.getAttribute("aria-expanded")).toBe("false");
+    expect(fixture.document.activeElement).toBe(fixture.document.body);
+  });
   it("falls back past hidden and disabled drawer controls", () => {
     const fixture = createDrawerFixture({ disabledCloseButton: true, hiddenFirstLink: true });
 
