@@ -663,6 +663,13 @@ function injectCustomNav($body: ReturnType<typeof load>): void {
   // without leaking into the native Astro SiteShell drawer.
   $body("#mobile-drawer").first().addClass("codex-legacy-mobile-drawer");
 
+  // Keep the mobile trigger self-evident even when donor icon styles drift.
+  // The aria-label remains the accessible name; this is the visible affordance.
+  const mobileTrigger = $body("#mobile-toggle").first();
+  if (mobileTrigger.length && mobileTrigger.find(".codex-mobile-menu-label").length === 0) {
+    mobileTrigger.append('<span class="codex-mobile-menu-label">Menu</span>');
+  }
+
   // ── Mobile drawer menu ──
   const mobile = $body("ul#mobile-menu").first();
   if (mobile.length && mobile.find(".codex-mega-item").length === 0) {
