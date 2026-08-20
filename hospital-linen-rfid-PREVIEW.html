@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hospital Linen RFID — Joint Commission Ready · Proudtek (preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --dark:#291c0e; --dark-mid:#6c5127; --gold:#c39a5f; --gold-light:#d4a755; --gold-muted:#6d5a3a;
+    --cyan:#1fcefb; --cyan-hover:#15bce8; --navy:#1f4e79; --teal:#3d6b6b; --steel:#4a5568; --forest:#2d6a4f;
+    --error:#8b2d2d; --success:#1f6f3a;
+    --text:#291c0e; --text-strong:#1a1a1a; --text-muted:#4f4f4f; --text-subtle:#5c5c5c;
+    --border:rgba(41,28,14,.12); --border-light:rgba(41,28,14,.08); --border-gold:rgba(195,154,95,.30);
+    --surface:#ffffff; --bg-warm:#f7f4ee; --panel:#fbf8f2;
+    --radius-sm:8px; --radius-card:16px; --radius-lg:20px; --radius-xl:24px; --radius-pill:999px;
+    --rest:0 1px 3px rgba(41,28,14,.08); --hover:0 4px 12px rgba(41,28,14,.10); --modal:0 16px 48px rgba(41,28,14,.18);
+    --font-head:"Lora",Georgia,"Times New Roman",serif;
+    --font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --measure:70ch; --col:min(72rem,92%); --col-wide:min(88rem,100%);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--text); line-height:1.65;
+    font-size:1.0625rem;
+    background:
+      radial-gradient(120% 80% at 85% -10%, rgba(195,154,95,.16), transparent 60%),
+      linear-gradient(180deg,#fffdf9 0%, var(--bg-warm) 40%, var(--bg-warm) 100%);
+    background-attachment:fixed;
+  }
+  a{color:var(--navy); text-decoration:none; border-bottom:1px solid var(--border-gold)}
+  a:hover{color:var(--dark); border-bottom-color:var(--gold)}
+  .wrap{max-width:var(--col); margin-inline:auto; padding-inline:clamp(1rem,4vw,2rem)}
+  .wide{max-width:var(--col-wide)}
+  h1,h2,h3,h4{font-family:var(--font-head); color:var(--text-strong); line-height:1.2; font-weight:600}
+  p,li{max-width:var(--measure)}
+
+  /* ── top ribbon ── */
+  .ribbon{background:linear-gradient(135deg,var(--dark),var(--dark-mid)); color:#f4ead3;
+    font-size:.78rem; letter-spacing:.06em; text-align:center; padding:.5rem 1rem}
+  .ribbon b{color:var(--gold-light)}
+
+  /* ── hero ── */
+  .hero{padding:clamp(2.5rem,6vw,4.5rem) 0 1.5rem}
+  .kicker{display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--gold-muted); background:rgba(195,154,95,.12); border:1px solid var(--border-gold);
+    padding:.35rem .7rem; border-radius:var(--radius-pill); margin-bottom:1rem}
+  .hero h1{font-size:clamp(2rem,4.6vw,2.9rem); margin:.2rem 0 .8rem; letter-spacing:-.01em}
+  .lead{font-size:clamp(1.1rem,2vw,1.28rem); color:var(--text); line-height:1.6; max-width:66ch}
+  .byline{margin-top:1rem; font-size:.85rem; color:var(--text-subtle)}
+  .byline b{color:var(--gold-muted); font-weight:600}
+
+  figure{margin:0}
+  .figure{margin:2rem auto; max-width:var(--col-wide)}
+  .figure img{width:100%; height:auto; display:block; border-radius:var(--radius-lg);
+    box-shadow:var(--hover); border:1px solid var(--border-light)}
+  .figcap{font-size:.85rem; color:var(--text-subtle); text-align:center; margin-top:.7rem; max-width:74ch; margin-inline:auto}
+
+  /* ── hero takeaway cards ── */
+  .takeaways{display:grid; gap:1rem; grid-template-columns:repeat(3,1fr); margin:2rem auto 0; max-width:var(--col-wide)}
+  .tk{background:linear-gradient(180deg,#fff, #fdfbf6); border:1px solid var(--border-gold); border-radius:var(--radius-card);
+    padding:1.25rem 1.35rem; box-shadow:var(--rest)}
+  .tk .n{display:inline-flex; align-items:center; justify-content:center; width:2rem; height:2rem; border-radius:var(--radius-pill);
+    background:var(--gradient,linear-gradient(135deg,var(--gold),var(--gold-light))); color:#fff; font-weight:800; font-size:.95rem; margin-bottom:.6rem;
+    box-shadow:0 1px 4px rgba(195,154,95,.5)}
+  .tk p{margin:0; font-size:.98rem; line-height:1.55; max-width:none; color:var(--text)}
+
+  /* ── sections ── */
+  section.body{padding:1.5rem 0}
+  section.body > .wrap > h2{font-size:clamp(1.55rem,3vw,2rem); margin:2rem 0 .2rem; position:relative; padding-top:1.2rem}
+  section.body > .wrap > h2::before{content:""; position:absolute; top:0; left:0; width:56px; height:4px;
+    border-radius:2px; background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+  .intro{font-size:1.12rem; color:var(--text); line-height:1.62; margin:1rem 0 1.4rem; max-width:70ch}
+
+  /* ── split: figure + bullets side by side (mirrors EditorialSection split/split-reverse) ── */
+  .duo{display:grid; grid-template-columns:1fr 1fr; gap:clamp(1.4rem,3vw,2.6rem); align-items:center;
+    max-width:var(--col-wide); margin:1.2rem 0 .5rem}
+  .duo .txt{order:1} .duo .fig{order:2}
+  .duo.rev .txt{order:2} .duo.rev .fig{order:1}
+  .duo .fig img{width:100%; height:auto; display:block; border-radius:var(--radius-lg);
+    box-shadow:var(--hover); border:1px solid var(--border-light)}
+  .duo .fig .figcap{text-align:left; margin-left:.2rem}
+
+  /* ── rich bullets ── */
+  ul.rich{list-style:none; margin:.4rem 0; padding:0; display:grid; gap:.8rem}
+  ul.rich > li{max-width:none; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--gold);
+    border-radius:var(--radius-card); padding:.9rem 1.1rem; box-shadow:var(--rest); font-size:.97rem; line-height:1.55}
+  ul.rich > li b{color:var(--text-strong)}
+
+  /* ── faq ── */
+  .faq{max-width:var(--col-wide); margin:1.2rem 0; display:grid; gap:.7rem}
+  details{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card); box-shadow:var(--rest); overflow:hidden}
+  summary{cursor:pointer; list-style:none; padding:1rem 1.2rem; font-family:var(--font-head); font-weight:600; font-size:1.05rem;
+    color:var(--text-strong); display:flex; justify-content:space-between; align-items:center; gap:1rem}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+"; color:var(--gold); font-size:1.4rem; font-weight:400; line-height:1; transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details .ans{padding:0 1.2rem 1.15rem; color:var(--text); font-size:.99rem; line-height:1.6}
+  details .ans p{max-width:none; margin:.2rem 0 0}
+
+  /* ── resources ── */
+  .resources{display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; max-width:var(--col-wide); margin:1.4rem 0}
+  .rc{background:linear-gradient(180deg,#fff,#fdfbf6); border:1px solid var(--border-gold); border-radius:var(--radius-card); padding:1.2rem 1.3rem; box-shadow:var(--rest)}
+  .rc h4{margin:0 0 .4rem; font-size:1.02rem}
+  .rc p{margin:0 0 .7rem; font-size:.9rem; color:var(--text-muted); max-width:none}
+  .rc .links{display:flex; flex-wrap:wrap; gap:.4rem}
+  .rc .links a{font-size:.85rem; background:rgba(31,78,121,.06); border:1px solid rgba(31,78,121,.14); border-radius:var(--radius-pill);
+    padding:.3rem .7rem; color:var(--navy)}
+  .rc .links a:hover{background:rgba(31,78,121,.12)}
+
+  /* ── cta ── */
+  .cta{max-width:var(--col-wide); margin:2.5rem auto 1rem; border-radius:var(--radius-xl); padding:2rem clamp(1.2rem,4vw,2.5rem);
+    background:linear-gradient(135deg,var(--dark),var(--dark-mid)); color:#f6ecd7; text-align:center; box-shadow:var(--modal)}
+  .cta h3{color:#fff; font-size:1.5rem; margin:0 0 .5rem}
+  .cta p{color:#e9dcc2; max-width:60ch; margin:0 auto 1.3rem}
+  .btns{display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap}
+  .btn{border-radius:var(--radius-pill); padding:.75rem 1.4rem; font-weight:700; font-size:.98rem; border-bottom:none; cursor:pointer}
+  .btn.primary{background:var(--cyan); color:#062a33}
+  .btn.primary:hover{background:var(--cyan-hover); color:#062a33}
+  .btn.ghost{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5)}
+  .btn.ghost:hover{border-color:#fff; color:#fff}
+
+  footer{padding:2rem 0 3rem; color:var(--text-subtle); font-size:.82rem; text-align:center}
+  .previewnote{background:rgba(31,78,121,.06); border:1px dashed rgba(31,78,121,.3); border-radius:var(--radius-card);
+    padding:.8rem 1rem; font-size:.82rem; color:var(--navy); max-width:var(--col-wide); margin:1.5rem auto 0}
+
+  @media(max-width:860px){
+    .takeaways,.resources{grid-template-columns:1fr}
+    .duo{grid-template-columns:1fr}
+    .duo .txt,.duo .fig,.duo.rev .txt,.duo.rev .fig{order:initial}
+    .duo .fig{margin-bottom:.4rem}
+  }
+</style>
+</head>
+<body>
+
+<div class="ribbon">Proudtek · <b>Healthcare Operations</b> — hospital linen RFID, Joint Commission audit-ready</div>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">Healthcare Operations</span>
+    <h1>Hospital Linen RFID — Joint Commission Ready</h1>
+    <p class="lead">A Joint Commission surveyor asks you to prove a specific sterile gown was laundered to standard before it was issued. For decades the honest answer lived on a loading-dock scale — which only ever knew that the cart got lighter. RFID trades that educated guess for a per-item record of every wash, sterilization and zone crossing: the audit trail inspectors actually expect.</p>
+    <p class="byline">By the <b>Proudtek Editorial Board</b> · Technically reviewed by <b>Peter Zhang</b> · Updated July 2026</p>
+  </div>
+
+  <div class="figure wide">
+    <img src="public/diagrams/blog/hospital-linen-rfid-joint-commission-audit-hero.svg"
+      alt="Diagram: a hospital linen's RFID-tracked journey — soiled intake, thermal wash, sterilization, clean-zone storage and patient use — with every zone logged per item, replacing a loading-dock scale that only knows the cart got lighter.">
+    <p class="figcap">One read per zone builds an audit trail that's ready on demand — no binder assembled the night before.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="takeaways">
+      <div class="tk"><span class="n" style="--gradient:linear-gradient(135deg,#c39a5f,#d4a755)">1</span><p>Hospital linen loss runs <b>5-15% per year</b> — for a 200-bed hospital with $1M annual linen spend, that's $50K-150K walking out the door as misrouted, stolen or simply unaccounted-for linens.</p></div>
+      <div class="tk"><span class="n" style="--gradient:linear-gradient(135deg,#1f4e79,#3d6b6b)">2</span><p>Purpose-built linen RFID survives <b>100-200 industrial wash cycles</b> plus autoclave or chemical sterilization — so the per-item lifecycle data audit teams ask for outlives the linen itself.</p></div>
+      <div class="tk"><span class="n" style="--gradient:linear-gradient(135deg,#2d6a4f,#1f6f3a)">3</span><p><b>One tag, two payoffs:</b> per-linen wash-cycle counting retires fabric before it fails, and the same read log flags the moment a sterile linen wanders out of the clean zone.</p></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ SECTION 1 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Why do hospitals need RFID for linen tracking?</h2>
+    <p class="intro">A Joint Commission surveyor asks how you can prove a specific sterile gown was laundered to standard before it was issued. For decades the honest answer lived on a loading-dock scale: the cart weighed what it should, so presumably everything inside was fine. A scale, though, cannot tell you which sheet went missing or whether one gown skipped a cycle — it only knows the cart got lighter. RFID trades that educated guess for per-item visibility, addressing infection control, inventory and audit needs in a single read.</p>
+    <div class="duo">
+      <div class="txt">
+        <ul class="rich">
+          <li><b>Zone integrity, logged automatically:</b> the Joint Commission infection-control standard requires linens leaving the sterile zone to stay in their certified-clean state. RFID timestamps every linen as it enters each zone — no clipboard required.</li>
+          <li><b>Loss finally has an address:</b> untracked linen disappears silently. RFID names the department, shift or laundry partner that's losing linen, so remediation is targeted instead of a shrug.</li>
+          <li><b>Wash-cycle compliance:</b> linen rated for 50-100 wash cycles must be retired before fabric failure becomes a patient-care problem. A per-linen cycle counter does the counting no human wants to do.</li>
+          <li><b>Sterile verification on demand:</b> surgical-grade linens must be re-verified as sterile before each procedure. RFID plus an autoclave reader confirms sterilization within the past 24-72 hours.</li>
+          <li><b>Audit evidence without the paperwork:</b> surveyors ask for proof that infection-control protocols were followed. A per-item RFID log is a defensible electronic record — not a binder assembled the night before.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <img src="public/diagrams/blog/hospital-linen-scale-vs-rfid.svg"
+          alt="A side-by-side comparison of weight-based tracking versus per-item RFID.">
+        <p class="figcap">A scale weighs the cart. RFID reads the linen — and answers the question the scale can't.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 2 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>What chip and tag work for hospital linen?</h2>
+    <p class="intro">A retail hangtag lives a pampered life next to what hospital linen endures — chemical sterilization, autoclave heat for surgical pieces, and industrial wash cycles by the hundred. The tag has to outlast conditions engineered to sterilize everything else in the room, which is exactly why tag selection matters more here than in standard laundry.</p>
+    <div class="duo rev">
+      <div class="txt">
+        <ul class="rich">
+          <li><b>Frequency follows the reader:</b> UHF (860-960 MHz) for the high-throughput tunnel readers in commercial laundries; HF (13.56 MHz) for surgical linens that need autoclave compatibility.</li>
+          <li><b>Form factor decides lifespan:</b> a tag <a href="/products/rfid-tags/rfid-textile-laundry-tag/">woven into linen seam</a> is the most durable at 200+ cycles, while a button tag clipped to the corner is easier to add but taps out at 50-100 cycles.</li>
+          <li><b>Chip by duty:</b> PPS-encapsulated UHF for general linen (rated 200+ cycles at 80°C wash); ceramic HF chips for autoclaved surgical linens (rated 1000+ autoclave cycles).</li>
+          <li><b>Read environment:</b> linen tunnel readers in industrial laundries clear 200-500 items/hour at 99%+ read rate. Hospital intake stations use fixed or handheld readers depending on volume.</li>
+          <li><b>Cost, in perspective:</b> $0.30-1.50 per tag including embedding. Amortized over 200+ cycles that's $0.002-0.008 per cycle — a rounding error against the $1-3 it costs to run the wash cycle itself.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <img src="public/diagrams/blog/hospital-linen-tag-selection.svg"
+          alt="Hospital linen tag selection: UHF versus HF, woven versus button form factor, and per-cycle cost.">
+        <p class="figcap">Match the frequency to the reader, the form factor to the lifespan — then check the per-cycle math.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 3 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>How do you implement linen RFID at a hospital?</h2>
+    <p class="intro">Here's the wrinkle that sinks rollouts: the linen lives in two houses at once — the hospital's central supply department and the contracted laundry vendor's wash floor. Neither side fully controls the other, so coordination isn't a nicety, it's the whole game. The five-step playbook below comes from successful 2024-2026 deployments.</p>
+    <div class="duo">
+      <div class="txt">
+        <ul class="rich">
+          <li><b>Tag at receipt:</b> every new linen gets a tag at first receipt, before first use. Existing inventory is tagged during scheduled refresh cycles over 12-24 months — no need to halt the ward to retrofit.</li>
+          <li><b>Install reader infrastructure where linen changes hands:</b> a tunnel reader at the laundry tunnel inlet/outlet, handheld readers at hospital intake/issue points, and wall-mounted readers at the sterile-zone perimeter.</li>
+          <li><b>Integrate with the systems of record:</b> RFID reads flow into the hospital ERP (typically <a href="/guides/rfid-sap-wms-integration/">SAP</a> or Lawson) and the laundry partner's WMS, so linen data lands where staff already work.</li>
+          <li><b>Define event types and alerts up front:</b> linen out of zone, over-cycle linen, mismatched rotation — wire each to a dashboard the central-supply manager actually watches.</li>
+          <li><b>Train central-supply and laundry staff:</b> 4-8 hours per role. Most hospitals run a 90-day side-by-side phase before retiring legacy weight-based tracking — trusting the scale until the data earns its replacement.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <img src="public/diagrams/blog/hospital-linen-implementation-playbook.svg"
+          alt="The five-step hospital linen RFID implementation playbook and a 12-24 month rollout timeline.">
+        <p class="figcap">Two organizations, one rollout — with a 90-day side-by-side phase before the scale retires.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 4 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Which compliance frameworks does the linen audit trail need to satisfy?</h2>
+    <p class="intro">Few phrases empty a room like "compliance framework," yet hospital linen answers to several at once, and a surveyor may open on any of them. MEDtegrity's compliance overview, CORE Linen Services' regulatory primer and the AHE (Association for the Health Care Environment) guidelines keep pointing hospital linen programs at the same set of authorities. RFID's real value is having each framework's documentation ready before it is asked for.</p>
+    <div class="duo rev">
+      <div class="txt">
+        <ul class="rich">
+          <li><b>Joint Commission Environment of Care (EC) and Infection Prevention (IC) standards:</b> surveyors expect documented evidence that contaminated linens are segregated, transported in leak-resistant containers, and processed under controlled hygienic conditions. RFID per-item zone logs are that documented evidence — minus the manual paperwork.</li>
+          <li><b>OSHA Bloodborne Pathogens Standard (29 CFR 1910.1030):</b> regulates handling, transport and storage of contaminated linens, including PPE requirements for handling staff. RFID does not change the PPE requirement, but it records who handled which linen when — exactly what OSHA inspectors can request post-incident.</li>
+          <li><b>CDC HICPAC Guidelines for Environmental Infection Control:</b> define the minimum laundering bar (≥71°C / 160°F for at least 25 minutes, or a low-temperature wash with appropriate chemistry). RFID-linked wash-cycle records prove each linen actually passed through a compliant cycle.</li>
+          <li><b>AAMI ST65 / ST79 (when surgical linens are involved):</b> set reusable surgical-textile reprocessing expectations. Per-item cycle counters tied to RFID retire reusable surgical drapes, gowns and wraps before fabric breakdown — a documented Joint Commission expectation in any sterile-processing audit.</li>
+          <li><b>TRSA Hygienically Clean Healthcare certification:</b> many hospital laundry partners (Cintas, Aramark, ImageFIRST and HHS-affiliated providers) are certified under this program, and RFID-driven traceability of contamination events is a documented best-practice within it.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <img src="public/diagrams/blog/hospital-linen-compliance-stack.svg"
+          alt="The compliance stack: Joint Commission, OSHA, CDC HICPAC, AAMI ST65/ST79 and TRSA Hygienically Clean Healthcare.">
+        <p class="figcap">One paper trail, five authorities — RFID's job is to have each one's documentation ready.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 5 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Vendor and laundry-partner selection — what to look for in 2026</h2>
+    <p class="intro">Most hospital linen RFID programs do not run in-house — they live inside the contracted laundry partner's wash facility, with hospital intake and sterile-zone readers as the customer-side endpoints. So vendor selection quietly overlaps two RFPs at once — the laundry RFP and the RFID RFP — and the hospital signs for both. Across public vendor literature (Cintas, ImageFIRST, Aramark, plus published RFID-vendor material), five buyer questions reliably separate the vendors who can carry the program from those who cannot.</p>
+    <div class="duo">
+      <div class="txt">
+        <ul class="rich">
+          <li><b>Tag-replacement policy and end-of-life:</b> who pays when a tag fails before its rated cycle count? The dominant 2025-2026 model is laundry-vendor-owned linen with the hospital paying a per-piece-per-day rental that already amortises tag replacement; hospital-owned linen models leave tag refresh on the hospital's capex budget.</li>
+          <li><b>Per-zone read-accuracy guarantees:</b> laundry tunnel readers commonly hit 99%+ at the wash facility, but sterile-zone perimeter and ward-issue handhelds vary widely. Require a documented site-survey read-rate benchmark (≥97% recommended) at every reader location, not just the vendor's flagship tunnel.</li>
+          <li><b>Data feed format and ownership:</b> per-item event data (received, washed, issued, returned, retired) needs to flow into the hospital's ERP / WMS / EHR-adjacent systems. Require API access (REST or HL7-compatible) plus a contractually owned data-export clause; legacy CSV-only feeds become the single largest barrier to Joint Commission audit-readiness reporting.</li>
+          <li><b>Surgical-textile and barrier-product cycle limits:</b> AAMI-rated reusable surgical gowns and drapes (Halyard, Standard Textile, Encompass Group lines) carry vendor-specified cycle limits, often 75-100 cycles. The RFID + laundry vendor must auto-retire at the cycle threshold and flag near-end-of-life pieces — manual cycle counting fails this audit reliably.</li>
+          <li><b>Infection-event traceability SLA:</b> when an infection cluster is identified, how fast can the laundry partner produce 'every linen that touched this ward in the last 14 days' from RFID logs? Industry-published material describes this as minutes vs days versus weight-based tracking; require an SLA of ≤2 hours for HAI investigation requests.</li>
+        </ul>
+      </div>
+      <div class="fig">
+        <img src="public/diagrams/blog/hospital-linen-vendor-checklist.svg"
+          alt="Five vendor-selection questions with the threshold to require for each.">
+        <p class="figcap">Five questions to ask before signing — because you're signing two RFPs at once.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Frequently asked</h2>
+    <div class="faq">
+      <details open>
+        <summary>How does RFID linen tracking help with infection control?</summary>
+        <div class="ans"><p>Each linen's location and zone history is logged. If a contaminated linen is identified, RFID quickly reveals every other linen that shared its zone or wash cycle, enabling fast quarantine. Without RFID, the investigation can take days; with RFID, minutes.</p></div>
+      </details>
+      <details>
+        <summary>Can RFID linen survive bleach and chemical sterilization?</summary>
+        <div class="ans"><p>Yes — purpose-built linen RFID tags survive 80-90°C wash cycles with industrial detergent and bleach for 200+ cycles. Surgical-grade autoclave-rated tags survive 134°C steam for 1000+ cycles. Always specify the actual cycle conditions when ordering tags.</p></div>
+      </details>
+      <details>
+        <summary>Does RFID linen tracking integrate with our laundry vendor?</summary>
+        <div class="ans"><p>Most major US hospital laundry vendors (Cintas, Aramark, ImageFIRST, Healthcare Services Group) support RFID integration. Tag selection and reader installation usually negotiated as part of laundry contract; some vendors prefer their own tag standards.</p></div>
+      </details>
+      <details>
+        <summary>What's typical payback period for hospital linen RFID?</summary>
+        <div class="ans"><p>12-24 months for a 200-bed hospital. Driven 60% by loss reduction (5-15% baseline → &lt;2%) and 40% by labor savings (eliminated manual sorting and counting). Larger hospitals see faster payback due to volume. Multi-site systems often see faster payback than single-site because the laundry-vendor capex is amortised across more facilities.</p></div>
+      </details>
+      <details>
+        <summary>Who owns the RFID data: the hospital or the laundry vendor?</summary>
+        <div class="ans"><p>By default, whoever installs the readers and writes the tags 'owns' the data unless a contract states otherwise. The recommended position is to negotiate hospital ownership with full read/export rights, even when tags are vendor-owned. Joint Commission, OSHA and CDC HICPAC inspections all interview the hospital — not the laundry vendor — so the hospital must be able to produce per-item event history without vendor delay.</p></div>
+      </details>
+      <details>
+        <summary>How does linen RFID interact with surgical sponge / surgical drape RFID programs?</summary>
+        <div class="ans"><p>They are separate workflows. Surgical sponge counting uses HF RFID-tagged sponges that are FDA-cleared for in-vivo detection (Stryker SurgiCount, STERIS ORLocate). Reusable surgical drapes and gowns use industrial-laundry UHF or HF tags rated for autoclave (where applicable) plus chemical wash. The same hospital often runs both — typically through different vendors — and they share little infrastructure, though both feed the central infection-control reporting layer.</p></div>
+      </details>
+    </div>
+
+    <h2>Keep going</h2>
+    <div class="resources">
+      <div class="rc">
+        <h4>Hospital linen RFID supply</h4>
+        <p>Industrial-laundry RFID tags, autoclave-rated surgical linens and Joint Commission audit-ready dashboards.</p>
+        <div class="links">
+          <a href="/solutions/rfid-laundry-management/">RFID laundry management</a>
+          <a href="/industries/healthcare/">Healthcare industry hub</a>
+          <a href="/contact/laundry-rfid/">Get a hospital-linen quote</a>
+          <a href="/products/rfid-tags/rfid-textile-laundry-tag/">RFID textile laundry tags</a>
+        </div>
+      </div>
+      <div class="rc">
+        <h4>Linen-program compliance authority references</h4>
+        <p>Primary regulatory and industry sources cited during Joint Commission, OSHA and CDC linen-program audits.</p>
+        <div class="links">
+          <a href="https://www.cdc.gov/infection-control/hcp/environmental-control/index.html">CDC — HICPAC Guidelines</a>
+          <a href="https://www.trsa.org/hygienically-clean-certification/healthcare/">TRSA — Hygienically Clean Healthcare</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <h3>Ready to trade the scale for a paper trail?</h3>
+      <p>Get purpose-built linen tags, autoclave-rated surgical options and audit-ready dashboards spec'd to your wash conditions and compliance frameworks.</p>
+      <div class="btns">
+        <a class="btn primary" href="/contact/laundry-rfid/">Get hospital-linen RFID quote</a>
+        <a class="btn ghost" href="/solutions/rfid-laundry-management/">Laundry management</a>
+        <a class="btn ghost" href="/industries/healthcare/">Healthcare hub</a>
+      </div>
+    </div>
+
+    <div class="previewnote"><b>Preview note.</b> This is a standalone visual preview of the enlivened blog post. The live page renders from <code>src/content/editorial/blog/hospital-linen-rfid-joint-commission-audit.json</code> with the six tokenized SVGs in <code>public/diagrams/blog/</code>. Every number, spec, price, standard and internal link is unchanged from the original — only the voice, structure and visuals were added (Tier-B house rule: dry, light wit on safe targets, never on clinical outcomes).</div>
+  </div>
+</section>
+
+<footer>
+  Proudtek · Hospital Linen RFID — Joint Commission Ready · editorial preview
+</footer>
+
+</body>
+</html>

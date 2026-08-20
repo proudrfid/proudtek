@@ -150,9 +150,155 @@
   }
 }
 
-/* ═══════════════════════════════════════════
-   Sticky Inquiry Bar
-   ═══════════════════════════════════════════ */
+/* Legacy snapshot mobile drawer compatibility. These rules are scoped to the
+   marker added by render-snapshot.ts and never affect native SiteShell. */
+@media (max-width: 1024px) {
+  #mobile-drawer.codex-legacy-mobile-drawer {
+    display: none;
+    position: fixed;
+    inset: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--codex-z-modal);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer.show-drawer,
+  #mobile-drawer.codex-legacy-mobile-drawer.active {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    opacity: 1;
+    background: rgba(41, 28, 14, 0.58);
+    cursor: pointer;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer .drawer-inner {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(92vw, 28rem);
+    max-width: 100%;
+    overflow: hidden auto;
+    opacity: 1;
+    transform: translateX(0);
+    background: var(--codex-dark) !important;
+    color: var(--codex-text-inverse) !important;
+    box-shadow: var(--codex-elevation-modal);
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer .drawer-header {
+    min-height: 4.5rem;
+    padding: var(--codex-space-3) var(--codex-space-5);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer .drawer-header .menu-toggle-close {
+    width: var(--codex-touch-min);
+    height: var(--codex-touch-min);
+    min-width: var(--codex-touch-min);
+    min-height: var(--codex-touch-min);
+    padding: 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.35) !important;
+    border-radius: var(--codex-radius-pill);
+    background: transparent !important;
+    color: var(--codex-text-inverse) !important;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer .drawer-header .menu-toggle-close .toggle-close-bar {
+    opacity: 1 !important;
+    background: currentColor !important;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer .drawer-content {
+    min-height: 0;
+    max-height: none;
+    padding: 0 var(--codex-space-5) var(--codex-space-8);
+    overflow: visible;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-site-navigation,
+  #mobile-drawer.codex-legacy-mobile-drawer .mobile-menu-container,
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu {
+    display: block !important;
+    width: 100%;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu {
+    max-height: none !important;
+    overflow: visible !important;
+    margin: 0;
+    padding: 0;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu > li > a {
+    min-height: var(--codex-touch-min);
+    padding: var(--codex-space-4) 0;
+    display: flex;
+    align-items: center;
+    color: var(--codex-text-inverse) !important;
+    font-size: var(--codex-text-base-plus);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255,255,255,0.14);
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu > li > a::after {
+    content: "＋";
+    margin-left: auto;
+    color: var(--codex-gold-light);
+    font-size: var(--codex-text-lg);
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu > li.codex-mega-item--plain > a::after {
+    content: "→";
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu > li > .sub-menu {
+    display: none !important;
+    margin: 0;
+    padding: 0 0 var(--codex-space-3);
+    background: rgba(255,255,255,0.05);
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu > li.is-open > .sub-menu,
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu > li > .sub-menu.show-drawer {
+    display: block !important;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu > li.is-open > a::after { content: "－"; }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu .codex-mobile-overview a,
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu .codex-mobile-sublink a,
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu .codex-mobile-heading span {
+    min-height: var(--codex-touch-min);
+    padding: var(--codex-space-3) var(--codex-space-4);
+    display: flex;
+    align-items: center;
+    color: rgba(255,255,255,0.82) !important;
+    font-size: var(--codex-text-sm-plus);
+    line-height: var(--codex-leading-snug);
+    text-decoration: none;
+  }
+  #mobile-drawer.codex-legacy-mobile-drawer #mobile-menu .codex-mobile-group-toggle {
+    color: rgba(255,255,255,0.9) !important;
+    border-bottom-color: rgba(255,255,255,0.12);
+  }
+  body.showing-popup-drawer-from-right .codex-sticky-cta,
+  body.showing-popup-drawer-from-right #codex-consent,
+  body.showing-popup-drawer-from-right .codex-wa-fab,
+  .codex-drawer-suppressed {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  #mobile-drawer.codex-legacy-mobile-drawer { display: none !important; }
+}
+
+
 
 /* DS-9 #6 (2026-04-26) — Visual weight upgrade.
    Original sticky was the same dark-brown as the page footer, so users'

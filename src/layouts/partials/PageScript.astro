@@ -129,6 +129,64 @@
         __drawerObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
       }
 
+      /* Legacy Kadence drawer compatibility. The imported snapshot CSS has
+         been purged over time and its original navigation script is async;
+         own only the retained drawer state so the injected menu cannot render
+         as an empty dark sheet. Native SiteShell pages are excluded. */
+      var legacyDrawer = document.querySelector('.codex-legacy-mobile-drawer');
+      if (legacyDrawer && !document.querySelector('[data-native-site-shell]')) {
+        var legacyOpenButton = document.querySelector('#mobile-toggle, #mobile-header .menu-toggle-open');
+        var legacyCloseButton = legacyDrawer.querySelector('.menu-toggle-close');
+        var legacyOverlay = legacyDrawer.querySelector('.drawer-overlay');
+        var legacyMobileMenu = legacyDrawer.querySelector('#mobile-menu');
+        function setLegacyDrawer(open, restoreFocus) {
+          if (!legacyDrawer) return;
+          legacyDrawer.classList.toggle('show-drawer', open);
+          legacyDrawer.classList.toggle('active', open);
+          legacyDrawer.setAttribute('aria-hidden', open ? 'false' : 'true');
+          document.body.classList.toggle('showing-popup-drawer-from-right', open);
+          if (legacyMobileMenu) legacyMobileMenu.scrollTop = 0;
+          var sticky = document.querySelector('.codex-sticky-cta');
+          var consent = document.querySelector('#codex-consent');
+          var wa = document.querySelector('.codex-wa-fab');
+          [sticky, consent, wa].forEach(function(el) {
+            if (el) el.classList.toggle('codex-drawer-suppressed', open);
+          });
+          if (!open && restoreFocus && legacyOpenButton && typeof legacyOpenButton.focus === 'function') {
+            legacyOpenButton.focus({ preventScroll: true });
+          }
+        }
+        if (legacyOpenButton) legacyOpenButton.addEventListener('click', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          setLegacyDrawer(true, false);
+        }, true);
+        if (legacyCloseButton) legacyCloseButton.addEventListener('click', function(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          setLegacyDrawer(false, true);
+        }, true);
+        if (legacyOverlay) legacyOverlay.addEventListener('click', function(event) {
+          event.preventDefault();
+          setLegacyDrawer(false, true);
+        }, true);
+        document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape' && legacyDrawer.classList.contains('active')) setLegacyDrawer(false, true);
+        });
+        document.querySelectorAll('#mobile-menu > li.menu-item-has-children > a').forEach(function(link) {
+          link.addEventListener('click', function(event) {
+            var parent = link.parentElement;
+            var submenu = parent ? parent.querySelector(':scope > .sub-menu') : null;
+            if (!submenu) return;
+            event.preventDefault();
+            event.stopPropagation();
+            var expanded = parent.classList.toggle('is-open');
+            submenu.classList.toggle('show-drawer', expanded);
+            link.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+          }, true);
+        });
+      }
+
       /* Mobile menu — second-level group accordion.
          Each `[data-codex-mobile-group-toggle]` button is paired with its
          next-sibling <ul.codex-mobile-group-list>. Click toggles aria-expanded

@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview — HIPAA-Compliant Patient ID RFID Wristbands (enlivened)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Brand core (warm earth) */
+  --codex-dark:#291c0e; --codex-dark-mid:#6c5127;
+  --codex-gold:#c39a5f; --codex-gold-light:#d4a755; --codex-gold-muted:#6d5a3a;
+  /* Text */
+  --codex-text:#291c0e; --codex-text-strong:#1a1a1a; --codex-text-muted:#4f4f4f; --codex-text-subtle:#5c5c5c; --codex-text-inverse:#fff;
+  /* Action / accents */
+  --codex-cyan:#1fcefb; --codex-cyan-hover:#15bce8;
+  --codex-teal:#3d6b6b; --codex-steel:#4a5568; --codex-forest:#2d6a4f;
+  --codex-error:#8b2d2d; --codex-error-tint:rgba(139,45,45,.10);
+  --codex-success:#1f6f3a; --codex-success-tint:rgba(31,111,58,.12);
+  /* Borders */
+  --codex-border:rgba(41,28,14,.12); --codex-border-light:rgba(41,28,14,.08); --codex-border-gold:rgba(195,154,95,.18);
+  /* Surfaces / backgrounds */
+  --codex-surface:#fff;
+  --codex-bg-warm:rgba(248,246,241,.92);
+  --codex-bg-warm-gradient:linear-gradient(180deg,rgba(248,246,241,.98),rgba(255,255,255,.98));
+  --codex-bg-card:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,246,241,.92));
+  --codex-bg-hero:radial-gradient(circle at top right,var(--codex-border-gold),transparent 30%),var(--codex-bg-warm-gradient);
+  --codex-gradient-dark:linear-gradient(135deg,#291c0e,#6c5127);
+  /* Radii */
+  --codex-radius-sm:8px; --codex-radius-card:16px; --codex-radius-card-lg:20px; --codex-radius-card-xl:24px; --codex-radius-pill:999px;
+  /* Elevation */
+  --codex-elevation-rest:0 1px 3px rgba(41,28,14,.08);
+  --codex-elevation-hover:0 4px 12px rgba(41,28,14,.10);
+  --codex-elevation-modal:0 16px 48px rgba(41,28,14,.18);
+  /* Type */
+  --codex-font-serif:"Lora",Georgia,"Times New Roman",serif;
+  --codex-font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --codex-weight-bold:700;
+  /* Spacing */
+  --codex-space-2:.5rem; --codex-space-3:.75rem; --codex-space-4:1rem; --codex-space-5:1.25rem;
+  --codex-space-6:1.5rem; --codex-space-8:2rem; --codex-space-10:2.5rem; --codex-space-12:3rem; --codex-space-16:4rem;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; color:var(--codex-text);
+  font-family:var(--codex-font-body); font-size:1.0625rem; line-height:1.65;
+  background:var(--codex-bg-hero); background-attachment:fixed;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:0 var(--codex-space-6) var(--codex-space-16)}
+h1,h2,h3{font-family:var(--codex-font-serif); color:var(--codex-text-strong); line-height:1.2}
+a{color:var(--codex-dark-mid); text-decoration:underline; text-underline-offset:2px; text-decoration-thickness:1px}
+a:hover{color:var(--codex-gold-muted)}
+figure{margin:0}
+
+/* Preview banner (not part of the page — reviewer context) */
+.pv{max-width:1180px; margin:0 auto; padding:var(--codex-space-4) var(--codex-space-6) 0}
+.pv-inner{
+  background:var(--codex-gradient-dark); color:var(--codex-text-inverse);
+  border-radius:var(--codex-radius-card); padding:var(--codex-space-4) var(--codex-space-5);
+  box-shadow:var(--codex-elevation-rest); font-size:.9rem; line-height:1.55;
+}
+.pv-inner strong{color:var(--codex-gold-light)}
+.pv-inner .tag{display:inline-block; font-size:.7rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--codex-dark); background:var(--codex-gold-light); border-radius:var(--codex-radius-pill); padding:2px 10px; margin-right:8px}
+
+/* Hero */
+.codex-editorial-hero{padding:var(--codex-space-12) 0 var(--codex-space-8)}
+.codex-editorial-kicker{margin:0 0 .4rem; color:var(--codex-gold-muted); font-size:.8rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase}
+.codex-editorial-hero h1{margin:.2rem 0 0; font-size:2.5rem; letter-spacing:-.01em}
+.codex-editorial-hero-deck{margin:.65rem 0 0; max-width:62ch; color:var(--codex-text-muted); font-family:var(--codex-font-serif); font-size:1.125rem; font-weight:400; line-height:1.45}
+.codex-editorial-byline{margin:.75rem 0 0; color:var(--codex-text-subtle); font-size:.9rem}
+.codex-editorial-byline .codex-byline-name{color:var(--codex-dark-mid); font-weight:600}
+.codex-editorial-figure{margin:var(--codex-space-8) 0 0; border:1px solid var(--codex-border-light); border-radius:var(--codex-radius-card-lg); overflow:hidden; box-shadow:var(--codex-elevation-rest); background:var(--codex-surface)}
+.codex-editorial-figure img,.codex-editorial-figure svg{display:block; width:100%; height:auto}
+.codex-editorial-answer{margin:var(--codex-space-8) 0 0; background:var(--codex-bg-card); border:1px solid var(--codex-border); border-left:4px solid var(--codex-gold); border-radius:var(--codex-radius-card); padding:var(--codex-space-5) var(--codex-space-6)}
+.codex-editorial-answer-label{margin:0 0 .4rem; color:var(--codex-gold-muted); font-size:.8rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase}
+.codex-editorial-summary{margin:0; font-size:1.15rem; line-height:1.6; color:var(--codex-text)}
+.codex-editorial-points{margin:var(--codex-space-6) 0 0; padding-left:1.15rem; max-width:70ch}
+.codex-editorial-points li{color:var(--codex-text-muted); margin-top:.5rem}
+.codex-hero-cta{margin-top:var(--codex-space-6); display:flex; flex-wrap:wrap; gap:var(--codex-space-3); align-items:center}
+.codex-hero-cta-btn{display:inline-block; padding:.75rem 2rem; background:var(--codex-gold); color:var(--codex-dark); font-weight:700; border-radius:var(--codex-radius-card); text-decoration:none; transition:opacity 150ms}
+.codex-hero-cta-btn:hover{opacity:.9; color:var(--codex-dark)}
+.codex-hero-cta-btn--ghost{background:transparent; border:1.5px solid var(--codex-border); color:var(--codex-dark-mid)}
+.codex-hero-trust-bar{margin-top:var(--codex-space-6); display:flex; flex-wrap:wrap; gap:var(--codex-space-6); padding-top:var(--codex-space-5); border-top:1px solid var(--codex-border-light); color:var(--codex-text-subtle); font-size:.9rem}
+.codex-hero-trust-bar strong{color:var(--codex-dark)}
+
+/* Sections */
+.codex-editorial-section{padding:var(--codex-space-12) 0; border-top:1px solid var(--codex-border-light)}
+.codex-editorial-section h2{margin:0 0 var(--codex-space-4); font-size:1.9rem; letter-spacing:-.01em}
+.codex-editorial-section .intro{max-width:70ch; margin:0 0 var(--codex-space-4); color:var(--codex-text); font-size:1.0625rem}
+.codex-editorial-list{margin:var(--codex-space-4) 0 0; padding-left:1.15rem; max-width:70ch}
+.codex-editorial-list li{margin-top:.6rem; color:var(--codex-text-muted)}
+.codex-editorial-list li strong{color:var(--codex-text-strong)}
+.codex-editorial-section .codex-editorial-figure{margin-top:var(--codex-space-6)}
+
+/* Split layout ≥1025px: prose one column, figure the other */
+@media(min-width:1025px){
+  .codex-editorial-section[data-section-layout="split"],
+  .codex-editorial-section[data-section-layout="split-reverse"]{
+    display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:var(--codex-space-8); align-items:start;
+  }
+  .codex-editorial-section[data-section-layout] > h2{grid-column:1 / -1}
+  .codex-editorial-section[data-section-layout="split"] > .codex-editorial-figure{grid-column:2; grid-row:2 / span 40; align-self:center; margin-top:0}
+  .codex-editorial-section[data-section-layout="split-reverse"] > .codex-editorial-figure{grid-column:1; grid-row:2 / span 40; align-self:center; margin-top:0}
+  .codex-editorial-section[data-section-layout="split"] > :not(h2):not(.codex-editorial-figure){grid-column:1}
+  .codex-editorial-section[data-section-layout="split-reverse"] > :not(h2):not(.codex-editorial-figure){grid-column:2}
+}
+
+/* FAQ */
+.codex-editorial-faq{padding:var(--codex-space-12) 0; border-top:1px solid var(--codex-border-light)}
+.codex-editorial-faq h2{margin:0 0 var(--codex-space-6); font-size:1.9rem}
+.codex-editorial-faq details{background:var(--codex-surface); border:1px solid var(--codex-border); border-radius:var(--codex-radius-card); padding:var(--codex-space-4) var(--codex-space-5); margin-bottom:var(--codex-space-3); box-shadow:var(--codex-elevation-rest)}
+.codex-editorial-faq details[open]{border-color:var(--codex-border-gold)}
+.codex-editorial-faq summary{cursor:pointer; font-family:var(--codex-font-serif); font-weight:600; font-size:1.15rem; color:var(--codex-text-strong); list-style:none; display:flex; justify-content:space-between; gap:1rem; align-items:center}
+.codex-editorial-faq summary::-webkit-details-marker{display:none}
+.codex-editorial-faq summary::after{content:"+"; color:var(--codex-gold-muted); font-family:var(--codex-font-body); font-weight:800; font-size:1.4rem; line-height:1}
+.codex-editorial-faq details[open] summary::after{content:"–"}
+.codex-editorial-faq .ans{margin:var(--codex-space-3) 0 0; color:var(--codex-text-muted); max-width:72ch}
+
+/* Resource cards */
+.codex-res{padding:var(--codex-space-12) 0; border-top:1px solid var(--codex-border-light)}
+.codex-res h2{margin:0 0 var(--codex-space-6); font-size:1.9rem}
+.codex-res-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:var(--codex-space-5)}
+.codex-res-card{background:var(--codex-bg-card); border:1px solid var(--codex-border); border-radius:var(--codex-radius-card); padding:var(--codex-space-6); box-shadow:var(--codex-elevation-rest)}
+.codex-res-card h3{margin:0 0 .4rem; font-size:1.2rem}
+.codex-res-card p{margin:0 0 var(--codex-space-4); color:var(--codex-text-muted); font-size:.95rem}
+.codex-res-card ul{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:.4rem}
+.codex-res-card a{color:var(--codex-dark-mid); font-weight:600; font-size:.95rem}
+
+/* Action bar */
+.codex-action-bar{margin-top:var(--codex-space-12); background:var(--codex-gradient-dark); color:var(--codex-text-inverse); border-radius:var(--codex-radius-card-xl); padding:var(--codex-space-10) var(--codex-space-8); text-align:center}
+.codex-action-bar h2{color:var(--codex-text-inverse); font-size:1.7rem; margin:0 0 var(--codex-space-3)}
+.codex-action-bar p{margin:0 auto var(--codex-space-6); max-width:60ch; color:rgba(255,255,255,.85)}
+.codex-cta--primary{display:inline-block; background:var(--codex-cyan); color:#00252e; font-weight:700; padding:.85rem 2rem; border-radius:var(--codex-radius-pill); text-decoration:none; margin:0 .35rem .5rem}
+.codex-cta--primary:hover{background:var(--codex-cyan-hover); color:#00252e}
+.codex-cta--secondary{display:inline-block; background:transparent; border:1.5px solid rgba(255,255,255,.5); color:#fff; font-weight:600; padding:.85rem 1.75rem; border-radius:var(--codex-radius-pill); text-decoration:none; margin:0 .35rem .5rem}
+
+@media(max-width:600px){
+  .codex-editorial-hero h1{font-size:2rem}
+  .codex-editorial-section h2,.codex-editorial-faq h2,.codex-res h2{font-size:1.55rem}
+  body{font-size:1rem}
+}
+</style>
+</head>
+<body>
+
+<div class="pv"><div class="pv-inner">
+  <span class="tag">Preview</span> Enlivened rewrite of <strong>/blog/hipaa-compliant-patient-id-rfid-wristband/</strong> — warm &amp; readable voice, six custom tokenized SVGs. This is a standalone mockup: no repo file changed, no PR opened (honoring the active <strong>STOP_BLOG_VOICE</strong> halt). Every clinical, legal, and compliance fact — CFR sections, NTAG&nbsp;424&nbsp;DNA/AES-128 specs, HHS/OCR figures, NPSG codes, cost ranges — is preserved verbatim. Root-relative links won't navigate here; they show link intent.
+</div></div>
+
+<main class="wrap" id="main">
+
+<!-- ===================== HERO ===================== -->
+<section class="codex-editorial-hero" data-page-type="blog">
+  <p class="codex-editorial-kicker">Healthcare Compliance</p>
+  <h1>HIPAA-Compliant Patient ID RFID Wristbands</h1>
+  <p class="codex-editorial-hero-deck">Scan the band and it tells you almost nothing about the patient — and that is exactly what makes it safe.</p>
+  <p class="codex-editorial-byline">By <span class="codex-byline-name">Editorial Board</span> · Reviewed by <span class="codex-byline-name">Peter Zhang</span> · Updated <time datetime="2026-06-11">Jun 11, 2026</time></p>
+
+  <figure class="codex-editorial-figure" aria-label="How a HIPAA-safe RFID wristband keeps PHI off the chip">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="heroT heroD" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      <title id="heroT">Scan a HIPAA-safe wristband and the chip returns only an opaque ID</title>
+      <desc id="heroD">A left-to-right flow. The Tyvek wristband carries an NTAG 424 DNA chip. A scan returns only a random UUID — no name, no medical record number, no diagnosis. That token is meaningless to a stranger. Only an authenticated clinician session over TLS 1.2+ resolves the UUID to the patient record, which lives in the EHR, not on the band. Footer: opaque ID only on the chip; AES-128 mutual authentication via NTAG 424 DNA; PHI stays in the EHR, retrieved server-side.</desc>
+      <defs>
+        <radialGradient id="hBg" cx="50%" cy="20%" r="90%"><stop offset="0%" stop-color="#f8f2e6"/><stop offset="100%" stop-color="#f1ece0"/></radialGradient>
+        <linearGradient id="hDark" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#291c0e"/><stop offset="100%" stop-color="#6c5127"/></linearGradient>
+        <linearGradient id="hVault" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#245a6b"/><stop offset="100%" stop-color="#18343e"/></linearGradient>
+        <marker id="hArrow" markerWidth="11" markerHeight="11" refX="3" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#c39a5f"/></marker>
+      </defs>
+      <rect width="1200" height="675" fill="url(#hBg)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="62" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="2.5" fill="#6d5a3a">THE WRISTBAND THAT KNOWS THE LEAST</text>
+      <text x="600" y="92" text-anchor="middle" font-size="16.5" fill="#4f4f4f">Sensitive data never rides on the band — only a key that's worthless without the lock</text>
+
+      <!-- Stage A: the band -->
+      <g>
+        <rect x="58" y="150" width="300" height="300" rx="16" fill="#fbf8f2" stroke="#e4d8bf" stroke-width="2"/>
+        <text x="208" y="184" text-anchor="middle" font-size="13.5" font-weight="700" letter-spacing="1.4" fill="#6d5a3a">THE WRISTBAND</text>
+        <!-- band -->
+        <path d="M96 250 q-14 34 0 68 h224 q14 -34 0 -68 z" fill="#ffffff" stroke="#b9a074" stroke-width="2"/>
+        <rect x="120" y="266" width="120" height="36" rx="6" fill="#fbf6ec" stroke="#d8c39a" stroke-width="1.5"/>
+        <text x="180" y="290" text-anchor="middle" font-size="15" font-weight="700" fill="#291c0e" font-family="ui-monospace,Menlo,monospace">PT-7Q2F-4K9</text>
+        <!-- chip -->
+        <rect x="256" y="262" width="44" height="44" rx="6" fill="#efe0bf" stroke="#c39a5f" stroke-width="2"/>
+        <rect x="268" y="274" width="20" height="20" rx="3" fill="#c39a5f"/>
+        <path d="M262 270 h-7 M262 284 h-7 M262 298 h-7 M300 270 h7 M300 284 h7 M300 298 h7" stroke="#c39a5f" stroke-width="2"/>
+        <text x="208" y="360" text-anchor="middle" font-size="14.5" fill="#4f4f4f">Single-use Tyvek band</text>
+        <text x="208" y="382" text-anchor="middle" font-size="14.5" fill="#4f4f4f">+ NTAG 424 DNA chip</text>
+        <text x="208" y="420" text-anchor="middle" font-size="13.5" font-style="italic" fill="#8a7a5f">Printed ID for the eye,</text>
+        <text x="208" y="438" text-anchor="middle" font-size="13.5" font-style="italic" fill="#8a7a5f">RFID ID for the reader.</text>
+      </g>
+      <line x1="360" y1="300" x2="418" y2="300" stroke="#c39a5f" stroke-width="3.5" marker-end="url(#hArrow)"/>
+      <text x="389" y="286" text-anchor="middle" font-size="12" font-weight="700" fill="#6d5a3a">scan</text>
+
+      <!-- Stage B: the opaque token -->
+      <g>
+        <rect x="432" y="150" width="300" height="300" rx="16" fill="#fbf8f2" stroke="#e4d8bf" stroke-width="2"/>
+        <text x="582" y="184" text-anchor="middle" font-size="13.5" font-weight="700" letter-spacing="1.4" fill="#6d5a3a">WHAT THE CHIP HANDS OVER</text>
+        <rect x="456" y="212" width="252" height="70" rx="10" fill="#20262e"/>
+        <text x="582" y="245" text-anchor="middle" font-size="16" font-weight="700" fill="#1fcefb" font-family="ui-monospace,Menlo,monospace">a9f3c1e0-4b2d</text>
+        <text x="582" y="268" text-anchor="middle" font-size="16" font-weight="700" fill="#1fcefb" font-family="ui-monospace,Menlo,monospace">-47aa-8b7d</text>
+        <text x="582" y="312" text-anchor="middle" font-size="14.5" font-weight="700" fill="#291c0e">An opaque random UUID</text>
+        <text x="582" y="344" text-anchor="middle" font-size="14" fill="#4f4f4f">no name · no MRN</text>
+        <text x="582" y="364" text-anchor="middle" font-size="14" fill="#4f4f4f">no diagnosis · no allergies</text>
+        <rect x="480" y="392" width="204" height="34" rx="17" fill="#f7ecea"/>
+        <text x="582" y="414" text-anchor="middle" font-size="13" font-weight="700" fill="#8b2d2d">To a stranger: meaningless</text>
+      </g>
+      <g>
+        <line x1="734" y1="300" x2="792" y2="300" stroke="#1fcefb" stroke-width="3.5" marker-end="url(#hArrow)"/>
+        <text x="763" y="284" text-anchor="middle" font-size="11.5" font-weight="700" fill="#177a92">clinician</text>
+        <text x="763" y="330" text-anchor="middle" font-size="11.5" font-weight="700" fill="#177a92">auth · TLS</text>
+      </g>
+
+      <!-- Stage C: the EHR vault -->
+      <g>
+        <rect x="806" y="150" width="336" height="300" rx="16" fill="url(#hVault)" stroke="#123039" stroke-width="2"/>
+        <text x="974" y="184" text-anchor="middle" font-size="13.5" font-weight="700" letter-spacing="1.4" fill="#bfe6f0">THE EHR — WHERE PHI LIVES</text>
+        <!-- lock -->
+        <rect x="946" y="212" width="56" height="46" rx="8" fill="#1fcefb"/>
+        <path d="M956 212 v-10 a18 18 0 0 1 36 0 v10" fill="none" stroke="#bfe6f0" stroke-width="6"/>
+        <rect x="970" y="228" width="8" height="16" rx="4" fill="#0d2b34"/>
+        <!-- record card -->
+        <rect x="846" y="278" width="256" height="150" rx="10" fill="#ffffff" opacity="0.96"/>
+        <text x="866" y="308" font-size="14.5" font-weight="700" fill="#18343e">Patient record</text>
+        <line x1="866" y1="318" x2="1082" y2="318" stroke="#e0e6ea" stroke-width="1.5"/>
+        <text x="866" y="342" font-size="13.5" fill="#3a4a52">Name · MRN</text>
+        <text x="866" y="366" font-size="13.5" fill="#3a4a52">Allergies · medications</text>
+        <text x="866" y="390" font-size="13.5" fill="#3a4a52">Care team · orders</text>
+        <text x="866" y="416" font-size="12.5" font-style="italic" fill="#245a6b">Resolved only after a valid login</text>
+      </g>
+
+      <!-- Footer stat strip -->
+      <rect x="58" y="486" width="1084" height="150" rx="16" fill="url(#hDark)"/>
+      <g text-anchor="middle">
+        <text x="245" y="538" font-size="25" font-weight="800" fill="#ffffff">Opaque ID only</text>
+        <text x="245" y="566" font-size="14" fill="#e7d8b8">on the chip and over RF</text>
+        <text x="600" y="538" font-size="25" font-weight="800" fill="#ffffff">AES-128 mutual auth</text>
+        <text x="600" y="566" font-size="14" fill="#e7d8b8">NTAG 424 DNA · tamper-evident</text>
+        <text x="955" y="538" font-size="25" font-weight="800" fill="#ffffff">PHI stays in the EHR</text>
+        <text x="955" y="566" font-size="14" fill="#e7d8b8">retrieved server-side after scan</text>
+        <line x1="423" y1="516" x2="423" y2="588" stroke="#8a6f3e" stroke-width="1.5"/>
+        <line x1="778" y1="516" x2="778" y2="588" stroke="#8a6f3e" stroke-width="1.5"/>
+        <text x="600" y="616" font-size="14.5" font-style="italic" fill="#8fdcf3">Drop the band in the parking lot and you've leaked exactly one thing: a random number.</text>
+      </g>
+    </svg>
+  </figure>
+
+  <div class="codex-editorial-answer" aria-label="Quick answer">
+    <p class="codex-editorial-answer-label">Quick answer</p>
+    <p class="codex-editorial-summary">A patient wristband has one job at the bedside — answer "is this the right person?" before anything else happens. An RFID version answers it in a fraction of a second, speeding bedside identification, medication safety and lab specimen tracking. But the same band can become a data leak if it's built carelessly. The difference is almost never the wristband itself; it's the chip you choose and the data you decide to put on it — both of which have to satisfy the HIPAA Security Rule and Privacy Rule.</p>
+  </div>
+
+  <ul class="codex-editorial-points">
+    <li>Wrong-patient errors cause 7-13% of medication errors and 5-10% of laboratory mismatches in US hospitals — RFID wristbands eliminate visual-only ID checks at every clinical touchpoint.</li>
+    <li>HIPAA-compliant RFID design stores only an opaque patient identifier on the chip; PHI lives in the EHR and is retrieved server-side after wristband scan.</li>
+    <li>Implementation cost runs $0.25-1.50 per wristband + $5-25K per scanner deployment. ROI from medication-error reduction and lab-mismatch prevention typically 9-18 months.</li>
+  </ul>
+
+  <div class="codex-hero-cta">
+    <a class="codex-hero-cta-btn" href="/contact/rfid-labels-tags/">Request samples</a>
+    <a class="codex-hero-cta-btn codex-hero-cta-btn--ghost" href="/products/rfid-wristbands/hospital-patient-id-wristband/">See the wristband SKUs →</a>
+  </div>
+  <div class="codex-hero-trust-bar">
+    <span><strong>Since 2008</strong></span>
+    <span><strong>ISO 9001</strong></span>
+    <span><strong>500+</strong> Clients</span>
+    <span><strong>50+</strong> Countries</span>
+  </div>
+</section>
+
+<!-- ===================== SECTION 1 ===================== -->
+<section class="codex-editorial-section" data-section-layout="split">
+  <h2>What does HIPAA require for patient RFID wristbands?</h2>
+  <p class="intro">The most HIPAA-compliant <a href="/products/rfid-wristbands/hospital-patient-id-wristband/">patient wristband</a> is, in a sense, the one that knows the least. Scan a well-designed band and the chip hands over nothing but an opaque string of characters — no name, no record number, no diagnosis — a key that is worthless to anyone who cannot also reach the locked system it opens. The whole trick of doing this safely is keeping the sensitive part somewhere the wristband never goes. HIPAA Security Rule and Privacy Rule both apply to RFID-stored patient data. The five requirements below define what "HIPAA-compliant" means for an RFID wristband program.</p>
+  <figure class="codex-editorial-figure" aria-label="Five requirements that define a HIPAA-compliant RFID wristband program">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="reqT reqD" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      <title id="reqT">The five controls that make an RFID wristband program HIPAA-compliant</title>
+      <desc id="reqD">Five requirements: minimize PHI on the chip (store only an opaque patient ID such as a random UUID); encrypt anything at rest (AES-128 mutual authentication via NTAG 424 DNA or DESFire EV3); log every access (reader ID, user ID and timestamp, per Security Rule 164.312(b)); destroy the band at discharge (cut and destroy, not just remove); and sign Business Associate Agreements with any vendor handling wristband data.</desc>
+      <defs><radialGradient id="rqBg" cx="50%" cy="16%" r="92%"><stop offset="0%" stop-color="#f8f2e6"/><stop offset="100%" stop-color="#f1ece0"/></radialGradient></defs>
+      <rect width="1200" height="675" fill="url(#rqBg)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="62" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="2" fill="#6d5a3a">WHAT "HIPAA-COMPLIANT" REQUIRES — FIVE CONTROLS</text>
+      <g font-family="inherit">
+        <!-- Row 1 -->
+        <circle cx="96" cy="150" r="26" fill="#c39a5f"/><text x="96" y="159" text-anchor="middle" font-size="24" font-weight="800" fill="#ffffff">1</text>
+        <text x="146" y="144" font-size="23" font-weight="800" fill="#291c0e">Minimize PHI on the chip</text>
+        <text x="146" y="172" font-size="16.5" fill="#4f4f4f">Store only an opaque patient ID (e.g. a random UUID); clinical data stays in the EHR.</text>
+        <line x1="146" y1="198" x2="1112" y2="198" stroke="#efe7d7" stroke-width="1.5"/>
+        <!-- Row 2 -->
+        <circle cx="96" cy="248" r="26" fill="#c39a5f"/><text x="96" y="257" text-anchor="middle" font-size="24" font-weight="800" fill="#ffffff">2</text>
+        <text x="146" y="242" font-size="23" font-weight="800" fill="#291c0e">Encrypt anything at rest</text>
+        <text x="146" y="270" font-size="16.5" fill="#4f4f4f">AES-128 mutual authentication via NTAG 424 DNA or DESFire EV3.</text>
+        <line x1="146" y1="296" x2="1112" y2="296" stroke="#efe7d7" stroke-width="1.5"/>
+        <!-- Row 3 -->
+        <circle cx="96" cy="346" r="26" fill="#c39a5f"/><text x="96" y="355" text-anchor="middle" font-size="24" font-weight="800" fill="#ffffff">3</text>
+        <text x="146" y="340" font-size="23" font-weight="800" fill="#291c0e">Log every access</text>
+        <text x="146" y="368" font-size="16.5" fill="#4f4f4f">Reader ID + user ID + timestamp — the audit trail in Security Rule §164.312(b).</text>
+        <line x1="146" y1="394" x2="1112" y2="394" stroke="#efe7d7" stroke-width="1.5"/>
+        <!-- Row 4 -->
+        <circle cx="96" cy="444" r="26" fill="#c39a5f"/><text x="96" y="453" text-anchor="middle" font-size="24" font-weight="800" fill="#ffffff">4</text>
+        <text x="146" y="438" font-size="23" font-weight="800" fill="#291c0e">Destroy the band at discharge</text>
+        <text x="146" y="466" font-size="16.5" fill="#4f4f4f">Cut and destroy the end-of-stay band — not just remove it — so any stored data is unreadable.</text>
+        <line x1="146" y1="492" x2="1112" y2="492" stroke="#efe7d7" stroke-width="1.5"/>
+        <!-- Row 5 -->
+        <circle cx="96" cy="542" r="26" fill="#c39a5f"/><text x="96" y="551" text-anchor="middle" font-size="24" font-weight="800" fill="#ffffff">5</text>
+        <text x="146" y="536" font-size="23" font-weight="800" fill="#291c0e">Sign BAAs with vendors</text>
+        <text x="146" y="564" font-size="16.5" fill="#4f4f4f">Third parties processing wristband data are Business Associates and must sign a BAA.</text>
+      </g>
+      <rect x="58" y="596" width="1084" height="42" rx="12" fill="#f4efe4"/>
+      <text x="600" y="623" text-anchor="middle" font-size="15" font-style="italic" fill="#6d5a3a">Get these five right and the wristband is boring in the best possible way.</text>
+    </svg>
+  </figure>
+  <ul class="codex-editorial-list">
+    <li><strong>PHI on the chip:</strong> should be minimized. Best practice stores only an opaque patient ID (e.g., random UUID) on the chip; clinical data stays in the EHR retrieved by ID lookup.</li>
+    <li><strong>Encryption at rest:</strong> chip-stored PHI (if any) must be encrypted. AES-128 mutual authentication via NTAG 424 DNA or DESFire EV3 satisfies HIPAA encryption-at-rest requirements.</li>
+    <li><strong>Access logging:</strong> every scan and EHR query logged with reader ID, user ID and timestamp. Required for HIPAA audit trail (security rule §164.312(b)).</li>
+    <li><strong>Disposal:</strong> end-of-stay wristband must be cut and destroyed (not just removed). Any chip-stored PHI rendered unreadable per HIPAA disposal requirements.</li>
+    <li><strong>Business Associate Agreements:</strong> third-party vendors processing wristband data are BAs and must sign BAA with the hospital.</li>
+  </ul>
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section class="codex-editorial-section" data-section-layout="split-reverse">
+  <h2>How do you design HIPAA-safe wristband data?</h2>
+  <p class="intro">If the wristband is a key, the point of good data design is making that key useless to anyone who pockets it. Chip-stored data design is the most consequential HIPAA decision in the whole program — and five principles separate the compliant setups from the at-risk ones.</p>
+  <figure class="codex-editorial-figure" aria-label="Three layers where HIPAA-safe wristband data design is enforced">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="ddT ddD" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      <title id="ddT">Three layers of HIPAA-safe wristband data design</title>
+      <desc id="ddD">Three stacked layers. On the chip: only an opaque pseudonymous UUID, made tamper-evident by NTAG 424 DNA secure messaging that signs each scan with a rotating cryptographic challenge, so cloned bands fail authentication. On the wire: wristband-to-EHR queries use TLS 1.2 or higher with server-side lookup and no plaintext patient identifiers. In the EHR: clinicians authenticate before the scan, and the wristband ID plus clinician identity together produce the audit-log entry.</desc>
+      <defs>
+        <radialGradient id="ddBg" cx="50%" cy="16%" r="92%"><stop offset="0%" stop-color="#f8f2e6"/><stop offset="100%" stop-color="#f1ece0"/></radialGradient>
+        <marker id="ddArrow" markerWidth="12" markerHeight="12" refX="4" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#c39a5f"/></marker>
+      </defs>
+      <rect width="1200" height="675" fill="url(#ddBg)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="60" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="2" fill="#6d5a3a">THREE PLACES THE DATA HAS TO BE SAFE</text>
+
+      <!-- Layer 1: the chip -->
+      <rect x="70" y="92" width="1060" height="140" rx="16" fill="#fbf5ea" stroke="#e4c98f" stroke-width="2.5"/>
+      <rect x="94" y="120" width="150" height="84" rx="10" fill="#efe0bf" stroke="#c39a5f" stroke-width="2"/>
+      <rect x="130" y="146" width="78" height="32" rx="4" fill="#c39a5f"/>
+      <text x="169" y="168" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="ui-monospace,Menlo,monospace">UUID</text>
+      <text x="280" y="138" font-size="20" font-weight="800" letter-spacing="1" fill="#6d5a3a">ON THE CHIP</text>
+      <text x="280" y="170" font-size="17.5" fill="#291c0e" font-weight="600">Pseudonymous by design — a random UUID, never the patient's MRN.</text>
+      <text x="280" y="198" font-size="16" fill="#4f4f4f">Tamper-evident: NTAG 424 DNA signs each scan with a rotating challenge, so clones fail auth.</text>
+
+      <line x1="600" y1="234" x2="600" y2="268" stroke="#c39a5f" stroke-width="3" marker-end="url(#ddArrow)"/>
+
+      <!-- Layer 2: the wire -->
+      <rect x="70" y="272" width="1060" height="120" rx="16" fill="#eef6f7" stroke="#a9cdd0" stroke-width="2.5"/>
+      <g transform="translate(118,332)"><path d="M-24 0 a24 24 0 0 1 48 0" fill="none" stroke="#3d6b6b" stroke-width="5"/><rect x="-30" y="0" width="60" height="34" rx="7" fill="#3d6b6b"/><rect x="-4" y="12" width="8" height="14" rx="4" fill="#eef6f7"/></g>
+      <text x="280" y="316" font-size="20" font-weight="800" letter-spacing="1" fill="#2c5454">ON THE WIRE</text>
+      <text x="280" y="348" font-size="17.5" fill="#18343e" font-weight="600">TLS 1.2+ with server-side patient lookup.</text>
+      <text x="280" y="376" font-size="16" fill="#3a4a52">No plain-text patient identifiers ever transit the network.</text>
+
+      <line x1="600" y1="394" x2="600" y2="428" stroke="#c39a5f" stroke-width="3" marker-end="url(#ddArrow)"/>
+
+      <!-- Layer 3: the EHR -->
+      <rect x="70" y="432" width="1060" height="130" rx="16" fill="#eaf1ec" stroke="#a9c8b2" stroke-width="2.5"/>
+      <g transform="translate(118,497)"><circle r="30" fill="#2d6a4f"/><circle cy="-6" r="10" fill="#eaf1ec"/><path d="M-16 16 a16 18 0 0 1 32 0" fill="#eaf1ec"/></g>
+      <text x="280" y="476" font-size="20" font-weight="800" letter-spacing="1" fill="#1b4332">IN THE EHR</text>
+      <text x="280" y="508" font-size="17.5" fill="#173a2b" font-weight="600">Per-user access: the clinician authenticates before the scan.</text>
+      <text x="280" y="536" font-size="16" fill="#3c5c46">Wristband ID + clinician identity together become one audit-log entry.</text>
+
+      <rect x="70" y="586" width="1060" height="42" rx="12" fill="#f4efe4"/>
+      <text x="600" y="613" text-anchor="middle" font-size="15" font-style="italic" fill="#6d5a3a">The UUID only becomes a person after a valid login. Steal the number, keep the mystery.</text>
+    </svg>
+  </figure>
+  <ul class="codex-editorial-list">
+    <li><strong>Minimize stored PHI:</strong> ideally only opaque ID on chip. Patient name, MRN, allergies and other PHI stay in EHR.</li>
+    <li><strong>Pseudonymous identifier:</strong> use a random UUID, not the patient's MRN. UUID resolves to MRN only via authenticated EHR lookup.</li>
+    <li><strong>Tamper-evident chips:</strong> NTAG 424 DNA's secure messaging signs each scan with a rotating cryptographic challenge. Cloned wristbands fail authentication.</li>
+    <li><strong>Encrypted EHR data link:</strong> wristband-to-EHR queries must use TLS 1.2+ with server-side patient lookup. No plain-text patient identifiers transit the wire.</li>
+    <li><strong>Per-user EHR access:</strong> clinicians authenticate to EHR before wristband scan. The combination of wristband ID + clinician auth produces the audit log entry.</li>
+  </ul>
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section class="codex-editorial-section">
+  <h2>How do you roll out RFID patient wristbands?</h2>
+  <p class="intro">Rolling out patient wristbands looks a lot like any other hospital RFID project — right up until you remember the tag is on a person, not a pallet, which raises the stakes at every step. The five-step rollout below mirrors successful 2024-2026 hospital deployments, and the thread running through all of them is simple: change one thing at a time.</p>
+  <figure class="codex-editorial-figure" aria-label="Five-step rollout timeline for RFID patient wristbands">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="roT roD" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      <title id="roT">The five-step RFID patient-wristband rollout</title>
+      <desc id="roD">A five-step timeline. Step 1: choose chip and form factor — a thermally-sensitive Tyvek band with an embedded NTAG 424 DNA chip that survives a 5 to 7 day stay and carries a printable identifier. Step 2: integrate with the EHR and admission workflow — Epic, Cerner and Meditech all support wristband-printer integration; the band is created at admission and encoded with an opaque ID linked to the MRN. Step 3: deploy bedside handheld or tablet-mounted scanners, standardizing on one device family. Step 4: define go-live use cases — medication administration (BCMA), lab specimen labeling, blood transfusion and surgical verification — rolling out one at a time. Step 5: train clinical staff 2 to 4 hours per role, running a 30 to 90 day side-by-side phase before retiring legacy barcode bands.</desc>
+      <defs>
+        <radialGradient id="roBg" cx="50%" cy="16%" r="92%"><stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/></radialGradient>
+        <linearGradient id="roDark" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#291c0e"/><stop offset="100%" stop-color="#6c5127"/></linearGradient>
+      </defs>
+      <rect width="1200" height="675" fill="url(#roBg)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="58" text-anchor="middle" font-size="20.5" font-weight="800" letter-spacing="1.4" fill="#6d5a3a">FIVE STEPS · ROLL OUT ONE USE CASE AT A TIME</text>
+      <!-- axis -->
+      <line x1="160" y1="208" x2="1040" y2="208" stroke="#c39a5f" stroke-width="5"/>
+      <g text-anchor="middle" font-weight="800" fill="#291c0e" font-size="14.5">
+        <text x="160" y="176">STEP 1</text><text x="380" y="176">STEP 2</text><text x="600" y="176">STEP 3</text><text x="820" y="176">STEP 4</text><text x="1040" y="176" fill="#177a92">STEP 5</text>
+      </g>
+      <circle cx="160" cy="208" r="14" fill="#c39a5f" stroke="#fff" stroke-width="3"/>
+      <circle cx="380" cy="208" r="14" fill="#c39a5f" stroke="#fff" stroke-width="3"/>
+      <circle cx="600" cy="208" r="14" fill="#c39a5f" stroke="#fff" stroke-width="3"/>
+      <circle cx="820" cy="208" r="14" fill="#c39a5f" stroke="#fff" stroke-width="3"/>
+      <circle cx="1040" cy="208" r="17" fill="#1fcefb" stroke="#fff" stroke-width="4"/>
+      <!-- cards -->
+      <g text-anchor="middle">
+        <rect x="60" y="250" width="200" height="300" rx="14" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <text x="160" y="292" font-size="17.5" font-weight="800" fill="#291c0e">Choose the chip</text>
+        <text x="160" y="330" font-size="14" fill="#4f4f4f">Tyvek band +</text>
+        <text x="160" y="350" font-size="14.5" font-weight="700" fill="#291c0e">NTAG 424 DNA</text>
+        <text x="160" y="386" font-size="14" fill="#4f4f4f">survives a 5-7</text>
+        <text x="160" y="406" font-size="14" fill="#4f4f4f">day inpatient stay</text>
+        <text x="160" y="442" font-size="14" fill="#4f4f4f">printable ID on</text>
+        <text x="160" y="462" font-size="14" fill="#4f4f4f">the band surface</text>
+
+        <rect x="280" y="250" width="200" height="300" rx="14" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <text x="380" y="292" font-size="17.5" font-weight="800" fill="#291c0e">Integrate the EHR</text>
+        <text x="380" y="330" font-size="14.5" font-weight="700" fill="#291c0e">Epic · Cerner</text>
+        <text x="380" y="350" font-size="14.5" font-weight="700" fill="#291c0e">· Meditech</text>
+        <text x="380" y="386" font-size="14" fill="#4f4f4f">band created at</text>
+        <text x="380" y="406" font-size="14" fill="#4f4f4f">admission, encoded</text>
+        <text x="380" y="442" font-size="14" fill="#4f4f4f">opaque ID linked</text>
+        <text x="380" y="462" font-size="14" fill="#4f4f4f">to the MRN</text>
+
+        <rect x="500" y="250" width="200" height="300" rx="14" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <text x="600" y="292" font-size="17.5" font-weight="800" fill="#291c0e">Deploy scanners</text>
+        <text x="600" y="330" font-size="14" fill="#4f4f4f">handheld or tablet-</text>
+        <text x="600" y="350" font-size="14" fill="#4f4f4f">mounted RFID readers</text>
+        <text x="600" y="386" font-size="14" fill="#4f4f4f">in the nurse workflow</text>
+        <text x="600" y="428" font-size="14.5" font-weight="700" fill="#291c0e">one device family,</text>
+        <text x="600" y="448" font-size="14" fill="#4f4f4f">simpler training</text>
+
+        <rect x="720" y="250" width="200" height="300" rx="14" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <text x="820" y="292" font-size="17.5" font-weight="800" fill="#291c0e">Pick go-live cases</text>
+        <text x="820" y="328" font-size="14" fill="#4f4f4f">medication (BCMA),</text>
+        <text x="820" y="348" font-size="14" fill="#4f4f4f">lab specimen labels,</text>
+        <text x="820" y="368" font-size="14" fill="#4f4f4f">transfusion &amp;</text>
+        <text x="820" y="388" font-size="14" fill="#4f4f4f">surgical ID checks</text>
+        <text x="820" y="430" font-size="14.5" font-weight="700" fill="#291c0e">one at a time</text>
+
+        <rect x="940" y="250" width="200" height="300" rx="14" fill="#fbf8f2" stroke="#1fcefb" stroke-width="2.5"/>
+        <text x="1040" y="292" font-size="17.5" font-weight="800" fill="#291c0e">Train &amp; go live</text>
+        <text x="1040" y="330" font-size="14.5" font-weight="700" fill="#291c0e">2-4 hrs per role</text>
+        <text x="1040" y="368" font-size="14" fill="#4f4f4f">30-90 day</text>
+        <text x="1040" y="388" font-size="14" fill="#4f4f4f">side-by-side phase</text>
+        <text x="1040" y="430" font-size="14" fill="#4f4f4f">then retire the</text>
+        <text x="1040" y="450" font-size="14" fill="#4f4f4f">legacy barcode band</text>
+      </g>
+      <rect x="60" y="576" width="1080" height="58" rx="14" fill="url(#roDark)"/>
+      <text x="88" y="612" font-size="15.5" fill="#ffffff">The tag rides on a person, not a pallet — which is exactly why you don't flip every use case on at once.</text>
+    </svg>
+  </figure>
+  <ul class="codex-editorial-list">
+    <li><strong>Choose chip and form factor:</strong> thermally-sensitive Tyvek wristband with embedded NTAG 424 DNA chip is most common. Survives 5-7 day inpatient stay; printable per-patient identifier on band surface.</li>
+    <li><strong>Integrate with EHR and admission workflow:</strong> Epic, Cerner, Meditech all support wristband-printer integration. Wristband created at admission, encoded with opaque patient ID linked to MRN.</li>
+    <li><strong>Deploy bedside scanners:</strong> handheld or tablet-mounted RFID scanners in nurse workflow. Most facilities standardize on one device family for clinical staff training simplicity.</li>
+    <li><strong>Define use cases for go-live:</strong> medication administration verification (BCMA), lab specimen labeling, blood transfusion verification, surgical patient ID verification. Roll out one use case at a time.</li>
+    <li><strong>Train clinical staff:</strong> 2-4 hours per role on the new workflow. Most hospitals run a 30-90 day side-by-side phase before retiring legacy barcode wristbands.</li>
+  </ul>
+</section>
+
+<!-- ===================== SECTION 4 ===================== -->
+<section class="codex-editorial-section" data-section-layout="split">
+  <h2>Where HIPAA Security Rule actually intersects RFID design</h2>
+  <p class="intro">Compliance teams don't grade your wristband on how clever it is; they grade it against HIPAA's Security Rule (45 CFR 164.302-318), the technical and administrative spine every RFID program gets cross-walked against. The good news: the rubric is short and stable. 2026 RFID-in-healthcare overviews and published wristband writeups keep landing on the same five Security-Rule controls — so come to the review ready to map your design to them line by line.</p>
+  <figure class="codex-editorial-figure" aria-label="Five HIPAA Security Rule controls mapped to their CFR citations">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="srT srD" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      <title id="srT">Five HIPAA Security Rule controls a wristband program is scored against</title>
+      <desc id="srD">Five controls with their CFR citations. Access control, section 164.312(a)(1): role-based access; RFID is one factor inside the EHR's authentication flow. Audit controls, 164.312(b): every read or write tied to staff identity, reader ID and timestamp. Integrity controls, 164.312(c)(1): tamper-evident ID via NTAG 424 DNA SUN message authentication and AES-128 mutual auth. Transmission security, 164.312(e)(1): TLS 1.2 or higher and ideally HSTS. Person or entity authentication, 164.312(d): the clinician must already be authenticated; EPCS requires two factors.</desc>
+      <defs><radialGradient id="srBg" cx="50%" cy="16%" r="92%"><stop offset="0%" stop-color="#f8f2e6"/><stop offset="100%" stop-color="#f1ece0"/></radialGradient></defs>
+      <rect width="1200" height="675" fill="url(#srBg)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="60" text-anchor="middle" font-size="20.5" font-weight="800" letter-spacing="1.6" fill="#6d5a3a">THE SECURITY-RULE RUBRIC · 45 CFR 164.312</text>
+      <g>
+        <!-- Row 1 -->
+        <rect x="70" y="98" width="196" height="72" rx="10" fill="#291c0e"/>
+        <text x="168" y="132" text-anchor="middle" font-size="17" font-weight="700" fill="#e7d8b8" font-family="ui-monospace,Menlo,monospace">§164.312</text>
+        <text x="168" y="154" text-anchor="middle" font-size="17" font-weight="700" fill="#1fcefb" font-family="ui-monospace,Menlo,monospace">(a)(1)</text>
+        <text x="288" y="128" font-size="21" font-weight="800" fill="#291c0e">Access control</text>
+        <text x="288" y="156" font-size="15.5" fill="#4f4f4f">Role-based; RFID is one factor inside the EHR's auth flow.</text>
+        <!-- Row 2 -->
+        <rect x="70" y="188" width="196" height="72" rx="10" fill="#291c0e"/>
+        <text x="168" y="222" text-anchor="middle" font-size="17" font-weight="700" fill="#e7d8b8" font-family="ui-monospace,Menlo,monospace">§164.312</text>
+        <text x="168" y="244" text-anchor="middle" font-size="17" font-weight="700" fill="#1fcefb" font-family="ui-monospace,Menlo,monospace">(b)</text>
+        <text x="288" y="218" font-size="21" font-weight="800" fill="#291c0e">Audit controls</text>
+        <text x="288" y="246" font-size="15.5" fill="#4f4f4f">Every read/write tied to staff ID, reader ID and timestamp.</text>
+        <!-- Row 3 -->
+        <rect x="70" y="278" width="196" height="72" rx="10" fill="#291c0e"/>
+        <text x="168" y="312" text-anchor="middle" font-size="17" font-weight="700" fill="#e7d8b8" font-family="ui-monospace,Menlo,monospace">§164.312</text>
+        <text x="168" y="334" text-anchor="middle" font-size="17" font-weight="700" fill="#1fcefb" font-family="ui-monospace,Menlo,monospace">(c)(1)</text>
+        <text x="288" y="308" font-size="21" font-weight="800" fill="#291c0e">Integrity controls</text>
+        <text x="288" y="336" font-size="15.5" fill="#4f4f4f">Tamper-evident: NTAG 424 DNA SUN + AES-128 mutual auth.</text>
+        <!-- Row 4 -->
+        <rect x="70" y="368" width="196" height="72" rx="10" fill="#291c0e"/>
+        <text x="168" y="402" text-anchor="middle" font-size="17" font-weight="700" fill="#e7d8b8" font-family="ui-monospace,Menlo,monospace">§164.312</text>
+        <text x="168" y="424" text-anchor="middle" font-size="17" font-weight="700" fill="#1fcefb" font-family="ui-monospace,Menlo,monospace">(e)(1)</text>
+        <text x="288" y="398" font-size="21" font-weight="800" fill="#291c0e">Transmission security</text>
+        <text x="288" y="426" font-size="15.5" fill="#4f4f4f">TLS 1.2+ and ideally HSTS — most scrutiny lands on the API calls.</text>
+        <!-- Row 5 -->
+        <rect x="70" y="458" width="196" height="72" rx="10" fill="#291c0e"/>
+        <text x="168" y="492" text-anchor="middle" font-size="17" font-weight="700" fill="#e7d8b8" font-family="ui-monospace,Menlo,monospace">§164.312</text>
+        <text x="168" y="514" text-anchor="middle" font-size="17" font-weight="700" fill="#1fcefb" font-family="ui-monospace,Menlo,monospace">(d)</text>
+        <text x="288" y="488" font-size="21" font-weight="800" fill="#291c0e">Person / entity auth</text>
+        <text x="288" y="516" font-size="15.5" fill="#4f4f4f">Clinician already authenticated; EPCS adds a second factor.</text>
+      </g>
+      <rect x="70" y="556" width="1060" height="72" rx="14" fill="#f4efe4"/>
+      <text x="600" y="588" text-anchor="middle" font-size="16" font-weight="700" fill="#6d5a3a">The wristband is never the whole answer — it's one factor in a flow.</text>
+      <text x="600" y="612" text-anchor="middle" font-size="14.5" font-style="italic" fill="#8a7a5f">"Something the patient has," standing next to "someone the clinician is."</text>
+    </svg>
+  </figure>
+  <ul class="codex-editorial-list">
+    <li><strong>Access control (§164.312(a)(1)):</strong> every wristband-to-EHR query must traverse role-based access — bedside nurse vs lab tech vs surgical team see different fields. RFID alone never carries authorisation; it is one factor (something the patient has) inside the EHR's existing user-authentication flow.</li>
+    <li><strong>Audit controls (§164.312(b)):</strong> every read/write event tied to staff identity, reader ID and timestamp. Industry guidance notes RFID badge-tap workflows produce 'a timestamped audit trail' that satisfies HIPAA logging without manual data-entry; the same expectation applies to patient-wristband scans.</li>
+    <li><strong>Integrity controls (§164.312(c)(1)):</strong> wristband-stored ID must be tamper-evident. NTAG 424 DNA's SUN message authentication, AES-128 mutual auth and rotating cryptographic challenges (sometimes summarised as 'AES-256 encryption protocol' in vendor literature) are what hospitals rely on to detect cloning.</li>
+    <li><strong>Transmission security (§164.312(e)(1)):</strong> wristband-to-EHR queries over Wi-Fi must use TLS 1.2+ and ideally HSTS. The wristband itself transmits very little data over RF; the heavy traffic is the resulting EHR API calls — that is where most HIPAA scrutiny lands.</li>
+    <li><strong>Person or entity authentication (§164.312(d)):</strong> the clinician scanning the wristband must already be authenticated to the EHR session. EPCS (Electronic Prescriptions for Controlled Substances) goes further, requiring two-factor; industry guidance notes a tap-to-authenticate badge can serve as one of those two factors, replacing one-time passwords for controlled-substance dispensing tied to a wristband-verified patient.</li>
+  </ul>
+</section>
+
+<!-- ===================== SECTION 5 ===================== -->
+<section class="codex-editorial-section">
+  <h2>What does the wristband program cost when you cost in breach risk?</h2>
+  <p class="intro">Here's the arithmetic that makes the budget conversation short. The global RFID-in-healthcare market is climbing from $4.64B in 2023 to a projected $14.65B by 2030 (Grand View Research) for one blunt reason: getting patient identification or PHI access wrong is expensive. HHS Office for Civil Rights settlement data runs from roughly $429,000 to $10.93M depending on severity, and IBM's Cost of a Data Breach has parked healthcare above every other industry for years. Against numbers like those, a wristband program is a rounding error — the breakdown below shows just how small.</p>
+  <figure class="codex-editorial-figure" aria-label="Program cost weighed against the cost of a patient-identification or PHI breach">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="coT coD" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+      <title id="coT">The wristband program costs a fraction of a single breach</title>
+      <desc id="coD">A ledger comparison. What the program costs: total program capex of $300K to $1M for a 300-bed hospital (handhelds, sleds, fixed readers, EHR integration at $5,000 to $25,000 per nursing unit); plus $9K to $75K a year in single-use Tyvek bands at $0.25 to $1.50 each. What one mistake costs: HHS OCR settlements from $429K (Lifespan, 2020) to $10.93M (Anthem, 2018), with IBM placing healthcare breach cost above $10M per incident — the highest of any industry. One avoided misidentification breach typically funds the program for years. Footer: wrong-patient events are 7 to 13 percent of medication errors and 5 to 10 percent of lab specimen mismatches; Joint Commission NPSG.01.01.01 requires at least two patient identifiers.</desc>
+      <defs>
+        <radialGradient id="coBg" cx="50%" cy="16%" r="92%"><stop offset="0%" stop-color="#f8f2e6"/><stop offset="100%" stop-color="#f1ece0"/></radialGradient>
+        <linearGradient id="coDark" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#291c0e"/><stop offset="100%" stop-color="#6c5127"/></linearGradient>
+      </defs>
+      <rect width="1200" height="675" fill="url(#coBg)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="60" text-anchor="middle" font-size="20.5" font-weight="800" letter-spacing="1.4" fill="#6d5a3a">COST THE PROGRAM AGAINST THE COST OF GETTING IT WRONG</text>
+
+      <!-- Left: program cost -->
+      <rect x="64" y="94" width="512" height="436" rx="16" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2.5"/>
+      <text x="320" y="134" text-anchor="middle" font-size="16" font-weight="800" letter-spacing="1.5" fill="#6d5a3a">WHAT THE PROGRAM COSTS</text>
+      <text x="320" y="212" text-anchor="middle" font-size="52" font-weight="800" fill="#291c0e">$300K–$1M</text>
+      <text x="320" y="244" text-anchor="middle" font-size="16" fill="#4f4f4f">total program capex · 300-bed hospital</text>
+      <text x="320" y="266" text-anchor="middle" font-size="14.5" fill="#8a7a5f">handhelds, tablet sleds, fixed readers + EHR integration</text>
+      <line x1="112" y1="298" x2="528" y2="298" stroke="#eaddc0" stroke-width="1.5"/>
+      <text x="320" y="356" text-anchor="middle" font-size="40" font-weight="800" fill="#291c0e">$9K–$75K<tspan font-size="22" fill="#6d5a3a"> / yr</tspan></text>
+      <text x="320" y="386" text-anchor="middle" font-size="16" fill="#4f4f4f">single-use Tyvek bands · $0.25–1.50 each</text>
+      <rect x="150" y="418" width="340" height="40" rx="20" fill="#efe0bf"/>
+      <text x="320" y="444" text-anchor="middle" font-size="15" font-weight="700" fill="#6d5a3a">$5K–25K per nursing-unit deployment</text>
+      <text x="320" y="498" text-anchor="middle" font-size="14.5" fill="#8a7a5f">~35,000–50,000 bands/yr at 500 beds, 75% occupancy, 4-day stay</text>
+
+      <!-- vs -->
+      <circle cx="600" cy="312" r="30" fill="#ffffff" stroke="#c39a5f" stroke-width="2.5"/>
+      <text x="600" y="320" text-anchor="middle" font-size="18" font-weight="800" fill="#6d5a3a">vs</text>
+
+      <!-- Right: breach cost -->
+      <rect x="624" y="94" width="512" height="436" rx="16" fill="#f7ecea" stroke="#dcb6b0" stroke-width="2.5"/>
+      <text x="880" y="134" text-anchor="middle" font-size="16" font-weight="800" letter-spacing="1.5" fill="#8b2d2d">WHAT ONE MISTAKE COSTS</text>
+      <text x="880" y="214" text-anchor="middle" font-size="46" font-weight="800" fill="#8b2d2d">$429K → $10.93M</text>
+      <text x="880" y="246" text-anchor="middle" font-size="16" fill="#734040">HHS OCR settlements, by scope</text>
+      <text x="880" y="268" text-anchor="middle" font-size="14.5" fill="#9a6a6a">Lifespan (2020) → Anthem (2018)</text>
+      <line x1="672" y1="300" x2="1088" y2="300" stroke="#e6c9c4" stroke-width="1.5"/>
+      <text x="880" y="358" text-anchor="middle" font-size="40" font-weight="800" fill="#8b2d2d">&gt; $10M<tspan font-size="22" fill="#734040"> / incident</tspan></text>
+      <text x="880" y="388" text-anchor="middle" font-size="16" fill="#734040">IBM: healthcare breach cost — #1 of any industry, years running</text>
+      <rect x="672" y="418" width="416" height="88" rx="12" fill="#ffffff" stroke="#dcb6b0" stroke-width="1.5"/>
+      <text x="880" y="452" text-anchor="middle" font-size="17" font-weight="800" fill="#291c0e">One avoided misidentification breach</text>
+      <text x="880" y="480" text-anchor="middle" font-size="17" font-weight="800" fill="#1f6f3a">funds the entire program for years.</text>
+
+      <!-- Footer strip -->
+      <rect x="64" y="548" width="1072" height="84" rx="14" fill="url(#coDark)"/>
+      <text x="90" y="582" font-size="15.5" fill="#ffffff">Wrong-patient baseline: <tspan font-weight="800">7–13%</tspan> of medication errors · <tspan font-weight="800">5–10%</tspan> of lab specimen mismatches.</text>
+      <text x="90" y="612" font-size="15" fill="#e9d9b8">Joint Commission <tspan font-weight="800" fill="#ffffff">NPSG.01.01.01</tspan> — at least two patient identifiers (band + printed text + EHR validation).</text>
+    </svg>
+  </figure>
+  <ul class="codex-editorial-list">
+    <li><strong>Per-wristband consumables:</strong> $0.25-1.50 per single-use Tyvek RFID wristband at typical 200-500-bed inpatient volumes. A 500-bed hospital with ~75% occupancy and 4-day average length of stay consumes roughly 35,000-50,000 wristbands per year — annual consumable spend $9K-75K depending on chip choice.</li>
+    <li><strong>Reader and infrastructure capex:</strong> $5,000-25,000 per nursing-unit deployment for handhelds, tablet sleds, fixed bedside readers, plus integration to the EHR (Epic Rover, Cerner CareAware, Meditech BCMA modules). Most 300-bed hospitals run $300K-1M total program capex.</li>
+    <li><strong>Wrong-patient error baseline:</strong> published medication-administration error studies place wrong-patient events at 7-13% of medication errors and 5-10% of laboratory specimen mismatches; industry guidance notes 'patient misidentification is one of the most common errors in hospitals' and that RFID 'eliminates this at every touchpoint'.</li>
+    <li><strong>HIPAA breach cost reference:</strong> HHS OCR published settlements ranging from $429K (Lifespan, 2020) up to $10.93M (Anthem, 2018) depending on scope; IBM's healthcare breach cost has run above $10M per incident for several years. A single avoided wristband-driven misidentification breach typically funds the entire wristband program for years.</li>
+    <li><strong>Joint Commission alignment:</strong> National Patient Safety Goal NPSG.01.01.01 requires use of at least two patient identifiers when providing care, treatment and services. RFID wristband + visual band-text + EHR validation routinely satisfies this; auditors look for documented procedure plus evidence of audit-log retention.</li>
+  </ul>
+</section>
+
+<!-- ===================== FAQ ===================== -->
+<section class="codex-editorial-faq">
+  <h2>Frequently asked questions</h2>
+  <details open>
+    <summary>Can a stranger read PHI off my RFID wristband?</summary>
+    <p class="ans">Not in any useful way. A properly designed wristband stores only an opaque patient ID (a random UUID), not a name or MRN. Someone who scans it in a hallway gets meaningless data — only authenticated EHR access can resolve the UUID to patient information.</p>
+  </details>
+  <details>
+    <summary>What chip is best for patient wristbands?</summary>
+    <p class="ans"><a href="/guides/ntag424-dna-sun-cmac-authentication/">NTAG 424 DNA</a> is the de facto standard for HIPAA-sensitive applications, and for good reason: AES-128 mutual authentication, tamper-evident packaging and FIPS 140-2 certified key management satisfy HIPAA Security Rule encryption requirements.</p>
+  </details>
+  <details>
+    <summary>How long do RFID wristbands last on a patient?</summary>
+    <p class="ans">Standard Tyvek RFID wristbands last 7-10 days in normal use, sufficient for most inpatient stays. Long-stay patients (ICU, oncology) get periodic re-issue. Pediatric and neonatal versions exist with smaller form factors.</p>
+  </details>
+  <details>
+    <summary>Does RFID wristband replace barcode wristband?</summary>
+    <p class="ans">Usually not — most hospitals deploy both: printed barcode for visual ID and legacy systems, plus RFID for fast contactless scanning. The barcode and RFID encode the same opaque ID; either can be used for any workflow that supports it. Joint Commission NPSG.01.01.01 (two-patient-identifier rule) is satisfied by either independently, but defence-in-depth is the dominant pattern.</p>
+  </details>
+  <details>
+    <summary>What is the policy for newborn or pediatric wristbands?</summary>
+    <p class="ans">Smaller form factors (10-15 mm wide) are standard for paediatric and neonatal wards, often paired with a maternal-band link so an alarm fires if the infant tag separates from the mother's tag inside the unit. Industry-published RTLS guidance treats infant abduction prevention as a distinct use case requiring exit-portal alerting in addition to wristband-level identity, with policies aligned to the National Center for Missing &amp; Exploited Children's Guidelines for the Prevention of and Response to Infant Abductions.</p>
+  </details>
+  <details>
+    <summary>What happens if the wristband fails or is removed?</summary>
+    <p class="ans">No system reads 100% of the time, so policy has to cover the misses. Hospital policy must require a visual cross-check whenever the chip read fails (typically less than 1% of scans on a properly deployed wristband). Re-issuance is part of the standard nursing protocol: cut the failed wristband, document the disposal, and re-print/encode a new wristband from the existing patient record so the opaque-ID mapping carries forward. Wristband vendors publish guidance that wristband removal during inpatient stays should trigger a chart entry — auditors look for this in HIPAA and Joint Commission medical-record reviews.</p>
+  </details>
+</section>
+
+<!-- ===================== RESOURCES ===================== -->
+<section class="codex-res">
+  <h2>Keep going</h2>
+  <div class="codex-res-grid">
+    <div class="codex-res-card">
+      <h3>HIPAA-compliant patient RFID wristbands</h3>
+      <p>Single-use Tyvek RFID wristbands, NTAG 424 DNA secure chips and EHR integration.</p>
+      <ul>
+        <li><a href="/solutions/rfid-patient-tracking/">RFID patient tracking →</a></li>
+        <li><a href="/industries/healthcare/">Healthcare industry hub →</a></li>
+        <li><a href="/contact/rfid-labels-tags/">Get a patient-wristband quote →</a></li>
+        <li><a href="/products/rfid-wristbands/hospital-patient-id-wristband/">RFID hospital patient-ID wristbands →</a></li>
+      </ul>
+    </div>
+    <div class="codex-res-card">
+      <h3>HIPAA and patient-safety reference material</h3>
+      <p>Authority sources hospital security and compliance teams cite during wristband program design.</p>
+      <ul>
+        <li><a href="https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html" target="_blank" rel="noopener noreferrer">HHS — HIPAA Security Rule (45 CFR Part 164 Subpart C) →</a></li>
+        <li><a href="https://www.jointcommission.org/standards/national-patient-safety-goals/hospital-national-patient-safety-goals/" target="_blank" rel="noopener noreferrer">Joint Commission — Hospital National Patient Safety Goals (NPSG) →</a></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ACTION BAR ===================== -->
+<section class="codex-action-bar">
+  <h2>Ready to make patient identity the boring part?</h2>
+  <p>We ship single-use Tyvek bands with NTAG 424 DNA secure chips and EHR integration — the design that keeps PHI in the EHR and off the band.</p>
+  <a class="codex-cta--primary" href="/contact/rfid-labels-tags/">Get a HIPAA RFID wristband quote</a>
+  <a class="codex-cta--secondary" href="/solutions/rfid-patient-tracking/">Patient tracking solution</a>
+  <a class="codex-cta--secondary" href="/industries/healthcare/">Healthcare hub</a>
+</section>
+
+</main>
+</body>
+</html>

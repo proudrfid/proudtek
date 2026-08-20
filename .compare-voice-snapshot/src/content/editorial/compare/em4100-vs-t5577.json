@@ -1,0 +1,322 @@
+{
+  "route": "/compare/em4100-vs-t5577/",
+  "group": "compare",
+  "title": "{chip:em-microelectronic-em4100:short_name} vs {chip:atmel-t5577:name} — The Practical 125 kHz LF Chip Comparison for Access, Cloning, Hotel Retrofit and Migration",
+  "kicker": "{chip:em-microelectronic-em4100:short_name} vs {chip:atmel-t5577:name}",
+  "summary": "Two chips run the entire 125 kHz low-frequency (LF) world, and the gap between them is basically 'sealed for life' versus 'erasable in seconds.' EM4100 is read-only: it leaves EM Microelectronic with a 40-bit unique ID (10 hex characters) burned into a 64-bit frame, and that number is its number forever. T5577 is the rewritable shape-shifter — a configurable EEPROM that can impersonate EM4100, HID Prox, Indala, Pyramid and AWID, which is exactly why every $25 card-cloning gadget on the internet is, under the hood, a T5577 writer. So the real question is rarely 'which is better.' It's whether your deployment wants read-only durability (EM4100), a one-time pre-encoded credential (either), or a card you can re-write in the field (T5577). This page walks the silicon, the six-second cloning trick, the compatibility matrix, the price ladder and the migration paths where T5577 earns its keep.",
+  "heroPoints": [
+    "Memory is the whole plot. EM4100 ships a 40-bit UID fused into ROM inside a 64-bit frame — readable, never re-writable. T5577 carries a 330-bit configurable EEPROM and a programmable modulator register, so one chip can speak EM4100, HID Prox 26/35/37-bit, Indala 26/27-bit, Pyramid and AWID with a single re-write.",
+    "The cloning economics are inverted. EM4100 is the format that gets copied; T5577 is the blank it gets copied onto. Every $20–$50 'card duplicator' on Amazon, AliExpress and Shenzhen's Huaqiangbei is functionally a T5577 writer — so if your access control only checks the 125 kHz UID, every EM4100 badge in the fleet is one blank away from a perfect twin.",
+    "The price gap is real but small. At 50k MOQ FOB Shenzhen, EM4100 runs $0.08–0.15 a card and T5577 $0.12–0.22. That 50–80% chip premium vanishes next to the headcount cost of re-issuing mis-encoded read-only cards — but it still matters for mass-volume tags (animal ID, amenity tokens, simple badges) where personalization is irrelevant."
+  ],
+  "imageAlt": "Side-by-side banner comparing the read-only EM4100 chip and the rewritable T5577 chip, both 125 kHz LF, with a padlock on EM4100 and a pencil on T5577",
+  "heroImage": "/landing-images/em4100-vs-t5577-hero.jpg",
+  "imageSourceRoutes": [
+    "/products/rfid-cards/em4100-rfid-card/",
+    "/products/rfid-keyfobs/t5577-keyfob/"
+  ],
+  "keywords": [
+    "{chip:em-microelectronic-em4100:short_name} vs {chip:atmel-t5577:name}",
+    "125 kHz LF chip comparison",
+    "{chip:atmel-t5577:name} rewritable card",
+    "{chip:em-microelectronic-em4100:short_name} cloning",
+    "LF access control chip",
+    "Proxmark3 {chip:atmel-t5577:name}"
+  ],
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "peter-zhang",
+  "publishedAt": "2026-05-13",
+  "modifiedAt": "2026-07-07T00:00:00Z",
+  "reviewedAt": "2026-05-13",
+  "sections": [
+    {
+      "title": "The silicon: same radio, wildly different memory",
+      "intro": "Both chips are 125 kHz passive LF devices, both speak ASK / Manchester, and both work on the very same reader hardware. Hold them up to an antenna and they're identical twins. Everything that separates them lives in the memory model and the modulator config.",
+      "statBar": {
+        "items": [
+          { "value": "64-bit", "label": "EM4100 frame · 40-bit UID" },
+          { "value": "330-bit", "label": "T5577 EEPROM · configurable" },
+          { "value": "0 vs 100k+", "label": "Write cycles" },
+          { "value": "5–15 cm", "label": "Read range · both chips" }
+        ]
+      },
+      "image": {
+        "src": "/diagrams/compare/em4100-vs-t5577-memory-model.svg",
+        "alt": "Memory maps compared: EM4100 as a fixed 64-bit frame with a highlighted 40-bit unique ID plus header, parity and stop bits; T5577 as seven 32-bit EEPROM blocks plus a configuration block, with block 0 holding the modulator config and block 7 an optional password."
+      },
+      "bullets": [
+        "EM4100 (also sold as EM4102 and, in later revisions, EM4200) is a 64-bit affair: 9 header bits, 40 bits of unique ID (10 hex characters, often shown as a 5- or 8-digit decimal Wiegand-26 / Wiegand-34 value), 14 row-and-column parity bits and 1 stop bit. The UID is laser-trimmed at the factory and immutable — no challenge-response, no cryptography, no spare memory to scribble in.",
+        "T5577 carries a 330-bit user EEPROM organised as 7 × 32-bit blocks plus a configuration block. Block 0 holds the modulator config (which protocol to emulate, bit rate, encoding); block 7 holds the optional password; blocks 1–6 carry the ID data, padded to whatever the emulated protocol needs — 40 bits for EM4100, 26/35/37 for HID Prox, 27 for Indala.",
+        "Read range and reader compatibility are identical — both are 125 kHz ASK Manchester at the air interface, and both work with every standard LF reader: HID ProxPoint and ProxPro, Indala ASR, EM-Marin readers, ESP8266 / Arduino DIY rigs, the Proxmark3, and the entire $20–$50 'card duplicator' commodity tier.",
+        "Cost tracks complexity. EM4100 is simpler silicon (smaller die, no EEPROM), so it's cheaper: at 50k-card MOQ FOB Shenzhen the ladder runs roughly EM4100 $0.08–0.15, EM4200 (re-revision) $0.10–0.16, T5577 $0.12–0.22, depending on chip-availability cycles and antenna geometry."
+      ]
+    },
+    {
+      "title": "Cloning mechanics: how a $25 gadget photocopies a badge",
+      "intro": "T5577 exists commercially for one reason: it's the cheapest way to drop an arbitrary 125 kHz credential into a re-writable body. The duplicator reads the source EM4100, decodes the 40-bit UID, sets the T5577 modulator to impersonate it at the same bit rate, writes the UID into the data blocks — and the resulting card is indistinguishable from the original to any standard reader.",
+      "image": {
+        "src": "/diagrams/compare/em4100-vs-t5577-cloning-flow.svg",
+        "alt": "Cloning flow: a commodity duplicator reads the original EM4100 over a 125 kHz field and writes a T5577 blank that reads identically, in five steps totalling 2 to 6 seconds; tools include a $25 handheld copier, the $35 Keysy and the $350 Proxmark3 RDV4."
+      },
+      "dataHighlight": {
+        "value": "2–6 sec",
+        "heading": "That's the entire heist",
+        "text": "Start to finish, that's all a commodity duplicator needs to read an EM4100 and write a working T5577 clone — no keys, no cryptography, no skill required."
+      },
+      "timeline": {
+        "items": [
+          { "label": "Step 1 · Read", "text": "The tool energises the EM4100 with a 125 kHz field and captures its ASK-modulated Manchester response. Decode time: under 50 ms." },
+          { "label": "Step 2 · Decode", "text": "It extracts the 40-bit UID from the response and validates the parity bits." },
+          { "label": "Step 3 · Configure", "text": "It writes the T5577 configuration block to emulate EM4100 — modulator = ASK, bit rate = RF/64, encoding = Manchester, data in blocks 1–2." },
+          { "label": "Step 4 · Write", "text": "It writes the 40-bit UID into blocks 1–2 of the T5577 EEPROM." },
+          { "label": "Step 5 · Verify", "text": "It reads the freshly minted T5577 back to confirm the copy. Total operation time: 2–6 seconds, depending on the tool." }
+        ]
+      },
+      "bullets": [
+        "The off-the-shelf toolkit is not exotic: a Keysy runs about $35, a handheld card copier around $25 on Amazon, and a Proxmark3 RDV4 roughly $350 for the pro tier that also handles HID Prox and Indala."
+      ],
+      "callout": {
+        "label": "The one reader-side defense (and why it's shaky)",
+        "text": "A handful of high-end HID readers (iCLASS SE, multiCLASS) try to reject T5577-emulated credentials by spotting subtle timing differences in the ASK response. It's brittle, absent from commodity readers, and the latest Proxmark3 firmware revisions already walk around it."
+      }
+    },
+    {
+      "title": "The spec sheet, minus the sedative",
+      "intro": "Everything above, compressed into the table you'll actually paste into the shortlist email. Every figure is buyer-verifiable — cross-reference against the vendor datasheets all you like.",
+      "table": {
+        "columns": [
+          "Specification",
+          "{chip:em-microelectronic-em4100:short_name} (read-only)",
+          "{chip:atmel-t5577:name} (rewritable)"
+        ],
+        "rows": [
+          [
+            "Frequency",
+            "125 kHz LF",
+            "125 kHz LF"
+          ],
+          [
+            "Memory",
+            "{chip:em-microelectronic-em4100:memory.frame_bits}-bit total ({chip:em-microelectronic-em4100:memory.id_bits}-bit UID immutable)",
+            "{chip:atmel-t5577:memory.rewritable_bits}-bit user EEPROM, configurable"
+          ],
+          [
+            "Re-writable",
+            "No",
+            "Yes — full re-encoding in field"
+          ],
+          [
+            "Protocol emulation",
+            "{chip:em-microelectronic-em4100:short_name} only",
+            "{chip:em-microelectronic-em4100:short_name}, HID Prox 26/35/37, Indala 26/27, Pyramid, AWID + others"
+          ],
+          [
+            "Encoding",
+            "ASK / Manchester at RF/64",
+            "Configurable: ASK / FSK / PSK, multiple bit rates"
+          ],
+          [
+            "Cryptography",
+            "None",
+            "None — UID-equivalent emulation only, no challenge-response"
+          ],
+          [
+            "Password protection",
+            "No",
+            "Optional 32-bit password (rarely used in commodity deployments)"
+          ],
+          [
+            "Anti-collision",
+            "No",
+            "No"
+          ],
+          [
+            "Read range",
+            "5–15 cm typical, 50 cm with high-power readers",
+            "5–15 cm typical, 50 cm with high-power readers"
+          ],
+          [
+            "Unit cost (50k MOQ, FOB Shenzhen)",
+            "$0.08–0.15",
+            "$0.12–0.22"
+          ],
+          [
+            "Cloning tool ecosystem",
+            "Source — cloned onto {chip:atmel-t5577:name} blanks",
+            "Target — every commodity duplicator writes to {chip:atmel-t5577:name}"
+          ],
+          [
+            "Lifetime read cycles",
+            "Unlimited",
+            "Unlimited"
+          ],
+          [
+            "Lifetime write cycles",
+            "0 (read-only)",
+            "100,000+ EEPROM write cycles"
+          ],
+          [
+            "Smartphone read (NFC)",
+            "No — NFC is 13.56 MHz, not 125 kHz",
+            "No — NFC is 13.56 MHz, not 125 kHz"
+          ]
+        ]
+      }
+    },
+    {
+      "title": "Pick your fighter: when each chip wins",
+      "intro": "This is rarely a 'which chip is better' question. It's a 'does this credential ever need to change after it ships' question — and that single fork decides almost every deployment. Read-only is a genuine feature on the left; re-writability earns its premium on the right.",
+      "image": {
+        "src": "/diagrams/compare/em4100-vs-t5577-decision.svg",
+        "alt": "Decision board. Reach for EM4100 for mass-volume single-use credentials, legacy reader fleets, immutable audit trails, 125 kHz animal-ID lineage, and the cheapest unique number. Reach for T5577 for hotel and multi-tenant retrofits, pre-encoded issuance, in-field rotation, one SKU across many formats, and test or pentest fleets."
+      },
+      "comparePanel": {
+        "beforeHeading": "Reach for EM4100",
+        "afterHeading": "Reach for T5577",
+        "before": [
+          "Mass-volume, single-use credentials — animal-ID ear tags, hotel-amenity tokens, gym lockers, parking day passes. The chip is consumed once and never re-issued, so the 50–80% chip-cost saving compounds hard above 250,000 units a year.",
+          "Legacy reader fleets that never re-encode — a 1990s-era HID ProxPoint fleet in a single-tenant building has no operational need for in-field re-write. EM4100 (or HID Prox on a non-EM4100 chip) is plenty.",
+          "Anti-counterfeit audit trails — when a factory-issued UID is audit-trailed to a specific batch or customer, EM4100's immutability is the feature, not the bug.",
+          "125 kHz animal-ID lineage — ISO 11784/11785 FDX/HDX at 134.2 kHz is a separate chip family, but for the older ICAR-registered 125 kHz EM4100 animal-ID chains, the chip's immutability is part of the regulatory record.",
+          "The cheapest 'unique number' — when all the reader needs is to see one immutable ID, EM4100 hits the spec at rock-bottom cost."
+        ],
+        "after": [
+          "Hotel & multi-tenant retrofit — the existing locks are HID Prox or Indala, but you want a single chip family to restock. T5577 emulates the current format on day one and can migrate to another later if the lock platform is upgraded.",
+          "Pre-encoded credential issuance — ship cards with the credential ID already programmed (e.g. employee badges carrying a payroll-system ID). T5577 supports this on a Proud Tek encoder line; EM4100 can't, because its UID is factory-set.",
+          "In-field credential rotation — security-conscious programmes that rotate credential IDs every 90 days can re-write T5577; EM4100 would force a full card re-issue every cycle.",
+          "One SKU across many reader formats — a portfolio with HID Prox at some sites, EM4100 at others and Indala at a third can run a single T5577 SKU configured per site.",
+          "Test, engineering & pen-test fleets — T5577 is the de facto lab chip for red-team exercises, capture-the-flag events and staging any 125 kHz format on a single blank."
+        ]
+      }
+    },
+    {
+      "title": "The read-only → rewritable upgrade path",
+      "intro": "Buildings that started on EM4100 and now want T5577 don't have to flip the entire credential fleet in one dramatic weekend. There's a calmer path — and one honest caveat that most card vendors won't lead with.",
+      "image": {
+        "src": "/diagrams/compare/em4100-vs-t5577-migration.svg",
+        "alt": "Four-stop upgrade roadmap: hybrid issuance of T5577 alongside existing EM4100; hardening the readers by moving from 125 kHz LF to 13.56 MHz HF; dual-frequency bridge cards carrying both an LF and an HF chip; and audit logging that flags impossible travel. Real cloning resistance means 13.56 MHz MIFARE Plus or DESFire with AES-128."
+      },
+      "featureGrid": {
+        "features": [
+          {
+            "icon": "🔁",
+            "title": "Hybrid issuance",
+            "text": "Issue new credentials on T5577 (emulating EM4100) while the existing EM4100 cards stay in circulation. Both badge in on the current readers, and over 12–18 months the old population attrits out — lost, broken, or retired."
+          },
+          {
+            "icon": "📡",
+            "title": "Harden the readers, not just the cards",
+            "text": "The harder — and real — upgrade is on the reader side. Replacing 125 kHz proximity readers with HF (13.56 MHz, MIFARE Plus / DESFire) readers is the only path to actual cloning resistance. T5577 changes the credential medium, not the fundamental 125 kHz cloning surface."
+          },
+          {
+            "icon": "🪪",
+            "title": "Dual-frequency bridge cards",
+            "text": "Cards that carry both an LF (EM4100 or T5577) chip and an HF (MIFARE Classic / Plus / DESFire) chip in the same body. Both readers see the same card through the migration window. Proud Tek's dual-frequency RFID card SKU covers this pattern."
+          },
+          {
+            "icon": "🔍",
+            "title": "Log it and watch",
+            "text": "Whatever the credential medium, the control that actually earns its keep is the access-control software flagging impossible travel — the same credential appearing at two readers 200 m apart in the same minute. That works no matter which chip is in the card."
+          }
+        ]
+      },
+      "callout": {
+        "label": "The part nobody selling you cards will lead with",
+        "text": "T5577 makes credentials easier to manage — it does not make them harder to clone. The only real fix for the 125 kHz cloning surface is moving to 13.56 MHz (MIFARE Plus EV2 SL3 or DESFire EV3), where mutual authentication ends the commodity-copy game entirely.",
+        "href": "/compare/125khz-vs-13.56mhz-rfid/"
+      }
+    }
+  ],
+  "resourceCards": [
+    {
+      "title": "Buy either chip family from Proud Tek",
+      "description": "Both SKUs ship from the same Shenzhen production lines.",
+      "links": [
+        {
+          "href": "/products/rfid-cards/em4100-rfid-card/",
+          "label": "{chip:em-microelectronic-em4100:short_name} RFID card (read-only)"
+        },
+        {
+          "href": "/products/rfid-keyfobs/t5577-keyfob/",
+          "label": "{chip:atmel-t5577:name} keyfob (rewritable)"
+        },
+        {
+          "href": "/products/rfid-cards/dual-frequency-rfid-card/",
+          "label": "Dual-frequency 125 kHz + 13.56 MHz card"
+        }
+      ]
+    },
+    {
+      "title": "Background reading on 125 kHz LF",
+      "description": "The LF chip encyclopedia and frequency-band primer.",
+      "links": [
+        {
+          "href": "/guides/em4100-em4305-t5577-lf-chip-encyclopedia/",
+          "label": "{chip:em-microelectronic-em4100:short_name} / {chip:em-microelectronic-em4305:short_name} / {chip:atmel-t5577:name} LF chip encyclopedia"
+        },
+        {
+          "href": "/compare/125khz-vs-13.56mhz-rfid/",
+          "label": "125 kHz vs 13.56 MHz RFID — when to migrate"
+        }
+      ]
+    },
+    {
+      "title": "When you have decided",
+      "description": "Talk to Proud Tek with the credential format, volume and reader info ready.",
+      "links": [
+        {
+          "href": "/sample-pack/",
+          "label": "Request a 125 kHz LF sample pack"
+        },
+        {
+          "href": "/contact/",
+          "label": "Talk to a Proud Tek LF chip specialist"
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "question": "Can I tell from looking at a card whether it is {chip:em-microelectronic-em4100:short_name} or {chip:atmel-t5577:name}?",
+      "answer": "Not with your eyes — both ship in the same standard 85 × 55 mm PVC body with identical antenna geometry. Telling them apart needs either a tool that reads the chip ID (a Proxmark3 will report the chip model on detection) or the per-SKU markings the manufacturer applies. Proud Tek labels every box of cards with the chip family and protocol on the lot label, so receiving teams can verify without a reader."
+    },
+    {
+      "question": "Will a {chip:atmel-t5577:name} emulating {chip:em-microelectronic-em4100:short_name} work on every {chip:em-microelectronic-em4100:short_name} reader?",
+      "answer": "On every commodity 125 kHz reader, yes. The handful of high-end HID iCLASS SE / multiCLASS readers that run timing-side-channel rejection of cloned credentials are the exception — and even those fall to the latest Proxmark3 firmware revisions. For the 95% of reader fleets in commercial use, treat T5577 emulation as functionally equivalent."
+    },
+    {
+      "question": "Can {chip:atmel-t5577:name} be password-protected to prevent cloning?",
+      "answer": "Yes — T5577 supports a 32-bit password lock on the configuration block, which blocks re-writing the modulator config or the data without the password. In practice it's rarely deployed, because (a) it doesn't stop anyone from reading the credential and building an emulation anyway, and (b) password management adds operational overhead. You'll see it far more in test / lab / pentest fleets than in commodity issuance."
+    },
+    {
+      "question": "Is there a 'secure' 125 kHz chip family that defeats commodity cloning?",
+      "answer": "Not at commodity price points. HITAG 1 / HITAG 2 / HITAG S add some authentication, but the chips and readers cost an order of magnitude more than EM4100/T5577 — and HITAG 2 has known vulnerabilities. The practical secure-credential path is to migrate to 13.56 MHz (MIFARE Plus EV2 SL3 or MIFARE DESFire EV3), where AES-128 mutual authentication eliminates the commodity cloning surface entirely. See the linked /compare/125khz-vs-13.56mhz-rfid/ page for the full migration analysis."
+    },
+    {
+      "question": "What MOQ does Proud Tek require for either chip?",
+      "answer": "EM4100 and T5577 cards are stocked in standard PVC formats, and Proud Tek can ship from 1,000 units. The unit-cost ladder flattens above 50,000 units; below that it steepens, because lamination tooling amortises across fewer units. Keyfob form factors carry a higher tooling minimum (typically 5,000 units), but the chip cost is the same."
+    },
+    {
+      "question": "Does either chip work with iPhone NFC reading?",
+      "answer": "No. Both EM4100 and T5577 are 125 kHz LF chips, and the iPhone — like every NFC-enabled smartphone — reads 13.56 MHz HF chips per the NFC Forum specification, not 125 kHz. If smartphone compatibility is a requirement, the chip family has to move to 13.56 MHz (MIFARE / NTAG / FeliCa / ICODE)."
+    }
+  ],
+  "primaryAction": {
+    "href": "/sample-pack/",
+    "label": "Request a 125 kHz LF sample pack"
+  },
+  "secondaryActions": [
+    {
+      "href": "/products/rfid-cards/em4100-rfid-card/",
+      "label": "{chip:em-microelectronic-em4100:short_name} RFID card product"
+    },
+    {
+      "href": "/products/rfid-keyfobs/t5577-keyfob/",
+      "label": "{chip:atmel-t5577:name} keyfob product"
+    },
+    {
+      "href": "/contact/",
+      "label": "Talk to a Proud Tek LF chip specialist"
+    }
+  ]
+}

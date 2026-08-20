@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>China RFID Factory Audit — What to Inspect · Proudtek (preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --dark:#291c0e; --dark-mid:#6c5127; --gold:#c39a5f; --gold-light:#d4a755; --gold-muted:#6d5a3a;
+    --cyan:#1fcefb; --cyan-hover:#15bce8; --navy:#1f4e79; --teal:#3d6b6b; --steel:#4a5568; --forest:#2d6a4f;
+    --error:#8b2d2d; --success:#1f6f3a;
+    --text:#291c0e; --text-strong:#1a1a1a; --text-muted:#4f4f4f; --text-subtle:#5c5c5c;
+    --border:rgba(41,28,14,.12); --border-light:rgba(41,28,14,.08); --border-gold:rgba(195,154,95,.30);
+    --surface:#ffffff; --bg-warm:#f7f4ee; --panel:#fbf8f2;
+    --radius-sm:8px; --radius-card:16px; --radius-lg:20px; --radius-xl:24px; --radius-pill:999px;
+    --rest:0 1px 3px rgba(41,28,14,.08); --hover:0 4px 12px rgba(41,28,14,.10); --modal:0 16px 48px rgba(41,28,14,.18);
+    --font-head:"Lora",Georgia,"Times New Roman",serif;
+    --font-body:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --measure:70ch; --col:min(72rem,92%); --col-wide:min(88rem,100%);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; font-family:var(--font-body); color:var(--text); line-height:1.65;
+    font-size:1.0625rem;
+    background:
+      radial-gradient(120% 80% at 85% -10%, rgba(195,154,95,.16), transparent 60%),
+      linear-gradient(180deg,#fffdf9 0%, var(--bg-warm) 40%, var(--bg-warm) 100%);
+    background-attachment:fixed;
+  }
+  a{color:var(--navy); text-decoration:none; border-bottom:1px solid var(--border-gold)}
+  a:hover{color:var(--dark); border-bottom-color:var(--gold)}
+  .wrap{max-width:var(--col); margin-inline:auto; padding-inline:clamp(1rem,4vw,2rem)}
+  .wide{max-width:var(--col-wide)}
+  h1,h2,h3,h4{font-family:var(--font-head); color:var(--text-strong); line-height:1.2; font-weight:600}
+  p,li{max-width:var(--measure)}
+
+  /* ── top ribbon ── */
+  .ribbon{background:linear-gradient(135deg,var(--dark),var(--dark-mid)); color:#f4ead3;
+    font-size:.78rem; letter-spacing:.06em; text-align:center; padding:.5rem 1rem}
+  .ribbon b{color:var(--gold-light)}
+
+  /* ── hero ── */
+  .hero{padding:clamp(2.5rem,6vw,4.5rem) 0 1.5rem}
+  .kicker{display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--gold-muted); background:rgba(195,154,95,.12); border:1px solid var(--border-gold);
+    padding:.35rem .7rem; border-radius:var(--radius-pill); margin-bottom:1rem}
+  .hero h1{font-size:clamp(2rem,4.6vw,2.9rem); margin:.2rem 0 .8rem; letter-spacing:-.01em}
+  .lead{font-size:clamp(1.1rem,2vw,1.28rem); color:var(--text); line-height:1.6; max-width:64ch}
+  .byline{margin-top:1rem; font-size:.85rem; color:var(--text-subtle)}
+  .byline b{color:var(--gold-muted); font-weight:600}
+
+  figure{margin:0}
+  .figure{margin:2rem auto; max-width:var(--col-wide)}
+  .figure svg{width:100%; height:auto; display:block; border-radius:var(--radius-lg);
+    box-shadow:var(--hover); border:1px solid var(--border-light)}
+  .figcap{font-size:.85rem; color:var(--text-subtle); text-align:center; margin-top:.7rem; max-width:70ch; margin-inline:auto}
+
+  /* ── hero takeaway cards ── */
+  .takeaways{display:grid; gap:1rem; grid-template-columns:repeat(3,1fr); margin:2rem auto 0; max-width:var(--col-wide)}
+  .tk{background:linear-gradient(180deg,#fff, #fdfbf6); border:1px solid var(--border-gold); border-radius:var(--radius-card);
+    padding:1.25rem 1.35rem; box-shadow:var(--rest)}
+  .tk .n{display:inline-flex; align-items:center; justify-content:center; width:2rem; height:2rem; border-radius:var(--radius-pill);
+    background:var(--gradient,linear-gradient(135deg,var(--gold),var(--gold-light))); color:#fff; font-weight:800; font-size:.95rem; margin-bottom:.6rem;
+    box-shadow:0 1px 4px rgba(195,154,95,.5)}
+  .tk p{margin:0; font-size:.98rem; line-height:1.55; max-width:none; color:var(--text)}
+
+  /* ── sections ── */
+  section.body{padding:1.75rem 0}
+  section.body > .wrap > h2{font-size:clamp(1.55rem,3vw,2rem); margin:2.2rem 0 .2rem; position:relative; padding-top:1.2rem}
+  section.body > .wrap > h2::before{content:""; position:absolute; top:0; left:0; width:56px; height:4px;
+    border-radius:2px; background:linear-gradient(90deg,var(--gold),var(--gold-light))}
+  .intro{font-size:1.12rem; color:var(--text); line-height:1.62; margin:1rem 0 1.4rem; max-width:68ch}
+
+  /* ── compare panel ── */
+  .compare{display:grid; grid-template-columns:1fr 1fr; gap:1rem; max-width:var(--col-wide); margin:1.4rem 0}
+  .compare .col{border-radius:var(--radius-card); padding:1.2rem 1.3rem; border:1px solid var(--border)}
+  .compare .deck{background:linear-gradient(180deg,#fdf6e8,#fbf1dc); border-color:#e4c98f}
+  .compare .floor{background:linear-gradient(180deg,#f4f7f8,#eef2f4); border-color:#cdd7de}
+  .compare h4{margin:.1rem 0 .9rem; font-size:.8rem; letter-spacing:.12em; text-transform:uppercase; font-family:var(--font-body); font-weight:700}
+  .compare .deck h4{color:var(--gold-muted)}
+  .compare .floor h4{color:var(--steel)}
+  .compare ul{list-style:none; margin:0; padding:0; display:grid; gap:.85rem}
+  .compare li{max-width:none; font-size:.96rem; line-height:1.5; padding-left:1.4rem; position:relative}
+  .compare .deck li::before{content:"“"; position:absolute; left:0; top:-.15rem; font-family:var(--font-head); font-size:1.3rem; color:var(--gold)}
+  .compare .floor li::before{content:"→"; position:absolute; left:0; top:0; color:var(--cyan-hover); font-weight:800}
+  .compare li b{color:var(--text-strong)}
+
+  /* ── rich bullets ── */
+  ul.rich{list-style:none; margin:1.2rem 0; padding:0; display:grid; gap:.9rem; max-width:var(--col-wide)}
+  ul.rich > li{max-width:none; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--gold);
+    border-radius:var(--radius-card); padding:.95rem 1.15rem; box-shadow:var(--rest); font-size:.99rem; line-height:1.56}
+  ul.rich > li b{color:var(--text-strong)}
+  ul.rich > li .tag{display:inline-block; font-size:.68rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--dark-mid); background:rgba(195,154,95,.14); border-radius:var(--radius-pill); padding:.15rem .55rem; margin-right:.5rem; vertical-align:.06em}
+
+  /* ── checklist ── */
+  ul.check{list-style:none; margin:1.2rem 0; padding:0; display:grid; gap:.7rem; max-width:var(--col-wide)}
+  ul.check li{max-width:none; position:relative; padding:.85rem 1rem .85rem 3rem; background:var(--surface);
+    border:1px solid var(--border); border-radius:var(--radius-card); box-shadow:var(--rest); font-size:.99rem; line-height:1.55}
+  ul.check li::before{content:""; position:absolute; left:1rem; top:1rem; width:1.15rem; height:1.15rem; border-radius:5px;
+    border:2px solid var(--forest); background:
+      linear-gradient(45deg,transparent 44%, var(--forest) 44%, var(--forest) 56%, transparent 56%) no-repeat,
+      linear-gradient(-45deg,transparent 44%, var(--forest) 44%, var(--forest) 56%, transparent 56%) no-repeat}
+  ul.check li::after{content:""; position:absolute; left:1.32rem; top:1.28rem; width:.5rem; height:.28rem; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg)}
+  ul.check li b{color:var(--text-strong)}
+
+  /* ── callout ── */
+  .callout{max-width:var(--col-wide); margin:1.5rem 0; border-radius:var(--radius-card); padding:1.1rem 1.3rem 1.1rem 1.5rem;
+    background:linear-gradient(180deg,#eaf9fe,#e2f4fb); border:1px solid #bfe8f5; border-left:4px solid var(--cyan-hover); position:relative}
+  .callout .lbl{font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:#127a92; margin-bottom:.3rem}
+  .callout p{margin:0; max-width:none; font-size:1rem; line-height:1.55}
+  .callout.warn{background:linear-gradient(180deg,#fdeee9,#fbe6df); border-color:#f0cfc4; border-left-color:var(--error)}
+  .callout.warn .lbl{color:var(--error)}
+
+  /* ── faq ── */
+  .faq{max-width:var(--col-wide); margin:1.2rem 0; display:grid; gap:.7rem}
+  details{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-card); box-shadow:var(--rest); overflow:hidden}
+  summary{cursor:pointer; list-style:none; padding:1rem 1.2rem; font-family:var(--font-head); font-weight:600; font-size:1.05rem;
+    color:var(--text-strong); display:flex; justify-content:space-between; align-items:center; gap:1rem}
+  summary::-webkit-details-marker{display:none}
+  summary::after{content:"+"; color:var(--gold); font-size:1.4rem; font-weight:400; line-height:1; transition:transform .2s}
+  details[open] summary::after{transform:rotate(45deg)}
+  details .ans{padding:0 1.2rem 1.15rem; color:var(--text); font-size:.99rem; line-height:1.6}
+  details .ans p{max-width:none; margin:.2rem 0 0}
+
+  /* ── resources ── */
+  .resources{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; max-width:var(--col-wide); margin:1.4rem 0}
+  .rc{background:linear-gradient(180deg,#fff,#fdfbf6); border:1px solid var(--border-gold); border-radius:var(--radius-card); padding:1.2rem 1.3rem; box-shadow:var(--rest)}
+  .rc h4{margin:0 0 .4rem; font-size:1.02rem}
+  .rc p{margin:0 0 .7rem; font-size:.9rem; color:var(--text-muted); max-width:none}
+  .rc .links{display:flex; flex-wrap:wrap; gap:.4rem}
+  .rc .links a{font-size:.85rem; background:rgba(31,78,121,.06); border:1px solid rgba(31,78,121,.14); border-radius:var(--radius-pill);
+    padding:.3rem .7rem; color:var(--navy)}
+  .rc .links a:hover{background:rgba(31,78,121,.12)}
+
+  /* ── cta ── */
+  .cta{max-width:var(--col-wide); margin:2.5rem auto 1rem; border-radius:var(--radius-xl); padding:2rem clamp(1.2rem,4vw,2.5rem);
+    background:linear-gradient(135deg,var(--dark),var(--dark-mid)); color:#f6ecd7; text-align:center; box-shadow:var(--modal)}
+  .cta h3{color:#fff; font-size:1.5rem; margin:0 0 .5rem}
+  .cta p{color:#e9dcc2; max-width:56ch; margin:0 auto 1.3rem}
+  .btns{display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap}
+  .btn{border-radius:var(--radius-pill); padding:.75rem 1.4rem; font-weight:700; font-size:.98rem; border-bottom:none; cursor:pointer}
+  .btn.primary{background:var(--cyan); color:#062a33}
+  .btn.primary:hover{background:var(--cyan-hover); color:#062a33}
+  .btn.ghost{background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5)}
+  .btn.ghost:hover{border-color:#fff; color:#fff}
+
+  footer{padding:2rem 0 3rem; color:var(--text-subtle); font-size:.82rem; text-align:center}
+  .previewnote{background:rgba(31,78,121,.06); border:1px dashed rgba(31,78,121,.3); border-radius:var(--radius-card);
+    padding:.8rem 1rem; font-size:.82rem; color:var(--navy); max-width:var(--col-wide); margin:1.5rem auto 0}
+
+  @media(max-width:820px){
+    .takeaways,.resources{grid-template-columns:1fr}
+    .compare{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="ribbon">Proudtek · <b>Distributor Programs</b> — Shenzhen RFID / NFC manufacturing, factory-direct</div>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="wrap">
+    <span class="kicker">Distributor Programs</span>
+    <h1>China RFID Factory Audit — What to Actually Inspect</h1>
+    <p class="lead">An RFP deck is a supplier's best photograph of itself, taken in flattering light. The factory floor is the unretouched version. Before you wire the deposit on a $100K+ first order, spend two days standing on that floor — it's where real capacity, real QC discipline, real working conditions and real management quietly reveal themselves.</p>
+    <p class="byline">By the <b>Proudtek Editorial Board</b> · Technically reviewed by <b>Peter Zhang</b> · Updated June 2026</p>
+  </div>
+
+  <div class="figure wide" aria-hidden="false">
+    <!-- SVG 1 · deck vs floor -->
+    <svg viewBox="0 0 1200 640" role="img" aria-labelledby="s1t s1d" font-family="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+      <title id="s1t">What the RFP deck promises versus what the factory floor delivers</title>
+      <desc id="s1d">On the left, a glossy RFP slide: a confident five-million-units-per-month capacity figure, a row of certificate logos, and a hero photo of a production line lit like a car commercial. On the right, the unretouched floor: three work benches and one operator, with verified capacity typically 50 to 70 percent of the number on the slide.</desc>
+      <defs>
+        <radialGradient id="bg1" cx="50%" cy="20%" r="90%"><stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/></radialGradient>
+        <linearGradient id="glam" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fff7e6"/><stop offset="100%" stop-color="#f3e2bd"/></linearGradient>
+      </defs>
+      <rect width="1200" height="640" fill="url(#bg1)"/>
+      <rect x="20" y="20" width="1160" height="600" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="62" text-anchor="middle" font-size="22" font-weight="800" letter-spacing="2.5" fill="#6d5a3a">THE DECK vs THE FLOOR</text>
+
+      <!-- LEFT: the deck -->
+      <rect x="58" y="92" width="520" height="470" rx="18" fill="url(#glam)" stroke="#e4c98f" stroke-width="2"/>
+      <rect x="82" y="116" width="150" height="32" rx="16" fill="#efe0bf"/><text x="157" y="138" text-anchor="middle" font-size="13.5" font-weight="700" letter-spacing="1" fill="#6d5a3a">THE RFP DECK</text>
+      <!-- glossy slide -->
+      <rect x="82" y="164" width="472" height="180" rx="12" fill="#ffffff" stroke="#e8d6ac" stroke-width="1.5"/>
+      <text x="318" y="236" text-anchor="middle" font-size="52" font-weight="800" fill="#291c0e">5,000,000</text>
+      <text x="318" y="272" text-anchor="middle" font-size="18" font-weight="600" fill="#6d5a3a">units / month "capacity"</text>
+      <g opacity="0.6"><path d="M300 300 l6 12 13 2-9 9 2 13-12-6-12 6 2-13-9-9 13-2z" fill="#c39a5f"/></g>
+      <!-- cert pills -->
+      <g font-size="12.5" font-weight="700" fill="#7a6a45">
+        <rect x="82" y="366" width="96" height="30" rx="15" fill="#fff" stroke="#e4c98f"/><text x="130" y="386" text-anchor="middle">ISO 9001</text>
+        <rect x="188" y="366" width="82" height="30" rx="15" fill="#fff" stroke="#e4c98f"/><text x="229" y="386" text-anchor="middle">BSCI</text>
+        <rect x="280" y="366" width="96" height="30" rx="15" fill="#fff" stroke="#e4c98f"/><text x="328" y="386" text-anchor="middle">SA8000</text>
+        <rect x="386" y="366" width="82" height="30" rx="15" fill="#fff" stroke="#e4c98f"/><text x="427" y="386" text-anchor="middle">WRAP</text>
+      </g>
+      <!-- hero photo lit like a car ad -->
+      <rect x="82" y="410" width="472" height="118" rx="12" fill="#2b2115"/>
+      <ellipse cx="318" cy="450" rx="150" ry="30" fill="#c39a5f" opacity="0.35"/>
+      <rect x="150" y="470" width="60" height="34" rx="4" fill="#6c5127"/><rect x="240" y="464" width="60" height="40" rx="4" fill="#7a5e2e"/><rect x="330" y="470" width="60" height="34" rx="4" fill="#6c5127"/><rect x="420" y="466" width="50" height="38" rx="4" fill="#7a5e2e"/>
+      <text x="318" y="520" text-anchor="middle" font-size="12.5" fill="#d9c8a2" font-style="italic">one hero shot, lit like a car commercial</text>
+
+      <!-- divider -->
+      <circle cx="600" cy="330" r="30" fill="#291c0e"/><text x="600" y="338" text-anchor="middle" font-size="17" font-weight="800" fill="#f4ead3">vs</text>
+
+      <!-- RIGHT: the floor -->
+      <rect x="622" y="92" width="520" height="470" rx="18" fill="#f1f4f6" stroke="#cdd7de" stroke-width="2"/>
+      <rect x="646" y="116" width="150" height="32" rx="16" fill="#e2e8ed"/><text x="721" y="138" text-anchor="middle" font-size="13.5" font-weight="700" letter-spacing="1" fill="#4a5568">THE FLOOR</text>
+      <!-- three benches + one operator -->
+      <g>
+        <rect x="690" y="210" width="120" height="20" rx="4" fill="#8a949c"/><rect x="700" y="230" width="12" height="46" fill="#8a949c"/><rect x="788" y="230" width="12" height="46" fill="#8a949c"/>
+        <rect x="836" y="210" width="120" height="20" rx="4" fill="#8a949c"/><rect x="846" y="230" width="12" height="46" fill="#8a949c"/><rect x="934" y="230" width="12" height="46" fill="#8a949c"/>
+        <rect x="982" y="210" width="120" height="20" rx="4" fill="#8a949c"/><rect x="992" y="230" width="12" height="46" fill="#8a949c"/><rect x="1080" y="230" width="12" height="46" fill="#8a949c"/>
+        <!-- one very patient operator -->
+        <circle cx="770" cy="192" r="13" fill="#4a5568"/><rect x="759" y="205" width="22" height="30" rx="8" fill="#4a5568"/>
+      </g>
+      <text x="882" y="300" text-anchor="middle" font-size="13.5" fill="#55687a" font-style="italic">three benches and one very patient operator</text>
+      <!-- reveal number -->
+      <rect x="672" y="336" width="420" height="150" rx="12" fill="#ffffff" stroke="#cdd7de" stroke-width="1.5"/>
+      <text x="882" y="392" text-anchor="middle" font-size="46" font-weight="800" fill="#8b2d2d">50–70%</text>
+      <text x="882" y="424" text-anchor="middle" font-size="17" font-weight="600" fill="#4a5568">of the claimed capacity is typical,</text>
+      <text x="882" y="450" text-anchor="middle" font-size="17" font-weight="600" fill="#4a5568">once you count the machines yourself</text>
+      <text x="882" y="474" text-anchor="middle" font-size="13" fill="#8a949c">verified on-site · not from the slide</text>
+
+      <text x="600" y="600" text-anchor="middle" font-size="15.5" fill="#6d5a3a">You only find out which version is true by standing on the floor. A ~$3K visit buys you out of $100K+ of failed-shipment pain.</text>
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <div class="takeaways">
+      <div class="tk"><span class="n" style="--gradient:linear-gradient(135deg,#c39a5f,#d4a755)">1</span><p>A factory audit surfaces the capacity, QC and compliance gaps a paper RFP is carefully worded to hide. One or two days on-site buys you out of six-to-twelve months of pain.</p></div>
+      <div class="tk"><span class="n" style="--gradient:linear-gradient(135deg,#3d6b6b,#4a5568)">2</span><p>The checklist covers five physical zones — production line, QC station, raw-material storage, finished-goods warehouse and a management interaction — plus a document review. Bring comfortable shoes.</p></div>
+      <div class="tk"><span class="n" style="--gradient:linear-gradient(135deg,#2d6a4f,#1f6f3a)">3</span><p>Budget $1.5K–5K to audit it yourself (flight + two days), or $3K–8K for a third-party audit (SGS, Bureau Veritas) if you can't make the trip. Cheapest insurance you'll ever buy.</p></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════ SECTION 1 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Why audit a factory before committing volume?</h2>
+    <p class="intro">Every supplier's RFP deck looks the same: a confident capacity figure, a wall of certificate logos, and one hero photo of a production line lit like a car commercial. The floor is where that story either holds up or quietly comes apart — where the "fully automated line" turns out to be three benches and one very patient operator. You only learn which by standing on it. A factory audit is the highest-ROI step in the whole procurement process: a $3K visit routinely catches problems that would otherwise compound into $100K+ of failed shipments, late deliveries and quality disputes over a multi-year supplier relationship.</p>
+
+    <div class="compare">
+      <div class="col deck">
+        <h4>What the deck promises</h4>
+        <ul>
+          <li>A capacity figure — <b>"X million units/month"</b> — stated with great confidence.</li>
+          <li>A polished defect-rate chart with a reassuring downward trend.</li>
+          <li><b>"Authorised NXP / Impinj supply chain,"</b> in a footnote.</li>
+          <li>A logo grid implying every compliance box is already ticked.</li>
+          <li>Smiling headshots on an "Our Team" slide.</li>
+        </ul>
+      </div>
+      <div class="col floor">
+        <h4>What the floor shows</h4>
+        <ul>
+          <li><b>Real capacity:</b> the actual machine count, shift schedule and current load. Verified figure is often <b>50–70%</b> of the slide.</li>
+          <li><b>QC discipline:</b> how operators actually behave, the real defect rate, and what genuinely happens to rejects.</li>
+          <li><b>Raw materials:</b> where the <a href="#">inlays</a> really come from — authorised distributor, or gray-market? A mismatch is a supply-continuity risk you inherit.</li>
+          <li><b>Labour &amp; compliance:</b> whether the factory actually passes the BSCI / SA8000 audits your buyers will demand of you.</li>
+          <li><b>Management:</b> decision-making speed, English fluency and problem-solving instinct — visible only in person.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="lbl">The one-line version</div>
+      <p>Paper tells you what a supplier <em>wants</em> to be true. The floor tells you what <em>is</em> true. The gap between the two is exactly the risk you're being asked to fund.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 2 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>What to inspect on the production floor</h2>
+    <p class="intro">A two-to-three-hour walk-through covers most of what matters. Bring a checklist, take photos (with permission), and gently resist the tour's gravitational pull toward the one spotless corner every factory keeps for exactly this occasion. Five zones do the heavy lifting — walk them in flow order.</p>
+  </div>
+
+  <div class="figure wide">
+    <!-- SVG 2 · 5-zone floor map -->
+    <svg viewBox="0 0 1200 675" role="img" aria-labelledby="s2t s2d" font-family="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+      <title id="s2t">The five inspection zones on an RFID factory floor, in material-flow order</title>
+      <desc id="s2d">Five zones in sequence: raw-material storage (chip lots, climate control); inlay assembly line (chip-bonding, 200 to 1000 units per hour); the encoding station, which should sit physically segregated behind its own wall with access logs; the QC station (RF test gantry, 0.5 to 2 percent sample inspection); and the finished-goods warehouse (inventory mix and turnover).</desc>
+      <defs><radialGradient id="bg2" cx="50%" cy="18%" r="90%"><stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/></radialGradient></defs>
+      <rect width="1200" height="675" fill="url(#bg2)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="60" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="2.5" fill="#6d5a3a">WALK THE FLOOR IN FLOW ORDER</text>
+
+      <!-- flow arrows in gaps -->
+      <g fill="#c39a5f"><path d="M247 320 l22 0 0 -7 14 14 -14 14 0 -7 -22 0z"/><path d="M707 320 l22 0 0 -7 14 14 -14 14 0 -7 -22 0z"/><path d="M937 320 l22 0 0 -7 14 14 -14 14 0 -7 -22 0z"/></g>
+      <!-- segregation wall before encoding (zone 3) -->
+      <line x1="485" y1="130" x2="485" y2="512" stroke="#8b2d2d" stroke-width="2.5" stroke-dasharray="7 6"/>
+      <text x="485" y="126" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1" fill="#8b2d2d">SECURED WALL</text>
+
+      <!-- ZONE 1 raw material -->
+      <g><rect x="40" y="150" width="200" height="340" rx="16" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <circle cx="72" cy="186" r="17" fill="#6c5127"/><text x="72" y="192" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">1</text>
+        <g transform="translate(140,240)"><rect x="-26" y="-8" width="24" height="24" rx="3" fill="#c39a5f"/><rect x="2" y="-8" width="24" height="24" rx="3" fill="#d4a755"/><rect x="-12" y="-30" width="24" height="24" rx="3" fill="#6c5127"/></g>
+        <text x="140" y="322" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">Raw-material</text>
+        <text x="140" y="344" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">storage</text>
+        <text x="140" y="382" text-anchor="middle" font-size="13" fill="#6d5a3a">chip lot numbers</text>
+        <text x="140" y="402" text-anchor="middle" font-size="13" fill="#6d5a3a">match distributor</text>
+        <text x="140" y="422" text-anchor="middle" font-size="13" fill="#6d5a3a">records; climate</text>
+        <text x="140" y="442" text-anchor="middle" font-size="13" fill="#6d5a3a">control checked</text>
+      </g>
+      <!-- ZONE 2 inlay line -->
+      <g><rect x="270" y="150" width="200" height="340" rx="16" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <circle cx="302" cy="186" r="17" fill="#6c5127"/><text x="302" y="192" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">2</text>
+        <g transform="translate(370,242)" fill="none" stroke="#6c5127" stroke-width="3.5"><circle cx="0" cy="0" r="16"/><path d="M0 -24 v8 M0 24 v-8 M-24 0 h8 M24 0 h-8 M-17 -17 l6 6 M17 17 l-6 -6 M17 -17 l-6 6 M-17 17 l6 -6"/><circle cx="0" cy="0" r="5" fill="#c39a5f" stroke="none"/></g>
+        <text x="370" y="322" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">Inlay</text>
+        <text x="370" y="344" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">assembly line</text>
+        <text x="370" y="382" text-anchor="middle" font-size="13" fill="#6d5a3a">chip-bonding,</text>
+        <text x="370" y="402" text-anchor="middle" font-size="13" fill="#6d5a3a">antenna print,</text>
+        <text x="370" y="422" text-anchor="middle" font-size="13" fill="#6d5a3a">lamination</text>
+        <text x="370" y="444" text-anchor="middle" font-size="13" font-weight="700" fill="#177a92">200–1,000 UPH</text>
+      </g>
+      <!-- ZONE 3 encoding (segregated, highlighted) -->
+      <g><rect x="500" y="150" width="200" height="340" rx="16" fill="#eaf9fe" stroke="#1fcefb" stroke-width="2.5"/>
+        <circle cx="532" cy="186" r="17" fill="#127a92"/><text x="532" y="192" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">3</text>
+        <rect x="592" y="170" width="92" height="26" rx="13" fill="#127a92"/><text x="638" y="188" text-anchor="middle" font-size="11" font-weight="700" letter-spacing=".5" fill="#fff">SEGREGATED</text>
+        <g transform="translate(600,246)"><rect x="-18" y="-4" width="36" height="28" rx="4" fill="#127a92"/><path d="M-11 -4 v-8 a11 11 0 0 1 22 0 v8" fill="none" stroke="#127a92" stroke-width="4"/><circle cx="0" cy="9" r="4" fill="#fff"/></g>
+        <text x="600" y="322" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">Encoding</text>
+        <text x="600" y="344" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">station</text>
+        <text x="600" y="382" text-anchor="middle" font-size="13" fill="#0e5f73">physically separate</text>
+        <text x="600" y="402" text-anchor="middle" font-size="13" fill="#0e5f73">from assembly;</text>
+        <text x="600" y="422" text-anchor="middle" font-size="13" fill="#0e5f73">secured access logs;</text>
+        <text x="600" y="442" text-anchor="middle" font-size="13" fill="#0e5f73">sample &amp; verify tags</text>
+      </g>
+      <!-- ZONE 4 QC -->
+      <g><rect x="730" y="150" width="200" height="340" rx="16" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <circle cx="762" cy="186" r="17" fill="#6c5127"/><text x="762" y="192" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">4</text>
+        <g transform="translate(830,244)" fill="none" stroke="#2d6a4f" stroke-width="3.5"><path d="M-18 8 a18 18 0 1 1 36 0" /><line x1="0" y1="8" x2="12" y2="-6"/><circle cx="0" cy="8" r="3" fill="#2d6a4f" stroke="none"/></g>
+        <text x="830" y="322" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">QC station</text>
+        <text x="830" y="360" text-anchor="middle" font-size="13" fill="#6d5a3a">RF test gantry,</text>
+        <text x="830" y="380" text-anchor="middle" font-size="13" fill="#6d5a3a">read-rate chamber</text>
+        <text x="830" y="404" text-anchor="middle" font-size="13" font-weight="700" fill="#1f6f3a">0.5–2% sample</text>
+        <text x="830" y="426" text-anchor="middle" font-size="13" fill="#6d5a3a">(cheap floors skip</text>
+        <text x="830" y="446" text-anchor="middle" font-size="13" fill="#6d5a3a">this and hope)</text>
+      </g>
+      <!-- ZONE 5 finished goods -->
+      <g><rect x="960" y="150" width="200" height="340" rx="16" fill="#fbf8f2" stroke="#e4c98f" stroke-width="2"/>
+        <circle cx="992" cy="186" r="17" fill="#6c5127"/><text x="992" y="192" text-anchor="middle" font-size="16" font-weight="800" fill="#fff">5</text>
+        <g transform="translate(1060,238)"><rect x="-26" y="0" width="52" height="30" rx="3" fill="#c39a5f"/><rect x="-20" y="-14" width="18" height="18" rx="2" fill="#6c5127"/><rect x="2" y="-14" width="18" height="18" rx="2" fill="#d4a755"/></g>
+        <text x="1060" y="322" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">Finished-goods</text>
+        <text x="1060" y="344" text-anchor="middle" font-size="16.5" font-weight="800" fill="#291c0e">warehouse</text>
+        <text x="1060" y="382" text-anchor="middle" font-size="13" fill="#6d5a3a">inventory mix &amp;</text>
+        <text x="1060" y="402" text-anchor="middle" font-size="13" fill="#6d5a3a">turnover; aged</text>
+        <text x="1060" y="422" text-anchor="middle" font-size="13" fill="#6d5a3a">stock = slow sales</text>
+        <text x="1060" y="442" text-anchor="middle" font-size="13" fill="#6d5a3a">or rejects parked</text>
+      </g>
+      <text x="600" y="562" text-anchor="middle" font-size="15.5" fill="#6d5a3a">If the encoding station is mixed into open production, your serialised customer data is less a secret than a rumour.</text>
+      <text x="600" y="600" text-anchor="middle" font-size="14" fill="#8a949c">Manual benches everywhere a modern line should be? The facility is small, aging, or borrowing capacity it doesn't have.</text>
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <ul class="rich">
+      <li><span class="tag">Zone 1 · Inlay line</span><b>Confirm the chip-bonding equipment, antenna-printing process and lamination machinery are real and running.</b> Modern factories automate chip-bonding at 200–1,000 units/hour; a row of manual benches tells you the facility is small, aging, or borrowing capacity it doesn't have.</li>
+      <li><span class="tag">Zone 2 · Encoding</span><b>The encoding station should be physically separated from assembly</b> to prevent cross-contamination of encoded data. Ask to see the encoding logs, then pull a few finished tags and check they're programmed correctly. "The system does that automatically" is not a log.</li>
+      <li><span class="tag">Zone 3 · QC</span><b>Look at the actual measurement equipment</b> — RFID test gantry, read-rate sample chamber. Reputable factories run 0.5–2% sample inspection; the cheap ones skip QC and hope for the best.</li>
+      <li><span class="tag">Zone 4 · Finished goods</span><b>Read the inventory mix and turnover.</b> A warehouse full of aged inventory means either slow sales or quality-rejected batches parked "temporarily" since around last spring.</li>
+      <li><span class="tag">Zone 5 · Raw materials</span><b>Chip lot numbers should match the supplier's authorised-distributor records.</b> Check climate control, too — inlays enjoy a damp warehouse about as much as you would.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 3 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Documents to review during the visit</h2>
+    <p class="intro">On-site document review is where paper RFP claims meet daylight. Ask for the originals. A cheerful "I'll email it over later" is the paperwork equivalent of a cheque that's in the post — do not accept copies-of-copies.</p>
+    <ul class="check">
+      <li><b>Business license</b> — the original, Chinese-government-issued, with a current registration date. Check the registered capital (a rough capacity proxy) and the business scope, which must actually include RFID / electronics, not just "trading."</li>
+      <li><b>ISO 9001 certificate</b> — the real one on the wall, with its audit cycle and last surveillance-audit date. Verify it on the issuing body's portal while you're standing there, not from the taxi afterwards.</li>
+      <li><b>Customer references</b> — invoice or PO copies for 2–3 named reference customers, prices redacted. "My biggest customer is Brand X" is a lovely sentence; without paper, it's just a sentence.</li>
+      <li><b>Quality records</b> — the last three months of QC inspection logs. Spot-check defect rates and rework actions; a sudden quality cliff and a suspiciously perfect 100%-pass record are both tells.</li>
+      <li><b>Export records</b> — customs export declarations for 2–3 recent shipments. This is what confirms the factory actually exports at the volumes it claims, rather than merely aspiring to.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 4 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Social-compliance audits you inherit from your supplier choice</h2>
+    <p class="intro">Sell into Walmart, Target, Costco, Disney, IKEA, Carrefour, Tesco or Marks &amp; Spencer and you don't just inherit the brand's logo on your PO — you inherit its social-compliance audit obligations. The factory's existing audit posture quietly decides whether you ship in four weeks or spend three months retrofitting paperwork you didn't know you needed.</p>
+  </div>
+
+  <div class="figure wide">
+    <!-- SVG 3 · retailer → audit-standard matrix -->
+    <svg viewBox="0 0 1200 675" role="img" aria-labelledby="s3t s3d" font-family="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+      <title id="s3t">Which retailer requires which factory social-compliance audit</title>
+      <desc id="s3d">A mapping. Walmart, Target and Costco require Walmart RSCI, which accepts BSCI, SMETA or SA8000 reports. IKEA, Carrefour and Tesco require amfori BSCI at grade C or better. Marks and Spencer, Sainsbury's and Asda require SMETA four-pillar. Disney under its FAMA programme accepts SMETA, WRAP or ICTI. Hasbro and Mattel licensees require ICTI CARE.</desc>
+      <defs><radialGradient id="bg3" cx="50%" cy="16%" r="92%"><stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/></radialGradient></defs>
+      <rect width="1200" height="675" fill="url(#bg3)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="58" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="2" fill="#6d5a3a">THE AUDIT YOU INHERIT WITH THE BUYER</text>
+      <text x="270" y="104" text-anchor="middle" font-size="13" font-weight="700" letter-spacing="1.5" fill="#4a5568">IF YOU SELL INTO…</text>
+      <text x="930" y="104" text-anchor="middle" font-size="13" font-weight="700" letter-spacing="1.5" fill="#6c5127">…THE FACTORY MUST CLEAR</text>
+
+      <!-- connector lines -->
+      <g stroke="#e4c98f" stroke-width="2.5" fill="none">
+        <path d="M470 165 H730"/><path d="M470 262 H730"/><path d="M470 359 H730"/><path d="M470 456 H730"/><path d="M470 553 H730"/>
+      </g>
+      <g fill="#c39a5f"><circle cx="600" cy="165" r="4"/><circle cx="600" cy="262" r="4"/><circle cx="600" cy="359" r="4"/><circle cx="600" cy="456" r="4"/><circle cx="600" cy="553" r="4"/></g>
+
+      <!-- left buyer chips -->
+      <g font-family="Inter">
+        <rect x="80" y="132" width="390" height="66" rx="14" fill="#f1f4f6" stroke="#cdd7de" stroke-width="2"/><text x="104" y="165" font-size="18" font-weight="800" fill="#291c0e">Walmart · Target · Costco</text><text x="104" y="187" font-size="12.5" fill="#55687a">US big-box mandate</text>
+        <rect x="80" y="229" width="390" height="66" rx="14" fill="#f1f4f6" stroke="#cdd7de" stroke-width="2"/><text x="104" y="262" font-size="18" font-weight="800" fill="#291c0e">IKEA · Carrefour · Tesco</text><text x="104" y="284" font-size="12.5" fill="#55687a">European retail</text>
+        <rect x="80" y="326" width="390" height="66" rx="14" fill="#f1f4f6" stroke="#cdd7de" stroke-width="2"/><text x="104" y="359" font-size="18" font-weight="800" fill="#291c0e">M&amp;S · Sainsbury's · Asda</text><text x="104" y="381" font-size="12.5" fill="#55687a">UK grocery &amp; apparel</text>
+        <rect x="80" y="423" width="390" height="66" rx="14" fill="#f1f4f6" stroke="#cdd7de" stroke-width="2"/><text x="104" y="456" font-size="18" font-weight="800" fill="#291c0e">Disney (FAMA)</text><text x="104" y="478" font-size="12.5" fill="#55687a">licensed consumer products</text>
+        <rect x="80" y="520" width="390" height="66" rx="14" fill="#f1f4f6" stroke="#cdd7de" stroke-width="2"/><text x="104" y="553" font-size="18" font-weight="800" fill="#291c0e">Hasbro · Mattel</text><text x="104" y="575" font-size="12.5" fill="#55687a">toys</text>
+      </g>
+      <!-- right standard chips -->
+      <g font-family="Inter">
+        <rect x="730" y="132" width="390" height="66" rx="14" fill="#fbf3e2" stroke="#e4c98f" stroke-width="2"/><text x="754" y="163" font-size="18" font-weight="800" fill="#291c0e">Walmart RSCI</text><text x="754" y="185" font-size="12.5" fill="#6d5a3a">accepts BSCI / SMETA / SA8000; zero-tolerance items</text>
+        <rect x="730" y="229" width="390" height="66" rx="14" fill="#fbf3e2" stroke="#e4c98f" stroke-width="2"/><text x="754" y="260" font-size="18" font-weight="800" fill="#291c0e">amfori BSCI — grade ≥ C</text><text x="754" y="282" font-size="12.5" fill="#6d5a3a">below C = hard stop, re-audit within 6 months</text>
+        <rect x="730" y="326" width="390" height="66" rx="14" fill="#fbf3e2" stroke="#e4c98f" stroke-width="2"/><text x="754" y="357" font-size="18" font-weight="800" fill="#291c0e">SMETA 4-pillar</text><text x="754" y="379" font-size="12.5" fill="#6d5a3a">valid 2 yrs · $1,500–$3,500 / factory / audit</text>
+        <rect x="730" y="423" width="390" height="66" rx="14" fill="#fbf3e2" stroke="#e4c98f" stroke-width="2"/><text x="754" y="454" font-size="18" font-weight="800" fill="#291c0e">SMETA / WRAP / ICTI</text><text x="754" y="476" font-size="12.5" fill="#6d5a3a">FAMA accepts any as equivalent</text>
+        <rect x="730" y="520" width="390" height="66" rx="14" fill="#fbf3e2" stroke="#e4c98f" stroke-width="2"/><text x="754" y="551" font-size="18" font-weight="800" fill="#291c0e">ICTI CARE</text><text x="754" y="573" font-size="12.5" fill="#6d5a3a">required by toy licensees</text>
+      </g>
+      <text x="600" y="632" text-anchor="middle" font-size="15" fill="#6d5a3a">Verify grades yourself at amfori.org/services/audit-search before you sign the first PO — the certificate on the wall is a claim, not proof.</text>
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <ul class="rich">
+      <li><span class="tag">BSCI / amfori</span><b>The dominant European framework, 50,000+ members.</b> The audit produces a single-letter grade (A–E) on the amfori portal that brands pull directly. A score below C usually triggers a re-audit within 6 months and is a hard stop for IKEA, Carrefour and Tesco. Verify it yourself at amfori.org/services/audit-search before you sign the first PO.</li>
+      <li><span class="tag">SMETA</span><b>Sedex Members Ethical Trade Audit — the dominant UK / global benchmark.</b> The 4-pillar version (labour, health &amp; safety, environment, business ethics) is what Marks &amp; Spencer, Tesco, Walmart Sourcing, Sainsbury's and Asda all accept. Reports are valid 2 years; budget $1,500–$3,500 per factory per audit.</li>
+      <li><span class="tag">Walmart RSCI</span><b>Walmart folded its Standards for Suppliers audit into the RSCI programme in 2023.</b> Existing BSCI / SMETA / SA8000 reports are accepted, but RSCI-specific items — working hours, dormitory, fire safety, building structural integrity — carry zero-tolerance failure conditions. Disney's FAMA programme similarly accepts SMETA / WRAP / ICTI as equivalents.</li>
+      <li><span class="tag">SA8000 / WRAP / ICTI CARE</span><b>SA8000</b> (Social Accountability International, ANSI-accredited, 8 elements, 3-year cycle) is the deepest standard. <b>WRAP</b> (Worldwide Responsible Accredited Production) covers apparel and consumer goods in Platinum / Gold / Silver tiers. <b>ICTI CARE</b> focuses on toys and is required by Disney, Hasbro and Mattel licensees.</li>
+      <li><span class="tag">Sector add-ons</span><b>Each is a $1.5K–$5K incremental audit stacked on the social-compliance baseline:</b> IATF 16949 (automotive, required by Tier 1s up to the OEMs), ISO 13485 (medical devices, required under FDA QSR / EU MDR), ISO 27001 (information security, required for any factory handling encoded data with PII), and the Disney ILS / FAMA checklist (overtime, age verification, building safety).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ SECTION 5 ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>The RFID-specific checklist your generic auditor will miss</h2>
+    <p class="intro">SGS, Bureau Veritas, TUV Rheinland and AsiaInspection run thousands of generic factory audits a year — and will happily run one for you that never once mentions an RFID chip, unless you brief them up front. These five checkpoints separate a real RFID converter from a printing house with a chip-bonding side hustle.</p>
+  </div>
+
+  <div class="figure wide">
+    <!-- SVG 4 · auto line vs manual bench + arithmetic reveal -->
+    <svg viewBox="0 0 1200 675" role="img" aria-labelledby="s4t s4d" font-family="Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+      <title id="s4t">Automated inlay line versus manual bench throughput, and the arithmetic that exposes an inflated capacity claim</title>
+      <desc id="s4d">An automated line (Mühlbauer TAL-15000, Ruhlamat ProLine, Melzer flip-chip) runs 6,000 to 30,000 units per hour. A manual bench runs 200 to 800 units per hour. A factory claiming 5 million units per month on three manual benches: three benches times 800 units per hour, running flat out 24 by 7, equals 1,728,000 per month. The remaining 3,272,000 is coming from a factory you have not audited.</desc>
+      <defs><radialGradient id="bg4" cx="50%" cy="16%" r="92%"><stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/></radialGradient>
+        <linearGradient id="autobar" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c39a5f"/><stop offset="100%" stop-color="#1fcefb"/></linearGradient></defs>
+      <rect width="1200" height="675" fill="url(#bg4)"/>
+      <rect x="20" y="20" width="1160" height="635" rx="22" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+      <text x="600" y="58" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="2" fill="#6d5a3a">DO THE ARITHMETIC, WATCH THE STORY FALL OVER</text>
+
+      <!-- AUTO -->
+      <text x="70" y="132" font-size="15" font-weight="700" letter-spacing="1" fill="#291c0e">AUTOMATED LINE</text>
+      <text x="70" y="154" font-size="12.5" fill="#6d5a3a">Mühlbauer TAL-15000 · Ruhlamat ProLine · Melzer flip-chip</text>
+      <rect x="70" y="166" width="900" height="52" rx="10" fill="url(#autobar)"/>
+      <text x="90" y="199" font-size="24" font-weight="800" fill="#062a33">6,000–30,000 UPH</text>
+      <text x="998" y="199" font-size="15" fill="#6d5a3a">units / hour</text>
+
+      <!-- MANUAL -->
+      <text x="70" y="270" font-size="15" font-weight="700" letter-spacing="1" fill="#291c0e">MANUAL BENCH ×3</text>
+      <text x="70" y="292" font-size="12.5" fill="#6d5a3a">three benches and, you'll recall, one very patient operator</text>
+      <rect x="70" y="304" width="86" height="52" rx="10" fill="#8a949c"/>
+      <text x="172" y="337" font-size="22" font-weight="800" fill="#4a5568">200–800 UPH</text>
+      <text x="430" y="337" font-size="13" fill="#8a949c" font-style="italic">(bars not to scale — that's rather the point)</text>
+
+      <!-- reveal box -->
+      <rect x="70" y="392" width="1060" height="212" rx="16" fill="#fdeee9" stroke="#f0cfc4" stroke-width="2"/>
+      <rect x="70" y="392" width="6" height="212" rx="3" fill="#8b2d2d"/>
+      <text x="102" y="432" font-size="14" font-weight="700" letter-spacing="1" fill="#8b2d2d">THE CLAIM: 5,000,000 UNITS / MONTH — ON THREE MANUAL BENCHES</text>
+      <text x="102" y="486" font-size="27" font-weight="800" fill="#291c0e">3 benches × 800 UPH × 24h × 30d = 1,728,000</text>
+      <text x="102" y="524" font-size="17" fill="#4a5568">…and that's flat out, no breaks, no sleep, no Chinese New Year.</text>
+      <text x="102" y="566" font-size="20" font-weight="800" fill="#8b2d2d">The other 3,272,000 is coming from a factory you haven't audited.</text>
+      <text x="600" y="636" text-anchor="middle" font-size="14" fill="#6d5a3a">A converter claiming volume it can't physically produce is subcontracting — quietly, and to a floor you never get to inspect.</text>
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <ul class="rich">
+      <li><span class="tag">Chip authenticity</span><b>Request the factory's wafer purchase records</b> — lot numbers traceable to NXP, Impinj, Alien, or authorised distributors like Avnet, Arrow or Mouser. Gray-market chips (sometimes Fudan FM11RF08 sold as MIFARE Classic) save $0.005–$0.015 per chip and expose you to backdoor risk and brand-protection takedowns. Cross-check five random reels' lot numbers on the chip-vendor portal, on the spot.</li>
+      <li><span class="tag">Assembly capability</span><b>Verify automated chip-bonding machines</b> (Mühlbauer TAL-15000, Ruhlamat ProLine, Melzer flip-chip lines) rather than manual benches. Modern auto lines run 6,000–30,000 UPH; manual benches run 200–800 UPH. A factory claiming 5M units/month on three manual benches is renting the work out to someone else — do the arithmetic and watch the story fall over.</li>
+      <li><span class="tag">RF test gantry</span><b>Ask to see the read-rate sample chamber</b> (Voyantic Tagformance, CISC RFID Xplorer, MTI MT-242025), calibrated within the past 12 months. A factory with no RF test capability cannot ARC-certify or guarantee tag performance, which makes it a hard stop for retail-mandate work (Walmart RFID, Macy's, Decathlon supply).</li>
+      <li><span class="tag">Encoding segregation</span><b>For any pre-encoded order (URLs, EPC, customer-specific data), the encoding station should be physically separate from open production,</b> with secured access logs. Co-located encoding creates a data-leak risk for serialised brand-protection programmes (LVMH, Estée Lauder NTAG 424 DNA SUN deployments).</li>
+      <li><span class="tag">Records &amp; yield</span><b>Ask for the last three months of QC daily logs, scrap rate by SKU, the customer-complaint log and corrective-action records (CAPA).</b> A sustained scrap rate above 2% on UHF inlay or above 1% on HF cards points to chip-bonding equipment that needs maintenance. And a 100% yield record isn't excellence — it's mathematically implausible, which is a polite word for manipulation.</li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="lbl">Brief this before the auditor lands</div>
+      <p>A generic factory audit will sail straight past chip authenticity, RF test capability and encoding segregation. If you want those checked, they go in the scope of work — in writing — before anyone books a flight.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ FAQ ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details><summary>Do I need a translator for a factory audit?</summary><div class="ans"><p>Helpful, rarely essential at the top-tier RFID factories — their sales and management speak English. For a deep technical review (QC processes, machinery), a translator earns their fee. Budget $200–400/day for a Mandarin–English translator who actually knows the vocabulary, not just the pleasantries.</p></div></details>
+      <details><summary>Can I do a video-call audit instead of visiting?</summary><div class="ans"><p>Great for follow-ups, not for first-time qualification. Video shows you precisely what the factory wants you to see and not one pixel more. An in-person visit lets you walk where you like, ask line operators direct questions, and read the management in the room.</p></div></details>
+      <details><summary>How do I find a good third-party auditor in China?</summary><div class="ans"><p>SGS, Bureau Veritas, TUV Rheinland and AsiaInspection cover most industrial cities at $1K–3K per audit day. Spell out the RFID-specific criteria up front (chip authenticity, ARC compliance, and so on) — a generic factory audit will sail right past our category's specifics.</p></div></details>
+      <details><summary>What's the typical factory audit cost?</summary><div class="ans"><p>Self-audit: $1.5K–5K (round-trip flight to Shenzhen / Guangzhou, two nights' hotel, meals). Third-party: $3K–8K (auditor + travel + report). Worth it for any first-time engagement above $50K annual volume — and cheap next to a single bad shipment.</p></div></details>
+      <details><summary>Should I audit during Chinese New Year prep season (December–January)?</summary><div class="ans"><p>No. Production capacity is at peak utilisation, management is distracted, and what you see bears little resemblance to the other ten months of the year. Best windows are March–May and September–October. Avoid Chinese New Year (late January–mid February), Mid-Autumn Festival (mid-September) and Golden Week (October 1–7) — half the people you need to meet are home with family.</p></div></details>
+      <details><summary>How do I cross-verify the BSCI / SMETA score the factory claims?</summary><div class="ans"><p>BSCI: amfori.org/services/audit-search (free login; the members-only directory shows the current A–E grade and audit date). SMETA: the Sedex members portal (your account, or your customer's, can pull factory reports directly). SA8000: the sa-intl.org certified-suppliers database. WRAP: wrapcompliance.org/certifications. If the factory can't hand you the auditor name, audit ID and report-issue date to verify, treat the certificate as decorative until proven otherwise.</p></div></details>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ RESOURCES ══════════ -->
+<section class="body">
+  <div class="wrap">
+    <h2>Keep going</h2>
+    <div class="resources">
+      <div class="rc"><h4>Audit-ready RFID label production</h4><p>RAIN RFID and HF inlay / label converting at our certified facility.</p><div class="links"><a href="#">RFID labels</a><a href="#">RFID tags</a><a href="#">UHF RFID inlays</a></div></div>
+      <div class="rc"><h4>ISO &amp; certification scope</h4><p>ISO 9001, ISO 14001, RoHS, and customer-driven certifications across our SKUs.</p><div class="links"><a href="#">Certified RFID card production</a></div></div>
+      <div class="rc"><h4>Schedule a factory audit</h4><p>Send us an audit checklist — we'll prepare documentation and a virtual tour or in-person visit.</p><div class="links"><a href="#">Schedule an audit</a></div></div>
+      <div class="rc"><h4>Audit standards reference</h4><p>Public verification portals for BSCI / SMETA / SA8000 / WRAP audits required by Walmart, Disney, IKEA, Carrefour and Tesco.</p><div class="links"><a href="#">amfori BSCI overview</a><a href="#">Sedex SMETA audit</a></div></div>
+      <div class="rc"><h4>Related reading</h4><p>More RFID sourcing guides from the blog.</p><div class="links"><a href="#">RFID RFP template: questions for suppliers</a></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CTA ══════════ -->
+<div class="cta wide">
+  <h3>Planning a first order? Audit the floor first.</h3>
+  <p>Send us your audit checklist and we'll prepare the documentation, plus a virtual tour or an in-person visit — the version with no flattering light.</p>
+  <div class="btns">
+    <button class="btn primary" onclick="if(window.sendPrompt)sendPrompt('I want to schedule an RFID factory visit')">Schedule an RFID factory visit</button>
+    <button class="btn ghost">Custom RFID quote</button>
+    <button class="btn ghost">Labels &amp; tags quote</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="previewnote"><b>Preview.</b> This is a standalone visual mock of the enlivened page — dry-wit rewrite, four tokenized SVG diagrams, and a readability pass that breaks the bullet walls into compare panels, a checklist and callouts. Every spec, standard, grade, machine model and cost is carried over unchanged from the live page; the <code>NTAG 424 DNA</code> mention maps to the <code>{chip:nxp-ntag-424-dna:short_name}</code> placeholder when ported. Links are stubbed. Once you approve, I port the copy into <code>src/content/editorial/blog/china-rfid-factory-audit-checklist.json</code> and save the four SVGs to <code>public/diagrams/blog/</code>.</div>
+</div>
+
+<footer>Proudtek · Shenzhen RFID / NFC manufacturing — preview rendering, not the production page</footer>
+</body>
+</html>
+</body>
+</html>

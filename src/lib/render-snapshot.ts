@@ -659,6 +659,10 @@ function injectCustomNav($body: ReturnType<typeof load>): void {
     replaceProductsAndInsert(primary, html);
   }
 
+  // Mark the retained Kadence drawer so our compatibility CSS/JS can target it
+  // without leaking into the native Astro SiteShell drawer.
+  $body("#mobile-drawer").first().addClass("codex-legacy-mobile-drawer");
+
   // ── Mobile drawer menu ──
   const mobile = $body("ul#mobile-menu").first();
   if (mobile.length && mobile.find(".codex-mega-item").length === 0) {

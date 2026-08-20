@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PREVIEW · How NFC Tags Work with Smartphones</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#291c0e; --muted:#4f4f4f; --subtle:#5c5c5c;
+    --gold:#c39a5f; --gold-muted:#6d5a3a; --gold-light:#d4a755;
+    --teal:#3d6b6b; --steel:#4a5568; --cyan:#1fcefb; --cyan-hover:#15bce8;
+    --error:#8b2d2d; --success:#1f6f3a;
+    --border:rgba(41,28,14,.12); --border-light:rgba(41,28,14,.08); --border-gold:rgba(195,154,95,.28);
+    --card:#fffdf9; --warm:#f8f6f1;
+    --serif:"Lora",Georgia,"Times New Roman",serif;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; font-family:var(--sans); color:var(--ink); line-height:1.65;
+    background:
+      radial-gradient(1200px 520px at 78% -8%, rgba(195,154,95,.14), transparent 60%),
+      linear-gradient(180deg,#fffefb 0%, #f8f6f1 100%);
+    background-attachment:fixed;
+  }
+  .flag{max-width:940px;margin:0 auto;padding:14px 28px;font-size:12.5px;color:var(--gold-muted);
+    letter-spacing:.4px;text-transform:uppercase;font-weight:700;opacity:.85}
+  .wrap{max-width:940px;margin:0 auto;padding:8px 28px 90px}
+  .col{max-width:70ch}
+  .kicker{color:var(--gold-muted);text-transform:uppercase;letter-spacing:2px;font-weight:800;font-size:13px;margin:18px 0 10px}
+  h1{font-family:var(--serif);font-weight:800;font-size:clamp(30px,5vw,42px);line-height:1.14;margin:0 0 14px;letter-spacing:-.01em}
+  .byline{color:var(--subtle);font-size:13.5px;font-weight:500;margin:0 0 26px}
+  .byline b{color:var(--gold-muted);font-weight:700}
+  figure{margin:30px 0}
+  figure img{width:100%;height:auto;display:block;border-radius:16px;border:1px solid var(--border);
+    box-shadow:0 14px 34px -18px rgba(41,28,14,.4), 0 2px 6px -3px rgba(41,28,14,.18);background:#fff}
+  figcaption{font-size:12.5px;color:var(--subtle);text-align:center;margin-top:10px;font-weight:500}
+  .quick{background:linear-gradient(180deg,#fff,#fbf6ec);border:1px solid var(--border-gold);
+    border-left:5px solid var(--gold);border-radius:14px;padding:20px 24px;margin:26px 0}
+  .quick .lab{color:var(--gold-muted);text-transform:uppercase;letter-spacing:1.4px;font-weight:800;font-size:11.5px;margin:0 0 8px}
+  .quick p{margin:0;font-size:17.5px;line-height:1.6}
+  ul.points{list-style:none;padding:0;margin:22px 0}
+  ul.points li{position:relative;padding:8px 0 8px 30px;font-size:16px;font-weight:500}
+  ul.points li::before{content:"";position:absolute;left:2px;top:15px;width:12px;height:12px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,var(--gold-light),var(--gold-muted))}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin:26px 0 6px}
+  .btn{display:inline-block;padding:13px 22px;border-radius:11px;font-weight:700;font-size:15px;text-decoration:none;
+    background:linear-gradient(180deg,var(--cyan),var(--cyan-hover));color:#06232c;box-shadow:0 8px 20px -10px rgba(31,206,251,.8)}
+  .btn.ghost{background:transparent;color:var(--gold-muted);border:1.5px solid var(--border-gold)}
+  .btn.dark{background:linear-gradient(135deg,#33240f,#291c0e);color:#f6ecd8}
+  .trust{display:flex;gap:26px;flex-wrap:wrap;padding:18px 0 6px;margin-top:16px;border-top:1px solid var(--border-light);
+    color:var(--subtle);font-size:13.5px}
+  .trust b{color:var(--gold-muted)}
+  section.blk{margin:52px 0 0}
+  h2{font-family:var(--serif);font-weight:700;font-size:clamp(24px,3.4vw,31px);line-height:1.2;margin:0 0 6px;letter-spacing:-.005em}
+  h2::after{content:"";display:block;width:56px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--gold),transparent);margin:12px 0 18px}
+  .intro{font-size:18.5px;line-height:1.62;color:#3a2c18;max-width:70ch}
+  section.blk p{max-width:70ch;font-size:16px}
+  ul.bul{max-width:70ch;padding-left:0;list-style:none;margin:18px 0}
+  ul.bul li{position:relative;padding:7px 0 7px 26px;font-size:15.5px}
+  ul.bul li::before{content:"";position:absolute;left:3px;top:14px;width:8px;height:8px;border-radius:2px;background:var(--gold);transform:rotate(45deg)}
+  ul.bul li b{color:var(--ink)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:#f1ebdd;padding:1px 6px;border-radius:5px;color:#5a4324}
+  a.inline{color:var(--teal);text-decoration:underline;text-underline-offset:2px;text-decoration-color:rgba(61,107,107,.4)}
+  table{border-collapse:collapse;width:100%;margin:22px 0;font-size:14px;border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  thead th{background:linear-gradient(180deg,#f3ead6,#efe3cb);text-align:left;padding:12px 14px;font-weight:800;color:var(--gold-muted);font-size:12.5px;letter-spacing:.4px;text-transform:uppercase}
+  tbody td{padding:12px 14px;border-top:1px solid var(--border-light);vertical-align:top}
+  tbody tr:nth-child(even){background:rgba(248,246,241,.6)}
+  tbody td:last-child{color:var(--error);font-weight:600}
+  .callout{margin:24px 0;background:linear-gradient(180deg,#fbf4e6,#f7edd7);border:1px solid var(--border-gold);border-radius:14px;padding:18px 22px}
+  .callout .lab{display:inline-block;background:var(--gold-muted);color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:10px}
+  .callout p{margin:0;font-size:15.5px}
+  .callout a{color:var(--teal);font-weight:600}
+  .subhead{font-family:var(--serif);font-size:22px;font-weight:700;margin:56px 0 14px}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0}
+  .cardx{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+  .cardx h4{margin:0 0 6px;font-size:16.5px;font-family:var(--serif)}
+  .cardx p{margin:0 0 12px;font-size:14px;color:var(--muted)}
+  .cardx a{display:block;color:var(--teal);font-weight:600;font-size:14.5px;text-decoration:none;padding:4px 0}
+  .cardx a::before{content:"→ ";color:var(--gold)}
+  details.faq{border-bottom:1px solid var(--border-light);padding:6px 0}
+  details.faq summary{cursor:pointer;font-weight:700;font-size:16.5px;padding:14px 0;list-style:none;position:relative;padding-right:30px}
+  details.faq summary::-webkit-details-marker{display:none}
+  details.faq summary::after{content:"+";position:absolute;right:6px;top:12px;color:var(--gold);font-size:22px;font-weight:400}
+  details.faq[open] summary::after{content:"–"}
+  details.faq .a{padding:0 0 16px;color:var(--muted);font-size:15.5px;max-width:72ch}
+  .actionbar{margin:44px 0 0;padding:26px;border-radius:16px;background:linear-gradient(135deg,#33240f,#291c0e);color:#f6ecd8;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .actionbar .t{font-family:var(--serif);font-size:19px;font-weight:700;margin-right:auto}
+  @media(max-width:680px){.cards{grid-template-columns:1fr}.wrap{padding:8px 18px 70px}}
+</style>
+</head>
+<body>
+<div class="flag">◆ Local preview — enlivened copy + on-brand vector diagrams · not yet shipped</div>
+<div class="wrap">
+
+  <p class="kicker">NFC Technology</p>
+  <h1>How NFC Tags Work with Smartphones</h1>
+  <p class="byline">By <b>Editorial Board</b> · Reviewed by <b>Peter Zhang</b> · Updated Jul 7, 2026</p>
+
+  <figure>
+    <img src="public/diagrams/blog/nfc-smartphones-banner.svg" alt="Diagram of a smartphone's 13.56 MHz field powering a passive NFC tag, which answers by load modulation">
+  </figure>
+
+  <div class="quick">
+    <p class="lab">Quick answer</p>
+    <p>The honest explainer for product managers and procurement teams on how NFC tags actually talk to smartphones — no hand-waving. It walks the 13.56&nbsp;MHz RF protocol stack, the NDEF message format, OS-level handling, and the iOS-versus-Android compatibility gaps that decide whether a tap works or quietly does nothing.</p>
+  </div>
+
+  <ul class="points">
+    <li>NFC tags harvest power from the smartphone's electromagnetic field, requiring no battery and enabling a 10+ year operational lifespan.</li>
+    <li>The NDEF data format is an open standard that both iOS and Android parse natively, ensuring cross-platform compatibility without app installation.</li>
+    <li>Understanding the NFC communication sequence helps procurement teams write sharper specifications and sidestep the chip-selection mistakes that only surface after the tags are already in the field.</li>
+  </ul>
+
+  <div class="cta">
+    <a class="btn" href="#">Request samples</a>
+    <a class="btn ghost" href="#">Browse all NFC SKUs →</a>
+  </div>
+  <div class="trust"><span><b>Since 2008</b></span><span><b>ISO 9001</b></span><span><b>500+</b> Clients</span><span><b>50+</b> Countries</span></div>
+
+  <!-- S1 -->
+  <section class="blk">
+    <h2>How does NFC communication physically work?</h2>
+    <p class="intro">Hold a phone close to a sticker and a web page opens — no battery in the sticker, no app to install, no pairing dialog to dismiss. To anyone who hasn't seen inside the protocol it looks like a minor magic trick, and the honest engineering explanation is almost stranger than the trick: the tag has no power source of its own. The phone lends it one for the length of the tap. Near Field Communication operates at 13.56 MHz using magnetic induction between two loop antennas. One in the smartphone and one in the NFC tag. The smartphone acts as the active device (reader), generating an alternating magnetic field that induces a current in the tag's antenna coil.</p>
+    <figure><img src="public/diagrams/blog/nfc-induction-handshake.svg" alt="Three-step NFC handshake: the phone's field powers the tag's chip, which answers by load modulation"></figure>
+    <p>This induced current powers the tag's integrated circuit, which then modulates the RF field to transmit its stored data back to the phone. The process is called load modulation: the tag switches a resistive load on and off across its antenna, creating small amplitude changes in the reader's field that the phone's NFC controller decodes as binary data.</p>
+    <ul class="bul">
+      <li><b>Operating frequency:</b> 13.56 MHz ISM band, globally license-free for NFC applications.</li>
+      <li><b>Communication range:</b> 0-10 cm, determined by antenna geometry and reader field strength. Typical smartphone-to-tag range is 1-5 cm.</li>
+      <li><b>Data rate:</b> 106 kbit/s for standard NFC Forum tags (NTAG, <a class="inline" href="#">MIFARE Ultralight</a>). Higher rates (212/424 kbit/s) are used for card emulation mode.</li>
+      <li><b>Power transfer:</b> 10-30 mW delivered to the tag from the phone's field. Enough to operate the chip but not enough to power external sensors or LEDs without additional energy harvesting.</li>
+    </ul>
+    <div class="callout"><span class="lab">Compatibility</span><p>All iPhones from XS (2018) and virtually all Android phones since 2015 support background NFC tag reading without requiring any app installation.</p></div>
+  </section>
+
+  <!-- S2 -->
+  <section class="blk">
+    <h2>How does the NFC protocol stack work from RF to application?</h2>
+    <p class="intro">A tap that "just works" is really five separate handshakes stacked on top of each other, each politely waiting for the one beneath it to finish before it takes its turn. You never notice them — until one fails, and a tag that lights up instantly on a colleague's Android plays dead on your iPhone. Here is the whole ladder, and the specific failure that hides on each rung.</p>
+    <figure><img src="public/diagrams/blog/nfc-protocol-stack.svg" alt="The five-layer NFC protocol stack from physical RF up to the OS handler, with each layer's failure mode"></figure>
+    <table>
+      <thead><tr><th>Layer</th><th>Standard</th><th>Function</th><th>Failure mode</th></tr></thead>
+      <tbody>
+        <tr><td>Physical / RF</td><td>ISO 18092 / ISO 14443-3A</td><td>Magnetic coupling, power transfer, bit-level modulation</td><td>Out-of-range, metal interference, detuned antenna</td></tr>
+        <tr><td>Anti-collision</td><td>ISO 14443-3A</td><td>Identifies and selects a single tag when multiple are in the field</td><td>Multiple overlapping tags cause read errors</td></tr>
+        <tr><td>Data link</td><td>NFC Forum Type 2 Tag</td><td>Memory access commands (READ, WRITE, sector select)</td><td>Incompatible tag type, corrupted memory</td></tr>
+        <tr><td>Application</td><td>NDEF (NFC Data Exchange Format)</td><td>Structured records: URI, text, vCard, MIME</td><td>Malformed NDEF message, unsupported record type</td></tr>
+        <tr><td>OS handler</td><td>iOS Core NFC / Android NFC Dispatch</td><td>Routes NDEF record to app or browser</td><td>Background reading disabled, NFC off in settings</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- S3 -->
+  <section class="blk">
+    <h2>How does NDEF message format work?</h2>
+    <p class="intro">NDEF is the tag's grammar: the agreed-upon way to arrange bytes so that a phone the tag has never met can still read the message and know exactly what to do with it. Formally, it is the standard data format stored on NFC tags. It defines how records (URLs, text strings, vCards, application launch commands) are structured so that any NFC-enabled device can parse them consistently. Get the grammar right and every device understands you; get it wrong and the tag technically "has data" — it just reads as gibberish.</p>
+    <figure><img src="public/diagrams/blog/ndef-record-anatomy.svg" alt="Anatomy of an NDEF message: records split into a header and payload, plus the four common record types"></figure>
+    <p>An <a class="inline" href="#">NDEF</a> message consists of one or more NDEF records, each containing a header (record type, payload length, ID) and a payload. The most common record types in B2B applications are URI (web link), Text (plain text with language code), vCard (contact information in MIME format) and Android Application Record (AAR) which forces a specific app to handle the tag.</p>
+    <ul class="bul">
+      <li>URI records use a prefix byte to compress common URL schemes (<code>https://</code>, <code>tel:</code>, <code>mailto:</code>), saving 5-10 bytes of tag memory.</li>
+      <li>Text records include a language code (e.g., 'en', 'de') enabling multi-language content on a single tag using multiple text records.</li>
+      <li>Smart Poster records combine a URI with a title and icon reference, allowing phones to display a preview before opening the link.</li>
+      <li>Custom MIME-type records can store application-specific binary data that only your app knows how to parse.</li>
+    </ul>
+  </section>
+
+  <!-- S4 -->
+  <section class="blk">
+    <h2>What's the difference between iOS and android NFC behavior?</h2>
+    <p class="intro">Here is the demo that has quietly humbled a hundred product launches: the tap works flawlessly on the presenter's Android, then does precisely nothing on the VP's iPhone. Same tag, same URL — two operating systems with very different manners. Design for both from the first spec and you simply never have that meeting.</p>
+    <figure><img src="public/diagrams/blog/ios-vs-android-nfc.svg" alt="iOS versus Android NFC behavior compared side by side, with the read rules each platform enforces"></figure>
+    <ul class="bul">
+      <li>iOS (iPhone XS and later) reads NFC tags in the background without user action. A notification banner appears when a tag is detected, and tapping the banner opens the URL or action.</li>
+      <li>Android dispatches NFC tag reads through an intent system. If no app claims the intent, the default browser opens URL records. Apps can register intent filters to handle specific tag types.</li>
+      <li>iOS requires HTTPS URLs. HTTP links without TLS are not opened from NFC tag reads. Always use HTTPS for cross-platform compatibility.</li>
+      <li>Android supports a wider range of NDEF record types natively, including application launch via AAR, which is ignored by iOS.</li>
+      <li>Both platforms suppress repeated reads of the same tag within a short cooldown period (approximately 5-10 seconds) to prevent accidental duplicate actions.</li>
+    </ul>
+  </section>
+
+  <!-- S5 -->
+  <section class="blk">
+    <h2>How do you troubleshoot common NFC read failures?</h2>
+    <p class="intro">When a smartphone fails to read an NFC tag, the issue is almost always physical positioning, environmental interference or a software configuration problem. Not a defective tag — though a defective tag is, reliably, the first thing everyone suspects.</p>
+    <figure><img src="public/diagrams/blog/nfc-read-failure-map.svg" alt="NFC read-failure map pairing each symptom with its likely cause and the fix"></figure>
+    <ul class="bul">
+      <li><b>No read response:</b> Ensure NFC is enabled in phone settings. On Android, check that the NFC toggle in quick settings is on. On iPhone, NFC is always on for background reading.</li>
+      <li><b>Intermittent reads:</b> The tag antenna is not aligned with the phone's NFC coil. NFC coil position varies by phone model. On iPhones it is at the top; on many Android devices it is center-back.</li>
+      <li><b>Metal surface interference:</b> Metal within 2 mm of the tag antenna detunes the resonant circuit. Use anti-metal (ferrite-backed) tags or add a 1 mm spacer between the tag and the metal surface.</li>
+      <li><b>Multiple tags in proximity:</b> If two or more tags overlap in the phone's field, the anti-collision protocol may fail. Space tags at least 3 cm apart.</li>
+      <li><b>NDEF not recognized:</b> The tag may contain raw data rather than a formatted NDEF message. Reformat the tag using an NFC writing app or desktop reader.</li>
+    </ul>
+  </section>
+
+  <!-- S6 -->
+  <section class="blk">
+    <h2>How do iOS App Clips and Web NFC change the developer story?</h2>
+    <p class="intro">Beyond the basic "tap to open URL" flow, two platform features have reshaped what a single NFC tap can do without forcing the user to install an app: Apple's App Clips (iOS 14+) and the W3C Web NFC API (Chrome on Android). Knowing which platform supports which API is the difference between an authentication flow that works for 100% of users vs one that silently fails on iPhone.</p>
+    <ul class="bul">
+      <li><b>iOS App Clips:</b> a 10 MB lightweight slice of a native iOS app that launches from an NFC tap, QR scan or App Clip Code. The tag's NDEF URI carries an <code>https://appclip.apple.com/id?p=&lt;bundle&gt;</code> link or a brand-controlled HTTPS URL with an associated <code>apple-app-site-association</code> file. Apple's App Clip template integrates with Apple Pay and Sign in with Apple — high-conversion for retail loyalty, valet parking, EV charging.</li>
+      <li><b>Android Instant Apps and intents:</b> Android equivalents launch via NFC intent filters; the older Instant Apps program is in maintenance mode but most consumer flows now use a regular installed app + deep links, or the Web NFC fallback. Android Application Records (AAR) on the tag force a specific package to handle the intent — but AAR is silently ignored by iOS, which is the most common cross-platform NFC bug.</li>
+      <li><b>Web NFC API (W3C):</b> exposes NDEFReader to web pages via JavaScript, letting a PWA read tags after a user permission prompt. Coverage is currently Chrome on Android only — Safari and iOS WebKit do not implement Web NFC as of 2026. Plan for a Web NFC primary path with a Core NFC native iOS app fallback when reaching iPhone users.</li>
+      <li><b>Core NFC (iOS):</b> Apple's native API surface for tag reading (iPhone 7+) and writing (iPhone 7+ from iOS 13). Background tag reading works on iPhone XS+ via the System Tag Reader; older devices require a foreground app. Apple's NDEF parser silently fails on <code>http://</code> URLs — always specify <code>https://</code>.</li>
+      <li><b>Tools landscape (2026):</b> NFC Tools (wakdev) remains the de facto Android writer/reader for off-the-shelf tag programming; NFC Tap (App Store) is a popular iOS counterpart that exercises iOS 17 Core NFC features. For volume programming workflows, desktop encoders (ACR122U, Identiv uTrust) plus a host SDK still win on speed and consistency.</li>
+    </ul>
+  </section>
+
+  <!-- S7 -->
+  <section class="blk">
+    <h2>How do MagSafe, foldable phones and wireless charging affect NFC tap reliability?</h2>
+    <p class="intro">The NFC tap experience used to be a simple antenna-positioning problem; on modern smartphones it has become an interference engineering problem. Procurement teams writing NFC product specs in 2026 should plan for these device-side variables. The tag itself is the one component in this whole exchange that hasn't changed in years; it is everything you hold it against that keeps reinventing itself.</p>
+    <ul class="bul">
+      <li><b>iPhone MagSafe interference:</b> iPhone 12+ have a MagSafe magnet ring near the rear NFC antenna. Magnetic accessories (wallets, mounts) usually don't block NFC reads, but ferrite-bearing accessories can detune the coil and degrade range by 30-50%. Test taps with the customer's actual case before launch.</li>
+      <li><b>Foldable phones (Samsung Galaxy Z Fold/Flip, Pixel Fold, OPPO Find N):</b> NFC antenna placement on foldables is non-standard — often top-rear or hinge-side. Marketing collateral that says 'tap the back of your phone' fails for users on foldables. Brand instructions should say 'tap with the back of your phone near the top'.</li>
+      <li><b>Wireless charging coils:</b> Qi/Qi2 wireless charging uses similar 100-200 kHz magnetic induction. A tag stuck on top of a charging pad will be intermittently detuned during charging cycles. Place tags ≥3 cm away from charging surfaces.</li>
+      <li><b>Phone case metal plates:</b> ring holders, MagSafe-compatible aftermarket cases with hidden steel plates, and 'wallet' folio cases all add metal that can detune NFC. Spec ferrite-backed (anti-metal) tags for B2B environments where the user's case is uncontrolled.</li>
+      <li><b>Power-saving and dark-screen reads:</b> iOS allows background tag reads even when the screen is off (locked iPhone XS+). Android typically requires the screen on; Samsung's One UI 'NFC always-on' setting must be enabled for screen-off reads. Document this explicitly in B2B onboarding.</li>
+    </ul>
+  </section>
+
+  <!-- Resources -->
+  <p class="subhead">Keep going</p>
+  <div class="cards">
+    <div class="cardx"><h4>NFC tag products</h4><p>Shop NFC stickers and cards with pre-formatted NDEF memory for smartphone compatibility.</p><a href="#">NFC stickers</a><a href="#">NFC cards</a></div>
+    <div class="cardx"><h4>NFC development tools</h4><p>Desktop readers and SDKs for programming and testing NFC tags.</p><a href="#">ACR122U NFC reader/writer</a><a href="#">NFC reader with SDKs</a><a href="#">Web NFC API (MDN)</a><a href="#">Apple Core NFC documentation</a></div>
+  </div>
+
+  <!-- FAQ -->
+  <p class="subhead">Frequently asked</p>
+  <details class="faq" open><summary>Do NFC tags need a battery?</summary><div class="a">No. Passive NFC tags harvest all their operating power from the smartphone's RF field. This is why they have no expiration date and can function for 10+ years without maintenance. Active NFC devices (like phones) do require a battery, but the tags themselves do not.</div></details>
+  <details class="faq"><summary>Can NFC tags be read through a phone case?</summary><div class="a">Yes, standard phone cases made of silicone, plastic, leather or TPU do not block NFC signals. Cases with metal plates, built-in magnets (MagSafe-style) or thick rugged armor may reduce read range by 1-2 cm. Remove the case to test if you experience read issues.</div></details>
+  <details class="faq"><summary>What is the maximum data an NFC tag can store?</summary><div class="a">Standard NFC Forum Type 2 Tags (NTAG series) store 144-888 bytes depending on the chip variant. For larger payloads, NFC Forum Type 4 Tags (like MIFARE DESFire) offer up to 8 KB. In practice, most NFC applications store a URL (50-150 bytes), making even the smallest chips sufficient.</div></details>
+  <details class="faq"><summary>Can a smartphone write data to an NFC tag?</summary><div class="a">Yes. Android phones can write NDEF records to writable NFC tags using built-in APIs or free apps like NFC TagWriter. iPhones gained NFC writing capability with iOS 13 (2019) via Core NFC APIs, though writing requires a dedicated app. Safari cannot write to tags.</div></details>
+  <details class="faq"><summary>Is NFC communication secure?</summary><div class="a">NFC's short range (under 10 cm) provides inherent physical security. An attacker must be within centimeters to intercept the signal. For additional security, NTAG chips support password-protected memory access, and advanced chips like NTAG424 DNA provide AES-128 encrypted communication and tamper detection.</div></details>
+  <details class="faq"><summary>Will the same NFC tag launch an iOS App Clip and an Android intent without two separate tags?</summary><div class="a">Yes if you encode the tag carefully. Use a single NDEF URI record pointing to your brand-controlled HTTPS URL (e.g., <code>https://brand.com/c/&lt;id&gt;</code>). On iOS 14+, an <code>apple-app-site-association</code> file at that domain triggers the matching App Clip experience. On Android, a deep-link intent filter or app-link verification at the same domain launches your installed app or falls back to the browser. Avoid using Android Application Records (AAR) — iOS silently ignores them, and the experience diverges. The 'one URL, two platforms' pattern is the production standard for retail loyalty, parking and luxury authentication taps.</div></details>
+  <details class="faq"><summary>When should we plan a Web NFC PWA vs a native Core NFC iOS app?</summary><div class="a">Use Web NFC (Chrome on Android only as of 2026) when your audience is overwhelmingly Android, when you want a no-install web experience, and when your read-only payload is short. The W3C NDEFReader API is mature on Chrome but not implemented in Safari/iOS WebKit, so for any consumer flow with significant iPhone share you must pair Web NFC with a Core NFC native iOS app or fall back to the OS-level System Tag Reader (which opens the URL in Safari without a permission prompt). For B2B enterprise apps with controlled device fleets — typically Android industrial handhelds — Web NFC alone is now production-ready.</div></details>
+
+  <!-- Action bar -->
+  <div class="actionbar">
+    <span class="t">Get NFC tag recommendations</span>
+    <a class="btn" href="#">Get NFC tag recommendations</a>
+    <a class="btn dark" href="#">Shop NFC stickers</a>
+    <a class="btn dark" href="#">View ACR122U reader</a>
+  </div>
+
+</div>
+</body>
+</html>
