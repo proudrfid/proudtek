@@ -39,13 +39,40 @@ describe("native SiteShell dark launch", () => {
     expect(html).toContain('href="/sample-pack/"');
   });
 
-  it("keeps legacy drawer ownership out of native shell pages", () => {
+  it("keeps the legacy snapshot drawer scoped and mutually exclusive with floating banners", () => {
+    const script = readFileSync(new URL("../../../layouts/partials/PageScript.astro", import.meta.url), "utf8");
+    const layout = readFileSync(new URL("../../../styles/codex-layout.css", import.meta.url), "utf8");
+    const renderer = readFileSync(new URL("../../../lib/render-snapshot.ts", import.meta.url), "utf8");
+
+    expect(renderer).toContain('addClass("codex-legacy-mobile-drawer")');
+    expect(script).toContain("var legacyDrawer = document.querySelector('.codex-legacy-mobile-drawer')");
+    expect(script).toContain("showing-popup-drawer-from-right");
+    expect(script).toContain("codex-drawer-suppressed");
+    expect(layout).toContain("#mobile-drawer.codex-legacy-mobile-drawer .drawer-inner");
+    expect(layout).toContain("body.showing-popup-drawer-from-right .codex-sticky-cta");
+  });
+
+
+  it("keeps the legacy drawer observer out of native shell pages", () => {
     const source = readFileSync(new URL("../../../layouts/partials/PageScript.astro", import.meta.url), "utf8");
 
     expect(source).toContain("new MutationObserver");
     expect(source).toContain("var __nativeSiteShell = document.querySelector('[data-native-site-shell]')");
     expect(source).toContain("if (__nativeSiteShell || document.querySelector('[data-native-site-shell]')) return;");
     expect(source).toContain("if (!__nativeSiteShell)");
+  });
+
+  it("isolates native drawer styling from donor and legacy drawer rules", () => {
+    const shellCss = readFileSync(new URL("../../../styles/codex-shell.css", import.meta.url), "utf8");
+
+    expect(shellCss).toContain("html body .codex-native-shell #mobile-drawer.codex-native-drawer");
+    expect(shellCss).toContain(".codex-native-drawer__panel");
+    expect(shellCss).toContain("background: var(--codex-surface) !important");
+    expect(shellCss).toContain("#mobile-site-navigation");
+    expect(shellCss).toContain("fill: none !important");
+    expect(shellCss).toContain("body.drawer-open .codex-sticky-cta");
+    expect(shellCss).toContain("body.drawer-open #codex-consent");
+    expect(shellCss).toContain("body.drawer-open .codex-wa-fab");
   });
 
   it("executes drawer focus management for open, Escape and backdrop close", async () => {

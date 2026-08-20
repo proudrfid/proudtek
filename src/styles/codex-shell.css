@@ -519,3 +519,68 @@
 @media (max-width: 480px) {
   .codex-native-footer__nav { grid-template-columns: 1fr; }
 }
+
+/* Native drawer isolation: hub pages still carry donor Kadence head CSS for
+   document-level parity. Keep those selectors from repainting the native
+   drawer, which intentionally reuses the legacy #mobile-drawer hook. */
+@media (max-width: 1279px) {
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer {
+    z-index: var(--codex-z-modal) !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer .codex-native-drawer__panel {
+    background: var(--codex-surface) !important;
+    color: var(--codex-text) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow-y: auto !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-site-navigation,
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu {
+    display: block !important;
+    max-height: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu > li > a,
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu summary,
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu summary span {
+    color: var(--codex-dark) !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu .codex-native-mobile-menu__overview {
+    color: var(--codex-color-accent) !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu .codex-native-mobile-menu__group h2 {
+    color: var(--codex-gold-muted) !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu .codex-native-mobile-menu__group a {
+    color: var(--codex-text-muted) !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer .codex-native-drawer__head p,
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer .codex-native-drawer__close {
+    color: var(--codex-dark) !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer .codex-native-drawer__close {
+    background: var(--codex-surface) !important;
+  }
+
+  html body .codex-native-shell #mobile-drawer.codex-native-drawer svg {
+    fill: none !important;
+    stroke: currentColor !important;
+  }
+
+  body.drawer-open .codex-sticky-cta,
+  body.drawer-open #codex-consent,
+  body.drawer-open .codex-wa-fab {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
