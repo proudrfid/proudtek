@@ -31,6 +31,7 @@ import { prepareSnapshot } from "../render-snapshot";
 import { sanitizeHead, sanitizeBody } from "./sanitize-html";
 import { stripNoiseHtmlComments } from "./utils";
 import { inventoryDonorHead } from "./donor-head-inventory";
+import { applyHeadPolicy, rebuildHeadHtml } from "./head-policy";
 
 export interface SnapshotChrome {
   htmlAttrs: Record<string, string>;
@@ -63,28 +64,46 @@ export interface SnapshotChrome {
 export function extractChromeFromSnapshot(
   donor: SnapshotPage,
   currentRoute: string,
+  isNativeRoute = false,
 ): SnapshotChrome {
   // Phase 0 Deliverable 3: Zero-output integration
   // Inventory donor head assets in dev mode for visibility, but don't modify output.
-  if (import.meta.env.DEV && donor.headHtml) {
-    const inventory = inventoryDonorHead(donor.headHtml);
-    const byClassification = inventory.reduce((acc, asset) => {
-      acc[asset.classification] = (acc[asset.classification] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+  // Phase 1: Apply native-safe head filtering when isNativeRoute = true
+  let filteredHeadHtml = donor.headHtml;
 
-    console.log(`[Phase 0] Donor head inventory for ${donor.route}:`);
-    console.log(`  Total: ${inventory.length} assets`);
-    Object.entries(byClassification)
-      .sort((a, b) => b[1] - a[1])
-      .forEach(([classification, count]) => {
-        console.log(`  ${classification}: ${count}`);
-      });
+  if (donor.headHtml) {
+    const inventory = inventoryDonorHead(donor.headHtml);
+
+    if (import.meta.env.DEV) {
+      const byClassification = inventory.reduce((acc, asset) => {
+        acc[asset.classification] = (acc[asset.classification] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      console.log(`[Phase 0] Donor head inventory for ${donor.route}:`);
+      console.log(`  Total: ${inventory.length} assets`);
+      Object.entries(byClassification)
+        .sort((a, b) => b[1] - a[1])
+        .forEach(([classification, count]) => {
+          console.log(`  ${classification}: ${count}`);
+        });
+    }
+
+    // Phase 1: Apply filtering for native routes
+    if (isNativeRoute) {
+      const filteredAssets = applyHeadPolicy(currentRoute, inventory, true);
+      filteredHeadHtml = rebuildHeadHtml(filteredAssets);
+
+      if (import.meta.env.DEV) {
+        console.log(`[Phase 1] Native-safe head filtering enabled for ${currentRoute}`);
+        console.log(`  Filtered: ${inventory.length} → ${filteredAssets.length} assets`);
+      }
+    }
   }
 
   // Clone donor with route override so markActiveNav inside prepareSnapshot
   // targets the consuming page's route, not the donor's.
-  const snap = prepareSnapshot({ ...donor, route: currentRoute });
+  const snap = prepareSnapshot({ ...donor, route: currentRoute, headHtml: filteredHeadHtml });
 
   // sanitizeHead strips <title>, <meta description/robots/og/twitter/article>,
   // canonical, JSON-LD, etc. — every tag SeoHead.astro re-emits authoritatively

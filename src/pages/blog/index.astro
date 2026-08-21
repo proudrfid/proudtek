@@ -170,7 +170,9 @@ if (!donorPage) {
     "blog/index.astro: no chrome donor snapshot (/blog/, /resources/, /about/ all missing)",
   );
 }
-const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+
+// Phase 1: Enable native-safe head filtering when native shell is active
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE, useNativeShell);
 // Note: extractChromeFromSnapshot() now strips H1 elements from
 // chrome.beforeMainHtml as of PR-5 a11y P0, so the local regex
 // removal previously done here is no longer needed.
