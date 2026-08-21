@@ -13,6 +13,9 @@ export type DonorAssetClassification =
   | 'analytics'        // GA4, GTM, third-party tracking
   | 'font'             // @font-face, font preloads
   | 'base'             // Resets, base styles, global tokens
+  | 'wp-core'          // WordPress core features (emoji, no-js)
+  | 'wp-plugin'        // WordPress plugin assets (ez-toc, translatepress)
+  | 'dependency'       // jQuery, libraries
   | 'unknown';         // Unclassified, needs review
 
 export interface DonorHeadAsset {
@@ -88,16 +91,53 @@ function classifyAsset(source: string): Pick<DonorHeadAsset, 'type' | 'classific
     }
   }
 
-  // Base/reset styles (simple heuristic: very short inline styles with * or html/body selectors)
-  if (type === 'style' && source.length < 500) {
+  // Base/reset styles and WordPress global-styles
+  if (type === 'style') {
     if (
+      lowerSource.includes('id="global-styles-inline-css"') ||
+      lowerSource.includes('--wp--preset--')
+    ) {
+      return { type, classification: 'base', reason: 'WordPress global styles / CSS custom properties' };
+    }
+
+    if (source.length < 500 && (
       lowerSource.includes('* {') ||
       lowerSource.includes('html {') ||
       lowerSource.includes('body {') ||
       lowerSource.includes(':root {')
-    ) {
+    )) {
       return { type, classification: 'base', reason: 'Reset or root-level base style' };
     }
+  }
+
+  // WordPress core features
+  if (
+    lowerSource.includes('no-js') ||
+    lowerSource.includes('emoji') ||
+    lowerSource.includes('wp-smiley') ||
+    lowerSource.includes('_wpemojisettings') ||
+    lowerSource.includes('id="wp-emoji-') ||
+    lowerSource.includes('id="classic-theme-styles-')
+  ) {
+    return { type, classification: 'wp-core', reason: 'WordPress core feature (emoji, theme compat, no-js)' };
+  }
+
+  // WordPress plugins
+  if (
+    lowerSource.includes('/wp-content/plugins/') ||
+    lowerSource.includes('id="ez-toc-') ||
+    lowerSource.includes('translatepress') ||
+    lowerSource.includes('trp-')
+  ) {
+    return { type, classification: 'wp-plugin', reason: 'WordPress plugin asset' };
+  }
+
+  // jQuery and common dependencies
+  if (
+    lowerSource.includes('jquery') ||
+    lowerSource.includes('/wp-includes/js/')
+  ) {
+    return { type, classification: 'dependency', reason: 'jQuery or WordPress bundled library' };
   }
 
   // Default: unknown
