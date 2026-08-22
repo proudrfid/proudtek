@@ -16,7 +16,7 @@
  * Architecture note: native .astro hub (path-3 pattern). Companion to
  * src/pages/compare/index.astro.
  */
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShellSwitchLayout from "../../layouts/ShellSwitchLayout.astro";
 import { getCollection } from "astro:content";
 import { COMPARE_CATEGORIES } from "../../data/compare-categories";
 import type { CompareCategory } from "../../data/compare-categories";
@@ -27,6 +27,7 @@ import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { truncateText } from "../../lib/seo/utils";
 import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
+import { shouldUseNativeShell } from "../../lib/rollout";
 
 /** See note in src/pages/compare/index.astro — strips SEO subtitle after em-dash. */
 function shortenCardTitle(title: string): string {
@@ -144,6 +145,7 @@ const railHtml = buildCompareCategoriesRailHtml(category.id);
 // hubs render with the same masthead + footer as every other page. Prefer
 // /compare/ as donor (when available), then /resources/, then /about/.
 const currentRoute = `/compare/${category.id}/`;
+const useNativeShell = shouldUseNativeShell(currentRoute);
 const donorPage =
   (await getPageByRoute("/compare/")) ||
   (await getPageByRoute("/resources/")) ||
@@ -153,7 +155,7 @@ if (!donorPage) {
     `[category].astro: no chrome donor snapshot (/compare/, /resources/, /about/ all missing)`,
   );
 }
-const chrome = extractChromeFromSnapshot(donorPage, currentRoute);
+const chrome = extractChromeFromSnapshot(donorPage, currentRoute, useNativeShell);
 seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
 seo.bodyAttrs = {
   ...chrome.bodyAttrs,
@@ -163,8 +165,8 @@ seo.bodyAttrs = {
 seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
 ---
 
-<BaseLayout seo={seo}>
-  <Fragment set:html={chrome.beforeMainHtml} />
+<ShellSwitchLayout seo={seo} currentRoute={currentRoute}>
+  {!useNativeShell && <Fragment set:html={chrome.beforeMainHtml} />}
 
   <main id="main" class="site-main" role="main">
     {/* Left rail (same shape as /blog/ + /guides/ + /compare/) */}
@@ -202,5 +204,5 @@ seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
     </section>
   </main>
 
-  <Fragment set:html={chrome.afterMainHtml} />
-</BaseLayout>
+  {!useNativeShell && <Fragment set:html={chrome.afterMainHtml} />}
+</ShellSwitchLayout>

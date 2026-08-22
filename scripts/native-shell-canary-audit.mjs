@@ -23,8 +23,22 @@ const FLAGGED_PATHS = new Set([
   "guides/index.html",
   "solutions/index.html",
   "blog/index.html",
+  "compare/index.html",
+  "compare/chip-vs-chip/index.html",
+  "compare/reader-vs-reader/index.html",
+  "compare/form-factor-material/index.html",
+  "compare/frequency-tech/index.html",
 ]);
-const HUB_PATHS = ["guides/index.html", "solutions/index.html", "blog/index.html"];
+const HUB_PATHS = [
+  "guides/index.html",
+  "solutions/index.html",
+  "blog/index.html",
+  "compare/index.html",
+  "compare/chip-vs-chip/index.html",
+  "compare/reader-vs-reader/index.html",
+  "compare/form-factor-material/index.html",
+  "compare/frequency-tech/index.html",
+];
 const REQUIRED_IDS = [
   ["#masthead", "masthead"],
   ["#site-navigation", "site-navigation"],

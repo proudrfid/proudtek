@@ -40,6 +40,11 @@ export const NATIVE_SHELL_CANARY_ROUTES = [
   "/guides/",
   "/solutions/",
   "/blog/",
+  "/compare/",
+  "/compare/chip-vs-chip/",
+  "/compare/reader-vs-reader/",
+  "/compare/form-factor-material/",
+  "/compare/frequency-tech/",
 ] as const;
 
 const NATIVE_SHELL_ROUTES = new Set<string>(NATIVE_SHELL_CANARY_ROUTES);

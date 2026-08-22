@@ -37,6 +37,93 @@ const editorialFixtures = [
       heroImage: "",
     },
   },
+  {
+    id: "compare/test-chip-comparison",
+    data: {
+      group: "compare",
+      route: "/compare/test-chip-comparison/",
+      title: "Test chip comparison",
+      summary: "Chip comparison fixture summary",
+      kicker: "Chip vs Chip",
+      heroImage: "",
+    },
+  },
+  {
+    id: "compare/test-reader-comparison",
+    data: {
+      group: "compare",
+      route: "/compare/test-reader-comparison/",
+      title: "Test reader comparison",
+      summary: "Reader comparison fixture summary",
+      kicker: "Reader vs Reader",
+      heroImage: "",
+    },
+  },
+  {
+    id: "compare/test-material-comparison",
+    data: {
+      group: "compare",
+      route: "/compare/test-material-comparison/",
+      title: "Test material comparison",
+      summary: "Material comparison fixture summary",
+      kicker: "Form Factor & Material",
+      heroImage: "",
+    },
+  },
+  {
+    id: "compare/test-frequency-comparison",
+    data: {
+      group: "compare",
+      route: "/compare/test-frequency-comparison/",
+      title: "Test frequency comparison",
+      summary: "Frequency comparison fixture summary",
+      kicker: "Frequency & Technology",
+      heroImage: "",
+    },
+  },
+];
+
+const compareCategoryFixtures = [
+  {
+    id: "chip-vs-chip",
+    label: "Chip vs Chip",
+    icon: "◈",
+    testTitle: "Test chip comparison",
+    description: "Compare RFID and NFC chip families.",
+    seoTitle: "Chip vs Chip Comparisons | Proud Tek",
+    pillars: ["Memory", "Security", "Compatibility"],
+    slugs: ["test-chip-comparison"],
+  },
+  {
+    id: "reader-vs-reader",
+    label: "Reader vs Reader",
+    icon: "▣",
+    testTitle: "Test reader comparison",
+    description: "Compare reader classes.",
+    seoTitle: "Reader vs Reader Comparisons | Proud Tek",
+    pillars: ["Frequency", "Range", "Integration"],
+    slugs: ["test-reader-comparison"],
+  },
+  {
+    id: "form-factor-material",
+    label: "Form Factor & Material",
+    icon: "◇",
+    testTitle: "Test material comparison",
+    description: "Compare tag bodies and materials.",
+    seoTitle: "Form Factor Comparisons | Proud Tek",
+    pillars: ["Material", "Durability", "Use case"],
+    slugs: ["test-material-comparison"],
+  },
+  {
+    id: "frequency-tech",
+    label: "Frequency & Technology",
+    icon: "◉",
+    testTitle: "Test frequency comparison",
+    description: "Compare RFID frequency technologies.",
+    seoTitle: "Frequency Comparisons | Proud Tek",
+    pillars: ["Frequency", "Read range", "Environment"],
+    slugs: ["test-frequency-comparison"],
+  },
 ];
 
 const donorFixture = {
@@ -64,6 +151,7 @@ type HubCase = {
   heading: string;
   cardTitle: string;
   loadPage: () => Promise<{ default: unknown }>;
+  props?: Record<string, unknown>;
   assertActiveRoute: ($: ReturnType<typeof load>) => void;
 };
 
@@ -88,14 +176,24 @@ const hubs: HubCase[] = [
     },
   },
   {
-    route: "/solutions/",
-    heading: "RFID & NFC Solutions",
-    cardTitle: "Test solution",
-    loadPage: () => import("../solutions/index.astro"),
+    route: "/compare/",
+    heading: "RFID & NFC Comparison Library",
+    cardTitle: "Test chip comparison",
+    loadPage: () => import("../compare/index.astro"),
     assertActiveRoute: ($) => {
-      expect($('#site-navigation a[href="/solutions/"][aria-current="page"]')).toHaveLength(1);
+      expect($('#site-navigation a[href="/compare/"][aria-current="page"]')).toHaveLength(1);
     },
   },
+  ...compareCategoryFixtures.map((category) => ({
+    route: `/compare/${category.id}/`,
+    heading: `${category.icon} ${category.label}`,
+    cardTitle: category.testTitle,
+    loadPage: () => import("../compare/[category].astro"),
+    props: { category },
+    assertActiveRoute: ($: ReturnType<typeof load>) => {
+      expect($(`.codex-industries-rail__link.active[href="/compare/${category.id}/"]`)).toHaveLength(1);
+    },
+  })),
 ];
 
 async function renderHub(hub: HubCase, nativeShell: boolean): Promise<string> {
@@ -109,10 +207,14 @@ async function renderHub(hub: HubCase, nativeShell: boolean): Promise<string> {
   vi.doMock("../../lib/site-data", () => ({
     getPageByRoute: vi.fn(async () => donorFixture),
   }));
+  vi.doMock("../../data/compare-categories", () => ({
+    COMPARE_CATEGORIES: compareCategoryFixtures,
+    getTotalCompareCount: () => compareCategoryFixtures.length,
+  }));
 
   const Page = (await hub.loadPage()).default;
   const container = await AstroContainer.create();
-  return container.renderToString(Page as never);
+  return container.renderToString(Page as never, { props: hub.props });
 }
 
 afterEach(() => {
@@ -121,6 +223,7 @@ afterEach(() => {
   vi.clearAllMocks();
   vi.doUnmock("astro:content");
   vi.doUnmock("../../lib/site-data");
+  vi.doUnmock("../../data/compare-categories");
 });
 
 describe.each(hubs)("$route hub shell branches", (hub) => {

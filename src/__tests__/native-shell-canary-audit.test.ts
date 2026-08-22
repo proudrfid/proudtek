@@ -23,8 +23,22 @@ async function fixture(): Promise<FixturePaths> {
   const baselineDist = path.join(root, "baseline");
   const defaultDist = path.join(root, "default");
   const flaggedDist = path.join(root, "flagged");
-  const outputs = ["glossary/index.html", "tools/rfid-tag-cost-estimator/index.html", "guides/index.html", "solutions/index.html", "blog/index.html", "research/index.html"];
-  const flagged = new Set(["glossary/index.html", "tools/rfid-tag-cost-estimator/index.html", "guides/index.html", "solutions/index.html", "blog/index.html"]);
+  const outputs = [
+    "glossary/index.html",
+    "tools/rfid-tag-cost-estimator/index.html",
+    "guides/index.html",
+    "solutions/index.html",
+    "blog/index.html",
+    "compare/index.html",
+    "compare/chip-vs-chip/index.html",
+    "compare/reader-vs-reader/index.html",
+    "compare/form-factor-material/index.html",
+    "compare/frequency-tech/index.html",
+    "research/index.html",
+  ];
+  const flagged = new Set(outputs.filter((relativePath) =>
+    relativePath !== "research/index.html",
+  ));
   for (const dist of [baselineDist, defaultDist, flaggedDist]) {
     for (const relativePath of outputs) {
       const filePath = path.join(dist, relativePath);
@@ -38,7 +52,16 @@ async function fixture(): Promise<FixturePaths> {
 }
 
 function html(relativePath: string, native: boolean) {
-  const hub = ["guides/index.html", "solutions/index.html", "blog/index.html"].includes(relativePath);
+  const hub = [
+    "guides/index.html",
+    "solutions/index.html",
+    "blog/index.html",
+    "compare/index.html",
+    "compare/chip-vs-chip/index.html",
+    "compare/reader-vs-reader/index.html",
+    "compare/form-factor-material/index.html",
+    "compare/frequency-tech/index.html",
+  ].includes(relativePath);
   const shell = native ? '<div class="codex-native-shell" data-native-site-shell><header id="masthead"><nav id="site-navigation"><ul id="primary-menu"></ul></nav><div id="mobile-drawer"><ul id="mobile-menu"></ul></div></header>' : '<header data-donor="masthead"></header>';
   const footer = native ? '<footer id="colophon"></footer></div>' : '<footer data-donor="footer"></footer>';
   return `<!doctype html><html><head><title>${relativePath}</title><link rel="canonical" href="https://proudtek.com/${relativePath.replace("index.html", "")}"/><meta name="description" content="fixture"/></head><body>${shell}${hub ? '<main id="main" class="hub-main" data-rail-key="fixture" aria-label="Fixture hub"><h1>Fixture hub</h1><p>Body <a href="/guides/original/" class="hub-link">Read guide</a></p></main>' : '<main id="main"><h1>Fixture</h1></main>'}${footer}</body></html>`;
@@ -127,7 +150,16 @@ describe("native shell canary output audit", () => {
     expect(contract.knownWarnings).toContainEqual({ code: "SITEMAP_MISSING", file: path.join(paths.defaultDist, "sitemap.xml") });
   });
   it("passes a clean deterministic default and flagged fixture", async () => {
-    await expect(audit(await fixture())).resolves.toMatchObject({ hubs: 3, flaggedMarkers: expect.arrayContaining(["guides/index.html"]) });
+    await expect(audit(await fixture())).resolves.toMatchObject({
+      hubs: 8,
+      flaggedMarkers: expect.arrayContaining([
+        "compare/index.html",
+        "compare/chip-vs-chip/index.html",
+        "compare/reader-vs-reader/index.html",
+        "compare/form-factor-material/index.html",
+        "compare/frequency-tech/index.html",
+      ]),
+    });
   });
 
   it("normalizes formatting-only HTML and XML changes", async () => {
