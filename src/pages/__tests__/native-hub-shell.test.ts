@@ -45,7 +45,11 @@ const donorFixture = {
   title: "Test chrome donor",
   htmlAttrs: { lang: "en", "data-donor-html": "yes" },
   bodyAttrs: { class: "donor-body" },
-  headHtml: '<meta name="donor-head-marker" content="yes">',
+  headHtml: `
+    <meta name="donor-head-marker" content="yes">
+    <style id="kadence-global-inline-css">#masthead { z-index: 1000; }</style>
+    <style id="woocommerce-theme-marker">.woocommerce-product-gallery { opacity: 1; }</style>
+  `,
   bodyHtml: `
     <div id="donor-wrapper">
       <header id="masthead" data-donor-before-marker>Snapshot header</header>
@@ -129,6 +133,8 @@ describe.each(hubs)("$route hub shell branches", (hub) => {
     expect($("[data-donor-before-marker]")).toHaveLength(1);
     expect($("[data-donor-after-marker]")).toHaveLength(1);
     expect($("[data-native-site-shell]")).toHaveLength(0);
+    expect($("style#kadence-global-inline-css")).toHaveLength(1);
+    expect($("style#woocommerce-theme-marker")).toHaveLength(1);
   });
 
   it("renders one native shell without donor chrome when flagged", async () => {
@@ -142,6 +148,8 @@ describe.each(hubs)("$route hub shell branches", (hub) => {
     expect($("[data-donor-after-marker]")).toHaveLength(0);
     expect($("#masthead")).toHaveLength(1);
     expect($("footer#colophon")).toHaveLength(1);
+    expect($("style#kadence-global-inline-css")).toHaveLength(0);
+    expect($("style#woocommerce-theme-marker")).toHaveLength(0);
     hub.assertActiveRoute($);
   });
 });
