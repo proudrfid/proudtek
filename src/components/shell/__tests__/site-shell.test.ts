@@ -73,6 +73,9 @@ describe("native SiteShell dark launch", () => {
     expect(shellCss).toContain("body.drawer-open .codex-sticky-cta");
     expect(shellCss).toContain("body.drawer-open #codex-consent");
     expect(shellCss).toContain("body.drawer-open .codex-wa-fab");
+    expect(shellCss).toContain(".codex-native-drawer__backdrop");
+    expect(shellCss).toContain("z-index: var(--codex-z-base)");
+    expect(shellCss).toContain("z-index: var(--codex-z-raised)");
   });
 
   it("executes drawer focus management for open, Escape and backdrop close", async () => {
