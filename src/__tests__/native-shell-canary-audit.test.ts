@@ -27,6 +27,13 @@ async function fixture(): Promise<FixturePaths> {
     "glossary/index.html",
     "tools/rfid-tag-cost-estimator/index.html",
     "guides/index.html",
+    "guides/google-review-cards/index.html",
+    "guides/hotel-keycards/index.html",
+    "guides/chip-encyclopedias/index.html",
+    "guides/standards-encoding/index.html",
+    "guides/compliance-regulatory/index.html",
+    "guides/integration-tools/index.html",
+    "guides/buying-reference/index.html",
     "solutions/index.html",
     "blog/index.html",
     "compare/index.html",
@@ -54,6 +61,13 @@ async function fixture(): Promise<FixturePaths> {
 function html(relativePath: string, native: boolean) {
   const hub = [
     "guides/index.html",
+    "guides/google-review-cards/index.html",
+    "guides/hotel-keycards/index.html",
+    "guides/chip-encyclopedias/index.html",
+    "guides/standards-encoding/index.html",
+    "guides/compliance-regulatory/index.html",
+    "guides/integration-tools/index.html",
+    "guides/buying-reference/index.html",
     "solutions/index.html",
     "blog/index.html",
     "compare/index.html",
@@ -151,7 +165,7 @@ describe("native shell canary output audit", () => {
   });
   it("passes a clean deterministic default and flagged fixture", async () => {
     await expect(audit(await fixture())).resolves.toMatchObject({
-      hubs: 8,
+      hubs: 15,
       flaggedMarkers: expect.arrayContaining([
         "compare/index.html",
         "compare/chip-vs-chip/index.html",

@@ -33,11 +33,21 @@ const CATALOG_V2_ENABLED = enabled(import.meta.env.PROUDTEK_CATALOG_V2);
  * then adds the guides, solutions and blog hubs. The global kill switch remains
  * off by default, so adding a route here does not change production until
  * PROUDTEK_NATIVE_SHELL=1 is set for a deployment.
+ *
+ * Phase 4 adds the seven /guides/{cluster}/ pages — same section as the
+ * validated /guides/ hub, identical rail + grid body classes.
  */
 export const NATIVE_SHELL_CANARY_ROUTES = [
   "/glossary/",
   "/tools/rfid-tag-cost-estimator/",
   "/guides/",
+  "/guides/google-review-cards/",
+  "/guides/hotel-keycards/",
+  "/guides/chip-encyclopedias/",
+  "/guides/standards-encoding/",
+  "/guides/compliance-regulatory/",
+  "/guides/integration-tools/",
+  "/guides/buying-reference/",
   "/solutions/",
   "/blog/",
   "/compare/",

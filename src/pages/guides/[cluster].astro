@@ -18,6 +18,7 @@
  * docs/architecture/editorial-rendering-debt.md.
  */
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PageFrameLayout from "../../layouts/PageFrameLayout.astro";
 import CardThumb from "../../components/editorial/CardThumb.astro";
 import "../../styles/codex-cluster-hub.css";
 import { getCollection } from "astro:content";
@@ -26,6 +27,7 @@ import type { GuideCluster } from "../../data/guide-clusters";
 import type { PageSeoData } from "../../lib/seo";
 import { buildGuideClustersRailHtml } from "../../lib/seo/guides-rail";
 import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { shouldUseNativeShell } from "../../lib/rollout";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
@@ -146,6 +148,7 @@ const railHtml = buildGuideClustersRailHtml(cluster.id);
 // guides.json pillar was deleted (audit priority #4) the first lookup
 // returns undefined; /about/ is always present so the chain terminates.
 const currentRoute = `/guides/${cluster.id}/`;
+const useNativeShell = shouldUseNativeShell(currentRoute);
 const donorPage =
   (await getPageByRoute("/guides/")) ||
   (await getPageByRoute("/resources/")) ||
@@ -155,7 +158,7 @@ if (!donorPage) {
     "[cluster].astro: no chrome donor snapshot (/guides/, /resources/, /about/ all missing)",
   );
 }
-const chrome = extractChromeFromSnapshot(donorPage, currentRoute);
+const chrome = extractChromeFromSnapshot(donorPage, currentRoute, useNativeShell);
 // Merge donor htmlAttrs/bodyAttrs into seo so <html lang=…> and <body class=…>
 // match the rest of the site (Kadence layout classes, transparent-header, etc.).
 seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
@@ -169,13 +172,22 @@ seo.bodyAttrs = {
 // so the site header / mega-menu / footer markup actually renders styled.
 // Without this, the bare HTML shows giant unstyled logo + plain-text menu.
 seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
+
+// Same switch ShellSwitchLayout performs, inlined here: this page carries a
+// direct page-level CSS import, and routing it through ShellSwitchLayout
+// reorders Astro's emitted <link> tags on snapshot builds (page chunk CSS
+// would land before BaseLayout.css), which breaks the clean-baseline
+// equality gate. Importing BaseLayout first keeps the legacy head byte-equal;
+// PageFrameLayout contributes no emitted CSS (?inline codex shell styles).
+const PageFrame = useNativeShell ? PageFrameLayout : BaseLayout;
 ---
 
-<BaseLayout seo={seo}>
+<PageFrame seo={seo} currentRoute={currentRoute}>
   {/* WP site header + #wrapper / #inner-wrap / #primary / .content-container
       opening — extracted from the /guides/ snapshot, so the masthead nav
-      matches every other page. */}
-  <Fragment set:html={chrome.beforeMainHtml} />
+      matches every other page. Guarded off on native builds, where SiteShell
+      renders header/footer instead and HeadPolicy filters the donor head. */}
+  {!useNativeShell && <Fragment set:html={chrome.beforeMainHtml} />}
 
   <main id="main" class="site-main" role="main">
     {/* Left rail (same shape as /blog/ + /guides/) */}
@@ -203,5 +215,5 @@ seo.headHtml = chrome.headHtml + (seo.headHtml ?? "");
   </main>
 
   {/* WP footer + closing of #wrapper / #inner-wrap / #primary / .content-container */}
-  <Fragment set:html={chrome.afterMainHtml} />
-</BaseLayout>
+  {!useNativeShell && <Fragment set:html={chrome.afterMainHtml} />}
+</PageFrame>

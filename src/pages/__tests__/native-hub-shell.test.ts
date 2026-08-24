@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { load } from "cheerio";
+import { GUIDE_CLUSTERS } from "../../data/guide-clusters";
 
 const editorialFixtures = [
   {
@@ -192,6 +193,20 @@ const hubs: HubCase[] = [
     props: { category },
     assertActiveRoute: ($: ReturnType<typeof load>) => {
       expect($(`.codex-industries-rail__link.active[href="/compare/${category.id}/"]`)).toHaveLength(1);
+    },
+  })),
+  ...GUIDE_CLUSTERS.slice(0, 1).map((cluster) => ({
+    // One representative cluster: the mocked editorial collection only
+    // carries a fixture for this cluster's first slug, and [cluster].astro
+    // defensively drops slugs without JSON. The remaining clusters share the
+    // same template and are covered by the flagged-build canary audit.
+    route: `/guides/${cluster.id}/`,
+    heading: `${cluster.icon} ${cluster.label}`,
+    cardTitle: "Test guide",
+    loadPage: () => import("../guides/[cluster].astro"),
+    props: { cluster },
+    assertActiveRoute: ($: ReturnType<typeof load>) => {
+      expect($(`.codex-industries-rail__link.active[href="/guides/${cluster.id}/"]`)).toHaveLength(1);
     },
   })),
 ];
