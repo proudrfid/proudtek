@@ -35,6 +35,8 @@ const FLAGGED_PATHS = new Set([
   "compare/reader-vs-reader/index.html",
   "compare/form-factor-material/index.html",
   "compare/frequency-tech/index.html",
+  "case-studies/index.html",
+  "compatibility/index.html",
 ]);
 const HUB_PATHS = [
   "guides/index.html",
@@ -52,6 +54,8 @@ const HUB_PATHS = [
   "compare/reader-vs-reader/index.html",
   "compare/form-factor-material/index.html",
   "compare/frequency-tech/index.html",
+  "case-studies/index.html",
+  "compatibility/index.html",
 ];
 const REQUIRED_IDS = [
   ["#masthead", "masthead"],

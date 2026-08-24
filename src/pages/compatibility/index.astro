@@ -22,7 +22,7 @@
  * src/lib/seo/enhance-page.ts gives those single pages the same look
  * as the blog/compare/guides single-pages.
  */
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import ShellSwitchLayout from "../../layouts/ShellSwitchLayout.astro";
 import CardThumb from "../../components/editorial/CardThumb.astro";
 import { getCollection } from "astro:content";
 import {
@@ -33,6 +33,7 @@ import type { PageSeoData } from "../../lib/seo";
 import { buildCompatibilityRailHtml } from "../../lib/seo/compatibility-rail";
 import { buildRailFilterScript } from "../../lib/seo/rail";
 import { extractChromeFromSnapshot } from "../../lib/seo/snapshot-chrome";
+import { shouldUseNativeShell } from "../../lib/rollout";
 import { getPageByRoute } from "../../lib/site-data";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 import { truncateText } from "../../lib/seo/utils";
@@ -41,6 +42,7 @@ import { resolveChipPlaceholdersDeep } from "../../lib/chip-placeholders";
 const ROUTE = "/compatibility/";
 const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
 const TOTAL_VENDORS = getTotalCompatibilityVendorCount();
+const useNativeShell = shouldUseNativeShell(ROUTE);
 
 // ── Pull every compatibility entry from editorial ──
 // Each vendor's editorial JSON lives at
@@ -153,7 +155,7 @@ if (!donorPage) {
     "compatibility/index.astro: no chrome donor snapshot (/resources/, /about/ both missing)",
   );
 }
-const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE, useNativeShell);
 seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
 seo.bodyAttrs = {
   ...chrome.bodyAttrs,
@@ -180,8 +182,8 @@ const filterScript = buildRailFilterScript({
 });
 ---
 
-<BaseLayout seo={seo}>
-  <Fragment set:html={chrome.beforeMainHtml} />
+<ShellSwitchLayout seo={seo} currentRoute={ROUTE}>
+  {!useNativeShell && <Fragment set:html={chrome.beforeMainHtml} />}
 
   <main id="main" class="site-main" role="main">
     {/* Same rail markup as blog + compare + guides hubs. */}
@@ -235,5 +237,5 @@ const filterScript = buildRailFilterScript({
     </section>
   </main>
 
-  <Fragment set:html={chrome.afterMainHtml} />
-</BaseLayout>
+  {!useNativeShell && <Fragment set:html={chrome.afterMainHtml} />}
+</ShellSwitchLayout>

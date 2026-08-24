@@ -82,6 +82,18 @@ const editorialFixtures = [
       heroImage: "",
     },
   },
+  {
+    id: "compatibility/saflok-hotel-key-cards",
+    data: {
+      group: "compatibility",
+      route: "/compatibility/saflok-hotel-key-cards/",
+      title: "Test vendor compatibility",
+      summary: "Compatibility fixture summary",
+      kicker: "Hotel Locks",
+      heroImage: "",
+      imageAlt: "",
+    },
+  },
 ];
 
 const compareCategoryFixtures = [
@@ -124,6 +136,26 @@ const compareCategoryFixtures = [
     seoTitle: "Frequency Comparisons | Proud Tek",
     pillars: ["Frequency", "Read range", "Environment"],
     slugs: ["test-frequency-comparison"],
+  },
+];
+
+const compatibilityVendorFixtures = [
+  {
+    slug: "saflok",
+    displayName: "Saflok",
+    parentCompany: "dormakaba",
+    shortDescription: "Test vendor pitch for the compatibility hub fixture.",
+    marketSegment: "Premium hotels",
+    category: "major-brands" as const,
+  },
+];
+
+const compatibilityCategoryFixtures = [
+  {
+    id: "major-brands" as const,
+    label: "Major hospitality brands",
+    icon: "🏢",
+    description: "Conglomerate-owned brands.",
   },
 ];
 
@@ -209,6 +241,25 @@ const hubs: HubCase[] = [
       expect($(`.codex-industries-rail__link.active[href="/guides/${cluster.id}/"]`)).toHaveLength(1);
     },
   })),
+  {
+    route: "/case-studies/",
+    heading: "Real deployments.Measurable results.",
+    cardTitle: "Measurable results",
+    loadPage: () => import("../case-studies.astro"),
+    assertActiveRoute: ($) => {
+      expect($("#site-navigation")).toHaveLength(1);
+    },
+  },
+  {
+    route: "/compatibility/",
+    heading: "RFID & NFC Hotel Lock Compatibility",
+    cardTitle: "Saflok",
+    loadPage: () => import("../compatibility/index.astro"),
+    assertActiveRoute: ($) => {
+      // Rail links are in-page anchors; "All vendors" carries the active state.
+      expect($('.codex-industries-rail__link.active[href="/compatibility/#compatibility-all"]')).toHaveLength(1);
+    },
+  },
 ];
 
 async function renderHub(hub: HubCase, nativeShell: boolean): Promise<string> {
@@ -226,6 +277,13 @@ async function renderHub(hub: HubCase, nativeShell: boolean): Promise<string> {
     COMPARE_CATEGORIES: compareCategoryFixtures,
     getTotalCompareCount: () => compareCategoryFixtures.length,
   }));
+  vi.doMock("../../data/compatibility-vendors", () => ({
+    COMPATIBILITY_VENDORS: compatibilityVendorFixtures,
+    COMPATIBILITY_CATEGORIES: compatibilityCategoryFixtures,
+    getTotalCompatibilityVendorCount: () => compatibilityVendorFixtures.length,
+    getCompatibilityVendor: (slug: string) =>
+      compatibilityVendorFixtures.find((vendor) => vendor.slug === slug),
+  }));
 
   const Page = (await hub.loadPage()).default;
   const container = await AstroContainer.create();
@@ -239,6 +297,7 @@ afterEach(() => {
   vi.doUnmock("astro:content");
   vi.doUnmock("../../lib/site-data");
   vi.doUnmock("../../data/compare-categories");
+  vi.doUnmock("../../data/compatibility-vendors");
 });
 
 describe.each(hubs)("$route hub shell branches", (hub) => {

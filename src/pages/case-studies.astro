@@ -18,13 +18,16 @@
  * src/lib/seo-feeds.ts (so it still appears in the sitemap).
  */
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PageFrameLayout from "../layouts/PageFrameLayout.astro";
 import type { PageSeoData } from "../lib/seo";
 import { extractChromeFromSnapshot } from "../lib/seo/snapshot-chrome";
+import { shouldUseNativeShell } from "../lib/rollout";
 import { getPageByRoute } from "../lib/site-data";
 import { SITE_ORIGIN } from "../lib/seo-content";
 
 const ROUTE = "/case-studies/";
 const CANONICAL_URL = `${SITE_ORIGIN}${ROUTE}`;
+const useNativeShell = shouldUseNativeShell(ROUTE);
 
 // Inter web font — matches the design. Kept in headHtml so it lands in <head>;
 // the CSS keeps a system-font fallback if this fails to load.
@@ -107,7 +110,7 @@ if (!donorPage) {
     "case-studies.astro: no chrome donor snapshot (/case-studies/, /resources/, /about/ all missing)",
   );
 }
-const chrome = extractChromeFromSnapshot(donorPage, ROUTE);
+const chrome = extractChromeFromSnapshot(donorPage, ROUTE, useNativeShell);
 seo.htmlAttrs = { ...chrome.htmlAttrs, ...seo.htmlAttrs };
 seo.bodyAttrs = {
   ...chrome.bodyAttrs,
@@ -115,10 +118,18 @@ seo.bodyAttrs = {
   class: [chrome.bodyAttrs.class, seo.bodyAttrs.class].filter(Boolean).join(" "),
 };
 seo.headHtml = chrome.headHtml + FONT_HEAD + (seo.headHtml ?? "");
+
+// Same switch ShellSwitchLayout performs, inlined here: this page's
+// <style is:global> block lands in a page-level CSS chunk, and routing it
+// through ShellSwitchLayout would reorder Astro's emitted <link> tags on
+// snapshot builds (page chunk CSS before BaseLayout.css), breaking the
+// clean-baseline equality gate. Importing BaseLayout first keeps the legacy
+// head byte-equal; PageFrameLayout contributes no emitted CSS (?inline shell).
+const PageFrame = useNativeShell ? PageFrameLayout : BaseLayout;
 ---
 
-<BaseLayout seo={seo}>
-  <Fragment set:html={chrome.beforeMainHtml} />
+<PageFrame seo={seo} currentRoute={ROUTE}>
+  {!useNativeShell && <Fragment set:html={chrome.beforeMainHtml} />}
 
   <main id="main">
     <div class="pt-cs">
@@ -370,8 +381,8 @@ seo.headHtml = chrome.headHtml + FONT_HEAD + (seo.headHtml ?? "");
     </div>
   </main>
 
-  <Fragment set:html={chrome.afterMainHtml} />
-</BaseLayout>
+  {!useNativeShell && <Fragment set:html={chrome.afterMainHtml} />}
+</PageFrame>
 
 <style is:global>
 

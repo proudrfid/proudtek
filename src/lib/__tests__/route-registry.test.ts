@@ -87,6 +87,8 @@ describe("rollout defaults", () => {
       "/compare/reader-vs-reader/",
       "/compare/form-factor-material/",
       "/compare/frequency-tech/",
+      "/case-studies/",
+      "/compatibility/",
     ]);
 
     for (const route of [
@@ -98,6 +100,8 @@ describe("rollout defaults", () => {
       "/compare/reader-vs-reader/",
       "/compare/form-factor-material/",
       "/compare/frequency-tech/",
+      "/case-studies/saflok/",
+      "/compatibility/saflok-hotel-key-cards/",
       "/guides/example/",
       "/guides/google-review-card-design-and-copy/",
       "/blog/example/",
@@ -139,6 +143,8 @@ describe("rollout defaults", () => {
       "/guides/buying-reference/",
       "/solutions/",
       "/blog/",
+      "/case-studies/",
+      "/compatibility/",
     ]) {
       expect(getFlaggedRouteRollout(route, true).shell).toBe("native");
     }
@@ -148,6 +154,8 @@ describe("rollout defaults", () => {
       "/guides/google-review-card-design-and-copy/",
       "/blog/example/",
       "/solutions/example/",
+      "/compatibility/saflok-hotel-key-cards/",
+      "/case-studies",
       "/guides",
       "/",
     ]) {

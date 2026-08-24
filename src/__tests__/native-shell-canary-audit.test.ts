@@ -41,6 +41,8 @@ async function fixture(): Promise<FixturePaths> {
     "compare/reader-vs-reader/index.html",
     "compare/form-factor-material/index.html",
     "compare/frequency-tech/index.html",
+    "case-studies/index.html",
+    "compatibility/index.html",
     "research/index.html",
   ];
   const flagged = new Set(outputs.filter((relativePath) =>
@@ -75,6 +77,8 @@ function html(relativePath: string, native: boolean) {
     "compare/reader-vs-reader/index.html",
     "compare/form-factor-material/index.html",
     "compare/frequency-tech/index.html",
+    "case-studies/index.html",
+    "compatibility/index.html",
   ].includes(relativePath);
   const shell = native ? '<div class="codex-native-shell" data-native-site-shell><header id="masthead"><nav id="site-navigation"><ul id="primary-menu"></ul></nav><div id="mobile-drawer"><ul id="mobile-menu"></ul></div></header>' : '<header data-donor="masthead"></header>';
   const footer = native ? '<footer id="colophon"></footer></div>' : '<footer data-donor="footer"></footer>';
@@ -165,7 +169,7 @@ describe("native shell canary output audit", () => {
   });
   it("passes a clean deterministic default and flagged fixture", async () => {
     await expect(audit(await fixture())).resolves.toMatchObject({
-      hubs: 15,
+      hubs: 17,
       flaggedMarkers: expect.arrayContaining([
         "compare/index.html",
         "compare/chip-vs-chip/index.html",

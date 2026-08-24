@@ -35,7 +35,8 @@ const CATALOG_V2_ENABLED = enabled(import.meta.env.PROUDTEK_CATALOG_V2);
  * PROUDTEK_NATIVE_SHELL=1 is set for a deployment.
  *
  * Phase 4 adds the seven /guides/{cluster}/ pages — same section as the
- * validated /guides/ hub, identical rail + grid body classes.
+ * validated /guides/ hub, identical rail + grid body classes. Phase 5 adds
+ * the /case-studies/ and /compatibility/ hubs.
  */
 export const NATIVE_SHELL_CANARY_ROUTES = [
   "/glossary/",
@@ -55,6 +56,8 @@ export const NATIVE_SHELL_CANARY_ROUTES = [
   "/compare/reader-vs-reader/",
   "/compare/form-factor-material/",
   "/compare/frequency-tech/",
+  "/case-studies/",
+  "/compatibility/",
 ] as const;
 
 const NATIVE_SHELL_ROUTES = new Set<string>(NATIVE_SHELL_CANARY_ROUTES);
