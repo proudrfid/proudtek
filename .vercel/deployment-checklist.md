@@ -1,8 +1,32 @@
 # Phase 1 Preview Deployment Checklist
 
-**Date:** ______________________  
-**Deployed by:** _______________  
-**Preview URL:** _______________
+**Date:** 2026-08-22 (backfilled from live verification)
+**Deployed by:** zhangping (Vercel dashboard, `PROUDTEK_NATIVE_SHELL=1`)
+**Preview URL:** superseded — flag since enabled on Production; record below re-verified against https://proudtek.com
+
+> Backfill note (2026-08-22): this checklist was executed during the Aug 21–22
+> deploy window but never filled in. The verification record reflects a
+> programmatic re-check of live production plus the repo's CI gates, not a
+> fresh manual browser session.
+
+## Verification record (2026-08-22)
+
+| Check | Scope | Result |
+| --- | --- | --- |
+| Native shell marker (`data-native-shell-header`) | `/blog/`, `/guides/`, `/solutions/`, `/compare/`, 4 compare category hubs, `/glossary/`, `/tools/rfid-tag-cost-estimator/` | ✅ present on all 10 canary routes |
+| Kadence/WooCommerce CSS filtered | same 10 routes | ✅ `kadence-global-inline-css` / `woocommerce-inline` absent from served HTML; only donor `theme-kadence` body class remains |
+| Snapshot routes untouched | `/`, products, industries, about | ✅ homepage still serves full donor head (~857 kadence refs) — expected while `PROUDTEK_HOME_V2` is off |
+| SEO head contract | all routes | ✅ dual-build site-contract audit passed in phase 1–3 gates (`ed1bdb1b`…`6538a3b9`): 595 paths, canonical/robots/sitemap/schema sets unchanged |
+| Mobile drawer stacking fix | Compare flow (local browser) | ✅ backdrop `codex-z-base`, panel `codex-z-raised`; regression-tested in commit `1d1af151` |
+
+### Still requires a human (not verifiable over HTTP)
+
+- [ ] Real-device spot check: iOS Safari + Android Chrome drawer open/close on one canary route (e.g. `/compare/chip-vs-chip/`)
+- [ ] 24h Vercel error-rate watch after each production enable
+
+---
+
+## Original checklist (kept for future route batches)
 
 ---
 

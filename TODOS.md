@@ -1,19 +1,37 @@
 # TODOs
 
-## P1 — Integrate native-safe head policy
+## DONE — Native-safe head policy integration (was P1)
 
-**What:** Connect the Phase 0 classifier and deterministic inventory to the Phase 1 `HeadPolicy` / `NativeHeadAssets` path, then enable native-safe head assets for `/blog/` behind `PROUDTEK_NATIVE_SHELL`.
+Phases 0–3 shipped and enabled in production between 2026-08-21 and 2026-08-22
+(`0f470a6f`…`6538a3b9`): Phase 0 classifier/inventory/dual-build audit, Phase 1
+`/blog/`, Phase 2 `/guides/` + `/solutions/`, Phase 3 compare index + 4 category
+hubs. `PROUDTEK_NATIVE_SHELL=1` is ON in Vercel Production; live re-verified
+2026-08-22 (see `.vercel/deployment-checklist.md` backfill). Rollback remains
+one line: set the flag to `0` and redeploy.
 
-**Why:** Phase 0 only inventories donor head assets. Without this follow-up, native pages continue carrying donor shell CSS and the repeated deployment-level style-isolation debugging remains possible.
+## P1 — Extend native-safe head + SiteShell to leaf routes
 
-**Pros:** Removes donor/native cascade coupling, gives new native pages a safe default, and reuses the shared pure classifier instead of creating page-specific filters.
+**What:** Next batch after the 10 migrated hub routes: the 7 `/guides/{cluster}/`
+pages first (same section as the validated `/guides/` hub), then case-studies,
+compatibility, and eventually blog/guide/solution leaf bodies via `[...slug].astro`.
 
-**Cons:** Requires explicit font ownership, native base/content asset validation, dual-build SEO/head contracts, and browser verification before production rollout.
+**Why:** Hubs render the native shell but their sibling leaf pages still carry
+donor shell CSS, so drawer/style fixes must be duplicated per deployment.
 
-**Context:** Approved design: `~/.gstack/projects/proudrfid-proudtek/zhangping-main-design-20260820-000000.md`. Phase 0 must pass first: deterministic `/blog/` inventory, parser failure matrix, zero-output integration harness, legacy contract equivalence, and cache repeatability. Phase 1 must keep `PROUDTEK_NATIVE_SHELL=0` as a hard legacy-head rollback and must not change the 595 output-path/SEO/machine-route contract.
+**Context:** Same pattern as phases 1–3: exact-route canary additions in
+`src/lib/rollout.ts`, `extractChromeFromSnapshot(donor, route, useNativeShell)`,
+`ShellSwitchLayout` with `{!useNativeShell && …}` chrome guards, extended
+`scripts/native-shell-canary-audit.mjs` coverage. All hard gates apply:
+595-page default+flagged builds byte-equal outside canary routes, site contract
+audit, native marker placement audit.
 
-**Effort:** L human team → M with Claude Code + gstack.
+**Effort:** S–M with Claude Code.
 
 **Priority:** P1.
 
-**Depends on / blocked by:** Phase 0 inventory and all hard-stop gates passing; reviewed Inter/Lora font records; no unresolved unknown assets selected for native-safe output.
+## P2 — Homepage v2 body migration
+
+Blocked pending visual direction sign-off (per `PINNACLE_HANDOFF_2026-08-12.md`
+note). `PROUDTEK_HOME_V2` switch and `HomePageLayout` branch already exist;
+only homepage main-content hash changes are allowlisted when it ships.
+Design direction lives in `docs/rebuild-blueprint-2026-08-15.md`.
