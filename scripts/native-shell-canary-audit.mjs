@@ -37,6 +37,13 @@ const FLAGGED_PATHS = new Set([
   "compare/frequency-tech/index.html",
   "case-studies/index.html",
   "compatibility/index.html",
+  "compatibility/be-tech-hotel-key-cards/index.html",
+  "compatibility/hafele-dialock-hotel-key-cards/index.html",
+  "compatibility/miwa-hotel-key-cards/index.html",
+  "compatibility/onity-hotel-key-cards/index.html",
+  "compatibility/saflok-hotel-key-cards/index.html",
+  "compatibility/salto-hotel-key-cards/index.html",
+  "compatibility/vingcard-hotel-key-cards/index.html",
 ]);
 const HUB_PATHS = [
   "guides/index.html",
@@ -56,6 +63,13 @@ const HUB_PATHS = [
   "compare/frequency-tech/index.html",
   "case-studies/index.html",
   "compatibility/index.html",
+  "compatibility/be-tech-hotel-key-cards/index.html",
+  "compatibility/hafele-dialock-hotel-key-cards/index.html",
+  "compatibility/miwa-hotel-key-cards/index.html",
+  "compatibility/onity-hotel-key-cards/index.html",
+  "compatibility/saflok-hotel-key-cards/index.html",
+  "compatibility/salto-hotel-key-cards/index.html",
+  "compatibility/vingcard-hotel-key-cards/index.html",
 ];
 const REQUIRED_IDS = [
   ["#masthead", "masthead"],

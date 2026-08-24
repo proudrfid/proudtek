@@ -89,6 +89,13 @@ describe("rollout defaults", () => {
       "/compare/frequency-tech/",
       "/case-studies/",
       "/compatibility/",
+      "/compatibility/be-tech-hotel-key-cards/",
+      "/compatibility/hafele-dialock-hotel-key-cards/",
+      "/compatibility/miwa-hotel-key-cards/",
+      "/compatibility/onity-hotel-key-cards/",
+      "/compatibility/saflok-hotel-key-cards/",
+      "/compatibility/salto-hotel-key-cards/",
+      "/compatibility/vingcard-hotel-key-cards/",
     ]);
 
     for (const route of [
@@ -102,6 +109,8 @@ describe("rollout defaults", () => {
       "/compare/frequency-tech/",
       "/case-studies/saflok/",
       "/compatibility/saflok-hotel-key-cards/",
+      "/compatibility/unknown-vendor-hotel-key-cards/",
+      "/compatibility/hotel-key-cards/",
       "/guides/example/",
       "/guides/google-review-card-design-and-copy/",
       "/blog/example/",
@@ -145,6 +154,8 @@ describe("rollout defaults", () => {
       "/blog/",
       "/case-studies/",
       "/compatibility/",
+      "/compatibility/saflok-hotel-key-cards/",
+      "/compatibility/vingcard-hotel-key-cards/",
     ]) {
       expect(getFlaggedRouteRollout(route, true).shell).toBe("native");
     }
@@ -154,7 +165,8 @@ describe("rollout defaults", () => {
       "/guides/google-review-card-design-and-copy/",
       "/blog/example/",
       "/solutions/example/",
-      "/compatibility/saflok-hotel-key-cards/",
+      "/compatibility/saflok-hotel-key-cards",
+      "/compatibility/unknown-vendor-hotel-key-cards/",
       "/case-studies",
       "/guides",
       "/",

@@ -23,6 +23,7 @@
  * AND `page.editorialDefinition` being present (see [...slug].astro).
  */
 import BaseLayout from "./BaseLayout.astro";
+import SiteShell from "../components/shell/SiteShell.astro";
 import EditorialArticle from "../components/editorial/EditorialArticle.astro";
 import RelatedArticles from "../components/editorial/RelatedArticles.astro";
 import type { SnapshotPage } from "../lib/site-data";
@@ -31,6 +32,12 @@ import { prepareSnapshot } from "../lib/render-snapshot";
 import { buildMachineRoute, buildPageSeo } from "../lib/seo";
 import { buildAuthorityLdForRoute } from "../lib/editorial-authority-ld";
 import { getCollection } from "astro:content";
+import { shouldUseNativeShell } from "../lib/rollout";
+import { applyHeadPolicy, rebuildHeadHtml } from "../lib/seo/head-policy";
+import { inventoryDonorHead } from "../lib/seo/donor-head-inventory";
+import { sanitizeHead } from "../lib/seo/sanitize-html";
+import { stripNoiseHtmlComments } from "../lib/seo/utils";
+import { load } from "cheerio";
 import {
   selectRelatedArticles,
   toRelatedCandidate,
@@ -56,6 +63,19 @@ if (authorityLd) seo.jsonLd = [...seo.jsonLd, authorityLd];
 
 const machineJsonPath = buildMachineRoute(page.route, "json");
 const machineTextPath = buildMachineRoute(page.route, "txt");
+
+// Phase 6: native-safe head for editorial leaf pages. Same policy the hub
+// pages use (phases 1–5): on flagged builds, strip legacy-shell CSS
+// (Kadence/WooCommerce) from the donor head; everything else — WP core,
+// fonts, analytics, dependencies — is retained. Snapshot builds keep the
+// donor head byte-for-byte.
+const useNativeShell = shouldUseNativeShell(page.route);
+if (useNativeShell && seo.headHtml) {
+  const filteredAssets = applyHeadPolicy(page.route, inventoryDonorHead(seo.headHtml), true);
+  const $head = load(`<head>${rebuildHeadHtml(filteredAssets)}</head>`);
+  sanitizeHead($head);
+  seo.headHtml = stripNoiseHtmlComments($head("head").html() ?? "");
+}
 
 // Split bodyHtml around <main>. The regex captures three groups:
 //   1. everything up to and including the <main ...> opening tag
@@ -133,12 +153,28 @@ if (definition) {
   stickyCtaLabel={canSplit ? "Get a quick quote" : undefined}
 >
   {canSplit ? (
-    <>
-      <Fragment set:html={preMain} />
-      <EditorialArticle definition={definition!} illustration={illustration} />
-      <RelatedArticles related={relatedArticles} />
-      <Fragment set:html={postMain} />
-    </>
+    useNativeShell ? (
+      /* Native mode: SiteShell replaces the donor masthead/footer chrome
+         fragments. The <main> wrapper uses the donor's exact tag so the
+         main-DOM contract between default and flagged builds holds. The
+         snapshot branch renders preMain (which ends with the <main> open
+         tag), then article + related, then postMain (starting with
+         </main>) — so RelatedArticles sits INSIDE <main>; the native branch
+         must match that exactly. */
+      <SiteShell currentRoute={page.route}>
+        <main id="main" class="site-main" role="main">
+          <EditorialArticle definition={definition!} illustration={illustration} />
+          <RelatedArticles related={relatedArticles} />
+        </main>
+      </SiteShell>
+    ) : (
+      <>
+        <Fragment set:html={preMain} />
+        <EditorialArticle definition={definition!} illustration={illustration} />
+        <RelatedArticles related={relatedArticles} />
+        <Fragment set:html={postMain} />
+      </>
+    )
   ) : (
     <Fragment set:html={seo.bodyHtml} />
   )}
