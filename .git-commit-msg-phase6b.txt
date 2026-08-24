@@ -1,0 +1,23 @@
+feat(phase-6b): migrate guides and solutions leaves to native-safe head
+
+- Enable all 51 guides + 37 solutions editorial leaves through
+  EditorialPageLayout's native branch (exact-route canary now 114 routes)
+- Extend canary audit to 114 markers / 112 hubs; fixture uses shared
+  LEAF_OUTPUTS const and a raised test timeout (deep checks over the full
+  leaf set can exceed vitest's default 5s under parallel workers)
+
+Determinism fix uncovered by the widened main-DOM audit:
+- solutions/rfid-patient-tracking (and 27 other editorial pages) lacked
+  top-level publishedAt, so EditorialArticle's `|| new Date()` fallback
+  baked the build timestamp into every rebuild. Backfill publishedAt with
+  the 2026-06-11 site-launch date across guides/solutions/compare/blog/
+  markets/lp/contact pages missing it, mirroring the earlier blog batch.
+- 7 pages intentionally left unbackfilled (6 contact + lp/uhf-rfid-tag-
+  manufacturer): all have authorSlug, so the fallback date would newly
+  render a visible byline segment; deferred pending content decision.
+- Refresh dist-baseline + re-freeze src/data/site-contract.v1.json for the
+  reviewed hidden-date change; update the locked lp snapshot.
+
+Verified: 322 tests, Astro check, lint, chip gates, 595-page default,
+baseline and flagged builds, site contract audit, and native shell canary
+audit (hubs=112 markers=114, contracts=default==flagged, image-sitemap=equal).

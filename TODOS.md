@@ -11,19 +11,29 @@ one line: set the flag to `0` and redeploy.
 
 ## P1 — Extend native-safe head + SiteShell to leaf routes
 
-**What:** Next batch after the 10 migrated hub routes: the 7 `/guides/{cluster}/`
-pages first (same section as the validated `/guides/` hub), then case-studies,
-compatibility, and eventually blog/guide/solution leaf bodies via `[...slug].astro`.
+**Progress (2026-08-24):** 114 exact routes now native: 10 original hubs,
+compare index + 4 categories, 7 `/guides/{cluster}/` pages, `/case-studies/`,
+`/compatibility/`, 7 compatibility vendor leaves (phase 6a via the new
+`EditorialPageLayout` native branch), and all 51 guides + 37 solutions
+editorial leaves (phase 6b).
 
-**Why:** Hubs render the native shell but their sibling leaf pages still carry
-donor shell CSS, so drawer/style fixes must be duplicated per deployment.
+**Remaining batches:**
+- blog posts (~114) + compare leaves (~27) — same EditorialPageLayout seam,
+  routes only
+- products / industries / about / contact render through `SnapshotLayout`
+  (donor body needs Kadence CSS) — need per-route body migration, not just
+  head filtering
 
-**Context:** Same pattern as phases 1–3: exact-route canary additions in
-`src/lib/rollout.ts`, `extractChromeFromSnapshot(donor, route, useNativeShell)`,
-`ShellSwitchLayout` with `{!useNativeShell && …}` chrome guards, extended
-`scripts/native-shell-canary-audit.mjs` coverage. All hard gates apply:
-595-page default+flagged builds byte-equal outside canary routes, site contract
-audit, native marker placement audit.
+**Follow-up (content):** 7 pages still lack top-level `publishedAt` (6
+`contact/*` + `lp/uhf-rfid-tag-manufacturer`). Backfilling them with the
+2026-06-11 launch date would also make their hidden freshness dates
+deterministic, but all 7 have `authorSlug`, so the visible byline would gain
+an "Updated Jun 2026" segment — needs an explicit content decision first.
+
+**Gates:** unchanged — 595-page default+flagged builds byte-equal outside
+canary routes (dist-baseline refreshed 2026-08-24 for the reviewed
+publishedAt backfill; contract baseline `src/data/site-contract.v1.json`
+re-frozen in the same commit).
 
 **Effort:** S–M with Claude Code.
 
