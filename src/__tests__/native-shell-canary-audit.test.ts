@@ -7,6 +7,7 @@ import { promisify } from "node:util";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { audit } from "../../scripts/native-shell-canary-audit.mjs";
 import { buildContract } from "../../scripts/site-contract-audit.mjs";
+import LEAF_ROUTE_REGISTRY from "../../scripts/native-canary-leaf-routes.json";
 
 // The fixture now materializes 115 outputs x 3 dists per test and the audit
 // deep-checks all of them; under full-suite parallel workers individual
@@ -22,98 +23,11 @@ const SITE_CONTRACT_CLI = fileURLToPath(new URL("../../scripts/site-contract-aud
 const tmpAlias = (filePath: string) => filePath.replace(/^\/private\/tmp\//, "/tmp/");
 const execFileAsync = promisify(execFile);
 
-// Phase 6b leaf outputs — guides + solutions editorial leaves, mirroring
-// scripts/native-shell-canary-audit.mjs LEAF_PATHS.
-const LEAF_OUTPUTS = [
-    "guides/california-rfid-privacy-law/index.html",
-    "guides/em4100-em4305-t5577-lf-chip-encyclopedia/index.html",
-    "guides/epc-gen2-uhf-rfid/index.html",
-    "guides/eu-digital-product-passport-2027/index.html",
-    "guides/fda-rfid-pharmaceutical-tracking/index.html",
-    "guides/google-review-card-design-and-copy/index.html",
-    "guides/google-review-card-placement-guide/index.html",
-    "guides/google-review-card-staff-prompt-playbook/index.html",
-    "guides/google-review-cards-for-auto-dealerships/index.html",
-    "guides/google-review-cards-for-dental-groups/index.html",
-    "guides/google-review-cards-for-fitness-franchises/index.html",
-    "guides/google-review-cards-for-hotel-groups/index.html",
-    "guides/google-review-cards-for-multi-location-brands/index.html",
-    "guides/google-review-cards-for-restaurant-franchises/index.html",
-    "guides/google-review-cards-for-salon-chains/index.html",
-    "guides/google-review-nfc-card-setup/index.html",
-    "guides/gs1-epc-encoding-guide/index.html",
-    "guides/hotel-key-card-artwork-and-printing-checklist/index.html",
-    "guides/hotel-key-card-encoding/index.html",
-    "guides/hotel-key-card-material-selection/index.html",
-    "guides/hotel-key-card-sample-planning/index.html",
-    "guides/icode-slix-chip-encyclopedia/index.html",
-    "guides/iso-14443-explained/index.html",
-    "guides/iso-18000-6c-uhf-rfid-standard/index.html",
-    "guides/item-level-rfid-tagging-mandate/index.html",
-    "guides/mifare-classic-1k-4k-chip-encyclopedia/index.html",
-    "guides/mifare-desfire-ev3-commands-reference/index.html",
-    "guides/mifare-ultralight-c-chip-encyclopedia/index.html",
-    "guides/monza-r6-family-chip-encyclopedia/index.html",
-    "guides/nfc-business-card-iphone-android-compatibility/index.html",
-    "guides/nfc-ndef-format-explained/index.html",
-    "guides/nfc-rohs-reach-compliance/index.html",
-    "guides/nfc-tag-programming-android-guide/index.html",
-    "guides/nfc-tag-programming-iphone/index.html",
-    "guides/ntag21x-family-memory-map-commands/index.html",
-    "guides/ntag424-dna-sun-cmac-authentication/index.html",
-    "guides/python-rfid-reader-library/index.html",
-    "guides/rain-rfid-explained/index.html",
-    "guides/rfid-card-cost/index.html",
-    "guides/rfid-ce-marking-europe/index.html",
-    "guides/rfid-food-safety-traceability/index.html",
-    "guides/rfid-oracle-netsuite-integration/index.html",
-    "guides/rfid-reader-writer-selection/index.html",
-    "guides/rfid-sap-wms-integration/index.html",
-    "guides/rfid-shopify-inventory-integration/index.html",
-    "guides/rfid-tag-card-wristband-lifespan/index.html",
-    "guides/rfid-wristband-cost/index.html",
-    "guides/ucode-8-uhf-chip-encyclopedia/index.html",
-    "guides/ucode-9-uhf-chip-encyclopedia/index.html",
-    "guides/uhf-rfid-reader-api-guide/index.html",
-    "guides/walmart-rfid-tagging-mandate/index.html",
-    "solutions/digital-product-passport/index.html",
-    "solutions/google-review-cards-for-checkout-counters/index.html",
-    "solutions/google-review-cards-for-clinics/index.html",
-    "solutions/google-review-cards-for-front-desks/index.html",
-    "solutions/google-review-cards-for-gyms-and-fitness-studios/index.html",
-    "solutions/google-review-cards-for-hotels/index.html",
-    "solutions/google-review-cards-for-pickup-counters/index.html",
-    "solutions/google-review-cards-for-restaurants/index.html",
-    "solutions/google-review-cards-for-retail-stores/index.html",
-    "solutions/google-review-cards-for-salons-and-spas/index.html",
-    "solutions/google-review-cards-for-tabletop-prompts/index.html",
-    "solutions/google-review-nfc-card/index.html",
-    "solutions/hotel-key-cards/index.html",
-    "solutions/hotel-rfid-access-control/index.html",
-    "solutions/nfc-brand-authentication/index.html",
-    "solutions/nfc-business-card/index.html",
-    "solutions/nfc-business-card-programs/index.html",
-    "solutions/nfc-luxury-authentication/index.html",
-    "solutions/rfid-access-control/index.html",
-    "solutions/rfid-asset-tracking-labels/index.html",
-    "solutions/rfid-attendance-system/index.html",
-    "solutions/rfid-event-access-control/index.html",
-    "solutions/rfid-event-wristbands/index.html",
-    "solutions/rfid-inventory-tracking/index.html",
-    "solutions/rfid-keyfobs-access-control/index.html",
-    "solutions/rfid-laundry-management/index.html",
-    "solutions/rfid-laundry-tags/index.html",
-    "solutions/rfid-laundry-tracking/index.html",
-    "solutions/rfid-library-management/index.html",
-    "solutions/rfid-parking-management/index.html",
-    "solutions/rfid-patient-tracking/index.html",
-    "solutions/rfid-race-timing/index.html",
-    "solutions/rfid-readers-and-encoding/index.html",
-    "solutions/rfid-supply-chain-management/index.html",
-    "solutions/rfid-tool-tracking/index.html",
-    "solutions/rfid-warehouse-management/index.html",
-    "solutions/vehicle-rfid-identification/index.html",
-];
+// Leaf outputs derive from the shared registry (single source with
+// scripts/native-shell-canary-audit.mjs).
+const LEAF_OUTPUTS: string[] = (
+  LEAF_ROUTE_REGISTRY as { routes: string[] }
+).routes.map((route) => route.slice(1) + "index.html");
 
 async function fixture(): Promise<FixturePaths> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "native-shell-canary-test-"));
@@ -261,7 +175,7 @@ describe("native shell canary output audit", () => {
   });
   it("passes a clean deterministic default and flagged fixture", async () => {
     await expect(audit(await fixture())).resolves.toMatchObject({
-      hubs: 112,
+      hubs: 272,
       flaggedMarkers: expect.arrayContaining([
         "compare/index.html",
         "compare/chip-vs-chip/index.html",
