@@ -65,10 +65,10 @@ async function fixture(): Promise<FixturePaths> {
     "compatibility/salto-hotel-key-cards/index.html",
     "compatibility/vingcard-hotel-key-cards/index.html",
     ...LEAF_OUTPUTS,
-    "research/index.html",
+    "unflagged-control/index.html",
   ];
   const flagged = new Set(outputs.filter((relativePath) =>
-    relativePath !== "research/index.html",
+    relativePath !== "unflagged-control/index.html",
   ));
   for (const dist of [baselineDist, defaultDist, flaggedDist]) {
     for (const relativePath of outputs) {
@@ -84,8 +84,8 @@ async function fixture(): Promise<FixturePaths> {
 
 function html(relativePath: string, native: boolean) {
   // Every flagged output is hub-shaped in this fixture (native shell with
-  // landmark ids + a main#main); only the research control page is not.
-  const hub = relativePath !== "research/index.html";
+  // landmark ids + a main#main); only the unflagged-control page is not.
+  const hub = relativePath !== "unflagged-control/index.html";
   const shell = native ? '<div class="codex-native-shell" data-native-site-shell><header id="masthead"><nav id="site-navigation"><ul id="primary-menu"></ul></nav><div id="mobile-drawer"><ul id="mobile-menu"></ul></div></header>' : '<header data-donor="masthead"></header>';
   const footer = native ? '<footer id="colophon"></footer></div>' : '<footer data-donor="footer"></footer>';
   return `<!doctype html><html><head><title>${relativePath}</title><link rel="canonical" href="https://proudtek.com/${relativePath.replace("index.html", "")}"/><meta name="description" content="fixture"/></head><body>${shell}${hub ? '<main id="main" class="hub-main" data-rail-key="fixture" aria-label="Fixture hub"><h1>Fixture hub</h1><p>Body <a href="/guides/original/" class="hub-link">Read guide</a></p></main>' : '<main id="main"><h1>Fixture</h1></main>'}${footer}</body></html>`;
@@ -143,8 +143,8 @@ describe("native shell canary output audit", () => {
   });
   it("fails the CLI with exit 1 and reports the first actionable path", async () => {
     const paths = await fixture();
-    await replace(path.join(paths.defaultDist, "research/index.html"), /<body/, "<body data-native-site-shell");
-    await expect(execFileAsync(process.execPath, [AUDIT_CLI, "--baseline-dist", paths.baselineDist, "--default-dist", paths.defaultDist, "--flagged-dist", paths.flaggedDist])).rejects.toMatchObject({ code: 1, stderr: expect.stringContaining("research/index.html") });
+    await replace(path.join(paths.defaultDist, "unflagged-control/index.html"), /<body/, "<body data-native-site-shell");
+    await expect(execFileAsync(process.execPath, [AUDIT_CLI, "--baseline-dist", paths.baselineDist, "--default-dist", paths.defaultDist, "--flagged-dist", paths.flaggedDist])).rejects.toMatchObject({ code: 1, stderr: expect.stringContaining("unflagged-control/index.html") });
   });
 
   it.each([
@@ -175,7 +175,7 @@ describe("native shell canary output audit", () => {
   });
   it("passes a clean deterministic default and flagged fixture", async () => {
     await expect(audit(await fixture())).resolves.toMatchObject({
-      hubs: 272,
+      hubs: 315,
       flaggedMarkers: expect.arrayContaining([
         "compare/index.html",
         "compare/chip-vs-chip/index.html",
@@ -198,11 +198,11 @@ describe("native shell canary output audit", () => {
   });
 
   it("rejects an unexpected native marker with its output path", async () => {
-    await expectFailure(({ defaultDist }) => replace(path.join(defaultDist, "research/index.html"), /<body/, "<body data-native-site-shell"), "default build has invalid native shell marker placement in research/index.html");
+    await expectFailure(({ defaultDist }) => replace(path.join(defaultDist, "unflagged-control/index.html"), /<body/, "<body data-native-site-shell"), "default build has invalid native shell marker placement in unflagged-control/index.html");
   });
 
   it("rejects a valid native wrapper marker in the default build", async () => {
-    await expectFailure(({ defaultDist }) => replace(path.join(defaultDist, "research/index.html"), /<body>/, '<body><div class="codex-native-shell" data-native-site-shell></div>'), "default build has unexpected native marker in research/index.html");
+    await expectFailure(({ defaultDist }) => replace(path.join(defaultDist, "unflagged-control/index.html"), /<body>/, '<body><div class="codex-native-shell" data-native-site-shell></div>'), "default build has unexpected native marker in unflagged-control/index.html");
   });
   it("rejects a missing guides marker with its output path", async () => {
     await expectFailure(({ flaggedDist }) => replace(path.join(flaggedDist, "guides/index.html"), / data-native-site-shell/g, ""), "flagged build is missing native marker in guides/index.html");
