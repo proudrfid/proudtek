@@ -399,6 +399,26 @@ export interface MachinePageData {
 }
 
 
+
+/**
+ * Append the verified factory-direct signal to commercial meta descriptions
+ * when absent. Never fabricates numbers: both facts condense existing site
+ * copy verbatim ("a 500-piece minimum per chip type"; "MOQ, price and lead
+ * time are quoted in writing before tooling, then held").
+ */
+const COMMERCE_SIGNAL_PATTERN = /factory|MOQ|minimum order|lead time|written quote/i;
+const COMMERCE_SIGNAL_SUFFIX =
+  " Factory-direct from Proud Tek: 500-piece MOQ per chip type with written quotes and lead times held before tooling.";
+const COMMERCE_SIGNAL_KINDS = new Set<PageKind>(["product"]);
+
+export function withCommerceSignal(description: string, kind: PageKind): string {
+  if (!COMMERCE_SIGNAL_KINDS.has(kind)) return description;
+  if (COMMERCE_SIGNAL_PATTERN.test(description)) return description;
+  if (!description.trim()) return description;
+  const candidate = `${description.trimEnd()}${COMMERCE_SIGNAL_SUFFIX}`;
+  return candidate.length <= 320 ? candidate : description;
+}
+
 export function buildPageSeo(page: SnapshotPage): PageSeoData {
   const kind = inferPageKind(page.route);
   const $head = load(`<head>${page.headHtml}</head>`);
@@ -415,6 +435,11 @@ export function buildPageSeo(page: SnapshotPage): PageSeoData {
 
   const context = buildPageContext(page, $head, $body, kind);
   normalizePageBody($body, page, context);
+  // GEO enrichment (2026-08-25): commercial pages carry the factory-direct
+  // signal buyers ask AI engines for. Claims mirror verified site copy
+  // (about/lp): 500-piece MOQ per chip type, written quotes held before
+  // tooling. Meta description and Article schema share this string.
+  context.description = withCommerceSignal(context.description, kind);
   const title = buildDocumentTitle(page.route, context.contentTitle, kind);
   const indexable = isIndexableRoute(page.route) && !isSoft404Page(page, context.contentTitle);
 
