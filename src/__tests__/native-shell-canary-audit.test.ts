@@ -175,7 +175,7 @@ describe("native shell canary output audit", () => {
   });
   it("passes a clean deterministic default and flagged fixture", async () => {
     await expect(audit(await fixture())).resolves.toMatchObject({
-      hubs: 540,
+      hubs: 545,
       flaggedMarkers: expect.arrayContaining([
         "compare/index.html",
         "compare/chip-vs-chip/index.html",

@@ -5,12 +5,29 @@
  * Thin wrapper around BaseLayout. Prepares snapshot data
  * (sanitize head/body, build SEO metadata) then delegates
  * all HTML rendering to BaseLayout.
+ *
+ * Native-shell branch (phase C2, 2026-08-24): routes on the canary
+ * allowlist render the <main> segment of seo.bodyHtml verbatim inside
+ * SiteShell with a native-safe filtered head — same seam as the editorial
+ * pages. IMPORTANT: the segment comes from seo.bodyHtml (the buildPageSeo
+ * output), NOT from a raw prepareSnapshot pass — buildPageSeo injects
+ * conversion blocks (codex-collection-buying-support) into the body, and
+ * the default/flagged contract compares against that final markup.
+ * Everything outside <main> (WP masthead/footer chrome, woo/kadence boot
+ * scripts) is dropped.
  */
 import BaseLayout from "./BaseLayout.astro";
+import SiteShell from "../components/shell/SiteShell.astro";
 import type { SnapshotPage } from "../lib/site-data";
 import { prepareSnapshot } from "../lib/render-snapshot";
 import { buildMachineRoute, buildPageSeo } from "../lib/seo";
+import { applyHeadPolicy, rebuildHeadHtml } from "../lib/seo/head-policy";
+import { inventoryDonorHead } from "../lib/seo/donor-head-inventory";
+import { sanitizeHead } from "../lib/seo/sanitize-html";
+import { stripNoiseHtmlComments } from "../lib/seo/utils";
+import { shouldUseNativeShell } from "../lib/rollout";
 import { buildAuthorityLdForRoute } from "../lib/editorial-authority-ld";
+import { load } from "cheerio";
 
 const { page } = Astro.props as { page: SnapshotPage };
 const snapshot = prepareSnapshot(page);
@@ -33,8 +50,46 @@ if (authorityLd) seo.jsonLd = [...seo.jsonLd, authorityLd];
 
 const machineJsonPath = buildMachineRoute(page.route, "json");
 const machineTextPath = buildMachineRoute(page.route, "txt");
+
+// Native mode: filter legacy-shell CSS out of the donor head (same policy
+// pipeline as EditorialPageLayout), then split the FINAL seo.bodyHtml so the
+// pre-main H1 (archive pages keep theirs outside <main>) and the <main>
+// segment render inside SiteShell in original document order.
+const useNativeShell = shouldUseNativeShell(page.route);
+let preMainH1Html = "";
+let nativeMainHtml = "";
+if (useNativeShell) {
+  if (seo.headHtml) {
+    const filteredAssets = applyHeadPolicy(
+      page.route,
+      inventoryDonorHead(seo.headHtml),
+      true,
+    );
+    const $head = load(`<head>${rebuildHeadHtml(filteredAssets)}</head>`);
+    sanitizeHead($head);
+    seo.headHtml = stripNoiseHtmlComments($head("head").html() ?? "");
+  }
+  const body = seo.bodyHtml;
+  const mainOpenMatch = body.match(/<main\b[^>]*>/i);
+  const mainOpen = mainOpenMatch ? mainOpenMatch.index ?? -1 : -1;
+  if (mainOpen >= 0) {
+    const mainClose = body.lastIndexOf("</main>");
+    if (mainClose > mainOpen) {
+      preMainH1Html =
+        body.slice(0, mainOpen).match(/<h1\b[^>]*>[\s\S]*?<\/h1>/i)?.[0] ?? "";
+      nativeMainHtml = body.slice(mainOpen, mainClose + "</main>".length);
+    }
+  }
+}
 ---
 
 <BaseLayout seo={seo} machineJsonPath={machineJsonPath} machineTextPath={machineTextPath}>
-  <Fragment set:html={seo.bodyHtml} />
+  {useNativeShell && nativeMainHtml ? (
+    <SiteShell currentRoute={page.route}>
+      {preMainH1Html && <Fragment set:html={preMainH1Html} />}
+      <Fragment set:html={nativeMainHtml} />
+    </SiteShell>
+  ) : (
+    <Fragment set:html={seo.bodyHtml} />
+  )}
 </BaseLayout>
