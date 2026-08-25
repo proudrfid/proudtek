@@ -43,7 +43,9 @@ describe("route registry", () => {
     expect(getNativeSitemapSupplementRoutes()).toEqual([
       "/guides/",
       "/compare/",
-      "/case-studies/",
+      // /case-studies/ deliberately NOT supplemented: it already enters the
+      // sitemap via siteData.pages (editorial _pillar), and supplementing it
+      // double-listed the URL (SITEMAP_DUPLICATE_URLS, fixed 2026-08-25).
       "/rfq/",
       "/glossary/",
       "/tools/rfid-tag-cost-estimator/",

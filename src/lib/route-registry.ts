@@ -25,7 +25,7 @@ export const NATIVE_ROUTE_DEFINITIONS: readonly NativeRouteDefinition[] = [
   { route: "/solutions/", ownsStaticPath: true, supplementSitemap: false },
   // Preserve the current sitemap supplement until the known duplicate is fixed
   // in a dedicated, contract-allowlisted SEO cleanup PR.
-  { route: "/case-studies/", ownsStaticPath: true, supplementSitemap: true },
+  { route: "/case-studies/", ownsStaticPath: true, supplementSitemap: false },
   { route: "/rfq/", ownsStaticPath: false, supplementSitemap: true },
   { route: "/glossary/", ownsStaticPath: false, supplementSitemap: true },
   { route: "/tools/rfid-tag-cost-estimator/", ownsStaticPath: false, supplementSitemap: true },
