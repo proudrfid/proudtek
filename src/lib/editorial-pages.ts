@@ -249,6 +249,23 @@ const EDITORIAL_OVERRIDE_ROUTES = new Set<string>([
 ]);
 
 /**
+ * Detail-level shadow overrides — the editorial json replaces an on-disk WP
+ * snapshot, but the route is NOT a breadcrumb section root. Kept separate
+ * from EDITORIAL_OVERRIDE_ROUTES because that set doubles as the pillar/
+ * section-root list for isBreadcrumbSectionRoot; detail pages must keep
+ * their family crumb as a link with themselves as aria-current.
+ *
+ * 2026-08-25: these two product detail pages had newer editorial rewrites
+ * shadowed by stale WooCommerce snapshots — the last /products/* detail
+ * pages still rendering legacy chrome. Editorial jsons carry chip
+ * placeholders + authored dates.
+ */
+const EDITORIAL_DETAIL_SHADOW_ROUTES: ReadonlySet<string> = new Set([
+  "/products/rfid-cards/standard-rfid-wood-card/",
+  "/products/rfid-keyfobs/rfid-wooden-keyfob/",
+]);
+
+/**
  * Route-pattern overrides — same intent as EDITORIAL_OVERRIDE_ROUTES but
  * matches a family of routes by regex instead of exact URL. Used for the
  * 15+ /industries/<slug>/ pages whose WP snapshots predate the editorial
@@ -262,6 +279,7 @@ const EDITORIAL_OVERRIDE_PATTERNS: RegExp[] = [
 
 function isEditorialOverrideRoute(route: string): boolean {
   return EDITORIAL_OVERRIDE_ROUTES.has(route)
+    || EDITORIAL_DETAIL_SHADOW_ROUTES.has(route)
     || EDITORIAL_OVERRIDE_PATTERNS.some((pattern) => pattern.test(route));
 }
 
