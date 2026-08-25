@@ -9,8 +9,8 @@
 |---|---|---|---|
 | `/products/{family}/{slug}/` 嵌套商品详情 | 189 | **EditorialPageLayout**(编辑管线) | ✅ C1 已注册原生化 |
 | `/products/{family}/` 家族索引 | 6 | EditorialPageLayout | ✅ C1 已注册 |
-| `/products/all/` 目录网格 | 1 | SnapshotLayout(WooCommerce 网格快照,woo 标记 ~611) | ⏳ C2 自研 composer |
-| `/products/*/page/N/` 分页 | 4 | SnapshotLayout | ⏳ 随 C2 |
+| `/products/all/` 目录网格 | 1 | SnapshotLayout → **C2 已原生化**(壳级接缝,正文标记原样保留) | ✅ |
+| `/products/*/page/N/` 分页 | 4 | 重定向存根(meta refresh) | ✅ C2 已随迁 |
 | `/product/{slug}/` 单数别名 | 51 | SnapshotLayout,**canonical 全部指向 /products/\*\*\*,noindex 别名存根** | 🔒 冻结(URL 合同) |
 | 特例:standard-rfid-wood-card、rfid-wooden-keyfob | 2 | SnapshotLayout(json 存在但未挂载编辑定义) | 🔍 单独排查 |
 
@@ -27,7 +27,7 @@
 - 门禁:322 测试、canary 524 markers / 540 hubs PASS、合同 default==flagged;
   因日期回填刷新 dist-baseline 并重冻合同基线
 
-## C2 —— `/products/all/` 目录网格 composer(待排期)
+## C2 —— `/products/all/` 目录网格(已完成,2026-08-25)
 
 唯一真正的工程活,对应蓝图 PR-06 的 ProductFamilyPage/SkuPage composer 思路:
 
