@@ -49,5 +49,18 @@
 - 2 个 wood 特例页:确认其 json 为何未挂载(疑似 `_pillar.json` 相关逻辑),
   属内容修复而非壳迁移
 
+## C3 —— 尾货批(已完成,2026-08-25)
+
+`/faq/` 与 `/contact/`(枢纽)经 SnapshotLayout 原生分支接入。**原生化定格
+538/595(90%)**,其余冻结理由:
+
+| 路由面 | 数量 | 冻结原因 |
+|---|---|---|
+| `/product/*` 别名 | 51 | 无 `<main>` 元素;noindex 别名,canonical 已冻结 |
+| `/2024/*`、`/2025/*` 旧链接 | 5 | 同上,无 main 的旧 WP 模板 |
+| `/rfq/` | 1 | 本就是纯 codex 渲染(rfq.astro + BaseLayout),非快照页 |
+| `/`(首页 v2) | 1 | PR-04,待视觉方向批准 |
+| `/404/` | 1 | 错误页,保持现状 |
+
 每阶段验收门与全站一致:全测试、lint/check、chip 双门禁、三树构建、
 site-contract、native-shell canary 审计、线上抽验。
