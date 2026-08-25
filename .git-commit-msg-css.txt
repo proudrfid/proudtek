@@ -1,0 +1,24 @@
+fix(shell): inline codex-shell.css via SiteShell — native header was unstyled
+
+Root cause of the "menu-only pages" incident (2026-08-25): codex-shell.css
+(all .codex-native-header/nav/brand rules) was inlined only by
+PageFrameLayout, so home and the phase 1-5a hubs looked correct while every
+page rendered through EditorialPageLayout's or SnapshotLayout's native
+branch (~500 leaf pages since phase 6a) shipped a header with zero styles —
+an unstyled vertical mega-menu that pushed main content out of view.
+
+Moved the ?inline import into SiteShell.astro, the single component every
+native rendering instantiates exactly once, and removed it from
+PageFrameLayout (no duplication). Home keeps its own styling path; hub
+output is byte-equivalent apart from where the style block now sits.
+
+Added assertShellStylesInlined to the canary audit: every flagged page must
+contain .codex-native-nav, so a future build that renders the native shell
+without its stylesheet fails CI instead of reaching production. The defect
+was invisible to all existing gates because they compare main-DOM equality,
+not head style coverage — structurally valid HTML, visually broken pages.
+
+Verified: 322 tests (audit fixtures extended with the style block), lint /
+astro check / chip gates, dual build with style-coverage spot checks across
+editorial + leaf + hub routes, site-contract PASS warnings=0, canary audit
+PASS (533 markers / 549 hubs).

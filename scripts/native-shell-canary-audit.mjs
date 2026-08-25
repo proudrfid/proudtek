@@ -351,6 +351,19 @@ async function assertMarkers(defaultDist, flaggedDist) {
   if (missing) throw new Error(`flagged build is missing native marker in ${missing}`);
 }
 
+async function assertShellStylesInlined(flaggedDist) {
+  // Regression guard (2026-08-25): SiteShell must inline codex-shell.css on
+  // every native page. A build that renders the native header without its
+  // stylesheet ships an unstyled vertical menu — structurally valid HTML,
+  // so only this style-coverage probe catches it.
+  for (const relativePath of FLAGGED_PATHS) {
+    const html = await fs.readFile(path.join(flaggedDist, relativePath), "utf8");
+    if (!html.includes(".codex-native-nav")) {
+      throw new Error(`${relativePath} is missing inlined codex-shell.css (native header would render unstyled)`);
+    }
+  }
+}
+
 async function assertFlaggedHubs(flaggedDist) {
   for (const relativePath of HUB_PATHS) {
     const html = await normalizedHtml(flaggedDist, relativePath);
@@ -491,6 +504,7 @@ async function assertSelectedHubs(defaultDist, baselineDist) {
 
 export async function audit({ baselineDist, defaultDist, flaggedDist }) {
   await assertMarkers(defaultDist, flaggedDist);
+  await assertShellStylesInlined(flaggedDist);
   await assertFlaggedHubs(flaggedDist);
   await assertContracts(defaultDist, flaggedDist);
   await assertHubDomContracts(defaultDist, flaggedDist);

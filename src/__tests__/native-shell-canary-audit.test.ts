@@ -86,9 +86,10 @@ function html(relativePath: string, native: boolean) {
   // Every flagged output is hub-shaped in this fixture (native shell with
   // landmark ids + a main#main); only the unflagged-control page is not.
   const hub = relativePath !== "unflagged-control/index.html";
+  const shellStyles = native ? "<style>.codex-native-nav{display:flex}</style>" : "";
   const shell = native ? '<div class="codex-native-shell" data-native-site-shell><header id="masthead"><nav id="site-navigation"><ul id="primary-menu"></ul></nav><div id="mobile-drawer"><ul id="mobile-menu"></ul></div></header>' : '<header data-donor="masthead"></header>';
   const footer = native ? '<footer id="colophon"></footer></div>' : '<footer data-donor="footer"></footer>';
-  return `<!doctype html><html><head><title>${relativePath}</title><link rel="canonical" href="https://proudtek.com/${relativePath.replace("index.html", "")}"/><meta name="description" content="fixture"/></head><body>${shell}${hub ? '<main id="main" class="hub-main" data-rail-key="fixture" aria-label="Fixture hub"><h1>Fixture hub</h1><p>Body <a href="/guides/original/" class="hub-link">Read guide</a></p></main>' : '<main id="main"><h1>Fixture</h1></main>'}${footer}</body></html>`;
+  return `<!doctype html><html><head><title>${relativePath}</title>${shellStyles}<link rel="canonical" href="https://proudtek.com/${relativePath.replace("index.html", "")}"/><meta name="description" content="fixture"/></head><body>${shell}${hub ? '<main id="main" class="hub-main" data-rail-key="fixture" aria-label="Fixture hub"><h1>Fixture hub</h1><p>Body <a href="/guides/original/" class="hub-link">Read guide</a></p></main>' : '<main id="main"><h1>Fixture</h1></main>'}${footer}</body></html>`;
 }
 
 function imageSitemap() {

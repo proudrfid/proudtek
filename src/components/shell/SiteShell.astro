@@ -1,6 +1,12 @@
 ---
 import SiteHeader from "./SiteHeader.astro";
 import SiteFooter from "./SiteFooter.astro";
+// Native chrome styles MUST ship with every SiteShell instantiation:
+// codex-shell.css carries .codex-native-header/nav/brand. It used to be
+// inlined only by PageFrameLayout, so EditorialPageLayout/SnapshotLayout
+// native branches (~500 leaf pages) rendered an unstyled vertical menu
+// while home/blog looked fine (2026-08-25 incident).
+import codexShellCss from "../../styles/codex-shell.css?inline";
 
 interface Props {
   currentRoute: string;
@@ -8,6 +14,7 @@ interface Props {
 
 const { currentRoute } = Astro.props;
 ---
+<style set:html={codexShellCss}></style>
 <div class="codex-native-shell" data-native-site-shell>
   <SiteHeader currentRoute={currentRoute} />
   <slot />
