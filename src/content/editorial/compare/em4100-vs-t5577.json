@@ -34,10 +34,22 @@
       "intro": "Both chips are 125 kHz passive LF devices, both speak ASK / Manchester, and both work on the very same reader hardware. Hold them up to an antenna and they're identical twins. Everything that separates them lives in the memory model and the modulator config.",
       "statBar": {
         "items": [
-          { "value": "64-bit", "label": "EM4100 frame · 40-bit UID" },
-          { "value": "330-bit", "label": "T5577 EEPROM · configurable" },
-          { "value": "0 vs 100k+", "label": "Write cycles" },
-          { "value": "5–15 cm", "label": "Read range · both chips" }
+          {
+            "value": "64-bit",
+            "label": "EM4100 frame · 40-bit UID"
+          },
+          {
+            "value": "330-bit",
+            "label": "T5577 EEPROM · configurable"
+          },
+          {
+            "value": "0 vs 100k+",
+            "label": "Write cycles"
+          },
+          {
+            "value": "5–15 cm",
+            "label": "Read range · both chips"
+          }
         ]
       },
       "image": {
@@ -65,11 +77,26 @@
       },
       "timeline": {
         "items": [
-          { "label": "Step 1 · Read", "text": "The tool energises the EM4100 with a 125 kHz field and captures its ASK-modulated Manchester response. Decode time: under 50 ms." },
-          { "label": "Step 2 · Decode", "text": "It extracts the 40-bit UID from the response and validates the parity bits." },
-          { "label": "Step 3 · Configure", "text": "It writes the T5577 configuration block to emulate EM4100 — modulator = ASK, bit rate = RF/64, encoding = Manchester, data in blocks 1–2." },
-          { "label": "Step 4 · Write", "text": "It writes the 40-bit UID into blocks 1–2 of the T5577 EEPROM." },
-          { "label": "Step 5 · Verify", "text": "It reads the freshly minted T5577 back to confirm the copy. Total operation time: 2–6 seconds, depending on the tool." }
+          {
+            "label": "Step 1 · Read",
+            "text": "The tool energises the EM4100 with a 125 kHz field and captures its ASK-modulated Manchester response. Decode time: under 50 ms."
+          },
+          {
+            "label": "Step 2 · Decode",
+            "text": "It extracts the 40-bit UID from the response and validates the parity bits."
+          },
+          {
+            "label": "Step 3 · Configure",
+            "text": "It writes the T5577 configuration block to emulate EM4100 — modulator = ASK, bit rate = RF/64, encoding = Manchester, data in blocks 1–2."
+          },
+          {
+            "label": "Step 4 · Write",
+            "text": "It writes the 40-bit UID into blocks 1–2 of the T5577 EEPROM."
+          },
+          {
+            "label": "Step 5 · Verify",
+            "text": "It reads the freshly minted T5577 back to confirm the copy. Total operation time: 2–6 seconds, depending on the tool."
+          }
         ]
       },
       "bullets": [
@@ -225,6 +252,15 @@
         "text": "T5577 makes credentials easier to manage — it does not make them harder to clone. The only real fix for the 125 kHz cloning surface is moving to 13.56 MHz (MIFARE Plus EV2 SL3 or DESFire EV3), where mutual authentication ends the commodity-copy game entirely.",
         "href": "/compare/125khz-vs-13.56mhz-rfid/"
       }
+    },
+    {
+      "title": "Verdict: T5577 for anything you issue, EM4100 only to consume legacy stock",
+      "intro": "EM4100 is read-only — a 40-bit UID fused in ROM that gets cloned; T5577 is the erasable, re-configurable blank that doubles as its drop-in emulator. For new issues and reissues, configurable wins. Keep ordering EM4100 only when a site is locked to read-only cards and the spares bin says so.",
+      "bullets": [
+        "New access-control issues, reprints, re-badging → {chip:atmel-t5577:name} (330-bit EEPROM, programmable).",
+        "Top-ups for an EM4100-only installed base → keep {chip:em-microelectronic-em4100:short_name} so format stays identical.",
+        "The price gap at 50k MOQ FOB Shenzhen is $0.08–0.15 vs slightly above — too small to justify locking yourself to read-only."
+      ]
     }
   ],
   "resourceCards": [

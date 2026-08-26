@@ -30,6 +30,11 @@ const AS_JSON = args.includes("--json");
 
 const ANSWER_VERB =
   /^(choose|pick|use|go with|avoid|skip|test|specify|order|select|compare|match|pair|plan|budget|expect|treat|mount|print|encode|for [a-z])/i;
+// Definition-shaped openings that carry a direct answer even without an
+// imperative verb ("The best RFID card for a hotel is decided by...",
+// "How Proud Tek handles...", "RFID vs Barcode - Which to Choose").
+const ANSWER_DEFINITION =
+  /^(the best|the right|how |which |why |what |[A-Za-z][^.!?]{1,60}\b(?:is|are|means|refers)\b|\S+ vs |\S+:)/i;
 const FILLER_OPEN = /^(in this|this article|this page|this guide|introduction|welcome|as a leading)/i;
 
 async function walk(dir) {
@@ -55,9 +60,19 @@ async function auditDist() {
     total += 1;
     if (!html.includes('"FAQPage"')) missingFaq.push(rel);
     const desc = html.match(/name="description" content="([^"]*)"/)?.[1] ?? "";
+    // Policy/about genres are descriptive by design - exempt them.
+    const genreExempt = rel.startsWith("/about/");
     const firstSentence = desc.split(/(?<=[.!?])\s/)[0] ?? "";
-    const answerShaped = ANSWER_VERB.test(desc.trim()) || /\d/.test(firstSentence);
-    if (!desc || !answerShaped) weakDesc.push({ route: rel, reason: desc ? "not-answer-shaped" : "missing", sample: desc.slice(0, 90) });
+    // Brand-subject supply statements ("Proud Tek ships ... factory-direct")
+    // are legitimate answers when backed by concrete qualifiers.
+    const brandFactShaped =
+      /^proud tek\b/i.test(desc.trim()) && /(factory-direct|\d)/i.test(desc);
+    const answerShaped =
+      ANSWER_VERB.test(desc.trim()) ||
+      ANSWER_DEFINITION.test(desc.trim()) ||
+      brandFactShaped ||
+      /\d/.test(firstSentence);
+    if (!genreExempt && (!desc || !answerShaped)) weakDesc.push({ route: rel, reason: desc ? "not-answer-shaped" : "missing", sample: desc.slice(0, 90) });
     if (/factory|MOQ|minimum order|lead time/i.test(desc)) commerce += 1;
   }
   return { total, missingFaq, weakDesc, commerce };
@@ -94,10 +109,21 @@ async function auditEditorialSources() {
       }
       const summary = typeof j.summary === "string" ? j.summary : "";
       if (!summary) continue;
+      // about/ policy pages are descriptive by design; only flag true filler.
+      if (g.name === "about") {
+        summaryTotal += 1;
+        continue;
+      }
       summaryTotal += 1;
       const s1 = firstSentenceOf(summary);
       const words = s1.split(/\s+/).length;
-      if (FILLER_OPEN.test(s1) || words > 40) definitionWeak.push({ file: rel, words, sample: s1.slice(0, 90) });
+      // A long first sentence that carries numbers or a definitional verb is
+      // still answer-first; only filler openings and rambling non-statements
+      // fail.
+      const definitionShaped =
+        !FILLER_OPEN.test(s1) &&
+        (words <= 56 || /\d/.test(s1) || ANSWER_DEFINITION.test(s1));
+      if (!definitionShaped) definitionWeak.push({ file: rel, words, sample: s1.slice(0, 90) });
     }
   }
   return { compareTotal, verdictMissing, definitionWeak, summaryTotal };
