@@ -437,7 +437,7 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/about/factory/", label: "Factory & Production" },
       { href: "/about/certifications/", label: "Certifications & Compliance" },
       { href: "/about/leadership/", label: "Leadership & Team" },
-      { href: "/about/case-studies/", label: "Case Studies" },
+      { href: "/case-studies//", label: "Case Studies" },
       { href: "/about/editorial-policy/", label: "Editorial Policy" },
       { href: "/about/methodology/", label: "Testing Methodology" },
       { href: "/about/review-board/", label: "Editorial & Review Board" },
