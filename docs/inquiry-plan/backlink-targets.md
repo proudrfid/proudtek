@@ -42,3 +42,48 @@ W__:  目标[目录/客座/PR] | 动作 | 状态(待回复/已上线 URL) | 获�
 - 不买链接、不进链接农场、不做全站sitewide交换 —— 2024 后的谷歌反垃圾
   对制造商站点尤其敏感,一次失误可让前面的内容投入清零。
 - 锚文本自然分布:品牌名 > 裸URL > 主题词,精确匹配锚文本占比 <30%。
+
+## E. 交钥匙材料包(2026-08-30 补,拿去即用)
+
+### E1. 实体一致性卡(NAP——所有目录/档案必须与此一字不差)
+
+| 字段 | 值 |
+|---|---|
+| 公司名 | Proud Tek Co., Ltd |
+| 地址 | Zhantao Building, #1079 Minzhi Rd., Longhua District, Shenzhen City, Guangdong, China |
+| 电话 | +86 186 6582 0632 |
+| 邮箱 | info@proudtek.com(商务)/ editors@proudtek.com(内容) |
+| 官网 | https://proudtek.com |
+
+### E2. 目录提交标准简介(EN,直接粘贴)
+
+> Proud Tek Co., Ltd is a Shenzhen-based RFID and NFC manufacturer producing
+> smart cards, wristbands, keyfobs, labels and readers at factory-direct
+> pricing. Products span 13.56 MHz (NTAG, MIFARE, DESFire, ICODE) and UHF
+> (RAIN RFID) families, with in-house printing, personalization and MOQ 500
+> per chip type. Written quotes and confirmed lead times before tooling.
+> https://proudtek.com
+
+### E3. 客座 Pitch 模板(EN,发编辑)
+
+> Subject: Original data for [Blog名] readers: what RFID wristbands actually lift event revenue
+>
+> Hi [Name], — we run a 15-year RFID factory in Shenzhen (Proud Tek).
+> We published original buyer-facing research your readers ask us about:
+> 1. Event revenue lift per RFID wristband program (arithmetic model + real fee tables)
+> 2. UHF wristband real-world read-range tests (antenna placement findings)
+> 3. Closed-loop cashless ROI for venues (break-even calculator)
+>
+> Happy to write 800-1,200 words original for you, with charts you can keep.
+> One natural link to our research page is all we ask. Samples attached.
+
+### E4. 记者回应模板(HARO/Connectively/Featured)
+
+> As a Shenzhen RFID factory lead (15 years, export to 40+ countries), the
+> honest answer on [topic]: [2-3 句立场]. Buyers should verify [关键点] before
+> accepting a quote. — Peter Zhang, Proud Tek Co., Ltd. (可附原创数据链接)
+
+### E5. 周记账表(复制到表格工具)
+
+| 周 | 渠道 | 目标 | 状态 | 落地 URL | 引用域 DR |
+|---|---|---|---|---|---|
