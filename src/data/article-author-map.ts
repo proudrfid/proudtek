@@ -9,7 +9,6 @@ export const ARTICLE_AUTHOR_MAP: Record<string, string> = {
   "/blog/anti-counterfeiting-rfid-events/": "sam-yao",
   "/blog/barcode-labels-peeling-warehouse-rfid-solution/": "sam-yao",
   "/blog/best-rfid-card-for-hotels/": "mia-li",
-  "/blog/cashless-payment-rfid-wristbands/": "sam-yao",
   "/blog/coconut-shell-rfid-wristbands-eco/": "mia-li",
   "/blog/cost-per-rfid-tag-2026/": "peter-zhang",
   "/blog/desfire-ev1-vs-ev2-vs-ev3/": "peter-zhang",

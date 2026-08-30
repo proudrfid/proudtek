@@ -25,6 +25,7 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/fr/": "/",
   "/ru/": "/",
   "/da/": "/",
+  "/blog/cashless-payment-rfid-wristbands/": "/products/rfid-wristbands/cashless-payment-rfid-wristband/",
 
   /* ── Legacy recovery sync (mirror of vercel.json) ── */
   "/ar/": "/",

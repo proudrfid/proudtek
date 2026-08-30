@@ -17,7 +17,7 @@
 |---|---|---|
 | T1 站群归一 | **proudrfid.com 由第三方管理,无管辖权 → 老站 301 计划搁置,独立管理**;proudtek.com 自身旧版遗产的 301(经自有主机)持续推进 | 🔴 分离管理(自身遗产部分 🟢) |
 | T2 权威度 | 15-25 真实引用域(目录/客座/PR/专家回应) | ⚪ 见 backlink-targets.md |
-| T3 发布形状 | 冻结量产;531→~300 收敛;真人署名替换 editorial-board | ⚪ 见 content-consolidation.md |
+| T3 发布形状 | 冻结量产 ✅;真人署名 458 页 ✅(503 Peter/28 Nancy 交叉审);腕带簇收敛图就绪,cashless 真重复已 301;剪尾 9/27 数据后执行 | 🟡 见 content-consolidation.md + wristband-cluster-map.md |
 | T4 关键词 | 20 个商业词作战表(LP+内链+多语言) | 🟡 见 keyword-battle-20.md |
 | T5 转化细节 | WhatsApp 按钮(缺号码)/案例前置/认证 logo 条 | ⚪ 等输入 |
 | T0 度量 | GSC API 已接通(sc-domain:proudtek.com,SA=Owner);首份实测诊断见 gsc-findings-2026-08-30.md | ✅ 完成(老站资源待建) |

@@ -168,7 +168,6 @@ const BLOG_THUMBNAIL_MAP: Record<string, string> = {
   "/blog/nfc-smart-rings-guide/": "/blog-images/smart-ring.jpg",
   "/blog/how-to-program-nfc-tags/": "/blog-images/program-nfc.jpg",
   "/blog/wooden-nfc-cards-eco-branding/": "/blog-images/eco-wood.jpg",
-  "/blog/cashless-payment-rfid-wristbands/": "/blog-images/cashless-payment.jpg",
   "/blog/rfid-event-access-control-setup/": "/blog-images/event-access.jpg",
   "/blog/uhf-rfid-wristbands-long-range/": "/blog-images/uhf-wristband-event.jpg",
   "/blog/rfid-vs-qr-codes-events/": "/blog-images/rfid-vs-qr.jpg",
