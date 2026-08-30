@@ -55,3 +55,28 @@ proudtek.com 旧版(多语言 WordPress,2025-10 起 GSC 有数据):
 遗产不但有,而且**最大的一笔是改版自己弄丢的**:旧站的排名记录还完整保存在
 GSC 里,老站还在线上等着 301。只要把"建老站 GSC 属性 + 实施 301"这两步做完,
 历史遗产就能开始计息。
+
+## 系统化回收(2026-08-30 第二轮挖掘)
+
+全量对账 782 个旧时代曝光页 vs 重定向层:
+- 30 页已有重定向 | 8 页新站同路径存活 | 604 页曝光<5(任其老化)
+- **140 页曝光≥5 的裸 404 → 全部 301 回收**(提交 24bafcfe + 5882238b)
+
+关键发现:旧站是 12+ 语言 storefront;语言首页曾高排位
+(/de pos2, /fa pos3, /ja pos3, /zh pos4)。现全部 308 → 英文根页(过渡),
+语言版上线后逐语回指。
+
+技术教训(两次上线验证才归因):
+1. Vercel 先做 trailingSlash 规范化、后匹配 redirect 规则 → source 必须带
+   尾斜杠,否则永不命中(此前被通配 lang 规则的副作用掩盖);
+2. 通配 `/:lang(...)/:path(.*) → /:path` 会剥语言前缀,新站无语言版时只
+   有害,已删除;
+3. vercel.json redirects 是唯一事实源,_redirects 现为其生成镜像
+   (247 条,头部标注 do-not-hand-edit)。
+
+线上验证(7/7 → 200):/fr/produit/mifare-desfire-ev2-cards → EV3 页;
+/de/produkt/legic-karte → /products/rfid-cards/;/ja/ → /;
+/da/produkt/biltransponderchip → /products/rfid-tags/;等。
+
+待用户确认的产品线缺口:LEGIC 卡与 NFC 戒指有旧站真实需求,新目录无
+对应 SKU(现暂指 hub)。
