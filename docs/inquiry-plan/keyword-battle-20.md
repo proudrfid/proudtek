@@ -27,6 +27,14 @@
 | 19 | rfid tag wholesale | /lp/rfid-tag-wholesale | 已有 |
 | 20 | sample pack rfid | /lp/sample-pack | 已有,转化型词 |
 
+## 状态(2026-08-30)
+
+- ✅ 四要素审计完成:20 个承接页(13 直查 + 7 项 dist 复核)MOQ/交期/书面报价/定制
+  全部在位(event-wristbands、custom-printing、uhf-tag-manufacturer 三处缺口已补;
+  waterpark 为待建新页,见候补标记)。
+- ✅ IndexNow 通道建立:`scripts/indexnow-ping.mjs`(部署后运行,把 sitemap 全量
+  提交给 Bing/DuckDuckGo/Yandex 生态,加速 348 个隐形长尾页的发现)。
+
 ## 每词标准动作(四件套)
 
 1. **承接页四要素齐**:MOQ/交期/书面报价承诺/定制能力(多数已有,查漏)。
