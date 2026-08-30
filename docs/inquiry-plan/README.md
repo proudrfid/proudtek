@@ -20,7 +20,7 @@
 | T3 发布形状 | 冻结量产;531→~300 收敛;真人署名替换 editorial-board | ⚪ 见 content-consolidation.md |
 | T4 关键词 | 20 个商业词作战表(LP+内链+多语言) | 🟡 见 keyword-battle-20.md |
 | T5 转化细节 | WhatsApp 按钮(缺号码)/案例前置/认证 logo 条 | ⚪ 等输入 |
-| T0 度量 | GSC+GA4+Clarity;索引数、Top 查询、老站询盘量 | ⚠️ 等用户提供 |
+| T0 度量 | GSC API 已接通(sc-domain:proudtek.com,SA=Owner);首份实测诊断见 gsc-findings-2026-08-30.md | ✅ 完成(老站资源待建) |
 
 ## 阻塞项(需要用户)
 
