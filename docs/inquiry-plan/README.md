@@ -15,7 +15,7 @@
 
 | 轨道 | 内容 | 状态 |
 |---|---|---|
-| T1 站群归一 | 301 迁移(规则版 CSV 已产出,等 GSC 精调 Stage-1 清单) | 🟡 规则版完成 |
+| T1 站群归一 | **proudrfid.com 由第三方管理,无管辖权 → 老站 301 计划搁置,独立管理**;proudtek.com 自身旧版遗产的 301(经自有主机)持续推进 | 🔴 分离管理(自身遗产部分 🟢) |
 | T2 权威度 | 15-25 真实引用域(目录/客座/PR/专家回应) | ⚪ 见 backlink-targets.md |
 | T3 发布形状 | 冻结量产;531→~300 收敛;真人署名替换 editorial-board | ⚪ 见 content-consolidation.md |
 | T4 关键词 | 20 个商业词作战表(LP+内链+多语言) | 🟡 见 keyword-battle-20.md |
@@ -27,7 +27,8 @@
 1. GSC 三数字:proudtek.com 已索引页数 / Top10 查询 / 老站月均询盘量。
 2. WhatsApp 接收号码(用于全站点击聊天按钮)。
 3. 真人署名名单(替换 458 页 editorial-board):建议 peter-zhang + 2 位真实工程师,含照片/简介/LinkedIn。
-4. proudrfid.com 的服务器/WordPress 管理权(301 在那边实施)。
+4. ~~老站服务器权限~~(已确认无管辖权,取消该项)。
+5. WhatsApp 接收号码、真人署名名单(不变)。
 
 ## 里程碑
 

@@ -17,6 +17,14 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
   "/2024/12/25/rfid-hotel-key-card/": "/solutions/hotel-key-cards/",
   "/2025/11/04/mifare_plus_card/": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
 
+  /* ── Pre-revamp multilingual homes with no current equivalent ─────────
+   * Old-era GSC shows clicks on these language homes; interim-target the
+   * root until the language launches (then re-point per language). */
+  "/it/": "/",
+  "/fr/": "/",
+  "/ru/": "/",
+  "/da/": "/",
+
   /* ── Compare-cluster collapses ──────────────────────────────────────── */
   "/compare/mifare-plus-vs-desfire/": "/compare/mifare-plus-ev2-vs-desfire-ev3/",
   "/compare/pps-vs-silicone-laundry-tags/": "/compare/pps-vs-silicone-vs-textile-rfid-laundry-tags/",

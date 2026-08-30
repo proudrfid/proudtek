@@ -1,5 +1,12 @@
 # 站群归一:proudrfid.com → proudtek.com 301 迁移方案(T1)
 
+> ⚠️ **状态更新(2026-08-30):proudrfid.com 由第三方优化,我方无管辖权。**
+> 本文档的 Stage-1/Stage-2(涉及老站服务器的部分)**搁置**;
+> `redirects-stage2.csv` 保留为休眠资产,若未来获得老站管辖权可重启。
+> proudtek.com 自身旧版遗产的重定向由自有主机承担,不在此限制内
+> (见 legacy-inheritance-2026-08-30.md,已实施 /product/* 共 51 条 +
+> 语言首页 4 条,来源 route-overrides.ts)。
+
 ## 现状实测
 
 - 老站 5,814 URL(18 个子 sitemap),仍在收录与排名;新站 520 URL。
