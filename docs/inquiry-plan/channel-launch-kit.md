@@ -1,14 +1,22 @@
-# 渠道从零启动包(Google 之外,2026-08-30)
+# 渠道启动包(Google 之外,2026-08-30;09-01 修订:存量盘活版)
+
+> **重要更正(2026-09-01)**:首页 sameAs 实测发现公司已有存量渠道资产
+> (全部 200 验活):Made-in-China 店铺 rfid-tag.en.made-in-china.com、
+> LinkedIn 公司页 /company/proud-tek-co-ltd/、YouTube @protekrfid875、
+> Facebook /RFIDTRANSPONDER/。策略从"从零注册"改为"**盘活存量**"。
+> 原始从零指南保留在文末作参考。
 
 > 背景:站内漏斗已就绪,Google 排名等权威度。本包解决"不依赖谷歌排名的询盘"。
 
-## A. 阿里国际站/Made-in-China 店铺(最快见询盘,2 周可上线)
+## A. Made-in-China 存量店铺优化(最快见询盘,本周可做)
 
-### 你要做的(纯机械)
-1. 注册阿里国际站卖家账号(基础版即可起步;营业执照+法人身份证)
-2. 上传 20-30 个产品(标题公式见下,图片直接用站内 landing-images)
-3. 公司档案填 NAP(与官网一字不差):Proud Tek Co., Ltd / Zhantao Building,
-   #1079 Minzhi Rd., Longhua, Shenzhen / +86 186 6582 0632 / proudtek.com
+**店铺已存在:rfid-tag.en.made-in-china.com(200 验活)**——不用注册,直接优化:
+
+1. 店铺档案 NAP 对齐官网(Proud Tek Co., Ltd / Zhantao Building,
+   #1079 Minzhi Rd., Longhua / +86 186 6582 0632 / proudtek.com)
+2. 用产品标题公式(下)重写 Top 20 产品标题
+3. 站内 landing-images 图用于产品主图(与官网视觉一致=品牌重复曝光)
+4. 检查店铺是否链接回官网(实体信号)
 
 ### 产品标题公式(阿里 SEO)
 `[应用] + [产品] + [芯片] + [材质/特性] + for [场景]`
@@ -23,8 +31,8 @@
 
 ## B. LinkedIn 起号 + 30 天内容日历(内容全部备好)
 
-### 你要做的
-1. Peter Zhang 个人页:头衔 "Founder, Proud Tek Co., Ltd | RFID & NFC
+### 你要做的(公司页已存在:/company/proud-tek-co-ltd/)
+1. 确认公司页管理员权限(找回或重新认领);Peter 个人页:头衔 "Founder, Proud Tek Co., Ltd | RFID & NFC
    Manufacturer, Shenzhen",简介段直接用官网 about 文案(英文)
 2. 公司页同步建;每帖发个人页(流量>公司页),公司页转发
 

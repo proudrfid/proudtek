@@ -47,6 +47,16 @@
 | not practically clonable | 原句有条件限定 | 保留 |
 | guaranteed ×21 | 7/8 是技术/厂商语境,仅 1 处软化 | 已修 1 处 |
 
+## 已验活的渠道资产(2026-09-01 实测,实体一致性锚点)
+
+| 资产 | URL | 状态 |
+|---|---|---|
+| Made-in-China 店铺 | rfid-tag.en.made-in-china.com | 200 |
+| LinkedIn 公司页 | /company/proud-tek-co-ltd/ | 200 |
+| YouTube | @protekrfid875 | 200 |
+| Facebook | /RFIDTRANSPONDER/ | 200 |
+| WhatsApp | wa.me/8618665820632 | 与 NAP 电话一致 |
+
 ## 开放项(需用户提供,不编造)
 
 - [ ] ISO 9001 证书编号 + 认证机构 + 有效期(首页信任信号)
