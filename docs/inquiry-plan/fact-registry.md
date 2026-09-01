@@ -27,6 +27,16 @@
 - hospitality + supply-chain:各加 "How to read the numbers" 证据归属节
   (ROI 区间=行业典型估计,非具名客户审计结果)
 
+## 第二轮清扫(同日)
+
+- CR80 ⇒ "适配所有读写器"指控:平反——卡指南 _pillar 早已写明
+  "Physical fit is not protocol fit"(审核误读);membership 页
+  "all major platforms" 属实,已改条件式
+- 双频卡 0.84mm "fits every card printer":实质错误(部分直印机
+  仅收 0.76mm),两处改为"确认打印机厚度规格"
+- FAQ:MOQ 两档写明(库存任意量/定制 100/500)、交期、退货两句语法
+  修复并补书面确认承诺
+
 ## 审核判定与处置(平反记录)
 
 | 审核指控 | 核查结果 | 处置 |
