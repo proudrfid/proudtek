@@ -965,7 +965,7 @@ function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
       "Self-owned RFID & NFC factories in Shenzhen — vertically integrated from inlay to printing to encoding.",
     "Automated Production Lines":
       "Automated production lines for RFID cards, tags, labels, wristbands, keyfobs and readers.",
-    "Advanced Production Equipments":
+    "Advanced Production Machines":
       "Advanced production equipments across LF (125 kHz), HF (13.56 MHz) and UHF (860–960 MHz) RFID/NFC manufacturing.",
     "Certified Patents":
       "Certified patents covering antenna design, inlay lamination and form-factor innovations across the RFID/NFC catalog.",
