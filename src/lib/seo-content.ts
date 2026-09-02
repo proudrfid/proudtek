@@ -581,8 +581,10 @@ export const PAGE_DESCRIPTION_OVERRIDES: Record<string, string> = {
   "/solutions/nfc-business-card/":
     "Custom NFC business cards: NTAG chip choice, PVC, wood, metal or bamboo, vCard & URL encoding, iPhone tap-to-share. You own the URL — no subscription.",
 
+  // 2026-09-02 (audit Phase 4 C-01..C-05): factory / line / equipment /
+  // country counts removed — no documentary evidence; certificates verified.
   "/":
-    "Proud Tek is a custom RFID & NFC manufacturer in China since 2008. Two Shenzhen factories, 10 automated production lines, 305+ pieces of equipment, OEM/ODM cards, tags, labels, wristbands, keyfobs and readers shipped to 50+ countries.",
+    "Custom RFID & NFC manufacturer in China since 2008: OEM/ODM cards, tags, labels, wristbands, keyfobs and readers. Shenzhen; ISO 9001/14001/45001 certified.",
   "/product/125khz-rfid-sticker/":
     "125 kHz RFID stickers for compact LF access-control or identification projects where adhesive labels work better than cards or keyfobs.",
   "/product/em4200-card/":

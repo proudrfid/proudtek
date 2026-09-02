@@ -516,8 +516,10 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
       "@type": "VideoObject",
       "@id": `${context.canonicalUrl}#hero-video`,
       name: "Proud Tek RFID & NFC Manufacturing — Production Floor",
+      // 2026-09-02 (audit Phase 4 C-01..C-05): factory / line / equipment /
+      // country counts removed — no documentary evidence.
       description:
-        "On-site footage from Proud Tek's Shenzhen facility showing automated RFID & NFC card / tag / label production lines. Two ISO 9001 audited factories, 10 production lines, 305+ pieces of equipment serving 50+ countries.",
+        "Production footage supplied by Proud Tek showing RFID & NFC card, tag and label production lines in Shenzhen.",
       thumbnailUrl: [
         absoluteUrl("/site-assets/wp-content/uploads/2024/08/rfid_factories.jpg"),
       ],
