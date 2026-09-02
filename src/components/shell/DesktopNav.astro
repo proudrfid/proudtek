@@ -44,10 +44,13 @@ function isExactActive(href: string): boolean {
               <div class="codex-native-nav__groups">
                 {menu.groups.map((group) => (
                   <section class="codex-native-nav__group">
+                    {/* Column labels are navigation, not document outline (audit
+                        2026-09-01 P2-1): a <p> keeps the styling without adding
+                        ~40 <h2>s to every page's heading tree. */}
                     {group.heading && (
                       group.headingHref
-                        ? <h2><a href={group.headingHref}>{group.heading}</a></h2>
-                        : <h2>{group.heading}</h2>
+                        ? <p class="codex-nav-group-label"><a href={group.headingHref}>{group.heading}</a></p>
+                        : <p class="codex-nav-group-label">{group.heading}</p>
                     )}
                     <ul>
                       {group.links.map((link) => (

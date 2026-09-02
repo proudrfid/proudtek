@@ -856,7 +856,9 @@ function renderFooterSection(s: FooterSection): string {
         `<li><a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a></li>`,
     )
     .join("");
-  return `<section class="codex-footer-nav__col"><h3 class="codex-footer-nav__heading">${escapeHtml(s.heading)}</h3><ul class="codex-footer-nav__list">${links}</ul></section>`;
+  // Column label as <p>, not <h3>: footer navigation is chrome, not document
+  // outline (audit 2026-09-01 P2-1); aria-label keeps the region named.
+  return `<section class="codex-footer-nav__col" aria-label="${escapeHtml(s.heading)}"><p class="codex-footer-nav__heading">${escapeHtml(s.heading)}</p><ul class="codex-footer-nav__list">${links}</ul></section>`;
 }
 
 function renderFooterBrandRow(): string {
