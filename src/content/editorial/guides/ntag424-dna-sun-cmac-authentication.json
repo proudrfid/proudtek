@@ -27,8 +27,8 @@
   ],
   "publishedAt": "2026-04-18",
   "modifiedAt": "2026-07-02",
-  "authorSlug": "peter-zhang",
-  "reviewedBySlug": "nancy-wu",
+  "authorSlug": "editorial-board",
+  "reviewedBySlug": "proudtek-engineering",
   "reviewedAt": "2026-05-10",
   "brief": [
     {
@@ -95,7 +95,7 @@
         "Three AES-128 application keys per tag plus a PICC-level key. The PICCMasterKey (Key 0x00 at the card level, used only for SetConfiguration and card-level admin commands), AppKey0 (application master, can rewrite keys within the NDEF application), AppKey1 (AES-128 SDMMACKey for CMAC computation), AppKey2 (AES-128 SDMEncKey for payload encryption when File 03 encryption is enabled). A fourth 'null' key index (0xE = free access) allows public read access; a fifth index (0xF = no access) denies all access and is used to permanently lock access rights. Each key has a separate 8-bit key version, incremented on every ChangeKey call so the server can cache which generation of keys applies to which tags.",
         "Diversified keys: production deployments do NOT use the same three keys across all tags. Instead, a Master Key (MK) held by the brand's HSM is combined with the tag UID via AES-128 CMAC to derive per-tag SDMMACKey and SDMEncKey. NXP's AN12196 Section 10 defines the standard diversification function: DivKey = AES-CMAC(MK, 0x01 || UID || 0x80 || 0x00...) truncated/formatted per the application note. Proud Tek uses this as the default personalization scheme, which means a breach of one tag's keys never compromises the master or any other tag.",
         "Key rotation: AppKey0 can change AppKey1 and AppKey2 post-issuance via authenticated ChangeKey commands (0xC4). In regulated deployments (EU DPP, pharmaceutical track-and-trace), keys are rotated annually and all prior keys archived for forensic re-verification per NIST SP 800-57 Part 1 Rev. 5 'crypto-period' guidance. Key version tracking (GetKeyVersion 0x64) lets the backend identify which master-key generation was used at personalization to derive the correct per-tag key.",
-        "Personalization workstation: a desktop NFC reader with a secure element (SAM, Secure Access Module) holds the MK and writes per-tag keys during manufacturing, typically on a PC/SC-compliant encoder running PC/SC 2.0 drivers. Proud Tek factory personalization runs on HID Omnikey 5427CK SAM-equipped encoders for low-volume orders (<50 K tags), and on Muhlbauer TAL 15000 fully-automated personalization lines for larger runs; the TAL line encodes, tests and rejects at 15,000-18,000 tags/hour with inline RF-test and DC-probe verification.",
+        "Personalization workstation: a desktop NFC reader with a secure element (SAM, Secure Access Module) holds the MK and writes per-tag keys during manufacturing, typically on a PC/SC-compliant encoder running PC/SC 2.0 drivers. Proud Tek personalization runs on HID Omnikey 5427CK SAM-equipped encoders for low-volume orders (<50 K tags), and on Muhlbauer TAL 15000 fully-automated personalization lines for larger runs; the TAL line encodes, tests and rejects at 15,000-18,000 tags/hour with inline RF-test and DC-probe verification.",
         "Personalization command sequence: typical flow: SELECT AID (A4 04 00 07 D2 76 00 00 85 01 01), AuthenticateEV2First (71 ... with AppKey0), ChangeKey (C4 ... to set AppKey1/AppKey2), ChangeFileSettings (5F ... to enable SDM mirrors and set access rights), Write NDEF template (8D ... to File 02 with mirror markers), and finally SetConfiguration (5C) to lock the configuration if the deployment requires it. The whole sequence runs in ~80-120 ms per tag on the TAL line.",
         "NXP TagWriter / NXP TapLinx. NXP's official SDKs provide reference implementations for personalization, SUN configuration and CMAC verification in Android (TapLinx Java/Kotlin), iOS (Core NFC with Swift), and server-side Java/Python/.NET. Proud Tek ships tested integration samples alongside order-specific key delivery; sample code includes end-to-end verification endpoints for Node.js/Express, FastAPI and AWS Lambda.",
         "Key delivery: Proud Tek supports three customer key-delivery models: (1) customer-generated MK delivered via PGP-encrypted email or SFTP drop (MK never leaves customer environment unencrypted); (2) split-knowledge MK generation inside Proud Tek's Thales Luna HSM with multi-party key ceremony (two customer witnesses, two Proud Tek witnesses, recorded session); (3) AWS KMS-based MK where personalization runs inside an AWS Nitro Enclave attested to the customer's KMS policy. Method (3) is the preferred approach for enterprise customers with existing AWS posture."
@@ -412,5 +412,7 @@
       "href": "/solutions/digital-product-passport/",
       "label": "Digital Product Passport"
     }
-  ]
+  ],
+  "author": "Proud Tek Editorial Team",
+  "reviewedBy": "Proud Tek RF / Production Engineering"
 }
