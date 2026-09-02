@@ -105,9 +105,6 @@ import {
   renderBlogGrowthHub,
 } from "./render-blocks";
 
-/** Formspree inbox shared by every lead form on the site (contact, FAQ, inline RFQ, RFQ wizard). */
-export const FORMSPREE_ENDPOINT = "https://formspree.io/f/xlgorlog";
-
 export function normalizePageBody($body: CheerioAPI, page: SnapshotPage, context: PageContext): void {
   rewriteLegacyInternalLinks($body);
 
@@ -225,7 +222,6 @@ export function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context
 
   if (page.route === "/faq/") {
     enhanceFaqPage($body);
-    enhanceFaqInquiryForm($body);
   }
 
   if (context.kind === "contact" && page.route === "/contact/") {
@@ -533,20 +529,6 @@ export function enhanceKadenceA11y($body: CheerioAPI): void {
   });
 }
 
-/**
- * /faq/ — the "Can't find an answer?" Kadence form still posted to the
- * WordPress AJAX endpoint (dead on the static host; Phase 12 CV-1 class).
- * Rewire it to Formspree with the same hardening as the contact form.
- */
-export function enhanceFaqInquiryForm($body: CheerioAPI): void {
-  const form = $body('form.kb-form').filter((_, element) =>
-    $body(element).find('input[name="action"][value="kb_process_ajax_submit"]').length > 0,
-  ).first();
-  if (!form.length) return;
-  rewireKadenceFormToFormspree($body, form, "FAQ page inquiry — proudtek.com");
-  hardenKadenceForm(form);
-}
-
 export function enhanceFaqPage($body: CheerioAPI): void {
   const faqHeading = $body("h2").filter((_, element) => cleanText($body(element).text()) === "FAQ Help Center").first();
 
@@ -660,11 +642,8 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
   }
 
   // Point the form to Formspree for submission
-  form.attr("action", FORMSPREE_ENDPOINT);
+  form.attr("action", "https://formspree.io/f/xlgorlog");
   form.attr("method", "POST");
-  // The native POST works without JavaScript, so the WP-only "enable
-  // JavaScript" warning (and its style hiding the submit button) must go.
-  removeKadenceNoscriptWarning(form);
 
   // Strip the WP-era AJAX router fields — junk data in a Formspree
   // submission ("action: kb_process_ajax_submit" in every lead email),
@@ -753,18 +732,11 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
     form.prepend('<input type="hidden" name="_subject" value="Contact form — proudtek.com" />');
   }
 
-  hardenKadenceForm(form);
-}
-
-/**
- * Bring a Kadence-era form up to the same a11y + attribution bar as the
- * editorial inline RFQ (DS-11 #5b). Kadence ships data-required="yes" but no
- * native HTML5 required, no aria-required, no error containers, and no
- * aria-describedby. We add all four so screen readers + the inline
- * form-validation JS in BaseLayout can both work, then prepend the hidden
- * attribution inputs the PageScript fills at submit time.
- */
-function hardenKadenceForm(form: ReturnType<CheerioAPI>): void {
+  // DS-11 #5b — Bring the Kadence form up to the same a11y bar as the
+  // editorial inline RFQ. Kadence ships data-required="yes" but no native
+  // HTML5 required, no aria-required, no error containers, and no
+  // aria-describedby. We add all four so screen readers + the inline
+  // form-validation JS in BaseLayout can both work.
   form.attr("novalidate", "true");
   form.attr("data-codex-rfq", "");
   // Each <input> / <textarea> with data-required gets HTML5 required +
@@ -819,59 +791,5 @@ function hardenKadenceForm(form: ReturnType<CheerioAPI>): void {
       '<input type="hidden" name="cta_label" data-codex-attribution="cta_label" />',
       '<input type="hidden" name="ga_client_id" data-codex-attribution="ga_client_id" />',
     ].join(""));
-  }
-}
-
-/**
- * Point a WordPress-era Kadence form at Formspree. On the static host the
- * original `action=""` + hidden `action=kb_process_ajax_submit` posts to
- * nothing (WP admin-ajax does not exist here) — the form is dead and the
- * `<noscript>` block even tells no-JS users to "enable JavaScript".
- * Conversion audit 2026-09-01 (Phase 12 CV-1). Shared by the /contact/ and
- * /faq/ forms; field names are mapped from Kadence `data-label`s.
- */
-/**
- * Kadence emits `<noscript>Please enable JavaScript … to submit the form
- * <style>…kb-submit-field{display:none}</style></noscript>` either inside the
- * `.wp-block-kadence-form` wrapper or as its next sibling (snapshot pages
- * differ). Once the form posts natively that warning is wrong, so remove it.
- */
-function removeKadenceNoscriptWarning(form: ReturnType<CheerioAPI>): void {
-  const wrap = form.closest(".wp-block-kadence-form");
-  const scope = wrap.length ? wrap : form;
-  scope.find("noscript").filter((_, el) => /enable JavaScript/i.test(scope.find(el).text())).remove();
-  const sibling = scope.next("noscript");
-  if (sibling.length && /enable JavaScript/i.test(sibling.text())) sibling.remove();
-}
-
-function rewireKadenceFormToFormspree(
-  $body: CheerioAPI,
-  form: ReturnType<CheerioAPI>,
-  fallbackSubject: string,
-): void {
-  form.attr("action", FORMSPREE_ENDPOINT);
-  form.attr("method", "POST");
-  // Strip the WP-era AJAX router fields — junk data in a Formspree
-  // submission ("action: kb_process_ajax_submit" in every lead email),
-  // and an input named "action" shadows form.action in DOM scripting.
-  form.find('input[name="_kb_form_id"], input[name="_kb_form_post_id"], input[name="action"]').remove();
-  // Kadence's honeypot → Formspree's native `_gotcha` trap so spam is
-  // discarded server-side. Visual hiding + aria-hidden stay as-is.
-  form.find('input[name="_kb_verify_email"]').attr("name", "_gotcha");
-  // The native POST now works without JavaScript, so the WP-only "enable
-  // JavaScript" warning (and its style hiding the submit button) must go.
-  removeKadenceNoscriptWarning(form);
-
-  form.find("input[data-label], textarea[data-label]").each((_, element) => {
-    const $el = $body(element);
-    const label = ($el.attr("data-label") ?? "").toLowerCase();
-    if (/e-?mail/.test(label)) $el.attr("name", "email");
-    else if (/name/.test(label)) $el.attr("name", "name");
-    else if (/phone|tel/.test(label)) $el.attr("name", "phone");
-    else if (/subject/.test(label)) $el.attr("name", "_subject");
-    else if (/message|note/.test(label)) $el.attr("name", "message");
-  });
-  if (!form.find('[name="_subject"]').length) {
-    form.prepend(`<input type="hidden" name="_subject" value="${escapeXml(fallbackSubject)}" />`);
   }
 }

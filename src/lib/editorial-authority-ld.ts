@@ -66,7 +66,6 @@ const ARTICLE_ROUTE_GROUPS = new Set([
   "case-studies",
   "compatibility",
   "research",
-  "about",
 ]);
 
 export function isArticleRoute(route: string): boolean {
