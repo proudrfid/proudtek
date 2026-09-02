@@ -546,6 +546,9 @@ export function resolveFaqEntries($body: CheerioAPI): FaqEntry[] {
   return entries;
 }
 
+/** Display budget for product <title>s before Google truncates (≈ 600 px / 60 chars). */
+const PRODUCT_TITLE_BUDGET = 60;
+
 export function buildDocumentTitle(route: string, contentTitle: string, kind: PageKind): string {
   if (route === "/") {
     // Homepage SEO title — compressed 2026-06-11 (user-approved) from the
@@ -559,7 +562,15 @@ export function buildDocumentTitle(route: string, contentTitle: string, kind: Pa
   }
 
   if (kind === "product") {
-    return `${contentTitle} | ${buildProductTitleQualifier(route, contentTitle)} | Proud Tek`;
+    // Audit 2026-09-01 (Phase 2 T7): the two-suffix template pushed 192/204
+    // product titles past 60 chars (median 84), so the differentiator was
+    // truncated in the SERP and the qualifier never shown. Keep the family
+    // qualifier only while the whole title fits the ~60-char display budget
+    // (short category/hub titles benefit from it); otherwise brand only.
+    const qualified = `${contentTitle} | ${buildProductTitleQualifier(route, contentTitle)} | Proud Tek`;
+    // Titles still > 60 after this are an editorial (JSON `title`) matter,
+    // not a template one — see the Phase 14 report for the list.
+    return qualified.length <= PRODUCT_TITLE_BUDGET ? qualified : `${contentTitle} | Proud Tek`;
   }
 
   // Compare pages are editorial (kind === "article") but they're product
