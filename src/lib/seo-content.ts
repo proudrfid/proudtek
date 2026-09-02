@@ -41,7 +41,16 @@ function absoluteUrl(value: string): string {
 }
 
 export const SITE_NAME = "Proud Tek";
-export const ORGANIZATION_NAME = "Proud Tek Co., Limited";
+/**
+ * Legal name as it appears on the three CAIC management-system certificates
+ * (ISO 9001 / 14001 / 45001, first certified 2026-06-10; PDF in repo,
+ * verifiable at cnca.gov.cn) — the only primary document on file. The
+ * Chinese registered name on the same certificates is 深圳市奥科物联有限公司
+ * (unified social credit code 91440300MA5FBLMP1Y). Confirm against the
+ * business-registration extract before treating as final (audit 2026-09-02,
+ * Phase 3 C1). The previous value "Proud Tek Co., Limited" had no document.
+ */
+export const ORGANIZATION_NAME = "Shenzhen Proud Tek Co., Ltd";
 export const EDITORIAL_TEAM_NAME = "Proud Tek Editorial Team";
 
 /**
@@ -215,18 +224,20 @@ export const ORGANIZATION_SOCIAL: Record<string, string> = {
  */
 export const ORGANIZATION_ALTERNATE_NAMES: ReadonlyArray<string> = [
   "ProudTek",
-  "Proud Tek Co. Limited",
+  "Proud Tek Co., Limited",
+  "深圳市奥科物联有限公司",
 ];
 
 /**
  * Publicly disclosable operational facts. Surfaced in:
- *   - Organization JSON-LD (foundingDate, numberOfEmployees)
+ *   - Organization JSON-LD (foundingDate)
  *   - llms.txt "Quick facts" block (P0-G3) — LLM-citation-friendly hard data
  */
 export const ORGANIZATION_OPERATIONS = {
   foundingDate: "2008",
   foundingLocation: "Shenzhen, Guangdong, China",
-  numberOfEmployees: "100+",
+  // numberOfEmployees ("100+") removed 2026-09-02 — no documentary basis
+  // (Phase 4 K-14). Re-add from payroll evidence.
   /** Typical MOQ per product family — used in llms.txt Quick facts (P0-G3).
    *  Reconciled 2026-06-11 with COMMERCIAL_TERMS + the lp sourcing pages
    *  (stock items from 100 pcs; custom production typically 500-1,000):
@@ -300,14 +311,76 @@ export const EXPERT_AUTHORS: Record<string, ExpertAuthor> = {
 /** Article author assignment — maps routes to expert authors */
 export { ARTICLE_AUTHOR_MAP } from "../data/article-author-map";
 
-/** Organization credentials & certifications */
+/**
+ * Organization credentials.
+ *
+ * Audit 2026-09-02 (Phase 4 K-09/K-11, Phase 10): the only certificates on
+ * file are the three CAIC management-system certificates below (scanned PDF
+ * `9001 certificate/奥科体系证书.pdf`). Every field is transcribed from the
+ * certificate text. Their scope is the *sales service* of smart cards and
+ * RFID tags — not manufacturing — so no surface may call the company an
+ * "ISO 9001 certified factory" or say "SGS audited" (the issuer is CAIC).
+ * RoHS / REACH are declarations of conformity, not certifications, and are
+ * listed separately so generators cannot conflate them.
+ */
+export interface OrganizationCertificate {
+  name: string;
+  standard: string;
+  certificateNumber: string;
+  issuer: string;
+  issuerUrl: string;
+  holder: string;
+  scope: string;
+  validFrom: string;
+  validThrough: string;
+  verifyUrl: string;
+}
+
+const CAIC = {
+  issuer: "Anhui Certification and Inspection Co., Ltd (CAIC)",
+  issuerUrl: "https://www.zjcaic.com",
+  holder: "Shenzhen Proud Tek Co., Ltd (深圳市奥科物联有限公司)",
+  validFrom: "2026-06-10",
+  validThrough: "2029-06-09",
+  verifyUrl: "https://www.cnca.gov.cn",
+};
+
 export const ORGANIZATION_CREDENTIALS = {
   certifications: [
-    { name: "ISO 9001:2015", issuer: "SGS", description: "Quality Management System Certification" },
-    { name: "ISO 14001:2015", issuer: "SGS", description: "Environmental Management System" },
-    { name: "RoHS Compliant", issuer: "EU Directive 2011/65/EU", description: "Restriction of Hazardous Substances" },
-    { name: "CE Marking", issuer: "EU", description: "European Conformity" },
-    { name: "REACH Compliant", issuer: "ECHA", description: "Registration, Evaluation, Authorisation and Restriction of Chemicals" },
+    {
+      name: "ISO 9001:2015",
+      standard: "GB/T 19001-2016 / ISO 9001:2015 — Quality management systems",
+      certificateNumber: "98026Q00274R000",
+      scope: "Sales service of smart cards (PVC cards, wooden cards) and RFID tags",
+      ...CAIC,
+    },
+    {
+      name: "ISO 14001:2015",
+      standard: "GB/T 24001-2016 / ISO 14001:2015 — Environmental management systems",
+      certificateNumber: "98026E00200R000",
+      scope: "Environmental management activities involved in the sales of smart cards (PVC cards, wooden cards) and RFID tags",
+      ...CAIC,
+    },
+    {
+      name: "ISO 45001:2018",
+      standard: "GB/T 45001-2020 / ISO 45001:2018 — Occupational health and safety management systems",
+      certificateNumber: "98026S00203R000",
+      scope: "Occupational health and safety management activities involved in the sales of smart cards (PVC cards, wooden cards) and RFID tags",
+      ...CAIC,
+    },
+  ] as OrganizationCertificate[],
+  /** One-line, certificate-accurate phrasing for trust strips and summaries. */
+  certifiedOperationSummary:
+    "ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 certified sales and service operation (CAIC, certificates 98026Q00274R000 / 98026E00200R000 / 98026S00203R000, valid to 2029-06-09)",
+  /**
+   * Product compliance paperwork the company states it supplies per order.
+   * These are declarations, not third-party certifications; evidence status
+   * UNVERIFIED (Phase 4 K-12) — phrase as "available on request", never as
+   * "certified".
+   */
+  complianceDeclarations: [
+    { name: "RoHS", basis: "Directive 2011/65/EU (+ 2015/863)", form: "Declaration of conformity per SKU, on request" },
+    { name: "REACH SVHC", basis: "Regulation (EC) 1907/2006", form: "SVHC declaration per SKU, on request" },
   ],
   // Owner confirmed 2026-06-22: Proud Tek is NOT a RAIN RFID Alliance or
   // NFC Forum member. Do NOT assert either membership anywhere (site,
@@ -319,11 +392,20 @@ export const ORGANIZATION_CREDENTIALS = {
   // obtained (see GROWTH_ROADMAP: NFC Forum Adopter is a free join).
   memberships: [] as Array<{ name: string; role: string; url: string }>,
   founded: "2008",
-  employeeCount: "100+",
-  clientCount: "500+",
-  countriesServed: "50+",
-  yearExperience: "17+",
+  // employeeCount ("100+"), clientCount ("500+"), countriesServed ("50+")
+  // removed 2026-09-02 — owner decision after Phase 4 (no documentary basis;
+  // figures disagreed across owned properties). Re-add with a dated basis.
 };
+
+/**
+ * Years in operation, computed from the founding year so the site never
+ * shows two different figures again (17+ vs 18+ in 2026). The founding year
+ * itself is consistent across every owned property but still awaits the
+ * registration extract (Phase 4 K-01).
+ */
+export function yearsInOperation(now: Date = new Date()): number {
+  return now.getUTCFullYear() - Number(ORGANIZATION_OPERATIONS.foundingDate);
+}
 
 /** Geo targeting constants for global SEO */
 export const GEO_CONFIG = {

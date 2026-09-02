@@ -497,6 +497,9 @@ export function buildPageSummary(page: SnapshotPage): { title: string; descripti
 
 export function buildMachinePageData(page: SnapshotPage, generatedAt?: string): MachinePageData {
   const seo = buildPageSeo(page);
+  const editorialByline = page.editorialDefinition as
+    | { author?: string; reviewedBy?: string; publishedAt?: string; modifiedAt?: string; reviewedAt?: string }
+    | undefined;
   const $body = load(`<body>${seo.bodyHtml}</body>`);
   const route = normalizeRoute(page.route);
   const machineJsonUrl = absoluteUrl(buildMachineRoute(route, "json"));
@@ -558,19 +561,29 @@ export function buildMachinePageData(page: SnapshotPage, generatedAt?: string): 
     productSpecs,
     machineJsonUrl,
     machineTextUrl,
+    // Audit 2026-09-02 (Phase 2 T9): the mirror must name the same author /
+    // reviewer as the visible byline. Editorial pages (products, solutions,
+    // …) carry them on the definition even when no articleMeta is resolved;
+    // only pages without any byline fall back to the organization.
     author: seo.articleMeta
       ? {
           name: seo.articleMeta.authorName,
           title: seo.articleMeta.authorTitle,
           expertise: seo.articleMeta.authorExpertise,
         }
-      : { name: ORGANIZATION_NAME },
+      : editorialByline?.author
+        ? { name: editorialByline.author }
+        : { name: ORGANIZATION_NAME },
     publisher: ORGANIZATION_NAME,
-    datePublished: seo.articleMeta?.publishedAt,
-    dateModified: seo.articleMeta?.modifiedAt,
-    reviewedBy: seo.articleMeta?.reviewedBy,
-    lastReviewedDate: seo.articleMeta?.lastReviewedDate,
-    credentials: ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name),
+    datePublished: seo.articleMeta?.publishedAt ?? editorialByline?.publishedAt,
+    dateModified: seo.articleMeta?.modifiedAt ?? editorialByline?.modifiedAt,
+    reviewedBy: seo.articleMeta?.reviewedBy ?? editorialByline?.reviewedBy,
+    lastReviewedDate: seo.articleMeta?.lastReviewedDate ?? editorialByline?.reviewedAt,
+    // Certificate-accurate credential strings (number, issuer, scope) —
+    // never bare standard names that read as "certified manufacturer".
+    credentials: ORGANIZATION_CREDENTIALS.certifications.map(
+      (c) => `${c.name} — certificate ${c.certificateNumber}, ${c.issuer}; scope: ${c.scope}; valid to ${c.validThrough}`,
+    ),
     generatedAt,
   };
 }

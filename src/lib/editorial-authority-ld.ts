@@ -42,7 +42,37 @@ async function loadRouteIndex(): Promise<Map<string, EditorialDefinition>> {
  */
 function hasAuthoritySignals(def: EditorialDefinition | undefined): boolean {
   if (!def) return false;
+  if (!isArticleRoute(def.route)) return false;
   return !!def.authorSlug || !!def.reviewedBySlug || !!def.author || !!def.reviewedBy || (def.sources ?? []).length > 0;
+}
+
+/**
+ * Audit 2026-09-02 (Phase 10 SD-3): an `Article` node is only appropriate on
+ * pages that *are* articles — editorial long-form content. Product pages,
+ * the homepage, contact forms, supplier landing pages and country pages were
+ * all emitting Article (≈260 pages) because every editorial definition has
+ * an author. Those pages keep WebPage / Product / ContactPage; the byline
+ * stays visible in HTML and in the /machine mirrors.
+ *
+ * Group hubs (`/blog/`, `/guides/`, …) are excluded because they are
+ * CollectionPages, not articles.
+ */
+const ARTICLE_ROUTE_GROUPS = new Set([
+  "blog",
+  "guides",
+  "compare",
+  "solutions",
+  "industries",
+  "case-studies",
+  "compatibility",
+  "research",
+  "about",
+]);
+
+export function isArticleRoute(route: string): boolean {
+  const segments = route.split("/").filter(Boolean);
+  if (segments.length < 2) return false; // homepage and group hubs
+  return ARTICLE_ROUTE_GROUPS.has(segments[0]);
 }
 
 /**

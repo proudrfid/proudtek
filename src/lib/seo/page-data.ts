@@ -84,7 +84,6 @@ import {
 import { buildBreadcrumbs } from "./breadcrumbs";
 
 import {
-  buildProductFaqEntries,
   buildProductMetaDescription,
   buildProductProcurementFields,
   buildProductRelatedPages,
@@ -126,7 +125,6 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
   const coreSummary = isCoreSupportKind(kind) ? buildCoreSummary(page.route, description, $body) : [];
   const articleSummary = kind === "article" ? buildArticleSummary(contentTitle, description, $body, page.route) : [];
   const resolvedFaqEntries = kind === "faq" || kind === "contact" || kind === "page" ? resolveFaqEntries($body) : [];
-  const coreFaqEntries = isCoreSupportKind(kind) ? buildCoreFaqEntries(page.route, contentTitle, description, $body) : [];
 
   // Editorial pages carry FAQ data in `definition.faq` (set at content-authoring
   // time). After Stage 3 cutover the `<main>` of `page.bodyHtml` is empty, so
@@ -137,20 +135,19 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
     ? editorialFaq.map((e) => ({ question: e.question, answer: e.answer }))
     : [];
 
+  // Audit 2026-09-02 (Phase 10 SD-4, rule "structured data must match visible
+  // page content"): FAQPage may only describe questions a reader can see.
+  // Two sources are visible — the authored editorial `faq` (rendered by
+  // Faq.astro) and <details> blocks found in the snapshot body. The synthetic
+  // builders (product / collection / article / core) generate plausible Q&A
+  // that is never rendered anywhere, so they are no longer fed into
+  // `faqEntries` (the builders remain exported for other consumers).
   const faqEntries =
     editorialFaqEntries.length > 0
       ? editorialFaqEntries
-      : kind === "product"
-        ? buildProductFaqEntries(contentTitle, description, productSpecs, page.route)
-        : kind === "collection"
-          ? buildCollectionFaqEntries(page.route, contentTitle, description, $body)
-        : kind === "article"
-          ? buildArticleFaqEntries(contentTitle, description, $body, page.route)
-        : kind === "faq" || kind === "contact" || kind === "page"
-          ? dedupeFaqEntries([...resolvedFaqEntries, ...coreFaqEntries], 10)
-        : isCoreSupportKind(kind)
-          ? coreFaqEntries
-          : [];
+      : kind === "faq" || kind === "contact" || kind === "page"
+        ? dedupeFaqEntries(resolvedFaqEntries, 10)
+        : [];
   const procurementFields =
     kind === "product" ? buildProductProcurementFields(contentTitle, description, productSpecs, page.route) : [];
   const collectionGuidanceFields = kind === "collection" ? buildCollectionGuidanceFields(page.route, contentTitle, $body) : [];
