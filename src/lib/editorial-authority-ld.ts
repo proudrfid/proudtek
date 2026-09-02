@@ -88,17 +88,28 @@ export function hasAuthorityArticle(route: string): boolean {
   return hasAuthoritySignals(EDITORIAL_ROUTE_INDEX.get(route));
 }
 
-function buildPersonLd(author: EditorialAuthor): Record<string, unknown> {
+/**
+ * Byline entity for Article.author / reviewedBy. Registry records are
+ * functions or teams (`type: "Organization"`, the default since 2026-09-02 —
+ * rfidak.com model: no named individuals) or, exceptionally, a Person with a
+ * verifiable public profile. Organization entities carry `description`
+ * (the role) instead of Person-only `jobTitle`.
+ */
+function buildAuthorLd(author: EditorialAuthor): Record<string, unknown> {
+  const isPerson = author.type === "Person";
   return {
-    "@type": "Person",
+    "@type": isPerson ? "Person" : "Organization",
     name: author.name,
-    jobTitle: author.jobTitle,
+    ...(isPerson ? { jobTitle: author.jobTitle } : { description: author.jobTitle }),
     // Registry records store root-relative profile URLs (anchors on
     // /about/review-board/). schema.org requires absolute URLs —
     // absoluteUrl() keeps the #fragment intact (see seo/utils.ts).
     ...(author.url ? { url: absoluteUrl(author.url) } : {}),
     ...(author.sameAs && author.sameAs.length ? { sameAs: author.sameAs } : {}),
     ...(author.expertise && author.expertise.length ? { knowsAbout: author.expertise } : {}),
+    // Functions belong to the publisher — same @id as the Organization node
+    // buildJsonLd emits on every page.
+    ...(isPerson ? {} : { parentOrganization: { "@id": `${SITE_ORIGIN}/#organization` } }),
   };
 }
 
@@ -168,22 +179,16 @@ export async function buildAuthorityLdForRoute(route: string): Promise<string | 
   let reviewerLd: Record<string, unknown> | null = null;
 
   const authorRecord = getAuthorRecord(def.authorSlug);
-  if (authorRecord) authorLd = buildPersonLd(authorRecord);
+  if (authorRecord) authorLd = buildAuthorLd(authorRecord);
   if (!authorLd && def.author) {
-    authorLd = { "@type": "Person", name: def.author };
+    // Free-text bylines are team names ("Proud Tek …"), not people.
+    authorLd = { "@type": /proud tek/i.test(def.author) ? "Organization" : "Person", name: def.author };
   }
 
   const reviewerRecord = getAuthorRecord(def.reviewedBySlug);
-  if (reviewerRecord) {
-    reviewerLd = {
-      "@type": "Person",
-      name: reviewerRecord.name,
-      jobTitle: reviewerRecord.jobTitle,
-      ...(reviewerRecord.url ? { url: absoluteUrl(reviewerRecord.url) } : {}),
-    };
-  }
+  if (reviewerRecord) reviewerLd = buildAuthorLd(reviewerRecord);
   if (!reviewerLd && def.reviewedBy) {
-    reviewerLd = { "@type": "Person", name: def.reviewedBy };
+    reviewerLd = { "@type": /proud tek/i.test(def.reviewedBy) ? "Organization" : "Person", name: def.reviewedBy };
   }
 
   const citationLd = (def.sources ?? []).map((src) => ({

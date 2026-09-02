@@ -14,28 +14,27 @@
  *     constants, which cannot use astro:content (plain ts module)
  *   - vitest — no astro:content stub needed; snapshots lock real names
  *
- * Adding an author: drop the JSON file in src/content/authors/ AND add the
- * import below. Set the record's `url` to its anchor on the review-board
- * page — `/about/review-board/#<slug>` — and give that person an entry with
- * a matching feature `id` in src/content/editorial/about/review-board.json
- * so the anchor actually resolves to content about them.
+ * Adding an author record: drop the JSON file in src/content/authors/ AND add
+ * the import below. Set the record's `url` to its anchor on the review-board
+ * page — `/about/review-board/#<slug>` — and give it an entry with a matching
+ * feature `id` in src/content/editorial/about/review-board.json so the anchor
+ * resolves. Records carry `type: "Organization"` (functions / teams) or
+ * `type: "Person"`; a Person record needs a verifiable public profile in
+ * `sameAs` before it may be used.
  */
 import type { EditorialAuthor } from "./editorial-types";
 
 import editorialBoard from "../content/authors/editorial-board.json";
-import miaLi from "../content/authors/mia-li.json";
-import nancyWu from "../content/authors/nancy-wu.json";
-import peterZhang from "../content/authors/peter-zhang.json";
 import proudtekEngineering from "../content/authors/proudtek-engineering.json";
-import samYao from "../content/authors/sam-yao.json";
 
+// 2026-09-02 (audit Phase 14 B8, owner decision "以 rfidak.com 的口径为准"):
+// the four named-person records (peter-zhang, nancy-wu, mia-li, sam-yao) were
+// retired. Like the sister brand rfidak.com, bylines credit functions —
+// the editorial team and the RF / production engineering function — not
+// individuals whose identities could not be evidenced (Phase 4 T9 / K-14).
 const RECORDS: EditorialAuthor[] = [
-  editorialBoard,
-  miaLi,
-  nancyWu,
-  peterZhang,
-  proudtekEngineering,
-  samYao,
+  editorialBoard as EditorialAuthor,
+  proudtekEngineering as EditorialAuthor,
 ];
 
 /** Registry keyed by `slug` (the foreign key editorial JSONs reference). */
