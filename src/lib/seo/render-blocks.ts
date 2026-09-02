@@ -154,10 +154,10 @@ export function renderHomeResourceTrio(): string {
   const compareCount = getTotalCompareCount();
   const cards = [
     {
-      eyebrow: "Real deployments",
-      title: "Case Studies — 6 industries",
+      eyebrow: "Worked examples",
+      title: "Programme templates — 6 industries",
       description:
-        "Documented Proud Tek programmes across hospitality, industrial laundry, events, retail apparel, libraries, pharmaceuticals and restaurants. Chip choice, alternatives rejected, volume, and measured operational results.",
+        "Illustrative RFID and NFC programme templates for hospitality, industrial laundry, events, retail apparel, libraries and pharmaceuticals: chip choice, alternatives rejected, assumed volumes and the arithmetic behind each outcome, so you can substitute your own numbers.",
       href: "/case-studies/",
       accent: "#3d6b6b",
     },

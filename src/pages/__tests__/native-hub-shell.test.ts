@@ -243,8 +243,8 @@ const hubs: HubCase[] = [
   })),
   {
     route: "/case-studies/",
-    heading: "Real deployments.Measurable results.",
-    cardTitle: "Measurable results",
+    heading: "Programme templates.Numbers you can check.",
+    cardTitle: "Featured worked example",
     loadPage: () => import("../case-studies.astro"),
     assertActiveRoute: ($) => {
       expect($("#site-navigation")).toHaveLength(1);
