@@ -301,6 +301,7 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // and standalone numeric H2s ("10", "305+", "8+", "12+") are reshaped
   // to carry the product-family keywords search engines and LLMs key off.
   if (page.route === "/" || page.route === "") {
+    removeDeadNewsletterForm($body);
     applyHomepageClaimCorrections($body);
     enhanceHomepageHeadings($body);
     restructureCapabilitiesSection($body);
@@ -955,6 +956,29 @@ const REMOVED_STAT_DESCRIPTORS = new Set([
   "Certified Patents",
   "International Certifications",
 ]);
+
+/**
+ * Conversion audit 2026-09-01 (Phase 12 CV-1): the WordPress "Subscribe to
+ * our newsletter" block posts to `action=""` with a hidden
+ * `action=kb_process_ajax_submit` — the WP admin-ajax router, which does not
+ * exist on the static host. The form has been dead since the migration and
+ * its `<noscript>` text ("Please enable JavaScript … to submit the form") is
+ * visible to no-JS users. There is no newsletter programme to wire it to, so
+ * the whole two-column row (icon + heading + form) is removed rather than
+ * left as a visibly broken promise. Guarded on the "newsletter" wording so
+ * no other Kadence form is touched.
+ */
+function removeDeadNewsletterForm($body: ReturnType<typeof load>): void {
+  $body("form.kb-form").each((_, el) => {
+    const $form = $body(el);
+    if (!$form.find('input[name="action"][value="kb_process_ajax_submit"]').length) return;
+    if ($form.find("textarea").length) return; // a contact-style form, not the newsletter
+    const row = $form.closest(".wp-block-kadence-rowlayout");
+    if (!row.length) return;
+    if (!/newsletter/i.test(row.text())) return;
+    row.remove();
+  });
+}
 
 function applyHomepageClaimCorrections($body: ReturnType<typeof load>): void {
   // 1. Stat cards: drop the cards whose figure has no evidence; keep the
