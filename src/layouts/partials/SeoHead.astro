@@ -122,7 +122,10 @@ const isOgRaster = imagePathname.startsWith("/og/");
 <title>{seo.title}</title>
 <meta name="description" content={description} />
 <meta name="robots" content={seo.robots} />
-<link rel="canonical" href={seo.canonicalUrl} />
+{/* The 404 template passes an empty canonicalUrl: an error page has no
+    canonical location, and the old self-canonical to /404/ (a URL that does
+    not exist) was a semantic error (audit 2026-09-01 T16). */}
+{seo.canonicalUrl ? <link rel="canonical" href={seo.canonicalUrl} /> : null}
 
 {/* Favicons — emitted once here for every page (native Astro hubs + WP-mirrored
     pages alike); the matching WP `<link rel="icon">` copies are stripped in
@@ -210,7 +213,7 @@ const isOgRaster = imagePathname.startsWith("/og/");
 <meta property="og:type" content={seo.ogType} />
 <meta property="og:title" content={seo.title} />
 <meta property="og:description" content={description} />
-<meta property="og:url" content={seo.canonicalUrl} />
+{seo.canonicalUrl ? <meta property="og:url" content={seo.canonicalUrl} /> : null}
 <meta property="og:image" content={seo.imageUrl} />
 <meta property="og:image:alt" content={seo.imageAlt} />
 {ogImageType ? <meta property="og:image:type" content={ogImageType} /> : null}

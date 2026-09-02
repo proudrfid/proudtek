@@ -29,7 +29,7 @@ import { load } from "cheerio";
 import type { SnapshotPage } from "../site-data";
 import { prepareSnapshot } from "../render-snapshot";
 import { sanitizeHead, sanitizeBody } from "./sanitize-html";
-import { stripNoiseHtmlComments } from "./utils";
+import { sanitizeHtmlAttrs, stripNoiseHtmlComments } from "./utils";
 import { inventoryDonorHead } from "./donor-head-inventory";
 import { applyHeadPolicy, rebuildHeadHtml } from "./head-policy";
 
@@ -180,7 +180,10 @@ export function extractChromeFromSnapshot(
   );
 
   return {
-    htmlAttrs: snap.htmlAttrs,
+    // Same <html> attribute policy as buildPageSeo: drop the WP microdata
+    // leftovers (itemtype without itemscope) and normalise lang to en-US so
+    // native hubs match the other 581 pages (audit 2026-09-01 T15).
+    htmlAttrs: sanitizeHtmlAttrs(snap.htmlAttrs),
     bodyAttrs: snap.bodyAttrs,
     headHtml: sanitizedHeadHtml,
     beforeMainHtml: beforeMainStripped,
