@@ -1,4 +1,5 @@
 import { COMPARE_CATEGORIES } from "../data/compare-categories";
+import { GUIDE_CLUSTERS } from "../data/guide-clusters";
 
 export interface NativeRouteDefinition {
   route: string;
@@ -29,10 +30,18 @@ export const NATIVE_ROUTE_DEFINITIONS: readonly NativeRouteDefinition[] = [
   { route: "/rfq/", ownsStaticPath: false, supplementSitemap: true },
   { route: "/glossary/", ownsStaticPath: false, supplementSitemap: true },
   { route: "/tools/rfid-tag-cost-estimator/", ownsStaticPath: false, supplementSitemap: true },
+  // Cluster hubs (compare categories + guide clusters) are indexable,
+  // self-canonical pages that were absent from sitemap.xml and unknown to
+  // Google (URL Inspection 2026-09-02, Phase 2 T4). Advertise them.
   ...COMPARE_CATEGORIES.map((category) => ({
     route: `/compare/${category.id}/`,
     ownsStaticPath: true,
-    supplementSitemap: false,
+    supplementSitemap: true,
+  })),
+  ...GUIDE_CLUSTERS.map((cluster) => ({
+    route: `/guides/${cluster.id}/`,
+    ownsStaticPath: true,
+    supplementSitemap: true,
   })),
 ];
 

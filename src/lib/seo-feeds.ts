@@ -1,4 +1,5 @@
 import type { SiteData, SnapshotPage } from "./site-data";
+import { BUILD_TIME_ISO } from "./site-data";
 import type { EditorialDefinition } from "./editorial-types";
 import { SITE_ORIGIN, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS } from "./seo-content";
 import { buildPageSeo, buildPageSummary, getIndexablePages, isIndexableRoute } from "./seo";
@@ -26,8 +27,15 @@ export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader):
   }
 
   // Append native hub indexes (not in siteData.pages — built from
-  // src/pages/{group}/index.astro files directly).
-  const siteLastmod = (siteData.generatedAt ?? new Date().toISOString()).slice(0, 10);
+  // src/pages/{group}/index.astro files directly). A hub changes whenever
+  // any of its spokes changes, so its lastmod is the newest page lastmod in
+  // this sitemap rather than the frozen snapshot timestamp (Phase 2 T3/T4).
+  const newestPageLastmod = urlEntries
+    .map((entry) => /<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/.exec(entry)?.[1] ?? "")
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+  const siteLastmod = newestPageLastmod ?? BUILD_TIME_ISO.slice(0, 10);
   for (const route of getNativeSitemapSupplementRoutes()) {
     urlEntries.push(
       [
@@ -53,7 +61,14 @@ export async function buildImageSitemapXml(siteData: SiteData, loadPage: PageLoa
   for (const stub of indexable) {
     const page = await loadPage(stub.route);
     const seo = buildPageSeo(page);
-    const images = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
+    const candidates = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
+    // Audit 2026-09-02 (Phase 2 T1/T6): inline SVG diagrams were 125 of the
+    // 522 image-sitemap entries and drew 240 of Googlebot's 516 successful
+    // fetches in August while HTML pages got ~37. SVG has little image-search
+    // value; keep raster product/hero photos only. Pages whose only image is
+    // an SVG are omitted from this sitemap (they remain in sitemap.xml).
+    const images = candidates.filter((image) => !/\.svg(\?|$)/i.test(image.url));
+    if (images.length === 0) continue;
     const imageEntries = images
       .map((image) =>
         [
@@ -154,8 +169,12 @@ Sitemap: ${SITE_ORIGIN}/sitemap-index.xml
  * robots.txt and is the format Google Search Console expects when you
  * declare a "Sitemaps index" property.
  */
-export function buildSitemapIndexXml(generatedAt: string): string {
-  const lastmod = (generatedAt ?? new Date().toISOString()).slice(0, 10);
+export function buildSitemapIndexXml(_generatedAt?: string): string {
+  // The index describes the child sitemaps produced by *this* build, so its
+  // lastmod is the build date — not the frozen WordPress snapshot timestamp
+  // that made it read "2026-03-16" while children carried July/August dates
+  // (Phase 2 T3). The parameter is kept for call-site compatibility.
+  const lastmod = BUILD_TIME_ISO.slice(0, 10);
   const entry = (path: string) => [
     "  <sitemap>",
     `    <loc>${escapeXml(`${SITE_ORIGIN}${path}`)}</loc>`,
