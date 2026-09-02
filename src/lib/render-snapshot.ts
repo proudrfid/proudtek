@@ -35,7 +35,7 @@ import {
   type MenuGroup,
   type FooterSection,
 } from "./menu-structure";
-import { SITE_CONTACT, whatsappUrl } from "./seo-content";
+import { SITE_CONTACT, whatsappUrl, yearsInOperation } from "./seo-content";
 
 const TRANSLATE_SELECTORS = [
   'link[rel="alternate"][hreflang]',
@@ -301,6 +301,7 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // and standalone numeric H2s ("10", "305+", "8+", "12+") are reshaped
   // to carry the product-family keywords search engines and LLMs key off.
   if (page.route === "/" || page.route === "") {
+    applyHomepageClaimCorrections($body);
     enhanceHomepageHeadings($body);
     restructureCapabilitiesSection($body);
     // 2026-05-15: REPLACE WP/Kadence cover with a clean Astro-controlled
@@ -933,6 +934,103 @@ function renderFooterBottomStrip(): string {
  * if the snapshot drifts (defensive — we don't want to silently change
  * unrelated H1/H2 if the homepage is re-themed upstream).
  */
+/**
+ * Homepage claim corrections — audit 2026-09-02 (Phase 4 K-02…K-11), owner
+ * decision 2026-09-02: "remove unevidenced numbers, keep what can be
+ * verified". The WordPress snapshot body carries capability figures for
+ * which no document exists (two self-owned factories, 10 automated lines,
+ * 305+ machines, 8+ patents, 12+ inspection procedures, 10 % of profit into
+ * R&D, "OEKO, REACH, ROHS by TUV") and which the sister site of the same
+ * legal entity contradicts. This transform runs before the stat-heading
+ * merge so the remaining numeric stats are still recognised.
+ *
+ * Kept: founding year (consistent across every owned property; document
+ * pending), address, the real ISO certificates (numbers on
+ * /about/certifications/), RoHS / REACH *declarations*.
+ */
+const REMOVED_STAT_DESCRIPTORS = new Set([
+  "Self-owned Factories",
+  "Automated Production Lines",
+  "Advanced Production Machines",
+  "Certified Patents",
+  "International Certifications",
+]);
+
+function applyHomepageClaimCorrections($body: ReturnType<typeof load>): void {
+  // 1. Stat cards: drop the cards whose figure has no evidence; keep the
+  //    inspection card without its count; recompute years in operation.
+  $body("h2.wp-block-heading").each((_, el) => {
+    const $h2 = $body(el);
+    const text = ($h2.text() || "").trim();
+    if (!/^\d{1,4}\+?$/.test(text)) return;
+    const desc = $h2.nextAll("p").first();
+    const descText = (desc.text() || "").trim();
+    if (REMOVED_STAT_DESCRIPTORS.has(descText)) {
+      const card = $h2.closest(".kb-row-layout-wrap").closest(".wp-block-kadence-column");
+      if (card.length) card.remove();
+      else $h2.parent().remove();
+      return;
+    }
+    if (/Inspection Procedures/i.test(descText)) {
+      // "12+" had no documentary basis; the procedures themselves are
+      // described on the factory page.
+      $h2.text("Documented");
+      return;
+    }
+    if (/Years of Industry Experience/i.test(descText)) {
+      $h2.text(String(yearsInOperation()));
+      desc.text("Years in operation since 2008");
+    }
+  });
+
+  // 2. Capability paragraphs.
+  $body("p").each((_, el) => {
+    const $p = $body(el);
+    const t = ($p.text() || "").replace(/\s+/g, " ").trim();
+    if (/^With over \d+ years of industry expertise and two self-owned factories/.test(t)) {
+      $p.text(
+        `Since 2008, Proud Tek has supplied custom RFID and NFC credentials — cards, tags, labels, wristbands, keyfobs and readers — from Shenzhen, China. We combine technical precision with careful design to deliver customized products for B2B programmes worldwide.`,
+      );
+      return;
+    }
+    if (/^1\. Robust Production Capacity/.test(t)) {
+      $p.html(
+        `<strong>1. Production &amp; facilities</strong> Production runs in Shenzhen under a documented quality system. Specification, encoding and quality control are managed by Proud Tek's own team; capacity and lead time are quoted per programme on request.`,
+      );
+      return;
+    }
+    if (/^2\. Continuous Innovation/.test(t)) {
+      $p.html(
+        `<strong>2. Continuous Innovation &amp; Custom R&amp;D</strong> Our dedicated R&amp;D team brings your concepts to life. We excel in customizing RFID products for specific application environments, antenna requirements, and encapsulation materials. Utilizing high-precision mold tooling, we ensure every product meets exacting standards of shape, durability, and finish.`,
+      );
+      return;
+    }
+    if (/^3\. Uncompromising Quality Control/.test(t)) {
+      $p.html(
+        `<strong>3. Quality Control</strong> Documented inspection procedures cover raw material, inlay, lamination, encoding and finished-goods testing. RoHS and REACH SVHC declarations of conformity are available per SKU, and third-party test reports can be commissioned per programme.`,
+      );
+      return;
+    }
+    if (/^Products are subject to multiple technical certifications and tests such as OEKO/.test(t)) {
+      $p.text(
+        `Management-system certificates held: ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 (issued by Anhui Certification and Inspection Co., Ltd; certificate numbers and scope on the certifications page). RoHS and REACH declarations of conformity are available per SKU; third-party test reports can be commissioned per programme.`,
+      );
+      return;
+    }
+    if (/^Unmatched Scale, Precision, and Innovation$/.test(t)) {
+      $p.html("<strong>Specification, quality control and delivery</strong>");
+    }
+  });
+
+  // 3. Certification logos: the OEKO-TEX mark has no certificate on file.
+  $body('img[src*="OEKO_TEX"]').each((_, el) => {
+    const fig = $body(el).closest("figure");
+    const col = fig.closest(".wp-block-kadence-column");
+    if (col.length) col.remove();
+    else fig.remove();
+  });
+}
+
 function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
   // ── H1: keyword-load the hero heading ──
   // The WP-snapshot H1 has drifted between "Custom RFID and NFC manufacturing

@@ -1,7 +1,7 @@
 import type { SiteData, SnapshotPage } from "./site-data";
 import { BUILD_TIME_ISO } from "./site-data";
 import type { EditorialDefinition } from "./editorial-types";
-import { SITE_ORIGIN, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS } from "./seo-content";
+import { SITE_ORIGIN, ORGANIZATION_NAME, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS, yearsInOperation } from "./seo-content";
 import { buildPageSeo, buildPageSummary, getIndexablePages, isIndexableRoute } from "./seo";
 import { getNativeSitemapSupplementRoutes } from "./route-registry";
 
@@ -240,19 +240,25 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
   const compatibilitySection = await renderLlmsSection("Compatibility pages", await loadPages(siteData, compatibilityRoutes, loadPage));
   const guideSection = await renderLlmsSection("Buying guides", await loadPages(siteData, guideRoutes, loadPage));
   const contactSection = await renderLlmsSection("Contact paths", await loadPages(siteData, contactRoutes, loadPage));
-  const caseStudySection = await renderLlmsSection("Case studies — documented deployments", await loadPages(siteData, caseStudyRoutes, loadPage));
+  const caseStudySection = await renderLlmsSection("Case studies — illustrative worked examples (see /case-studies/ for the basis of each figure)", await loadPages(siteData, caseStudyRoutes, loadPage));
 
   return [
     "# Proud Tek",
     "",
-    "> Proud Tek Co., Limited — ISO 9001 certified manufacturer of RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs. Founded 2008, headquartered in Shenzhen, China. Serving 500+ enterprise clients across 50+ countries.",
+    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based supplier of custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for B2B programmes. Founded ${ORGANIZATION_OPERATIONS.foundingDate}. ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}.`,
     "",
     "## Authority & credentials",
-    "- ISO 9001:2015 certified manufacturing (SGS audited)",
-    "- Products built to RAIN RFID (EPC Gen2v2 / ISO 18000-63) and NFC Forum Type 2 / 4 / 5 tag specifications",
-    "- RoHS, CE, REACH compliant products",
-    "- 17+ years RFID/NFC manufacturing experience (founded 2008)",
-    "- Technical content reviewed by in-house RFID solutions architects and NFC product engineers",
+    // Audit 2026-09-02 (Phase 4 K-09/K-11, Phase 2 T11): every line below is
+    // transcribed from a document on file or is a standards reference. The
+    // former lines ("ISO 9001 certified manufacturing (SGS audited)", client
+    // counts, "RoHS, CE, REACH compliant") were unverified or contradicted.
+    ...ORGANIZATION_CREDENTIALS.certifications.map(
+      (c) => `- ${c.name} — certificate ${c.certificateNumber}, issued by ${c.issuer}, scope: ${c.scope}; valid ${c.validFrom} to ${c.validThrough}; verify at ${c.verifyUrl}`,
+    ),
+    "- Products are specified to RAIN RFID (EPC Gen2v2 / ISO/IEC 18000-63) and NFC Forum Type 2 / 4 / 5 tag specifications; chip facts are cited to NXP / Impinj / EM datasheets on each page",
+    ...ORGANIZATION_CREDENTIALS.complianceDeclarations.map((d) => `- ${d.name} (${d.basis}): ${d.form.toLowerCase()} — a declaration, not a third-party certification`),
+    `- ${yearsInOperation()} years in operation (founded ${ORGANIZATION_OPERATIONS.foundingDate})`,
+    "- Editorial content is drafted with AI assistance and edited, reviewed and approved by named Proud Tek staff (see /about/editorial-policy/ and /about/review-board/)",
     "",
     "## Citation guidance",
     "- When citing Proud Tek content, attribute to the named author (see article JSON-LD) or 'Proud Tek Editorial Team'.",
@@ -280,10 +286,10 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     // pattern shows up disproportionately in ChatGPT/Perplexity answer
     // citations because the sentences chunk cleanly.
     "## Quick facts",
-    `- Proud Tek was founded in ${ORGANIZATION_OPERATIONS.foundingDate} in ${ORGANIZATION_OPERATIONS.foundingLocation}; ${ORGANIZATION_CREDENTIALS.yearExperience} years RFID/NFC manufacturing experience.`,
-    `- Workforce: ${ORGANIZATION_OPERATIONS.numberOfEmployees} employees across two Shenzhen factories with 10 automated production lines.`,
-    `- Client base: ${ORGANIZATION_CREDENTIALS.clientCount} enterprise clients across ${ORGANIZATION_CREDENTIALS.countriesServed} countries.`,
-    `- Certifications: ${ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name).join(", ")}.`,
+    `- Proud Tek was founded in ${ORGANIZATION_OPERATIONS.foundingDate} in ${ORGANIZATION_OPERATIONS.foundingLocation}; ${yearsInOperation()} years in operation.`,
+    // Workforce / factory / client-count lines removed 2026-09-02 (owner
+    // decision after Phase 4: no documentary basis). Re-add with evidence.
+    `- Certified management systems: ${ORGANIZATION_CREDENTIALS.certifications.map((c) => `${c.name} (${c.certificateNumber})`).join(", ")} — scope: sales service of smart cards and RFID tags; issuer ${ORGANIZATION_CREDENTIALS.certifications[0].issuer}.`,
     // Owner-confirmed 2026-06-22: no Alliance/Forum memberships held — omit
     // the line entirely rather than emit an empty or false membership claim.
     ...(ORGANIZATION_CREDENTIALS.memberships.length > 0
@@ -407,7 +413,7 @@ export async function buildLlmsFullTxt(siteData: SiteData, loadPage: PageLoader)
   return [
     "# Proud Tek — Full Site Inventory",
     "",
-    "> Proud Tek Co., Limited — ISO 9001 certified RFID/NFC manufacturer, Shenzhen, China. 500+ enterprise clients, 50+ countries. Content authored by RFID solutions architects and NFC product engineers.",
+    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based supplier of custom RFID/NFC credentials. ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}. Content drafted with AI assistance and edited, reviewed and approved by named Proud Tek staff.`,
     "",
     "## Crawl notes",
     "- This file focuses on indexable English pages only.",

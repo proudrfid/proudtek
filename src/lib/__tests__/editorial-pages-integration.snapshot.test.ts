@@ -31,7 +31,7 @@
  *      collection-driven and lives elsewhere; this test focuses on the
  *      per-page composition.
  */
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -80,7 +80,14 @@ const FIXTURES = [
 
 let container: AstroContainer;
 beforeAll(async () => {
+  // TrustSignals renders `yearsInOperation()` (current year − 2008). Pin the
+  // clock so the snapshot does not roll over every 1 January (only Date is
+  // faked; timers/promises stay real for the Astro container).
+  vi.useFakeTimers({ now: new Date("2026-09-02T00:00:00Z"), toFake: ["Date"] });
   container = await AstroContainer.create();
+});
+afterAll(() => {
+  vi.useRealTimers();
 });
 
 describe("EditorialArticle.astro — full-page integration snapshots", () => {

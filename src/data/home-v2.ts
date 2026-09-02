@@ -71,8 +71,8 @@ export const HOME_EVIDENCE: HomeEvidence[] = [
   },
   {
     status: "Company-stated record",
-    title: "Factory and process evidence",
-    detail: "Two Shenzhen production sites, ten lines and 305+ pieces of process equipment are published as operational claims, separate from ISO scope.",
+    title: "Production organisation and QC",
+    detail: "How production, encoding, quality control and records retention are organised is described on the factory page; capacity is quoted per programme. Site and equipment figures are withheld until they are independently documented.",
     href: "/about/factory/",
     linkLabel: "Review factory record",
   },

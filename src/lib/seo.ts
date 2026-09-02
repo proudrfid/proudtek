@@ -36,6 +36,7 @@ import {
 } from "./seo-content";
 
 import { EDITORIAL_KEYWORDS_MAP } from "./editorial-pages";
+import { resolveEditorialByline } from "./editorial-authority-ld";
 
 import {
   type PageKind,
@@ -497,9 +498,22 @@ export function buildPageSummary(page: SnapshotPage): { title: string; descripti
 
 export function buildMachinePageData(page: SnapshotPage, generatedAt?: string): MachinePageData {
   const seo = buildPageSeo(page);
-  const editorialByline = page.editorialDefinition as
-    | { author?: string; reviewedBy?: string; publishedAt?: string; modifiedAt?: string; reviewedAt?: string }
+  const editorialDef = page.editorialDefinition as
+    | { authorSlug?: string; author?: string; reviewedBySlug?: string; reviewedBy?: string; publishedAt?: string; modifiedAt?: string; reviewedAt?: string }
     | undefined;
+  // Same resolver as the visible byline (EditorialArticle) and the authority
+  // Article: slugs win over free-text names, so the mirror can never show a
+  // different reviewer than the HTML.
+  const resolvedByline = editorialDef ? resolveEditorialByline(editorialDef) : null;
+  const editorialByline = editorialDef
+    ? {
+        author: resolvedByline?.author?.name ?? editorialDef.author,
+        reviewedBy: resolvedByline?.reviewer?.name ?? editorialDef.reviewedBy,
+        publishedAt: editorialDef.publishedAt,
+        modifiedAt: editorialDef.modifiedAt,
+        reviewedAt: editorialDef.reviewedAt,
+      }
+    : undefined;
   const $body = load(`<body>${seo.bodyHtml}</body>`);
   const route = normalizeRoute(page.route);
   const machineJsonUrl = absoluteUrl(buildMachineRoute(route, "json"));
