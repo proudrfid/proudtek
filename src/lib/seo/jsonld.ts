@@ -311,17 +311,31 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
             // The three management-system certificates on file (PDF in repo,
             // verifiable at cnca.gov.cn). Values are transcribed from the
             // certificate text — scope is "sales service", not manufacturing.
-            hasCredential: ORGANIZATION_CREDENTIALS.certifications.map((cert) => ({
-              "@type": "EducationalOccupationalCredential",
-              credentialCategory: "certification",
-              name: cert.name,
-              identifier: cert.certificateNumber,
-              description: cert.scope,
-              validIn: { "@type": "Country", name: "China" },
-              validFrom: cert.validFrom,
-              validThrough: cert.validThrough,
-              recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.issuerUrl },
-            })),
+            hasCredential: [
+              ...ORGANIZATION_CREDENTIALS.certifications.map((cert) => ({
+                "@type": "EducationalOccupationalCredential",
+                credentialCategory: "certification",
+                name: cert.name,
+                identifier: cert.certificateNumber,
+                description: cert.scope,
+                validIn: { "@type": "Country", name: "China" },
+                validFrom: cert.validFrom,
+                validThrough: cert.validThrough,
+                recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.issuerUrl },
+              })),
+              // Product-level certificate (OEKO-TEX STANDARD 100, UHF laundry
+              // tag) — verified in the OEKO-TEX Label Check 2026-09-02.
+              ...ORGANIZATION_CREDENTIALS.productCertifications.map((cert) => ({
+                "@type": "EducationalOccupationalCredential",
+                credentialCategory: "product certification",
+                name: cert.name,
+                identifier: cert.certificateNumber,
+                description: cert.scope,
+                validFrom: cert.validFrom,
+                validThrough: cert.validThrough,
+                recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.verifyUrl },
+              })),
+            ],
           }
         : {}),
     },

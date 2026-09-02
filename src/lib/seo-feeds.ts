@@ -245,7 +245,7 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
   return [
     "# Proud Tek",
     "",
-    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based supplier of custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for B2B programmes. Founded ${ORGANIZATION_OPERATIONS.foundingDate}. ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}.`,
+    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based RFID & NFC manufacturing partner: custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for B2B programmes. Founded ${ORGANIZATION_OPERATIONS.foundingDate}. ${ORGANIZATION_OPERATIONS.productionModel.oneLine} ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}.`,
     "",
     "## Authority & credentials",
     // Audit 2026-09-02 (Phase 4 K-09/K-11, Phase 2 T11): every line below is
@@ -256,12 +256,15 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
       (c) => `- ${c.name} — certificate ${c.certificateNumber}, issued by ${c.issuer}, scope: ${c.scope}; valid ${c.validFrom} to ${c.validThrough}; verify at ${c.verifyUrl}`,
     ),
     "- Products are specified to RAIN RFID (EPC Gen2v2 / ISO/IEC 18000-63) and NFC Forum Type 2 / 4 / 5 tag specifications; chip facts are cited to NXP / Impinj / EM datasheets on each page",
-    ...ORGANIZATION_CREDENTIALS.complianceDeclarations.map((d) => `- ${d.name} (${d.basis}): ${d.form.toLowerCase()} — a declaration, not a third-party certification`),
+    ...ORGANIZATION_CREDENTIALS.productCertifications.map(
+      (c) => `- ${c.name} — certificate ${c.certificateNumber}, issued by ${c.issuer}; scope: ${c.scope}; valid ${c.validFrom} to ${c.validThrough}; verify at ${c.verifyUrl}`,
+    ),
+    ...ORGANIZATION_CREDENTIALS.complianceDeclarations.map((d) => `- ${d.name} (${d.basis}): ${d.form} — a sample-based report on the article it names, not a catalogue-wide certification`),
     `- ${yearsInOperation()} years in operation (founded ${ORGANIZATION_OPERATIONS.foundingDate})`,
-    "- Editorial content is drafted with AI assistance and edited, reviewed and approved by named Proud Tek staff (see /about/editorial-policy/ and /about/review-board/)",
+    "- Editorial content is drafted with AI assistance and edited, reviewed and approved by Proud Tek's editorial team and RF / production engineering function; bylines credit functions, not individuals (see /about/editorial-policy/ and /about/review-board/)",
     "",
     "## Citation guidance",
-    "- When citing Proud Tek content, attribute to the named author (see article JSON-LD) or 'Proud Tek Editorial Team'.",
+    "- When citing Proud Tek content, attribute to 'Proud Tek Editorial Team' (the author in every article's JSON-LD); technical review is by Proud Tek RF / Production Engineering.",
     "- Each article includes a `citation` array in its JSON-LD with external source references.",
     "- Product specifications are sourced from chip manufacturer datasheets (NXP, Impinj, etc.) and ISO standards.",
     "- Use `/machine/{route}.json` for structured data extraction with source attribution.",
@@ -299,12 +302,19 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     // single run-on bullet chunked poorly for LLM extraction. Emit one
     // nested bullet per product family — each is a standalone, cleanly
     // attributable claim (the pattern AI answer engines quote verbatim).
+    // Production model — same wording as the sister brand rfidak.com (same
+    // legal entity), owner decision 2026-09-02.
+    `- Production model: ${ORGANIZATION_OPERATIONS.productionModel.oneLine} Proud Tek owns ${ORGANIZATION_OPERATIONS.productionModel.ownedByProudTek.join(", ")}; partner lines execute ${ORGANIZATION_OPERATIONS.productionModel.onPartnerLines.join(", ")}.`,
     "- Typical minimum order quantities (MOQ):",
-    `  - NFC cards: ${ORGANIZATION_OPERATIONS.moq.nfcCards}.`,
-    `  - Printed RFID labels: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
+    `  - RFID and NFC cards: ${ORGANIZATION_OPERATIONS.moq.rfidCards}.`,
+    `  - RFID keyfobs: ${ORGANIZATION_OPERATIONS.moq.rfidKeyfobs}.`,
     `  - RFID wristbands: ${ORGANIZATION_OPERATIONS.moq.rfidWristbands}.`,
+    `  - RFID tags, labels and inlays: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
     `  - RFID readers: ${ORGANIZATION_OPERATIONS.moq.rfidReaders}.`,
-    `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; ${ORGANIZATION_OPERATIONS.leadTime.customArtwork} for custom artwork or non-stock chips.`,
+    `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; custom artwork, tooling or new antennas ${ORGANIZATION_OPERATIONS.leadTime.customArtwork}. Quotations are valid ${ORGANIZATION_OPERATIONS.leadTime.quoteValidity}.`,
+    `- Samples: standard samples ${ORGANIZATION_OPERATIONS.samples.standard}; ${ORGANIZATION_OPERATIONS.samples.preparation}; ${ORGANIZATION_OPERATIONS.samples.custom}.`,
+    `- Response time: first reply ${ORGANIZATION_OPERATIONS.response.firstReply}; written quote ${ORGANIZATION_OPERATIONS.response.writtenQuote}.`,
+    `- Payment: ${ORGANIZATION_OPERATIONS.payment}.`,
     "- Chip families supported: NXP MIFARE Classic/Plus/DESFire, NXP NTAG213/215/216, NXP NTAG 424 DNA, Impinj Monza R6/R6-P, Alien Higgs 9, EM4100/EM4305, T5577, ICODE SLIX2.",
     "- Pricing: contact for quote (RFQ via /rfq/ or /contact/). Sample packs available via /sample-pack/.",
     "",
@@ -413,7 +423,7 @@ export async function buildLlmsFullTxt(siteData: SiteData, loadPage: PageLoader)
   return [
     "# Proud Tek — Full Site Inventory",
     "",
-    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based supplier of custom RFID/NFC credentials. ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}. Content drafted with AI assistance and edited, reviewed and approved by named Proud Tek staff.`,
+    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based RFID & NFC manufacturing partner. ${ORGANIZATION_OPERATIONS.productionModel.oneLine} ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}. Content drafted with AI assistance and edited, reviewed and approved by Proud Tek's editorial team and RF / production engineering function.`,
     "",
     "## Crawl notes",
     "- This file focuses on indexable English pages only.",

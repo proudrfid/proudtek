@@ -869,7 +869,7 @@ function renderFooterBrandRow(): string {
         `<a class="codex-footer-brand__logo" href="/" aria-label="Proud Tek home">` +
           `<img src="/site-assets/wp-content/uploads/2024/04/proudtek-logo.png" alt="Proud Tek" width="220" height="60" loading="lazy" decoding="async">` +
         `</a>` +
-        `<p class="codex-footer-brand__tagline">Custom RFID &amp; NFC manufacturer — cards, tags, labels, wristbands, keyfobs and readers shipped worldwide from China since 2008.</p>` +
+        `<p class="codex-footer-brand__tagline">RFID &amp; NFC manufacturing partner in Shenzhen since 2008 — cards, tags, labels, wristbands, keyfobs and readers, specified and quality-controlled by Proud Tek, produced on contracted partner lines.</p>` +
         `<address class="codex-footer-brand__address" aria-label="Office address and hours">` +
           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.line1)}, ${escapeHtml(addr.line2)}</span>` +
           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.region)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.country)}</span>` +
@@ -1021,30 +1021,38 @@ function applyHomepageClaimCorrections($body: ReturnType<typeof load>): void {
     }
     if (/^1\. Robust Production Capacity/.test(t)) {
       $p.html(
-        `<strong>1. Production &amp; facilities</strong> Production runs in Shenzhen under a documented quality system. Specification, encoding and quality control are managed by Proud Tek's own team; capacity and lead time are quoted per programme on request.`,
+        `<strong>1. Production model</strong> Proud Tek owns the product and antenna specification, chip sourcing through authorised distribution, first-article approval and incoming, in-process and final quality control. Tooling, lamination, printing and encoding run on contracted partner lines in Shenzhen to our specification, and our QC signs off every batch before release. Capacity and lead time are quoted per programme.`,
       );
       return;
     }
     if (/^2\. Continuous Innovation/.test(t)) {
       $p.html(
-        `<strong>2. Continuous Innovation &amp; Custom R&amp;D</strong> Our dedicated R&amp;D team brings your concepts to life. We excel in customizing RFID products for specific application environments, antenna requirements, and encapsulation materials. Utilizing high-precision mold tooling, we ensure every product meets exacting standards of shape, durability, and finish.`,
+        `<strong>2. Engineering &amp; customisation</strong> Our RF and production engineering matches chip families and antenna designs to your installed readers before production starts, and specifies application-specific materials and encapsulation. Custom mould tooling is executed on partner lines to our drawings, with the first article approved by us before any run.`,
       );
       return;
     }
     if (/^3\. Uncompromising Quality Control/.test(t)) {
       $p.html(
-        `<strong>3. Quality Control</strong> Documented inspection procedures cover raw material, inlay, lamination, encoding and finished-goods testing. RoHS and REACH SVHC declarations of conformity are available per SKU, and third-party test reports can be commissioned per programme.`,
+        `<strong>3. Quality Control</strong> Every production batch goes through 100% inspection — chip read/write testing, print quality, dimensions and packaging — under ISO 9001 documented procedures with traceability from raw material to finished goods. Sample-based RoHS, REACH SVHC and CE test reports are published on the certifications page; testing on your exact specification can be commissioned per programme.`,
       );
       return;
     }
     if (/^Products are subject to multiple technical certifications and tests such as OEKO/.test(t)) {
       $p.text(
-        `Management-system certificates held: ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 (issued by Anhui Certification and Inspection Co., Ltd; certificate numbers and scope on the certifications page). RoHS and REACH declarations of conformity are available per SKU; third-party test reports can be commissioned per programme.`,
+        `Certificates held by Shenzhen Proud Tek Co., Ltd: ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 over the sales and supplier-management operation (issued by Anhui Certification and Inspection Co., Ltd; production runs on contracted partner lines), OEKO-TEX STANDARD 100 (Hohenstein, product class II) for our UHF laundry tag, plus sample-based RoHS, REACH SVHC and CE (EN 62311) test reports — every certificate number and scope is on the certifications page.`,
       );
       return;
     }
     if (/^Unmatched Scale, Precision, and Innovation$/.test(t)) {
       $p.html("<strong>Specification, quality control and delivery</strong>");
+      return;
+    }
+    // Process step 02 — response-time promise aligned with rfidak.com (owner
+    // decision 2026-09-02): first reply 2–4 h in business hours, quote 24–48 h.
+    if (/^Our experienced business team will respond to the inquiry and provide a quotation/.test(t)) {
+      $p.text(
+        "Our sales engineering team replies within 2–4 hours in Shenzhen business hours (Mon–Fri, GMT+8) and provides a written quotation based on the client's specific requirements within 24–48 hours, valid for 30 days.",
+      );
     }
   });
 
@@ -1498,7 +1506,7 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
   <header class="codex-contact__hero">
     <p class="codex-contact__eyebrow">Get in touch</p>
     <h1 class="codex-contact__title">Talk to a Proud Tek RFID specialist</h1>
-    <p class="codex-contact__lede">Custom RFID &amp; NFC manufacturer since 2008 — cards, tags, labels, wristbands, keyfobs and readers. Tell us your project and we'll reply within one business day with a quote, samples options, and chip recommendations.</p>
+    <p class="codex-contact__lede">Custom RFID &amp; NFC manufacturer since 2008 — cards, tags, labels, wristbands, keyfobs and readers. Tell us your project — first reply within 2–4 hours in Shenzhen business hours, written quote within 24–48 hours, with sample options and chip recommendations.</p>
   </header>
 
   <div class="codex-contact__grid">

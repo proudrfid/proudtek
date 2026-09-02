@@ -38,7 +38,7 @@ import {
   CORE_SUPPORT_PROFILES,
   DEFAULT_DESCRIPTION,
   DEFAULT_IMAGE,
-  EDITORIAL_TEAM_NAME,
+  EDITORIAL_REVIEWER,
   EXPERT_AUTHORS,
   PAGE_DESCRIPTION_OVERRIDES,
   SITE_NAME,
@@ -465,8 +465,10 @@ export function resolveArticleMeta($body: CheerioAPI, route: string, editorialDe
     authorUrl: absoluteUrl(author.url),
     authorTitle: author.title,
     authorExpertise: author.expertise,
-    reviewedBy: authorKey !== "default" ? EDITORIAL_TEAM_NAME : undefined,
-    reviewedByTitle: authorKey !== "default" ? "RFID & NFC Technical Content Team" : undefined,
+    // Every article is reviewed by the RF / production engineering function
+    // (2026-09-02: function-based bylines, no named individuals).
+    reviewedBy: EDITORIAL_REVIEWER.name,
+    reviewedByTitle: EDITORIAL_REVIEWER.title,
     lastReviewedDate: modifiedAt,
     publishedAt,
     modifiedAt,

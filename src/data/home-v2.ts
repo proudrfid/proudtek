@@ -71,10 +71,10 @@ export const HOME_EVIDENCE: HomeEvidence[] = [
   },
   {
     status: "Company-stated record",
-    title: "Production organisation and QC",
-    detail: "How production, encoding, quality control and records retention are organised is described on the factory page; capacity is quoted per programme. Site and equipment figures are withheld until they are independently documented.",
+    title: "Production model: partner lines, our specification",
+    detail: "Proud Tek owns the specification, chip sourcing and quality control; tooling and production run on contracted partner lines in Shenzhen to our spec, and our QC signs off every batch. Who does what, step by step, is on the production page; capacity is quoted per programme.",
     href: "/about/factory/",
-    linkLabel: "Review factory record",
+    linkLabel: "Review the production model",
   },
   {
     status: "Available per program",
