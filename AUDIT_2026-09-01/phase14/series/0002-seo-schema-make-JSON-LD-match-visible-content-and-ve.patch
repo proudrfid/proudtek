@@ -1,0 +1,724 @@
+From adfa4ce8fbd28dc8ed96fcb2503c2deca5ec6310 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 05:33:03 -0400
+Subject: [PATCH 02/20] seo(schema): make JSON-LD match visible content and
+ verified credentials
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Phase 14 batch B2 (audit 2026-09-01, Phase 10):
+- Product: name = visible H1; drop invented sku/productID/mpn, inLanguage,
+  audience; offers gated behind PRODUCT_OFFERS_ENABLED=false (indicative
+  price ranges stay page text only — owner decision 2026-09-02)
+- FAQPage only for FAQs actually rendered on the page (no synthetic feed)
+- Article/authority markup only on article routes (blog/guides/compare/...)
+- Organization: legal name Shenzhen Proud Tek Co., Ltd, full postal address,
+  sameAs without WhatsApp deep link, numberOfEmployees removed; hasCredential
+  (3 CAIC ISO certificates) emitted on /about/certifications/ only
+- WebPage typed AboutPage on /about/* (except legal pages)
+- machine mirrors: byline/reviewer resolved via resolveEditorialByline
+---
+ src/lib/__tests__/product-offer.test.ts |  85 ++++++++++++++++++
+ src/lib/editorial-authority-ld.ts       |  30 +++++++
+ src/lib/seo-content.ts                  | 110 ++++++++++++++++++++---
+ src/lib/seo.ts                          |  25 ++++--
+ src/lib/seo/jsonld.ts                   | 109 +++++++++++++----------
+ src/lib/seo/page-data.ts                |  23 +++--
+ src/lib/seo/product-offer.ts            | 112 ++++++++++++++++++++++++
+ 7 files changed, 413 insertions(+), 81 deletions(-)
+ create mode 100644 src/lib/__tests__/product-offer.test.ts
+ create mode 100644 src/lib/seo/product-offer.ts
+
+diff --git a/src/lib/__tests__/product-offer.test.ts b/src/lib/__tests__/product-offer.test.ts
+new file mode 100644
+index 0000000..b433bc2
+--- /dev/null
++++ b/src/lib/__tests__/product-offer.test.ts
+@@ -0,0 +1,85 @@
++/**
++ * Product JSON-LD offers — AggregateOffer derived from the editorial
++ * "Typical pricing" brief (GSC 2026-09-01: 6/6 crawled product pages
++ * invalid for missing offers.price).
++ */
++
++import { describe, it, expect } from 'vitest';
++import { parseTypicalPriceRange, buildProductOffers, formatSchemaPrice } from '../seo/product-offer';
++import type { EditorialBriefField } from '../editorial-types';
++
++const brief = (text: string, label = 'Typical pricing'): EditorialBriefField[] => [
++  { label: 'Air-interface + CR80 envelope', items: ['ISO/IEC 14443 Type A at 13.56 MHz — 106 kbit/s'] },
++  { label, text },
++];
++
++describe('parseTypicalPriceRange', () => {
++  it('parses the canonical "USD a–b /pc @ qty" form and ignores the quantity tier', () => {
++    expect(
++      parseTypicalPriceRange(brief('USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day.')),
++    ).toEqual({ low: 0.3, high: 0.5, currency: 'USD' });
++  });
++
++  it('spans all tiers of a multi-tier quote', () => {
++    expect(
++      parseTypicalPriceRange(brief('USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day.')),
++    ).toEqual({ low: 0.05, high: 0.25, currency: 'USD' });
++  });
++
++  it('accepts an ASCII hyphen and "@ 5k+" tiers', () => {
++    expect(parseTypicalPriceRange(brief('USD 0.10-0.30 /pc @ 5k+ (typical FOB Shenzhen range)'))).toEqual({
++      low: 0.1,
++      high: 0.3,
++      currency: 'USD',
++    });
++  });
++
++  it('returns null when there is no pricing field', () => {
++    expect(parseTypicalPriceRange(undefined)).toBeNull();
++    expect(parseTypicalPriceRange([{ label: 'Memory architecture', items: ['1 KB EEPROM'] }])).toBeNull();
++  });
++
++  it('ignores prose that merely mentions USD (never fabricates a price)', () => {
++    // Bench-kit description, not a unit price → no offers.
++    expect(
++      parseTypicalPriceRange(brief('Typical bench: 1× ACR1252U + 1× Zebra ZC300 card printer — USD figures vary by bureau.')),
++    ).toBeNull();
++    // Market-size prose under a non-pricing label must not be picked up.
++    expect(
++      parseTypicalPriceRange(brief('U.S. alone tops USD 170 B annually, 30–40 % of it in retail.', 'Market context')),
++    ).toBeNull();
++  });
++
++  it('rejects implausible ranges', () => {
++    expect(parseTypicalPriceRange(brief('USD 0–0 /pc'))).toBeNull();
++    expect(parseTypicalPriceRange(brief('USD 500000–900000 /pc'))).toBeNull();
++  });
++});
++
++describe('buildProductOffers', () => {
++  it('emits an AggregateOffer with 2-decimal string prices', () => {
++    const offers = buildProductOffers(
++      { low: 0.3, high: 0.5, currency: 'USD' },
++      'https://proudtek.com/products/rfid-cards/mifare-classic-1k-card/',
++      'https://proudtek.com/#organization',
++    );
++    expect(offers).toEqual({
++      '@type': 'AggregateOffer',
++      url: 'https://proudtek.com/products/rfid-cards/mifare-classic-1k-card/',
++      priceCurrency: 'USD',
++      lowPrice: '0.30',
++      highPrice: '0.50',
++      availability: 'https://schema.org/InStock',
++      seller: { '@id': 'https://proudtek.com/#organization' },
++    });
++  });
++
++  it('returns null (caller omits offers) when no range is known', () => {
++    expect(buildProductOffers(null, 'https://proudtek.com/products/x/', 'https://proudtek.com/#organization')).toBeNull();
++  });
++
++  it('formats prices without float noise', () => {
++    expect(formatSchemaPrice(0.1 + 0.2)).toBe('0.30');
++    expect(formatSchemaPrice(2)).toBe('2.00');
++  });
++});
+diff --git a/src/lib/editorial-authority-ld.ts b/src/lib/editorial-authority-ld.ts
+index 84c5d60..fedd920 100644
+--- a/src/lib/editorial-authority-ld.ts
++++ b/src/lib/editorial-authority-ld.ts
+@@ -42,9 +42,39 @@ async function loadRouteIndex(): Promise<Map<string, EditorialDefinition>> {
+  */
+ function hasAuthoritySignals(def: EditorialDefinition | undefined): boolean {
+   if (!def) return false;
++  if (!isArticleRoute(def.route)) return false;
+   return !!def.authorSlug || !!def.reviewedBySlug || !!def.author || !!def.reviewedBy || (def.sources ?? []).length > 0;
+ }
+ 
++/**
++ * Audit 2026-09-02 (Phase 10 SD-3): an `Article` node is only appropriate on
++ * pages that *are* articles — editorial long-form content. Product pages,
++ * the homepage, contact forms, supplier landing pages and country pages were
++ * all emitting Article (≈260 pages) because every editorial definition has
++ * an author. Those pages keep WebPage / Product / ContactPage; the byline
++ * stays visible in HTML and in the /machine mirrors.
++ *
++ * Group hubs (`/blog/`, `/guides/`, …) are excluded because they are
++ * CollectionPages, not articles.
++ */
++const ARTICLE_ROUTE_GROUPS = new Set([
++  "blog",
++  "guides",
++  "compare",
++  "solutions",
++  "industries",
++  "case-studies",
++  "compatibility",
++  "research",
++  "about",
++]);
++
++export function isArticleRoute(route: string): boolean {
++  const segments = route.split("/").filter(Boolean);
++  if (segments.length < 2) return false; // homepage and group hubs
++  return ARTICLE_ROUTE_GROUPS.has(segments[0]);
++}
++
+ /**
+  * Sync lookup used by seo/jsonld.ts buildJsonLd: when true, the layouts
+  * (EditorialPageLayout / SnapshotLayout) append the authority Article for
+diff --git a/src/lib/seo-content.ts b/src/lib/seo-content.ts
+index 0b18eac..8e2f973 100644
+--- a/src/lib/seo-content.ts
++++ b/src/lib/seo-content.ts
+@@ -41,7 +41,16 @@ function absoluteUrl(value: string): string {
+ }
+ 
+ export const SITE_NAME = "Proud Tek";
+-export const ORGANIZATION_NAME = "Proud Tek Co., Limited";
++/**
++ * Legal name as it appears on the three CAIC management-system certificates
++ * (ISO 9001 / 14001 / 45001, first certified 2026-06-10; PDF in repo,
++ * verifiable at cnca.gov.cn) — the only primary document on file. The
++ * Chinese registered name on the same certificates is 深圳市奥科物联有限公司
++ * (unified social credit code 91440300MA5FBLMP1Y). Confirm against the
++ * business-registration extract before treating as final (audit 2026-09-02,
++ * Phase 3 C1). The previous value "Proud Tek Co., Limited" had no document.
++ */
++export const ORGANIZATION_NAME = "Shenzhen Proud Tek Co., Ltd";
+ export const EDITORIAL_TEAM_NAME = "Proud Tek Editorial Team";
+ 
+ /**
+@@ -215,18 +224,20 @@ export const ORGANIZATION_SOCIAL: Record<string, string> = {
+  */
+ export const ORGANIZATION_ALTERNATE_NAMES: ReadonlyArray<string> = [
+   "ProudTek",
+-  "Proud Tek Co. Limited",
++  "Proud Tek Co., Limited",
++  "深圳市奥科物联有限公司",
+ ];
+ 
+ /**
+  * Publicly disclosable operational facts. Surfaced in:
+- *   - Organization JSON-LD (foundingDate, numberOfEmployees)
++ *   - Organization JSON-LD (foundingDate)
+  *   - llms.txt "Quick facts" block (P0-G3) — LLM-citation-friendly hard data
+  */
+ export const ORGANIZATION_OPERATIONS = {
+   foundingDate: "2008",
+   foundingLocation: "Shenzhen, Guangdong, China",
+-  numberOfEmployees: "100+",
++  // numberOfEmployees ("100+") removed 2026-09-02 — no documentary basis
++  // (Phase 4 K-14). Re-add from payroll evidence.
+   /** Typical MOQ per product family — used in llms.txt Quick facts (P0-G3).
+    *  Reconciled 2026-06-11 with COMMERCIAL_TERMS + the lp sourcing pages
+    *  (stock items from 100 pcs; custom production typically 500-1,000):
+@@ -300,14 +311,76 @@ export const EXPERT_AUTHORS: Record<string, ExpertAuthor> = {
+ /** Article author assignment — maps routes to expert authors */
+ export { ARTICLE_AUTHOR_MAP } from "../data/article-author-map";
+ 
+-/** Organization credentials & certifications */
++/**
++ * Organization credentials.
++ *
++ * Audit 2026-09-02 (Phase 4 K-09/K-11, Phase 10): the only certificates on
++ * file are the three CAIC management-system certificates below (scanned PDF
++ * `9001 certificate/奥科体系证书.pdf`). Every field is transcribed from the
++ * certificate text. Their scope is the *sales service* of smart cards and
++ * RFID tags — not manufacturing — so no surface may call the company an
++ * "ISO 9001 certified factory" or say "SGS audited" (the issuer is CAIC).
++ * RoHS / REACH are declarations of conformity, not certifications, and are
++ * listed separately so generators cannot conflate them.
++ */
++export interface OrganizationCertificate {
++  name: string;
++  standard: string;
++  certificateNumber: string;
++  issuer: string;
++  issuerUrl: string;
++  holder: string;
++  scope: string;
++  validFrom: string;
++  validThrough: string;
++  verifyUrl: string;
++}
++
++const CAIC = {
++  issuer: "Anhui Certification and Inspection Co., Ltd (CAIC)",
++  issuerUrl: "https://www.zjcaic.com",
++  holder: "Shenzhen Proud Tek Co., Ltd (深圳市奥科物联有限公司)",
++  validFrom: "2026-06-10",
++  validThrough: "2029-06-09",
++  verifyUrl: "https://www.cnca.gov.cn",
++};
++
+ export const ORGANIZATION_CREDENTIALS = {
+   certifications: [
+-    { name: "ISO 9001:2015", issuer: "SGS", description: "Quality Management System Certification" },
+-    { name: "ISO 14001:2015", issuer: "SGS", description: "Environmental Management System" },
+-    { name: "RoHS Compliant", issuer: "EU Directive 2011/65/EU", description: "Restriction of Hazardous Substances" },
+-    { name: "CE Marking", issuer: "EU", description: "European Conformity" },
+-    { name: "REACH Compliant", issuer: "ECHA", description: "Registration, Evaluation, Authorisation and Restriction of Chemicals" },
++    {
++      name: "ISO 9001:2015",
++      standard: "GB/T 19001-2016 / ISO 9001:2015 — Quality management systems",
++      certificateNumber: "98026Q00274R000",
++      scope: "Sales service of smart cards (PVC cards, wooden cards) and RFID tags",
++      ...CAIC,
++    },
++    {
++      name: "ISO 14001:2015",
++      standard: "GB/T 24001-2016 / ISO 14001:2015 — Environmental management systems",
++      certificateNumber: "98026E00200R000",
++      scope: "Environmental management activities involved in the sales of smart cards (PVC cards, wooden cards) and RFID tags",
++      ...CAIC,
++    },
++    {
++      name: "ISO 45001:2018",
++      standard: "GB/T 45001-2020 / ISO 45001:2018 — Occupational health and safety management systems",
++      certificateNumber: "98026S00203R000",
++      scope: "Occupational health and safety management activities involved in the sales of smart cards (PVC cards, wooden cards) and RFID tags",
++      ...CAIC,
++    },
++  ] as OrganizationCertificate[],
++  /** One-line, certificate-accurate phrasing for trust strips and summaries. */
++  certifiedOperationSummary:
++    "ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 certified sales and service operation (CAIC, certificates 98026Q00274R000 / 98026E00200R000 / 98026S00203R000, valid to 2029-06-09)",
++  /**
++   * Product compliance paperwork the company states it supplies per order.
++   * These are declarations, not third-party certifications; evidence status
++   * UNVERIFIED (Phase 4 K-12) — phrase as "available on request", never as
++   * "certified".
++   */
++  complianceDeclarations: [
++    { name: "RoHS", basis: "Directive 2011/65/EU (+ 2015/863)", form: "Declaration of conformity per SKU, on request" },
++    { name: "REACH SVHC", basis: "Regulation (EC) 1907/2006", form: "SVHC declaration per SKU, on request" },
+   ],
+   // Owner confirmed 2026-06-22: Proud Tek is NOT a RAIN RFID Alliance or
+   // NFC Forum member. Do NOT assert either membership anywhere (site,
+@@ -319,12 +392,21 @@ export const ORGANIZATION_CREDENTIALS = {
+   // obtained (see GROWTH_ROADMAP: NFC Forum Adopter is a free join).
+   memberships: [] as Array<{ name: string; role: string; url: string }>,
+   founded: "2008",
+-  employeeCount: "100+",
+-  clientCount: "500+",
+-  countriesServed: "50+",
+-  yearExperience: "17+",
++  // employeeCount ("100+"), clientCount ("500+"), countriesServed ("50+")
++  // removed 2026-09-02 — owner decision after Phase 4 (no documentary basis;
++  // figures disagreed across owned properties). Re-add with a dated basis.
+ };
+ 
++/**
++ * Years in operation, computed from the founding year so the site never
++ * shows two different figures again (17+ vs 18+ in 2026). The founding year
++ * itself is consistent across every owned property but still awaits the
++ * registration extract (Phase 4 K-01).
++ */
++export function yearsInOperation(now: Date = new Date()): number {
++  return now.getUTCFullYear() - Number(ORGANIZATION_OPERATIONS.foundingDate);
++}
++
+ /** Geo targeting constants for global SEO */
+ export const GEO_CONFIG = {
+   latitude: 22.6312,
+diff --git a/src/lib/seo.ts b/src/lib/seo.ts
+index 5f716ca..4a090f4 100644
+--- a/src/lib/seo.ts
++++ b/src/lib/seo.ts
+@@ -497,6 +497,9 @@ export function buildPageSummary(page: SnapshotPage): { title: string; descripti
+ 
+ export function buildMachinePageData(page: SnapshotPage, generatedAt?: string): MachinePageData {
+   const seo = buildPageSeo(page);
++  const editorialByline = page.editorialDefinition as
++    | { author?: string; reviewedBy?: string; publishedAt?: string; modifiedAt?: string; reviewedAt?: string }
++    | undefined;
+   const $body = load(`<body>${seo.bodyHtml}</body>`);
+   const route = normalizeRoute(page.route);
+   const machineJsonUrl = absoluteUrl(buildMachineRoute(route, "json"));
+@@ -558,19 +561,29 @@ export function buildMachinePageData(page: SnapshotPage, generatedAt?: string):
+     productSpecs,
+     machineJsonUrl,
+     machineTextUrl,
++    // Audit 2026-09-02 (Phase 2 T9): the mirror must name the same author /
++    // reviewer as the visible byline. Editorial pages (products, solutions,
++    // …) carry them on the definition even when no articleMeta is resolved;
++    // only pages without any byline fall back to the organization.
+     author: seo.articleMeta
+       ? {
+           name: seo.articleMeta.authorName,
+           title: seo.articleMeta.authorTitle,
+           expertise: seo.articleMeta.authorExpertise,
+         }
+-      : { name: ORGANIZATION_NAME },
++      : editorialByline?.author
++        ? { name: editorialByline.author }
++        : { name: ORGANIZATION_NAME },
+     publisher: ORGANIZATION_NAME,
+-    datePublished: seo.articleMeta?.publishedAt,
+-    dateModified: seo.articleMeta?.modifiedAt,
+-    reviewedBy: seo.articleMeta?.reviewedBy,
+-    lastReviewedDate: seo.articleMeta?.lastReviewedDate,
+-    credentials: ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name),
++    datePublished: seo.articleMeta?.publishedAt ?? editorialByline?.publishedAt,
++    dateModified: seo.articleMeta?.modifiedAt ?? editorialByline?.modifiedAt,
++    reviewedBy: seo.articleMeta?.reviewedBy ?? editorialByline?.reviewedBy,
++    lastReviewedDate: seo.articleMeta?.lastReviewedDate ?? editorialByline?.reviewedAt,
++    // Certificate-accurate credential strings (number, issuer, scope) —
++    // never bare standard names that read as "certified manufacturer".
++    credentials: ORGANIZATION_CREDENTIALS.certifications.map(
++      (c) => `${c.name} — certificate ${c.certificateNumber}, ${c.issuer}; scope: ${c.scope}; valid to ${c.validThrough}`,
++    ),
+     generatedAt,
+   };
+ }
+diff --git a/src/lib/seo/jsonld.ts b/src/lib/seo/jsonld.ts
+index f71d38f..e994c9d 100644
+--- a/src/lib/seo/jsonld.ts
++++ b/src/lib/seo/jsonld.ts
+@@ -25,11 +25,13 @@ import {
+   ORGANIZATION_SOCIAL,
+   ORGANIZATION_ALTERNATE_NAMES,
+   ORGANIZATION_OPERATIONS,
++  ORGANIZATION_CREDENTIALS,
+   COMMERCIAL_TERMS,
+ } from "../seo-content";
+ 
+-import { EDITORIAL_KEYWORDS_MAP } from "../editorial-pages";
+-import { hasAuthorityArticle } from "../editorial-authority-ld";
++import { EDITORIAL_KEYWORDS_MAP, EDITORIAL_ROUTE_INDEX } from "../editorial-pages";
++import { hasAuthorityArticle, isArticleRoute } from "../editorial-authority-ld";
++import { PRODUCT_OFFERS_ENABLED, parseTypicalPriceRange, buildProductOffers } from "./product-offer";
+ import type { EditorialDefinition } from "../editorial-types";
+ import { isWorkflowSection } from "../editorial-types";
+ 
+@@ -153,10 +155,15 @@ export function buildWebPageJsonLd(
+ ): Record<string, unknown> {
+   const sourceLinks = resolveContextSourceLinks(context);
+   const isIndustriesPillar = canonicalPath === "/industries/";
++  // Audit 2026-09-02 (Phase 10 SD-16): every company/evidence page under
++  // /about/ is an AboutPage (previously only the kind-inferred root was);
++  // legal texts stay plain WebPage.
++  const isAboutRoute =
++    canonicalPath.startsWith("/about/") && !/\/about\/(privacy-policy|terms-of-use)\/$/.test(canonicalPath);
+   const type =
+     context.kind === "contact"
+       ? "ContactPage"
+-      : context.kind === "about"
++      : context.kind === "about" || isAboutRoute
+         ? "AboutPage"
+         : context.kind === "collection" || context.kind === "blog" || isIndustriesPillar
+           ? "CollectionPage"
+@@ -252,6 +259,8 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+         "@type": "PostalAddress",
+         streetAddress: ORGANIZATION_CONTACT.streetAddress,
+         addressLocality: ORGANIZATION_CONTACT.addressLocality,
++        addressRegion: ORGANIZATION_CONTACT.addressRegion,
++        postalCode: ORGANIZATION_CONTACT.postalCode,
+         addressCountry: ORGANIZATION_CONTACT.addressCountry,
+       },
+       contactPoint: [
+@@ -290,11 +299,31 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+         "@type": "Place",
+         name: ORGANIZATION_OPERATIONS.foundingLocation,
+       },
+-      numberOfEmployees: {
+-        "@type": "QuantitativeValue",
+-        value: ORGANIZATION_OPERATIONS.numberOfEmployees,
+-      },
+-      sameAs: Object.values(ORGANIZATION_SOCIAL).filter((url) => url && url.length > 0),
++      // numberOfEmployees removed 2026-09-02: the "100+" figure has no
++      // documentary basis (Phase 4 K-14 / G-02). Re-add from payroll evidence.
++      // sameAs carries identity profiles only — the WhatsApp deep link is a
++      // contact channel and lives in contactPoint (Phase 3 §3.6).
++      sameAs: Object.entries(ORGANIZATION_SOCIAL)
++        .filter(([key, url]) => key !== "whatsapp" && url && url.length > 0)
++        .map(([, url]) => url),
++      ...(canonicalPath === "/about/certifications/"
++        ? {
++            // The three management-system certificates on file (PDF in repo,
++            // verifiable at cnca.gov.cn). Values are transcribed from the
++            // certificate text — scope is "sales service", not manufacturing.
++            hasCredential: ORGANIZATION_CREDENTIALS.certifications.map((cert) => ({
++              "@type": "EducationalOccupationalCredential",
++              credentialCategory: "certification",
++              name: cert.name,
++              identifier: cert.certificateNumber,
++              description: cert.scope,
++              validIn: { "@type": "Country", name: "China" },
++              validFrom: cert.validFrom,
++              validThrough: cert.validThrough,
++              recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.issuerUrl },
++            })),
++          }
++        : {}),
+     },
+     {
+       "@context": "https://schema.org",
+@@ -328,28 +357,31 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+     const material = findProductSpecValue(context.productSpecs, ["Material"]);
+     const size = findProductSpecValue(context.productSpecs, ["Size", "Dimensions"]);
+     const color = findProductSpecValue(context.productSpecs, ["Color", "Finish"]);
+-    // PR-S1-C: derive a stable SKU from the route's last segment
+-    // (the product slug). For /products/rfid-cards/mifare-classic-
+-    // 1k-card/ → "PT-MIFARE-CLASSIC-1K-CARD". Prefixed with PT- so
+-    // it's identifiable as a Proud Tek product code, not a generic
+-    // industry-wide identifier.
+-    const slugMatch = canonicalPath.match(/\/([^/]+)\/?$/);
+-    const productSku = slugMatch ? `PT-${slugMatch[1].toUpperCase()}` : undefined;
+-    // MPN: use the chip-family spec value if present (e.g. "MIFARE
+-    // Classic 1K", "EM4100"), else fall back to the SKU.
+-    const chipFamily = findProductSpecValue(context.productSpecs, [
+-      "Chip",
+-      "Chip family",
+-      "Chip Family",
+-      "Protocol",
+-    ]);
+-    const productMpn = chipFamily || productSku;
++    // Audit 2026-09-02 (Phase 10 SD-2/SD-5/SD-6/SD-7, rules 10-11):
++    //  - No `sku` / `productID` / `mpn`: the previous values were derived from
++    //    the URL slug ("PT-<SLUG>") or a chip-family label — invented
++    //    identifiers, not real part numbers. Re-add only from an owner-
++    //    maintained part-number field.
++    //  - `name` mirrors the visible <h1>, which EditorialHero.astro renders
++    //    from the part of the title before the first ": " / "—" / "–" / "|"
++    //    separator (the remainder is the visible deck line).
++    //  - No `inLanguage` (not a Product property) and no synthetic `audience`.
++    //  - No `offers`: the visible "Typical pricing" ranges are indicative and
++    //    not yet evidence-backed (Phase 4 S-05; owner decision 2026-09-02),
++    //    so they stay as page text and are not emitted as Offer/AggregateOffer.
++    //    `PRODUCT_OFFERS_ENABLED` in ./product-offer.ts is the gate.
++    const editorialTitle = EDITORIAL_ROUTE_INDEX.get(canonicalPath)?.title ?? context.contentTitle;
++    const visibleH1 = editorialTitle.split(/\s*(?::\s|—|–|\|)\s*/)[0].trim() || context.contentTitle;
++    const priceRange = PRODUCT_OFFERS_ENABLED
++      ? parseTypicalPriceRange(EDITORIAL_ROUTE_INDEX.get(canonicalPath)?.brief)
++      : null;
++    const productOffers = buildProductOffers(priceRange, context.canonicalUrl, organizationId);
+ 
+     entries.push({
+       "@context": "https://schema.org",
+       "@type": "Product",
+       "@id": `${context.canonicalUrl}#product`,
+-      name: context.contentTitle,
++      name: visibleH1,
+       description: context.description,
+       image: context.imageGallery.map((entry) => entry.url),
+       brand: {
+@@ -361,16 +393,6 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+       mainEntityOfPage: context.canonicalUrl,
+       keywords: buildSchemaKeywords(context.contentTitle, canonicalPath),
+       countryOfOrigin: "CN",
+-      ...(productSku ? { sku: productSku, productID: productSku } : {}),
+-      ...(productMpn ? { mpn: productMpn } : {}),
+-      audience: {
+-        "@type": "Audience",
+-        geographicArea: {
+-          "@type": "Country",
+-          name: "Global",
+-        },
+-      },
+-      inLanguage: "en-US",
+       ...(material ? { material } : {}),
+       ...(size ? { size } : {}),
+       ...(color ? { color } : {}),
+@@ -391,18 +413,7 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+         })),
+       ],
+       url: context.canonicalUrl,
+-      offers: {
+-        "@type": "Offer",
+-        url: absoluteUrl("/contact/"),
+-        availability: "https://schema.org/InStock",
+-        priceCurrency: "USD",
+-        priceSpecification: {
+-          "@type": "PriceSpecification",
+-          priceCurrency: "USD",
+-          description: "Contact for quote — pricing varies by chip, material, quantity and customization",
+-        },
+-        seller: { "@id": organizationId },
+-      },
++      ...(productOffers ? { offers: productOffers } : {}),
+     });
+   }
+ 
+@@ -411,7 +422,9 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+   // append the richer authority Article from editorial-authority-ld.ts for
+   // exactly those routes, and emitting both produced two Article entities
+   // with the same @id on every editorial page.
+-  if (context.kind === "article" && context.articleMeta && !hasAuthorityArticle(canonicalPath)) {
++  // Audit 2026-09-02 (Phase 10 SD-3): Article only on article-like routes —
++  // never on products, landing pages, country pages or the homepage.
++  if (context.kind === "article" && context.articleMeta && isArticleRoute(canonicalPath) && !hasAuthorityArticle(canonicalPath)) {
+     const authorSchema: Record<string, unknown> = {
+       "@type": "Person",
+       name: context.articleMeta.authorName,
+diff --git a/src/lib/seo/page-data.ts b/src/lib/seo/page-data.ts
+index c1055a8..84a895a 100644
+--- a/src/lib/seo/page-data.ts
++++ b/src/lib/seo/page-data.ts
+@@ -84,7 +84,6 @@ import {
+ import { buildBreadcrumbs } from "./breadcrumbs";
+ 
+ import {
+-  buildProductFaqEntries,
+   buildProductMetaDescription,
+   buildProductProcurementFields,
+   buildProductRelatedPages,
+@@ -126,7 +125,6 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
+   const coreSummary = isCoreSupportKind(kind) ? buildCoreSummary(page.route, description, $body) : [];
+   const articleSummary = kind === "article" ? buildArticleSummary(contentTitle, description, $body, page.route) : [];
+   const resolvedFaqEntries = kind === "faq" || kind === "contact" || kind === "page" ? resolveFaqEntries($body) : [];
+-  const coreFaqEntries = isCoreSupportKind(kind) ? buildCoreFaqEntries(page.route, contentTitle, description, $body) : [];
+ 
+   // Editorial pages carry FAQ data in `definition.faq` (set at content-authoring
+   // time). After Stage 3 cutover the `<main>` of `page.bodyHtml` is empty, so
+@@ -137,20 +135,19 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
+     ? editorialFaq.map((e) => ({ question: e.question, answer: e.answer }))
+     : [];
+ 
++  // Audit 2026-09-02 (Phase 10 SD-4, rule "structured data must match visible
++  // page content"): FAQPage may only describe questions a reader can see.
++  // Two sources are visible — the authored editorial `faq` (rendered by
++  // Faq.astro) and <details> blocks found in the snapshot body. The synthetic
++  // builders (product / collection / article / core) generate plausible Q&A
++  // that is never rendered anywhere, so they are no longer fed into
++  // `faqEntries` (the builders remain exported for other consumers).
+   const faqEntries =
+     editorialFaqEntries.length > 0
+       ? editorialFaqEntries
+-      : kind === "product"
+-        ? buildProductFaqEntries(contentTitle, description, productSpecs, page.route)
+-        : kind === "collection"
+-          ? buildCollectionFaqEntries(page.route, contentTitle, description, $body)
+-        : kind === "article"
+-          ? buildArticleFaqEntries(contentTitle, description, $body, page.route)
+-        : kind === "faq" || kind === "contact" || kind === "page"
+-          ? dedupeFaqEntries([...resolvedFaqEntries, ...coreFaqEntries], 10)
+-        : isCoreSupportKind(kind)
+-          ? coreFaqEntries
+-          : [];
++      : kind === "faq" || kind === "contact" || kind === "page"
++        ? dedupeFaqEntries(resolvedFaqEntries, 10)
++        : [];
+   const procurementFields =
+     kind === "product" ? buildProductProcurementFields(contentTitle, description, productSpecs, page.route) : [];
+   const collectionGuidanceFields = kind === "collection" ? buildCollectionGuidanceFields(page.route, contentTitle, $body) : [];
+diff --git a/src/lib/seo/product-offer.ts b/src/lib/seo/product-offer.ts
+new file mode 100644
+index 0000000..a33608c
+--- /dev/null
++++ b/src/lib/seo/product-offer.ts
+@@ -0,0 +1,112 @@
++import type { EditorialBriefField } from "../editorial-types";
++
++/**
++ * Product-page offer data for JSON-LD.
++ *
++ * GSC (2026-09-01) flagged every crawled product page in both the
++ * "Product snippets" and "Merchant listings" reports: the emitted
++ * `Offer` carried a `priceSpecification` with no `price`, which Google
++ * treats as a critical error ("price or priceSpecification.price must
++ * be specified").
++ *
++ * Pricing on this site is a *range* quoted in the editorial brief under
++ * the "Typical pricing" label, e.g.
++ *
++ *   "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote…"
++ *   "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range)…"
++ *
++ * schema.org models a range as `AggregateOffer` (lowPrice / highPrice /
++ * priceCurrency) — valid for Google Product snippets and, unlike
++ * `Offer`, not eligible for Merchant listings, so the shipping / return
++ * policy warnings disappear too. Pages without a parseable range emit
++ * no `offers` at all: never invent a price (see CLAUDE.md, "Content
++ * factual accuracy").
++ */
++
++/**
++ * Evidence gate for machine-readable prices. The visible "Typical pricing"
++ * ranges are indicative and not yet backed by a dated price list (Phase 4
++ * S-05; owner decision 2026-09-02: keep as page text, do not emit offers).
++ * Flip to true only when the ranges are confirmed as the current quoting
++ * basis — then every priced product page emits an AggregateOffer.
++ */
++export const PRODUCT_OFFERS_ENABLED = false;
++
++export interface ProductPriceRange {
++  low: number;
++  high: number;
++  currency: "USD";
++}
++
++const PRICING_LABEL = /pricing|price/i;
++const USD_PREFIX = /^\s*USD\b/;
++// "a–b" or "a-b" decimal pairs. The negative look-aheads reject volume
++// tiers such as "5k–50k" / "100k+" so only money pairs are captured.
++const PAIR = /(\d+(?:\.\d+)?)(?![\d.]*k)\s*[–-]\s*(\d+(?:\.\d+)?)(?![\d.]*k)/g;
++const MAX_SANE_UNIT_PRICE = 10_000;
++
++function collectPricingStrings(brief: EditorialBriefField[] | undefined): string[] {
++  if (!brief) return [];
++  const out: string[] = [];
++  for (const field of brief) {
++    if (!PRICING_LABEL.test(field.label ?? "")) continue;
++    if (field.text) out.push(field.text);
++    for (const item of field.items ?? []) out.push(item);
++  }
++  return out;
++}
++
++/**
++ * Parse the editorial "Typical pricing" brief into a low/high USD range.
++ * Returns null when there is no pricing field, the text is not a USD
++ * figure, or the numbers are implausible — callers must then omit
++ * `offers` rather than fall back to a placeholder.
++ */
++export function parseTypicalPriceRange(brief: EditorialBriefField[] | undefined): ProductPriceRange | null {
++  const candidates = collectPricingStrings(brief).filter((text) => USD_PREFIX.test(text));
++  if (candidates.length === 0) return null;
++
++  const values: number[] = [];
++  for (const text of candidates) {
++    // Only the money part — anything after "(" is commentary
++    // ("(typical FOB Shenzhen range)").
++    const head = text.split("(")[0];
++    for (const match of head.matchAll(PAIR)) {
++      const a = Number(match[1]);
++      const b = Number(match[2]);
++      if (Number.isFinite(a) && Number.isFinite(b)) values.push(a, b);
++    }
++  }
++  if (values.length === 0) return null;
++
++  const low = Math.min(...values);
++  const high = Math.max(...values);
++  if (!(low > 0) || !(high >= low) || high > MAX_SANE_UNIT_PRICE) return null;
++  return { low, high, currency: "USD" };
++}
++
++/** Format for schema.org price fields — Google's examples use "0.30"-style strings. */
++export function formatSchemaPrice(value: number): string {
++  return value.toFixed(2);
++}
++
++/**
++ * Build the `offers` value for a Product node, or null when the page has
++ * no verifiable price range.
++ */
++export function buildProductOffers(
++  range: ProductPriceRange | null,
++  productUrl: string,
++  sellerId: string,
++): Record<string, unknown> | null {
++  if (!range) return null;
++  return {
++    "@type": "AggregateOffer",
++    url: productUrl,
++    priceCurrency: range.currency,
++    lowPrice: formatSchemaPrice(range.low),
++    highPrice: formatSchemaPrice(range.high),
++    availability: "https://schema.org/InStock",
++    seller: { "@id": sellerId },
++  };
++}
+-- 
+2.34.1
+

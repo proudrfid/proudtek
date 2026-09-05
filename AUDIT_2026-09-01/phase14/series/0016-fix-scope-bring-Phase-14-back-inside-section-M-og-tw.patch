@@ -1,0 +1,386 @@
+From 6282433cb2c848ae86a157b8cb6220f57a87d028 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 11:41:26 -0400
+Subject: [PATCH 16/20] fix(scope): bring Phase 14 back inside section M; og
+ twins render in prebuild
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Owner instruction 2026-09-02 ("偏离项按照计划修正"): the items the Phase 14
+report flagged as beyond the approved plan are reverted or completed as
+planned.
+- redirects: the five non-JP nfc-reader-writer rules return to the family hub
+  /products/rfid-readers/ (only the JP rule was approved for the encoder
+  page); the two translation-inferred LEGIC targets (IT carta-legale, FR
+  carte-legendaire) go to the card family hub instead of the LEGIC SKU
+- forms: the /faq/ Kadence form rewire and the contact <noscript> removal
+  are dropped (enhance-page.ts back to baseline); the approved B5 scope —
+  inline RFQ / sample-pack hardening and the dead homepage newsletter row —
+  stands
+- schema: /about/* pages no longer count as article routes (AboutPage only,
+  as Phase 10 intended)
+- og twins: scripts/build-og-rasters.mjs runs in prebuild — renders missing
+  twins locally with sharp, runs --check on Vercel/CI — so the committed
+  twins stay the deterministic source while new SVG heroes cannot ship
+  without one
+---
+ package.json                      |  2 +-
+ public/_redirects                 | 14 ++---
+ src/lib/editorial-authority-ld.ts |  1 -
+ src/lib/route-overrides.ts        | 14 ++---
+ src/lib/seo/enhance-page.ts       | 94 ++-----------------------------
+ vercel.json                       | 14 ++---
+ 6 files changed, 28 insertions(+), 111 deletions(-)
+
+diff --git a/package.json b/package.json
+index c9d5da5..2182aef 100644
+--- a/package.json
++++ b/package.json
+@@ -7,7 +7,7 @@
+     "fetch": "node scripts/fetch-proudtek.mjs",
+     "generate:fallbacks": "node scripts/generate-fallback-pages.mjs",
+     "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
+-    "prebuild": "node scripts/build-kadence-css-bundle.mjs && (if [ -n \"$VERCEL\" ] || [ -n \"$CI\" ]; then echo 'Skipping WebP gen on Vercel/CI (227 webp files pre-committed)'; else npm run images:build-webp -- --quiet; fi)",
++    "prebuild": "node scripts/build-kadence-css-bundle.mjs && (if [ -n \"$VERCEL\" ] || [ -n \"$CI\" ]; then echo 'Skipping WebP gen on Vercel/CI (227 webp files pre-committed)'; node scripts/build-og-rasters.mjs --check; else npm run images:build-webp -- --quiet; node scripts/build-og-rasters.mjs; fi)",
+     "build:kadence-bundle": "node scripts/build-kadence-css-bundle.mjs",
+     "build": "ASTRO_TELEMETRY_DISABLED=1 astro build",
+     "build:site": "npm run fetch && npm run build",
+diff --git a/public/_redirects b/public/_redirects
+index 6e65567..5841ee9 100644
+--- a/public/_redirects
++++ b/public/_redirects
+@@ -12,7 +12,7 @@
+ /zh/%E4%BA%A7%E5%93%81/mifare-desfire-ev2%E5%8D%A1/ /products/rfid-cards/mifare-desfire-ev3-card/ 301
+ /zh/%E4%BA%A7%E5%93%81/java-card/ /products/rfid-cards/ 301
+ /zh/ / 301
+-/tr/urun/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/desktop-nfc-reader-encoder/ 301
++/tr/urun/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/ 301
+ /tr/urun/mifare-desfire-ev2-cards/ /products/rfid-cards/mifare-desfire-ev3-card/ 301
+ /tr/urun/hotel-key-cards/ /products/rfid-cards/ 301
+ /tr/sss/ /faq/ 301
+@@ -55,10 +55,10 @@
+ /ja/%E5%95%86%E5%93%81%E3%82%BF%E3%82%B0/rfid-key-tags/ /products/rfid-tags/ 301
+ /ja/ / 301
+ /it/prodotto/schede-mifare-desfire-ev2/ /products/rfid-cards/mifare-desfire-ev3-card/ 301
+-/it/prodotto/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/desktop-nfc-reader-encoder/ 301
++/it/prodotto/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/ 301
+ /it/prodotto/mifare-plus-card/ /products/rfid-cards/mifare-plus-se-card/ 301
+ /it/prodotto/hitag-2-card/ /products/rfid-tags/ 301
+-/it/prodotto/carta-legale/ /products/rfid-cards/legic-card/ 301
++/it/prodotto/carta-legale/ /products/rfid-cards/ 301
+ /it/prodotto/car-transponder-chip/ /products/rfid-tags/ 301
+ /he/product-category/urunler/rfid-tags/ /products/rfid-cards/ 301
+ /he/product-category/produtos/rfid-keyfobs/ /products/rfid-cards/ 301
+@@ -71,12 +71,12 @@
+ /he/%D7%9E%D7%95%D6%BC%D7%A6%D6%B8%D7%A8/%D7%9B%D7%A8%D7%98%D7%99%D7%A1%D7%99-nfc/ /products/rfid-cards/ 301
+ /he/%D7%9E%D7%95%D6%BC%D7%A6%D6%B8%D7%A8/%D7%9B%D7%A8%D7%98%D7%99%D7%A1%D7%99-%D7%9E%D7%99%D7%A4%D7%90%D7%A8-%D7%93%D7%A1%D7%A4%D7%99%D7%99%D7%A8/ /products/rfid-cards/mifare-desfire-ev3-card/ 301
+ /he/ / 301
+-/fr/produit/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/desktop-nfc-reader-encoder/ 301
++/fr/produit/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/ 301
+ /fr/produit/mifare-plus-card/ /products/rfid-cards/mifare-plus-se-card/ 301
+ /fr/produit/mifare-desfire-ev2-cards/ /products/rfid-cards/mifare-desfire-ev3-card/ 301
+ /fr/produit/hitag-2-card/ /products/rfid-tags/ 301
+ /fr/produit/felica-card/ /products/rfid-cards/ 301
+-/fr/produit/carte-legendaire/ /products/rfid-cards/legic-card/ 301
++/fr/produit/carte-legendaire/ /products/rfid-cards/ 301
+ /fr/produit/carte-java/ /products/rfid-cards/java-card/ 301
+ /fr/produit/car-transponder-chip/ /products/rfid-tags/ 301
+ /fr/etiquette-de-produit/nfc-tap-here-sticker/ /products/rfid-labels/ 301
+@@ -96,7 +96,7 @@
+ /fa/ / 301
+ /es/producto/tarjeta-legic/ /products/rfid-cards/legic-card/ 301
+ /es/producto/pulseras-rfid-para-hoteles/ /products/rfid-wristbands/ 301
+-/es/producto/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/desktop-nfc-reader-encoder/ 301
++/es/producto/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/ 301
+ /es/producto/mifare-stickers/ /products/rfid-labels/ 301
+ /es/producto/mifare-plus-card/ /products/rfid-cards/mifare-plus-se-card/ 301
+ /es/producto/mifare-desfire-ev2-cards/ /products/rfid-cards/mifare-desfire-ev3-card/ 301
+@@ -138,7 +138,7 @@
+ /da/produktkategori/produkter/rfid-wristbands/ /products/rfid-wristbands/ 301
+ /da/produkt/t5577-kort/ /products/rfid-cards/ 301
+ /da/produkt/rfid-silikone-armband/ /products/rfid-wristbands/ 301
+-/da/produkt/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/desktop-nfc-reader-encoder/ 301
++/da/produkt/nfc-reader-writer-with-free-sdks/ /products/rfid-readers/ 301
+ /da/produkt/mifare-plus-card/ /products/rfid-cards/mifare-plus-se-card/ 301
+ /da/produkt/mifare-desfire-ev2-kort/ /products/rfid-cards/mifare-desfire-ev3-card/ 301
+ /da/produkt/legitimt-kort/ /products/rfid-cards/ 301
+diff --git a/src/lib/editorial-authority-ld.ts b/src/lib/editorial-authority-ld.ts
+index fedd920..b8a021b 100644
+--- a/src/lib/editorial-authority-ld.ts
++++ b/src/lib/editorial-authority-ld.ts
+@@ -66,7 +66,6 @@ const ARTICLE_ROUTE_GROUPS = new Set([
+   "case-studies",
+   "compatibility",
+   "research",
+-  "about",
+ ]);
+ 
+ export function isArticleRoute(route: string): boolean {
+diff --git a/src/lib/route-overrides.ts b/src/lib/route-overrides.ts
+index 30891af..32a14fe 100644
+--- a/src/lib/route-overrides.ts
++++ b/src/lib/route-overrides.ts
+@@ -60,7 +60,7 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
+   "/da/produkt/legitimt-kort/": "/products/rfid-cards/",
+   "/da/produkt/mifare-desfire-ev2-kort/": "/products/rfid-cards/mifare-desfire-ev3-card/",
+   "/da/produkt/mifare-plus-card/": "/products/rfid-cards/mifare-plus-se-card/",
+-  "/da/produkt/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++  "/da/produkt/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/",
+   "/da/produkt/rfid-silikone-armband/": "/products/rfid-wristbands/",
+   "/da/produkt/t5577-kort/": "/products/rfid-cards/",
+   "/da/produktkategori/produkter/rfid-wristbands/": "/products/rfid-wristbands/",
+@@ -102,7 +102,7 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
+   "/es/producto/mifare-desfire-ev2-cards/": "/products/rfid-cards/mifare-desfire-ev3-card/",
+   "/es/producto/mifare-plus-card/": "/products/rfid-cards/mifare-plus-se-card/",
+   "/es/producto/mifare-stickers/": "/products/rfid-labels/",
+-  "/es/producto/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++  "/es/producto/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/",
+   "/es/producto/pulseras-rfid-para-hoteles/": "/products/rfid-wristbands/",
+   "/es/producto/tarjeta-legic/": "/products/rfid-cards/legic-card/",
+   "/fa/": "/",
+@@ -122,12 +122,12 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
+   "/fr/etiquette-de-produit/nfc-tap-here-sticker/": "/products/rfid-labels/",
+   "/fr/produit/car-transponder-chip/": "/products/rfid-tags/",
+   "/fr/produit/carte-java/": "/products/rfid-cards/java-card/",
+-  "/fr/produit/carte-legendaire/": "/products/rfid-cards/legic-card/",
++  "/fr/produit/carte-legendaire/": "/products/rfid-cards/",
+   "/fr/produit/felica-card/": "/products/rfid-cards/",
+   "/fr/produit/hitag-2-card/": "/products/rfid-tags/",
+   "/fr/produit/mifare-desfire-ev2-cards/": "/products/rfid-cards/mifare-desfire-ev3-card/",
+   "/fr/produit/mifare-plus-card/": "/products/rfid-cards/mifare-plus-se-card/",
+-  "/fr/produit/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++  "/fr/produit/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/",
+   "/he/": "/",
+   "/he/%D7%9E%D7%95%D6%BC%D7%A6%D6%B8%D7%A8/%D7%9B%D7%A8%D7%98%D7%99%D7%A1%D7%99-%D7%9E%D7%99%D7%A4%D7%90%D7%A8-%D7%93%D7%A1%D7%A4%D7%99%D7%99%D7%A8/": "/products/rfid-cards/mifare-desfire-ev3-card/",
+   "/he/%D7%9E%D7%95%D6%BC%D7%A6%D6%B8%D7%A8/%D7%9B%D7%A8%D7%98%D7%99%D7%A1%D7%99-nfc/": "/products/rfid-cards/",
+@@ -140,10 +140,10 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
+   "/he/product-category/produtos/rfid-keyfobs/": "/products/rfid-cards/",
+   "/he/product-category/urunler/rfid-tags/": "/products/rfid-cards/",
+   "/it/prodotto/car-transponder-chip/": "/products/rfid-tags/",
+-  "/it/prodotto/carta-legale/": "/products/rfid-cards/legic-card/",
++  "/it/prodotto/carta-legale/": "/products/rfid-cards/",
+   "/it/prodotto/hitag-2-card/": "/products/rfid-tags/",
+   "/it/prodotto/mifare-plus-card/": "/products/rfid-cards/mifare-plus-se-card/",
+-  "/it/prodotto/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++  "/it/prodotto/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/",
+   "/it/prodotto/schede-mifare-desfire-ev2/": "/products/rfid-cards/mifare-desfire-ev3-card/",
+   "/ja/": "/",
+   "/ja/%E5%95%86%E5%93%81%E3%82%BF%E3%82%B0/rfid-key-tags/": "/products/rfid-tags/",
+@@ -186,7 +186,7 @@ export const ROUTE_CANONICAL_OVERRIDES: Record<string, string> = {
+   "/tr/sss/": "/faq/",
+   "/tr/urun/hotel-key-cards/": "/products/rfid-cards/",
+   "/tr/urun/mifare-desfire-ev2-cards/": "/products/rfid-cards/mifare-desfire-ev3-card/",
+-  "/tr/urun/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++  "/tr/urun/nfc-reader-writer-with-free-sdks/": "/products/rfid-readers/",
+   "/zh/": "/",
+   "/zh/%E4%BA%A7%E5%93%81/java-card/": "/products/rfid-cards/",
+   "/zh/%E4%BA%A7%E5%93%81/mifare-desfire-ev2%E5%8D%A1/": "/products/rfid-cards/mifare-desfire-ev3-card/",
+diff --git a/src/lib/seo/enhance-page.ts b/src/lib/seo/enhance-page.ts
+index 362aea6..6c99844 100644
+--- a/src/lib/seo/enhance-page.ts
++++ b/src/lib/seo/enhance-page.ts
+@@ -105,9 +105,6 @@ import {
+   renderBlogGrowthHub,
+ } from "./render-blocks";
+ 
+-/** Formspree inbox shared by every lead form on the site (contact, FAQ, inline RFQ, RFQ wizard). */
+-export const FORMSPREE_ENDPOINT = "https://formspree.io/f/xlgorlog";
+-
+ export function normalizePageBody($body: CheerioAPI, page: SnapshotPage, context: PageContext): void {
+   rewriteLegacyInternalLinks($body);
+ 
+@@ -225,7 +222,6 @@ export function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context
+ 
+   if (page.route === "/faq/") {
+     enhanceFaqPage($body);
+-    enhanceFaqInquiryForm($body);
+   }
+ 
+   if (context.kind === "contact" && page.route === "/contact/") {
+@@ -533,20 +529,6 @@ export function enhanceKadenceA11y($body: CheerioAPI): void {
+   });
+ }
+ 
+-/**
+- * /faq/ — the "Can't find an answer?" Kadence form still posted to the
+- * WordPress AJAX endpoint (dead on the static host; Phase 12 CV-1 class).
+- * Rewire it to Formspree with the same hardening as the contact form.
+- */
+-export function enhanceFaqInquiryForm($body: CheerioAPI): void {
+-  const form = $body('form.kb-form').filter((_, element) =>
+-    $body(element).find('input[name="action"][value="kb_process_ajax_submit"]').length > 0,
+-  ).first();
+-  if (!form.length) return;
+-  rewireKadenceFormToFormspree($body, form, "FAQ page inquiry — proudtek.com");
+-  hardenKadenceForm(form);
+-}
+-
+ export function enhanceFaqPage($body: CheerioAPI): void {
+   const faqHeading = $body("h2").filter((_, element) => cleanText($body(element).text()) === "FAQ Help Center").first();
+ 
+@@ -660,11 +642,8 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
+   }
+ 
+   // Point the form to Formspree for submission
+-  form.attr("action", FORMSPREE_ENDPOINT);
++  form.attr("action", "https://formspree.io/f/xlgorlog");
+   form.attr("method", "POST");
+-  // The native POST works without JavaScript, so the WP-only "enable
+-  // JavaScript" warning (and its style hiding the submit button) must go.
+-  removeKadenceNoscriptWarning(form);
+ 
+   // Strip the WP-era AJAX router fields — junk data in a Formspree
+   // submission ("action: kb_process_ajax_submit" in every lead email),
+@@ -753,18 +732,11 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
+     form.prepend('<input type="hidden" name="_subject" value="Contact form — proudtek.com" />');
+   }
+ 
+-  hardenKadenceForm(form);
+-}
+-
+-/**
+- * Bring a Kadence-era form up to the same a11y + attribution bar as the
+- * editorial inline RFQ (DS-11 #5b). Kadence ships data-required="yes" but no
+- * native HTML5 required, no aria-required, no error containers, and no
+- * aria-describedby. We add all four so screen readers + the inline
+- * form-validation JS in BaseLayout can both work, then prepend the hidden
+- * attribution inputs the PageScript fills at submit time.
+- */
+-function hardenKadenceForm(form: ReturnType<CheerioAPI>): void {
++  // DS-11 #5b — Bring the Kadence form up to the same a11y bar as the
++  // editorial inline RFQ. Kadence ships data-required="yes" but no native
++  // HTML5 required, no aria-required, no error containers, and no
++  // aria-describedby. We add all four so screen readers + the inline
++  // form-validation JS in BaseLayout can both work.
+   form.attr("novalidate", "true");
+   form.attr("data-codex-rfq", "");
+   // Each <input> / <textarea> with data-required gets HTML5 required +
+@@ -821,57 +793,3 @@ function hardenKadenceForm(form: ReturnType<CheerioAPI>): void {
+     ].join(""));
+   }
+ }
+-
+-/**
+- * Point a WordPress-era Kadence form at Formspree. On the static host the
+- * original `action=""` + hidden `action=kb_process_ajax_submit` posts to
+- * nothing (WP admin-ajax does not exist here) — the form is dead and the
+- * `<noscript>` block even tells no-JS users to "enable JavaScript".
+- * Conversion audit 2026-09-01 (Phase 12 CV-1). Shared by the /contact/ and
+- * /faq/ forms; field names are mapped from Kadence `data-label`s.
+- */
+-/**
+- * Kadence emits `<noscript>Please enable JavaScript … to submit the form
+- * <style>…kb-submit-field{display:none}</style></noscript>` either inside the
+- * `.wp-block-kadence-form` wrapper or as its next sibling (snapshot pages
+- * differ). Once the form posts natively that warning is wrong, so remove it.
+- */
+-function removeKadenceNoscriptWarning(form: ReturnType<CheerioAPI>): void {
+-  const wrap = form.closest(".wp-block-kadence-form");
+-  const scope = wrap.length ? wrap : form;
+-  scope.find("noscript").filter((_, el) => /enable JavaScript/i.test(scope.find(el).text())).remove();
+-  const sibling = scope.next("noscript");
+-  if (sibling.length && /enable JavaScript/i.test(sibling.text())) sibling.remove();
+-}
+-
+-function rewireKadenceFormToFormspree(
+-  $body: CheerioAPI,
+-  form: ReturnType<CheerioAPI>,
+-  fallbackSubject: string,
+-): void {
+-  form.attr("action", FORMSPREE_ENDPOINT);
+-  form.attr("method", "POST");
+-  // Strip the WP-era AJAX router fields — junk data in a Formspree
+-  // submission ("action: kb_process_ajax_submit" in every lead email),
+-  // and an input named "action" shadows form.action in DOM scripting.
+-  form.find('input[name="_kb_form_id"], input[name="_kb_form_post_id"], input[name="action"]').remove();
+-  // Kadence's honeypot → Formspree's native `_gotcha` trap so spam is
+-  // discarded server-side. Visual hiding + aria-hidden stay as-is.
+-  form.find('input[name="_kb_verify_email"]').attr("name", "_gotcha");
+-  // The native POST now works without JavaScript, so the WP-only "enable
+-  // JavaScript" warning (and its style hiding the submit button) must go.
+-  removeKadenceNoscriptWarning(form);
+-
+-  form.find("input[data-label], textarea[data-label]").each((_, element) => {
+-    const $el = $body(element);
+-    const label = ($el.attr("data-label") ?? "").toLowerCase();
+-    if (/e-?mail/.test(label)) $el.attr("name", "email");
+-    else if (/name/.test(label)) $el.attr("name", "name");
+-    else if (/phone|tel/.test(label)) $el.attr("name", "phone");
+-    else if (/subject/.test(label)) $el.attr("name", "_subject");
+-    else if (/message|note/.test(label)) $el.attr("name", "message");
+-  });
+-  if (!form.find('[name="_subject"]').length) {
+-    form.prepend(`<input type="hidden" name="_subject" value="${escapeXml(fallbackSubject)}" />`);
+-  }
+-}
+diff --git a/vercel.json b/vercel.json
+index bc0d9bb..fd0a42a 100644
+--- a/vercel.json
++++ b/vercel.json
+@@ -62,7 +62,7 @@
+     },
+     {
+       "source": "/tr/urun/nfc-reader-writer-with-free-sdks/",
+-      "destination": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++      "destination": "/products/rfid-readers/",
+       "permanent": true
+     },
+     {
+@@ -277,7 +277,7 @@
+     },
+     {
+       "source": "/it/prodotto/nfc-reader-writer-with-free-sdks/",
+-      "destination": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++      "destination": "/products/rfid-readers/",
+       "permanent": true
+     },
+     {
+@@ -292,7 +292,7 @@
+     },
+     {
+       "source": "/it/prodotto/carta-legale/",
+-      "destination": "/products/rfid-cards/legic-card/",
++      "destination": "/products/rfid-cards/",
+       "permanent": true
+     },
+     {
+@@ -357,7 +357,7 @@
+     },
+     {
+       "source": "/fr/produit/nfc-reader-writer-with-free-sdks/",
+-      "destination": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++      "destination": "/products/rfid-readers/",
+       "permanent": true
+     },
+     {
+@@ -382,7 +382,7 @@
+     },
+     {
+       "source": "/fr/produit/carte-legendaire/",
+-      "destination": "/products/rfid-cards/legic-card/",
++      "destination": "/products/rfid-cards/",
+       "permanent": true
+     },
+     {
+@@ -482,7 +482,7 @@
+     },
+     {
+       "source": "/es/producto/nfc-reader-writer-with-free-sdks/",
+-      "destination": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++      "destination": "/products/rfid-readers/",
+       "permanent": true
+     },
+     {
+@@ -692,7 +692,7 @@
+     },
+     {
+       "source": "/da/produkt/nfc-reader-writer-with-free-sdks/",
+-      "destination": "/products/rfid-readers/desktop-nfc-reader-encoder/",
++      "destination": "/products/rfid-readers/",
+       "permanent": true
+     },
+     {
+-- 
+2.34.1
+

@@ -1,0 +1,193 @@
+From 37dea8050427fd577c929ad493bca0e89460142e Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 06:27:31 -0400
+Subject: [PATCH 11/20] seo(templates): keep product titles inside 60 chars,
+ cap every meta description at 155
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Phase 14 batch B6 (audit 2026-09-01, Phase 2 T7).
+- product <title>: the family qualifier ('| RFID Card Manufacturer') is
+  kept only while the whole title fits 60 chars; otherwise '<title> | Proud
+  Tek'. 192/204 product titles were > 60 (median 84); 99 now fit, the 105
+  still over are long editorial titles (listed in
+  AUDIT_2026-09-01/phase14/B6-long-product-titles.csv for editing).
+- meta description: the withCommerceSignal suffix (' Factory-direct from
+  Proud Tek: 500-piece MOQ per chip type …') is removed — it produced
+  246-char descriptions with an ellipsis mid-string and repeated a MOQ
+  figure the Phase 4 ledger rates UNVERIFIED / INCONSISTENT (S-03).
+  capDescription() enforces 155 in buildPageSeo and in SeoHead for the
+  native hubs; longest description in the build is now 159 -> 155.
+- /case-studies/ hub description shortened to 155.
+---
+ src/layouts/partials/SeoHead.astro | 18 ++++++++++++----
+ src/lib/seo.ts                     | 34 ++++++++++++------------------
+ src/lib/seo/page-data.ts           | 13 +++++++++++-
+ src/pages/case-studies.astro       |  2 +-
+ 4 files changed, 41 insertions(+), 26 deletions(-)
+
+diff --git a/src/layouts/partials/SeoHead.astro b/src/layouts/partials/SeoHead.astro
+index 174995b..1263c9a 100644
+--- a/src/layouts/partials/SeoHead.astro
++++ b/src/layouts/partials/SeoHead.astro
+@@ -11,7 +11,7 @@
+  * Extracted from BaseLayout.astro on 2026-05-08 to keep the layout
+  * file focused on structure rather than meta-tag plumbing.
+  */
+-import type { PageSeoData } from "../../lib/seo";
++import { capDescription, type PageSeoData } from "../../lib/seo";
+ import { SITE_ORIGIN } from "../../lib/seo-content";
+ 
+ interface Props {
+@@ -22,6 +22,11 @@ interface Props {
+ 
+ const { seo, machineJsonPath, machineTextPath } = Astro.props;
+ 
++// Native-shell hubs (guides / compare clusters, case studies, compatibility)
++// hand in their own description strings; cap them at the same 155-char
++// budget the snapshot/editorial pipeline already enforces (Phase 2 T7).
++const description = capDescription(seo.description ?? "");
++
+ // seo.imageUrl is ABSOLUTE (image-utils wraps every selection in
+ // absoluteUrl()), so gates on a "/landing-images/" prefix must parse the
+ // pathname first — a startsWith() on the full URL never matches and left
+@@ -46,6 +51,9 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
+     : /\.webp$/i.test(imagePathname)
+       ? "image/webp"
+       : "";
++// The one exception: raster twins of SVG hero diagrams under /og/ are always
++// rendered at 1200×630 (scripts/build-og-rasters.mjs), so the size is known.
++const isOgRaster = imagePathname.startsWith("/og/");
+ ---
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+@@ -112,7 +120,7 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
+     keeping our overrides first means we never need to re-sanitize the chrome
+     fragment at the call sites. */}
+ <title>{seo.title}</title>
+-<meta name="description" content={seo.description} />
++<meta name="description" content={description} />
+ <meta name="robots" content={seo.robots} />
+ <link rel="canonical" href={seo.canonicalUrl} />
+ 
+@@ -201,15 +209,17 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
+ <meta property="og:site_name" content="Proud Tek" />
+ <meta property="og:type" content={seo.ogType} />
+ <meta property="og:title" content={seo.title} />
+-<meta property="og:description" content={seo.description} />
++<meta property="og:description" content={description} />
+ <meta property="og:url" content={seo.canonicalUrl} />
+ <meta property="og:image" content={seo.imageUrl} />
+ <meta property="og:image:alt" content={seo.imageAlt} />
+ {ogImageType ? <meta property="og:image:type" content={ogImageType} /> : null}
++{isOgRaster ? <meta property="og:image:width" content="1200" /> : null}
++{isOgRaster ? <meta property="og:image:height" content="630" /> : null}
+ 
+ <meta name="twitter:card" content="summary_large_image" />
+ <meta name="twitter:title" content={seo.title} />
+-<meta name="twitter:description" content={seo.description} />
++<meta name="twitter:description" content={description} />
+ <meta name="twitter:image" content={seo.imageUrl} />
+ <meta name="twitter:image:alt" content={seo.imageAlt} />
+ 
+diff --git a/src/lib/seo.ts b/src/lib/seo.ts
+index 6f50d57..71e23a3 100644
+--- a/src/lib/seo.ts
++++ b/src/lib/seo.ts
+@@ -402,22 +402,19 @@ export interface MachinePageData {
+ 
+ 
+ /**
+- * Append the verified factory-direct signal to commercial meta descriptions
+- * when absent. Never fabricates numbers: both facts condense existing site
+- * copy verbatim ("a 500-piece minimum per chip type"; "MOQ, price and lead
+- * time are quoted in writing before tooling, then held").
++ * Meta-description length cap (Phase 2 T7, 2026-09-01). The former
++ * `withCommerceSignal` helper appended " Factory-direct from Proud Tek:
++ * 500-piece MOQ per chip type …" to every product description, producing
++ * 246-char descriptions with an ellipsis in the middle, and propagated a MOQ
++ * figure the Phase 4 ledger rates UNVERIFIED and INCONSISTENT (S-03: 100 /
++ * 200–1,000 / 500 / 1,000–5,000 pcs on different surfaces). Descriptions
++ * now stay at the 155-char budget the editorial summary already meets; the
++ * MOQ text remains on the pages themselves pending the sales-owned MOQ table.
+  */
+-const COMMERCE_SIGNAL_PATTERN = /factory|MOQ|minimum order|lead time|written quote/i;
+-const COMMERCE_SIGNAL_SUFFIX =
+-  " Factory-direct from Proud Tek: 500-piece MOQ per chip type with written quotes and lead times held before tooling.";
+-const COMMERCE_SIGNAL_KINDS = new Set<PageKind>(["product"]);
+-
+-export function withCommerceSignal(description: string, kind: PageKind): string {
+-  if (!COMMERCE_SIGNAL_KINDS.has(kind)) return description;
+-  if (COMMERCE_SIGNAL_PATTERN.test(description)) return description;
+-  if (!description.trim()) return description;
+-  const candidate = `${description.trimEnd()}${COMMERCE_SIGNAL_SUFFIX}`;
+-  return candidate.length <= 320 ? candidate : description;
++export const META_DESCRIPTION_BUDGET = 155;
++
++export function capDescription(description: string): string {
++  return description.length <= META_DESCRIPTION_BUDGET ? description : truncateText(description, META_DESCRIPTION_BUDGET);
+ }
+ 
+ export function buildPageSeo(page: SnapshotPage): PageSeoData {
+@@ -436,11 +433,8 @@ export function buildPageSeo(page: SnapshotPage): PageSeoData {
+ 
+   const context = buildPageContext(page, $head, $body, kind);
+   normalizePageBody($body, page, context);
+-  // GEO enrichment (2026-08-25): commercial pages carry the factory-direct
+-  // signal buyers ask AI engines for. Claims mirror verified site copy
+-  // (about/lp): 500-piece MOQ per chip type, written quotes held before
+-  // tooling. Meta description and Article schema share this string.
+-  context.description = withCommerceSignal(context.description, kind);
++  // Meta description and Article schema share this string (≤ 155 chars).
++  context.description = capDescription(context.description);
+   const title = buildDocumentTitle(page.route, context.contentTitle, kind);
+   const indexable = isIndexableRoute(page.route) && !isSoft404Page(page, context.contentTitle);
+ 
+diff --git a/src/lib/seo/page-data.ts b/src/lib/seo/page-data.ts
+index 84a895a..38c3144 100644
+--- a/src/lib/seo/page-data.ts
++++ b/src/lib/seo/page-data.ts
+@@ -546,6 +546,9 @@ export function resolveFaqEntries($body: CheerioAPI): FaqEntry[] {
+   return entries;
+ }
+ 
++/** Display budget for product <title>s before Google truncates (≈ 600 px / 60 chars). */
++const PRODUCT_TITLE_BUDGET = 60;
++
+ export function buildDocumentTitle(route: string, contentTitle: string, kind: PageKind): string {
+   if (route === "/") {
+     // Homepage SEO title — compressed 2026-06-11 (user-approved) from the
+@@ -559,7 +562,15 @@ export function buildDocumentTitle(route: string, contentTitle: string, kind: Pa
+   }
+ 
+   if (kind === "product") {
+-    return `${contentTitle} | ${buildProductTitleQualifier(route, contentTitle)} | Proud Tek`;
++    // Audit 2026-09-01 (Phase 2 T7): the two-suffix template pushed 192/204
++    // product titles past 60 chars (median 84), so the differentiator was
++    // truncated in the SERP and the qualifier never shown. Keep the family
++    // qualifier only while the whole title fits the ~60-char display budget
++    // (short category/hub titles benefit from it); otherwise brand only.
++    const qualified = `${contentTitle} | ${buildProductTitleQualifier(route, contentTitle)} | Proud Tek`;
++    // Titles still > 60 after this are an editorial (JSON `title`) matter,
++    // not a template one — see the Phase 14 report for the list.
++    return qualified.length <= PRODUCT_TITLE_BUDGET ? qualified : `${contentTitle} | Proud Tek`;
+   }
+ 
+   // Compare pages are editorial (kind === "article") but they're product
+diff --git a/src/pages/case-studies.astro b/src/pages/case-studies.astro
+index bb2afcb..7186748 100644
+--- a/src/pages/case-studies.astro
++++ b/src/pages/case-studies.astro
+@@ -41,7 +41,7 @@ const FONT_HEAD =
+ // approved design's <meta name="description">.
+ const CS_TITLE = "RFID & NFC Worked Examples — Programme Templates | Proud Tek";
+ const CS_DESCRIPTION =
+-  "Six illustrative RFID & NFC programme templates — hotel keys, laundry tags, festival wristbands, retail source tagging, library self-service and pharma traceability — with every figure derived from stated assumptions. Not named-customer records.";
++  "Six illustrative RFID & NFC programme templates — hotel keys, laundry, festivals, retail, libraries, pharma — every figure derived from stated assumptions.";
+ 
+ const breadcrumbLd = JSON.stringify({
+   "@context": "https://schema.org",
+-- 
+2.34.1
+

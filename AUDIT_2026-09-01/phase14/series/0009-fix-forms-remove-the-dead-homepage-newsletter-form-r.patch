@@ -1,0 +1,213 @@
+From 2930762ece9843783bfcda899a6006388efa73e3 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 06:02:33 -0400
+Subject: [PATCH 09/20] fix(forms): remove the dead homepage newsletter form,
+ rewire the FAQ inquiry form to Formspree
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Phase 14 batch B5 (audit 2026-09-01, Phase 12 CV-1). Two WordPress-era
+Kadence forms still posted to action="" with the hidden WP admin-ajax
+router field (kb_process_ajax_submit), which does not exist on the static
+host — both have been dead since the migration and told no-JS users to
+'enable JavaScript'.
+- Homepage 'Subscribe to our newsletter' row: removed at render time
+  (render-snapshot.ts). There is no newsletter programme to point it at;
+  a visibly broken form is worse than none. Guarded on the newsletter
+  wording so no other form is touched.
+- /faq/ 'Can't find an answer?' form: rewired to the shared Formspree inbox
+  with the same field mapping, honeypot rename and a11y/attribution
+  hardening as /contact/ (helpers extracted from enhancePrimaryContactPage).
+- Both Kadence forms drop the WP-only <noscript> 'enable JavaScript'
+  warning (and its style hiding the submit button) — the native POST works
+  without JavaScript now.
+FORMSPREE_ENDPOINT is exported once and reused.
+---
+ src/lib/render-snapshot.ts  | 24 ++++++++++
+ src/lib/seo/enhance-page.ts | 94 ++++++++++++++++++++++++++++++++++---
+ 2 files changed, 112 insertions(+), 6 deletions(-)
+
+diff --git a/src/lib/render-snapshot.ts b/src/lib/render-snapshot.ts
+index 7c9f244..b8ceada 100644
+--- a/src/lib/render-snapshot.ts
++++ b/src/lib/render-snapshot.ts
+@@ -301,6 +301,7 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
+   // and standalone numeric H2s ("10", "305+", "8+", "12+") are reshaped
+   // to carry the product-family keywords search engines and LLMs key off.
+   if (page.route === "/" || page.route === "") {
++    removeDeadNewsletterForm($body);
+     applyHomepageClaimCorrections($body);
+     enhanceHomepageHeadings($body);
+     restructureCapabilitiesSection($body);
+@@ -956,6 +957,29 @@ const REMOVED_STAT_DESCRIPTORS = new Set([
+   "International Certifications",
+ ]);
+ 
++/**
++ * Conversion audit 2026-09-01 (Phase 12 CV-1): the WordPress "Subscribe to
++ * our newsletter" block posts to `action=""` with a hidden
++ * `action=kb_process_ajax_submit` — the WP admin-ajax router, which does not
++ * exist on the static host. The form has been dead since the migration and
++ * its `<noscript>` text ("Please enable JavaScript … to submit the form") is
++ * visible to no-JS users. There is no newsletter programme to wire it to, so
++ * the whole two-column row (icon + heading + form) is removed rather than
++ * left as a visibly broken promise. Guarded on the "newsletter" wording so
++ * no other Kadence form is touched.
++ */
++function removeDeadNewsletterForm($body: ReturnType<typeof load>): void {
++  $body("form.kb-form").each((_, el) => {
++    const $form = $body(el);
++    if (!$form.find('input[name="action"][value="kb_process_ajax_submit"]').length) return;
++    if ($form.find("textarea").length) return; // a contact-style form, not the newsletter
++    const row = $form.closest(".wp-block-kadence-rowlayout");
++    if (!row.length) return;
++    if (!/newsletter/i.test(row.text())) return;
++    row.remove();
++  });
++}
++
+ function applyHomepageClaimCorrections($body: ReturnType<typeof load>): void {
+   // 1. Stat cards: drop the cards whose figure has no evidence; keep the
+   //    inspection card without its count; recompute years in operation.
+diff --git a/src/lib/seo/enhance-page.ts b/src/lib/seo/enhance-page.ts
+index 6c99844..362aea6 100644
+--- a/src/lib/seo/enhance-page.ts
++++ b/src/lib/seo/enhance-page.ts
+@@ -105,6 +105,9 @@ import {
+   renderBlogGrowthHub,
+ } from "./render-blocks";
+ 
++/** Formspree inbox shared by every lead form on the site (contact, FAQ, inline RFQ, RFQ wizard). */
++export const FORMSPREE_ENDPOINT = "https://formspree.io/f/xlgorlog";
++
+ export function normalizePageBody($body: CheerioAPI, page: SnapshotPage, context: PageContext): void {
+   rewriteLegacyInternalLinks($body);
+ 
+@@ -222,6 +225,7 @@ export function normalizeCoreBody($body: CheerioAPI, page: SnapshotPage, context
+ 
+   if (page.route === "/faq/") {
+     enhanceFaqPage($body);
++    enhanceFaqInquiryForm($body);
+   }
+ 
+   if (context.kind === "contact" && page.route === "/contact/") {
+@@ -529,6 +533,20 @@ export function enhanceKadenceA11y($body: CheerioAPI): void {
+   });
+ }
+ 
++/**
++ * /faq/ — the "Can't find an answer?" Kadence form still posted to the
++ * WordPress AJAX endpoint (dead on the static host; Phase 12 CV-1 class).
++ * Rewire it to Formspree with the same hardening as the contact form.
++ */
++export function enhanceFaqInquiryForm($body: CheerioAPI): void {
++  const form = $body('form.kb-form').filter((_, element) =>
++    $body(element).find('input[name="action"][value="kb_process_ajax_submit"]').length > 0,
++  ).first();
++  if (!form.length) return;
++  rewireKadenceFormToFormspree($body, form, "FAQ page inquiry — proudtek.com");
++  hardenKadenceForm(form);
++}
++
+ export function enhanceFaqPage($body: CheerioAPI): void {
+   const faqHeading = $body("h2").filter((_, element) => cleanText($body(element).text()) === "FAQ Help Center").first();
+ 
+@@ -642,8 +660,11 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
+   }
+ 
+   // Point the form to Formspree for submission
+-  form.attr("action", "https://formspree.io/f/xlgorlog");
++  form.attr("action", FORMSPREE_ENDPOINT);
+   form.attr("method", "POST");
++  // The native POST works without JavaScript, so the WP-only "enable
++  // JavaScript" warning (and its style hiding the submit button) must go.
++  removeKadenceNoscriptWarning(form);
+ 
+   // Strip the WP-era AJAX router fields — junk data in a Formspree
+   // submission ("action: kb_process_ajax_submit" in every lead email),
+@@ -732,11 +753,18 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
+     form.prepend('<input type="hidden" name="_subject" value="Contact form — proudtek.com" />');
+   }
+ 
+-  // DS-11 #5b — Bring the Kadence form up to the same a11y bar as the
+-  // editorial inline RFQ. Kadence ships data-required="yes" but no native
+-  // HTML5 required, no aria-required, no error containers, and no
+-  // aria-describedby. We add all four so screen readers + the inline
+-  // form-validation JS in BaseLayout can both work.
++  hardenKadenceForm(form);
++}
++
++/**
++ * Bring a Kadence-era form up to the same a11y + attribution bar as the
++ * editorial inline RFQ (DS-11 #5b). Kadence ships data-required="yes" but no
++ * native HTML5 required, no aria-required, no error containers, and no
++ * aria-describedby. We add all four so screen readers + the inline
++ * form-validation JS in BaseLayout can both work, then prepend the hidden
++ * attribution inputs the PageScript fills at submit time.
++ */
++function hardenKadenceForm(form: ReturnType<CheerioAPI>): void {
+   form.attr("novalidate", "true");
+   form.attr("data-codex-rfq", "");
+   // Each <input> / <textarea> with data-required gets HTML5 required +
+@@ -793,3 +821,57 @@ export function enhancePrimaryContactPage($body: CheerioAPI): void {
+     ].join(""));
+   }
+ }
++
++/**
++ * Point a WordPress-era Kadence form at Formspree. On the static host the
++ * original `action=""` + hidden `action=kb_process_ajax_submit` posts to
++ * nothing (WP admin-ajax does not exist here) — the form is dead and the
++ * `<noscript>` block even tells no-JS users to "enable JavaScript".
++ * Conversion audit 2026-09-01 (Phase 12 CV-1). Shared by the /contact/ and
++ * /faq/ forms; field names are mapped from Kadence `data-label`s.
++ */
++/**
++ * Kadence emits `<noscript>Please enable JavaScript … to submit the form
++ * <style>…kb-submit-field{display:none}</style></noscript>` either inside the
++ * `.wp-block-kadence-form` wrapper or as its next sibling (snapshot pages
++ * differ). Once the form posts natively that warning is wrong, so remove it.
++ */
++function removeKadenceNoscriptWarning(form: ReturnType<CheerioAPI>): void {
++  const wrap = form.closest(".wp-block-kadence-form");
++  const scope = wrap.length ? wrap : form;
++  scope.find("noscript").filter((_, el) => /enable JavaScript/i.test(scope.find(el).text())).remove();
++  const sibling = scope.next("noscript");
++  if (sibling.length && /enable JavaScript/i.test(sibling.text())) sibling.remove();
++}
++
++function rewireKadenceFormToFormspree(
++  $body: CheerioAPI,
++  form: ReturnType<CheerioAPI>,
++  fallbackSubject: string,
++): void {
++  form.attr("action", FORMSPREE_ENDPOINT);
++  form.attr("method", "POST");
++  // Strip the WP-era AJAX router fields — junk data in a Formspree
++  // submission ("action: kb_process_ajax_submit" in every lead email),
++  // and an input named "action" shadows form.action in DOM scripting.
++  form.find('input[name="_kb_form_id"], input[name="_kb_form_post_id"], input[name="action"]').remove();
++  // Kadence's honeypot → Formspree's native `_gotcha` trap so spam is
++  // discarded server-side. Visual hiding + aria-hidden stay as-is.
++  form.find('input[name="_kb_verify_email"]').attr("name", "_gotcha");
++  // The native POST now works without JavaScript, so the WP-only "enable
++  // JavaScript" warning (and its style hiding the submit button) must go.
++  removeKadenceNoscriptWarning(form);
++
++  form.find("input[data-label], textarea[data-label]").each((_, element) => {
++    const $el = $body(element);
++    const label = ($el.attr("data-label") ?? "").toLowerCase();
++    if (/e-?mail/.test(label)) $el.attr("name", "email");
++    else if (/name/.test(label)) $el.attr("name", "name");
++    else if (/phone|tel/.test(label)) $el.attr("name", "phone");
++    else if (/subject/.test(label)) $el.attr("name", "_subject");
++    else if (/message|note/.test(label)) $el.attr("name", "message");
++  });
++  if (!form.find('[name="_subject"]').length) {
++    form.prepend(`<input type="hidden" name="_subject" value="${escapeXml(fallbackSubject)}" />`);
++  }
++}
+-- 
+2.34.1
+

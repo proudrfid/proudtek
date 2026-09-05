@@ -1,0 +1,230 @@
+From fb50705d737e823bcb61fb912e6203ee91f5d3e4 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 06:37:12 -0400
+Subject: [PATCH 14/20] fix(seo): no canonical on the 404 template, lang=en-US
+ everywhere, repair the dead ROI-calculator link
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Phase 14 batch B7 (audit 2026-09-01, T15 / T16 / T17).
+- 404 template: canonicalUrl is empty and SeoHead omits <link rel=canonical>
+  / og:url when it is — the page was self-canonicalising to /404/, a URL
+  that does not exist
+- <html lang>: native hubs said 'en' while the other 581 pages said
+  'en-US'; extractChromeFromSnapshot now runs the donor <html> attributes
+  through sanitizeHtmlAttrs (also dropping the WP itemtype leftovers) and
+  the 9 native pages declare en-US. Build: 598/598 pages en-US.
+- /blog/rfid-rfp-template-questions-suppliers/: the resource card linked
+  /downloads/rfid-roi-calculator.xlsx, which is not in the build; it now
+  points at the on-site cost estimator tool.
+The 9 'missing alt' images from Phase 2 are decorative industry icons with
+alt="" + aria-hidden — correct as they are; no change.
+---
+ .../blog/rfid-rfp-template-questions-suppliers.json        | 4 ++--
+ src/layouts/partials/SeoHead.astro                         | 7 +++++--
+ src/lib/seo/snapshot-chrome.ts                             | 7 +++++--
+ src/pages/404.astro                                        | 6 ++++--
+ src/pages/blog/index.astro                                 | 2 +-
+ src/pages/case-studies.astro                               | 2 +-
+ src/pages/compare/[category].astro                         | 2 +-
+ src/pages/compare/index.astro                              | 2 +-
+ src/pages/compatibility/index.astro                        | 2 +-
+ src/pages/guides/[cluster].astro                           | 2 +-
+ src/pages/guides/index.astro                               | 2 +-
+ src/pages/solutions/index.astro                            | 2 +-
+ 12 files changed, 24 insertions(+), 16 deletions(-)
+
+diff --git a/src/content/editorial/blog/rfid-rfp-template-questions-suppliers.json b/src/content/editorial/blog/rfid-rfp-template-questions-suppliers.json
+index ce421c9..b2c3356 100644
+--- a/src/content/editorial/blog/rfid-rfp-template-questions-suppliers.json
++++ b/src/content/editorial/blog/rfid-rfp-template-questions-suppliers.json
+@@ -101,8 +101,8 @@
+           "label": "RFID / NFC procurement RFP template (DOCX, fillable, 7 pp)"
+         },
+         {
+-          "href": "/downloads/rfid-roi-calculator.xlsx",
+-          "label": "RFID deployment ROI calculator (XLSX)"
++          "href": "/tools/rfid-tag-cost-estimator/",
++          "label": "RFID tag cost estimator (interactive, on-site)"
+         }
+       ]
+     },
+diff --git a/src/layouts/partials/SeoHead.astro b/src/layouts/partials/SeoHead.astro
+index 1263c9a..dae1e7d 100644
+--- a/src/layouts/partials/SeoHead.astro
++++ b/src/layouts/partials/SeoHead.astro
+@@ -122,7 +122,10 @@ const isOgRaster = imagePathname.startsWith("/og/");
+ <title>{seo.title}</title>
+ <meta name="description" content={description} />
+ <meta name="robots" content={seo.robots} />
+-<link rel="canonical" href={seo.canonicalUrl} />
++{/* The 404 template passes an empty canonicalUrl: an error page has no
++    canonical location, and the old self-canonical to /404/ (a URL that does
++    not exist) was a semantic error (audit 2026-09-01 T16). */}
++{seo.canonicalUrl ? <link rel="canonical" href={seo.canonicalUrl} /> : null}
+ 
+ {/* Favicons — emitted once here for every page (native Astro hubs + WP-mirrored
+     pages alike); the matching WP `<link rel="icon">` copies are stripped in
+@@ -210,7 +213,7 @@ const isOgRaster = imagePathname.startsWith("/og/");
+ <meta property="og:type" content={seo.ogType} />
+ <meta property="og:title" content={seo.title} />
+ <meta property="og:description" content={description} />
+-<meta property="og:url" content={seo.canonicalUrl} />
++{seo.canonicalUrl ? <meta property="og:url" content={seo.canonicalUrl} /> : null}
+ <meta property="og:image" content={seo.imageUrl} />
+ <meta property="og:image:alt" content={seo.imageAlt} />
+ {ogImageType ? <meta property="og:image:type" content={ogImageType} /> : null}
+diff --git a/src/lib/seo/snapshot-chrome.ts b/src/lib/seo/snapshot-chrome.ts
+index 57787dd..2af8d25 100644
+--- a/src/lib/seo/snapshot-chrome.ts
++++ b/src/lib/seo/snapshot-chrome.ts
+@@ -29,7 +29,7 @@ import { load } from "cheerio";
+ import type { SnapshotPage } from "../site-data";
+ import { prepareSnapshot } from "../render-snapshot";
+ import { sanitizeHead, sanitizeBody } from "./sanitize-html";
+-import { stripNoiseHtmlComments } from "./utils";
++import { sanitizeHtmlAttrs, stripNoiseHtmlComments } from "./utils";
+ import { inventoryDonorHead } from "./donor-head-inventory";
+ import { applyHeadPolicy, rebuildHeadHtml } from "./head-policy";
+ 
+@@ -180,7 +180,10 @@ export function extractChromeFromSnapshot(
+   );
+ 
+   return {
+-    htmlAttrs: snap.htmlAttrs,
++    // Same <html> attribute policy as buildPageSeo: drop the WP microdata
++    // leftovers (itemtype without itemscope) and normalise lang to en-US so
++    // native hubs match the other 581 pages (audit 2026-09-01 T15).
++    htmlAttrs: sanitizeHtmlAttrs(snap.htmlAttrs),
+     bodyAttrs: snap.bodyAttrs,
+     headHtml: sanitizedHeadHtml,
+     beforeMainHtml: beforeMainStripped,
+diff --git a/src/pages/404.astro b/src/pages/404.astro
+index 6f83c59..fe6048d 100644
+--- a/src/pages/404.astro
++++ b/src/pages/404.astro
+@@ -16,12 +16,14 @@ const seo: PageSeoData = {
+   description: "The page you're looking for doesn't exist or has been moved. Browse our RFID and NFC product catalog or contact us for help.",
+   robots: "noindex,follow",
+   indexable: false,
+-  canonicalUrl: "https://proudtek.com/404/",
++  // No canonical: the page is served at whatever URL was not found, and
++  // /404/ itself is not a real location (audit 2026-09-01 T16).
++  canonicalUrl: "",
+   imageUrl: "https://proudtek.com/site-assets/wp-content/uploads/proudtek-og-default.jpg",
+   imageAlt: "Proud Tek — Custom RFID & NFC Products",
+   ogType: "website",
+   kind: "page",
+-  htmlAttrs: { lang: "en" },
++  htmlAttrs: { lang: "en-US" },
+   bodyAttrs: {},
+   headHtml: "",
+   bodyHtml: "",
+diff --git a/src/pages/blog/index.astro b/src/pages/blog/index.astro
+index 08afa80..2cb172b 100644
+--- a/src/pages/blog/index.astro
++++ b/src/pages/blog/index.astro
+@@ -118,7 +118,7 @@ const collectionLd = JSON.stringify({
+ });
+ 
+ const seo: PageSeoData = {
+-  htmlAttrs: { lang: "en" },
++  htmlAttrs: { lang: "en-US" },
+   bodyAttrs: { class: "page-blog-hub" },
+   headHtml: "",
+   bodyHtml: "",
+diff --git a/src/pages/case-studies.astro b/src/pages/case-studies.astro
+index 7186748..0efb689 100644
+--- a/src/pages/case-studies.astro
++++ b/src/pages/case-studies.astro
+@@ -63,7 +63,7 @@ const collectionLd = JSON.stringify({
+ });
+ 
+ const seo: PageSeoData = {
+-  htmlAttrs: { lang: "en" },
++  htmlAttrs: { lang: "en-US" },
+   bodyAttrs: { class: "page-case-studies-hub" },
+   headHtml: "",
+   bodyHtml: "",
+diff --git a/src/pages/compare/[category].astro b/src/pages/compare/[category].astro
+index 023a91e..b5b39fd 100644
+--- a/src/pages/compare/[category].astro
++++ b/src/pages/compare/[category].astro
+@@ -75,7 +75,7 @@ function buildCategorySeo(category: CompareCategory, count: number): PageSeoData
+   });
+ 
+   return {
+-    htmlAttrs: { lang: "en" },
++    htmlAttrs: { lang: "en-US" },
+     bodyAttrs: { class: "page-compare-category" },
+     headHtml: "",
+     bodyHtml: "",
+diff --git a/src/pages/compare/index.astro b/src/pages/compare/index.astro
+index e8cfb90..ddbccd8 100644
+--- a/src/pages/compare/index.astro
++++ b/src/pages/compare/index.astro
+@@ -111,7 +111,7 @@ const collectionLd = JSON.stringify({
+ });
+ 
+ const seo: PageSeoData = {
+-  htmlAttrs: { lang: "en" },
++  htmlAttrs: { lang: "en-US" },
+   bodyAttrs: { class: "page-compare-hub" },
+   headHtml: "",
+   bodyHtml: "",
+diff --git a/src/pages/compatibility/index.astro b/src/pages/compatibility/index.astro
+index e7f6323..27df513 100644
+--- a/src/pages/compatibility/index.astro
++++ b/src/pages/compatibility/index.astro
+@@ -104,7 +104,7 @@ const collectionLd = JSON.stringify({
+ });
+ 
+ const seo: PageSeoData = {
+-  htmlAttrs: { lang: "en" },
++  htmlAttrs: { lang: "en-US" },
+   bodyAttrs: { class: "page-compatibility-hub" },
+   headHtml: "",
+   bodyHtml: "",
+diff --git a/src/pages/guides/[cluster].astro b/src/pages/guides/[cluster].astro
+index ac8a19a..b9afb30 100644
+--- a/src/pages/guides/[cluster].astro
++++ b/src/pages/guides/[cluster].astro
+@@ -72,7 +72,7 @@ function buildClusterSeo(cluster: GuideCluster, count: number): PageSeoData {
+   });
+ 
+   return {
+-    htmlAttrs: { lang: "en" },
++    htmlAttrs: { lang: "en-US" },
+     bodyAttrs: { class: "page-cluster-hub" },
+     headHtml: "",
+     bodyHtml: "",
+diff --git a/src/pages/guides/index.astro b/src/pages/guides/index.astro
+index 4052d2a..37df719 100644
+--- a/src/pages/guides/index.astro
++++ b/src/pages/guides/index.astro
+@@ -86,7 +86,7 @@ const collectionLd = JSON.stringify({
+ });
+ 
+ const seo: PageSeoData = {
+-  htmlAttrs: { lang: "en" },
++  htmlAttrs: { lang: "en-US" },
+   bodyAttrs: { class: "page-guides-hub" },
+   headHtml: "",
+   bodyHtml: "",
+diff --git a/src/pages/solutions/index.astro b/src/pages/solutions/index.astro
+index 6f4fc48..5f7f759 100644
+--- a/src/pages/solutions/index.astro
++++ b/src/pages/solutions/index.astro
+@@ -146,7 +146,7 @@ const collectionLd = JSON.stringify({
+ });
+ 
+ const seo: PageSeoData = {
+-  htmlAttrs: { lang: "en" },
++  htmlAttrs: { lang: "en-US" },
+   bodyAttrs: { class: "page-solutions-hub" },
+   headHtml: "",
+   bodyHtml: "",
+-- 
+2.34.1
+

@@ -1,0 +1,73 @@
+From 96e9ba950f0bfb2de02160927a2ede2d3d541890 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 05:34:17 -0400
+Subject: [PATCH 03/20] lint(chip-drift): do not re-check prose edits on lines
+ with pre-existing placeholders
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The drift lint compares the RESOLVED added line against the RAW removed
+lines. When a line already carried a {chip:...} placeholder and only its
+prose changed, that comparison can never match (the removed line holds the
+unresolved token), so every such edit was reported as drift — the 'mixed
+placeholder line' blind spot. A changed line is now drift-checked only when
+it INTRODUCES a placeholder token that no removed line of the same file had.
+Verified: a newly introduced token that resolves to different prose is still
+reported as drift.
+---
+ scripts/lint-chip-placeholder-drift.mjs | 25 +++++++++++++++++++++++--
+ 1 file changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/lint-chip-placeholder-drift.mjs b/scripts/lint-chip-placeholder-drift.mjs
+index b0fca6f..10bae16 100644
+--- a/scripts/lint-chip-placeholder-drift.mjs
++++ b/scripts/lint-chip-placeholder-drift.mjs
+@@ -193,12 +193,30 @@ function main() {
+ 
+   let drifts = 0;
+   let compoundSkipped = 0;
++  let preexistingSkipped = 0;
+   let unknownIssues = 0;
+ 
+   for (const [path, { added, removed }] of Object.entries(files)) {
++    // Placeholder tokens that were already present on a REMOVED line of this
++    // file. A changed line whose tokens are all pre-existing is a prose edit
++    // around an established placeholder, not a migration — the removed line
++    // holds the raw `{chip:...}` token, so the resolved-vs-removed byte check
++    // can never match and would be a false positive (the "mixed placeholder
++    // line" blind spot). Only lines that INTRODUCE a token are drift-checked.
++    const removedTokens = new Set();
++    for (const r of removed) {
++      for (const m of r.matchAll(PLACEHOLDER_RE)) removedTokens.add(m[0]);
++    }
++
+     for (const { lineNo, text } of added) {
+       if (!text.includes('{chip:')) continue;
+ 
++      const tokens = [...text.matchAll(PLACEHOLDER_RE)].map((m) => m[0]);
++      if (tokens.length && tokens.every((tok) => removedTokens.has(tok))) {
++        preexistingSkipped++;
++        continue;
++      }
++
+       const { resolved, hadCompound, unknowns } = resolveLine(text);
+ 
+       if (unknowns.length) {
+@@ -232,8 +250,11 @@ function main() {
+   console.log(`scanned ${fileCount} changed editorial JSON file(s) vs ${base}`);
+ 
+   if (drifts === 0 && unknownIssues === 0) {
+-    if (compoundSkipped) {
+-      console.log(`✓ no chip-placeholder drift (${compoundSkipped} compound placeholder line(s) noted, drift-check skipped)`);
++    const notes = [];
++    if (compoundSkipped) notes.push(`${compoundSkipped} compound placeholder line(s) noted, drift-check skipped`);
++    if (preexistingSkipped) notes.push(`${preexistingSkipped} prose edit(s) on lines with pre-existing placeholders, not re-checked`);
++    if (notes.length) {
++      console.log(`✓ no chip-placeholder drift (${notes.join('; ')})`);
+     } else {
+       console.log('✓ no chip-placeholder drift');
+     }
+-- 
+2.34.1
+

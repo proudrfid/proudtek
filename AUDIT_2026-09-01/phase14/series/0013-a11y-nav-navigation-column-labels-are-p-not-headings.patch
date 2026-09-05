@@ -1,0 +1,148 @@
+From 5207b033d911b119b3b71bb46b0ff5f80b4ed76b Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 06:37:12 -0400
+Subject: [PATCH 13/20] a11y(nav): navigation column labels are <p>, not
+ headings
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Phase 14 batch B7 (audit 2026-09-01, P2-1). Footer columns (snapshot shell,
+6 per page × 536 pages) and the native mega-menu / mobile-menu groups used
+<h2>/<h3> for what are navigation labels, padding every page's heading
+outline with chrome. They are now <p class="codex-nav-group-label"> /
+<p class="codex-footer-nav__heading"> with the same styling; the sections
+carry aria-label / aria-labelledby so the regions stay named for assistive
+tech. Product page: 0 headings outside <main> (was 6).
+---
+ src/components/shell/DesktopNav.astro |  7 +++++--
+ src/components/shell/MobileNav.astro  |  2 +-
+ src/components/shell/SiteFooter.astro |  4 ++--
+ src/lib/render-snapshot.ts            |  4 +++-
+ src/styles/codex-shell.css            | 12 ++++++------
+ 5 files changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/src/components/shell/DesktopNav.astro b/src/components/shell/DesktopNav.astro
+index ec8668a..d853011 100644
+--- a/src/components/shell/DesktopNav.astro
++++ b/src/components/shell/DesktopNav.astro
+@@ -44,10 +44,13 @@ function isExactActive(href: string): boolean {
+               <div class="codex-native-nav__groups">
+                 {menu.groups.map((group) => (
+                   <section class="codex-native-nav__group">
++                    {/* Column labels are navigation, not document outline (audit
++                        2026-09-01 P2-1): a <p> keeps the styling without adding
++                        ~40 <h2>s to every page's heading tree. */}
+                     {group.heading && (
+                       group.headingHref
+-                        ? <h2><a href={group.headingHref}>{group.heading}</a></h2>
+-                        : <h2>{group.heading}</h2>
++                        ? <p class="codex-nav-group-label"><a href={group.headingHref}>{group.heading}</a></p>
++                        : <p class="codex-nav-group-label">{group.heading}</p>
+                     )}
+                     <ul>
+                       {group.links.map((link) => (
+diff --git a/src/components/shell/MobileNav.astro b/src/components/shell/MobileNav.astro
+index 0564d7a..85257b6 100644
+--- a/src/components/shell/MobileNav.astro
++++ b/src/components/shell/MobileNav.astro
+@@ -43,7 +43,7 @@ function groupId(menuLabel: string, index: number): string {
+                 <a class="codex-native-mobile-menu__overview" href={menu.href}>View {menu.label} overview <span aria-hidden="true">→</span></a>
+                 {menu.groups.map((group, index) => (
+                   <section class="codex-native-mobile-menu__group" aria-labelledby={groupId(menu.label, index)}>
+-                    {group.heading && <h2 id={groupId(menu.label, index)}>{group.heading}</h2>}
++                    {group.heading && <p class="codex-nav-group-label" id={groupId(menu.label, index)}>{group.heading}</p>}
+                     <ul>
+                       {group.links.map((link) => (
+                         <li><a href={link.href} aria-current={isActive(link.href) ? "page" : undefined}>{link.label}</a></li>
+diff --git a/src/components/shell/SiteFooter.astro b/src/components/shell/SiteFooter.astro
+index 5675354..8e5ef6a 100644
+--- a/src/components/shell/SiteFooter.astro
++++ b/src/components/shell/SiteFooter.astro
+@@ -30,8 +30,8 @@ import { SITE_CONTACT } from "../../lib/seo-content";
+     </section>
+     <nav class="codex-native-footer__nav" aria-label="Footer navigation">
+       {FOOTER_SECTIONS.map((section) => (
+-        <section>
+-          <h2>{section.heading}</h2>
++        <section aria-label={section.heading}>
++          <p class="codex-nav-group-label">{section.heading}</p>
+           <ul>
+             {section.links.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+           </ul>
+diff --git a/src/lib/render-snapshot.ts b/src/lib/render-snapshot.ts
+index b8ceada..2c85bc7 100644
+--- a/src/lib/render-snapshot.ts
++++ b/src/lib/render-snapshot.ts
+@@ -856,7 +856,9 @@ function renderFooterSection(s: FooterSection): string {
+         `<li><a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a></li>`,
+     )
+     .join("");
+-  return `<section class="codex-footer-nav__col"><h3 class="codex-footer-nav__heading">${escapeHtml(s.heading)}</h3><ul class="codex-footer-nav__list">${links}</ul></section>`;
++  // Column label as <p>, not <h3>: footer navigation is chrome, not document
++  // outline (audit 2026-09-01 P2-1); aria-label keeps the region named.
++  return `<section class="codex-footer-nav__col" aria-label="${escapeHtml(s.heading)}"><p class="codex-footer-nav__heading">${escapeHtml(s.heading)}</p><ul class="codex-footer-nav__list">${links}</ul></section>`;
+ }
+ 
+ function renderFooterBrandRow(): string {
+diff --git a/src/styles/codex-shell.css b/src/styles/codex-shell.css
+index 57be042..4bad940 100644
+--- a/src/styles/codex-shell.css
++++ b/src/styles/codex-shell.css
+@@ -144,7 +144,7 @@
+ 
+ .codex-native-nav__panel-head p,
+ .codex-native-nav__panel-head a,
+-.codex-native-nav__group h2 {
++.codex-native-nav__group .codex-nav-group-label {
+   margin: 0;
+ }
+ 
+@@ -156,7 +156,7 @@
+ }
+ 
+ .codex-native-nav__panel-head a,
+-.codex-native-nav__group h2 a {
++.codex-native-nav__group .codex-nav-group-label a {
+   color: var(--codex-color-accent);
+   font-weight: var(--codex-weight-semibold);
+   text-decoration: none;
+@@ -168,7 +168,7 @@
+   gap: var(--codex-space-6) var(--codex-space-8);
+ }
+ 
+-.codex-native-nav__group h2 {
++.codex-native-nav__group .codex-nav-group-label {
+   margin-bottom: var(--codex-space-3);
+   color: var(--codex-gold-muted);
+   font-family: var(--codex-font-body);
+@@ -375,7 +375,7 @@ html body .codex-native-shell .codex-native-header__menu .codex-mobile-menu-labe
+   padding: var(--codex-space-3) 0 var(--codex-space-5) var(--codex-space-4);
+ }
+ 
+-.codex-native-mobile-menu__group h2 {
++.codex-native-mobile-menu__group .codex-nav-group-label {
+   margin: 0 0 var(--codex-space-2);
+   color: var(--codex-gold-muted);
+   font-family: var(--codex-font-body);
+@@ -484,7 +484,7 @@ html body .codex-native-shell .codex-native-header__menu .codex-mobile-menu-labe
+   gap: var(--codex-space-8);
+ }
+ 
+-.codex-native-footer__nav h2 {
++.codex-native-footer__nav .codex-nav-group-label {
+   margin: 0 0 var(--codex-space-3);
+   color: var(--codex-gold-light);
+   font-family: var(--codex-font-body);
+@@ -574,7 +574,7 @@ html body .codex-native-shell .codex-native-header__menu .codex-mobile-menu-labe
+     color: var(--codex-color-accent) !important;
+   }
+ 
+-  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu .codex-native-mobile-menu__group h2 {
++  html body .codex-native-shell #mobile-drawer.codex-native-drawer #mobile-menu .codex-native-mobile-menu__group .codex-nav-group-label {
+     color: var(--codex-gold-muted) !important;
+   }
+ 
+-- 
+2.34.1
+

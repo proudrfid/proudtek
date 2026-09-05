@@ -1,0 +1,301 @@
+From d82a88f5764b4bd29385e524d3ce2ea973c87bb5 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 05:32:52 -0400
+Subject: [PATCH 01/20] seo(crawl): sitemap-index lastmod from build time, add
+ compare/guide hubs to sitemap, drop SVG from image sitemap
+
+Phase 14 batch B1 (audit 2026-09-01, Phase 2 T3/T4/T5):
+- sitemap index and supplements carry a real lastmod (build time / newest page)
+- 4 compare-category + 7 guide-cluster hubs enter the sitemap supplement
+- image sitemap skips SVG entries (Google ignores SVG in image sitemaps)
+- machine mirrors / site-index reuse BUILD_TIME_ISO instead of per-request now()
+---
+ src/lib/__tests__/route-registry.test.ts | 13 +++++++++++
+ src/lib/route-registry.ts                | 11 ++++++++-
+ src/lib/seo-feeds.ts                     | 29 ++++++++++++++++++++----
+ src/lib/site-data.ts                     | 12 ++++++++++
+ src/pages/machine/[...slug].json.ts      |  7 +++---
+ src/pages/machine/[...slug].txt.ts       |  7 +++---
+ src/pages/machine/index.json.ts          |  7 +++---
+ src/pages/machine/index.txt.ts           |  7 +++---
+ src/pages/site-index.json.ts             |  4 ++--
+ 9 files changed, 77 insertions(+), 20 deletions(-)
+
+diff --git a/src/lib/__tests__/route-registry.test.ts b/src/lib/__tests__/route-registry.test.ts
+index 09152ea..7120651 100644
+--- a/src/lib/__tests__/route-registry.test.ts
++++ b/src/lib/__tests__/route-registry.test.ts
+@@ -49,6 +49,19 @@ describe("route registry", () => {
+       "/rfq/",
+       "/glossary/",
+       "/tools/rfid-tag-cost-estimator/",
++      // Cluster hubs — indexable native pages that were missing from the
++      // sitemap and "unknown to Google" (audit 2026-09-02, Phase 2 T4).
++      "/compare/chip-vs-chip/",
++      "/compare/reader-vs-reader/",
++      "/compare/form-factor-material/",
++      "/compare/frequency-tech/",
++      "/guides/google-review-cards/",
++      "/guides/hotel-keycards/",
++      "/guides/chip-encyclopedias/",
++      "/guides/standards-encoding/",
++      "/guides/compliance-regulatory/",
++      "/guides/integration-tools/",
++      "/guides/buying-reference/",
+     ]);
+   });
+ });
+diff --git a/src/lib/route-registry.ts b/src/lib/route-registry.ts
+index 986536e..e50acd2 100644
+--- a/src/lib/route-registry.ts
++++ b/src/lib/route-registry.ts
+@@ -1,4 +1,5 @@
+ import { COMPARE_CATEGORIES } from "../data/compare-categories";
++import { GUIDE_CLUSTERS } from "../data/guide-clusters";
+ 
+ export interface NativeRouteDefinition {
+   route: string;
+@@ -29,10 +30,18 @@ export const NATIVE_ROUTE_DEFINITIONS: readonly NativeRouteDefinition[] = [
+   { route: "/rfq/", ownsStaticPath: false, supplementSitemap: true },
+   { route: "/glossary/", ownsStaticPath: false, supplementSitemap: true },
+   { route: "/tools/rfid-tag-cost-estimator/", ownsStaticPath: false, supplementSitemap: true },
++  // Cluster hubs (compare categories + guide clusters) are indexable,
++  // self-canonical pages that were absent from sitemap.xml and unknown to
++  // Google (URL Inspection 2026-09-02, Phase 2 T4). Advertise them.
+   ...COMPARE_CATEGORIES.map((category) => ({
+     route: `/compare/${category.id}/`,
+     ownsStaticPath: true,
+-    supplementSitemap: false,
++    supplementSitemap: true,
++  })),
++  ...GUIDE_CLUSTERS.map((cluster) => ({
++    route: `/guides/${cluster.id}/`,
++    ownsStaticPath: true,
++    supplementSitemap: true,
+   })),
+ ];
+ 
+diff --git a/src/lib/seo-feeds.ts b/src/lib/seo-feeds.ts
+index 103b3cc..15e31e3 100644
+--- a/src/lib/seo-feeds.ts
++++ b/src/lib/seo-feeds.ts
+@@ -1,4 +1,5 @@
+ import type { SiteData, SnapshotPage } from "./site-data";
++import { BUILD_TIME_ISO } from "./site-data";
+ import type { EditorialDefinition } from "./editorial-types";
+ import { SITE_ORIGIN, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS } from "./seo-content";
+ import { buildPageSeo, buildPageSummary, getIndexablePages, isIndexableRoute } from "./seo";
+@@ -26,8 +27,15 @@ export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader):
+   }
+ 
+   // Append native hub indexes (not in siteData.pages — built from
+-  // src/pages/{group}/index.astro files directly).
+-  const siteLastmod = (siteData.generatedAt ?? new Date().toISOString()).slice(0, 10);
++  // src/pages/{group}/index.astro files directly). A hub changes whenever
++  // any of its spokes changes, so its lastmod is the newest page lastmod in
++  // this sitemap rather than the frozen snapshot timestamp (Phase 2 T3/T4).
++  const newestPageLastmod = urlEntries
++    .map((entry) => /<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/.exec(entry)?.[1] ?? "")
++    .filter(Boolean)
++    .sort()
++    .at(-1);
++  const siteLastmod = newestPageLastmod ?? BUILD_TIME_ISO.slice(0, 10);
+   for (const route of getNativeSitemapSupplementRoutes()) {
+     urlEntries.push(
+       [
+@@ -53,7 +61,14 @@ export async function buildImageSitemapXml(siteData: SiteData, loadPage: PageLoa
+   for (const stub of indexable) {
+     const page = await loadPage(stub.route);
+     const seo = buildPageSeo(page);
+-    const images = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
++    const candidates = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
++    // Audit 2026-09-02 (Phase 2 T1/T6): inline SVG diagrams were 125 of the
++    // 522 image-sitemap entries and drew 240 of Googlebot's 516 successful
++    // fetches in August while HTML pages got ~37. SVG has little image-search
++    // value; keep raster product/hero photos only. Pages whose only image is
++    // an SVG are omitted from this sitemap (they remain in sitemap.xml).
++    const images = candidates.filter((image) => !/\.svg(\?|$)/i.test(image.url));
++    if (images.length === 0) continue;
+     const imageEntries = images
+       .map((image) =>
+         [
+@@ -154,8 +169,12 @@ Sitemap: ${SITE_ORIGIN}/sitemap-index.xml
+  * robots.txt and is the format Google Search Console expects when you
+  * declare a "Sitemaps index" property.
+  */
+-export function buildSitemapIndexXml(generatedAt: string): string {
+-  const lastmod = (generatedAt ?? new Date().toISOString()).slice(0, 10);
++export function buildSitemapIndexXml(_generatedAt?: string): string {
++  // The index describes the child sitemaps produced by *this* build, so its
++  // lastmod is the build date — not the frozen WordPress snapshot timestamp
++  // that made it read "2026-03-16" while children carried July/August dates
++  // (Phase 2 T3). The parameter is kept for call-site compatibility.
++  const lastmod = BUILD_TIME_ISO.slice(0, 10);
+   const entry = (path: string) => [
+     "  <sitemap>",
+     `    <loc>${escapeXml(`${SITE_ORIGIN}${path}`)}</loc>`,
+diff --git a/src/lib/site-data.ts b/src/lib/site-data.ts
+index 9e167b1..5474c31 100644
+--- a/src/lib/site-data.ts
++++ b/src/lib/site-data.ts
+@@ -36,6 +36,18 @@ export interface SiteData {
+   pages: SnapshotPage[];
+ }
+ 
++/**
++ * Wall-clock timestamp of the current build, fixed once per process.
++ *
++ * `siteData.generatedAt` is the WordPress *snapshot* timestamp (frozen at
++ * 2026-03-16 since the fetch pipeline was mothballed). It is still the right
++ * fallback for per-page content dates, but it must not be advertised as the
++ * generation time of build artefacts: sitemap-index.xml, site-index.json and
++ * the /machine/ mirrors were telling crawlers "nothing new since March".
++ * Audit 2026-09-02 (Phase 2 T3).
++ */
++export const BUILD_TIME_ISO = new Date().toISOString();
++
+ // ---------------------------------------------------------------------------
+ // Caches
+ // ---------------------------------------------------------------------------
+diff --git a/src/pages/machine/[...slug].json.ts b/src/pages/machine/[...slug].json.ts
+index 07813ad..9a33c0f 100644
+--- a/src/pages/machine/[...slug].json.ts
++++ b/src/pages/machine/[...slug].json.ts
+@@ -1,6 +1,6 @@
+ import type { APIRoute } from "astro";
+ 
+-import { getSiteData, getPageByRoute, routeToParam } from "../../lib/site-data";
++import { getSiteData, getPageByRoute, routeToParam, BUILD_TIME_ISO } from "../../lib/site-data";
+ import { buildMachinePageData, getIndexablePages } from "../../lib/seo";
+ 
+ export const prerender = true;
+@@ -16,7 +16,8 @@ export async function getStaticPaths() {
+ }
+ 
+ export const GET: APIRoute = async ({ params }) => {
+-  const siteData = await getSiteData();
++  // warm the site-data cache used by getPageByRoute()
++  await getSiteData();
+   const slug = params.slug;
+   const route = slug ? `/${String(slug).replace(/^\/+|\/+$/g, "")}/` : "/";
+   const page = await getPageByRoute(route);
+@@ -25,7 +26,7 @@ export const GET: APIRoute = async ({ params }) => {
+     return new Response("Not found", { status: 404 });
+   }
+ 
+-  return new Response(JSON.stringify(buildMachinePageData(page, siteData.generatedAt), null, 2), {
++  return new Response(JSON.stringify(buildMachinePageData(page, BUILD_TIME_ISO), null, 2), {
+     headers: {
+       "Content-Type": "application/json; charset=utf-8",
+     },
+diff --git a/src/pages/machine/[...slug].txt.ts b/src/pages/machine/[...slug].txt.ts
+index deef5b2..f1d575c 100644
+--- a/src/pages/machine/[...slug].txt.ts
++++ b/src/pages/machine/[...slug].txt.ts
+@@ -1,6 +1,6 @@
+ import type { APIRoute } from "astro";
+ 
+-import { getSiteData, getPageByRoute, routeToParam } from "../../lib/site-data";
++import { getSiteData, getPageByRoute, routeToParam, BUILD_TIME_ISO } from "../../lib/site-data";
+ import { buildMachinePageText, getIndexablePages } from "../../lib/seo";
+ 
+ export const prerender = true;
+@@ -16,7 +16,8 @@ export async function getStaticPaths() {
+ }
+ 
+ export const GET: APIRoute = async ({ params }) => {
+-  const siteData = await getSiteData();
++  // warm the site-data cache used by getPageByRoute()
++  await getSiteData();
+   const slug = params.slug;
+   const route = slug ? `/${String(slug).replace(/^\/+|\/+$/g, "")}/` : "/";
+   const page = await getPageByRoute(route);
+@@ -25,7 +26,7 @@ export const GET: APIRoute = async ({ params }) => {
+     return new Response("Not found", { status: 404 });
+   }
+ 
+-  return new Response(buildMachinePageText(page, siteData.generatedAt), {
++  return new Response(buildMachinePageText(page, BUILD_TIME_ISO), {
+     headers: {
+       "Content-Type": "text/plain; charset=utf-8",
+     },
+diff --git a/src/pages/machine/index.json.ts b/src/pages/machine/index.json.ts
+index 73fbeb8..a7f1ba0 100644
+--- a/src/pages/machine/index.json.ts
++++ b/src/pages/machine/index.json.ts
+@@ -1,19 +1,20 @@
+ import type { APIRoute } from "astro";
+ 
+-import { getSiteData, getPageByRoute } from "../../lib/site-data";
++import { getSiteData, getPageByRoute, BUILD_TIME_ISO } from "../../lib/site-data";
+ import { buildMachinePageData } from "../../lib/seo";
+ 
+ export const prerender = true;
+ 
+ export const GET: APIRoute = async () => {
+-  const siteData = await getSiteData();
++  // warm the site-data cache used by getPageByRoute()
++  await getSiteData();
+   const page = await getPageByRoute("/");
+ 
+   if (!page) {
+     return new Response("Not found", { status: 404 });
+   }
+ 
+-  return new Response(JSON.stringify(buildMachinePageData(page, siteData.generatedAt), null, 2), {
++  return new Response(JSON.stringify(buildMachinePageData(page, BUILD_TIME_ISO), null, 2), {
+     headers: {
+       "Content-Type": "application/json; charset=utf-8",
+     },
+diff --git a/src/pages/machine/index.txt.ts b/src/pages/machine/index.txt.ts
+index 48122f8..e16bf6f 100644
+--- a/src/pages/machine/index.txt.ts
++++ b/src/pages/machine/index.txt.ts
+@@ -1,19 +1,20 @@
+ import type { APIRoute } from "astro";
+ 
+-import { getSiteData, getPageByRoute } from "../../lib/site-data";
++import { getSiteData, getPageByRoute, BUILD_TIME_ISO } from "../../lib/site-data";
+ import { buildMachinePageText } from "../../lib/seo";
+ 
+ export const prerender = true;
+ 
+ export const GET: APIRoute = async () => {
+-  const siteData = await getSiteData();
++  // warm the site-data cache used by getPageByRoute()
++  await getSiteData();
+   const page = await getPageByRoute("/");
+ 
+   if (!page) {
+     return new Response("Not found", { status: 404 });
+   }
+ 
+-  return new Response(buildMachinePageText(page, siteData.generatedAt), {
++  return new Response(buildMachinePageText(page, BUILD_TIME_ISO), {
+     headers: {
+       "Content-Type": "text/plain; charset=utf-8",
+     },
+diff --git a/src/pages/site-index.json.ts b/src/pages/site-index.json.ts
+index d91f77c..17deb36 100644
+--- a/src/pages/site-index.json.ts
++++ b/src/pages/site-index.json.ts
+@@ -1,6 +1,6 @@
+ import type { APIRoute } from "astro";
+ 
+-import { getSiteData, getPageByRoute } from "../lib/site-data";
++import { getSiteData, getPageByRoute, BUILD_TIME_ISO } from "../lib/site-data";
+ import { buildMachineRoute, buildPageSeo, buildPageSummary, getIndexablePages } from "../lib/seo";
+ import { absoluteUrl } from "../lib/seo/utils";
+ 
+@@ -31,7 +31,7 @@ export const GET: APIRoute = async () => {
+     JSON.stringify(
+       {
+         site: "Proud Tek",
+-        generatedAt: siteData.generatedAt,
++        generatedAt: BUILD_TIME_ISO,
+         pageCount: pages.length,
+         pages,
+       },
+-- 
+2.34.1
+

@@ -1,0 +1,657 @@
+From 5e1e9441a7929af4f213dbeca6d0e908441732d5 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 11:42:12 -0400
+Subject: [PATCH 18/20] content(rfidak): production model, commercial terms and
+ certificate registry as single-source constants
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Owner decision 2026-09-02 ("待决策项以 rfidak.com 的口径为准"; D-04, D-05, D-09,
+K-11, K-12). Every generated surface now states what rfidak.com — same
+legal entity — states, from one place (src/lib/seo-content.ts; evidence in
+AUDIT_2026-09-01/phase14/RFIDAK_REFERENCE_FACTS.md):
+- production model: 'in-house specification and quality control; tooling
+  and production executed on contracted partner lines in Shenzhen' — trust
+  strip, hero trust bar, about trust band, home-v2 evidence card, homepage
+  snapshot paragraphs and footer tagline, llms.txt / llms-full.txt header and
+  Quick facts (owned-by / partner-line split)
+- COMMERCIAL_TERMS (every product page + Product additionalProperty): MOQ
+  from 500 pcs cards/keyfobs/wristbands, 1,000 tags/labels, stock from 100,
+  custom tooling 2,000-5,000; standard production 7-15 business days from
+  order confirmation; free standard samples prepared in 1 business day with
+  DHL/FedEx freight (5-60) refunded against the first order; 30% T/T
+  deposit / 70% before shipment, L/C or 50/50 for established accounts,
+  PayPal under 00; FOB Shenzhen; first reply 2-4 h in business hours,
+  written quote 24-48 h valid 30 days
+- ORGANIZATION_OPERATIONS.moq / leadTime / response / samples / payment /
+  productionModel feed llms.txt Quick facts
+- response promises on the RFQ wizard, inline RFQ / sample-pack form,
+  homepage process step and quote-target block: 2-4 h first reply,
+  24-48 h written quote (was 'one business day')
+- certificates: OEKO-TEX STANDARD 100 23.HCN.97349 (Hohenstein, product
+  class II, UHF laundry tag — checked valid in the OEKO-TEX Label Check
+  2026-09-02) added as a product certification and to hasCredential on
+  /about/certifications/; RoHS / REACH SVHC / CE(EN 62311) carried as the
+  sample-based test reports they are, with their numbers
+- authorship: EXPERT_AUTHORS resolves the editorial-team record,
+  EDITORIAL_REVIEWER the engineering function; llms.txt attribution line
+  updated; wristband MOQ 200 -> 500 per rfidak (supersedes the 2026-07-15
+  ruling noted in the code comment)
+---
+ src/components/editorial/AboutTrustBand.astro |  31 ++---
+ src/components/editorial/EditorialHero.astro  |   2 +-
+ src/components/editorial/InlineRfqForm.astro  |   4 +-
+ src/components/editorial/TrustSignals.astro   |   2 +-
+ .../home/__tests__/home-page.test.ts          |   2 +-
+ src/data/home-v2.ts                           |   6 +-
+ src/lib/render-snapshot.ts                    |  20 ++-
+ src/lib/seo-content.ts                        | 121 ++++++++++++------
+ src/lib/seo-feeds.ts                          |  26 ++--
+ src/lib/seo/jsonld.ts                         |  36 ++++--
+ src/lib/seo/page-data.ts                      |   8 +-
+ src/lib/seo/render-blocks.ts                  |   4 +-
+ src/pages/rfq.astro                           |   8 +-
+ 13 files changed, 174 insertions(+), 96 deletions(-)
+
+diff --git a/src/components/editorial/AboutTrustBand.astro b/src/components/editorial/AboutTrustBand.astro
+index cfe427b..0f9e0bd 100644
+--- a/src/components/editorial/AboutTrustBand.astro
++++ b/src/components/editorial/AboutTrustBand.astro
+@@ -29,20 +29,21 @@
+  * need per-page variation, lift the items to props and read from
+  * definition's `trustBand` field (schema extension required).
+  */
++import { yearsInOperation } from "../../lib/seo-content";
+ ---
+ <section class="codex-trust-band" aria-label="Proud Tek at a glance">
+   <ol class="codex-trust-band__row codex-trust-band__row--stats" aria-label="Key facts">
+     <li class="codex-trust-band__stat">
+       <span class="codex-trust-band__stat-value">2008</span>
+-      <span class="codex-trust-band__stat-label">Founded — 18 yrs continuous operation</span>
++      <span class="codex-trust-band__stat-label">Founded — {yearsInOperation()} yrs in operation</span>
+     </li>
+     <li class="codex-trust-band__stat">
+-      <span class="codex-trust-band__stat-value">50<sup>+</sup></span>
+-      <span class="codex-trust-band__stat-label">Countries shipped to</span>
++      <span class="codex-trust-band__stat-value">3</span>
++      <span class="codex-trust-band__stat-label">ISO systems certified (sales &amp; supplier management)</span>
+     </li>
+     <li class="codex-trust-band__stat">
+       <span class="codex-trust-band__stat-value">6</span>
+-      <span class="codex-trust-band__stat-label">Product families in-house</span>
++      <span class="codex-trust-band__stat-label">Product families we specify and quality-control</span>
+     </li>
+     <li class="codex-trust-band__stat">
+       <span class="codex-trust-band__stat-value">100<span class="codex-trust-band__stat-value-unit">%</span></span>
+@@ -52,7 +53,7 @@
+ 
+   <div class="codex-trust-band__row codex-trust-band__row--vendors">
+     <span class="codex-trust-band__row-label">Chip vendors supported</span>
+-    <ul class="codex-trust-band__vendor-list" aria-label="Chip families we manufacture for">
++    <ul class="codex-trust-band__vendor-list" aria-label="Chip families we specify and stock">
+       <li class="codex-trust-band__vendor">NXP</li>
+       <li class="codex-trust-band__vendor-sep" aria-hidden="true"></li>
+       <li class="codex-trust-band__vendor">Infineon</li>
+@@ -68,27 +69,27 @@
+   </div>
+ 
+   <div class="codex-trust-band__row codex-trust-band__row--certs">
+-    <span class="codex-trust-band__row-label">Compliance shipped with every order</span>
+-    <ul class="codex-trust-band__cert-list" aria-label="Compliance certifications and approvals">
++    <span class="codex-trust-band__row-label">Certificates and test reports published</span>
++    <ul class="codex-trust-band__cert-list" aria-label="Certificates and sample-based test reports (numbers on the certifications page)">
+       <li class="codex-trust-band__cert">
+         <span class="codex-trust-band__cert-mark">ISO</span>
+-        <span class="codex-trust-band__cert-name">9001:2015</span>
++        <span class="codex-trust-band__cert-name">9001 · 14001 · 45001</span>
+       </li>
+       <li class="codex-trust-band__cert">
+-        <span class="codex-trust-band__cert-mark">RoHS</span>
+-        <span class="codex-trust-band__cert-name">2011/65/EU</span>
++        <span class="codex-trust-band__cert-mark">OEKO-TEX</span>
++        <span class="codex-trust-band__cert-name">STANDARD 100 · laundry tag</span>
+       </li>
+       <li class="codex-trust-band__cert">
+-        <span class="codex-trust-band__cert-mark">REACH</span>
+-        <span class="codex-trust-band__cert-name">SVHC</span>
++        <span class="codex-trust-band__cert-mark">RoHS</span>
++        <span class="codex-trust-band__cert-name">sample-based report</span>
+       </li>
+       <li class="codex-trust-band__cert">
+-        <span class="codex-trust-band__cert-mark">FCC</span>
+-        <span class="codex-trust-band__cert-name">Part 15 / 18</span>
++        <span class="codex-trust-band__cert-mark">REACH</span>
++        <span class="codex-trust-band__cert-name">SVHC screening</span>
+       </li>
+       <li class="codex-trust-band__cert">
+         <span class="codex-trust-band__cert-mark">CE</span>
+-        <span class="codex-trust-band__cert-name">EN 300 330</span>
++        <span class="codex-trust-band__cert-name">EN 62311 report</span>
+       </li>
+     </ul>
+   </div>
+diff --git a/src/components/editorial/EditorialHero.astro b/src/components/editorial/EditorialHero.astro
+index 430faa6..1fbcbab 100644
+--- a/src/components/editorial/EditorialHero.astro
++++ b/src/components/editorial/EditorialHero.astro
+@@ -232,7 +232,7 @@ const shouldShowDeck = !isContact && !!decoratedDeck && decoratedDeck.length > 0
+         <div class="codex-hero-trust-bar">
+           <span><strong>Since 2008</strong></span>
+           <span><strong>ISO 9001:2015</strong> sales &amp; service QMS</span>
+-          <span><strong>Shenzhen</strong> direct supplier</span>
++          <span><strong>Shenzhen</strong> manufacturing partner</span>
+         </div>
+       </>
+     )}
+diff --git a/src/components/editorial/InlineRfqForm.astro b/src/components/editorial/InlineRfqForm.astro
+index 8b54021..537ad4c 100644
+--- a/src/components/editorial/InlineRfqForm.astro
++++ b/src/components/editorial/InlineRfqForm.astro
+@@ -88,7 +88,7 @@ const errorNoteId = `codex-rfq-${seed}-error-note`;
+ ---
+ <section class="codex-inline-rfq" id={QUICK_QUOTE_ID}>
+   <h2>Get a Quick Quote</h2>
+-  <p>Tell us about your project and we'll respond within one business day. Fields marked <span class="codex-rfq-required" aria-hidden="true">*</span><span class="codex-sr-only">(asterisk)</span> are required.</p>
++  <p>Tell us about your project — first reply within 2–4 hours in Shenzhen business hours (Mon–Fri, GMT+8), written quote within 24–48 hours. Fields marked <span class="codex-rfq-required" aria-hidden="true">*</span><span class="codex-sr-only">(asterisk)</span> are required.</p>
+   <form action="https://formspree.io/f/xlgorlog" method="POST" class="codex-inline-rfq-form" data-codex-rfq novalidate>
+     <input type="hidden" name="_subject" value={`Inquiry: ${productName}`} />
+     <input type="hidden" name="product" value={productName} />
+@@ -164,7 +164,7 @@ const errorNoteId = `codex-rfq-${seed}-error-note`;
+       200/202 response. tabindex=-1 lets the script move focus here. */}
+   <div class="codex-inline-rfq-success" id={successId} data-codex-rfq-success role="status" tabindex="-1" hidden>
+     <h3>Inquiry received</h3>
+-    <p>Thanks — your inquiry about <strong>{productName}</strong> is with our specialists. We reply within one business day (Mon–Fri, GMT+8) with pricing, MOQ, lead time and sample options.</p>
++    <p>Thanks — your inquiry about <strong>{productName}</strong> is with our specialists. We reply within 2–4 hours in Shenzhen business hours (Mon–Fri, GMT+8) and send a written quote with pricing, MOQ, lead time and sample options within 24–48 hours.</p>
+     <p>Need it faster, or want to attach artwork or specs? Email <a href="mailto:info@proudtek.com">info@proudtek.com</a> or WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
+   </div>
+ </section>
+diff --git a/src/components/editorial/TrustSignals.astro b/src/components/editorial/TrustSignals.astro
+index 8e9d795..db82fac 100644
+--- a/src/components/editorial/TrustSignals.astro
++++ b/src/components/editorial/TrustSignals.astro
+@@ -31,5 +31,5 @@ import { yearsInOperation } from "../../lib/seo-content";
+       <span>In operation</span>
+     </div>
+   </div>
+-  <p class="codex-trust-note">Proud Tek is a Shenzhen-based supplier of custom RFID &amp; NFC cards, tags, labels, wristbands, keyfobs and readers for hotels, laundries, events, retail and industrial programmes. Certificate numbers and scope are published on <a href="/about/certifications/">the certifications page</a>; stock sample packs are free for qualified B2B buyers (courier at your cost).</p>
++  <p class="codex-trust-note">Proud Tek is a Shenzhen-based RFID &amp; NFC manufacturing partner for hotels, laundries, events, retail and industrial programmes: we own the specification, chip sourcing and quality control, and tooling and production run on contracted partner lines to our spec. Certificate numbers and scope are published on <a href="/about/certifications/">the certifications page</a>; standard samples are free for qualified B2B buyers (DHL/FedEx freight at your cost, refunded against your first production order).</p>
+ </section>
+diff --git a/src/components/home/__tests__/home-page.test.ts b/src/components/home/__tests__/home-page.test.ts
+index ca990e0..4ec8776 100644
+--- a/src/components/home/__tests__/home-page.test.ts
++++ b/src/components/home/__tests__/home-page.test.ts
+@@ -12,7 +12,7 @@ describe("HomePage V2", () => {
+     expect(html).toContain("Verified certificate");
+     expect(html).toContain("ISO 9001:2015");
+     expect(html).toContain("Company-stated record");
+-    expect(html).toContain("Production organisation and QC");
++    expect(html).toContain("Production model: partner lines, our specification");
+     expect(html).toContain("Browse the full product catalog");
+     expect(html).not.toMatch(/ISO 9001 audited factories/i);
+     expect(html).not.toContain("191 catalog variants");
+diff --git a/src/data/home-v2.ts b/src/data/home-v2.ts
+index a63bfe3..2b25129 100644
+--- a/src/data/home-v2.ts
++++ b/src/data/home-v2.ts
+@@ -71,10 +71,10 @@ export const HOME_EVIDENCE: HomeEvidence[] = [
+   },
+   {
+     status: "Company-stated record",
+-    title: "Production organisation and QC",
+-    detail: "How production, encoding, quality control and records retention are organised is described on the factory page; capacity is quoted per programme. Site and equipment figures are withheld until they are independently documented.",
++    title: "Production model: partner lines, our specification",
++    detail: "Proud Tek owns the specification, chip sourcing and quality control; tooling and production run on contracted partner lines in Shenzhen to our spec, and our QC signs off every batch. Who does what, step by step, is on the production page; capacity is quoted per programme.",
+     href: "/about/factory/",
+-    linkLabel: "Review factory record",
++    linkLabel: "Review the production model",
+   },
+   {
+     status: "Available per program",
+diff --git a/src/lib/render-snapshot.ts b/src/lib/render-snapshot.ts
+index 2c85bc7..d284aa4 100644
+--- a/src/lib/render-snapshot.ts
++++ b/src/lib/render-snapshot.ts
+@@ -869,7 +869,7 @@ function renderFooterBrandRow(): string {
+         `<a class="codex-footer-brand__logo" href="/" aria-label="Proud Tek home">` +
+           `<img src="/site-assets/wp-content/uploads/2024/04/proudtek-logo.png" alt="Proud Tek" width="220" height="60" loading="lazy" decoding="async">` +
+         `</a>` +
+-        `<p class="codex-footer-brand__tagline">Custom RFID &amp; NFC manufacturer — cards, tags, labels, wristbands, keyfobs and readers shipped worldwide from China since 2008.</p>` +
++        `<p class="codex-footer-brand__tagline">RFID &amp; NFC manufacturing partner in Shenzhen since 2008 — cards, tags, labels, wristbands, keyfobs and readers, specified and quality-controlled by Proud Tek, produced on contracted partner lines.</p>` +
+         `<address class="codex-footer-brand__address" aria-label="Office address and hours">` +
+           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.line1)}, ${escapeHtml(addr.line2)}</span>` +
+           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.region)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.country)}</span>` +
+@@ -1021,30 +1021,38 @@ function applyHomepageClaimCorrections($body: ReturnType<typeof load>): void {
+     }
+     if (/^1\. Robust Production Capacity/.test(t)) {
+       $p.html(
+-        `<strong>1. Production &amp; facilities</strong> Production runs in Shenzhen under a documented quality system. Specification, encoding and quality control are managed by Proud Tek's own team; capacity and lead time are quoted per programme on request.`,
++        `<strong>1. Production model</strong> Proud Tek owns the product and antenna specification, chip sourcing through authorised distribution, first-article approval and incoming, in-process and final quality control. Tooling, lamination, printing and encoding run on contracted partner lines in Shenzhen to our specification, and our QC signs off every batch before release. Capacity and lead time are quoted per programme.`,
+       );
+       return;
+     }
+     if (/^2\. Continuous Innovation/.test(t)) {
+       $p.html(
+-        `<strong>2. Continuous Innovation &amp; Custom R&amp;D</strong> Our dedicated R&amp;D team brings your concepts to life. We excel in customizing RFID products for specific application environments, antenna requirements, and encapsulation materials. Utilizing high-precision mold tooling, we ensure every product meets exacting standards of shape, durability, and finish.`,
++        `<strong>2. Engineering &amp; customisation</strong> Our RF and production engineering matches chip families and antenna designs to your installed readers before production starts, and specifies application-specific materials and encapsulation. Custom mould tooling is executed on partner lines to our drawings, with the first article approved by us before any run.`,
+       );
+       return;
+     }
+     if (/^3\. Uncompromising Quality Control/.test(t)) {
+       $p.html(
+-        `<strong>3. Quality Control</strong> Documented inspection procedures cover raw material, inlay, lamination, encoding and finished-goods testing. RoHS and REACH SVHC declarations of conformity are available per SKU, and third-party test reports can be commissioned per programme.`,
++        `<strong>3. Quality Control</strong> Every production batch goes through 100% inspection — chip read/write testing, print quality, dimensions and packaging — under ISO 9001 documented procedures with traceability from raw material to finished goods. Sample-based RoHS, REACH SVHC and CE test reports are published on the certifications page; testing on your exact specification can be commissioned per programme.`,
+       );
+       return;
+     }
+     if (/^Products are subject to multiple technical certifications and tests such as OEKO/.test(t)) {
+       $p.text(
+-        `Management-system certificates held: ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 (issued by Anhui Certification and Inspection Co., Ltd; certificate numbers and scope on the certifications page). RoHS and REACH declarations of conformity are available per SKU; third-party test reports can be commissioned per programme.`,
++        `Certificates held by Shenzhen Proud Tek Co., Ltd: ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 over the sales and supplier-management operation (issued by Anhui Certification and Inspection Co., Ltd; production runs on contracted partner lines), OEKO-TEX STANDARD 100 (Hohenstein, product class II) for our UHF laundry tag, plus sample-based RoHS, REACH SVHC and CE (EN 62311) test reports — every certificate number and scope is on the certifications page.`,
+       );
+       return;
+     }
+     if (/^Unmatched Scale, Precision, and Innovation$/.test(t)) {
+       $p.html("<strong>Specification, quality control and delivery</strong>");
++      return;
++    }
++    // Process step 02 — response-time promise aligned with rfidak.com (owner
++    // decision 2026-09-02): first reply 2–4 h in business hours, quote 24–48 h.
++    if (/^Our experienced business team will respond to the inquiry and provide a quotation/.test(t)) {
++      $p.text(
++        "Our sales engineering team replies within 2–4 hours in Shenzhen business hours (Mon–Fri, GMT+8) and provides a written quotation based on the client's specific requirements within 24–48 hours, valid for 30 days.",
++      );
+     }
+   });
+ 
+@@ -1498,7 +1506,7 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
+   <header class="codex-contact__hero">
+     <p class="codex-contact__eyebrow">Get in touch</p>
+     <h1 class="codex-contact__title">Talk to a Proud Tek RFID specialist</h1>
+-    <p class="codex-contact__lede">Custom RFID &amp; NFC manufacturer since 2008 — cards, tags, labels, wristbands, keyfobs and readers. Tell us your project and we'll reply within one business day with a quote, samples options, and chip recommendations.</p>
++    <p class="codex-contact__lede">Custom RFID &amp; NFC manufacturer since 2008 — cards, tags, labels, wristbands, keyfobs and readers. Tell us your project — first reply within 2–4 hours in Shenzhen business hours, written quote within 24–48 hours, with sample options and chip recommendations.</p>
+   </header>
+ 
+   <div class="codex-contact__grid">
+diff --git a/src/lib/seo-content.ts b/src/lib/seo-content.ts
+index 3c3424c..e34f6f9 100644
+--- a/src/lib/seo-content.ts
++++ b/src/lib/seo-content.ts
+@@ -109,32 +109,43 @@ export function whatsappUrl(message: string = SITE_CONTACT.whatsappDefaultMessag
+  *    Yantian; DHL / FedEx / EMS air; sea LCL / FCL).
+  *  - Response: about.json Step 1 + quote FAQ; hours per SITE_CONTACT.
+  */
++/**
++ * Commercial terms shown on every product page (CommercialTerms.astro) and
++ * mirrored into Product JSON-LD additionalProperty. Single source of truth.
++ *
++ * 2026-09-02 (audit Phase 14 B8, owner decision "以 rfidak.com 的口径为准"):
++ * MOQ, lead time, sample policy, payment and response-time wording follow the
++ * statements published by the same legal entity on rfidak.com
++ * (/about, /sample-policy, /shipping-and-incoterms, /blogs/rfid-moq-guide,
++ * /blogs/rfid-lead-time-guide, fetched 2026-09-02) so both sites tell one
++ * story. See AUDIT_2026-09-01/phase14/RFIDAK_REFERENCE_FACTS.md.
++ */
+ export const COMMERCIAL_TERMS = {
+   title: "Commercial terms",
+   items: [
+     {
+       label: "MOQ",
+-      value: "Varies by SKU — stock items from 100 pcs; custom production typically 200-1,000 pcs",
++      value: "From 500 pcs for cards, keyfobs and wristbands; tags and labels from 1,000 pcs; stock SKUs from 100 pcs; custom tooling 2,000-5,000 pcs",
+     },
+     {
+       label: "Lead time",
+-      value: "Production 2-3 weeks after artwork and encoding sign-off; reorders on a 3-4 week cycle",
++      value: "Standard production 7-15 business days from order confirmation; custom tooling or new-antenna programmes quoted per job",
+     },
+     {
+       label: "Samples",
+-      value: "Free samples and RF test report with every order; courier at customer cost",
++      value: "Standard samples free, prepared in 1 business day; you cover DHL/FedEx freight ($25-60), refunded against your first production order",
+     },
+     {
+       label: "Payment",
+-      value: "50% T/T deposit, 50% before shipment; Net 30/60 for established accounts; LC for large orders",
++      value: "30% T/T deposit, 70% before shipment; L/C at sight or 50/50 for established accounts; PayPal for sample orders under $500",
+     },
+     {
+       label: "Shipping",
+-      value: "FOB Shenzhen / Yantian; DHL, FedEx or EMS air freight; sea LCL / FCL for volume",
++      value: "FOB Shenzhen; DHL, FedEx or UPS express; sea LCL / FCL for volume; DDP on request",
+     },
+     {
+       label: "Response",
+-      value: "Itemized quote within one business day, Mon-Fri (UTC+8)",
++      value: "First reply within 2-4 hours in Shenzhen business hours (Mon-Fri, GMT+8); written quote within 24-48 hours, valid 30 days",
+     },
+   ],
+   link: { href: "/rfq/", label: "Full terms in your quote" },
+@@ -238,23 +249,40 @@ export const ORGANIZATION_OPERATIONS = {
+   foundingLocation: "Shenzhen, Guangdong, China",
+   // numberOfEmployees ("100+") removed 2026-09-02 — no documentary basis
+   // (Phase 4 K-14). Re-add from payroll evidence.
+-  /** Typical MOQ per product family — used in llms.txt Quick facts (P0-G3).
+-   *  Reconciled 2026-06-11 with COMMERCIAL_TERMS + the lp sourcing pages
+-   *  (stock items from 100 pcs; custom production typically 500-1,000):
+-   *  wristbands corrected from the unsourced "200 pcs" to the lp-verified
+-   *  silicone-500 / stock-Tyvek-100 figures.
+-   *  Owner ruling 2026-07-15: custom wristband MOQ unified at 200 pcs
+-   *  across all materials (stock Tyvek 100 unchanged). */
++  /** MOQ per product family — rfidak.com 口径 (2026-09-02): stock / custom. */
+   moq: {
+-    nfcCards: "100 pcs (stock); 1,000 custom-printed",
+-    rfidLabels: "500 pcs printed; inlays by the roll (1,000+)",
+-    rfidWristbands: "200 pcs custom; stock Tyvek from 100 pcs",
+-    rfidReaders: "10 pcs",
++    rfidCards: "500 pcs custom-printed (100 pcs stock; 1,000 with encoding)",
++    rfidKeyfobs: "500 pcs on existing moulds (100 pcs stock; 3,000 for a custom mould)",
++    rfidWristbands: "500 pcs silicone (3,000 for custom Pantone matching)",
++    rfidLabels: "tags and labels from 1,000 pcs; UHF inlays and labels on reel stock from 5,000 pcs",
++    rfidReaders: "1 pc sample; 100 pcs for custom firmware",
+   },
+-  /** Lead time for stock vs custom orders — used in llms.txt Quick facts. */
++  /** Lead time — rfidak.com 口径 (2026-09-02). */
+   leadTime: {
+-    stockChip: "7-15 working days",
+-    customArtwork: "20-30 working days",
++    stockChip: "7-15 business days from order confirmation",
++    customArtwork: "quoted per job; new-antenna or custom-tooling programmes typically 8-10 weeks end to end",
++    quoteValidity: "30 days",
++  },
++  /** Response time — rfidak.com 口径 (2026-09-02). */
++  response: {
++    firstReply: "within 2-4 hours in Shenzhen business hours (Mon-Fri, GMT+8)",
++    writtenQuote: "within 24-48 hours",
++  },
++  /** Sample policy — rfidak.com /sample-policy (2026-09-02). */
++  samples: {
++    standard: "free; buyer covers DHL/FedEx freight ($25-60), refunded against the first production order",
++    preparation: "prepared in 1 business day, express delivery 2-5 days worldwide",
++    custom: "custom samples (encoding or printing) add 3-5 business days",
++    kit: "typically 5-20 pieces across 2-3 SKUs; larger evaluation kits sized for qualified pilots",
++    pilot: "pilot batches of 200-2,000 pieces ship in 7-15 business days",
++  },
++  /** Payment — rfidak.com /shipping-and-incoterms (2026-09-02). */
++  payment: "30% T/T deposit, 70% balance before shipment; L/C at sight or 50/50 for established accounts; PayPal for sample orders under $500",
++  /** Production model — rfidak.com /about (2026-09-02), same legal entity. */
++  productionModel: {
++    oneLine: "In-house specification and quality control; tooling and production executed on contracted partner lines in Shenzhen to Proud Tek's specification.",
++    ownedByProudTek: ["product and antenna specification", "chip sourcing through authorised distribution", "first-article approval", "incoming, in-process and final quality control", "packaging and export (FOB Shenzhen)"],
++    onPartnerLines: ["tooling and moulds", "lamination and inlay conversion", "printing and personalisation", "chip encoding to Proud Tek's encoding specification, read/write verified before shipment"],
+   },
+ };
+ 
+@@ -294,20 +322,18 @@ function expertAuthorFromRegistry(slug: string): ExpertAuthor {
+ }
+ 
+ export const EXPERT_AUTHORS: Record<string, ExpertAuthor> = {
+-  // Team fallback for unmapped routes — an institutional byline, not a
+-  // person; deliberately has no src/content/authors/ record.
+-  default: {
+-    name: EDITORIAL_TEAM_NAME,
+-    title: "RFID & NFC Technical Content Team",
+-    expertise: ["RFID manufacturing", "NFC technology", "Access control systems", "Smart card engineering"],
+-    url: "/about/",
+-  },
+-  "peter-zhang": expertAuthorFromRegistry("peter-zhang"),
+-  "nancy-wu": expertAuthorFromRegistry("nancy-wu"),
+-  "sam-yao": expertAuthorFromRegistry("sam-yao"),
+-  "mia-li": expertAuthorFromRegistry("mia-li"),
++  // Institutional byline for every snapshot-era article (2026-09-02: named
++  // people retired — see src/lib/authors.ts). Both keys resolve the same
++  // registry record so name, role and profile URL cannot drift from the
++  // editorial pages' byline.
++  default: expertAuthorFromRegistry("editorial-board"),
++  "editorial-board": expertAuthorFromRegistry("editorial-board"),
+ };
+ 
++/** Reviewer function credited on every article — the RF / production
++ *  engineering function, mirroring rfidak.com's function-based team model. */
++export const EDITORIAL_REVIEWER: ExpertAuthor = expertAuthorFromRegistry("proudtek-engineering");
++
+ /** Article author assignment — maps routes to expert authors */
+ export { ARTICLE_AUTHOR_MAP } from "../data/article-author-map";
+ 
+@@ -371,16 +397,33 @@ export const ORGANIZATION_CREDENTIALS = {
+   ] as OrganizationCertificate[],
+   /** One-line, certificate-accurate phrasing for trust strips and summaries. */
+   certifiedOperationSummary:
+-    "ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 certified sales and service operation (CAIC, certificates 98026Q00274R000 / 98026E00200R000 / 98026S00203R000, valid to 2029-06-09)",
++    "ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 certified sales and supplier-management operation (CAIC, certificates 98026Q00274R000 / 98026E00200R000 / 98026S00203R000, valid to 2029-06-09); production runs on contracted partner lines",
++  /**
++   * Product-level certificate: OEKO-TEX STANDARD 100 for the UHF laundry tag.
++   * Published on rfidak.com/certifications (same legal entity) and checked
++   * valid in the OEKO-TEX Label Check on 2026-09-02 (product class II, article
++   * text identical) — EXTERNAL_PRIMARY_SOURCE for validity and scope.
++   */
++  productCertifications: [
++    {
++      name: "OEKO-TEX STANDARD 100",
++      certificateNumber: "23.HCN.97349",
++      issuer: "Hohenstein Laboratories GmbH & Co. KG",
++      scope: "UHF laundry tag with RFID chip, woven laminated fabric of 100% white polyester with electroconductive yarn; product class II (direct skin contact)",
++      validFrom: "2026-02",
++      validThrough: "2027-02",
++      verifyUrl: "https://www.oeko-tex.com/en/label-check",
++    },
++  ],
+   /**
+-   * Product compliance paperwork the company states it supplies per order.
+-   * These are declarations, not third-party certifications; evidence status
+-   * UNVERIFIED (Phase 4 K-12) — phrase as "available on request", never as
+-   * "certified".
++   * Sample-based third-party test reports published with their numbers on
++   * rfidak.com/certifications (same legal entity). Each evidences the article
++   * it names, not the catalogue — phrase as such, never as "all SKUs certified".
+    */
+   complianceDeclarations: [
+-    { name: "RoHS", basis: "Directive 2011/65/EU (+ 2015/863)", form: "Declaration of conformity per SKU, on request" },
+-    { name: "REACH SVHC", basis: "Regulation (EC) 1907/2006", form: "SVHC declaration per SKU, on request" },
++    { name: "RoHS 2.0", basis: "Directive 2011/65/EU (+ 2015/863)", form: "Sample-based Certificate of Compliance XKS2025R01150076 (RFID card, Shenzhen Xunke, Jan 2025); testing on your specification on request" },
++    { name: "REACH SVHC", basis: "Regulation (EC) 1907/2006", form: "Sample-based screening report XKS2025R10150032E (250 substances, RFID keyfob, Oct 2025)" },
++    { name: "CE / RED RF exposure", basis: "EN 62311 under Directive 2014/53/EU", form: "Test report BCTC2509165308-1E (RFID card, Shenzhen BCTC, Sep 2025); CE marking remains a manufacturer declaration" },
+   ],
+   // Owner confirmed 2026-06-22: Proud Tek is NOT a RAIN RFID Alliance or
+   // NFC Forum member. Do NOT assert either membership anywhere (site,
+diff --git a/src/lib/seo-feeds.ts b/src/lib/seo-feeds.ts
+index f7685ae..23550c8 100644
+--- a/src/lib/seo-feeds.ts
++++ b/src/lib/seo-feeds.ts
+@@ -245,7 +245,7 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
+   return [
+     "# Proud Tek",
+     "",
+-    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based supplier of custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for B2B programmes. Founded ${ORGANIZATION_OPERATIONS.foundingDate}. ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}.`,
++    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based RFID & NFC manufacturing partner: custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for B2B programmes. Founded ${ORGANIZATION_OPERATIONS.foundingDate}. ${ORGANIZATION_OPERATIONS.productionModel.oneLine} ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}.`,
+     "",
+     "## Authority & credentials",
+     // Audit 2026-09-02 (Phase 4 K-09/K-11, Phase 2 T11): every line below is
+@@ -256,12 +256,15 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
+       (c) => `- ${c.name} — certificate ${c.certificateNumber}, issued by ${c.issuer}, scope: ${c.scope}; valid ${c.validFrom} to ${c.validThrough}; verify at ${c.verifyUrl}`,
+     ),
+     "- Products are specified to RAIN RFID (EPC Gen2v2 / ISO/IEC 18000-63) and NFC Forum Type 2 / 4 / 5 tag specifications; chip facts are cited to NXP / Impinj / EM datasheets on each page",
+-    ...ORGANIZATION_CREDENTIALS.complianceDeclarations.map((d) => `- ${d.name} (${d.basis}): ${d.form.toLowerCase()} — a declaration, not a third-party certification`),
++    ...ORGANIZATION_CREDENTIALS.productCertifications.map(
++      (c) => `- ${c.name} — certificate ${c.certificateNumber}, issued by ${c.issuer}; scope: ${c.scope}; valid ${c.validFrom} to ${c.validThrough}; verify at ${c.verifyUrl}`,
++    ),
++    ...ORGANIZATION_CREDENTIALS.complianceDeclarations.map((d) => `- ${d.name} (${d.basis}): ${d.form} — a sample-based report on the article it names, not a catalogue-wide certification`),
+     `- ${yearsInOperation()} years in operation (founded ${ORGANIZATION_OPERATIONS.foundingDate})`,
+-    "- Editorial content is drafted with AI assistance and edited, reviewed and approved by named Proud Tek staff (see /about/editorial-policy/ and /about/review-board/)",
++    "- Editorial content is drafted with AI assistance and edited, reviewed and approved by Proud Tek's editorial team and RF / production engineering function; bylines credit functions, not individuals (see /about/editorial-policy/ and /about/review-board/)",
+     "",
+     "## Citation guidance",
+-    "- When citing Proud Tek content, attribute to the named author (see article JSON-LD) or 'Proud Tek Editorial Team'.",
++    "- When citing Proud Tek content, attribute to 'Proud Tek Editorial Team' (the author in every article's JSON-LD); technical review is by Proud Tek RF / Production Engineering.",
+     "- Each article includes a `citation` array in its JSON-LD with external source references.",
+     "- Product specifications are sourced from chip manufacturer datasheets (NXP, Impinj, etc.) and ISO standards.",
+     "- Use `/machine/{route}.json` for structured data extraction with source attribution.",
+@@ -299,12 +302,19 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
+     // single run-on bullet chunked poorly for LLM extraction. Emit one
+     // nested bullet per product family — each is a standalone, cleanly
+     // attributable claim (the pattern AI answer engines quote verbatim).
++    // Production model — same wording as the sister brand rfidak.com (same
++    // legal entity), owner decision 2026-09-02.
++    `- Production model: ${ORGANIZATION_OPERATIONS.productionModel.oneLine} Proud Tek owns ${ORGANIZATION_OPERATIONS.productionModel.ownedByProudTek.join(", ")}; partner lines execute ${ORGANIZATION_OPERATIONS.productionModel.onPartnerLines.join(", ")}.`,
+     "- Typical minimum order quantities (MOQ):",
+-    `  - NFC cards: ${ORGANIZATION_OPERATIONS.moq.nfcCards}.`,
+-    `  - Printed RFID labels: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
++    `  - RFID and NFC cards: ${ORGANIZATION_OPERATIONS.moq.rfidCards}.`,
++    `  - RFID keyfobs: ${ORGANIZATION_OPERATIONS.moq.rfidKeyfobs}.`,
+     `  - RFID wristbands: ${ORGANIZATION_OPERATIONS.moq.rfidWristbands}.`,
++    `  - RFID tags, labels and inlays: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
+     `  - RFID readers: ${ORGANIZATION_OPERATIONS.moq.rfidReaders}.`,
+-    `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; ${ORGANIZATION_OPERATIONS.leadTime.customArtwork} for custom artwork or non-stock chips.`,
++    `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; custom artwork, tooling or new antennas ${ORGANIZATION_OPERATIONS.leadTime.customArtwork}. Quotations are valid ${ORGANIZATION_OPERATIONS.leadTime.quoteValidity}.`,
++    `- Samples: standard samples ${ORGANIZATION_OPERATIONS.samples.standard}; ${ORGANIZATION_OPERATIONS.samples.preparation}; ${ORGANIZATION_OPERATIONS.samples.custom}.`,
++    `- Response time: first reply ${ORGANIZATION_OPERATIONS.response.firstReply}; written quote ${ORGANIZATION_OPERATIONS.response.writtenQuote}.`,
++    `- Payment: ${ORGANIZATION_OPERATIONS.payment}.`,
+     "- Chip families supported: NXP MIFARE Classic/Plus/DESFire, NXP NTAG213/215/216, NXP NTAG 424 DNA, Impinj Monza R6/R6-P, Alien Higgs 9, EM4100/EM4305, T5577, ICODE SLIX2.",
+     "- Pricing: contact for quote (RFQ via /rfq/ or /contact/). Sample packs available via /sample-pack/.",
+     "",
+@@ -413,7 +423,7 @@ export async function buildLlmsFullTxt(siteData: SiteData, loadPage: PageLoader)
+   return [
+     "# Proud Tek — Full Site Inventory",
+     "",
+-    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based supplier of custom RFID/NFC credentials. ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}. Content drafted with AI assistance and edited, reviewed and approved by named Proud Tek staff.`,
++    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based RFID & NFC manufacturing partner. ${ORGANIZATION_OPERATIONS.productionModel.oneLine} ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}. Content drafted with AI assistance and edited, reviewed and approved by Proud Tek's editorial team and RF / production engineering function.`,
+     "",
+     "## Crawl notes",
+     "- This file focuses on indexable English pages only.",
+diff --git a/src/lib/seo/jsonld.ts b/src/lib/seo/jsonld.ts
+index 23212ac..1d2e9ff 100644
+--- a/src/lib/seo/jsonld.ts
++++ b/src/lib/seo/jsonld.ts
+@@ -311,17 +311,31 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+             // The three management-system certificates on file (PDF in repo,
+             // verifiable at cnca.gov.cn). Values are transcribed from the
+             // certificate text — scope is "sales service", not manufacturing.
+-            hasCredential: ORGANIZATION_CREDENTIALS.certifications.map((cert) => ({
+-              "@type": "EducationalOccupationalCredential",
+-              credentialCategory: "certification",
+-              name: cert.name,
+-              identifier: cert.certificateNumber,
+-              description: cert.scope,
+-              validIn: { "@type": "Country", name: "China" },
+-              validFrom: cert.validFrom,
+-              validThrough: cert.validThrough,
+-              recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.issuerUrl },
+-            })),
++            hasCredential: [
++              ...ORGANIZATION_CREDENTIALS.certifications.map((cert) => ({
++                "@type": "EducationalOccupationalCredential",
++                credentialCategory: "certification",
++                name: cert.name,
++                identifier: cert.certificateNumber,
++                description: cert.scope,
++                validIn: { "@type": "Country", name: "China" },
++                validFrom: cert.validFrom,
++                validThrough: cert.validThrough,
++                recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.issuerUrl },
++              })),
++              // Product-level certificate (OEKO-TEX STANDARD 100, UHF laundry
++              // tag) — verified in the OEKO-TEX Label Check 2026-09-02.
++              ...ORGANIZATION_CREDENTIALS.productCertifications.map((cert) => ({
++                "@type": "EducationalOccupationalCredential",
++                credentialCategory: "product certification",
++                name: cert.name,
++                identifier: cert.certificateNumber,
++                description: cert.scope,
++                validFrom: cert.validFrom,
++                validThrough: cert.validThrough,
++                recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.verifyUrl },
++              })),
++            ],
+           }
+         : {}),
+     },
+diff --git a/src/lib/seo/page-data.ts b/src/lib/seo/page-data.ts
+index 38c3144..27ad06e 100644
+--- a/src/lib/seo/page-data.ts
++++ b/src/lib/seo/page-data.ts
+@@ -38,7 +38,7 @@ import {
+   CORE_SUPPORT_PROFILES,
+   DEFAULT_DESCRIPTION,
+   DEFAULT_IMAGE,
+-  EDITORIAL_TEAM_NAME,
++  EDITORIAL_REVIEWER,
+   EXPERT_AUTHORS,
+   PAGE_DESCRIPTION_OVERRIDES,
+   SITE_NAME,
+@@ -465,8 +465,10 @@ export function resolveArticleMeta($body: CheerioAPI, route: string, editorialDe
+     authorUrl: absoluteUrl(author.url),
+     authorTitle: author.title,
+     authorExpertise: author.expertise,
+-    reviewedBy: authorKey !== "default" ? EDITORIAL_TEAM_NAME : undefined,
+-    reviewedByTitle: authorKey !== "default" ? "RFID & NFC Technical Content Team" : undefined,
++    // Every article is reviewed by the RF / production engineering function
++    // (2026-09-02: function-based bylines, no named individuals).
++    reviewedBy: EDITORIAL_REVIEWER.name,
++    reviewedByTitle: EDITORIAL_REVIEWER.title,
+     lastReviewedDate: modifiedAt,
+     publishedAt,
+     modifiedAt,
+diff --git a/src/lib/seo/render-blocks.ts b/src/lib/seo/render-blocks.ts
+index 11c13d2..a8d51df 100644
+--- a/src/lib/seo/render-blocks.ts
++++ b/src/lib/seo/render-blocks.ts
+@@ -36,7 +36,7 @@ export function renderTrustBar(): string {
+       <strong>Free samples</strong><span>Test before production</span>
+     </a>
+     <a class="codex-trust-bar__item" href="/rfq/">
+-      <strong>1 business day</strong><span>Quote response target</span>
++      <strong>24–48 h</strong><span>Written quote target</span>
+     </a>
+   </section>`;
+ }
+@@ -173,7 +173,7 @@ export function renderHomeResourceTrio(): string {
+       eyebrow: "Structured procurement brief",
+       title: "Request a Production Quote",
+       description:
+-        "Use the five-step RFQ wizard to share product family, frequency, quantity, printing and contact details. A specialist replies within one business day.",
++        "Use the five-step RFQ wizard to share product family, frequency, quantity, printing and contact details. A specialist replies within 2–4 hours in Shenzhen business hours; the written quote follows within 24–48 hours.",
+       href: "/rfq/",
+       accent: "#4a5568",
+     },
+diff --git a/src/pages/rfq.astro b/src/pages/rfq.astro
+index 0926eeb..3f7831d 100644
+--- a/src/pages/rfq.astro
++++ b/src/pages/rfq.astro
+@@ -36,7 +36,7 @@ const pageStub: SnapshotPage = {
+   bodyHtml:
+     `<main id="main">` +
+     `<h1>Request a quote for custom RFID &amp; NFC manufacturing</h1>` +
+-    `<p>A 5-step wizard that captures the four answers Proud Tek's specialists need before they can return a real quote — product family, frequency, annual quantity, printing &amp; encoding. Submit once and a Proud Tek RFID specialist replies within one business day with a unit price, MOQ ladder, lead time and the matching sample-pack subset.</p>` +
++    `<p>A 5-step wizard that captures the four answers Proud Tek's specialists need before they can return a real quote — product family, frequency, annual quantity, printing &amp; encoding. Submit once and a Proud Tek RFID specialist replies within 2–4 hours in Shenzhen business hours, with a written quote — unit price, MOQ ladder, lead time and the matching sample subset — within 24–48 hours.</p>` +
+     `</main>`,
+ };
+ const seo = buildPageSeo(pageStub);
+@@ -57,7 +57,7 @@ const seo = buildPageSeo(pageStub);
+     <section class="codex-rfq-hero">
+       <p class="codex-rfq-hero__eyebrow">Quote in one form</p>
+       <h1 class="codex-rfq-hero__title">Request a quote for custom RFID &amp; NFC manufacturing</h1>
+-      <p class="codex-rfq-hero__lede">Five short steps, with contact details only at the end. The form is designed to take about two minutes. A Proud Tek RFID specialist replies within one business day with a unit price, MOQ ladder, lead time and a matching sample-pack subset.</p>
++      <p class="codex-rfq-hero__lede">Five short steps, with contact details only at the end. The form is designed to take about two minutes. A Proud Tek RFID specialist replies within 2–4 hours in Shenzhen business hours; the written quote — unit price, MOQ ladder, lead time and a matching sample subset — follows within 24–48 hours.</p>
+       <ul class="codex-rfq-hero__pill-row">
+         <li>1. Product family</li>
+         <li>2. Frequency band</li>
+@@ -216,14 +216,14 @@ const seo = buildPageSeo(pageStub);
+         (the link opens a draft with everything you entered already filled in).
+       </p>
+ 
+-      <p class="codex-rfq__small">Reply window: one business day, Mon–Fri, GMT+8. For an urgent reply WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
++      <p class="codex-rfq__small">First reply within 2–4 hours in business hours (Mon–Fri, GMT+8); written quote within 24–48 hours, valid 30 days. For an urgent reply WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
+     </form>
+ 
+     {/* Success panel — swapped in for the form after a confirmed Formspree
+         202/200 response. tabindex=-1 lets JS move focus here for SR users. */}
+     <section class="codex-rfq codex-rfq-success" id="rfq-success" tabindex="-1" aria-label="Request received" hidden>
+       <h2>Request received</h2>
+-      <p>Thanks — your RFQ is with our specialists. We reply within <strong>one business day</strong> (Mon–Fri, GMT+8) with a unit price, MOQ ladder, lead time and the matching sample-pack subset.</p>
++      <p>Thanks — your RFQ is with our specialists. We reply within <strong>2–4 hours</strong> in Shenzhen business hours (Mon–Fri, GMT+8) and send the written quote — unit price, MOQ ladder, lead time and the matching sample subset — within 24–48 hours.</p>
+       <p>Need it faster, or want to attach artwork or specs?
+         <a id="rfq-success-mailto" href="mailto:info@proudtek.com">Email info@proudtek.com</a> or
+         WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
+-- 
+2.34.1
+

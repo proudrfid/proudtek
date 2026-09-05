@@ -1,0 +1,1987 @@
+From 203e07eefdd0f2f29ec7e610aeb5760fd3c3c123 Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 05:34:17 -0400
+Subject: [PATCH 04/20] content(products): label price ranges as indicative,
+ fix MIFARE Classic launch year, repair inverted modifiedAt
+
+Phase 14 batch B3 (audit 2026-09-01, Phase 4 ledger S-05 / F-02 / T-09):
+- 103 product pages: 'Typical pricing' -> 'Indicative pricing', text now
+  reads '(indicative FOB Shenzhen range, as of Q3 2026)'. Owner decision
+  2026-09-02: keep as page text, do not emit in structured data.
+- MIFARE Classic launch year 1997 -> 1994 (NXP/Philips product history) in
+  mifare-classic-1k-card, rfid-cards pillar and the hotel-lock compare page;
+  'from the late 1990s to ~2015' wording kept consistent.
+- 20 pages had modifiedAt earlier than publishedAt; modifiedAt now equals
+  publishedAt (no invented dates).
+---
+ ...ifare-classic-vs-plus-vs-desfire-hotel-locks.json |  2 +-
+ .../editorial/compare/mifare-plus-vs-desfire.json    |  2 +-
+ src/content/editorial/contact/hotel-rfid.json        |  2 +-
+ src/content/editorial/contact/laundry-rfid.json      |  2 +-
+ src/content/editorial/contact/rfid-labels-tags.json  |  2 +-
+ .../editorial/products/rfid-cards/_pillar.json       |  4 ++--
+ .../rfid-cards/dual-frequency-rfid-card.json         |  6 +++---
+ .../products/rfid-cards/em4100-rfid-card.json        |  4 ++--
+ .../products/rfid-cards/icode-slix-card.json         |  4 ++--
+ .../products/rfid-cards/mifare-classic-1k-card.json  | 12 ++++++------
+ .../products/rfid-cards/mifare-desfire-ev3-card.json |  4 ++--
+ .../products/rfid-cards/mifare-plus-se-card.json     |  4 ++--
+ .../rfid-cards/mifare-ultralight-c-card.json         |  4 ++--
+ .../products/rfid-cards/nfc-warranty-card.json       |  2 +-
+ .../products/rfid-cards/rfid-bamboo-card.json        |  4 ++--
+ .../products/rfid-cards/rfid-employee-badge.json     |  4 ++--
+ .../products/rfid-cards/rfid-membership-card.json    |  2 +-
+ .../products/rfid-cards/rfid-parking-card.json       |  2 +-
+ .../products/rfid-cards/rfid-wooden-card.json        |  4 ++--
+ .../products/rfid-cards/standard-rfid-wood-card.json |  4 ++--
+ .../products/rfid-cards/transparent-nfc-card.json    |  4 ++--
+ .../editorial/products/rfid-cards/uhf-rfid-card.json |  4 ++--
+ .../wooden-nfc-business-card-engraved.json           |  4 ++--
+ .../rfid-keyfobs/dual-frequency-key-fob.json         |  4 ++--
+ .../products/rfid-keyfobs/em4305-keyfob.json         |  4 ++--
+ .../products/rfid-keyfobs/mifare-desfire-keyfob.json |  4 ++--
+ .../products/rfid-keyfobs/nfc-epoxy-key-tag.json     |  4 ++--
+ .../products/rfid-keyfobs/nfc-wood-keychain-tag.json |  4 ++--
+ .../products/rfid-keyfobs/rfid-abs-keyfob.json       |  4 ++--
+ .../products/rfid-keyfobs/rfid-epoxy-keyfob.json     |  4 ++--
+ .../products/rfid-keyfobs/rfid-metal-keyfob.json     |  4 ++--
+ .../products/rfid-keyfobs/rfid-wristwatch-tag.json   |  4 ++--
+ .../products/rfid-keyfobs/t5577-keyfob.json          |  4 ++--
+ .../rfid-labels/alien-higgs-9-uhf-inlay.json         |  4 ++--
+ .../products/rfid-labels/impinj-m700-uhf-inlay.json  |  4 ++--
+ .../products/rfid-labels/impinj-m730-uhf-inlay.json  |  4 ++--
+ .../products/rfid-labels/impinj-m750-uhf-inlay.json  |  4 ++--
+ .../products/rfid-labels/impinj-m800-uhf-inlay.json  |  4 ++--
+ .../products/rfid-labels/nfc-anti-metal-sticker.json |  4 ++--
+ .../rfid-labels/nfc-battery-passport-tag.json        |  4 ++--
+ .../products/rfid-labels/nfc-dry-inlay.json          |  4 ++--
+ .../products/rfid-labels/nfc-wet-inlay.json          |  4 ++--
+ .../products/rfid-labels/nfc-wine-bottle-tag.json    |  4 ++--
+ .../products/rfid-labels/ntag213-nfc-sticker.json    |  4 ++--
+ .../products/rfid-labels/ntag215-nfc-sticker.json    |  4 ++--
+ .../products/rfid-labels/ntag216-nfc-sticker.json    |  4 ++--
+ .../rfid-labels/ntag424-dna-tamper-evident-tag.json  |  4 ++--
+ .../rfid-labels/rfid-cryogenic-specimen-label.json   |  4 ++--
+ .../products/rfid-labels/rfid-dry-inlay.json         |  4 ++--
+ .../rfid-labels/rfid-plant-nursery-label.json        |  4 ++--
+ .../rfid-labels/rfid-specimen-slide-label.json       |  4 ++--
+ .../uhf-rfid-apparel-hang-tag-retail.json            |  4 ++--
+ .../products/rfid-labels/uhf-rfid-paper-label.json   |  4 ++--
+ .../products/rfid-labels/uhf-rfid-tire-label.json    |  4 ++--
+ .../rfid-readers/desktop-nfc-reader-encoder.json     |  2 +-
+ .../products/rfid-readers/fixed-uhf-rfid-reader.json |  6 +++---
+ .../rfid-readers/handheld-uhf-rfid-reader.json       |  4 ++--
+ .../rfid-tags/anti-metal-uhf-it-asset-tag.json       |  4 ++--
+ .../rfid-tags/high-temperature-rfid-tag-200c.json    |  4 ++--
+ .../products/rfid-tags/rfid-aircraft-part-tag.json   |  6 +++---
+ .../products/rfid-tags/rfid-ammo-can-tag.json        |  4 ++--
+ .../products/rfid-tags/rfid-anchor-bolt-tag.json     |  4 ++--
+ .../products/rfid-tags/rfid-animal-ear-tag.json      |  4 ++--
+ .../products/rfid-tags/rfid-anti-metal-tag.json      |  4 ++--
+ .../products/rfid-tags/rfid-blood-bag-tag.json       |  4 ++--
+ .../editorial/products/rfid-tags/rfid-bolt-tag.json  |  4 ++--
+ .../products/rfid-tags/rfid-cable-seal-tag.json      |  4 ++--
+ .../products/rfid-tags/rfid-ceramic-tag.json         |  6 +++---
+ .../products/rfid-tags/rfid-concrete-embed-tag.json  |  4 ++--
+ .../products/rfid-tags/rfid-ear-tag-livestock.json   |  4 ++--
+ .../editorial/products/rfid-tags/rfid-epoxy-tag.json |  4 ++--
+ .../products/rfid-tags/rfid-eyelet-tag.json          |  4 ++--
+ .../rfid-tags/rfid-fire-extinguisher-tag.json        |  4 ++--
+ .../editorial/products/rfid-tags/rfid-fish-tag.json  |  6 +++---
+ .../editorial/products/rfid-tags/rfid-flag-tag.json  |  4 ++--
+ .../products/rfid-tags/rfid-glass-capsule-tag.json   |  6 +++---
+ .../products/rfid-tags/rfid-guard-tour-tag.json      |  2 +-
+ .../editorial/products/rfid-tags/rfid-hang-tag.json  |  4 ++--
+ .../products/rfid-tags/rfid-helmet-tag.json          |  4 ++--
+ .../rfid-tags/rfid-high-temp-silicone-tag.json       |  4 ++--
+ .../rfid-tags/rfid-high-temperature-ceramic-tag.json |  4 ++--
+ .../rfid-tags/rfid-ibc-chemical-drum-tag.json        |  4 ++--
+ .../products/rfid-tags/rfid-jewelry-tag.json         |  4 ++--
+ .../editorial/products/rfid-tags/rfid-keg-tag.json   |  2 +-
+ .../products/rfid-tags/rfid-library-book-tag.json    |  4 ++--
+ .../products/rfid-tags/rfid-livestock-leg-band.json  |  4 ++--
+ .../products/rfid-tags/rfid-magnet-mount-tag.json    |  4 ++--
+ .../products/rfid-tags/rfid-manhole-cover-tag.json   |  4 ++--
+ .../products/rfid-tags/rfid-mining-asset-tag.json    |  4 ++--
+ .../editorial/products/rfid-tags/rfid-nail-tag.json  |  4 ++--
+ .../products/rfid-tags/rfid-oil-gas-pipe-tag.json    |  4 ++--
+ .../products/rfid-tags/rfid-parking-token.json       |  4 ++--
+ .../products/rfid-tags/rfid-pcb-screw-mount-tag.json |  4 ++--
+ .../editorial/products/rfid-tags/rfid-pcb-tag.json   |  4 ++--
+ .../products/rfid-tags/rfid-pps-laundry-chip.json    |  4 ++--
+ .../products/rfid-tags/rfid-race-timing-tag.json     |  4 ++--
+ .../editorial/products/rfid-tags/rfid-screw-tag.json |  4 ++--
+ .../rfid-tags/rfid-silicone-flexible-tag.json        |  4 ++--
+ .../rfid-tags/rfid-surgical-instrument-tag.json      |  4 ++--
+ .../products/rfid-tags/rfid-tamper-seal-tag.json     |  4 ++--
+ .../rfid-tags/rfid-temperature-sensor-tag.json       |  2 +-
+ .../products/rfid-tags/rfid-textile-laundry-tag.json |  4 ++--
+ .../editorial/products/rfid-tags/rfid-tire-tag.json  |  2 +-
+ .../editorial/products/rfid-tags/rfid-tool-tag.json  |  4 ++--
+ .../products/rfid-tags/rfid-tool-tracking-tag.json   |  4 ++--
+ .../editorial/products/rfid-tags/rfid-tree-tag.json  |  4 ++--
+ .../editorial/products/rfid-tags/rfid-valve-tag.json |  4 ++--
+ .../products/rfid-tags/rfid-waste-bin-tag.json       |  6 +++---
+ .../products/rfid-tags/rfid-weapon-tracking-tag.json |  4 ++--
+ .../editorial/products/rfid-tags/rfid-wedge-tag.json |  4 ++--
+ .../rfid-tags/uhf-rfid-apparel-hang-tag.json         |  4 ++--
+ .../products/rfid-tags/uhf-rfid-hard-tag.json        |  4 ++--
+ .../rfid-tags/uhf-rfid-woven-care-label.json         |  4 ++--
+ .../rfid-tags/waterproof-uhf-rfid-outdoor-tag.json   |  4 ++--
+ .../rfid-wristbands/fabric-rfid-wristband.json       |  4 ++--
+ .../rfid-wristbands/nfc-fitness-wristband.json       |  4 ++--
+ .../rfid-wristbands/rfid-vinyl-wristband.json        |  4 ++--
+ src/content/editorial/resources/_pillar.json         |  2 +-
+ 118 files changed, 233 insertions(+), 233 deletions(-)
+
+diff --git a/src/content/editorial/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks.json b/src/content/editorial/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks.json
+index d9c16aa..abebab5 100644
+--- a/src/content/editorial/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks.json
++++ b/src/content/editorial/compare/mifare-classic-vs-plus-vs-desfire-hotel-locks.json
+@@ -109,7 +109,7 @@
+     {
+       "title": "The three chips at a glance (hotel context)",
+       "bullets": [
+-        "MIFARE Classic 1K/4K — NXP MF1S50 (1K) / MF1S70 (4K). The dominant hotel-key-card chip 1997-2015. ~€0.15-0.25 per card at volume. 1,024 or 4,096 bytes organized as sectors with per-sector Key A / Key B. CRYPTO1 cipher, publicly broken since 2008 (nested / darkside / hardnested attacks; commodity tooling takes minutes). Still appropriate for properties where cloning risk is negligible and the reader fleet predates Plus/DESFire support.",
++        "MIFARE Classic 1K/4K — NXP MF1S50 (1K) / MF1S70 (4K). The dominant hotel-key-card chip from the late 1990s to ~2015. ~€0.15-0.25 per card at volume. 1,024 or 4,096 bytes organized as sectors with per-sector Key A / Key B. CRYPTO1 cipher, publicly broken since 2008 (nested / darkside / hardnested attacks; commodity tooling takes minutes). Still appropriate for properties where cloning risk is negligible and the reader fleet predates Plus/DESFire support.",
+         "MIFARE Plus EV2 — NXP MF1P family. Launched as successor to Plus EV1 in 2018. 2K or 4K memory, Classic-compatible sector layout, {chip:nxp-mifare-plus-ev2:crypto.algorithm} session keys. The distinguishing feature: three security levels (SL1 = CRYPTO1 compatible, SL2 = CRYPTO1 auth + AES data, SL3 = full {chip:nxp-mifare-plus-ev2:crypto.algorithm}). Drop-in replacement for Classic cards on legacy readers (SL1); future-proof against the CRYPTO1 break (SL3). ~€0.30-0.40 per card at volume.",
+         "DESFire EV3 — NXP MF3DHx3 family. Launched 2020 as successor to DESFire EV2. 2K / 4K / 8K variants. File-system memory model. Up to 28 applications per card, up to 32 files per application, per-file AES keys. EAL5+ hardware. ~€0.60-0.90 per card at volume. The architecturally-correct choice for multi-application credentials (room + spa + F&B + loyalty on one card).",
+         "All three chips are ISO 14443-A compliant at the physical and anti-collision layers. Classic stops at Part 3 (sector authentication frames on raw 14443-A). Plus EV2 supports both Part 3 (SL1/SL2 modes) and Part 4 (SL3 mode T=CL). DESFire EV3 uses Part 4 exclusively with APDU-wrapped commands.",
+diff --git a/src/content/editorial/compare/mifare-plus-vs-desfire.json b/src/content/editorial/compare/mifare-plus-vs-desfire.json
+index 78e5f56..bcb6f6f 100644
+--- a/src/content/editorial/compare/mifare-plus-vs-desfire.json
++++ b/src/content/editorial/compare/mifare-plus-vs-desfire.json
+@@ -26,7 +26,7 @@
+     "Plus SL1 SL3 migration"
+   ],
+   "publishedAt": "2026-04-20",
+-  "modifiedAt": "2026-03-21",
++  "modifiedAt": "2026-04-20",
+   "authorSlug": "peter-zhang",
+   "reviewedBySlug": "nancy-wu",
+   "reviewedAt": "2026-03-24",
+diff --git a/src/content/editorial/contact/hotel-rfid.json b/src/content/editorial/contact/hotel-rfid.json
+index bcf5e46..adeef29 100644
+--- a/src/content/editorial/contact/hotel-rfid.json
++++ b/src/content/editorial/contact/hotel-rfid.json
+@@ -12,7 +12,7 @@
+   "imageAlt": "Hotel guest tapping a blue RFID key card on a stainless steel door lock reader",
+   "heroImage": "/landing-images/hotel-rfid-hero.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T02:42:32Z",
++  "modifiedAt": "2026-06-11",
+   "imageSourceRoutes": [
+     "/solutions/hotel-key-cards/",
+     "/solutions/rfid-event-wristbands/"
+diff --git a/src/content/editorial/contact/laundry-rfid.json b/src/content/editorial/contact/laundry-rfid.json
+index 13d20f9..145f459 100644
+--- a/src/content/editorial/contact/laundry-rfid.json
++++ b/src/content/editorial/contact/laundry-rfid.json
+@@ -12,7 +12,7 @@
+   "imageAlt": "Banner showing an industrial washer and PPS, silicone and woven textile RFID laundry tag types",
+   "heroImage": "/landing-images/laundry-rfid-hero.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T01:00:47Z",
++  "modifiedAt": "2026-06-11",
+   "imageSourceRoutes": [
+     "/solutions/rfid-laundry-tags/",
+     "/products/rfid-tags/rfid-pps-laundry-chip/",
+diff --git a/src/content/editorial/contact/rfid-labels-tags.json b/src/content/editorial/contact/rfid-labels-tags.json
+index b3e1beb..93923ea 100644
+--- a/src/content/editorial/contact/rfid-labels-tags.json
++++ b/src/content/editorial/contact/rfid-labels-tags.json
+@@ -12,7 +12,7 @@
+   "imageAlt": "Roll of square white RFID labels with visible antenna coils on a white background",
+   "heroImage": "/landing-images/rfid-labels-tags-hero.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T01:00:47Z",
++  "modifiedAt": "2026-06-11",
+   "imageSourceRoutes": [
+     "/products/rfid-labels/ntag213-nfc-sticker/",
+     "/products/rfid-labels/",
+diff --git a/src/content/editorial/products/rfid-cards/_pillar.json b/src/content/editorial/products/rfid-cards/_pillar.json
+index e5d21b3..0326483 100644
+--- a/src/content/editorial/products/rfid-cards/_pillar.json
++++ b/src/content/editorial/products/rfid-cards/_pillar.json
+@@ -53,7 +53,7 @@
+       "title": "What is an RFID card?",
+       "intro": "An RFID card is an ISO/IEC 7810 ID-1 plastic credential with an embedded chip and antenna that communicates wirelessly with a reader. The direct descendant of contact smart cards (ISO/IEC 7816) but without the metallic contact pads.",
+       "paragraphs": [
+-        "The first commercially successful RFID cards were low-frequency 125 kHz proximity cards (HID Prox II, Indala, AWID and the {chip:em-microelectronic-em4100:short_name} clone family) launched in the late 1980s for US enterprise access control. The 2001 ratification of ISO/IEC 14443 and the 1997 introduction of MIFARE Classic (NXP, née Philips) established 13.56 MHz as the dominant card frequency, and the subsequent rollout of EMV Contactless payment (2003+), ePassport (ICAO 9303, 2005+) and transit-card programmes (Octopus, Oyster, Suica, Clipper) scaled the RFID card from a niche access-control product into a high-volume credential category whose annual global shipments are tracked alongside payment and identity cards by Smart Payment Association and Eurosmart market reports.",
++        "The first commercially successful RFID cards were low-frequency 125 kHz proximity cards (HID Prox II, Indala, AWID and the {chip:em-microelectronic-em4100:short_name} clone family) launched in the late 1980s for US enterprise access control. The 2001 ratification of ISO/IEC 14443 and the 1994 introduction of MIFARE Classic (NXP, née Philips) established 13.56 MHz as the dominant card frequency, and the subsequent rollout of EMV Contactless payment (2003+), ePassport (ICAO 9303, 2005+) and transit-card programmes (Octopus, Oyster, Suica, Clipper) scaled the RFID card from a niche access-control product into a high-volume credential category whose annual global shipments are tracked alongside payment and identity cards by Smart Payment Association and Eurosmart market reports.",
+         "In 2024-2026 the dominant forces in card demand are (a) the migration from {chip:nxp-mifare-classic-1k:short_name} to {chip:nxp-mifare-desfire-ev3:short_name} for enterprise and transit, driven by the known cryptographic weaknesses in the proprietary CRYPTO-1 cipher; (b) the rapid adoption of NTAG424 DNA SUN-authenticated NFC cards for luxury brand, warranty and anti-counterfeit; and (c) the continued growth of eco-materials (wood, bamboo, PLA, recycled ocean plastic) as corporate sustainability mandates reach card-issuance programmes."
+       ],
+       "bullets": [
+@@ -293,7 +293,7 @@
+   "faq": [
+     {
+       "question": "What is the difference between MIFARE Classic, Plus and DESFire cards?",
+-      "answer": "MIFARE Classic 1K is the original 1997 NXP card using the proprietary CRYPTO-1 cipher — since 2008 CRYPTO-1 is cryptographically broken and can be attacked in under a minute with a Proxmark or ChameleonMini, so Classic should not be specified for any new secure deployment. MIFARE Plus (SE / S / X / EV1 / EV2) is the migration path: AES-128 security level 3, backward-compatible with Classic 1K memory layout so legacy readers continue to work. MIFARE DESFire (EV1 / EV2 / EV3) is a different architecture. A full file-system card with {chip:nxp-mifare-desfire-ev3:crypto.algorithm}, 3DES, ISO/IEC 7816-4 APDU command set, up to {chip:nxp-mifare-desfire-ev3:limits.max_applications} applications and {chip:nxp-mifare-desfire-ev3:limits.max_files_per_app} files per application. DESFire EV3 is the current generation, adds SUN message authentication (similar to NTAG424 DNA) and is the 2026 default for transit and enterprise access."
++      "answer": "MIFARE Classic 1K is the original 1994 NXP card using the proprietary CRYPTO-1 cipher — since 2008 CRYPTO-1 is cryptographically broken and can be attacked in under a minute with a Proxmark or ChameleonMini, so Classic should not be specified for any new secure deployment. MIFARE Plus (SE / S / X / EV1 / EV2) is the migration path: AES-128 security level 3, backward-compatible with Classic 1K memory layout so legacy readers continue to work. MIFARE DESFire (EV1 / EV2 / EV3) is a different architecture. A full file-system card with {chip:nxp-mifare-desfire-ev3:crypto.algorithm}, 3DES, ISO/IEC 7816-4 APDU command set, up to {chip:nxp-mifare-desfire-ev3:limits.max_applications} applications and {chip:nxp-mifare-desfire-ev3:limits.max_files_per_app} files per application. DESFire EV3 is the current generation, adds SUN message authentication (similar to NTAG424 DNA) and is the 2026 default for transit and enterprise access."
+     },
+     {
+       "question": "Are MIFARE Classic cards still secure?",
+diff --git a/src/content/editorial/products/rfid-cards/dual-frequency-rfid-card.json b/src/content/editorial/products/rfid-cards/dual-frequency-rfid-card.json
+index 4e11358..cfe45a5 100644
+--- a/src/content/editorial/products/rfid-cards/dual-frequency-rfid-card.json
++++ b/src/content/editorial/products/rfid-cards/dual-frequency-rfid-card.json
+@@ -105,8 +105,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.80–2.00 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.80–2.00 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+@@ -121,7 +121,7 @@
+   ],
+   "heroImage": "/landing-images/dual-frequency-rfid-card-hero.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "sections": [
+     {
+       "title": "Why dual-frequency exists — migration arithmetic and the two-card problem",
+diff --git a/src/content/editorial/products/rfid-cards/em4100-rfid-card.json b/src/content/editorial/products/rfid-cards/em4100-rfid-card.json
+index 55ed92f..4a56046 100644
+--- a/src/content/editorial/products/rfid-cards/em4100-rfid-card.json
++++ b/src/content/editorial/products/rfid-cards/em4100-rfid-card.json
+@@ -42,8 +42,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.50 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2026-04-18",
+diff --git a/src/content/editorial/products/rfid-cards/icode-slix-card.json b/src/content/editorial/products/rfid-cards/icode-slix-card.json
+index 1007cf6..6e1d367 100644
+--- a/src/content/editorial/products/rfid-cards/icode-slix-card.json
++++ b/src/content/editorial/products/rfid-cards/icode-slix-card.json
+@@ -46,8 +46,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.50 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2024-02-12",
+diff --git a/src/content/editorial/products/rfid-cards/mifare-classic-1k-card.json b/src/content/editorial/products/rfid-cards/mifare-classic-1k-card.json
+index e539d20..73c1268 100644
+--- a/src/content/editorial/products/rfid-cards/mifare-classic-1k-card.json
++++ b/src/content/editorial/products/rfid-cards/mifare-classic-1k-card.json
+@@ -30,7 +30,7 @@
+       "items": [
+         "ISO/IEC 14443-1/-2/-3 Type A at 13.56 MHz — 106 kbit/s bit-rate with anticollision per Type A cascade level 1.",
+         "ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) physical card body; ISO/IEC 10373-6 durability test regime.",
+-        "Launched by Philips Semiconductors (now NXP) in 1997 — oldest contactless smart card specification still in wide active issuance."
++        "Introduced by Philips Semiconductors (now NXP) in 1994 — the oldest contactless smart-card IC family still in wide active issuance (NXP MIFARE Classic product page)."
+       ]
+     },
+     {
+@@ -42,8 +42,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.50 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2026-04-18",
+@@ -56,7 +56,7 @@
+   "sections": [
+     {
+       "title": "What is MIFARE Classic 1K, and where does it still fit?",
+-      "intro": "MIFARE Classic 1K is a 13.56 MHz ISO/IEC 14443-3 Type A smart card launched by Philips Semiconductors (now NXP) in 1997 and still the most widely issued contactless credential on earth. It remains the right specification when the threat model is low-value and the existing reader base is Classic-capable — not as a new-deployment security baseline.",
++      "intro": "MIFARE Classic 1K is a 13.56 MHz ISO/IEC 14443-3 Type A smart card introduced by Philips Semiconductors (now NXP) in 1994 and still the most widely issued contactless credential on earth. It remains the right specification when the threat model is low-value and the existing reader base is Classic-capable — not as a new-deployment security baseline.",
+       "paragraphs": [
+         "The chip's 1 KB EEPROM is organised into 16 sectors of 4 blocks each. Each sector has two independent keys (A and B) and configurable access conditions, so a single card can carry access authorisation in sector 1, a canteen balance in sector 2 and a parking counter in sector 3 under separate key ownership. That sector model is the reason Classic is still specified — legacy reader systems, time-attendance terminals and hotel locks all understand it natively.",
+         "The elephant in the room is CRYPTO-1: the proprietary stream cipher Classic authenticates with has been publicly broken since 2008, and a Classic card can be cloned in seconds with a Proxmark, ChameleonMini or Flipper Zero. For any new deployment where the credential protects a high-value asset (data-centre access, banking, government ID, enterprise that audits under PCI/SOX), Classic should not be the answer. The migration path is MIFARE Plus SE (AES-128, backward-compatible on Classic readers) or MIFARE DESFire EV3 (AES-128 file system on modern readers)."
+@@ -89,7 +89,7 @@
+         "src": "/diagrams/products/mifare-classic-1k-card-anatomy.svg",
+         "alt": "Exploded CR80 card: printed PVC overlay, inlay with chip and planar 13.56 MHz antenna loop, PVC core — with the ISO/IEC 14443 Type A interface facts alongside"
+       },
+-      "intro": "The CR80 body is the easy part; the work happens in the inlay. ISO/IEC 14443-1/-2/-3 Type A at 13.56 MHz — 106 kbit/s bit-rate with anticollision per Type A cascade level 1. ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) physical card body; ISO/IEC 10373-6 durability test regime. Launched by Philips Semiconductors (now NXP) in 1997 — oldest contactless smart card specification still in wide active issuance.",
++      "intro": "The CR80 body is the easy part; the work happens in the inlay. ISO/IEC 14443-1/-2/-3 Type A at 13.56 MHz — 106 kbit/s bit-rate with anticollision per Type A cascade level 1. ISO/IEC 7810 ID-1 CR80 (85.60 × 53.98 × 0.76 mm) physical card body; ISO/IEC 10373-6 durability test regime. Introduced by Philips Semiconductors (now NXP) in 1994 — the oldest contactless smart-card IC family still in wide active issuance (NXP MIFARE Classic product page).",
+       "bullets": [
+         "Every MIFARE-capable reader deployed in the last two decades reads Classic 1K natively — HID, SALTO, ASSA ABLOY, dormakaba, Suprema, ZKTeco, Rosslare. Every major card-printer platform (Zebra ZXP Series 7/8, Evolis Primacy, Matica XID, Fargo HDP5000) supports inline Classic encoding. iOS Core NFC exposes Classic UID only; Android MifareClassic API exposes sector data under known keys.",
+         "Card-body posture: RoHS 3 + REACH Annex XVII compliant PVC substrates; ISO/IEC 27001 controlled pre-encoding bureau process. Batch chip certificates + ISO/IEC 14443 conformance test reports + UID lists ship with every production lot. Classic 1K is NOT suitable where PCI DSS, SOX, HIPAA, SOC 2 or government procurement references AES-128 / EAL4+ as the credential baseline."
+@@ -168,7 +168,7 @@
+       "timeline": {
+         "items": [
+           {
+-            "label": "1997 · MIFARE Classic launches",
++            "label": "1994 · MIFARE Classic launches (NXP)",
+             "text": "Philips Semiconductors (now NXP) introduces the Classic 1K chip with the proprietary CRYPTO-1 stream cipher; it becomes the dominant 13.56 MHz credential of the 2000s."
+           },
+           {
+diff --git a/src/content/editorial/products/rfid-cards/mifare-desfire-ev3-card.json b/src/content/editorial/products/rfid-cards/mifare-desfire-ev3-card.json
+index 4736e1b..add426d 100644
+--- a/src/content/editorial/products/rfid-cards/mifare-desfire-ev3-card.json
++++ b/src/content/editorial/products/rfid-cards/mifare-desfire-ev3-card.json
+@@ -42,8 +42,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.80–2.00 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.80–2.00 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2026-04-18",
+diff --git a/src/content/editorial/products/rfid-cards/mifare-plus-se-card.json b/src/content/editorial/products/rfid-cards/mifare-plus-se-card.json
+index 13cd031..a40359b 100644
+--- a/src/content/editorial/products/rfid-cards/mifare-plus-se-card.json
++++ b/src/content/editorial/products/rfid-cards/mifare-plus-se-card.json
+@@ -42,8 +42,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.80–2.00 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.80–2.00 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2026-04-18",
+diff --git a/src/content/editorial/products/rfid-cards/mifare-ultralight-c-card.json b/src/content/editorial/products/rfid-cards/mifare-ultralight-c-card.json
+index d214f77..92a6145 100644
+--- a/src/content/editorial/products/rfid-cards/mifare-ultralight-c-card.json
++++ b/src/content/editorial/products/rfid-cards/mifare-ultralight-c-card.json
+@@ -28,8 +28,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.50 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-cards/nfc-warranty-card.json b/src/content/editorial/products/rfid-cards/nfc-warranty-card.json
+index 022db4b..06c28dd 100644
+--- a/src/content/editorial/products/rfid-cards/nfc-warranty-card.json
++++ b/src/content/editorial/products/rfid-cards/nfc-warranty-card.json
+@@ -16,7 +16,7 @@
+   ],
+   "heroImage": "/landing-images/nfc-warranty-card.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "keywords": [
+     "NFC warranty card",
+     "tap to register warranty",
+diff --git a/src/content/editorial/products/rfid-cards/rfid-bamboo-card.json b/src/content/editorial/products/rfid-cards/rfid-bamboo-card.json
+index 1a87454..2b451d5 100644
+--- a/src/content/editorial/products/rfid-cards/rfid-bamboo-card.json
++++ b/src/content/editorial/products/rfid-cards/rfid-bamboo-card.json
+@@ -121,8 +121,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by material (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by material (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2024-01-18",
+diff --git a/src/content/editorial/products/rfid-cards/rfid-employee-badge.json b/src/content/editorial/products/rfid-cards/rfid-employee-badge.json
+index 367e21d..8a5fea2 100644
+--- a/src/content/editorial/products/rfid-cards/rfid-employee-badge.json
++++ b/src/content/editorial/products/rfid-cards/rfid-employee-badge.json
+@@ -135,8 +135,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.50 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2024-03-08",
+diff --git a/src/content/editorial/products/rfid-cards/rfid-membership-card.json b/src/content/editorial/products/rfid-cards/rfid-membership-card.json
+index 7f65bfd..ea92bb2 100644
+--- a/src/content/editorial/products/rfid-cards/rfid-membership-card.json
++++ b/src/content/editorial/products/rfid-cards/rfid-membership-card.json
+@@ -16,7 +16,7 @@
+   ],
+   "heroImage": "/landing-images/rfid-membership-card.webp",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "keywords": [
+     "RFID membership card",
+     "NFC membership card",
+diff --git a/src/content/editorial/products/rfid-cards/rfid-parking-card.json b/src/content/editorial/products/rfid-cards/rfid-parking-card.json
+index bcaef6a..bd08526 100644
+--- a/src/content/editorial/products/rfid-cards/rfid-parking-card.json
++++ b/src/content/editorial/products/rfid-cards/rfid-parking-card.json
+@@ -16,7 +16,7 @@
+   ],
+   "heroImage": "/landing-images/rfid-parking-card.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "keywords": [
+     "RFID parking card",
+     "UHF parking permit card",
+diff --git a/src/content/editorial/products/rfid-cards/rfid-wooden-card.json b/src/content/editorial/products/rfid-cards/rfid-wooden-card.json
+index db0afbc..e9bc2a2 100644
+--- a/src/content/editorial/products/rfid-cards/rfid-wooden-card.json
++++ b/src/content/editorial/products/rfid-cards/rfid-wooden-card.json
+@@ -122,8 +122,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by material (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by material (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2024-01-25",
+diff --git a/src/content/editorial/products/rfid-cards/standard-rfid-wood-card.json b/src/content/editorial/products/rfid-cards/standard-rfid-wood-card.json
+index 86fc08f..b7fe311 100644
+--- a/src/content/editorial/products/rfid-cards/standard-rfid-wood-card.json
++++ b/src/content/editorial/products/rfid-cards/standard-rfid-wood-card.json
+@@ -65,8 +65,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by material (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by material (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-cards/transparent-nfc-card.json b/src/content/editorial/products/rfid-cards/transparent-nfc-card.json
+index b7825cc..31576cd 100644
+--- a/src/content/editorial/products/rfid-cards/transparent-nfc-card.json
++++ b/src/content/editorial/products/rfid-cards/transparent-nfc-card.json
+@@ -106,8 +106,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by material (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by material (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-cards/uhf-rfid-card.json b/src/content/editorial/products/rfid-cards/uhf-rfid-card.json
+index b1307c5..cdc2062 100644
+--- a/src/content/editorial/products/rfid-cards/uhf-rfid-card.json
++++ b/src/content/editorial/products/rfid-cards/uhf-rfid-card.json
+@@ -127,8 +127,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.50 /pc @ 5k–50k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.50 /pc @ 5k–50k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2024-02-05",
+diff --git a/src/content/editorial/products/rfid-cards/wooden-nfc-business-card-engraved.json b/src/content/editorial/products/rfid-cards/wooden-nfc-business-card-engraved.json
+index 8ee0e76..ac6a935 100644
+--- a/src/content/editorial/products/rfid-cards/wooden-nfc-business-card-engraved.json
++++ b/src/content/editorial/products/rfid-cards/wooden-nfc-business-card-engraved.json
+@@ -125,8 +125,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by material (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by material (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "publishedAt": "2024-02-03",
+diff --git a/src/content/editorial/products/rfid-keyfobs/dual-frequency-key-fob.json b/src/content/editorial/products/rfid-keyfobs/dual-frequency-key-fob.json
+index 25e677e..59651c7 100644
+--- a/src/content/editorial/products/rfid-keyfobs/dual-frequency-key-fob.json
++++ b/src/content/editorial/products/rfid-keyfobs/dual-frequency-key-fob.json
+@@ -41,8 +41,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.80–2.00 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.80–2.00 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/em4305-keyfob.json b/src/content/editorial/products/rfid-keyfobs/em4305-keyfob.json
+index a1983a1..89875b3 100644
+--- a/src/content/editorial/products/rfid-keyfobs/em4305-keyfob.json
++++ b/src/content/editorial/products/rfid-keyfobs/em4305-keyfob.json
+@@ -41,8 +41,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.20–0.45 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.20–0.45 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/mifare-desfire-keyfob.json b/src/content/editorial/products/rfid-keyfobs/mifare-desfire-keyfob.json
+index ce3deec..98bed72 100644
+--- a/src/content/editorial/products/rfid-keyfobs/mifare-desfire-keyfob.json
++++ b/src/content/editorial/products/rfid-keyfobs/mifare-desfire-keyfob.json
+@@ -41,8 +41,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.80–2.00 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.80–2.00 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/nfc-epoxy-key-tag.json b/src/content/editorial/products/rfid-keyfobs/nfc-epoxy-key-tag.json
+index 158880e..5603015 100644
+--- a/src/content/editorial/products/rfid-keyfobs/nfc-epoxy-key-tag.json
++++ b/src/content/editorial/products/rfid-keyfobs/nfc-epoxy-key-tag.json
+@@ -105,8 +105,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.35–0.80 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.35–0.80 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/nfc-wood-keychain-tag.json b/src/content/editorial/products/rfid-keyfobs/nfc-wood-keychain-tag.json
+index 20c0cc0..d04f622 100644
+--- a/src/content/editorial/products/rfid-keyfobs/nfc-wood-keychain-tag.json
++++ b/src/content/editorial/products/rfid-keyfobs/nfc-wood-keychain-tag.json
+@@ -103,8 +103,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.35–0.80 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.35–0.80 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/rfid-abs-keyfob.json b/src/content/editorial/products/rfid-keyfobs/rfid-abs-keyfob.json
+index 575f7d6..6e1224d 100644
+--- a/src/content/editorial/products/rfid-keyfobs/rfid-abs-keyfob.json
++++ b/src/content/editorial/products/rfid-keyfobs/rfid-abs-keyfob.json
+@@ -30,8 +30,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.20–0.45 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.20–0.45 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/rfid-epoxy-keyfob.json b/src/content/editorial/products/rfid-keyfobs/rfid-epoxy-keyfob.json
+index 428594f..248abb5 100644
+--- a/src/content/editorial/products/rfid-keyfobs/rfid-epoxy-keyfob.json
++++ b/src/content/editorial/products/rfid-keyfobs/rfid-epoxy-keyfob.json
+@@ -93,8 +93,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.35–0.80 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.35–0.80 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/rfid-metal-keyfob.json b/src/content/editorial/products/rfid-keyfobs/rfid-metal-keyfob.json
+index b89b4af..17adcc3 100644
+--- a/src/content/editorial/products/rfid-keyfobs/rfid-metal-keyfob.json
++++ b/src/content/editorial/products/rfid-keyfobs/rfid-metal-keyfob.json
+@@ -32,8 +32,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.80–2.00 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.80–2.00 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/rfid-wristwatch-tag.json b/src/content/editorial/products/rfid-keyfobs/rfid-wristwatch-tag.json
+index 8cea3f2..4907a77 100644
+--- a/src/content/editorial/products/rfid-keyfobs/rfid-wristwatch-tag.json
++++ b/src/content/editorial/products/rfid-keyfobs/rfid-wristwatch-tag.json
+@@ -113,8 +113,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.35–0.80 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.35–0.80 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-keyfobs/t5577-keyfob.json b/src/content/editorial/products/rfid-keyfobs/t5577-keyfob.json
+index c64d883..ec1c7c3 100644
+--- a/src/content/editorial/products/rfid-keyfobs/t5577-keyfob.json
++++ b/src/content/editorial/products/rfid-keyfobs/t5577-keyfob.json
+@@ -41,8 +41,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.20–0.45 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.20–0.45 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/alien-higgs-9-uhf-inlay.json b/src/content/editorial/products/rfid-labels/alien-higgs-9-uhf-inlay.json
+index 804278b..a89f429 100644
+--- a/src/content/editorial/products/rfid-labels/alien-higgs-9-uhf-inlay.json
++++ b/src/content/editorial/products/rfid-labels/alien-higgs-9-uhf-inlay.json
+@@ -119,8 +119,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-labels/impinj-m700-uhf-inlay.json b/src/content/editorial/products/rfid-labels/impinj-m700-uhf-inlay.json
+index 921202e..f9bcfac 100644
+--- a/src/content/editorial/products/rfid-labels/impinj-m700-uhf-inlay.json
++++ b/src/content/editorial/products/rfid-labels/impinj-m700-uhf-inlay.json
+@@ -31,8 +31,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-labels/impinj-m730-uhf-inlay.json b/src/content/editorial/products/rfid-labels/impinj-m730-uhf-inlay.json
+index 628b6e9..62b0855 100644
+--- a/src/content/editorial/products/rfid-labels/impinj-m730-uhf-inlay.json
++++ b/src/content/editorial/products/rfid-labels/impinj-m730-uhf-inlay.json
+@@ -117,8 +117,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-labels/impinj-m750-uhf-inlay.json b/src/content/editorial/products/rfid-labels/impinj-m750-uhf-inlay.json
+index 3af1ede..e552f77 100644
+--- a/src/content/editorial/products/rfid-labels/impinj-m750-uhf-inlay.json
++++ b/src/content/editorial/products/rfid-labels/impinj-m750-uhf-inlay.json
+@@ -94,8 +94,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-labels/impinj-m800-uhf-inlay.json b/src/content/editorial/products/rfid-labels/impinj-m800-uhf-inlay.json
+index cf60f33..6155c58 100644
+--- a/src/content/editorial/products/rfid-labels/impinj-m800-uhf-inlay.json
++++ b/src/content/editorial/products/rfid-labels/impinj-m800-uhf-inlay.json
+@@ -81,8 +81,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-labels/nfc-anti-metal-sticker.json b/src/content/editorial/products/rfid-labels/nfc-anti-metal-sticker.json
+index 7aa0a9c..693b398 100644
+--- a/src/content/editorial/products/rfid-labels/nfc-anti-metal-sticker.json
++++ b/src/content/editorial/products/rfid-labels/nfc-anti-metal-sticker.json
+@@ -45,8 +45,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/nfc-battery-passport-tag.json b/src/content/editorial/products/rfid-labels/nfc-battery-passport-tag.json
+index 5492e22..76b34fd 100644
+--- a/src/content/editorial/products/rfid-labels/nfc-battery-passport-tag.json
++++ b/src/content/editorial/products/rfid-labels/nfc-battery-passport-tag.json
+@@ -133,8 +133,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–1.20 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–1.20 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-labels/nfc-dry-inlay.json b/src/content/editorial/products/rfid-labels/nfc-dry-inlay.json
+index 8258794..0971841 100644
+--- a/src/content/editorial/products/rfid-labels/nfc-dry-inlay.json
++++ b/src/content/editorial/products/rfid-labels/nfc-dry-inlay.json
+@@ -45,8 +45,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/nfc-wet-inlay.json b/src/content/editorial/products/rfid-labels/nfc-wet-inlay.json
+index ec09268..bed1ba0 100644
+--- a/src/content/editorial/products/rfid-labels/nfc-wet-inlay.json
++++ b/src/content/editorial/products/rfid-labels/nfc-wet-inlay.json
+@@ -44,8 +44,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/nfc-wine-bottle-tag.json b/src/content/editorial/products/rfid-labels/nfc-wine-bottle-tag.json
+index ac63e37..07366ef 100644
+--- a/src/content/editorial/products/rfid-labels/nfc-wine-bottle-tag.json
++++ b/src/content/editorial/products/rfid-labels/nfc-wine-bottle-tag.json
+@@ -139,8 +139,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/ntag213-nfc-sticker.json b/src/content/editorial/products/rfid-labels/ntag213-nfc-sticker.json
+index 04bf92f..2a0964d 100644
+--- a/src/content/editorial/products/rfid-labels/ntag213-nfc-sticker.json
++++ b/src/content/editorial/products/rfid-labels/ntag213-nfc-sticker.json
+@@ -43,8 +43,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/ntag215-nfc-sticker.json b/src/content/editorial/products/rfid-labels/ntag215-nfc-sticker.json
+index 978c406..afbb2df 100644
+--- a/src/content/editorial/products/rfid-labels/ntag215-nfc-sticker.json
++++ b/src/content/editorial/products/rfid-labels/ntag215-nfc-sticker.json
+@@ -43,8 +43,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/ntag216-nfc-sticker.json b/src/content/editorial/products/rfid-labels/ntag216-nfc-sticker.json
+index 506f0e6..f0035b9 100644
+--- a/src/content/editorial/products/rfid-labels/ntag216-nfc-sticker.json
++++ b/src/content/editorial/products/rfid-labels/ntag216-nfc-sticker.json
+@@ -44,8 +44,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/ntag424-dna-tamper-evident-tag.json b/src/content/editorial/products/rfid-labels/ntag424-dna-tamper-evident-tag.json
+index c0b29a6..600786a 100644
+--- a/src/content/editorial/products/rfid-labels/ntag424-dna-tamper-evident-tag.json
++++ b/src/content/editorial/products/rfid-labels/ntag424-dna-tamper-evident-tag.json
+@@ -42,8 +42,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–1.20 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–1.20 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/rfid-cryogenic-specimen-label.json b/src/content/editorial/products/rfid-labels/rfid-cryogenic-specimen-label.json
+index 670eb76..73e707a 100644
+--- a/src/content/editorial/products/rfid-labels/rfid-cryogenic-specimen-label.json
++++ b/src/content/editorial/products/rfid-labels/rfid-cryogenic-specimen-label.json
+@@ -148,8 +148,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/rfid-dry-inlay.json b/src/content/editorial/products/rfid-labels/rfid-dry-inlay.json
+index 702124a..35df4a4 100644
+--- a/src/content/editorial/products/rfid-labels/rfid-dry-inlay.json
++++ b/src/content/editorial/products/rfid-labels/rfid-dry-inlay.json
+@@ -44,8 +44,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.15–0.25 @ 1k · 0.05–0.10 @ 100k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/rfid-plant-nursery-label.json b/src/content/editorial/products/rfid-labels/rfid-plant-nursery-label.json
+index b060e16..14dbdf5 100644
+--- a/src/content/editorial/products/rfid-labels/rfid-plant-nursery-label.json
++++ b/src/content/editorial/products/rfid-labels/rfid-plant-nursery-label.json
+@@ -142,8 +142,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/rfid-specimen-slide-label.json b/src/content/editorial/products/rfid-labels/rfid-specimen-slide-label.json
+index 518c5ab..2869e15 100644
+--- a/src/content/editorial/products/rfid-labels/rfid-specimen-slide-label.json
++++ b/src/content/editorial/products/rfid-labels/rfid-specimen-slide-label.json
+@@ -156,8 +156,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/uhf-rfid-apparel-hang-tag-retail.json b/src/content/editorial/products/rfid-labels/uhf-rfid-apparel-hang-tag-retail.json
+index 1c4eb51..901e719 100644
+--- a/src/content/editorial/products/rfid-labels/uhf-rfid-apparel-hang-tag-retail.json
++++ b/src/content/editorial/products/rfid-labels/uhf-rfid-apparel-hang-tag-retail.json
+@@ -151,8 +151,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.08–0.25 /pc @ 10k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.08–0.25 /pc @ 10k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/uhf-rfid-paper-label.json b/src/content/editorial/products/rfid-labels/uhf-rfid-paper-label.json
+index 4aa4b46..7e6c3aa 100644
+--- a/src/content/editorial/products/rfid-labels/uhf-rfid-paper-label.json
++++ b/src/content/editorial/products/rfid-labels/uhf-rfid-paper-label.json
+@@ -153,8 +153,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.08–0.25 /pc @ 10k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.08–0.25 /pc @ 10k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-labels/uhf-rfid-tire-label.json b/src/content/editorial/products/rfid-labels/uhf-rfid-tire-label.json
+index 94bc618..476b079 100644
+--- a/src/content/editorial/products/rfid-labels/uhf-rfid-tire-label.json
++++ b/src/content/editorial/products/rfid-labels/uhf-rfid-tire-label.json
+@@ -156,8 +156,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.08–0.25 /pc @ 10k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.08–0.25 /pc @ 10k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-readers/desktop-nfc-reader-encoder.json b/src/content/editorial/products/rfid-readers/desktop-nfc-reader-encoder.json
+index 2990e1a..4828eb6 100644
+--- a/src/content/editorial/products/rfid-readers/desktop-nfc-reader-encoder.json
++++ b/src/content/editorial/products/rfid-readers/desktop-nfc-reader-encoder.json
+@@ -20,7 +20,7 @@
+   "imageAlt": "Fingers holding a round gray NFC sticker over a white desktop NFC reader",
+   "heroImage": "/landing-images/desktop-nfc-reader-encoder-hero.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "imageSourceRoutes": [
+     "/products/rfid-readers/desktop-nfc-reader-encoder/",
+     "/products/rfid-readers/desktop-nfc-reader-encoder/"
+diff --git a/src/content/editorial/products/rfid-readers/fixed-uhf-rfid-reader.json b/src/content/editorial/products/rfid-readers/fixed-uhf-rfid-reader.json
+index 6f38af4..81d68b8 100644
+--- a/src/content/editorial/products/rfid-readers/fixed-uhf-rfid-reader.json
++++ b/src/content/editorial/products/rfid-readers/fixed-uhf-rfid-reader.json
+@@ -20,7 +20,7 @@
+   "imageAlt": "Close-up of a UHF RFID panel antenna. The circularly polarised 8.5-inch radome that mounts on dock-door frames and portal posts and gets driven by a fixed reader's TX/RX port, representative of the R700 / FX9600 / ALR-F800 installations this page covers.",
+   "heroImage": "/landing-images/rfid-panel-antenna.jpg",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "imageSourceRoutes": [],
+   "brief": [
+     {
+@@ -110,8 +110,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "From USD 800 (fixed UHF, 4-port) (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "From USD 800 (fixed UHF, 4-port) (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-readers/handheld-uhf-rfid-reader.json b/src/content/editorial/products/rfid-readers/handheld-uhf-rfid-reader.json
+index cfd3459..4330ff4 100644
+--- a/src/content/editorial/products/rfid-readers/handheld-uhf-rfid-reader.json
++++ b/src/content/editorial/products/rfid-readers/handheld-uhf-rfid-reader.json
+@@ -119,8 +119,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "From USD 400 (handheld UHF) (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "From USD 400 (handheld UHF) (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/anti-metal-uhf-it-asset-tag.json b/src/content/editorial/products/rfid-tags/anti-metal-uhf-it-asset-tag.json
+index 7ff4149..fbfd47d 100644
+--- a/src/content/editorial/products/rfid-tags/anti-metal-uhf-it-asset-tag.json
++++ b/src/content/editorial/products/rfid-tags/anti-metal-uhf-it-asset-tag.json
+@@ -50,8 +50,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/high-temperature-rfid-tag-200c.json b/src/content/editorial/products/rfid-tags/high-temperature-rfid-tag-200c.json
+index 0720702..b387792 100644
+--- a/src/content/editorial/products/rfid-tags/high-temperature-rfid-tag-200c.json
++++ b/src/content/editorial/products/rfid-tags/high-temperature-rfid-tag-200c.json
+@@ -150,8 +150,8 @@
+       "text": "12-month high-temperature warranty; per-batch IEC 60068-2 + MIL-STD-810H + AMS 2750 (where applicable) test reports; COC with chip family + substrate + operating envelope + GS1 SGTIN / GIAI / GRAI range + thermal-cycle lot log; ISO 9001:2015 + IATF 16949 + AS9100D QMS on request; ISO 13485 for medical-device sterilisation variants."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-aircraft-part-tag.json b/src/content/editorial/products/rfid-tags/rfid-aircraft-part-tag.json
+index 7d5fcfb..5e96e2a 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-aircraft-part-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-aircraft-part-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Aircraft Part Tags — MRO Lifecycle Traceability",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "Aerospace RFID",
+   "summary": "RFID flyable aircraft part tags meet ATA Spec 2000 Chapter 9 requirements for permanent identification of aircraft components. From rotable parts and life-limited components to cabin furnishings and structural elements. Enable automated part identification, maintenance tracking and airworthiness documentation throughout the aircraft component lifecycle.",
+   "keywords": [
+@@ -84,8 +84,8 @@
+       "text": "Cabin / LRU variant: 200 pcs / 20-30 business days. Engine-zone ceramic variant: 100 pcs / 30-40 business days. OEM engineering-order-specific: qualification 12-20 weeks (first article inspection + DO-160G report)."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-ammo-can-tag.json b/src/content/editorial/products/rfid-tags/rfid-ammo-can-tag.json
+index c81b6cc..437455d 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-ammo-can-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-ammo-can-tag.json
+@@ -75,8 +75,8 @@
+       "text": "1,000 units per SKU for standard R6-P / UCODE 9 PA70 / M2A1 / M2A2 / PA108 / PA120 variants; 2,000 units for M775 long-range 155 mm / 105 mm pallet variants; 1,000 units for NTAG424 DNA cryptographic variants. Lead time 4-6 weeks for standard; 6-8 weeks for NTAG424 DNA + MIL-STD-1168D DODIC / NALC / LOT pre-encoding pack with manufacturer CAGE code + DoDAAC + hazard-class reconciled documentation trail."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-anchor-bolt-tag.json b/src/content/editorial/products/rfid-tags/rfid-anchor-bolt-tag.json
+index 60e6aa1..2e0024d 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-anchor-bolt-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-anchor-bolt-tag.json
+@@ -35,8 +35,8 @@
+       "text": "860-960 MHz UHF Gen2v2 per EPCglobal Class 1 Gen 2 v2.1 + ISO/IEC 18000-63:2015 for drive-by / walk-by / rope-access / crane-boom / handheld reads; 13.56 MHz HF per ISO/IEC 14443-3 Type A + NFC Forum Type 4 Tag Operation v3.0 for NTAG424 DNA per-anchor forensic tap during re-tension / FHWA biennial inspection; ATEX / IECEx Zone 1 / 2 reader stack for LNG terminal / refinery / transmission-substation environments; FCC Part 15 / ETSI EN 302 208 / IC RSS-247 spectrum compliance; MIL-STD-461G EMC for DoD + military-marine applications (USACE levee / lock / dam + USN shore-facility)."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-animal-ear-tag.json b/src/content/editorial/products/rfid-tags/rfid-animal-ear-tag.json
+index 7542edf..bc33e65 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-animal-ear-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-animal-ear-tag.json
+@@ -77,8 +77,8 @@
+       "text": "Button tag 1,000 pcs / 15-20 business days; flag tag 1,000 pcs / 15-20 business days; TST tag 2,000 pcs / 20-25 business days; ICAR-registered serial block registration 6-10 weeks for first-time OEM."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-anti-metal-tag.json b/src/content/editorial/products/rfid-tags/rfid-anti-metal-tag.json
+index af58d2d..2c9c98e 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-anti-metal-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-anti-metal-tag.json
+@@ -76,8 +76,8 @@
+       "text": "500 pieces / 12-18 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-blood-bag-tag.json b/src/content/editorial/products/rfid-tags/rfid-blood-bag-tag.json
+index 747c21b..ddfb53e 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-blood-bag-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-blood-bag-tag.json
+@@ -80,8 +80,8 @@
+       "text": "5,000 pieces / 15-20 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–1.20 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–1.20 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-bolt-tag.json b/src/content/editorial/products/rfid-tags/rfid-bolt-tag.json
+index 86a93c0..05748b1 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-bolt-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-bolt-tag.json
+@@ -37,8 +37,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sources": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-cable-seal-tag.json b/src/content/editorial/products/rfid-tags/rfid-cable-seal-tag.json
+index 556ce40..dfa70d0 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-cable-seal-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-cable-seal-tag.json
+@@ -126,8 +126,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-ceramic-tag.json b/src/content/editorial/products/rfid-tags/rfid-ceramic-tag.json
+index 6f998e6..3644999 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-ceramic-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-ceramic-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Ceramic Tag — Foundry & Heat-Treat Survivable",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "High-Temperature Ceramic RFID",
+   "summary": "RFID ceramic tags hermetically seal a UHF RFID die + sintered silver-palladium antenna inside a dense alumina (Al₂O₃ 96-99.7%) or partially-stabilised zirconia (Y-TZP / Mg-PSZ) substrate. The all-inorganic stack survives 300 °C continuous and 500 °C short-burst exposure with thermal-shock resistance validated to MIL-STD-883 Method 1011 / IEC 60068-2-14 — the thermal envelope required for AMS 2750G-compliant aerospace heat-treat, ASM Handbook Vol 4E quench-and-temper, steel-foundry pouring, cast-aluminum Hall-Héroult smelter operations, jet-engine turbine-blade tracking (ATA Spec 2000 Chapter 9-5), powder-coat curing and AAMI ST79 steam-autoclave instrument trays.",
+   "keywords": [
+@@ -171,8 +171,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sources": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-concrete-embed-tag.json b/src/content/editorial/products/rfid-tags/rfid-concrete-embed-tag.json
+index ecd8334..7dfad5d 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-concrete-embed-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-concrete-embed-tag.json
+@@ -129,8 +129,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-ear-tag-livestock.json b/src/content/editorial/products/rfid-tags/rfid-ear-tag-livestock.json
+index 5efc08a..4546f3b 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-ear-tag-livestock.json
++++ b/src/content/editorial/products/rfid-tags/rfid-ear-tag-livestock.json
+@@ -71,8 +71,8 @@
+       "text": "USDA APHIS 9 CFR Part 86 (Traceability for Livestock Moving Interstate); USDA APHIS 9 CFR Part 71 (general provisions) + Part 75 (TB) + Part 77 (Brucellosis); USDA FSIS 9 CFR Part 310 (Post-Mortem Inspection) + Part 313 (Humane Slaughter) + Part 316 (Marking) + Part 317 (Labelling); USDA-ARS LIS + APHIS ADTIS database schemas; EU Regulation 2016/429 Animal Health Law + 2019/2035 (cattle / pigs / sheep / goats / equine / camelids) + 1760/2000 (bovine EID) + 21/2004 (sheep / goats) + 2021/1372 + 1311/2023 (equine); EU 2017/625 Official Controls Regulation; EU Regulation 853/2004 specific hygiene for animal-origin food; UK Welfare of Farmed Animals (England) Regulations; Australia NLIS Business Rules (Meat & Livestock Australia); New Zealand NAIT Act 2012 + Animal Products Act 1999 + MPI Animal Welfare Act 1999; Canada Health of Animals Act + CFIA Livestock Identification and Traceability Regulations SOR/2019-156; Mexico SINIIGA Acuerdo + NOM-063-SAG/SENASICA; Brazil SISBOV IN MAPA 51 + SISBI/POA; ISO 11784:1996 + ISO 11785:1996 + ISO 24631 (conformance / performance); ICAR International Agreement for Recording Practices Section 5 (cattle EID) + Section 10 (sheep-goat EID) + Section 11.7 (rumen bolus) + Section 5.6 (injectable transponders); OIE / WOAH Terrestrial Animal Health Code; Codex Alimentarius CAC/RCP 58-2005."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-epoxy-tag.json b/src/content/editorial/products/rfid-tags/rfid-epoxy-tag.json
+index d8b0dbe..5e08113 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-epoxy-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-epoxy-tag.json
+@@ -39,8 +39,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.35–0.80 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.35–0.80 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sources": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-eyelet-tag.json b/src/content/editorial/products/rfid-tags/rfid-eyelet-tag.json
+index 986e261..996f2f1 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-eyelet-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-eyelet-tag.json
+@@ -93,8 +93,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-fire-extinguisher-tag.json b/src/content/editorial/products/rfid-tags/rfid-fire-extinguisher-tag.json
+index e40272c..b5bb3eb 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-fire-extinguisher-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-fire-extinguisher-tag.json
+@@ -75,8 +75,8 @@
+       "text": "250 units per SKU for standard hang-tag / cylinder-wrap variants; 500 units for NTAG424 DNA cryptographic variants with dedicated key-derivation root. Lead time 3-4 weeks for NTAG21x, 4-6 weeks for NTAG424 DNA with keyed-pair encoding."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-fish-tag.json b/src/content/editorial/products/rfid-tags/rfid-fish-tag.json
+index d587f3e..40b5b47 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-fish-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-fish-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Fish Tag (PIT) — Aquaculture & Fisheries ID",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "Aquaculture & fisheries PIT tagging",
+   "summary": "Passive Integrated Transponder (PIT) fish tags deliver individual identification across aquaculture broodstock, fisheries research, and endangered-species programmes. Proud Tek supplies HDX and FDX-B ISO 11784/11785 + ISO 24631-1/-6 conformance-tested transponders in 8.4 × 1.4 mm micro, 12 × 2.12 mm standard, 23 × 3.85 mm bolus, and 32 × 3.85 mm long-range formats — matched to the reader, antenna, and detection-station infrastructure that the Columbia River PIT Tag Information System (PTAGIS), NMFS Endangered Species Act programmes, USFWS refuge monitoring, NOAA Fisheries stock-assessment work, and the AFTM (American Fisheries Society + American Fisheries Society Fish Marking Techniques Committee) reference. Chip options include Texas Instruments HDX (RI-TRP-RRHP), {chip:em-microelectronic-em4305:name} / EM4469 / EM4569 FDX-B, and Biomark / Oregon RFID / Destron Fearing-compatible encoders. Welfare posture follows AFS/AIFRB Use of Fishes in Research, AVMA Guidelines on Euthanasia of Animals (2020), AALAS / FELASA aquatic-species guidance, and the 2% body-weight tag-to-fish ratio rule. Biocompatible medical-grade borosilicate glass + Parylene-C anti-migration coating; EO-sterilised pre-loaded single-use injector needles (12 g / 14 g / 16 g); retention >98 % at 6 months when body-cavity injected per PTAGIS protocol. Export posture covers CITES Appendix I (sturgeon, European eel) + II (Atlantic salmon listed stocks) aquaculture traceability, EU 2016/1012 zootechnical + EU 2019/1009 + EU CFP (Common Fisheries Policy) catch-documentation, and US Magnuson-Stevens Act stock-rebuilding programmes.",
+   "keywords": [
+@@ -140,8 +140,8 @@
+       "text": "12-month defect warranty; COC with chip family + encoded ID range + EO sterilisation lot + ISO 24631 conformance batch number + biocompatibility declaration; ISO 9001:2015 quality system (certificate 98026Q00274R000). We do not hold ISO 13485 — the sterile-device process follows ISO 11135 EO validation and the evidence ships per lot"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-flag-tag.json b/src/content/editorial/products/rfid-tags/rfid-flag-tag.json
+index 3b057a2..c6d6559 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-flag-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-flag-tag.json
+@@ -124,8 +124,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-glass-capsule-tag.json b/src/content/editorial/products/rfid-tags/rfid-glass-capsule-tag.json
+index 801d211..91eb335 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-glass-capsule-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-glass-capsule-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Glass Capsule Tags — Pet Microchip & Animal ID",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "Implantable RFID",
+   "summary": "RFID glass capsule tags are miniature transponders sealed in biocompatible glass tubes. Designed for subcutaneous injection in animals (pet microchips), embedding into products (anti-counterfeit) and insertion into harsh environments where no external tag can survive.",
+   "keywords": [
+@@ -81,8 +81,8 @@
+       "text": "Pre-loaded syringe (12G or 15G, EtO-sterile, ICAR-registered block): 500 pcs / 12-18 business days; ICAR Manufacturer Code registration lead time 6-10 weeks for first-time OEM customers."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-guard-tour-tag.json b/src/content/editorial/products/rfid-tags/rfid-guard-tour-tag.json
+index 72a3d68..966c0eb 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-guard-tour-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-guard-tour-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Guard Tour Checkpoint Tags — Patrol Records",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "Guard Tour",
+   "summary": "In real-world deployments, RFID guard tour checkpoint tags are rugged NFC tags mounted at fixed locations throughout a facility. Security guards tap each tag with a handheld reader or smartphone during their patrol, creating a timestamped digital record aligned with ASIS International PSC.1, ISO 18788:2015, BS 7499:2020, Joint Commission EC.02.01.01 rounds and SOC 2 / PCI DSS / NIST SP 800-53 physical access evidence requirements.",
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-hang-tag.json b/src/content/editorial/products/rfid-tags/rfid-hang-tag.json
+index 487d858..0b123bd 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-hang-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-hang-tag.json
+@@ -93,8 +93,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-helmet-tag.json b/src/content/editorial/products/rfid-tags/rfid-helmet-tag.json
+index 18948ee..cecbb00 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-helmet-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-helmet-tag.json
+@@ -75,8 +75,8 @@
+       "text": "500 units per SKU for standard NTAG213 / 215 / 216 + R6-P / UCODE 9 industrial inside-shell / chin-strap variants; 1,000 units for NFPA 1971-rated fire-service SKU; 1,000 units for ACH / ECH military SKU with NTAG424 DNA + MIL-DTL-44099 / MIL-DTL-32480 thread-count retention validation; 1,000 units for NTAG424 DNA cryptographic variants. Lead time 4-6 weeks for standard; 6-8 weeks for NTAG424 DNA + ANSI / EN / NFPA / MIL / NIJ pre-encoding pack with helmet-OEM master reconciled and date-of-manufacture + rating cross-check."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-high-temp-silicone-tag.json b/src/content/editorial/products/rfid-tags/rfid-high-temp-silicone-tag.json
+index 9e0789d..93eeb04 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-high-temp-silicone-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-high-temp-silicone-tag.json
+@@ -169,8 +169,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sources": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-high-temperature-ceramic-tag.json b/src/content/editorial/products/rfid-tags/rfid-high-temperature-ceramic-tag.json
+index 5dfd909..be7548b 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-high-temperature-ceramic-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-high-temperature-ceramic-tag.json
+@@ -73,8 +73,8 @@
+       "text": "500 pieces / 20-30 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-ibc-chemical-drum-tag.json b/src/content/editorial/products/rfid-tags/rfid-ibc-chemical-drum-tag.json
+index 025934b..b8a88b4 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-ibc-chemical-drum-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-ibc-chemical-drum-tag.json
+@@ -73,8 +73,8 @@
+       "text": "500 pieces / 15-20 business days (ATEX variants +2-4 weeks)"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-jewelry-tag.json b/src/content/editorial/products/rfid-tags/rfid-jewelry-tag.json
+index f8afec2..709eff0 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-jewelry-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-jewelry-tag.json
+@@ -76,8 +76,8 @@
+       "text": "5,000 pieces / 12-18 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-keg-tag.json b/src/content/editorial/products/rfid-tags/rfid-keg-tag.json
+index 940b1de..1d4b8eb 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-keg-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-keg-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Keg Tags — Stop Keg Loss, Real-Time Fleet View",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "Brewery RFID",
+   "summary": "RFID keg tags enable automated tracking of beer kegs, wine barrels, beverage containers and reusable packaging through the entire distribution cycle. From filling line through distribution, retail delivery, tap room service and empty return. Reduce keg loss, optimise distribution routes and gain visibility into your container fleet.",
+   "keywords": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-library-book-tag.json b/src/content/editorial/products/rfid-tags/rfid-library-book-tag.json
+index c595ac4..c64b63a 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-library-book-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-library-book-tag.json
+@@ -71,8 +71,8 @@
+       "text": "5,000 pieces / 10-15 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.10–0.30 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.10–0.30 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-livestock-leg-band.json b/src/content/editorial/products/rfid-tags/rfid-livestock-leg-band.json
+index c10049c..e9bdba5 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-livestock-leg-band.json
++++ b/src/content/editorial/products/rfid-tags/rfid-livestock-leg-band.json
+@@ -71,8 +71,8 @@
+       "text": "USDA APHIS 9 CFR Part 145 (National Poultry Improvement Plan for Breeding Poultry) + 9 CFR Part 146 (NPIP for Commercial Poultry) + 9 CFR Part 147 (Auxiliary Provisions) + 9 CFR 381 (Poultry Products Inspection); USDA AMS 7 CFR Part 56 (Shell Eggs); USFWS 50 CFR Part 21 (Migratory Bird Permits) + Part 22 (Eagle Permits) + Part 23 (CITES); CITES (Convention on International Trade in Endangered Species) + Appendix I/II listing + Resolution Conf. 11.17 (Rev. CoP18) on National Reports; EU Regulation 2016/429 Animal Health Law + 2019/2035 (kept terrestrial animals including poultry + equine + camelids) + 1308/2013 CMO poultry + eggs + 589/2008 egg marketing + 617/2008 hatching eggs + 543/2008 poultry marketing; EU Regulation 338/97 CITES implementation; UK Wildlife and Countryside Act 1981 + Schedule 4 bird registration; ISO 11784:1996 + ISO 11785:1996 + ISO 24631-1 to 24631-7; ICAR International Agreement for Recording Practices Section 5.7 (cattle fetlock) + Section 10.8 (sheep-goat fetlock); USBGA Band Standard + PIPA Rules + FCI Sporting Code (pigeon racing); RPRA General Stud Book + AU Race Rules; DHIA Uniform Data Collection Procedures + NDHIA testing standard; EU 2017/625 Official Controls Regulation."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-magnet-mount-tag.json b/src/content/editorial/products/rfid-tags/rfid-magnet-mount-tag.json
+index 219038b..fd5c624 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-magnet-mount-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-magnet-mount-tag.json
+@@ -51,8 +51,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-manhole-cover-tag.json b/src/content/editorial/products/rfid-tags/rfid-manhole-cover-tag.json
+index aa4f852..3461bd3 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-manhole-cover-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-manhole-cover-tag.json
+@@ -107,8 +107,8 @@
+       "text": "500 pieces epoxy retrofit / surface marker / pick-hole insert, 14-20 business days; cast-in SKUs require foundry coordination — typical lead time 6-10 weeks with GS1 GIAI-96 manifest pre-encoding"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-mining-asset-tag.json b/src/content/editorial/products/rfid-tags/rfid-mining-asset-tag.json
+index 3dfeff7..e2d30e6 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-mining-asset-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-mining-asset-tag.json
+@@ -124,8 +124,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-nail-tag.json b/src/content/editorial/products/rfid-tags/rfid-nail-tag.json
+index 86f9696..9607988 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-nail-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-nail-tag.json
+@@ -36,8 +36,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sources": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-oil-gas-pipe-tag.json b/src/content/editorial/products/rfid-tags/rfid-oil-gas-pipe-tag.json
+index 6d92bf4..538c262 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-oil-gas-pipe-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-oil-gas-pipe-tag.json
+@@ -75,8 +75,8 @@
+       "text": "1,000 units per SKU for standard R6-P / UCODE 9 band-clamp joint-ID and bevel-pad spot; 2,000 units for M750 / M775 / Higgs-9 ILI-correlation long-range variants; 1,000 units for NTAG424 DNA cryptographic variants. Lead time 4-5 weeks standard; 5-6 weeks for NACE MR0175 sour-service, 316L overlay and offshore DNV-ST-F101 programmes with full material traceability."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-parking-token.json b/src/content/editorial/products/rfid-tags/rfid-parking-token.json
+index 3654529..4ca0e16 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-parking-token.json
++++ b/src/content/editorial/products/rfid-tags/rfid-parking-token.json
+@@ -78,8 +78,8 @@
+       "text": "500 pc MOQ (NTAG213 / NTAG215 coin) · 1,000 pc MOQ (NTAG424 DNA SUN or DESFire EV3 AES keyed lot, factory key diversification) · 7-12 business days standard · 5-day expedite on pre-approved SKIDATA / Designa / Amano / WPS block-write templates"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.20–0.45 /pc @ 5k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.20–0.45 /pc @ 5k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-pcb-screw-mount-tag.json b/src/content/editorial/products/rfid-tags/rfid-pcb-screw-mount-tag.json
+index e68ebc8..f63232a 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-pcb-screw-mount-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-pcb-screw-mount-tag.json
+@@ -93,8 +93,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-pcb-tag.json b/src/content/editorial/products/rfid-tags/rfid-pcb-tag.json
+index b750c9d..9acd294 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-pcb-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-pcb-tag.json
+@@ -93,8 +93,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-pps-laundry-chip.json b/src/content/editorial/products/rfid-tags/rfid-pps-laundry-chip.json
+index d5e0206..df403c8 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-pps-laundry-chip.json
++++ b/src/content/editorial/products/rfid-tags/rfid-pps-laundry-chip.json
+@@ -171,8 +171,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.25–0.80 /pc by form (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.25–0.80 /pc by form (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sources": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-race-timing-tag.json b/src/content/editorial/products/rfid-tags/rfid-race-timing-tag.json
+index bc3731d..a30c3b7 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-race-timing-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-race-timing-tag.json
+@@ -87,8 +87,8 @@
+       "text": "1,000 pc MOQ (bib tag) / 500 pc MOQ (ankle / shoe / frame) · 10-15 business days lead time + 3-day expedite option for single-event emergencies"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.08–0.25 /pc @ 10k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.08–0.25 /pc @ 10k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-screw-tag.json b/src/content/editorial/products/rfid-tags/rfid-screw-tag.json
+index 4a2f9e4..5a78e1a 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-screw-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-screw-tag.json
+@@ -41,8 +41,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-silicone-flexible-tag.json b/src/content/editorial/products/rfid-tags/rfid-silicone-flexible-tag.json
+index 0815ac5..3e3f451 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-silicone-flexible-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-silicone-flexible-tag.json
+@@ -38,8 +38,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.25–0.80 /pc by form (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.25–0.80 /pc by form (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sources": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-surgical-instrument-tag.json b/src/content/editorial/products/rfid-tags/rfid-surgical-instrument-tag.json
+index 8920883..399e8b2 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-surgical-instrument-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-surgical-instrument-tag.json
+@@ -87,8 +87,8 @@
+       "text": "500 pieces / 18-25 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-tamper-seal-tag.json b/src/content/editorial/products/rfid-tags/rfid-tamper-seal-tag.json
+index e63d1bf..b862441 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-tamper-seal-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-tamper-seal-tag.json
+@@ -74,8 +74,8 @@
+       "text": "1,000 pieces / 15-20 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-temperature-sensor-tag.json b/src/content/editorial/products/rfid-tags/rfid-temperature-sensor-tag.json
+index 186d558..74f5784 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-temperature-sensor-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-temperature-sensor-tag.json
+@@ -30,7 +30,7 @@
+     "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/"
+   },
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "brief": [
+     {
+       "label": "Sensor IC",
+diff --git a/src/content/editorial/products/rfid-tags/rfid-textile-laundry-tag.json b/src/content/editorial/products/rfid-tags/rfid-textile-laundry-tag.json
+index 9d9ebdf..4d72f61 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-textile-laundry-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-textile-laundry-tag.json
+@@ -80,8 +80,8 @@
+       "text": "1,000 pieces / 12-18 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.25–0.80 /pc by form (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.25–0.80 /pc by form (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-tire-tag.json b/src/content/editorial/products/rfid-tags/rfid-tire-tag.json
+index 8852b6a..83cb49c 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-tire-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-tire-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Tire Tags — Embedded Lifecycle Tire Passport",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "Tire RFID",
+   "summary": "RFID tire tags are ruggedised UHF transponders embedded into the tire carcass during tire building or patched onto the inner liner after cure. They provide a permanent digital tire passport across the entire lifecycle — factory, distribution, fleet operation, retreading and end-of-life recycling. Aligned with ISO 20909:2021 physical requirements, ISO 20910:2022 data content, the WBCSD Tire Industry Project RFID data specification, US DOT 49 CFR Part 574 Tire Identification Number correlation, UNECE R117 / R108 / R109 and EU Regulation 2020/740 tire labelling.",
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-tool-tag.json b/src/content/editorial/products/rfid-tags/rfid-tool-tag.json
+index 2d42238..e54f0d9 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-tool-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-tool-tag.json
+@@ -75,8 +75,8 @@
+       "text": "500 units per SKU for standard R6-P / UCODE 9 wrap-around / disc / ring / flag / micro-inlay variants; 1,000 units for M775 long-range smart-crib and zone-portal variants; 1,000 units for NTAG424 DNA cryptographic variants. Lead time 4-6 weeks for standard; 6-8 weeks for NTAG424 DNA + Snap-on ATC / Stanley Vidmar / Lista / CribMaster / ToolHound / ToolWatch / ShadowBoard-aligned pre-encoding pack with tool-family master reconciled and calibration-due-date cross-check."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-tool-tracking-tag.json b/src/content/editorial/products/rfid-tags/rfid-tool-tracking-tag.json
+index c9e8c83..feacf08 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-tool-tracking-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-tool-tracking-tag.json
+@@ -75,8 +75,8 @@
+       "text": "500 units per SKU for standard R6-P / UCODE 9 micro / handle-wrap / flat-disc / cal-cert-case / tilt-resistant / PEEK variants; 1,000 units for M775 long-range cal-lab receiving portal variants; 1,000 units for NTAG424 DNA cryptographic variants with dedicated key-derivation root for Tier-1 programmes. Lead time 4-6 weeks for standard; 6-8 weeks for NTAG424 DNA + GageTrak / Fluke MET/TEAM / Beamex CMX / Blue Mountain RAM / IndySoft-aligned pre-encoding pack with cal-master reconciled and ILAC-MRA scope cross-check."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-tree-tag.json b/src/content/editorial/products/rfid-tags/rfid-tree-tag.json
+index 1a79741..00eacfb 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-tree-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-tree-tag.json
+@@ -141,8 +141,8 @@
+       "text": "10-year outdoor life; COC with chip family + EPC encoding range + UV / salt-spray / thermal test lot numbers + GS1 GIAI assignment log; ISO 9001:2015 QMS; FSC / SFI / PEFC chain-of-custody integration dossier on request"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-valve-tag.json b/src/content/editorial/products/rfid-tags/rfid-valve-tag.json
+index da8dbc6..0c96ac5 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-valve-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-valve-tag.json
+@@ -79,8 +79,8 @@
+       "text": "500 units per SKU for standard R6-P / UCODE 9 block-valve fleet; 1,000 units for M750 / M775 / Higgs-9 extended-range variants; 1,000 units for NTAG424 DNA cryptographic variants with dedicated key-derivation root. Lead time 4-5 weeks for standard UHF, 5-6 weeks for NACE MR0175 sour-service and PEEK GMP variants with full material traceability."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-waste-bin-tag.json b/src/content/editorial/products/rfid-tags/rfid-waste-bin-tag.json
+index 49f21c8..af99760 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-waste-bin-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-waste-bin-tag.json
+@@ -3,7 +3,7 @@
+   "group": "products",
+   "title": "RFID Waste Bin Tags — PAYT Billing & Route Analytics",
+   "publishedAt": "2026-06-11",
+-  "modifiedAt": "2026-06-10T17:00:00Z",
++  "modifiedAt": "2026-06-11",
+   "kicker": "Smart City RFID",
+   "summary": "RFID waste bin tags identify individual wheelie bins and commercial containers during automated kerbside collection, enabling pay-as-you-throw (PAYT) billing, route optimisation, service verification and contamination tracking. Municipalities and private haulers deploy DIN 30745-conformant, EN 840-compatible tags on AMCS, Bucher Municipal, FAUN Zoeller and Geesinknorba truck-arm readers, reporting to the EU Waste Framework Directive 2008/98/EC (as amended by 2018/851), Landfill Directive 1999/31/EC and Extended Producer Responsibility schemes.",
+   "heroPoints": [
+@@ -81,8 +81,8 @@
+       "text": "1,000 pc MOQ (in-mold / bolt-on) · 5,000 pc MOQ (hot-stamp embed depot programme) · 15-20 business days standard · 10-day expedite on pre-approved DIN 30745-2 encoding templates"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 1.00–3.00 /pc @ 1k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 1.00–3.00 /pc @ 1k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-weapon-tracking-tag.json b/src/content/editorial/products/rfid-tags/rfid-weapon-tracking-tag.json
+index a58c9a7..8ddf795 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-weapon-tracking-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-weapon-tracking-tag.json
+@@ -71,8 +71,8 @@
+       "text": "500 units per SKU for standard R6-P / UCODE 9 stock-cavity, grip-cavity and rail-recess variants; 1,000 units for M750 / M775 long-range portal variants; 1,000 units for NTAG424 DNA cryptographic variants with dedicated key-derivation root. Lead time 4-6 weeks for standard; 6-8 weeks for NTAG424 DNA + IUID pre-encoding pack with DoD-aligned documentation trail (manufacturer CAGE code + NIIN + NSN + DoDAAC reconciled)."
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/rfid-wedge-tag.json b/src/content/editorial/products/rfid-tags/rfid-wedge-tag.json
+index 64186f5..ee08ec8 100644
+--- a/src/content/editorial/products/rfid-tags/rfid-wedge-tag.json
++++ b/src/content/editorial/products/rfid-tags/rfid-wedge-tag.json
+@@ -51,8 +51,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/uhf-rfid-apparel-hang-tag.json b/src/content/editorial/products/rfid-tags/uhf-rfid-apparel-hang-tag.json
+index 831bf7b..7f69422 100644
+--- a/src/content/editorial/products/rfid-tags/uhf-rfid-apparel-hang-tag.json
++++ b/src/content/editorial/products/rfid-tags/uhf-rfid-apparel-hang-tag.json
+@@ -75,8 +75,8 @@
+       "text": "Auburn ARC Category F / H · RAIN Alliance Endorsed · ISO/IEC 18000-63 · EU ESPR textile DPP-ready"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.45–0.95 @ 1k · 0.28–0.55 @ 10k (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/uhf-rfid-hard-tag.json b/src/content/editorial/products/rfid-tags/uhf-rfid-hard-tag.json
+index 2d43cdd..126827e 100644
+--- a/src/content/editorial/products/rfid-tags/uhf-rfid-hard-tag.json
++++ b/src/content/editorial/products/rfid-tags/uhf-rfid-hard-tag.json
+@@ -73,8 +73,8 @@
+       "text": "5,000 pieces / 15-20 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/uhf-rfid-woven-care-label.json b/src/content/editorial/products/rfid-tags/uhf-rfid-woven-care-label.json
+index f94b3d2..0a0dfb4 100644
+--- a/src/content/editorial/products/rfid-tags/uhf-rfid-woven-care-label.json
++++ b/src/content/editorial/products/rfid-tags/uhf-rfid-woven-care-label.json
+@@ -77,8 +77,8 @@
+       "text": "10,000 pieces / 18-25 business days"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.08–0.25 /pc @ 10k+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.08–0.25 /pc @ 10k+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-tags/waterproof-uhf-rfid-outdoor-tag.json b/src/content/editorial/products/rfid-tags/waterproof-uhf-rfid-outdoor-tag.json
+index 2b524b0..d894f43 100644
+--- a/src/content/editorial/products/rfid-tags/waterproof-uhf-rfid-outdoor-tag.json
++++ b/src/content/editorial/products/rfid-tags/waterproof-uhf-rfid-outdoor-tag.json
+@@ -139,8 +139,8 @@
+       "text": "10-year outdoor life; COC with chip family + GS1 SGTIN / GIAI / GRAI assignment log + IEC 60529 IP rating test lot + ISO 12944 corrosivity category + ATEX / IECEx certificate reference (hazardous-area SKU) + MIL-STD-810H test method log + ASTM G154 / D4329 / B117 / ISO 9227 qualification reports; ISO 9001:2015 QMS; IATF 16949 for automotive-yard fleet variants on request"
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–2.50 /pc by size (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–2.50 /pc by size (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "sections": [
+diff --git a/src/content/editorial/products/rfid-wristbands/fabric-rfid-wristband.json b/src/content/editorial/products/rfid-wristbands/fabric-rfid-wristband.json
+index a375ea3..40ec702 100644
+--- a/src/content/editorial/products/rfid-wristbands/fabric-rfid-wristband.json
++++ b/src/content/editorial/products/rfid-wristbands/fabric-rfid-wristband.json
+@@ -30,8 +30,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.60–1.50 /band @ 500+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.60–1.50 /band @ 500+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-wristbands/nfc-fitness-wristband.json b/src/content/editorial/products/rfid-wristbands/nfc-fitness-wristband.json
+index 349f0b1..c083483 100644
+--- a/src/content/editorial/products/rfid-wristbands/nfc-fitness-wristband.json
++++ b/src/content/editorial/products/rfid-wristbands/nfc-fitness-wristband.json
+@@ -29,8 +29,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.70 /band @ 500+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.70 /band @ 500+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/products/rfid-wristbands/rfid-vinyl-wristband.json b/src/content/editorial/products/rfid-wristbands/rfid-vinyl-wristband.json
+index 933f0a4..17ce522 100644
+--- a/src/content/editorial/products/rfid-wristbands/rfid-vinyl-wristband.json
++++ b/src/content/editorial/products/rfid-wristbands/rfid-vinyl-wristband.json
+@@ -102,8 +102,8 @@
+       ]
+     },
+     {
+-      "label": "Typical pricing",
+-      "text": "USD 0.30–0.70 /band @ 500+ (typical FOB Shenzhen range) — firm quote in one business day."
++      "label": "Indicative pricing",
++      "text": "USD 0.30–0.70 /band @ 500+ (indicative FOB Shenzhen range, as of Q3 2026) — firm quote in one business day."
+     }
+   ],
+   "heroPoints": [
+diff --git a/src/content/editorial/resources/_pillar.json b/src/content/editorial/resources/_pillar.json
+index fa4b898..08d11c0 100644
+--- a/src/content/editorial/resources/_pillar.json
++++ b/src/content/editorial/resources/_pillar.json
+@@ -22,7 +22,7 @@
+     "NFC technical reference"
+   ],
+   "publishedAt": "2026-04-22",
+-  "modifiedAt": "2026-03-09",
++  "modifiedAt": "2026-04-22",
+   "authorSlug": "peter-zhang",
+   "author": "Peter Zhang",
+   "reviewedBySlug": "nancy-wu",
+-- 
+2.34.1
+

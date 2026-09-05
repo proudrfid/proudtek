@@ -1,0 +1,177 @@
+From 65b0bf657ef75274290c568fcd2931817712f42e Mon Sep 17 00:00:00 2001
+From: Phase14 audit <audit@local>
+Date: Wed, 2 Sep 2026 06:27:31 -0400
+Subject: [PATCH 10/20] content(claims): remove the remaining factory / line /
+ country figures from meta, video schema and LP diagrams
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Follow-up to the B3 capability-claims batch (audit Phase 4 C-01..C-05):
+a build-wide sweep found the same undocumented figures on four more
+surfaces that the JSON/component pass did not reach.
+- homepage meta description (PAGE_DESCRIPTION_OVERRIDES['/']): 'Two
+  Shenzhen factories, 10 automated production lines, 305+ pieces of
+  equipment … 50+ countries' -> product families + certified systems (155 ch)
+- homepage VideoObject.description: same figures removed; footage described
+  as supplied by Proud Tek rather than asserting facility ownership
+- 3 /lp/ hero diagrams (SVG text + <desc>): '10 lines, 2 sites', '2 factories
+  · 10 lines', 'To 50+ countries', '2 Shenzhen sites · 10 automated lines' and
+  the 'no subcontracted production' footer rewritten to the certified-scope /
+  'specified, controlled and documented by Proud Tek' wording
+- /lp/rfid-manufacturer-shenzhen/: the matching 'no subcontracted step'
+  sentence softened the same way
+The wider 'in-house / own-the-line' narrative (75 editorial files) is left
+for the owner decision recorded in the Phase 14 report (D-04).
+---
+ .../lp/rfid-factory-direct-china-supply-chain.svg    |  4 ++--
+ .../lp/rfid-manufacturer-shenzhen-floor-flow.svg     | 12 ++++++------
+ .../lp/rfid-manufacturer-shenzhen-product-range.svg  |  8 ++++----
+ .../editorial/lp/rfid-manufacturer-shenzhen.json     |  2 +-
+ src/lib/seo-content.ts                               |  4 +++-
+ src/lib/seo/jsonld.ts                                |  4 +++-
+ 6 files changed, 19 insertions(+), 15 deletions(-)
+
+diff --git a/public/diagrams/lp/rfid-factory-direct-china-supply-chain.svg b/public/diagrams/lp/rfid-factory-direct-china-supply-chain.svg
+index 0faca86..37c41db 100644
+--- a/public/diagrams/lp/rfid-factory-direct-china-supply-chain.svg
++++ b/public/diagrams/lp/rfid-factory-direct-china-supply-chain.svg
+@@ -2,7 +2,7 @@
+      aria-labelledby="t d"
+      font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+   <title id="t">Factory-direct versus trading company: where the reseller margin lives in an RFID supply chain</title>
+-  <desc id="d">Two paths compared. Path 1, through a trading company: the buyer pays a trading company that resells the order and owns no factory (marked with a red reseller-margin badge), which forwards the job to a factory the buyer never audits, so the buyer pays the factory price plus the desk's margin. Path 2, factory-direct from Proud Tek: the buyer deals straight with the Proud Tek factory — chip, antenna, print, encode and QC under one ISO 9001 system — and pays the factory-gate price. A footer notes the factory has run since 2008 across ten lines and two Shenzhen sites, ships to 50+ countries, and holds ISO 9001, 14001 and 45001 systems.</desc>
++  <desc id="d">Two paths compared. Path 1, through a trading company: the buyer pays a trading company that resells the order and owns no factory (marked with a red reseller-margin badge), which forwards the job to a factory the buyer never audits, so the buyer pays the factory price plus the desk's margin. Path 2, factory-direct from Proud Tek: the buyer deals straight with Proud Tek — chip, antenna, print, encode and QC specified and controlled under one ISO 9001 system — and pays the factory-gate price. A footer notes Proud Tek has supplied RFID from Shenzhen since 2008 and holds ISO 9001, 14001 and 45001 certified management systems (sales and service scope).</desc>
+   <defs>
+     <radialGradient id="bg" cx="50%" cy="16%" r="94%">
+       <stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/>
+@@ -71,5 +71,5 @@
+ 
+   <!-- footer -->
+   <line x1="60" y1="562" x2="1140" y2="562" stroke="#e6dfd2" stroke-width="1.5"/>
+-  <text x="600" y="600" text-anchor="middle" font-size="14" fill="#5c5c5c">Since 2008 · 10 lines, 2 sites · ships to 50+ countries · ISO 9001 / 14001 / 45001</text>
++  <text x="600" y="600" text-anchor="middle" font-size="14" fill="#5c5c5c">Since 2008 · Shenzhen · ISO 9001 / 14001 / 45001 certified (sales &amp; service scope)</text>
+ </svg>
+diff --git a/public/diagrams/lp/rfid-manufacturer-shenzhen-floor-flow.svg b/public/diagrams/lp/rfid-manufacturer-shenzhen-floor-flow.svg
+index 48d36c2..1174925 100644
+--- a/public/diagrams/lp/rfid-manufacturer-shenzhen-floor-flow.svg
++++ b/public/diagrams/lp/rfid-manufacturer-shenzhen-floor-flow.svg
+@@ -1,8 +1,8 @@
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img"
+      aria-labelledby="t d"
+      font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+-  <title id="t">Inside the Proud Tek Shenzhen floor: six in-house line families from materials to export</title>
+-  <desc id="d">A left-to-right process flow in six stages. Stage 1, materials in: chips, antennas and PVC and PET substrates sourced locally. Stage 2, inlay bonding: chip-to-antenna for HF 13.56 MHz and UHF 860-960 MHz inlays. Stage 3, laminate and print: PVC, ABS and PET stock, offset, screen and laser. Stage 4, encoding: UID, NDEF and GS1 SGTIN-96, with MIFARE Plus and DESFire keys. Stage 5, QC read-test: 100% functional read test plus AQL sampling. Stage 6, export packing: FOB, CIF or DDP by DHL, FedEx or sea to 50+ countries. A footer notes every value-added step is in-house across 2 Shenzhen sites and 10 automated lines.</desc>
++  <title id="t">Inside the Proud Tek Shenzhen production flow: six stages from materials to export</title>
++  <desc id="d">A left-to-right process flow in six stages. Stage 1, materials in: chips, antennas and PVC and PET substrates sourced locally. Stage 2, inlay bonding: chip-to-antenna for HF 13.56 MHz and UHF 860-960 MHz inlays. Stage 3, laminate and print: PVC, ABS and PET stock, offset, screen and laser. Stage 4, encoding: UID, NDEF and GS1 SGTIN-96, with MIFARE Plus and DESFire keys. Stage 5, QC read-test: 100% functional read test plus AQL sampling. Stage 6, export packing: FOB, CIF or DDP by DHL, FedEx or sea worldwide. A footer notes every value-added step is specified, controlled and documented by Proud Tek, with production records retained seven years.</desc>
+   <defs>
+     <radialGradient id="bg" cx="50%" cy="16%" r="94%">
+       <stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/>
+@@ -12,7 +12,7 @@
+   <rect x="16" y="16" width="1168" height="643" rx="20" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+ 
+   <text x="600" y="52" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="0.5" fill="#6d5a3a">INSIDE THE SHENZHEN FLOOR</text>
+-  <text x="600" y="92" text-anchor="middle" font-size="29" font-weight="700" fill="#291c0e" font-family="Lora, Georgia, serif">Six line families, every step in-house</text>
++  <text x="600" y="92" text-anchor="middle" font-size="29" font-weight="700" fill="#291c0e" font-family="Lora, Georgia, serif">Six production stages, one accountable supplier</text>
+   <text x="600" y="118" text-anchor="middle" font-size="14" fill="#5c5c5c">The operators who build your pilot lot run the production order.</text>
+ 
+   <!-- stage 1 -->
+@@ -73,7 +73,7 @@
+   <text x="1065" y="322" text-anchor="middle" font-size="13" fill="#5c5c5c">FOB / CIF / DDP,</text>
+   <text x="1065" y="343" text-anchor="middle" font-size="13" fill="#5c5c5c">DHL, FedEx, sea</text>
+   <rect x="995" y="398" width="140" height="34" rx="8" fill="#eef5f5"/>
+-  <text x="1065" y="420" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2c5454">To 50+ countries</text>
++  <text x="1065" y="420" text-anchor="middle" font-size="12.5" font-weight="700" fill="#2c5454">Worldwide export</text>
+ 
+   <!-- chevrons between stages -->
+   <polygon points="212,318 224,328 212,338" fill="#c39a5f"/>
+@@ -84,6 +84,6 @@
+ 
+   <!-- footer -->
+   <line x1="100" y1="540" x2="1100" y2="540" stroke="#e6dfd2" stroke-width="2"/>
+-  <text x="600" y="576" text-anchor="middle" font-size="15" font-weight="700" fill="#291c0e">Every value-added step in-house — no subcontracted production.</text>
+-  <text x="600" y="606" text-anchor="middle" font-size="14" fill="#5c5c5c">2 Shenzhen sites · 10 automated lines · records retained seven years</text>
++  <text x="600" y="576" text-anchor="middle" font-size="15" font-weight="700" fill="#291c0e">Every value-added step specified, controlled and documented by Proud Tek.</text>
++  <text x="600" y="606" text-anchor="middle" font-size="14" fill="#5c5c5c">Shenzhen · production records retained seven years</text>
+ </svg>
+diff --git a/public/diagrams/lp/rfid-manufacturer-shenzhen-product-range.svg b/public/diagrams/lp/rfid-manufacturer-shenzhen-product-range.svg
+index 01c8de5..f789107 100644
+--- a/public/diagrams/lp/rfid-manufacturer-shenzhen-product-range.svg
++++ b/public/diagrams/lp/rfid-manufacturer-shenzhen-product-range.svg
+@@ -1,8 +1,8 @@
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img"
+      aria-labelledby="t d"
+      font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+-  <title id="t">Proud Tek Shenzhen product range: one factory resolved into six RFID product families and one shipment</title>
+-  <desc id="d">A left-to-right map. On the left, a card labelled PROUD TEK SHENZHEN (2 factories, 10 lines). In the centre, six product-family lanes: RFID cards and fobs (MIFARE Classic, MIFARE Plus, DESFire, NTAG 215, T5577); NFC tags and stickers (NTAG 213, NTAG 216, NTAG 424 DNA, ICODE SLIX2); UHF inlays and labels (Impinj M730, NXP UCODE 9, Monza R6 at 860-960 MHz); event wristbands (MIFARE Ultralight, NTAG 213, UCODE 9); keyfobs and hard tags (EM4200, T5577, NTAG 216, MIFARE Classic); and RFID readers (desktop, handheld and fixed UHF encoders). All six converge on the right into ONE SHIPMENT: encoded to spec, 100% read-verified, full document pack. A footer notes RFID has been made in Shenzhen since 2008 under one ISO 9001, 14001 and 45001 system.</desc>
++  <title id="t">Proud Tek Shenzhen product range: one supplier resolved into six RFID product families and one shipment</title>
++  <desc id="d">A left-to-right map. On the left, a card labelled PROUD TEK SHENZHEN (since 2008). In the centre, six product-family lanes: RFID cards and fobs (MIFARE Classic, MIFARE Plus, DESFire, NTAG 215, T5577); NFC tags and stickers (NTAG 213, NTAG 216, NTAG 424 DNA, ICODE SLIX2); UHF inlays and labels (Impinj M730, NXP UCODE 9, Monza R6 at 860-960 MHz); event wristbands (MIFARE Ultralight, NTAG 213, UCODE 9); keyfobs and hard tags (EM4200, T5577, NTAG 216, MIFARE Classic); and RFID readers (desktop, handheld and fixed UHF encoders). All six converge on the right into ONE SHIPMENT: encoded to spec, 100% read-verified, full document pack. A footer notes RFID has been made in Shenzhen since 2008 under one ISO 9001, 14001 and 45001 system.</desc>
+   <defs>
+     <radialGradient id="bg" cx="50%" cy="16%" r="94%">
+       <stop offset="0%" stop-color="#f8ead0"/><stop offset="100%" stop-color="#f4efe4"/>
+@@ -12,7 +12,7 @@
+   <rect x="16" y="16" width="1168" height="643" rx="20" fill="#ffffff" stroke="#e6dfd2" stroke-width="2"/>
+ 
+   <text x="600" y="52" text-anchor="middle" font-size="21" font-weight="800" letter-spacing="0.5" fill="#6d5a3a">PROUD TEK SHENZHEN PRODUCT RANGE</text>
+-  <text x="600" y="92" text-anchor="middle" font-size="29" font-weight="700" fill="#291c0e" font-family="Lora, Georgia, serif">One factory, six families, one shipment</text>
++  <text x="600" y="92" text-anchor="middle" font-size="29" font-weight="700" fill="#291c0e" font-family="Lora, Georgia, serif">One supplier, six families, one shipment</text>
+   <text x="600" y="118" text-anchor="middle" font-size="14" fill="#5c5c5c">Every family runs to a published air-interface standard — not a reader-locked part.</text>
+ 
+   <!-- connectors: factory to lanes -->
+@@ -34,7 +34,7 @@
+   <rect x="48" y="310" width="210" height="150" rx="14" fill="#eef5f5" stroke="#3d6b6b" stroke-width="2"/>
+   <text x="153" y="352" text-anchor="middle" font-size="17" font-weight="700" fill="#291c0e">PROUD TEK</text>
+   <text x="153" y="375" text-anchor="middle" font-size="17" font-weight="700" fill="#291c0e">SHENZHEN</text>
+-  <text x="153" y="408" text-anchor="middle" font-size="13" fill="#5c5c5c">2 factories · 10 lines</text>
++  <text x="153" y="408" text-anchor="middle" font-size="13" fill="#5c5c5c">Shenzhen · since 2008</text>
+   <text x="153" y="428" text-anchor="middle" font-size="13" fill="#5c5c5c">chip-vendor agnostic</text>
+ 
+   <!-- lane 1: cards and fobs -->
+diff --git a/src/content/editorial/lp/rfid-manufacturer-shenzhen.json b/src/content/editorial/lp/rfid-manufacturer-shenzhen.json
+index abeb654..1f44764 100644
+--- a/src/content/editorial/lp/rfid-manufacturer-shenzhen.json
++++ b/src/content/editorial/lp/rfid-manufacturer-shenzhen.json
+@@ -60,7 +60,7 @@
+         "The Shenzhen supply chain on the doorstep: chips, antennas, PVC and PET substrates and converting equipment sourced locally, which is why sample and re-order lead times stay short even on custom parts.",
+         "Chip-vendor agnostic — we bond NXP, Infineon, Impinj, Alien, EM Microelectronic and Quanray inlays in-house, so a program is specified around your read requirement, not around whatever one distributor is pushing.",
+         "A direct factory, not a trading desk: your purchase order reaches the production planner and the engineers who build the part, at the factory-gate price, with compliance documents shipped as standard rather than billed as an extra.",
+-        "Every value-added step is in-house — inlay bonding, lamination, printing, encoding, laser marking and final QC — so no subcontracted step can quietly swap a chip or a substrate between your sample and your production run."
++        "Every value-added step — inlay bonding, lamination, printing, encoding, laser marking and final QC — is specified, controlled and documented by Proud Tek under one ISO 9001 management system, so no step can quietly swap a chip or a substrate between your sample and your production run."
+       ]
+     },
+     {
+diff --git a/src/lib/seo-content.ts b/src/lib/seo-content.ts
+index 8e2f973..3c3424c 100644
+--- a/src/lib/seo-content.ts
++++ b/src/lib/seo-content.ts
+@@ -581,8 +581,10 @@ export const PAGE_DESCRIPTION_OVERRIDES: Record<string, string> = {
+   "/solutions/nfc-business-card/":
+     "Custom NFC business cards: NTAG chip choice, PVC, wood, metal or bamboo, vCard & URL encoding, iPhone tap-to-share. You own the URL — no subscription.",
+ 
++  // 2026-09-02 (audit Phase 4 C-01..C-05): factory / line / equipment /
++  // country counts removed — no documentary evidence; certificates verified.
+   "/":
+-    "Proud Tek is a custom RFID & NFC manufacturer in China since 2008. Two Shenzhen factories, 10 automated production lines, 305+ pieces of equipment, OEM/ODM cards, tags, labels, wristbands, keyfobs and readers shipped to 50+ countries.",
++    "Custom RFID & NFC manufacturer in China since 2008: OEM/ODM cards, tags, labels, wristbands, keyfobs and readers. Shenzhen; ISO 9001/14001/45001 certified.",
+   "/product/125khz-rfid-sticker/":
+     "125 kHz RFID stickers for compact LF access-control or identification projects where adhesive labels work better than cards or keyfobs.",
+   "/product/em4200-card/":
+diff --git a/src/lib/seo/jsonld.ts b/src/lib/seo/jsonld.ts
+index e994c9d..23212ac 100644
+--- a/src/lib/seo/jsonld.ts
++++ b/src/lib/seo/jsonld.ts
+@@ -516,8 +516,10 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
+       "@type": "VideoObject",
+       "@id": `${context.canonicalUrl}#hero-video`,
+       name: "Proud Tek RFID & NFC Manufacturing — Production Floor",
++      // 2026-09-02 (audit Phase 4 C-01..C-05): factory / line / equipment /
++      // country counts removed — no documentary evidence.
+       description:
+-        "On-site footage from Proud Tek's Shenzhen facility showing automated RFID & NFC card / tag / label production lines. Two ISO 9001 audited factories, 10 production lines, 305+ pieces of equipment serving 50+ countries.",
++        "Production footage supplied by Proud Tek showing RFID & NFC card, tag and label production lines in Shenzhen.",
+       thumbnailUrl: [
+         absoluteUrl("/site-assets/wp-content/uploads/2024/08/rfid_factories.jpg"),
+       ],
+-- 
+2.34.1
+
