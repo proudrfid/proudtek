@@ -106,9 +106,10 @@ New transform in `src/lib/render-snapshot.ts`, run right after
    Superlatives ("top industry experts", "superior … molds", "exacting
    standards") removed.
 3. "WHAT MAKES US DIFFERENT" row removed and replaced by an evidence strip
-   rendered from `HOME_EVIDENCE` (`src/data/home-v2.ts`, shared with V2) —
-   three cards: verified certificate / company-stated production model /
-   product-level certificate, each with status label and link.
+   rendered from `HOME_EVIDENCE` (`src/data/home-v2.ts`, shared with V2,
+   unchanged) — three cards: verified certificate (ISO 9001) / company-stated
+   production model / documentation pack available per programme, each with
+   its status label and link.
 4. "OUR CHIP PARTNERS" → "Supported chip families"; blurb → "Chips we specify,
    stock and encode, bought through authorised distribution. 'Supported' means
    we have encoded and read-tested the family in Proud Tek products; it is not
@@ -133,18 +134,21 @@ Canonical (already in `ORGANIZATION_OPERATIONS`, rfidak-aligned 2026-09-02):
 - First reply within 2–4 hours in Shenzhen business hours; written quote within
   24–48 hours, valid 30 days.
 
-Add `sampleKitCount` ("8–12 stock SKUs when you ask for the full LF/HF/UHF
-pack") to `ORGANIZATION_OPERATIONS.samples` so both figures are reconciled
-(standard pack vs project-specific set) and `formatSamplePolicy()` helper in
-`seo-content.ts` returns the one-sentence version used by trust strip, trust
-bar, resource trio, `home-v2.ts` and llms Quick facts.
+The "8–12 SKU pack" figure is retired everywhere (spec review 2026-09-05): it
+described a different product than the 2–3 SKU / 5–20 piece policy and could
+not coexist with one sentence. `formatSamplePolicy()` / `formatResponsePolicy()`
+helpers in `seo-content.ts` return the one-sentence versions used by the trust
+bar, resource trio and llms Quick facts; `home-v2.ts` carries no sample figures.
 
 JSON surfaces hand-aligned to the same words: `lp/sample-pack.json` (statBar
 "8–12 SKUs" → "2–3 SKUs · 5–20 pieces"; "5–10 days" → "3–6 business days";
 "1 day specialist reply" → "2–4 h first reply"; timeline day 5–10 → 3–6),
 `faq.json` (sample turnaround 5–7 working days → prepared 1 business day +
-2–5 days express), editorial `index.json` (5–7 working days, "no middleman
-markup", "declarations issued per shipment" → sample-based reports wording).
+2–5 days express), editorial `index.json`: the sample bullet (5–7 working days
+→ prepared in 1 business day), the FAQ production lead time (5–7 working days
+→ the canonical 7–15 business days from `ORGANIZATION_OPERATIONS.leadTime`),
+"no middleman markup" → manufacturing-partner wording, "declarations issued per
+shipment" → sample-based test reports wording. No "5–7 working days" remains.
 
 ### 3.5 About page (`about.json`)
 
@@ -225,7 +229,9 @@ the block today (`about.json`).
 
 `npm run lint`, `npm run lint:chip-claims`, `npm run lint:chip-placeholder-drift`,
 `npm run test`, `npm run build` (flag-less and with `PROUDTEK_HOME_V2=1`),
-`npm run audit:site-contract` then `audit:site-contract:write` (main-text hashes
+regenerate the editorial-pages snapshot fixtures (`npx vitest run -u` on the
+three `editorial-pages-*.snapshot.test.ts` files, review the diff, commit the
+`.snap` files), `npm run audit:site-contract` then `audit:site-contract:write` (main-text hashes
 change on `/`, the About pages, `/sample-pack/`, `/faq/` and every page carrying
 a testimonial), browser check of `/` and `/about/` via the dev server with a
 screenshot of the new homepage evidence strip.

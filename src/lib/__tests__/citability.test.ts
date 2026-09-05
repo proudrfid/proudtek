@@ -109,3 +109,82 @@ describe("live homepage snapshot after the citability pass", () => {
     expect(text).toContain("EASY PROCESS");
   });
 });
+
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import path from "node:path";
+import Testimonial from "../../components/editorial/Testimonial.astro";
+
+describe("Testimonial disclosure", () => {
+  it("labels every editorial testimonial as unverified", async () => {
+    const container = await AstroContainer.create();
+    const html = await container.renderToString(Testimonial, {
+      props: { text: "Great tags.", source: "Procurement lead, anonymised" },
+    });
+    expect(html).toContain("not an independently verified review");
+  });
+});
+
+/**
+ * Retired-claim denylist. Each phrase was removed after the 2026-09-02 audit
+ * or the 2026-09-05 diagnosis because it had no evidence on file, overstated
+ * a certificate scope, or contradicted the one commercial policy. If a phrase
+ * comes back, the test names the file.
+ */
+const RETIRED_PHRASES = [
+  "ISO 9001 Certified Factory",
+  "SGS audited",
+  "Chip Partners",
+  "no middlemen",
+  "15-30% markup",
+  "15–30% markup",
+  "15-30% margin",
+  "15–30% margin",
+  "20-30% markup",
+  "Every order includes free samples",
+  "seamless compatibility",
+  "ARC-graded UHF inlays for Walmart",
+  "5–7 working days",
+  "two self-owned factories",
+  "305+ ",
+  "8–12-SKU",
+  "meet the air-interface and memory requirements for EU DPP",
+];
+
+function walk(dir: string, out: string[] = []): string[] {
+  for (const entry of readdirSync(dir)) {
+    const full = path.join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      if (entry === "_unused") continue;
+      walk(full, out);
+    } else if (full.endsWith(".json")) {
+      out.push(full);
+    }
+  }
+  return out;
+}
+
+/** Code files may mention a retired phrase in a comment explaining why it went. */
+function stripComments(file: string, source: string): string {
+  if (file.endsWith(".json")) return source;
+  return source
+    .split("\n")
+    .filter((line) => !/^\s*(\/\/|\/?\*)/.test(line))
+    .join("\n");
+}
+
+describe("retired claims stay retired", () => {
+  const root = path.resolve(__dirname, "../..");
+  const files = [
+    ...walk(path.join(root, "content/editorial")),
+    path.join(root, "data/home-v2.ts"),
+    path.join(root, "lib/seo-content.ts"),
+    path.join(root, "lib/seo/render-blocks.ts"),
+    path.join(root, "components/editorial/TrustSignals.astro"),
+    path.join(root, "components/editorial/AboutTrustBand.astro"),
+  ];
+
+  it.each(RETIRED_PHRASES)("no content file contains %s", (phrase) => {
+    const hits = files.filter((file) => stripComments(file, readFileSync(file, "utf8")).includes(phrase));
+    expect(hits.map((f) => path.relative(root, f))).toEqual([]);
+  });
+});
