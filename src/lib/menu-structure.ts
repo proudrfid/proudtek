@@ -324,7 +324,7 @@ export const ABOUT_MENU: MenuDropdown = {
       links: [
         { href: "/about/editorial-policy/", label: "Editorial Policy" },
         { href: "/about/methodology/", label: "Testing Methodology" },
-        { href: "/about/review-board/", label: "Editorial & Review Board" },
+        { href: "/about/review-board/", label: "Editorial & Review Functions" },
         { href: "/about/disclosures/", label: "Disclosures" },
         { href: "/about/corrections/", label: "Corrections Log" },
         // Legal pages (added 2026-06-11 with the C-9 privacy/terms work) —
@@ -408,7 +408,7 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/guides/", label: "Guides" },
       { href: "/compare/", label: "Comparisons" },
       { href: "/compatibility/", label: "Hotel Lock Compatibility" },
-      { href: "/case-studies/", label: "Case Studies" },
+      { href: "/case-studies/", label: "Worked examples" },
       { href: "/sample-pack/", label: "Free Sample Pack" },
       { href: "/tools/rfid-tag-cost-estimator/", label: "Cost Estimator Tool" },
       { href: "/rfq/", label: "Request a Quote" },
@@ -440,7 +440,7 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/case-studies/", label: "Worked examples" },
       { href: "/about/editorial-policy/", label: "Editorial Policy" },
       { href: "/about/methodology/", label: "Testing Methodology" },
-      { href: "/about/review-board/", label: "Editorial & Review Board" },
+      { href: "/about/review-board/", label: "Editorial & Review Functions" },
       { href: "/about/disclosures/", label: "Disclosures" },
       { href: "/about/corrections/", label: "Corrections Log" },
       { href: "/contact/", label: "Contact" },
