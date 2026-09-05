@@ -408,7 +408,7 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/guides/", label: "Guides" },
       { href: "/compare/", label: "Comparisons" },
       { href: "/compatibility/", label: "Hotel Lock Compatibility" },
-      { href: "/case-studies/", label: "Case Studies" },
+      { href: "/case-studies/", label: "Worked examples" },
       { href: "/sample-pack/", label: "Free Sample Pack" },
       { href: "/tools/rfid-tag-cost-estimator/", label: "Cost Estimator Tool" },
       { href: "/rfq/", label: "Request a Quote" },
