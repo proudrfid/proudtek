@@ -1110,7 +1110,7 @@ function applyHomepageCitabilityPass($body: ReturnType<typeof load>): void {
     }
     if (/^We combine robust infrastructure with specialized R&D/.test(t)) {
       $p.html(
-        'Specification, chip sourcing, first-article approval and quality control are ours; tooling, lamination, printing and encoding run on contracted partner lines in Shenzhen. <a href="/about/factory/">Who does what, step by step &rarr;</a>',
+        'Specification, chip sourcing, first-article approval and quality control are ours; tooling, lamination, printing and encoding run on contracted partner lines in Shenzhen. <a class="codex-home-inline-link" href="/about/factory/">Who does what, step by step &rarr;</a>',
       );
       return;
     }
@@ -1125,7 +1125,7 @@ function applyHomepageCitabilityPass($body: ReturnType<typeof load>): void {
     }
     if (/^Through the repeated refinement by numerous valued partners/.test(t)) {
       $p.html(
-        'Chips we specify, stock and encode, bought through authorised distribution. "Supported" means we have encoded and read-tested the family in Proud Tek products — it is not a vendor partnership. Family-by-family list on the <a href="/about/">About page</a>.',
+        'Chips we specify, stock and encode, bought through authorised distribution. "Supported" means we have encoded and read-tested the family in Proud Tek products — it is not a vendor partnership. Family-by-family list on the <a class="codex-home-inline-link" href="/about/">About page</a>.',
       );
     }
   });

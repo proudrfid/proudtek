@@ -499,7 +499,9 @@ export function enhanceKadenceA11y($body: CheerioAPI): void {
   $body("h4.wp-block-heading").each((_, element) => {
     const $el = $body(element);
     const text = cleanText($el.text());
-    if (text !== "Comprehensive Manufacturing Excellence") return;
+    // 2026-09-05 citability pass renames this heading in render-snapshot
+    // before this enhancer runs; match both texts so the promotion holds.
+    if (text !== "Comprehensive Manufacturing Excellence" && text !== "What we own, and what runs on partner lines") return;
     const html = $el.html() ?? "";
     const className = $el.attr("class") ?? "";
     $el.replaceWith(`<h3 class="${className}">${html}</h3>`);

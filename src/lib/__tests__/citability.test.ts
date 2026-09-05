@@ -100,6 +100,17 @@ describe("live homepage snapshot after the citability pass", () => {
     expect(text).toContain(phrase);
   });
 
+  it("keeps the heading outline and AA-safe inline links (Lighthouse a11y ≥ 0.95)", () => {
+    // The renamed Capabilities sub-heading must still be promoted h4 → h3 by
+    // enhance-page.ts, otherwise heading-order fails.
+    expect($("main h4").length).toBe(0);
+    expect($("main h3").filter((_, el) => $(el).text().trim() === "What we own, and what runs on partner lines").length).toBe(1);
+    // Injected links must not inherit the gold Kadence link colour.
+    expect($('a.codex-home-inline-link[href="/about/factory/"]').length).toBe(1);
+    expect($('a.codex-home-inline-link[href="/about/"]').length).toBe(1);
+    expect($('.codex-home-evidence__header a.codex-home-inline-link').length).toBe(1);
+  });
+
   it("renders the evidence strip once with three cards and keeps one H1", () => {
     expect($(".codex-home-evidence").length).toBe(1);
     expect($(".codex-home-evidence__card").length).toBe(3);

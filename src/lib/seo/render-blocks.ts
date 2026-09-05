@@ -229,7 +229,7 @@ export function renderHomeEvidenceStrip(): string {
     <div class="codex-home-evidence__header">
       <p class="codex-home-evidence__eyebrow">Proof, not adjectives</p>
       <h2 id="codex-home-evidence-title">What is verified, and what is company-stated</h2>
-      <p>Every claim on this site carries an evidence status — a registrar-issued certificate, a Proud Tek statement you can audit, or documentation matched per programme. <a href="/about/methodology/#evidence-tiers-used-on-this-site">How to read the labels &rarr;</a></p>
+      <p>Every claim on this site carries an evidence status — a registrar-issued certificate, a Proud Tek statement you can audit, or documentation matched per programme. <a class="codex-home-inline-link" href="/about/methodology/#evidence-tiers-used-on-this-site">How to read the labels &rarr;</a></p>
     </div>
     <div class="codex-home-evidence__grid">
       ${cards.join("")}
