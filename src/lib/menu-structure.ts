@@ -324,7 +324,7 @@ export const ABOUT_MENU: MenuDropdown = {
       links: [
         { href: "/about/editorial-policy/", label: "Editorial Policy" },
         { href: "/about/methodology/", label: "Testing Methodology" },
-        { href: "/about/review-board/", label: "Editorial & Review Board" },
+        { href: "/about/review-board/", label: "Editorial & Review Functions" },
         { href: "/about/disclosures/", label: "Disclosures" },
         { href: "/about/corrections/", label: "Corrections Log" },
         // Legal pages (added 2026-06-11 with the C-9 privacy/terms work) —
@@ -440,7 +440,7 @@ export const FOOTER_SECTIONS: FooterSection[] = [
       { href: "/case-studies/", label: "Worked examples" },
       { href: "/about/editorial-policy/", label: "Editorial Policy" },
       { href: "/about/methodology/", label: "Testing Methodology" },
-      { href: "/about/review-board/", label: "Editorial & Review Board" },
+      { href: "/about/review-board/", label: "Editorial & Review Functions" },
       { href: "/about/disclosures/", label: "Disclosures" },
       { href: "/about/corrections/", label: "Corrections Log" },
       { href: "/contact/", label: "Contact" },
