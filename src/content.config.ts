@@ -75,6 +75,27 @@ const sectionSchema = z.object({
   statBar: z
     .object({ items: z.array(z.object({ value: z.string(), label: z.string() })) })
     .optional(),
+  /** Claim / evidence-tier / verify cards (2026-09-05 citability uplift). */
+  evidenceCards: z
+    .array(
+      z.object({
+        claim: z.string(),
+        tier: z.enum([
+          "OFFICIAL_STANDARD",
+          "CHIP_VENDOR_DATASHEET",
+          "THIRD_PARTY_TEST",
+          "PROUD_TEK_INTERNAL_TEST",
+          "PROUD_TEK_SELF_REPORTED",
+          "COMMERCIAL_POLICY",
+          "GENERAL_EXPLANATION",
+          "UNSUPPORTED",
+        ]),
+        evidence: z.string(),
+        href: z.string().optional(),
+        linkLabel: z.string().optional(),
+      }),
+    )
+    .optional(),
   comparePanel: z
     .object({
       beforeHeading: z.string().optional(),

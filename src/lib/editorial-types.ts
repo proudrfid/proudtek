@@ -1,3 +1,5 @@
+import type { EvidenceTier } from "../data/evidence-tiers";
+
 /**
  * Shared type definitions for editorial content.
  *
@@ -18,6 +20,14 @@ export interface EditorialTable {
   rows: string[][];
 }
 
+export interface EvidenceCard {
+  claim: string;
+  tier: EvidenceTier;
+  evidence: string;
+  href?: string;
+  linkLabel?: string;
+}
+
 export interface EditorialSectionData {
   title: string;
   intro?: string;
@@ -28,6 +38,7 @@ export interface EditorialSectionData {
   callout?: { label: string; text: string; href?: string };
   /* Extended section fields (keyword landings) */
   statBar?: { items: Array<{ value: string; label: string }> };
+  evidenceCards?: EvidenceCard[];
   comparePanel?: {
     beforeHeading?: string;
     afterHeading?: string;
