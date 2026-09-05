@@ -25,11 +25,13 @@ import {
   ORGANIZATION_SOCIAL,
   ORGANIZATION_ALTERNATE_NAMES,
   ORGANIZATION_OPERATIONS,
+  ORGANIZATION_CREDENTIALS,
   COMMERCIAL_TERMS,
 } from "../seo-content";
 
-import { EDITORIAL_KEYWORDS_MAP } from "../editorial-pages";
-import { hasAuthorityArticle } from "../editorial-authority-ld";
+import { EDITORIAL_KEYWORDS_MAP, EDITORIAL_ROUTE_INDEX } from "../editorial-pages";
+import { hasAuthorityArticle, isArticleRoute } from "../editorial-authority-ld";
+import { PRODUCT_OFFERS_ENABLED, parseTypicalPriceRange, buildProductOffers } from "./product-offer";
 import type { EditorialDefinition } from "../editorial-types";
 import { isWorkflowSection } from "../editorial-types";
 
@@ -153,10 +155,15 @@ export function buildWebPageJsonLd(
 ): Record<string, unknown> {
   const sourceLinks = resolveContextSourceLinks(context);
   const isIndustriesPillar = canonicalPath === "/industries/";
+  // Audit 2026-09-02 (Phase 10 SD-16): every company/evidence page under
+  // /about/ is an AboutPage (previously only the kind-inferred root was);
+  // legal texts stay plain WebPage.
+  const isAboutRoute =
+    canonicalPath.startsWith("/about/") && !/\/about\/(privacy-policy|terms-of-use)\/$/.test(canonicalPath);
   const type =
     context.kind === "contact"
       ? "ContactPage"
-      : context.kind === "about"
+      : context.kind === "about" || isAboutRoute
         ? "AboutPage"
         : context.kind === "collection" || context.kind === "blog" || isIndustriesPillar
           ? "CollectionPage"
@@ -252,6 +259,8 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
         "@type": "PostalAddress",
         streetAddress: ORGANIZATION_CONTACT.streetAddress,
         addressLocality: ORGANIZATION_CONTACT.addressLocality,
+        addressRegion: ORGANIZATION_CONTACT.addressRegion,
+        postalCode: ORGANIZATION_CONTACT.postalCode,
         addressCountry: ORGANIZATION_CONTACT.addressCountry,
       },
       contactPoint: [
@@ -290,11 +299,45 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
         "@type": "Place",
         name: ORGANIZATION_OPERATIONS.foundingLocation,
       },
-      numberOfEmployees: {
-        "@type": "QuantitativeValue",
-        value: ORGANIZATION_OPERATIONS.numberOfEmployees,
-      },
-      sameAs: Object.values(ORGANIZATION_SOCIAL).filter((url) => url && url.length > 0),
+      // numberOfEmployees removed 2026-09-02: the "100+" figure has no
+      // documentary basis (Phase 4 K-14 / G-02). Re-add from payroll evidence.
+      // sameAs carries identity profiles only — the WhatsApp deep link is a
+      // contact channel and lives in contactPoint (Phase 3 §3.6).
+      sameAs: Object.entries(ORGANIZATION_SOCIAL)
+        .filter(([key, url]) => key !== "whatsapp" && url && url.length > 0)
+        .map(([, url]) => url),
+      ...(canonicalPath === "/about/certifications/"
+        ? {
+            // The three management-system certificates on file (PDF in repo,
+            // verifiable at cnca.gov.cn). Values are transcribed from the
+            // certificate text — scope is "sales service", not manufacturing.
+            hasCredential: [
+              ...ORGANIZATION_CREDENTIALS.certifications.map((cert) => ({
+                "@type": "EducationalOccupationalCredential",
+                credentialCategory: "certification",
+                name: cert.name,
+                identifier: cert.certificateNumber,
+                description: cert.scope,
+                validIn: { "@type": "Country", name: "China" },
+                validFrom: cert.validFrom,
+                validThrough: cert.validThrough,
+                recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.issuerUrl },
+              })),
+              // Product-level certificate (OEKO-TEX STANDARD 100, UHF laundry
+              // tag) — verified in the OEKO-TEX Label Check 2026-09-02.
+              ...ORGANIZATION_CREDENTIALS.productCertifications.map((cert) => ({
+                "@type": "EducationalOccupationalCredential",
+                credentialCategory: "product certification",
+                name: cert.name,
+                identifier: cert.certificateNumber,
+                description: cert.scope,
+                validFrom: cert.validFrom,
+                validThrough: cert.validThrough,
+                recognizedBy: { "@type": "Organization", name: cert.issuer, url: cert.verifyUrl },
+              })),
+            ],
+          }
+        : {}),
     },
     {
       "@context": "https://schema.org",
@@ -328,28 +371,31 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
     const material = findProductSpecValue(context.productSpecs, ["Material"]);
     const size = findProductSpecValue(context.productSpecs, ["Size", "Dimensions"]);
     const color = findProductSpecValue(context.productSpecs, ["Color", "Finish"]);
-    // PR-S1-C: derive a stable SKU from the route's last segment
-    // (the product slug). For /products/rfid-cards/mifare-classic-
-    // 1k-card/ → "PT-MIFARE-CLASSIC-1K-CARD". Prefixed with PT- so
-    // it's identifiable as a Proud Tek product code, not a generic
-    // industry-wide identifier.
-    const slugMatch = canonicalPath.match(/\/([^/]+)\/?$/);
-    const productSku = slugMatch ? `PT-${slugMatch[1].toUpperCase()}` : undefined;
-    // MPN: use the chip-family spec value if present (e.g. "MIFARE
-    // Classic 1K", "EM4100"), else fall back to the SKU.
-    const chipFamily = findProductSpecValue(context.productSpecs, [
-      "Chip",
-      "Chip family",
-      "Chip Family",
-      "Protocol",
-    ]);
-    const productMpn = chipFamily || productSku;
+    // Audit 2026-09-02 (Phase 10 SD-2/SD-5/SD-6/SD-7, rules 10-11):
+    //  - No `sku` / `productID` / `mpn`: the previous values were derived from
+    //    the URL slug ("PT-<SLUG>") or a chip-family label — invented
+    //    identifiers, not real part numbers. Re-add only from an owner-
+    //    maintained part-number field.
+    //  - `name` mirrors the visible <h1>, which EditorialHero.astro renders
+    //    from the part of the title before the first ": " / "—" / "–" / "|"
+    //    separator (the remainder is the visible deck line).
+    //  - No `inLanguage` (not a Product property) and no synthetic `audience`.
+    //  - No `offers`: the visible "Typical pricing" ranges are indicative and
+    //    not yet evidence-backed (Phase 4 S-05; owner decision 2026-09-02),
+    //    so they stay as page text and are not emitted as Offer/AggregateOffer.
+    //    `PRODUCT_OFFERS_ENABLED` in ./product-offer.ts is the gate.
+    const editorialTitle = EDITORIAL_ROUTE_INDEX.get(canonicalPath)?.title ?? context.contentTitle;
+    const visibleH1 = editorialTitle.split(/\s*(?::\s|—|–|\|)\s*/)[0].trim() || context.contentTitle;
+    const priceRange = PRODUCT_OFFERS_ENABLED
+      ? parseTypicalPriceRange(EDITORIAL_ROUTE_INDEX.get(canonicalPath)?.brief)
+      : null;
+    const productOffers = buildProductOffers(priceRange, context.canonicalUrl, organizationId);
 
     entries.push({
       "@context": "https://schema.org",
       "@type": "Product",
       "@id": `${context.canonicalUrl}#product`,
-      name: context.contentTitle,
+      name: visibleH1,
       description: context.description,
       image: context.imageGallery.map((entry) => entry.url),
       brand: {
@@ -361,16 +407,6 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
       mainEntityOfPage: context.canonicalUrl,
       keywords: buildSchemaKeywords(context.contentTitle, canonicalPath),
       countryOfOrigin: "CN",
-      ...(productSku ? { sku: productSku, productID: productSku } : {}),
-      ...(productMpn ? { mpn: productMpn } : {}),
-      audience: {
-        "@type": "Audience",
-        geographicArea: {
-          "@type": "Country",
-          name: "Global",
-        },
-      },
-      inLanguage: "en-US",
       ...(material ? { material } : {}),
       ...(size ? { size } : {}),
       ...(color ? { color } : {}),
@@ -391,18 +427,7 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
         })),
       ],
       url: context.canonicalUrl,
-      offers: {
-        "@type": "Offer",
-        url: absoluteUrl("/contact/"),
-        availability: "https://schema.org/InStock",
-        priceCurrency: "USD",
-        priceSpecification: {
-          "@type": "PriceSpecification",
-          priceCurrency: "USD",
-          description: "Contact for quote — pricing varies by chip, material, quantity and customization",
-        },
-        seller: { "@id": organizationId },
-      },
+      ...(productOffers ? { offers: productOffers } : {}),
     });
   }
 
@@ -411,7 +436,9 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
   // append the richer authority Article from editorial-authority-ld.ts for
   // exactly those routes, and emitting both produced two Article entities
   // with the same @id on every editorial page.
-  if (context.kind === "article" && context.articleMeta && !hasAuthorityArticle(canonicalPath)) {
+  // Audit 2026-09-02 (Phase 10 SD-3): Article only on article-like routes —
+  // never on products, landing pages, country pages or the homepage.
+  if (context.kind === "article" && context.articleMeta && isArticleRoute(canonicalPath) && !hasAuthorityArticle(canonicalPath)) {
     const authorSchema: Record<string, unknown> = {
       "@type": "Person",
       name: context.articleMeta.authorName,
@@ -503,8 +530,10 @@ export function buildJsonLd(context: PageContext, page: SnapshotPage): Array<Rec
       "@type": "VideoObject",
       "@id": `${context.canonicalUrl}#hero-video`,
       name: "Proud Tek RFID & NFC Manufacturing — Production Floor",
+      // 2026-09-02 (audit Phase 4 C-01..C-05): factory / line / equipment /
+      // country counts removed — no documentary evidence.
       description:
-        "On-site footage from Proud Tek's Shenzhen facility showing automated RFID & NFC card / tag / label production lines. Two ISO 9001 audited factories, 10 production lines, 305+ pieces of equipment serving 50+ countries.",
+        "Production footage supplied by Proud Tek showing RFID & NFC card, tag and label production lines in Shenzhen.",
       thumbnailUrl: [
         absoluteUrl("/site-assets/wp-content/uploads/2024/08/rfid_factories.jpg"),
       ],

@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { getSiteData, getPageByRoute } from "../lib/site-data";
+import { getSiteData, getPageByRoute, BUILD_TIME_ISO } from "../lib/site-data";
 import { buildMachineRoute, buildPageSeo, buildPageSummary, getIndexablePages } from "../lib/seo";
 import { absoluteUrl } from "../lib/seo/utils";
 
@@ -31,7 +31,7 @@ export const GET: APIRoute = async () => {
     JSON.stringify(
       {
         site: "Proud Tek",
-        generatedAt: siteData.generatedAt,
+        generatedAt: BUILD_TIME_ISO,
         pageCount: pages.length,
         pages,
       },

@@ -11,7 +11,7 @@
  * Extracted from BaseLayout.astro on 2026-05-08 to keep the layout
  * file focused on structure rather than meta-tag plumbing.
  */
-import type { PageSeoData } from "../../lib/seo";
+import { capDescription, type PageSeoData } from "../../lib/seo";
 import { SITE_ORIGIN } from "../../lib/seo-content";
 
 interface Props {
@@ -21,6 +21,11 @@ interface Props {
 }
 
 const { seo, machineJsonPath, machineTextPath } = Astro.props;
+
+// Native-shell hubs (guides / compare clusters, case studies, compatibility)
+// hand in their own description strings; cap them at the same 155-char
+// budget the snapshot/editorial pipeline already enforces (Phase 2 T7).
+const description = capDescription(seo.description ?? "");
 
 // seo.imageUrl is ABSOLUTE (image-utils wraps every selection in
 // absoluteUrl()), so gates on a "/landing-images/" prefix must parse the
@@ -46,6 +51,9 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
     : /\.webp$/i.test(imagePathname)
       ? "image/webp"
       : "";
+// The one exception: raster twins of SVG hero diagrams under /og/ are always
+// rendered at 1200×630 (scripts/build-og-rasters.mjs), so the size is known.
+const isOgRaster = imagePathname.startsWith("/og/");
 ---
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -112,9 +120,12 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
     keeping our overrides first means we never need to re-sanitize the chrome
     fragment at the call sites. */}
 <title>{seo.title}</title>
-<meta name="description" content={seo.description} />
+<meta name="description" content={description} />
 <meta name="robots" content={seo.robots} />
-<link rel="canonical" href={seo.canonicalUrl} />
+{/* The 404 template passes an empty canonicalUrl: an error page has no
+    canonical location, and the old self-canonical to /404/ (a URL that does
+    not exist) was a semantic error (audit 2026-09-01 T16). */}
+{seo.canonicalUrl ? <link rel="canonical" href={seo.canonicalUrl} /> : null}
 
 {/* Favicons — emitted once here for every page (native Astro hubs + WP-mirrored
     pages alike); the matching WP `<link rel="icon">` copies are stripped in
@@ -201,15 +212,17 @@ const ogImageType = /\.jpe?g$/i.test(imagePathname)
 <meta property="og:site_name" content="Proud Tek" />
 <meta property="og:type" content={seo.ogType} />
 <meta property="og:title" content={seo.title} />
-<meta property="og:description" content={seo.description} />
-<meta property="og:url" content={seo.canonicalUrl} />
+<meta property="og:description" content={description} />
+{seo.canonicalUrl ? <meta property="og:url" content={seo.canonicalUrl} /> : null}
 <meta property="og:image" content={seo.imageUrl} />
 <meta property="og:image:alt" content={seo.imageAlt} />
 {ogImageType ? <meta property="og:image:type" content={ogImageType} /> : null}
+{isOgRaster ? <meta property="og:image:width" content="1200" /> : null}
+{isOgRaster ? <meta property="og:image:height" content="630" /> : null}
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={seo.title} />
-<meta name="twitter:description" content={seo.description} />
+<meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={seo.imageUrl} />
 <meta name="twitter:image:alt" content={seo.imageAlt} />
 

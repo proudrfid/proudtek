@@ -38,7 +38,7 @@ import {
   CORE_SUPPORT_PROFILES,
   DEFAULT_DESCRIPTION,
   DEFAULT_IMAGE,
-  EDITORIAL_TEAM_NAME,
+  EDITORIAL_REVIEWER,
   EXPERT_AUTHORS,
   PAGE_DESCRIPTION_OVERRIDES,
   SITE_NAME,
@@ -84,7 +84,6 @@ import {
 import { buildBreadcrumbs } from "./breadcrumbs";
 
 import {
-  buildProductFaqEntries,
   buildProductMetaDescription,
   buildProductProcurementFields,
   buildProductRelatedPages,
@@ -126,7 +125,6 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
   const coreSummary = isCoreSupportKind(kind) ? buildCoreSummary(page.route, description, $body) : [];
   const articleSummary = kind === "article" ? buildArticleSummary(contentTitle, description, $body, page.route) : [];
   const resolvedFaqEntries = kind === "faq" || kind === "contact" || kind === "page" ? resolveFaqEntries($body) : [];
-  const coreFaqEntries = isCoreSupportKind(kind) ? buildCoreFaqEntries(page.route, contentTitle, description, $body) : [];
 
   // Editorial pages carry FAQ data in `definition.faq` (set at content-authoring
   // time). After Stage 3 cutover the `<main>` of `page.bodyHtml` is empty, so
@@ -137,20 +135,19 @@ export function buildPageContext(page: SnapshotPage, $head: CheerioAPI, $body: C
     ? editorialFaq.map((e) => ({ question: e.question, answer: e.answer }))
     : [];
 
+  // Audit 2026-09-02 (Phase 10 SD-4, rule "structured data must match visible
+  // page content"): FAQPage may only describe questions a reader can see.
+  // Two sources are visible — the authored editorial `faq` (rendered by
+  // Faq.astro) and <details> blocks found in the snapshot body. The synthetic
+  // builders (product / collection / article / core) generate plausible Q&A
+  // that is never rendered anywhere, so they are no longer fed into
+  // `faqEntries` (the builders remain exported for other consumers).
   const faqEntries =
     editorialFaqEntries.length > 0
       ? editorialFaqEntries
-      : kind === "product"
-        ? buildProductFaqEntries(contentTitle, description, productSpecs, page.route)
-        : kind === "collection"
-          ? buildCollectionFaqEntries(page.route, contentTitle, description, $body)
-        : kind === "article"
-          ? buildArticleFaqEntries(contentTitle, description, $body, page.route)
-        : kind === "faq" || kind === "contact" || kind === "page"
-          ? dedupeFaqEntries([...resolvedFaqEntries, ...coreFaqEntries], 10)
-        : isCoreSupportKind(kind)
-          ? coreFaqEntries
-          : [];
+      : kind === "faq" || kind === "contact" || kind === "page"
+        ? dedupeFaqEntries(resolvedFaqEntries, 10)
+        : [];
   const procurementFields =
     kind === "product" ? buildProductProcurementFields(contentTitle, description, productSpecs, page.route) : [];
   const collectionGuidanceFields = kind === "collection" ? buildCollectionGuidanceFields(page.route, contentTitle, $body) : [];
@@ -468,8 +465,10 @@ export function resolveArticleMeta($body: CheerioAPI, route: string, editorialDe
     authorUrl: absoluteUrl(author.url),
     authorTitle: author.title,
     authorExpertise: author.expertise,
-    reviewedBy: authorKey !== "default" ? EDITORIAL_TEAM_NAME : undefined,
-    reviewedByTitle: authorKey !== "default" ? "RFID & NFC Technical Content Team" : undefined,
+    // Every article is reviewed by the RF / production engineering function
+    // (2026-09-02: function-based bylines, no named individuals).
+    reviewedBy: EDITORIAL_REVIEWER.name,
+    reviewedByTitle: EDITORIAL_REVIEWER.title,
     lastReviewedDate: modifiedAt,
     publishedAt,
     modifiedAt,
@@ -549,6 +548,9 @@ export function resolveFaqEntries($body: CheerioAPI): FaqEntry[] {
   return entries;
 }
 
+/** Display budget for product <title>s before Google truncates (≈ 600 px / 60 chars). */
+const PRODUCT_TITLE_BUDGET = 60;
+
 export function buildDocumentTitle(route: string, contentTitle: string, kind: PageKind): string {
   if (route === "/") {
     // Homepage SEO title — compressed 2026-06-11 (user-approved) from the
@@ -562,7 +564,15 @@ export function buildDocumentTitle(route: string, contentTitle: string, kind: Pa
   }
 
   if (kind === "product") {
-    return `${contentTitle} | ${buildProductTitleQualifier(route, contentTitle)} | Proud Tek`;
+    // Audit 2026-09-01 (Phase 2 T7): the two-suffix template pushed 192/204
+    // product titles past 60 chars (median 84), so the differentiator was
+    // truncated in the SERP and the qualifier never shown. Keep the family
+    // qualifier only while the whole title fits the ~60-char display budget
+    // (short category/hub titles benefit from it); otherwise brand only.
+    const qualified = `${contentTitle} | ${buildProductTitleQualifier(route, contentTitle)} | Proud Tek`;
+    // Titles still > 60 after this are an editorial (JSON `title`) matter,
+    // not a template one — see the Phase 14 report for the list.
+    return qualified.length <= PRODUCT_TITLE_BUDGET ? qualified : `${contentTitle} | Proud Tek`;
   }
 
   // Compare pages are editorial (kind === "article") but they're product

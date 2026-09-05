@@ -36,6 +36,18 @@ export interface SiteData {
   pages: SnapshotPage[];
 }
 
+/**
+ * Wall-clock timestamp of the current build, fixed once per process.
+ *
+ * `siteData.generatedAt` is the WordPress *snapshot* timestamp (frozen at
+ * 2026-03-16 since the fetch pipeline was mothballed). It is still the right
+ * fallback for per-page content dates, but it must not be advertised as the
+ * generation time of build artefacts: sitemap-index.xml, site-index.json and
+ * the /machine/ mirrors were telling crawlers "nothing new since March".
+ * Audit 2026-09-02 (Phase 2 T3).
+ */
+export const BUILD_TIME_ISO = new Date().toISOString();
+
 // ---------------------------------------------------------------------------
 // Caches
 // ---------------------------------------------------------------------------

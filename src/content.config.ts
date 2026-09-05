@@ -259,7 +259,10 @@ const editorialSchema = z.object({
 const authorSchema = z.object({
   /** Slug used as the `authorSlug` / `reviewedBySlug` foreign key from editorial pages. */
   slug: z.string(),
-  /** Full display name, e.g. "Peter Zhang". */
+  /** schema.org type of the byline entity — a function/team (Organization) or
+   *  a person with a verifiable public profile. */
+  type: z.enum(["Person", "Organization"]).optional(),
+  /** Full display name, e.g. "Proud Tek Editorial Team". */
   name: z.string(),
   /** One-line role / title shown under the byline. */
   jobTitle: z.string(),

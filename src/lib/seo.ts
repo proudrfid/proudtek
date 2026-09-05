@@ -36,6 +36,7 @@ import {
 } from "./seo-content";
 
 import { EDITORIAL_KEYWORDS_MAP } from "./editorial-pages";
+import { resolveEditorialByline } from "./editorial-authority-ld";
 
 import {
   type PageKind,
@@ -401,22 +402,19 @@ export interface MachinePageData {
 
 
 /**
- * Append the verified factory-direct signal to commercial meta descriptions
- * when absent. Never fabricates numbers: both facts condense existing site
- * copy verbatim ("a 500-piece minimum per chip type"; "MOQ, price and lead
- * time are quoted in writing before tooling, then held").
+ * Meta-description length cap (Phase 2 T7, 2026-09-01). The former
+ * `withCommerceSignal` helper appended " Factory-direct from Proud Tek:
+ * 500-piece MOQ per chip type …" to every product description, producing
+ * 246-char descriptions with an ellipsis in the middle, and propagated a MOQ
+ * figure the Phase 4 ledger rates UNVERIFIED and INCONSISTENT (S-03: 100 /
+ * 200–1,000 / 500 / 1,000–5,000 pcs on different surfaces). Descriptions
+ * now stay at the 155-char budget the editorial summary already meets; the
+ * MOQ text remains on the pages themselves pending the sales-owned MOQ table.
  */
-const COMMERCE_SIGNAL_PATTERN = /factory|MOQ|minimum order|lead time|written quote/i;
-const COMMERCE_SIGNAL_SUFFIX =
-  " Factory-direct from Proud Tek: 500-piece MOQ per chip type with written quotes and lead times held before tooling.";
-const COMMERCE_SIGNAL_KINDS = new Set<PageKind>(["product"]);
+export const META_DESCRIPTION_BUDGET = 155;
 
-export function withCommerceSignal(description: string, kind: PageKind): string {
-  if (!COMMERCE_SIGNAL_KINDS.has(kind)) return description;
-  if (COMMERCE_SIGNAL_PATTERN.test(description)) return description;
-  if (!description.trim()) return description;
-  const candidate = `${description.trimEnd()}${COMMERCE_SIGNAL_SUFFIX}`;
-  return candidate.length <= 320 ? candidate : description;
+export function capDescription(description: string): string {
+  return description.length <= META_DESCRIPTION_BUDGET ? description : truncateText(description, META_DESCRIPTION_BUDGET);
 }
 
 export function buildPageSeo(page: SnapshotPage): PageSeoData {
@@ -435,11 +433,8 @@ export function buildPageSeo(page: SnapshotPage): PageSeoData {
 
   const context = buildPageContext(page, $head, $body, kind);
   normalizePageBody($body, page, context);
-  // GEO enrichment (2026-08-25): commercial pages carry the factory-direct
-  // signal buyers ask AI engines for. Claims mirror verified site copy
-  // (about/lp): 500-piece MOQ per chip type, written quotes held before
-  // tooling. Meta description and Article schema share this string.
-  context.description = withCommerceSignal(context.description, kind);
+  // Meta description and Article schema share this string (≤ 155 chars).
+  context.description = capDescription(context.description);
   const title = buildDocumentTitle(page.route, context.contentTitle, kind);
   const indexable = isIndexableRoute(page.route) && !isSoft404Page(page, context.contentTitle);
 
@@ -497,6 +492,22 @@ export function buildPageSummary(page: SnapshotPage): { title: string; descripti
 
 export function buildMachinePageData(page: SnapshotPage, generatedAt?: string): MachinePageData {
   const seo = buildPageSeo(page);
+  const editorialDef = page.editorialDefinition as
+    | { authorSlug?: string; author?: string; reviewedBySlug?: string; reviewedBy?: string; publishedAt?: string; modifiedAt?: string; reviewedAt?: string }
+    | undefined;
+  // Same resolver as the visible byline (EditorialArticle) and the authority
+  // Article: slugs win over free-text names, so the mirror can never show a
+  // different reviewer than the HTML.
+  const resolvedByline = editorialDef ? resolveEditorialByline(editorialDef) : null;
+  const editorialByline = editorialDef
+    ? {
+        author: resolvedByline?.author?.name ?? editorialDef.author,
+        reviewedBy: resolvedByline?.reviewer?.name ?? editorialDef.reviewedBy,
+        publishedAt: editorialDef.publishedAt,
+        modifiedAt: editorialDef.modifiedAt,
+        reviewedAt: editorialDef.reviewedAt,
+      }
+    : undefined;
   const $body = load(`<body>${seo.bodyHtml}</body>`);
   const route = normalizeRoute(page.route);
   const machineJsonUrl = absoluteUrl(buildMachineRoute(route, "json"));
@@ -558,19 +569,29 @@ export function buildMachinePageData(page: SnapshotPage, generatedAt?: string): 
     productSpecs,
     machineJsonUrl,
     machineTextUrl,
+    // Audit 2026-09-02 (Phase 2 T9): the mirror must name the same author /
+    // reviewer as the visible byline. Editorial pages (products, solutions,
+    // …) carry them on the definition even when no articleMeta is resolved;
+    // only pages without any byline fall back to the organization.
     author: seo.articleMeta
       ? {
           name: seo.articleMeta.authorName,
           title: seo.articleMeta.authorTitle,
           expertise: seo.articleMeta.authorExpertise,
         }
-      : { name: ORGANIZATION_NAME },
+      : editorialByline?.author
+        ? { name: editorialByline.author }
+        : { name: ORGANIZATION_NAME },
     publisher: ORGANIZATION_NAME,
-    datePublished: seo.articleMeta?.publishedAt,
-    dateModified: seo.articleMeta?.modifiedAt,
-    reviewedBy: seo.articleMeta?.reviewedBy,
-    lastReviewedDate: seo.articleMeta?.lastReviewedDate,
-    credentials: ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name),
+    datePublished: seo.articleMeta?.publishedAt ?? editorialByline?.publishedAt,
+    dateModified: seo.articleMeta?.modifiedAt ?? editorialByline?.modifiedAt,
+    reviewedBy: seo.articleMeta?.reviewedBy ?? editorialByline?.reviewedBy,
+    lastReviewedDate: seo.articleMeta?.lastReviewedDate ?? editorialByline?.reviewedAt,
+    // Certificate-accurate credential strings (number, issuer, scope) —
+    // never bare standard names that read as "certified manufacturer".
+    credentials: ORGANIZATION_CREDENTIALS.certifications.map(
+      (c) => `${c.name} — certificate ${c.certificateNumber}, ${c.issuer}; scope: ${c.scope}; valid to ${c.validThrough}`,
+    ),
     generatedAt,
   };
 }

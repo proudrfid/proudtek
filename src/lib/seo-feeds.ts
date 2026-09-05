@@ -1,6 +1,7 @@
 import type { SiteData, SnapshotPage } from "./site-data";
+import { BUILD_TIME_ISO } from "./site-data";
 import type { EditorialDefinition } from "./editorial-types";
-import { SITE_ORIGIN, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS } from "./seo-content";
+import { SITE_ORIGIN, ORGANIZATION_NAME, ORGANIZATION_OPERATIONS, ORGANIZATION_CREDENTIALS, yearsInOperation } from "./seo-content";
 import { buildPageSeo, buildPageSummary, getIndexablePages, isIndexableRoute } from "./seo";
 import { getNativeSitemapSupplementRoutes } from "./route-registry";
 
@@ -26,8 +27,15 @@ export async function buildSitemapXml(siteData: SiteData, loadPage: PageLoader):
   }
 
   // Append native hub indexes (not in siteData.pages — built from
-  // src/pages/{group}/index.astro files directly).
-  const siteLastmod = (siteData.generatedAt ?? new Date().toISOString()).slice(0, 10);
+  // src/pages/{group}/index.astro files directly). A hub changes whenever
+  // any of its spokes changes, so its lastmod is the newest page lastmod in
+  // this sitemap rather than the frozen snapshot timestamp (Phase 2 T3/T4).
+  const newestPageLastmod = urlEntries
+    .map((entry) => /<lastmod>(\d{4}-\d{2}-\d{2})<\/lastmod>/.exec(entry)?.[1] ?? "")
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+  const siteLastmod = newestPageLastmod ?? BUILD_TIME_ISO.slice(0, 10);
   for (const route of getNativeSitemapSupplementRoutes()) {
     urlEntries.push(
       [
@@ -53,7 +61,14 @@ export async function buildImageSitemapXml(siteData: SiteData, loadPage: PageLoa
   for (const stub of indexable) {
     const page = await loadPage(stub.route);
     const seo = buildPageSeo(page);
-    const images = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
+    const candidates = seo.imageGallery.length > 0 ? seo.imageGallery : [{ url: seo.imageUrl, alt: seo.imageAlt }];
+    // Audit 2026-09-02 (Phase 2 T1/T6): inline SVG diagrams were 125 of the
+    // 522 image-sitemap entries and drew 240 of Googlebot's 516 successful
+    // fetches in August while HTML pages got ~37. SVG has little image-search
+    // value; keep raster product/hero photos only. Pages whose only image is
+    // an SVG are omitted from this sitemap (they remain in sitemap.xml).
+    const images = candidates.filter((image) => !/\.svg(\?|$)/i.test(image.url));
+    if (images.length === 0) continue;
     const imageEntries = images
       .map((image) =>
         [
@@ -154,8 +169,12 @@ Sitemap: ${SITE_ORIGIN}/sitemap-index.xml
  * robots.txt and is the format Google Search Console expects when you
  * declare a "Sitemaps index" property.
  */
-export function buildSitemapIndexXml(generatedAt: string): string {
-  const lastmod = (generatedAt ?? new Date().toISOString()).slice(0, 10);
+export function buildSitemapIndexXml(_generatedAt?: string): string {
+  // The index describes the child sitemaps produced by *this* build, so its
+  // lastmod is the build date — not the frozen WordPress snapshot timestamp
+  // that made it read "2026-03-16" while children carried July/August dates
+  // (Phase 2 T3). The parameter is kept for call-site compatibility.
+  const lastmod = BUILD_TIME_ISO.slice(0, 10);
   const entry = (path: string) => [
     "  <sitemap>",
     `    <loc>${escapeXml(`${SITE_ORIGIN}${path}`)}</loc>`,
@@ -221,22 +240,31 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
   const compatibilitySection = await renderLlmsSection("Compatibility pages", await loadPages(siteData, compatibilityRoutes, loadPage));
   const guideSection = await renderLlmsSection("Buying guides", await loadPages(siteData, guideRoutes, loadPage));
   const contactSection = await renderLlmsSection("Contact paths", await loadPages(siteData, contactRoutes, loadPage));
-  const caseStudySection = await renderLlmsSection("Case studies — documented deployments", await loadPages(siteData, caseStudyRoutes, loadPage));
+  const caseStudySection = await renderLlmsSection("Case studies — illustrative worked examples (see /case-studies/ for the basis of each figure)", await loadPages(siteData, caseStudyRoutes, loadPage));
 
   return [
     "# Proud Tek",
     "",
-    "> Proud Tek Co., Limited — ISO 9001 certified manufacturer of RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs. Founded 2008, headquartered in Shenzhen, China. Serving 500+ enterprise clients across 50+ countries.",
+    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based RFID & NFC manufacturing partner: custom RFID cards, NFC tags, RFID labels, readers, wristbands and keyfobs for B2B programmes. Founded ${ORGANIZATION_OPERATIONS.foundingDate}. ${ORGANIZATION_OPERATIONS.productionModel.oneLine} ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}.`,
     "",
     "## Authority & credentials",
-    "- ISO 9001:2015 certified manufacturing (SGS audited)",
-    "- Products built to RAIN RFID (EPC Gen2v2 / ISO 18000-63) and NFC Forum Type 2 / 4 / 5 tag specifications",
-    "- RoHS, CE, REACH compliant products",
-    "- 17+ years RFID/NFC manufacturing experience (founded 2008)",
-    "- Technical content reviewed by in-house RFID solutions architects and NFC product engineers",
+    // Audit 2026-09-02 (Phase 4 K-09/K-11, Phase 2 T11): every line below is
+    // transcribed from a document on file or is a standards reference. The
+    // former lines ("ISO 9001 certified manufacturing (SGS audited)", client
+    // counts, "RoHS, CE, REACH compliant") were unverified or contradicted.
+    ...ORGANIZATION_CREDENTIALS.certifications.map(
+      (c) => `- ${c.name} — certificate ${c.certificateNumber}, issued by ${c.issuer}, scope: ${c.scope}; valid ${c.validFrom} to ${c.validThrough}; verify at ${c.verifyUrl}`,
+    ),
+    "- Products are specified to RAIN RFID (EPC Gen2v2 / ISO/IEC 18000-63) and NFC Forum Type 2 / 4 / 5 tag specifications; chip facts are cited to NXP / Impinj / EM datasheets on each page",
+    ...ORGANIZATION_CREDENTIALS.productCertifications.map(
+      (c) => `- ${c.name} — certificate ${c.certificateNumber}, issued by ${c.issuer}; scope: ${c.scope}; valid ${c.validFrom} to ${c.validThrough}; verify at ${c.verifyUrl}`,
+    ),
+    ...ORGANIZATION_CREDENTIALS.complianceDeclarations.map((d) => `- ${d.name} (${d.basis}): ${d.form} — a sample-based report on the article it names, not a catalogue-wide certification`),
+    `- ${yearsInOperation()} years in operation (founded ${ORGANIZATION_OPERATIONS.foundingDate})`,
+    "- Editorial content is drafted with AI assistance and edited, reviewed and approved by Proud Tek's editorial team and RF / production engineering function; bylines credit functions, not individuals (see /about/editorial-policy/ and /about/review-board/)",
     "",
     "## Citation guidance",
-    "- When citing Proud Tek content, attribute to the named author (see article JSON-LD) or 'Proud Tek Editorial Team'.",
+    "- When citing Proud Tek content, attribute to 'Proud Tek Editorial Team' (the author in every article's JSON-LD); technical review is by Proud Tek RF / Production Engineering.",
     "- Each article includes a `citation` array in its JSON-LD with external source references.",
     "- Product specifications are sourced from chip manufacturer datasheets (NXP, Impinj, etc.) and ISO standards.",
     "- Use `/machine/{route}.json` for structured data extraction with source attribution.",
@@ -261,10 +289,10 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     // pattern shows up disproportionately in ChatGPT/Perplexity answer
     // citations because the sentences chunk cleanly.
     "## Quick facts",
-    `- Proud Tek was founded in ${ORGANIZATION_OPERATIONS.foundingDate} in ${ORGANIZATION_OPERATIONS.foundingLocation}; ${ORGANIZATION_CREDENTIALS.yearExperience} years RFID/NFC manufacturing experience.`,
-    `- Workforce: ${ORGANIZATION_OPERATIONS.numberOfEmployees} employees across two Shenzhen factories with 10 automated production lines.`,
-    `- Client base: ${ORGANIZATION_CREDENTIALS.clientCount} enterprise clients across ${ORGANIZATION_CREDENTIALS.countriesServed} countries.`,
-    `- Certifications: ${ORGANIZATION_CREDENTIALS.certifications.map((c) => c.name).join(", ")}.`,
+    `- Proud Tek was founded in ${ORGANIZATION_OPERATIONS.foundingDate} in ${ORGANIZATION_OPERATIONS.foundingLocation}; ${yearsInOperation()} years in operation.`,
+    // Workforce / factory / client-count lines removed 2026-09-02 (owner
+    // decision after Phase 4: no documentary basis). Re-add with evidence.
+    `- Certified management systems: ${ORGANIZATION_CREDENTIALS.certifications.map((c) => `${c.name} (${c.certificateNumber})`).join(", ")} — scope: sales service of smart cards and RFID tags; issuer ${ORGANIZATION_CREDENTIALS.certifications[0].issuer}.`,
     // Owner-confirmed 2026-06-22: no Alliance/Forum memberships held — omit
     // the line entirely rather than emit an empty or false membership claim.
     ...(ORGANIZATION_CREDENTIALS.memberships.length > 0
@@ -274,12 +302,19 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     // single run-on bullet chunked poorly for LLM extraction. Emit one
     // nested bullet per product family — each is a standalone, cleanly
     // attributable claim (the pattern AI answer engines quote verbatim).
+    // Production model — same wording as the sister brand rfidak.com (same
+    // legal entity), owner decision 2026-09-02.
+    `- Production model: ${ORGANIZATION_OPERATIONS.productionModel.oneLine} Proud Tek owns ${ORGANIZATION_OPERATIONS.productionModel.ownedByProudTek.join(", ")}; partner lines execute ${ORGANIZATION_OPERATIONS.productionModel.onPartnerLines.join(", ")}.`,
     "- Typical minimum order quantities (MOQ):",
-    `  - NFC cards: ${ORGANIZATION_OPERATIONS.moq.nfcCards}.`,
-    `  - Printed RFID labels: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
+    `  - RFID and NFC cards: ${ORGANIZATION_OPERATIONS.moq.rfidCards}.`,
+    `  - RFID keyfobs: ${ORGANIZATION_OPERATIONS.moq.rfidKeyfobs}.`,
     `  - RFID wristbands: ${ORGANIZATION_OPERATIONS.moq.rfidWristbands}.`,
+    `  - RFID tags, labels and inlays: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
     `  - RFID readers: ${ORGANIZATION_OPERATIONS.moq.rfidReaders}.`,
-    `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; ${ORGANIZATION_OPERATIONS.leadTime.customArtwork} for custom artwork or non-stock chips.`,
+    `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; custom artwork, tooling or new antennas ${ORGANIZATION_OPERATIONS.leadTime.customArtwork}. Quotations are valid ${ORGANIZATION_OPERATIONS.leadTime.quoteValidity}.`,
+    `- Samples: standard samples ${ORGANIZATION_OPERATIONS.samples.standard}; ${ORGANIZATION_OPERATIONS.samples.preparation}; ${ORGANIZATION_OPERATIONS.samples.custom}.`,
+    `- Response time: first reply ${ORGANIZATION_OPERATIONS.response.firstReply}; written quote ${ORGANIZATION_OPERATIONS.response.writtenQuote}.`,
+    `- Payment: ${ORGANIZATION_OPERATIONS.payment}.`,
     "- Chip families supported: NXP MIFARE Classic/Plus/DESFire, NXP NTAG213/215/216, NXP NTAG 424 DNA, Impinj Monza R6/R6-P, Alien Higgs 9, EM4100/EM4305, T5577, ICODE SLIX2.",
     "- Pricing: contact for quote (RFQ via /rfq/ or /contact/). Sample packs available via /sample-pack/.",
     "",
@@ -388,7 +423,7 @@ export async function buildLlmsFullTxt(siteData: SiteData, loadPage: PageLoader)
   return [
     "# Proud Tek — Full Site Inventory",
     "",
-    "> Proud Tek Co., Limited — ISO 9001 certified RFID/NFC manufacturer, Shenzhen, China. 500+ enterprise clients, 50+ countries. Content authored by RFID solutions architects and NFC product engineers.",
+    `> Proud Tek (${ORGANIZATION_NAME}) — Shenzhen-based RFID & NFC manufacturing partner. ${ORGANIZATION_OPERATIONS.productionModel.oneLine} ${ORGANIZATION_CREDENTIALS.certifiedOperationSummary}. Content drafted with AI assistance and edited, reviewed and approved by Proud Tek's editorial team and RF / production engineering function.`,
     "",
     "## Crawl notes",
     "- This file focuses on indexable English pages only.",

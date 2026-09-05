@@ -12,7 +12,7 @@ describe("HomePage V2", () => {
     expect(html).toContain("Verified certificate");
     expect(html).toContain("ISO 9001:2015");
     expect(html).toContain("Company-stated record");
-    expect(html).toContain("Factory and process evidence");
+    expect(html).toContain("Production model: partner lines, our specification");
     expect(html).toContain("Browse the full product catalog");
     expect(html).not.toMatch(/ISO 9001 audited factories/i);
     expect(html).not.toContain("191 catalog variants");

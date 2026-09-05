@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 
-import { getSiteData, getPageByRoute, routeToParam } from "../../lib/site-data";
+import { getSiteData, getPageByRoute, routeToParam, BUILD_TIME_ISO } from "../../lib/site-data";
 import { buildMachinePageText, getIndexablePages } from "../../lib/seo";
 
 export const prerender = true;
@@ -16,7 +16,8 @@ export async function getStaticPaths() {
 }
 
 export const GET: APIRoute = async ({ params }) => {
-  const siteData = await getSiteData();
+  // warm the site-data cache used by getPageByRoute()
+  await getSiteData();
   const slug = params.slug;
   const route = slug ? `/${String(slug).replace(/^\/+|\/+$/g, "")}/` : "/";
   const page = await getPageByRoute(route);
@@ -25,7 +26,7 @@ export const GET: APIRoute = async ({ params }) => {
     return new Response("Not found", { status: 404 });
   }
 
-  return new Response(buildMachinePageText(page, siteData.generatedAt), {
+  return new Response(buildMachinePageText(page, BUILD_TIME_ISO), {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
     },

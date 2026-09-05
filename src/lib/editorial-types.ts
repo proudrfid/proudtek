@@ -134,6 +134,10 @@ export interface EditorialDefinition {
 /** Minimal author record shape; mirrors authorSchema in src/content.config.ts. */
 export interface EditorialAuthor {
   slug: string;
+  /** schema.org type for the byline entity. Functions/teams are Organization
+   *  (the default since 2026-09-02); a Person record needs a verifiable
+   *  public profile in `sameAs`. */
+  type?: "Person" | "Organization";
   name: string;
   jobTitle: string;
   bio: string;

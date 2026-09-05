@@ -35,7 +35,7 @@ import {
   type MenuGroup,
   type FooterSection,
 } from "./menu-structure";
-import { SITE_CONTACT, whatsappUrl } from "./seo-content";
+import { SITE_CONTACT, whatsappUrl, yearsInOperation } from "./seo-content";
 
 const TRANSLATE_SELECTORS = [
   'link[rel="alternate"][hreflang]',
@@ -301,6 +301,8 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   // and standalone numeric H2s ("10", "305+", "8+", "12+") are reshaped
   // to carry the product-family keywords search engines and LLMs key off.
   if (page.route === "/" || page.route === "") {
+    removeDeadNewsletterForm($body);
+    applyHomepageClaimCorrections($body);
     enhanceHomepageHeadings($body);
     restructureCapabilitiesSection($body);
     // 2026-05-15: REPLACE WP/Kadence cover with a clean Astro-controlled
@@ -854,7 +856,9 @@ function renderFooterSection(s: FooterSection): string {
         `<li><a href="${escapeHtml(l.href)}">${escapeHtml(l.label)}</a></li>`,
     )
     .join("");
-  return `<section class="codex-footer-nav__col"><h3 class="codex-footer-nav__heading">${escapeHtml(s.heading)}</h3><ul class="codex-footer-nav__list">${links}</ul></section>`;
+  // Column label as <p>, not <h3>: footer navigation is chrome, not document
+  // outline (audit 2026-09-01 P2-1); aria-label keeps the region named.
+  return `<section class="codex-footer-nav__col" aria-label="${escapeHtml(s.heading)}"><p class="codex-footer-nav__heading">${escapeHtml(s.heading)}</p><ul class="codex-footer-nav__list">${links}</ul></section>`;
 }
 
 function renderFooterBrandRow(): string {
@@ -865,7 +869,7 @@ function renderFooterBrandRow(): string {
         `<a class="codex-footer-brand__logo" href="/" aria-label="Proud Tek home">` +
           `<img src="/site-assets/wp-content/uploads/2024/04/proudtek-logo.png" alt="Proud Tek" width="220" height="60" loading="lazy" decoding="async">` +
         `</a>` +
-        `<p class="codex-footer-brand__tagline">Custom RFID &amp; NFC manufacturer — cards, tags, labels, wristbands, keyfobs and readers shipped worldwide from China since 2008.</p>` +
+        `<p class="codex-footer-brand__tagline">RFID &amp; NFC manufacturing partner in Shenzhen since 2008 — cards, tags, labels, wristbands, keyfobs and readers, specified and quality-controlled by Proud Tek, produced on contracted partner lines.</p>` +
         `<address class="codex-footer-brand__address" aria-label="Office address and hours">` +
           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.line1)}, ${escapeHtml(addr.line2)}</span>` +
           `<span class="codex-footer-brand__address-line">${escapeHtml(addr.region)}, ${escapeHtml(addr.city)}, ${escapeHtml(addr.country)}</span>` +
@@ -933,6 +937,134 @@ function renderFooterBottomStrip(): string {
  * if the snapshot drifts (defensive — we don't want to silently change
  * unrelated H1/H2 if the homepage is re-themed upstream).
  */
+/**
+ * Homepage claim corrections — audit 2026-09-02 (Phase 4 K-02…K-11), owner
+ * decision 2026-09-02: "remove unevidenced numbers, keep what can be
+ * verified". The WordPress snapshot body carries capability figures for
+ * which no document exists (two self-owned factories, 10 automated lines,
+ * 305+ machines, 8+ patents, 12+ inspection procedures, 10 % of profit into
+ * R&D, "OEKO, REACH, ROHS by TUV") and which the sister site of the same
+ * legal entity contradicts. This transform runs before the stat-heading
+ * merge so the remaining numeric stats are still recognised.
+ *
+ * Kept: founding year (consistent across every owned property; document
+ * pending), address, the real ISO certificates (numbers on
+ * /about/certifications/), RoHS / REACH *declarations*.
+ */
+const REMOVED_STAT_DESCRIPTORS = new Set([
+  "Self-owned Factories",
+  "Automated Production Lines",
+  "Advanced Production Machines",
+  "Certified Patents",
+  "International Certifications",
+]);
+
+/**
+ * Conversion audit 2026-09-01 (Phase 12 CV-1): the WordPress "Subscribe to
+ * our newsletter" block posts to `action=""` with a hidden
+ * `action=kb_process_ajax_submit` — the WP admin-ajax router, which does not
+ * exist on the static host. The form has been dead since the migration and
+ * its `<noscript>` text ("Please enable JavaScript … to submit the form") is
+ * visible to no-JS users. There is no newsletter programme to wire it to, so
+ * the whole two-column row (icon + heading + form) is removed rather than
+ * left as a visibly broken promise. Guarded on the "newsletter" wording so
+ * no other Kadence form is touched.
+ */
+function removeDeadNewsletterForm($body: ReturnType<typeof load>): void {
+  $body("form.kb-form").each((_, el) => {
+    const $form = $body(el);
+    if (!$form.find('input[name="action"][value="kb_process_ajax_submit"]').length) return;
+    if ($form.find("textarea").length) return; // a contact-style form, not the newsletter
+    const row = $form.closest(".wp-block-kadence-rowlayout");
+    if (!row.length) return;
+    if (!/newsletter/i.test(row.text())) return;
+    row.remove();
+  });
+}
+
+function applyHomepageClaimCorrections($body: ReturnType<typeof load>): void {
+  // 1. Stat cards: drop the cards whose figure has no evidence; keep the
+  //    inspection card without its count; recompute years in operation.
+  $body("h2.wp-block-heading").each((_, el) => {
+    const $h2 = $body(el);
+    const text = ($h2.text() || "").trim();
+    if (!/^\d{1,4}\+?$/.test(text)) return;
+    const desc = $h2.nextAll("p").first();
+    const descText = (desc.text() || "").trim();
+    if (REMOVED_STAT_DESCRIPTORS.has(descText)) {
+      const card = $h2.closest(".kb-row-layout-wrap").closest(".wp-block-kadence-column");
+      if (card.length) card.remove();
+      else $h2.parent().remove();
+      return;
+    }
+    if (/Inspection Procedures/i.test(descText)) {
+      // "12+" had no documentary basis; the procedures themselves are
+      // described on the factory page.
+      $h2.text("Documented");
+      return;
+    }
+    if (/Years of Industry Experience/i.test(descText)) {
+      $h2.text(String(yearsInOperation()));
+      desc.text("Years in operation since 2008");
+    }
+  });
+
+  // 2. Capability paragraphs.
+  $body("p").each((_, el) => {
+    const $p = $body(el);
+    const t = ($p.text() || "").replace(/\s+/g, " ").trim();
+    if (/^With over \d+ years of industry expertise and two self-owned factories/.test(t)) {
+      $p.text(
+        `Since 2008, Proud Tek has supplied custom RFID and NFC credentials — cards, tags, labels, wristbands, keyfobs and readers — from Shenzhen, China. We combine technical precision with careful design to deliver customized products for B2B programmes worldwide.`,
+      );
+      return;
+    }
+    if (/^1\. Robust Production Capacity/.test(t)) {
+      $p.html(
+        `<strong>1. Production model</strong> Proud Tek owns the product and antenna specification, chip sourcing through authorised distribution, first-article approval and incoming, in-process and final quality control. Tooling, lamination, printing and encoding run on contracted partner lines in Shenzhen to our specification, and our QC signs off every batch before release. Capacity and lead time are quoted per programme.`,
+      );
+      return;
+    }
+    if (/^2\. Continuous Innovation/.test(t)) {
+      $p.html(
+        `<strong>2. Engineering &amp; customisation</strong> Our RF and production engineering matches chip families and antenna designs to your installed readers before production starts, and specifies application-specific materials and encapsulation. Custom mould tooling is executed on partner lines to our drawings, with the first article approved by us before any run.`,
+      );
+      return;
+    }
+    if (/^3\. Uncompromising Quality Control/.test(t)) {
+      $p.html(
+        `<strong>3. Quality Control</strong> Every production batch goes through 100% inspection — chip read/write testing, print quality, dimensions and packaging — under ISO 9001 documented procedures with traceability from raw material to finished goods. Sample-based RoHS, REACH SVHC and CE test reports are published on the certifications page; testing on your exact specification can be commissioned per programme.`,
+      );
+      return;
+    }
+    if (/^Products are subject to multiple technical certifications and tests such as OEKO/.test(t)) {
+      $p.text(
+        `Certificates held by Shenzhen Proud Tek Co., Ltd: ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 over the sales and supplier-management operation (issued by Anhui Certification and Inspection Co., Ltd; production runs on contracted partner lines), OEKO-TEX STANDARD 100 (Hohenstein, product class II) for our UHF laundry tag, plus sample-based RoHS, REACH SVHC and CE (EN 62311) test reports — every certificate number and scope is on the certifications page.`,
+      );
+      return;
+    }
+    if (/^Unmatched Scale, Precision, and Innovation$/.test(t)) {
+      $p.html("<strong>Specification, quality control and delivery</strong>");
+      return;
+    }
+    // Process step 02 — response-time promise aligned with rfidak.com (owner
+    // decision 2026-09-02): first reply 2–4 h in business hours, quote 24–48 h.
+    if (/^Our experienced business team will respond to the inquiry and provide a quotation/.test(t)) {
+      $p.text(
+        "Our sales engineering team replies within 2–4 hours in Shenzhen business hours (Mon–Fri, GMT+8) and provides a written quotation based on the client's specific requirements within 24–48 hours, valid for 30 days.",
+      );
+    }
+  });
+
+  // 3. Certification logos: the OEKO-TEX mark has no certificate on file.
+  $body('img[src*="OEKO_TEX"]').each((_, el) => {
+    const fig = $body(el).closest("figure");
+    const col = fig.closest(".wp-block-kadence-column");
+    if (col.length) col.remove();
+    else fig.remove();
+  });
+}
+
 function enhanceHomepageHeadings($body: ReturnType<typeof load>): void {
   // ── H1: keyword-load the hero heading ──
   // The WP-snapshot H1 has drifted between "Custom RFID and NFC manufacturing
@@ -1374,7 +1506,7 @@ function redesignContactPage($body: ReturnType<typeof load>): void {
   <header class="codex-contact__hero">
     <p class="codex-contact__eyebrow">Get in touch</p>
     <h1 class="codex-contact__title">Talk to a Proud Tek RFID specialist</h1>
-    <p class="codex-contact__lede">Custom RFID &amp; NFC manufacturer since 2008 — cards, tags, labels, wristbands, keyfobs and readers. Tell us your project and we'll reply within one business day with a quote, samples options, and chip recommendations.</p>
+    <p class="codex-contact__lede">Custom RFID &amp; NFC manufacturer since 2008 — cards, tags, labels, wristbands, keyfobs and readers. Tell us your project — first reply within 2–4 hours in Shenzhen business hours, written quote within 24–48 hours, with sample options and chip recommendations.</p>
   </header>
 
   <div class="codex-contact__grid">

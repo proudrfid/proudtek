@@ -14,6 +14,7 @@ import type { EditorialDefinition } from "../editorial-types";
 import { DEFAULT_IMAGE, PAGE_IMAGE_OVERRIDES, SITE_ORIGIN } from "../seo-content";
 
 import { absoluteUrl, cleanText, parseDimension, type PageKind } from "./utils";
+import { toOgRasterPath } from "./og-raster";
 
 import type { ImageCandidate, ImageSelection, PageContext } from "./types";
 
@@ -224,7 +225,28 @@ export function refreshNormalizedImageContext($body: CheerioAPI, route: string, 
 
 /* ── Image selection / gallery (uses collectImageCandidates) ───── */
 
+/**
+ * Social/JSON-LD image references cannot be SVG (Phase 2 T6). When the chosen
+ * image is an SVG diagram with a committed raster twin under /og/, point the
+ * machine-facing reference at the twin; the page itself still shows the SVG.
+ */
+export function preferOgRaster(selection: ImageSelection): ImageSelection {
+  const raster = toOgRasterPath(selection.url);
+  return raster ? { ...selection, url: absoluteUrl(raster) } : selection;
+}
+
 export function resolveImageSelection(
+  $head: CheerioAPI | null,
+  $body: CheerioAPI,
+  kind: PageKind,
+  contentTitle: string,
+  route: string,
+  editorialDef?: EditorialDefinition,
+): ImageSelection {
+  return preferOgRaster(resolveRawImageSelection($head, $body, kind, contentTitle, route, editorialDef));
+}
+
+function resolveRawImageSelection(
   $head: CheerioAPI | null,
   $body: CheerioAPI,
   kind: PageKind,
@@ -302,10 +324,10 @@ export function resolveImageGallery(
       }
 
       seen.add(candidate.url);
-      gallery.push({
+      gallery.push(preferOgRaster({
         url: candidate.url,
         alt: candidate.alt,
-      });
+      }));
     });
 
   return gallery.slice(0, kind === "product" ? 6 : 2);

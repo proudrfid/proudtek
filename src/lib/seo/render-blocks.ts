@@ -36,7 +36,7 @@ export function renderTrustBar(): string {
       <strong>Free samples</strong><span>Test before production</span>
     </a>
     <a class="codex-trust-bar__item" href="/rfq/">
-      <strong>1 business day</strong><span>Quote response target</span>
+      <strong>24–48 h</strong><span>Written quote target</span>
     </a>
   </section>`;
 }
@@ -154,10 +154,10 @@ export function renderHomeResourceTrio(): string {
   const compareCount = getTotalCompareCount();
   const cards = [
     {
-      eyebrow: "Real deployments",
-      title: "Case Studies — 6 industries",
+      eyebrow: "Worked examples",
+      title: "Programme templates — 6 industries",
       description:
-        "Documented Proud Tek programmes across hospitality, industrial laundry, events, retail apparel, libraries, pharmaceuticals and restaurants. Chip choice, alternatives rejected, volume, and measured operational results.",
+        "Illustrative RFID and NFC programme templates for hospitality, industrial laundry, events, retail apparel, libraries and pharmaceuticals: chip choice, alternatives rejected, assumed volumes and the arithmetic behind each outcome, so you can substitute your own numbers.",
       href: "/case-studies/",
       accent: "#3d6b6b",
     },
@@ -173,7 +173,7 @@ export function renderHomeResourceTrio(): string {
       eyebrow: "Structured procurement brief",
       title: "Request a Production Quote",
       description:
-        "Use the five-step RFQ wizard to share product family, frequency, quantity, printing and contact details. A specialist replies within one business day.",
+        "Use the five-step RFQ wizard to share product family, frequency, quantity, printing and contact details. A specialist replies within 2–4 hours in Shenzhen business hours; the written quote follows within 24–48 hours.",
       href: "/rfq/",
       accent: "#4a5568",
     },

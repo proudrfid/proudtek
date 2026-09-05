@@ -193,11 +193,29 @@ function main() {
 
   let drifts = 0;
   let compoundSkipped = 0;
+  let preexistingSkipped = 0;
   let unknownIssues = 0;
 
   for (const [path, { added, removed }] of Object.entries(files)) {
+    // Placeholder tokens that were already present on a REMOVED line of this
+    // file. A changed line whose tokens are all pre-existing is a prose edit
+    // around an established placeholder, not a migration — the removed line
+    // holds the raw `{chip:...}` token, so the resolved-vs-removed byte check
+    // can never match and would be a false positive (the "mixed placeholder
+    // line" blind spot). Only lines that INTRODUCE a token are drift-checked.
+    const removedTokens = new Set();
+    for (const r of removed) {
+      for (const m of r.matchAll(PLACEHOLDER_RE)) removedTokens.add(m[0]);
+    }
+
     for (const { lineNo, text } of added) {
       if (!text.includes('{chip:')) continue;
+
+      const tokens = [...text.matchAll(PLACEHOLDER_RE)].map((m) => m[0]);
+      if (tokens.length && tokens.every((tok) => removedTokens.has(tok))) {
+        preexistingSkipped++;
+        continue;
+      }
 
       const { resolved, hadCompound, unknowns } = resolveLine(text);
 
@@ -232,8 +250,11 @@ function main() {
   console.log(`scanned ${fileCount} changed editorial JSON file(s) vs ${base}`);
 
   if (drifts === 0 && unknownIssues === 0) {
-    if (compoundSkipped) {
-      console.log(`✓ no chip-placeholder drift (${compoundSkipped} compound placeholder line(s) noted, drift-check skipped)`);
+    const notes = [];
+    if (compoundSkipped) notes.push(`${compoundSkipped} compound placeholder line(s) noted, drift-check skipped`);
+    if (preexistingSkipped) notes.push(`${preexistingSkipped} prose edit(s) on lines with pre-existing placeholders, not re-checked`);
+    if (notes.length) {
+      console.log(`✓ no chip-placeholder drift (${notes.join('; ')})`);
     } else {
       console.log('✓ no chip-placeholder drift');
     }

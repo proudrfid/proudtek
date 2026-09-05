@@ -41,7 +41,16 @@ function absoluteUrl(value: string): string {
 }
 
 export const SITE_NAME = "Proud Tek";
-export const ORGANIZATION_NAME = "Proud Tek Co., Limited";
+/**
+ * Legal name as it appears on the three CAIC management-system certificates
+ * (ISO 9001 / 14001 / 45001, first certified 2026-06-10; PDF in repo,
+ * verifiable at cnca.gov.cn) — the only primary document on file. The
+ * Chinese registered name on the same certificates is 深圳市奥科物联有限公司
+ * (unified social credit code 91440300MA5FBLMP1Y). Confirm against the
+ * business-registration extract before treating as final (audit 2026-09-02,
+ * Phase 3 C1). The previous value "Proud Tek Co., Limited" had no document.
+ */
+export const ORGANIZATION_NAME = "Shenzhen Proud Tek Co., Ltd";
 export const EDITORIAL_TEAM_NAME = "Proud Tek Editorial Team";
 
 /**
@@ -100,32 +109,43 @@ export function whatsappUrl(message: string = SITE_CONTACT.whatsappDefaultMessag
  *    Yantian; DHL / FedEx / EMS air; sea LCL / FCL).
  *  - Response: about.json Step 1 + quote FAQ; hours per SITE_CONTACT.
  */
+/**
+ * Commercial terms shown on every product page (CommercialTerms.astro) and
+ * mirrored into Product JSON-LD additionalProperty. Single source of truth.
+ *
+ * 2026-09-02 (audit Phase 14 B8, owner decision "以 rfidak.com 的口径为准"):
+ * MOQ, lead time, sample policy, payment and response-time wording follow the
+ * statements published by the same legal entity on rfidak.com
+ * (/about, /sample-policy, /shipping-and-incoterms, /blogs/rfid-moq-guide,
+ * /blogs/rfid-lead-time-guide, fetched 2026-09-02) so both sites tell one
+ * story. See AUDIT_2026-09-01/phase14/RFIDAK_REFERENCE_FACTS.md.
+ */
 export const COMMERCIAL_TERMS = {
   title: "Commercial terms",
   items: [
     {
       label: "MOQ",
-      value: "Varies by SKU — stock items from 100 pcs; custom production typically 200-1,000 pcs",
+      value: "From 500 pcs for cards, keyfobs and wristbands; tags and labels from 1,000 pcs; stock SKUs from 100 pcs; custom tooling 2,000-5,000 pcs",
     },
     {
       label: "Lead time",
-      value: "Production 2-3 weeks after artwork and encoding sign-off; reorders on a 3-4 week cycle",
+      value: "Standard production 7-15 business days from order confirmation; custom tooling or new-antenna programmes quoted per job",
     },
     {
       label: "Samples",
-      value: "Free samples and RF test report with every order; courier at customer cost",
+      value: "Standard samples free, prepared in 1 business day; you cover DHL/FedEx freight ($25-60), refunded against your first production order",
     },
     {
       label: "Payment",
-      value: "50% T/T deposit, 50% before shipment; Net 30/60 for established accounts; LC for large orders",
+      value: "30% T/T deposit, 70% before shipment; L/C at sight or 50/50 for established accounts; PayPal for sample orders under $500",
     },
     {
       label: "Shipping",
-      value: "FOB Shenzhen / Yantian; DHL, FedEx or EMS air freight; sea LCL / FCL for volume",
+      value: "FOB Shenzhen; DHL, FedEx or UPS express; sea LCL / FCL for volume; DDP on request",
     },
     {
       label: "Response",
-      value: "Itemized quote within one business day, Mon-Fri (UTC+8)",
+      value: "First reply within 2-4 hours in Shenzhen business hours (Mon-Fri, GMT+8); written quote within 24-48 hours, valid 30 days",
     },
   ],
   link: { href: "/rfq/", label: "Full terms in your quote" },
@@ -215,35 +235,54 @@ export const ORGANIZATION_SOCIAL: Record<string, string> = {
  */
 export const ORGANIZATION_ALTERNATE_NAMES: ReadonlyArray<string> = [
   "ProudTek",
-  "Proud Tek Co. Limited",
+  "Proud Tek Co., Limited",
+  "深圳市奥科物联有限公司",
 ];
 
 /**
  * Publicly disclosable operational facts. Surfaced in:
- *   - Organization JSON-LD (foundingDate, numberOfEmployees)
+ *   - Organization JSON-LD (foundingDate)
  *   - llms.txt "Quick facts" block (P0-G3) — LLM-citation-friendly hard data
  */
 export const ORGANIZATION_OPERATIONS = {
   foundingDate: "2008",
   foundingLocation: "Shenzhen, Guangdong, China",
-  numberOfEmployees: "100+",
-  /** Typical MOQ per product family — used in llms.txt Quick facts (P0-G3).
-   *  Reconciled 2026-06-11 with COMMERCIAL_TERMS + the lp sourcing pages
-   *  (stock items from 100 pcs; custom production typically 500-1,000):
-   *  wristbands corrected from the unsourced "200 pcs" to the lp-verified
-   *  silicone-500 / stock-Tyvek-100 figures.
-   *  Owner ruling 2026-07-15: custom wristband MOQ unified at 200 pcs
-   *  across all materials (stock Tyvek 100 unchanged). */
+  // numberOfEmployees ("100+") removed 2026-09-02 — no documentary basis
+  // (Phase 4 K-14). Re-add from payroll evidence.
+  /** MOQ per product family — rfidak.com 口径 (2026-09-02): stock / custom. */
   moq: {
-    nfcCards: "100 pcs (stock); 1,000 custom-printed",
-    rfidLabels: "500 pcs printed; inlays by the roll (1,000+)",
-    rfidWristbands: "200 pcs custom; stock Tyvek from 100 pcs",
-    rfidReaders: "10 pcs",
+    rfidCards: "500 pcs custom-printed (100 pcs stock; 1,000 with encoding)",
+    rfidKeyfobs: "500 pcs on existing moulds (100 pcs stock; 3,000 for a custom mould)",
+    rfidWristbands: "500 pcs silicone (3,000 for custom Pantone matching)",
+    rfidLabels: "tags and labels from 1,000 pcs; UHF inlays and labels on reel stock from 5,000 pcs",
+    rfidReaders: "1 pc sample; 100 pcs for custom firmware",
   },
-  /** Lead time for stock vs custom orders — used in llms.txt Quick facts. */
+  /** Lead time — rfidak.com 口径 (2026-09-02). */
   leadTime: {
-    stockChip: "7-15 working days",
-    customArtwork: "20-30 working days",
+    stockChip: "7-15 business days from order confirmation",
+    customArtwork: "quoted per job; new-antenna or custom-tooling programmes typically 8-10 weeks end to end",
+    quoteValidity: "30 days",
+  },
+  /** Response time — rfidak.com 口径 (2026-09-02). */
+  response: {
+    firstReply: "within 2-4 hours in Shenzhen business hours (Mon-Fri, GMT+8)",
+    writtenQuote: "within 24-48 hours",
+  },
+  /** Sample policy — rfidak.com /sample-policy (2026-09-02). */
+  samples: {
+    standard: "free; buyer covers DHL/FedEx freight ($25-60), refunded against the first production order",
+    preparation: "prepared in 1 business day, express delivery 2-5 days worldwide",
+    custom: "custom samples (encoding or printing) add 3-5 business days",
+    kit: "typically 5-20 pieces across 2-3 SKUs; larger evaluation kits sized for qualified pilots",
+    pilot: "pilot batches of 200-2,000 pieces ship in 7-15 business days",
+  },
+  /** Payment — rfidak.com /shipping-and-incoterms (2026-09-02). */
+  payment: "30% T/T deposit, 70% balance before shipment; L/C at sight or 50/50 for established accounts; PayPal for sample orders under $500",
+  /** Production model — rfidak.com /about (2026-09-02), same legal entity. */
+  productionModel: {
+    oneLine: "In-house specification and quality control; tooling and production executed on contracted partner lines in Shenzhen to Proud Tek's specification.",
+    ownedByProudTek: ["product and antenna specification", "chip sourcing through authorised distribution", "first-article approval", "incoming, in-process and final quality control", "packaging and export (FOB Shenzhen)"],
+    onPartnerLines: ["tooling and moulds", "lamination and inlay conversion", "printing and personalisation", "chip encoding to Proud Tek's encoding specification, read/write verified before shipment"],
   },
 };
 
@@ -283,31 +322,108 @@ function expertAuthorFromRegistry(slug: string): ExpertAuthor {
 }
 
 export const EXPERT_AUTHORS: Record<string, ExpertAuthor> = {
-  // Team fallback for unmapped routes — an institutional byline, not a
-  // person; deliberately has no src/content/authors/ record.
-  default: {
-    name: EDITORIAL_TEAM_NAME,
-    title: "RFID & NFC Technical Content Team",
-    expertise: ["RFID manufacturing", "NFC technology", "Access control systems", "Smart card engineering"],
-    url: "/about/",
-  },
-  "peter-zhang": expertAuthorFromRegistry("peter-zhang"),
-  "nancy-wu": expertAuthorFromRegistry("nancy-wu"),
-  "sam-yao": expertAuthorFromRegistry("sam-yao"),
-  "mia-li": expertAuthorFromRegistry("mia-li"),
+  // Institutional byline for every snapshot-era article (2026-09-02: named
+  // people retired — see src/lib/authors.ts). Both keys resolve the same
+  // registry record so name, role and profile URL cannot drift from the
+  // editorial pages' byline.
+  default: expertAuthorFromRegistry("editorial-board"),
+  "editorial-board": expertAuthorFromRegistry("editorial-board"),
 };
+
+/** Reviewer function credited on every article — the RF / production
+ *  engineering function, mirroring rfidak.com's function-based team model. */
+export const EDITORIAL_REVIEWER: ExpertAuthor = expertAuthorFromRegistry("proudtek-engineering");
 
 /** Article author assignment — maps routes to expert authors */
 export { ARTICLE_AUTHOR_MAP } from "../data/article-author-map";
 
-/** Organization credentials & certifications */
+/**
+ * Organization credentials.
+ *
+ * Audit 2026-09-02 (Phase 4 K-09/K-11, Phase 10): the only certificates on
+ * file are the three CAIC management-system certificates below (scanned PDF
+ * `9001 certificate/奥科体系证书.pdf`). Every field is transcribed from the
+ * certificate text. Their scope is the *sales service* of smart cards and
+ * RFID tags — not manufacturing — so no surface may call the company an
+ * "ISO 9001 certified factory" or say "SGS audited" (the issuer is CAIC).
+ * RoHS / REACH are declarations of conformity, not certifications, and are
+ * listed separately so generators cannot conflate them.
+ */
+export interface OrganizationCertificate {
+  name: string;
+  standard: string;
+  certificateNumber: string;
+  issuer: string;
+  issuerUrl: string;
+  holder: string;
+  scope: string;
+  validFrom: string;
+  validThrough: string;
+  verifyUrl: string;
+}
+
+const CAIC = {
+  issuer: "Anhui Certification and Inspection Co., Ltd (CAIC)",
+  issuerUrl: "https://www.zjcaic.com",
+  holder: "Shenzhen Proud Tek Co., Ltd (深圳市奥科物联有限公司)",
+  validFrom: "2026-06-10",
+  validThrough: "2029-06-09",
+  verifyUrl: "https://www.cnca.gov.cn",
+};
+
 export const ORGANIZATION_CREDENTIALS = {
   certifications: [
-    { name: "ISO 9001:2015", issuer: "SGS", description: "Quality Management System Certification" },
-    { name: "ISO 14001:2015", issuer: "SGS", description: "Environmental Management System" },
-    { name: "RoHS Compliant", issuer: "EU Directive 2011/65/EU", description: "Restriction of Hazardous Substances" },
-    { name: "CE Marking", issuer: "EU", description: "European Conformity" },
-    { name: "REACH Compliant", issuer: "ECHA", description: "Registration, Evaluation, Authorisation and Restriction of Chemicals" },
+    {
+      name: "ISO 9001:2015",
+      standard: "GB/T 19001-2016 / ISO 9001:2015 — Quality management systems",
+      certificateNumber: "98026Q00274R000",
+      scope: "Sales service of smart cards (PVC cards, wooden cards) and RFID tags",
+      ...CAIC,
+    },
+    {
+      name: "ISO 14001:2015",
+      standard: "GB/T 24001-2016 / ISO 14001:2015 — Environmental management systems",
+      certificateNumber: "98026E00200R000",
+      scope: "Environmental management activities involved in the sales of smart cards (PVC cards, wooden cards) and RFID tags",
+      ...CAIC,
+    },
+    {
+      name: "ISO 45001:2018",
+      standard: "GB/T 45001-2020 / ISO 45001:2018 — Occupational health and safety management systems",
+      certificateNumber: "98026S00203R000",
+      scope: "Occupational health and safety management activities involved in the sales of smart cards (PVC cards, wooden cards) and RFID tags",
+      ...CAIC,
+    },
+  ] as OrganizationCertificate[],
+  /** One-line, certificate-accurate phrasing for trust strips and summaries. */
+  certifiedOperationSummary:
+    "ISO 9001:2015, ISO 14001:2015 and ISO 45001:2018 certified sales and supplier-management operation (CAIC, certificates 98026Q00274R000 / 98026E00200R000 / 98026S00203R000, valid to 2029-06-09); production runs on contracted partner lines",
+  /**
+   * Product-level certificate: OEKO-TEX STANDARD 100 for the UHF laundry tag.
+   * Published on rfidak.com/certifications (same legal entity) and checked
+   * valid in the OEKO-TEX Label Check on 2026-09-02 (product class II, article
+   * text identical) — EXTERNAL_PRIMARY_SOURCE for validity and scope.
+   */
+  productCertifications: [
+    {
+      name: "OEKO-TEX STANDARD 100",
+      certificateNumber: "23.HCN.97349",
+      issuer: "Hohenstein Laboratories GmbH & Co. KG",
+      scope: "UHF laundry tag with RFID chip, woven laminated fabric of 100% white polyester with electroconductive yarn; product class II (direct skin contact)",
+      validFrom: "2026-02",
+      validThrough: "2027-02",
+      verifyUrl: "https://www.oeko-tex.com/en/label-check",
+    },
+  ],
+  /**
+   * Sample-based third-party test reports published with their numbers on
+   * rfidak.com/certifications (same legal entity). Each evidences the article
+   * it names, not the catalogue — phrase as such, never as "all SKUs certified".
+   */
+  complianceDeclarations: [
+    { name: "RoHS 2.0", basis: "Directive 2011/65/EU (+ 2015/863)", form: "Sample-based Certificate of Compliance XKS2025R01150076 (RFID card, Shenzhen Xunke, Jan 2025); testing on your specification on request" },
+    { name: "REACH SVHC", basis: "Regulation (EC) 1907/2006", form: "Sample-based screening report XKS2025R10150032E (250 substances, RFID keyfob, Oct 2025)" },
+    { name: "CE / RED RF exposure", basis: "EN 62311 under Directive 2014/53/EU", form: "Test report BCTC2509165308-1E (RFID card, Shenzhen BCTC, Sep 2025); CE marking remains a manufacturer declaration" },
   ],
   // Owner confirmed 2026-06-22: Proud Tek is NOT a RAIN RFID Alliance or
   // NFC Forum member. Do NOT assert either membership anywhere (site,
@@ -319,11 +435,20 @@ export const ORGANIZATION_CREDENTIALS = {
   // obtained (see GROWTH_ROADMAP: NFC Forum Adopter is a free join).
   memberships: [] as Array<{ name: string; role: string; url: string }>,
   founded: "2008",
-  employeeCount: "100+",
-  clientCount: "500+",
-  countriesServed: "50+",
-  yearExperience: "17+",
+  // employeeCount ("100+"), clientCount ("500+"), countriesServed ("50+")
+  // removed 2026-09-02 — owner decision after Phase 4 (no documentary basis;
+  // figures disagreed across owned properties). Re-add with a dated basis.
 };
+
+/**
+ * Years in operation, computed from the founding year so the site never
+ * shows two different figures again (17+ vs 18+ in 2026). The founding year
+ * itself is consistent across every owned property but still awaits the
+ * registration extract (Phase 4 K-01).
+ */
+export function yearsInOperation(now: Date = new Date()): number {
+  return now.getUTCFullYear() - Number(ORGANIZATION_OPERATIONS.foundingDate);
+}
 
 /** Geo targeting constants for global SEO */
 export const GEO_CONFIG = {
@@ -499,8 +624,10 @@ export const PAGE_DESCRIPTION_OVERRIDES: Record<string, string> = {
   "/solutions/nfc-business-card/":
     "Custom NFC business cards: NTAG chip choice, PVC, wood, metal or bamboo, vCard & URL encoding, iPhone tap-to-share. You own the URL — no subscription.",
 
+  // 2026-09-02 (audit Phase 4 C-01..C-05): factory / line / equipment /
+  // country counts removed — no documentary evidence; certificates verified.
   "/":
-    "Proud Tek is a custom RFID & NFC manufacturer in China since 2008. Two Shenzhen factories, 10 automated production lines, 305+ pieces of equipment, OEM/ODM cards, tags, labels, wristbands, keyfobs and readers shipped to 50+ countries.",
+    "Custom RFID & NFC manufacturer in China since 2008: OEM/ODM cards, tags, labels, wristbands, keyfobs and readers. Shenzhen; ISO 9001/14001/45001 certified.",
   "/product/125khz-rfid-sticker/":
     "125 kHz RFID stickers for compact LF access-control or identification projects where adhesive labels work better than cards or keyfobs.",
   "/product/em4200-card/":

@@ -71,10 +71,10 @@ export const HOME_EVIDENCE: HomeEvidence[] = [
   },
   {
     status: "Company-stated record",
-    title: "Factory and process evidence",
-    detail: "Two Shenzhen production sites, ten lines and 305+ pieces of process equipment are published as operational claims, separate from ISO scope.",
+    title: "Production model: partner lines, our specification",
+    detail: "Proud Tek owns the specification, chip sourcing and quality control; tooling and production run on contracted partner lines in Shenzhen to our spec, and our QC signs off every batch. Who does what, step by step, is on the production page; capacity is quoted per programme.",
     href: "/about/factory/",
-    linkLabel: "Review factory record",
+    linkLabel: "Review the production model",
   },
   {
     status: "Available per program",

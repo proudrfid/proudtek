@@ -49,6 +49,19 @@ describe("route registry", () => {
       "/rfq/",
       "/glossary/",
       "/tools/rfid-tag-cost-estimator/",
+      // Cluster hubs — indexable native pages that were missing from the
+      // sitemap and "unknown to Google" (audit 2026-09-02, Phase 2 T4).
+      "/compare/chip-vs-chip/",
+      "/compare/reader-vs-reader/",
+      "/compare/form-factor-material/",
+      "/compare/frequency-tech/",
+      "/guides/google-review-cards/",
+      "/guides/hotel-keycards/",
+      "/guides/chip-encyclopedias/",
+      "/guides/standards-encoding/",
+      "/guides/compliance-regulatory/",
+      "/guides/integration-tools/",
+      "/guides/buying-reference/",
     ]);
   });
 });

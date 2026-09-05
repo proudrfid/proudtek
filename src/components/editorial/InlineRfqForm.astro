@@ -21,6 +21,18 @@
  * Field IDs are namespaced via a route-derived seed so multiple forms on the
  * same page (rare but possible) don't collide.
  *
+ * Conversion audit 2026-09-01 (Phase 12 CV-2 / CV-3 / CV-5, Phase 14 B5):
+ *   - `name` and `company` are required alongside `email` (B2B lead
+ *     qualification; the sample-pack page renders this same component).
+ *   - Formspree's native `_gotcha` honeypot is present (aria-hidden, so the
+ *     validation script skips it — see codexFormValidate in PageScript).
+ *   - A privacy line links to /about/privacy-policy/ at the point of
+ *     collection.
+ *   - `[data-codex-rfq-success]` / `[data-codex-rfq-error]` panels let the
+ *     PageScript submit handler fetch() to Formspree and confirm on-site
+ *     instead of handing the buyer to Formspree's hosted thank-you page.
+ *     No-JS still posts natively.
+ *
  * Stage 3 sprint 1 note: `resolveArticleInquiryAction` is NOT wired here.
  * The legacy cheerio normalizer in `seo/normalize-body.ts` only rewrites
  * `<a href="/contact/">` anchors found inside `.entry-content`. This form
@@ -57,19 +69,26 @@ interface FieldOpts {
 }
 
 const fields: FieldOpts[] = [
-  { name: "email",       type: "email",    label: "Your email",         hint: "We'll only use this to reply to your inquiry.", required: true, autocomplete: "email", inputmode: "email" },
-  { name: "company",     type: "text",     label: "Company name",       hint: "Optional, but helps us route your inquiry faster.", autocomplete: "organization" },
+  { name: "name",        type: "text",     label: "Your name",          hint: "So we know who to address the quote to.", required: true, autocomplete: "name" },
+  { name: "email",       type: "email",    label: "Work email",         hint: "We'll only use this to reply to your inquiry.", required: true, autocomplete: "email", inputmode: "email" },
+  { name: "company",     type: "text",     label: "Company name",       hint: "We quote B2B programmes; this routes your inquiry to the right specialist.", required: true, autocomplete: "organization" },
   { name: "quantity",    type: "text",     label: "Quantity",           hint: "e.g. 5,000 pcs", inputmode: "numeric" },
   { name: "application", type: "text",     label: "Application",        hint: "e.g. hotel, event, asset tracking" },
   { name: "country",     type: "text",     label: "Country",            hint: "Helps us quote shipping and compliance correctly", autocomplete: "country-name" },
   { name: "message",     type: "textarea", label: "Additional details", hint: "Chip preference, timeline, special requirements...", rows: 3 },
 ];
 
+// Two fields per row; the message textarea is rendered full-width below.
+const rows: FieldOpts[][] = [fields.slice(0, 2), fields.slice(2, 4), fields.slice(4, 6)];
+const messageField = fields[6];
+
 function idOf(name: string): string { return `codex-rfq-${seed}-${name}`; }
+const successId = `codex-rfq-${seed}-success`;
+const errorNoteId = `codex-rfq-${seed}-error-note`;
 ---
 <section class="codex-inline-rfq" id={QUICK_QUOTE_ID}>
   <h2>Get a Quick Quote</h2>
-  <p>Tell us about your project and we'll respond within one business day. Fields marked <span class="codex-rfq-required" aria-hidden="true">*</span><span class="codex-sr-only">(asterisk)</span> are required.</p>
+  <p>Tell us about your project — first reply within 2–4 hours in Shenzhen business hours (Mon–Fri, GMT+8), written quote within 24–48 hours. Fields marked <span class="codex-rfq-required" aria-hidden="true">*</span><span class="codex-sr-only">(asterisk)</span> are required.</p>
   <form action="https://formspree.io/f/xlgorlog" method="POST" class="codex-inline-rfq-form" data-codex-rfq novalidate>
     <input type="hidden" name="_subject" value={`Inquiry: ${productName}`} />
     <input type="hidden" name="product" value={productName} />
@@ -86,74 +105,36 @@ function idOf(name: string): string { return `codex-rfq-${seed}-${name}`; }
     <input type="hidden" name="cta_tier" data-codex-attribution="cta_tier" />
     <input type="hidden" name="cta_label" data-codex-attribution="cta_label" />
     <input type="hidden" name="ga_client_id" data-codex-attribution="ga_client_id" />
-    <div class="codex-inline-rfq-row">
-      {fields.slice(0, 2).map((f) => {
-        const id = idOf(f.name);
-        return (
-          <div class="codex-inline-rfq-field">
-            <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
-            <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
-            <input
-              id={id}
-              name={f.name}
-              type={f.type as "text" | "email"}
-              required={f.required}
-              aria-required={f.required ? "true" : undefined}
-              aria-describedby={`${id}-hint ${id}-error`}
-              autocomplete={f.autocomplete}
-              inputmode={f.inputmode}
-            />
-            <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
-          </div>
-        );
-      })}
-    </div>
-    <div class="codex-inline-rfq-row">
-      {fields.slice(2, 4).map((f) => {
-        const id = idOf(f.name);
-        return (
-          <div class="codex-inline-rfq-field">
-            <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
-            <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
-            <input
-              id={id}
-              name={f.name}
-              type={f.type as "text" | "email"}
-              required={f.required}
-              aria-required={f.required ? "true" : undefined}
-              aria-describedby={`${id}-hint ${id}-error`}
-              autocomplete={f.autocomplete}
-              inputmode={f.inputmode}
-            />
-            <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
-          </div>
-        );
-      })}
-    </div>
-    <div class="codex-inline-rfq-row">
-      {fields.slice(4, 5).map((f) => {
-        const id = idOf(f.name);
-        return (
-          <div class="codex-inline-rfq-field">
-            <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
-            <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
-            <input
-              id={id}
-              name={f.name}
-              type={f.type as "text" | "email"}
-              required={f.required}
-              aria-required={f.required ? "true" : undefined}
-              aria-describedby={`${id}-hint ${id}-error`}
-              autocomplete={f.autocomplete}
-              inputmode={f.inputmode}
-            />
-            <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
-          </div>
-        );
-      })}
-    </div>
+    {/* Honeypot — Formspree's native `_gotcha` trap: submissions that fill it
+        are discarded server-side, JS or no JS. aria-hidden + tabindex=-1 keep
+        it out of the accessibility tree and the validation pass. */}
+    <input class="codex-inline-rfq-hp" type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" />
+    {rows.map((row) => (
+      <div class="codex-inline-rfq-row">
+        {row.map((f) => {
+          const id = idOf(f.name);
+          return (
+            <div class="codex-inline-rfq-field">
+              <label for={id} class="codex-inline-rfq-label">{f.label}{f.required && <> <span class="codex-rfq-required" aria-hidden="true">*</span></>}</label>
+              <span id={`${id}-hint`} class="codex-inline-rfq-hint">{f.hint}</span>
+              <input
+                id={id}
+                name={f.name}
+                type={f.type as "text" | "email"}
+                required={f.required}
+                aria-required={f.required ? "true" : undefined}
+                aria-describedby={`${id}-hint ${id}-error`}
+                autocomplete={f.autocomplete}
+                inputmode={f.inputmode}
+              />
+              <span id={`${id}-error`} class="codex-inline-rfq-error" role="alert" aria-live="polite" />
+            </div>
+          );
+        })}
+      </div>
+    ))}
     {(() => {
-      const f = fields[5]; // message textarea
+      const f = messageField;
       const id = idOf(f.name);
       return (
         <div class="codex-inline-rfq-field">
@@ -172,5 +153,18 @@ function idOf(name: string): string { return `codex-rfq-${seed}-${name}`; }
       );
     })()}
     <button type="submit" class="codex-inline-rfq-submit">Get My Quote</button>
+    <p class="codex-inline-rfq-privacy">We use these details only to answer your inquiry and manage the business relationship that follows; we do not sell personal data. See our <a href="/about/privacy-policy/">privacy policy</a>.</p>
+    {/* Shown only if the fetch() to Formspree fails — the form stays intact
+        (nothing typed is lost) and the buyer gets a direct email address. */}
+    <p class="codex-inline-rfq-status codex-inline-rfq-status--error" id={errorNoteId} data-codex-rfq-error role="alert" hidden>
+      Sorry — your inquiry couldn't be sent just now. Please try again in a minute, or email <a href="mailto:info@proudtek.com">info@proudtek.com</a> with the same details.
+    </p>
   </form>
+  {/* Success panel — swapped in for the form after a confirmed Formspree
+      200/202 response. tabindex=-1 lets the script move focus here. */}
+  <div class="codex-inline-rfq-success" id={successId} data-codex-rfq-success role="status" tabindex="-1" hidden>
+    <h3>Inquiry received</h3>
+    <p>Thanks — your inquiry about <strong>{productName}</strong> is with our specialists. We reply within 2–4 hours in Shenzhen business hours (Mon–Fri, GMT+8) and send a written quote with pricing, MOQ, lead time and sample options within 24–48 hours.</p>
+    <p>Need it faster, or want to attach artwork or specs? Email <a href="mailto:info@proudtek.com">info@proudtek.com</a> or WhatsApp <a href="https://wa.me/8618665820632">+86 186 6582 0632</a>.</p>
+  </div>
 </section>

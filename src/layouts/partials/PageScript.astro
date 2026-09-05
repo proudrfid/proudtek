@@ -480,9 +480,52 @@
           if (firstInvalid) {
             e.preventDefault();
             firstInvalid.focus();
+            return;
           }
+          codexRfqFetchSubmit(form, e);
         });
       });
+
+      /* On-site confirmation — conversion audit 2026-09-01 (Phase 12 CV-2,
+         Phase 14 B5). Forms that ship a sibling [data-codex-rfq-success]
+         panel (InlineRfqForm.astro, incl. /sample-pack/) are posted with
+         fetch() to their own `action` (Formspree, Accept: application/json)
+         so the buyer stays on proudtek.com; on a 2xx the form is swapped for
+         the success panel and focus moves there. On failure the form stays
+         intact and the [data-codex-rfq-error] note (mailto fallback) shows.
+         Forms without a success panel (e.g. the /contact/ snapshot form)
+         keep the native POST. No-JS always posts natively. Analytics
+         (form_submit / generate_lead) fire on CONFIRMED delivery via the
+         `codex:rfq-delivered` event, not on the attempt. */
+      function codexRfqFetchSubmit(form, e) {
+        var container = form.parentNode;
+        var success = container ? container.querySelector('[data-codex-rfq-success]') : null;
+        if (!success || typeof window.fetch !== 'function' || typeof window.FormData !== 'function') return;
+        e.preventDefault();
+        fillAttribution(form);
+        var errorNote = form.querySelector('[data-codex-rfq-error]');
+        if (errorNote) errorNote.hidden = true;
+        var submitBtn = form.querySelector('button[type="submit"]');
+        var originalLabel = submitBtn ? submitBtn.textContent : '';
+        if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sending\u2026'; }
+        fetch(form.getAttribute('action'), {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+        }).then(function(res) {
+          if (!res.ok) throw new Error('Formspree HTTP ' + res.status);
+          form.hidden = true;
+          success.hidden = false;
+          try { success.focus(); } catch (err) { /* ignore */ }
+          form.dispatchEvent(new CustomEvent('codex:rfq-delivered'));
+        }).catch(function() {
+          if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = originalLabel; }
+          if (errorNote) {
+            errorNote.hidden = false;
+            if (errorNote.scrollIntoView) errorNote.scrollIntoView({ block: 'nearest' });
+          }
+        });
+      }
 
       /* Compare-table sortable columns — DS-10 #4 (2026-04-27).
          Tables marked [data-sortable] expose click+keyboard sort on each
@@ -909,16 +952,7 @@
           });
         });
 
-        form.addEventListener('submit', function(e) {
-          fillAttribution(form);
-          // CRO 2026-06-11: only count submits that pass validation. The
-          // DS-11 #5c validation handler is registered earlier on this same
-          // form (same file, codexForms loop above), so an invalid submit
-          // arrives here already defaultPrevented; checkValidity() is the
-          // order-independent double-guard. Net effect: exactly ONE
-          // form_submit per valid (actually posted) submit, zero for
-          // attempts the validation handler blocked.
-          if (e.defaultPrevented || !form.checkValidity()) return;
+        function pushLeadEvents() {
           codexPushEvent('form_submit', {
             form_id: formId,
             route: window.location.pathname,
@@ -934,7 +968,26 @@
             route: window.location.pathname,
             lead_source: 'inline_rfq_form',
           });
+        }
+
+        form.addEventListener('submit', function(e) {
+          fillAttribution(form);
+          // CRO 2026-06-11: only count submits that pass validation. The
+          // DS-11 #5c validation handler is registered earlier on this same
+          // form (same file, codexForms loop above), so an invalid submit
+          // arrives here already defaultPrevented; checkValidity() is the
+          // order-independent double-guard. Net effect: exactly ONE
+          // form_submit per valid (actually posted) submit, zero for
+          // attempts the validation handler blocked.
+          // 2026-09-02: the fetch() path (codexRfqFetchSubmit) also prevents
+          // default and reports delivery through `codex:rfq-delivered`
+          // below, so a fetch-posted form is never counted here.
+          if (e.defaultPrevented || !form.checkValidity()) return;
+          pushLeadEvents();
         });
+
+        // Fetch-posted forms: count only a confirmed 2xx from the endpoint.
+        form.addEventListener('codex:rfq-delivered', pushLeadEvents);
       });
 
       /* DS-13 #1 (Critical) — keyboard scroll for .codex-scroll-region.
