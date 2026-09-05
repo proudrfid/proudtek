@@ -11,8 +11,10 @@
 | 公司法定名 | Proud Tek Co., Ltd | 站内统一;FAQ 曾写 "Proud RFID" 已修 |
 | NAP | Zhantao Building, #1079 Minzhi Rd., Longhua, Shenzhen / +86 186 6582 0632 / info@proudtek.com | contact.json |
 | MOQ 两档 | 库存标准品 100 pcs 起;定制/芯片程序 500 pcs/芯片型号 | FAQ + 各产品页,FAQ 现已写明两档 |
-| 样品政策 | 库存样品免费(快递到付);定制/新开样品 $30-$100 | FAQ + sample-pack LP(已对齐) |
+| 样品政策 | 合格 B2B 买家库存样品免费:典型 2–3 个 SKU、5–20 件(LF/HF/UHF);1 个工作日备好,快递 2–5 天;买家承担 DHL/FedEx 运费($25–60),首单抵扣;定制样品 +3–5 个工作日,样品费抵扣量产 PO。**2026-09-05 起 "8–12 SKU 样品包 / 5–10 天" 口径全站作废**,代码唯一源 `formatSamplePolicy()`(src/lib/seo-content.ts) | ORGANIZATION_OPERATIONS.samples;首页资源卡/信任条/llms.txt 由代码生成;LP、FAQ、About、contact、products/all 手工对齐并由 `src/lib/__tests__/citability.test.ts` 黑名单守护 |
 | 保修 | 1 年,覆盖我们供应的全部产品 | FAQ(已修语法与实体名) |
+| 响应时效 | 首次回复:深圳工作时间 2–4 小时内;书面报价 24–48 小时内,有效期 30 天 | ORGANIZATION_OPERATIONS.response;`formatResponsePolicy()` |
+| 证据分级 | 全站 8 级标签(OFFICIAL_STANDARD / CHIP_VENDOR_DATASHEET / THIRD_PARTY_TEST / PROUD_TEK_INTERNAL_TEST / PROUD_TEK_SELF_REPORTED / COMMERCIAL_POLICY / GENERAL_EXPLANATION / UNSUPPORTED) | `src/data/evidence-tiers.ts`;渲染为 `evidenceCards` 区块(About / Factory / Certifications),图例在 /about/methodology/#evidence-tiers-used-on-this-site |
 | 产品目录 | 动态计数(不手写死数);当前 199 个产品 json | 由构建系统生成 |
 
 ## 2026-08-30 修复记录(外部审核驱动)
@@ -56,6 +58,16 @@
 | YouTube | @protekrfid875 | 200 |
 | Facebook | /RFIDTRANSPONDER/ | 200 |
 | WhatsApp | wa.me/8618665820632 | 与 NAP 电话一致 |
+
+## 2026-09-05 可引用性整改(外部答案引擎诊断驱动)
+
+- 首页(WP 快照,`applyHomepageCitabilityPass`):删除形容词段落("meticulous craftsmanship" 等)、
+  "WHAT MAKES US DIFFERENT" 行替换为证据条(与 V2 首页共用 HOME_EVIDENCE)、
+  "OUR CHIP PARTNERS"→"Supported chip families"(注明非厂商合作关系)、
+  "seamless compatibility"→兼容性以样品验证为准、客户评价加"未经独立核实"声明
+- About:去掉"no middlemen / 15–30% markup / 50+ countries / 非标不加价";DPP、电池法规仅陈述
+  标签层角色;认证页 NFC Forum / ARC / Walmart / FSMA-DSCSA / FCC 表述收窄到实际供应范围
+- Methodology 与 Factory 对齐:洗涤耐久测试按项目在合作产线或第三方实验室进行,协议不变
 
 ## 开放项(需用户提供,不编造)
 
