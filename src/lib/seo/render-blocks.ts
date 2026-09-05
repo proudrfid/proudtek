@@ -17,7 +17,9 @@ import {
   BLOG_GROWTH_GROUPS,
   HOME_GROWTH_BRIEF,
   GROWTH_ACTIONS,
+  formatSamplePolicyShort,
 } from "../seo-content";
+import { HOME_EVIDENCE } from "../../data/home-v2";
 
 import { getTotalCompareCount } from "../../data/compare-categories";
 import { escapeXml } from "./utils";
@@ -33,7 +35,7 @@ export function renderTrustBar(): string {
       <strong>ISO 9001</strong><span>Verify certification</span>
     </a>
     <a class="codex-trust-bar__item" href="/sample-pack/">
-      <strong>Free samples</strong><span>Test before production</span>
+      <strong>Free stock samples</strong><span>Freight at your cost</span>
     </a>
     <a class="codex-trust-bar__item" href="/rfq/">
       <strong>24–48 h</strong><span>Written quote target</span>
@@ -164,8 +166,7 @@ export function renderHomeResourceTrio(): string {
     {
       eyebrow: "Test before production",
       title: "Request a Free Sample Pack",
-      description:
-        "Hold the chip first: a free 8–12-SKU LF / HF / UHF sample pack ships in 5–10 days so your team can validate compatibility before production.",
+      description: `Hold the chip first. ${formatSamplePolicyShort()}`,
       href: "/sample-pack/",
       accent: "#2d6a4f",
     },
@@ -203,6 +204,35 @@ export function renderHomeResourceTrio(): string {
           </a>`,
         )
         .join("")}
+    </div>
+  </section>`;
+}
+
+/* ── Home evidence strip (2026-09-05 citability uplift) ─────────── */
+
+/**
+ * Replaces the WordPress "WHAT MAKES US DIFFERENT" adjectives row on the
+ * live snapshot homepage. Renders the same HOME_EVIDENCE cards the V2
+ * native homepage uses, so both bodies state the same verified / company-
+ * stated / per-programme facts with the same links.
+ */
+export function renderHomeEvidenceStrip(): string {
+  const cards = HOME_EVIDENCE.map(
+    (item) => `<article class="codex-home-evidence__card">
+        <p class="codex-home-evidence__status">${escapeXml(item.status)}</p>
+        <h3>${escapeXml(item.title)}</h3>
+        <p>${escapeXml(item.detail)}</p>
+        <a href="${escapeXml(item.href)}">${escapeXml(item.linkLabel)} <span aria-hidden="true">&rarr;</span></a>
+      </article>`,
+  );
+  return `<section class="codex-home-evidence" aria-labelledby="codex-home-evidence-title">
+    <div class="codex-home-evidence__header">
+      <p class="codex-home-evidence__eyebrow">Proof, not adjectives</p>
+      <h2 id="codex-home-evidence-title">What is verified, and what is company-stated</h2>
+      <p>Every claim on this site carries an evidence status — a registrar-issued certificate, a Proud Tek statement you can audit, or documentation matched per programme. <a href="/about/methodology/#evidence-tiers-used-on-this-site">How to read the labels &rarr;</a></p>
+    </div>
+    <div class="codex-home-evidence__grid">
+      ${cards.join("")}
     </div>
   </section>`;
 }

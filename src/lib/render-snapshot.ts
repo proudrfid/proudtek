@@ -36,6 +36,7 @@ import {
   type FooterSection,
 } from "./menu-structure";
 import { SITE_CONTACT, whatsappUrl, yearsInOperation } from "./seo-content";
+import { renderHomeEvidenceStrip } from "./seo/render-blocks";
 
 const TRANSLATE_SELECTORS = [
   'link[rel="alternate"][hreflang]',
@@ -303,6 +304,7 @@ export function prepareSnapshot(page: SnapshotPage): RenderSnapshot {
   if (page.route === "/" || page.route === "") {
     removeDeadNewsletterForm($body);
     applyHomepageClaimCorrections($body);
+    applyHomepageCitabilityPass($body);
     enhanceHomepageHeadings($body);
     restructureCapabilitiesSection($body);
     // 2026-05-15: REPLACE WP/Kadence cover with a clean Astro-controlled
@@ -1062,6 +1064,121 @@ function applyHomepageClaimCorrections($body: ReturnType<typeof load>): void {
     const col = fig.closest(".wp-block-kadence-column");
     if (col.length) col.remove();
     else fig.remove();
+  });
+}
+
+/**
+ * Homepage citability pass — external answer-engine diagnosis, 2026-09-05.
+ *
+ * The claim corrections above removed the unevidenced numbers. What remained
+ * on the live snapshot was the layer an answer engine cannot quote safely:
+ * marketing adjectives ("meticulous craftsmanship", "cutting-edge design",
+ * "Proven Reliability"), an unconditional compatibility promise ("complete
+ * RFID hardware suites … seamless compatibility"), a "Chip Partners" heading
+ * that implies vendor partnerships, and testimonials with no disclosure.
+ * Every mutation below is guarded on the current snapshot text so a
+ * re-themed upstream page is left alone rather than half-rewritten.
+ */
+const HOME_SERVICE_COPY: Record<string, string> = {
+  "Hardware Integration":
+    "We configure and validate selected tags, readers, antennas and encoders against the buyer's stated environment. Final compatibility depends on the reader model, firmware, antenna setup, encoding and application software — it is confirmed with samples, not assumed.",
+  "product development":
+    "Our RF and production engineering turns a brief into a manufacturable specification: chip family, antenna, material and encoding matched to the stated reader environment.",
+  "Performance Optimization":
+    "Read range, orientation sensitivity and survivability depend on the surface, housing and duty cycle. We tune antenna and encapsulation per application and validate on your substrate before production.",
+  "Precision Mold Tooling":
+    "Custom moulds are made on partner lines to our drawings; we approve the first article before any production run.",
+  "Enclosure & Structural Design":
+    "Injection-moulded and metal housings are designed to the application's mechanical, temperature and ingress requirements and sampled before tooling is released.",
+  "Tailored Branding Solutions":
+    "Logo and artwork are applied to the approved proof; colour, position and durability are checked on the first article.",
+  "Branding & Personalization":
+    "Proud Tek offers laser engraving, UV printing, silkscreen, DOD printing and offset printing; the method is chosen for the material and the durability the application needs.",
+};
+
+function applyHomepageCitabilityPass($body: ReturnType<typeof load>): void {
+  const textOf = (el: ReturnType<typeof $body>): string => (el.text() || "").replace(/\s+/g, " ").trim();
+
+  // 1. Capabilities: drop the adjective paragraph, rename the sub-heading and
+  //    state the production split plainly.
+  $body("p").each((_, el) => {
+    const $p = $body(el);
+    const t = textOf($p);
+    if (/^We prioritize meticulous craftsmanship/.test(t)) {
+      $p.remove();
+      return;
+    }
+    if (/^We combine robust infrastructure with specialized R&D/.test(t)) {
+      $p.html(
+        'Specification, chip sourcing, first-article approval and quality control are ours; tooling, lamination, printing and encoding run on contracted partner lines in Shenzhen. <a href="/about/factory/">Who does what, step by step &rarr;</a>',
+      );
+      return;
+    }
+    if (/^3\. Quality Control/.test(t) && /under ISO 9001 documented procedures/.test(t)) {
+      $p.html(
+        ($p.html() || "").replace(
+          "under ISO 9001 documented procedures",
+          "under our documented QC procedures (our ISO 9001 certificate covers the sales and supplier-management operation)",
+        ),
+      );
+      return;
+    }
+    if (/^Through the repeated refinement by numerous valued partners/.test(t)) {
+      $p.html(
+        'Chips we specify, stock and encode, bought through authorised distribution. "Supported" means we have encoded and read-tested the family in Proud Tek products — it is not a vendor partnership. Family-by-family list on the <a href="/about/">About page</a>.',
+      );
+    }
+  });
+
+  $body("h4").each((_, el) => {
+    const $h = $body(el);
+    if (textOf($h) === "Comprehensive Manufacturing Excellence") {
+      $h.text("What we own, and what runs on partner lines");
+    }
+  });
+
+  // 2. "UNIQUE SERVICE" feature blurbs → conditional, concrete wording.
+  $body("h3").each((_, el) => {
+    const $h = $body(el);
+    const title = textOf($h);
+    const copy = HOME_SERVICE_COPY[title];
+    if (!copy) return;
+    const $p = $h.nextAll("p").first();
+    if (!$p.length) return;
+    $p.text(copy);
+    if (title === "product development") $h.text("Product development");
+  });
+
+  // 3. "WHAT MAKES US DIFFERENT" adjectives row → evidence strip.
+  $body("h2").each((_, el) => {
+    const $h = $body(el);
+    if (textOf($h) !== "WHAT MAKES US DIFFERENT") return;
+    // Outermost row ancestor that does not also contain the neighbouring
+    // sections — a defensive bound so a page-level wrapper is never removed.
+    let target: ReturnType<typeof $body> | null = null;
+    $h.parents(".wp-block-kadence-rowlayout").each((__, row) => {
+      const $row = $body(row);
+      const rowText = textOf($row);
+      if (/CERTIFICATIONS|UNIQUE SERVICE|EASY PROCESS/.test(rowText)) return;
+      target = $row;
+    });
+    if (target) (target as ReturnType<typeof $body>).replaceWith(renderHomeEvidenceStrip());
+  });
+
+  // 4. Chip vendor logos: heading no longer claims a partnership.
+  $body("h2").each((_, el) => {
+    const $h = $body(el);
+    if (textOf($h) === "OUR CHIP PARTNERS") $h.text("Supported chip families");
+  });
+
+  // 5. Testimonials: honest heading + disclosure line.
+  $body("h3").each((_, el) => {
+    const $h = $body(el);
+    if (textOf($h) !== "Trusted by Clients Worldwide") return;
+    $h.text("What customers wrote to us");
+    $h.after(
+      '<p class="codex-home-testimonial-note">Excerpts from customer messages, shown with first name and country only. They are not independently verified reviews; named references are offered per programme.</p>',
+    );
   });
 }
 

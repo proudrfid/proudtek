@@ -450,6 +450,28 @@ export function yearsInOperation(now: Date = new Date()): number {
   return now.getUTCFullYear() - Number(ORGANIZATION_OPERATIONS.foundingDate);
 }
 
+/**
+ * One sample policy, one sentence (2026-09-05 citability uplift). Every
+ * surface that mentions samples — trust bar, homepage resource card, trust
+ * strip, llms.txt — renders this so the figures cannot drift apart again.
+ * The retired "8–12-SKU pack in 5–10 days" wording described a different
+ * product than the policy in ORGANIZATION_OPERATIONS.samples and is gone.
+ */
+export function formatSamplePolicy(): string {
+  const s = ORGANIZATION_OPERATIONS.samples;
+  return `Standard samples are free for qualified B2B buyers — ${s.kit}. Prepared in 1 business day with express delivery in 2–5 days; you cover DHL/FedEx freight ($25–60), refunded against your first production order. Custom samples (encoding, printing or a new housing) add 3–5 business days and a sample fee credited against the production PO.`;
+}
+
+/** Short form for cards and strips. */
+export function formatSamplePolicyShort(): string {
+  return "Standard samples are free for qualified B2B buyers (typically 2–3 SKUs, 5–20 pieces across LF / HF / UHF), prepared in 1 business day; you cover DHL/FedEx freight, refunded against your first production order.";
+}
+
+/** One response-time promise, one sentence. */
+export function formatResponsePolicy(): string {
+  return `First reply ${ORGANIZATION_OPERATIONS.response.firstReply}; written quote ${ORGANIZATION_OPERATIONS.response.writtenQuote}, valid ${ORGANIZATION_OPERATIONS.leadTime.quoteValidity}.`;
+}
+
 /** Geo targeting constants for global SEO */
 export const GEO_CONFIG = {
   latitude: 22.6312,
