@@ -1,0 +1,39 @@
+---
+/**
+ * Editorial section variant — claim / evidence-tier / how-to-verify cards.
+ *
+ * Renders each company or product claim next to the tier of evidence behind
+ * it, so a buyer (or an answer engine) can tell a registrar-issued certificate
+ * from a company-stated figure without reading the surrounding prose.
+ *
+ * Schema: src/lib/editorial-types.ts → EditorialSectionData["evidenceCards"]
+ * Tiers:  src/data/evidence-tiers.ts
+ */
+import { EVIDENCE_TIERS } from "../../data/evidence-tiers";
+import type { EvidenceCard } from "../../lib/editorial-types";
+
+interface Props {
+  cards: EvidenceCard[];
+}
+
+const { cards } = Astro.props;
+---
+{cards.length > 0 && (
+  <ul class="codex-evidence-cards" role="list" aria-label="Claims and the evidence behind them">
+    {cards.map((card) => {
+      const tier = EVIDENCE_TIERS[card.tier];
+      return (
+        <li class="codex-evidence-cards__card" data-evidence-tier={card.tier}>
+          <p class="codex-evidence-cards__tier" title={tier.gloss}>{tier.label}</p>
+          <p class="codex-evidence-cards__claim">{card.claim}</p>
+          <p class="codex-evidence-cards__evidence">{card.evidence}</p>
+          {card.href && (
+            <a class="codex-evidence-cards__link" href={card.href}>
+              {card.linkLabel ?? "Verify"} <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </li>
+      );
+    })}
+  </ul>
+)}

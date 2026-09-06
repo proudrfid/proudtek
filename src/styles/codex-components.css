@@ -3135,6 +3135,7 @@ body.codex-catalog-rail-locked { overflow: hidden; }
     .codex-editorial-compare-panel,
     .codex-editorial-timeline,
     .codex-editorial-stat-bar,
+    .codex-evidence-cards,
     .codex-editorial-figure
   ) {
     max-width: var(--codex-reading-column-wide);
@@ -5209,6 +5210,67 @@ form[data-codex-rfq] .kb-forms-submit {
   line-height: 1.4;
 }
 
+/* Evidence cards (2026-09-05 citability uplift) — claim / evidence tier /
+   how to verify. Tier ids come from src/data/evidence-tiers.ts. */
+.codex-evidence-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--codex-space-3);
+  margin: var(--codex-space-4) 0;
+  padding: 0;
+  list-style: none;
+}
+.codex-evidence-cards__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--codex-space-2);
+  padding: var(--codex-space-4) var(--codex-space-5);
+  background: var(--codex-surface);
+  border: 1px solid var(--codex-border);
+  border-top: 3px solid var(--codex-gold);
+  border-radius: var(--codex-radius-card);
+  box-shadow: var(--codex-elevation-rest);
+}
+.codex-evidence-cards .codex-evidence-cards__tier {
+  margin: 0;
+  font-size: var(--codex-text-xs);
+  font-weight: var(--codex-weight-bold, 700);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--codex-gold-muted);
+}
+.codex-evidence-cards__card[data-evidence-tier="THIRD_PARTY_TEST"] .codex-evidence-cards__tier,
+.codex-evidence-cards__card[data-evidence-tier="OFFICIAL_STANDARD"] .codex-evidence-cards__tier {
+  color: var(--codex-success);
+}
+.codex-evidence-cards__card[data-evidence-tier="UNSUPPORTED"] .codex-evidence-cards__tier {
+  color: var(--codex-error);
+}
+.codex-evidence-cards .codex-evidence-cards__claim {
+  margin: 0;
+  font-family: var(--codex-font-heading);
+  font-size: var(--codex-text-lg);
+  line-height: var(--codex-leading-snug);
+  color: var(--codex-text);
+}
+.codex-evidence-cards .codex-evidence-cards__evidence {
+  margin: 0;
+  font-size: var(--codex-text-sm-plus);
+  line-height: var(--codex-leading-relaxed);
+  color: var(--codex-text-muted);
+}
+.codex-evidence-cards .codex-evidence-cards__link {
+  margin-top: auto;
+  padding-top: var(--codex-space-2);
+  font-size: var(--codex-text-sm);
+  font-weight: var(--codex-weight-semibold, 600);
+  color: var(--codex-color-accent);
+  text-decoration: none;
+}
+.codex-evidence-cards .codex-evidence-cards__link:hover {
+  text-decoration: underline;
+}
+
 /* P0-CRIT (2026-05-19): renamed from `.codex-editorial-compare` to
    `.codex-editorial-compare-panel`. The old name collided with the body
    group-marker class `codex-editorial-${definition.group}` (compare group
@@ -5415,6 +5477,14 @@ form[data-codex-rfq] .kb-forms-submit {
   margin-top: var(--codex-space-2);
   font-size: var(--codex-text-sm, 0.875rem);
   color: var(--codex-text-muted);
+}
+/* Disclosure line (2026-09-05 citability uplift): anonymised customer
+   messages are labelled as such rather than presented as verified reviews. */
+.codex-editorial-testimonial__note {
+  margin: var(--codex-space-2) 0 0;
+  font-size: var(--codex-text-xs-plus);
+  color: var(--codex-text-subtle);
+  line-height: var(--codex-leading-normal);
 }
 
 .codex-editorial-checklist {
@@ -6081,6 +6151,119 @@ form[data-codex-rfq] .kb-forms-submit {
    * the inner flex distributions below to actually push bottom-row
    * content to the bottom edge in alignment with each other. */
   align-items: stretch !important;
+}
+
+/* Home evidence strip (2026-09-05 citability uplift) — replaces the
+   WordPress "WHAT MAKES US DIFFERENT" adjectives row with the same
+   HOME_EVIDENCE cards the V2 homepage renders. */
+.codex-home-evidence {
+  margin: var(--codex-space-10) 0;
+  padding: var(--codex-space-12) 4%;
+  background: var(--codex-bg-warm);
+  border-top: 1px solid var(--codex-border-light);
+  border-bottom: 1px solid var(--codex-border-light);
+}
+.codex-home-evidence__header {
+  max-width: 72rem;
+  margin: 0 auto var(--codex-space-8);
+  text-align: center;
+}
+.codex-home-evidence__eyebrow {
+  margin: 0 0 var(--codex-space-2);
+  font-size: var(--codex-text-xs);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--codex-gold-muted);
+}
+.codex-home-evidence__header h2 {
+  margin: 0 0 var(--codex-space-3);
+  font-family: var(--codex-font-heading);
+  font-size: var(--codex-text-2xl);
+  line-height: var(--codex-leading-tight);
+  color: var(--codex-text);
+}
+.codex-home-evidence__header p:not(.codex-home-evidence__eyebrow) {
+  max-width: 70ch;
+  margin: 0 auto;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-base);
+  line-height: var(--codex-leading-relaxed);
+}
+.codex-home-evidence__grid {
+  max-width: 88rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--codex-space-4);
+}
+.codex-home-evidence__card {
+  display: flex;
+  flex-direction: column;
+  padding: var(--codex-space-6);
+  background: var(--codex-surface);
+  border: 1px solid var(--codex-border);
+  border-radius: var(--codex-radius-card);
+  box-shadow: var(--codex-elevation-rest);
+}
+.codex-home-evidence__status {
+  margin: 0;
+  font-size: var(--codex-text-xs);
+  font-weight: var(--codex-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--codex-success);
+}
+.codex-home-evidence__card h3 {
+  margin: var(--codex-space-4) 0 var(--codex-space-3);
+  font-family: var(--codex-font-heading);
+  font-size: var(--codex-text-xl);
+  line-height: var(--codex-leading-snug);
+  color: var(--codex-text);
+}
+.codex-home-evidence__card p:not(.codex-home-evidence__status) {
+  margin: 0;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: var(--codex-leading-relaxed);
+}
+.codex-home-evidence__card a {
+  margin-top: auto;
+  padding-top: var(--codex-space-5);
+  color: var(--codex-color-accent);
+  font-size: var(--codex-text-sm-plus);
+  font-weight: var(--codex-weight-semibold);
+  text-decoration: none;
+}
+.codex-home-evidence__card a:hover {
+  text-decoration: underline;
+}
+/* Inline links injected by the citability pass sit on Kadence-styled
+   paragraphs whose default link colour is brand gold (#c39a5f — 2.6:1 on
+   white, fails WCAG AA). Use the procurement navy accent instead. */
+.codex-home-inline-link,
+.codex-home-evidence__header a {
+  color: var(--codex-color-accent);
+  font-weight: var(--codex-weight-semibold);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.codex-home-inline-link:hover,
+.codex-home-evidence__header a:hover {
+  color: var(--codex-color-ink-strong);
+}
+.codex-home-testimonial-note {
+  max-width: 70ch;
+  margin: var(--codex-space-2) auto var(--codex-space-6);
+  text-align: center;
+  color: var(--codex-text-muted);
+  font-size: var(--codex-text-sm-plus);
+  line-height: var(--codex-leading-relaxed);
+}
+@media (max-width: 600px) {
+  .codex-home-evidence {
+    padding: var(--codex-space-8) 4%;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────

@@ -312,7 +312,7 @@ export async function buildLlmsTxt(siteData: SiteData, loadPage: PageLoader): Pr
     `  - RFID tags, labels and inlays: ${ORGANIZATION_OPERATIONS.moq.rfidLabels}.`,
     `  - RFID readers: ${ORGANIZATION_OPERATIONS.moq.rfidReaders}.`,
     `- Lead time: ${ORGANIZATION_OPERATIONS.leadTime.stockChip} for stock chip configurations; custom artwork, tooling or new antennas ${ORGANIZATION_OPERATIONS.leadTime.customArtwork}. Quotations are valid ${ORGANIZATION_OPERATIONS.leadTime.quoteValidity}.`,
-    `- Samples: standard samples ${ORGANIZATION_OPERATIONS.samples.standard}; ${ORGANIZATION_OPERATIONS.samples.preparation}; ${ORGANIZATION_OPERATIONS.samples.custom}.`,
+    `- Samples: standard samples ${ORGANIZATION_OPERATIONS.samples.standard}; ${ORGANIZATION_OPERATIONS.samples.kit}; ${ORGANIZATION_OPERATIONS.samples.preparation}; ${ORGANIZATION_OPERATIONS.samples.custom}.`,
     `- Response time: first reply ${ORGANIZATION_OPERATIONS.response.firstReply}; written quote ${ORGANIZATION_OPERATIONS.response.writtenQuote}.`,
     `- Payment: ${ORGANIZATION_OPERATIONS.payment}.`,
     "- Chip families supported: NXP MIFARE Classic/Plus/DESFire, NXP NTAG213/215/216, NXP NTAG 424 DNA, Impinj Monza R6/R6-P, Alien Higgs 9, EM4100/EM4305, T5577, ICODE SLIX2.",
